@@ -46,7 +46,7 @@ const navigation = [
         <!-- Logo/Brand -->
         <div class="flex items-center space-x-2">
           <div
-            class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-navy-500 to-emerald-400"
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-linear-to-br from-navy-500 to-emerald-400"
           >
             <span class="text-white font-bold text-xl">FS</span>
           </div>
