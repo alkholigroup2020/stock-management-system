@@ -240,10 +240,30 @@ Consumption: SAR  XX,XXX      Manday cost: SAR  XX.XX
 
 ## 5) Components library (lightweight)
 
-- **Card**: white box with title and short content.
-- **Pill**: small rounded label (e.g., "R-1007").
-- **Input**: consistent height; numeric rightâ€‘aligned.
-- **Primary button**: dark filled; secondary button: bordered.
+### Brand Colors
+
+**Primary - Navy Blue (#000046):**
+- Used for: Primary buttons, headings, important text, brand elements
+- Shades: Available from `navy-50` to `navy-950`
+
+**Secondary - Emerald Green (#45cf7b):**
+- Used for: Success states, secondary actions, accents, positive feedback
+- Shades: Available from `emerald-50` to `emerald-950`
+
+### Component Styles
+
+- **Card**: white box with title and short content; navy headings (`text-navy-500`)
+- **Pill**: small rounded label (e.g., "R-1007"); emerald for success states (`bg-emerald-400`)
+- **Input**: consistent height; numeric right‑aligned; navy focus border (`focus:border-navy-500`)
+- **Primary button**: navy filled (`bg-navy-500`); white text; hover state (`hover:bg-navy-600`)
+- **Secondary button**: emerald bordered (`border-emerald-400`); emerald text (`text-emerald-600`)
+- **Success indicators**: emerald background (`bg-emerald-400`) with white text
+- **Status badges**: Navy for active/pending, emerald for completed/approved
+
+**Usage Rules:**
+- Always use Tailwind color tokens (e.g., `text-navy-500`, `bg-emerald-400`)
+- Never use inline styles with hex colors
+- Support dark mode using `dark:` variant (e.g., `dark:text-navy-400`)
 
 ---
 

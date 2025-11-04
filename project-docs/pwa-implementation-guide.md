@@ -60,8 +60,8 @@ export default defineNuxtConfig({
       name: 'Food Stock Control System',
       short_name: 'FoodStock',
       description: 'Food stock control and inventory management',
-      theme_color: '#ffffff',
-      background_color: '#ffffff',
+      theme_color: '#000046', // Navy blue - primary brand color
+      background_color: '#000046', // Navy blue - matches brand
       display: 'standalone',
       orientation: 'portrait',
       icons: [
@@ -124,10 +124,13 @@ export default defineNuxtConfig({
 
 ### Icon Design Guidelines:
 1. **Simple and recognizable** - Clear at small sizes
-2. **No text** - Icons should be visual only
+2. **No text** - Icons should be visual only (or minimal text like "FS")
 3. **Solid background** - Avoid transparency for maskable icons
 4. **Centered design** - Leave 10% padding from edges
-5. **Brand colors** - Use your app's color scheme
+5. **Brand colors** - Use the app's color scheme:
+   - **Primary background:** Navy Blue (#000046)
+   - **Accent/Icon:** Emerald Green (#45cf7b) or White
+   - **Text (if any):** White for contrast
 
 ### Recommended Tools:
 - **Figma** - Design icons
@@ -144,24 +147,31 @@ public/
 
 ### Quick Icon Creation (Placeholder):
 
-For development/testing, you can create simple placeholder icons:
+For development/testing, you can create simple placeholder icons using the brand colors:
 
 ```bash
 # Using ImageMagick (install first if needed)
-# Create a simple colored square as placeholder
+# Create a simple icon with navy background and white text
 
-# 192x192 icon
-convert -size 192x192 xc:#4F46E5 -font Arial -pointsize 48 \
+# 192x192 icon with navy blue background
+convert -size 192x192 xc:#000046 -font Arial -pointsize 48 \
   -fill white -gravity center -annotate +0+0 "FS" \
   public/icon-192.png
 
-# 512x512 icon
-convert -size 512x512 xc:#4F46E5 -font Arial -pointsize 128 \
+# 512x512 icon with navy blue background
+convert -size 512x512 xc:#000046 -font Arial -pointsize 128 \
   -fill white -gravity center -annotate +0+0 "FS" \
   public/icon-512.png
+
+# Alternative: Navy background with emerald accent
+# (Add a circular emerald green element for visual interest)
 ```
 
-Or use an online tool like **Canva** or **Figma** to design proper icons.
+**Recommended:** Use an online tool like **Canva** or **Figma** to design proper icons that incorporate:
+- Navy blue background (#000046)
+- Emerald green accent elements (#45cf7b)
+- Simple food/inventory icon symbol
+- Clean, modern aesthetic
 
 ---
 

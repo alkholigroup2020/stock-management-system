@@ -147,10 +147,37 @@ sequenceDiagram
 
 ## 12) UI guidelines
 
+### General Principles
 - Use simple words (Food, Clean, Delivery, Issue).
 - Always show totals and clear buttons ("Post delivery", "Post Issue").
 - Prevent mistakes: block negative stock; confirm on close.
 - Keep forms short; remember last choices where helpful.
+
+### Color Usage
+
+**Brand Colors:**
+- **Navy Blue (#000046):** Primary brand color for headings, primary buttons, important text
+- **Emerald Green (#45cf7b):** Secondary color for success states, secondary actions, accents
+
+**Application:**
+- **Primary actions:** Navy blue buttons (`bg-navy-500` with white text)
+- **Success messages:** Emerald green background (`bg-emerald-400`)
+- **Status indicators:**
+  - Active/Pending: Navy (`navy-500`)
+  - Completed/Approved: Emerald (`emerald-400`)
+- **Headings:** Navy text (`text-navy-500`)
+- **Focus states:** Navy borders (`focus:border-navy-500`)
+
+**Accessibility:**
+- Maintain sufficient contrast ratios (WCAG AA minimum)
+- Support both light and dark modes
+- Use color AND text/icons (don't rely on color alone)
+
+**Implementation Rules:**
+- ✅ Use Tailwind color tokens (e.g., `text-navy-500`, `bg-emerald-400`)
+- ❌ Never use inline styles with hex colors (e.g., `style="color: #000046"`)
+- ✅ Always include dark mode variants (e.g., `dark:text-navy-400`)
+- ✅ Use semantic color naming for Nuxt UI components (`color="navy"`, `color="emerald"`)
 
 ---
 

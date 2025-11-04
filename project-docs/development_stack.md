@@ -35,10 +35,15 @@ This document defines the complete technology stack for the Food Stock Control S
   - Pre-built form components
   - Modal, toast notifications
   - Tables and data display
-- **Tailwind CSS** - Utility-first styling
+- **Tailwind CSS v4** - Utility-first styling
   - Via `@nuxtjs/tailwindcss` module
   - Custom theme for SAR currency formatting
   - RTL support prepared (future)
+  - **Brand Colors** (defined in `app/assets/css/main.css` using `@theme` directive):
+    - **Primary (Navy Blue):** #000046 - Used for primary brand elements, headings, primary buttons
+    - **Secondary (Emerald Green):** #45cf7b - Used for success states, secondary actions, accents
+    - Both colors available in shades 50-950 (e.g., `navy-500`, `emerald-400`)
+    - Usage: `text-navy-500`, `bg-emerald-400`, `border-navy-600`, etc.
 
 ### 1.3 State Management
 - **Pinia** - Official Vue state management
@@ -578,6 +583,48 @@ datasource db {
 - **MVP:** English only
 - **Future:** Arabic support via `@nuxtjs/i18n`
 - **Prepared:** RTL-ready Tailwind classes
+
+### 11.5 Theme & Brand Colors
+
+**Color Palette** (defined in `app/assets/css/main.css` using Tailwind CSS v4 `@theme` directive):
+
+**Primary Color - Navy Blue (#000046):**
+- Purpose: Primary brand elements, headings, primary buttons, important text
+- Available shades: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950
+- Token prefix: `navy` (e.g., `navy-500`, `navy-700`)
+
+**Secondary Color - Emerald Green (#45cf7b):**
+- Purpose: Success states, secondary actions, accents, positive feedback
+- Available shades: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950
+- Token prefix: `emerald` (e.g., `emerald-400`, `emerald-600`)
+
+**Usage Examples:**
+```vue
+<!-- Text colors -->
+<p class="text-navy-500">Primary text</p>
+<p class="text-emerald-400">Success message</p>
+
+<!-- Background colors -->
+<div class="bg-navy-500">Primary background</div>
+<div class="bg-emerald-400">Success background</div>
+
+<!-- Dark mode support -->
+<h1 class="text-navy-500 dark:text-navy-400">Heading</h1>
+
+<!-- Nuxt UI components -->
+<UButton color="navy">Primary Action</UButton>
+<UButton color="emerald">Secondary Action</UButton>
+```
+
+**Important Rules:**
+- ✅ **Always use Tailwind color tokens** (e.g., `text-navy-500`)
+- ❌ **Never use inline styles** (e.g., `style="color: #000046"`)
+- ✅ **Support both light and dark modes** using `dark:` variant
+- ❌ **Don't configure colors in app.config.ts** (has no effect with Tailwind v4 `@theme`)
+
+**Theme Configuration Files:**
+- `app/assets/css/main.css` - Defines all custom colors using `@theme` directive (single source of truth)
+- `nuxt.config.ts` - Configures color mode (light/dark theme support)
 
 ---
 
