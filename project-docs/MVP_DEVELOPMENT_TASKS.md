@@ -51,13 +51,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.1.2 Environment Configuration
 
-- [ ] Create `.env.example` template file
-- [ ] Document all required environment variables
-- [ ] Set up local `.env` file (gitignored)
-- [ ] Configure `nuxt.config.ts` runtime config
-  - [ ] Private runtime config (server-only)
-  - [ ] Public runtime config (client + server)
-- [ ] Document environment variable setup in README
+- [x] Create `.env.example` template file
+- [x] Document all required environment variables
+- [x] Set up local `.env` file (gitignored)
+- [x] Configure `nuxt.config.ts` runtime config
+  - [x] Private runtime config (server-only)
+  - [x] Public runtime config (client + server)
+- [x] Document environment variable setup in README
 
 ### 1.1.3 Tailwind CSS v4 Configuration
 

@@ -6,6 +6,22 @@ export default defineNuxtConfig({
   // SPA mode as per CLAUDE.md requirements
   ssr: false,
 
+  // Runtime configuration for environment variables
+  runtimeConfig: {
+    // Private keys (server-only) - never exposed to client
+    databaseUrl: process.env.DATABASE_URL,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
+    authSecret: process.env.AUTH_SECRET,
+
+    // Public keys (exposed to client)
+    public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      currency: process.env.NUXT_PUBLIC_CURRENCY || 'SAR',
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+    }
+  },
+
   modules: ['@nuxt/eslint', '@nuxt/image', '@nuxt/ui'],
 
   // Import Tailwind CSS
