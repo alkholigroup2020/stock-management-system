@@ -524,6 +524,8 @@ Comprehensive project documentation in `/project-docs/`:
 
 - **PRD.md:** Product requirements, user stories, acceptance criteria
 - **MVP.md:** MVP scope, development slices, timeline
+- **MVP_DEVELOPMENT_TASKS.md:** Detailed checklist of all development tasks
+- **TASK_COMPLETION_LOG.md:** Progress log of completed tasks (update after each main task)
 - **System_Design.md:** Architecture, workflows, state machines, ERD
 - **API_Contract.md:** Complete API specification with examples
 - **Entities_ERD.md:** Database schema, relationships, constraints
@@ -533,6 +535,17 @@ Comprehensive project documentation in `/project-docs/`:
 - **pwa-implementation-guide.md:** PWA setup steps
 
 Always reference these documents when implementing features to ensure alignment with business requirements.
+
+### Task Completion Logging
+
+**IMPORTANT:** After completing each main task from MVP_DEVELOPMENT_TASKS.md, update the TASK_COMPLETION_LOG.md file:
+
+1. Add a new entry with the task number and completion date
+2. Write 1-2 concise paragraphs summarizing what was accomplished
+3. Keep it brief - focus on key deliverables and outcomes only
+4. Update the "Next" line at the bottom to show the upcoming task
+
+This log provides a quick reference of development progress without needing to review the full task checklist.
 
 ## Currency and Localization
 

@@ -38,16 +38,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 - [x] Verify Nuxt 4 project structure is in place
 - [x] Ensure pnpm is configured as package manager
-- [ ] Update `package.json` with all required dependencies
-  - [ ] Verify `@nuxt/ui` version
-  - [ ] Verify `@pinia/nuxt` version
-  - [ ] Verify `@vite-pwa/nuxt` version
-  - [ ] Verify `@prisma/client` version
-  - [ ] Verify `dayjs` version
-  - [ ] Verify `zod` version
-- [ ] Install all dependencies (`pnpm install`)
-- [ ] Verify TypeScript is configured correctly
-- [ ] Test dev server runs (`pnpm dev`)
+- [x] Update `package.json` with all required dependencies
+  - [x] Verify `@nuxt/ui` version (^4.1.0)
+  - [x] Verify `@pinia/nuxt` version (^0.11.2)
+  - [x] Verify `@vite-pwa/nuxt` version (^1.0.7)
+  - [x] Verify `@prisma/client` version (^6.18.0)
+  - [x] Verify `dayjs` version (^1.11.19)
+  - [x] Verify `zod` version (^4.1.12)
+- [x] Install all dependencies (`pnpm install`)
+- [x] Verify TypeScript is configured correctly
+- [x] Test dev server runs (`pnpm dev`)
 
 ### 1.1.2 Environment Configuration
 
