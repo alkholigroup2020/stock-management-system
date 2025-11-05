@@ -14,22 +14,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Nuxt 4 Component Auto-Import Rules:**
 
-When creating components in subdirectories under `/components/`, Nuxt 4 uses a naming convention that combines the folder path with the component name:
+When creating components in subdirectories under `/app/components/`, Nuxt 4 uses a naming convention that combines the folder path with the component name:
 
-- **File location:** `components/layout/AppNavbar.vue`
+- **File location:** `app/components/layout/AppNavbar.vue`
 - **Component reference:** `<LayoutAppNavbar />`
 
-- **File location:** `components/delivery/LineItem.vue`
+- **File location:** `app/components/delivery/LineItem.vue`
 - **Component reference:** `<DeliveryLineItem />`
 
-- **File location:** `components/common/DataTable.vue`
+- **File location:** `app/components/common/DataTable.vue`
 - **Component reference:** `<CommonDataTable />`
 
 **Rules:**
 1. Each folder name becomes a PascalCase prefix
 2. The component filename becomes the suffix
-3. Nested folders create longer prefixes: `components/ui/form/Input.vue` → `<UiFormInput />`
-4. Components in the root `/components/` folder don't need a prefix: `components/Footer.vue` → `<Footer />`
+3. Nested folders create longer prefixes: `app/components/ui/form/Input.vue` → `<UiFormInput />`
+4. Components in the root `/app/components/` folder don't need a prefix: `app/components/Footer.vue` → `<Footer />`
 
 **Example:**
 ```vue
@@ -141,63 +141,97 @@ pnpm lint
 
 This is a **single Nuxt 4 application** that contains both frontend and backend:
 
-- Frontend: SPA pages in `/pages/`, components in `/components/`
+- Frontend: SPA pages in `/app/pages/`, components in `/app/components/`
 - Backend: API routes in `/server/api/`, server middleware in `/server/middleware/`
-- Shared: Types in `/types/`, composables in `/composables/`
+- Shared: Composables in `/app/composables/`, utilities in `/app/utils/`, types in `/shared/types/`
 - No separate backend service; all API routes are Nuxt server routes deployed as Vercel serverless functions
 
 ### Directory Structure Conventions
 
+**Nuxt 4 uses an `/app/` directory for all frontend code:**
+
 ```
-/server/api/          # API endpoints (RESTful routes)
-  /locations/         # Location management
-  /deliveries/        # Delivery posting
-  /issues/            # Issue posting
-  /transfers/         # Inter-location transfers
-  /periods/           # Period management
-  /auth/              # Authentication
+/app/                     # Frontend application code
+  /assets/                # Static assets (CSS, images, fonts)
+    /css/                 # Global styles
+      main.css            # Tailwind CSS v4 theme configuration
 
-/server/middleware/   # Server-side middleware
-  auth.ts             # Authentication check
-  location-access.ts  # Location-based access control
+  /components/            # Vue components (auto-imported)
+    /delivery/            # Delivery-related components
+    /issue/               # Issue-related components
+    /common/              # Shared components
+    /layout/              # Layout components
 
-/server/utils/        # Server utilities
-  wac.ts              # WAC calculation functions
-  validation.ts       # Zod schemas for API validation
+  /composables/           # Vue composables (auto-imported)
+    useApi.ts             # API fetch wrapper
+    useAuth.ts            # Authentication state
+    useOnlineStatus.ts    # PWA offline detection
 
-/composables/         # Vue composables
-  useApi.ts           # API fetch wrapper
-  useAuth.ts          # Authentication state
-  useOnlineStatus.ts  # PWA offline detection
+  /layouts/               # Layout templates
+    default.vue           # Default layout
 
-/stores/              # Pinia stores
-  auth.ts             # User session
-  period.ts           # Current period state
-  ui.ts               # Global UI state
+  /middleware/            # Client-side route middleware
+    auth.ts               # Client auth guard
 
-/components/          # Vue components
-  /delivery/          # Delivery-related components
-  /issue/             # Issue-related components
-  /common/            # Shared components
-  /layout/            # Layout components
+  /pages/                 # Nuxt pages (auto-routing)
+    index.vue             # Dashboard
+    /deliveries/          # Delivery screens
+    /issues/              # Issue screens
+    /transfers/           # Transfer screens
+    stock-now.vue         # Real-time stock view
+    reconciliations.vue   # Period reconciliation
+    period-close.vue      # Period close workflow
 
-/pages/               # Nuxt pages (auto-routing)
-  index.vue           # Dashboard
-  /deliveries/        # Delivery screens
-  /issues/            # Issue screens
-  /transfers/         # Transfer screens
-  stock-now.vue       # Real-time stock view
-  reconciliations.vue # Period reconciliation
-  period-close.vue    # Period close workflow
+  /plugins/               # Vue plugins
+    pinia.ts              # Pinia store initialization
 
-/prisma/              # Database
-  schema.prisma       # Prisma schema
-  /migrations/        # Migration history
+  /stores/                # Pinia stores
+    auth.ts               # User session
+    period.ts             # Current period state
+    ui.ts                 # Global UI state
 
-/types/               # TypeScript types
-  api.ts              # API request/response types
-  database.ts         # Re-exported Prisma types
-  business.ts         # Business logic types
+  /utils/                 # Utility functions
+    formatting.ts         # Date, currency formatters
+    validation.ts         # Client-side validation
+
+  app.vue                 # Root app component
+  app.config.ts           # App-level configuration
+
+/server/                  # Backend server code
+  /api/                   # API endpoints (RESTful routes)
+    /locations/           # Location management
+    /deliveries/          # Delivery posting
+    /issues/              # Issue posting
+    /transfers/           # Inter-location transfers
+    /periods/             # Period management
+    /auth/                # Authentication
+
+  /middleware/            # Server-side middleware
+    auth.ts               # Authentication check
+    location-access.ts    # Location-based access control
+
+  /utils/                 # Server utilities
+    wac.ts                # WAC calculation functions
+    validation.ts         # Zod schemas for API validation
+
+/shared/                  # Shared code (frontend + backend)
+  /types/                 # TypeScript types
+    api.ts                # API request/response types
+    database.ts           # Re-exported Prisma types
+    business.ts           # Business logic types
+
+/prisma/                  # Database (not yet configured)
+  schema.prisma           # Prisma schema
+  /migrations/            # Migration history
+
+/public/                  # Static files (served as-is)
+  favicon.ico             # App icon
+  manifest.json           # PWA manifest
+
+/project-docs/            # Project documentation
+  PRD.md                  # Product requirements
+  MVP_DEVELOPMENT_TASKS.md # Task checklist
+  ...                     # Other docs
 ```
 
 ## Data Model Key Concepts
@@ -558,72 +592,295 @@ This log provides a quick reference of development progress without needing to r
 
 ## Theme Colors and Styling
 
-### Brand Colors
+### Design System Overview
 
-The application uses a custom color palette defined in `app/assets/css/main.css` using the `@theme` directive:
+The Food Stock Control System uses a comprehensive design system with **semantic color tokens** that map to business logic. All colors are defined in `app/assets/css/main.css` using Tailwind CSS v4's `@theme` directive and CSS variables.
 
-- **Primary Color (Navy Blue):** #000046
-  - Token: `navy` (shades 50-950)
-  - Used for primary brand elements, headings, primary buttons, important text
+**Philosophy:**
+- **Navy Blue** (#000046) = Brand, primary actions, trust, pending states
+- **Emerald Green** (#45cf7b) = Success, approvals, healthy stock, positive states
+- **Amber** = Warnings, low stock, price variance, attention needed
+- **Red** = Errors, critical stock, rejections, dangerous actions
+- **Blue** = Informational messages
+- **Zinc** (Gray) = Neutral UI, text, borders, disabled states
 
-- **Secondary Color (Emerald Green):** #45cf7b
-  - Token: `emerald` (shades 50-950)
-  - Used for success states, secondary actions, accents
+### Color Palettes
 
-### Color Token Usage Rules
+All color palettes available in shades `50`-`950`:
 
-**CRITICAL:** Always use Tailwind color tokens, never inline styles with hardcoded hex colors.
+| Palette | Purpose | Key Shades |
+|---------|---------|------------|
+| `navy` | Brand primary | 500 (#000046) for light mode, 400 for dark mode |
+| `emerald` | Success/secondary | 600 for light mode, 500 for dark mode |
+| `zinc` | Neutral/text | 900 (text), 300 (borders), 100 (backgrounds) |
+| `amber` | Warnings | 500 for light mode, 400 for dark mode |
+| `red` | Errors/critical | 600 for light mode, 500 for dark mode |
+| `blue` | Info | 600 for light mode, 500 for dark mode |
 
-✅ **CORRECT:**
+**Usage in Tailwind classes:**
 ```vue
-<p class="text-navy-500">Total Locations</p>
-<div class="bg-emerald-400">...</div>
-<span class="text-navy-700 dark:text-navy-400">...</span>
+<div class="text-navy-500 bg-emerald-50 border-zinc-300">
+  <span class="text-amber-600 dark:text-amber-400">Warning</span>
+</div>
 ```
 
-❌ **INCORRECT:**
+### Semantic Color Tokens
+
+**IMPORTANT:** Always prefer semantic tokens over direct color references for consistency and maintainability.
+
+#### Background Tokens
+
+| Token | Light Mode | Dark Mode | Usage |
+|-------|------------|-----------|-------|
+| `--ui-bg` | zinc-50 | zinc-950 | Page background |
+| `--ui-bg-elevated` | white | zinc-900 | Cards, modals, elevated surfaces |
+| `--ui-bg-muted` | zinc-100 | zinc-800 | Subtle backgrounds, disabled states |
+| `--ui-bg-accented` | navy-50 | navy-950 | Highlighted sections |
+| `--ui-bg-inverted` | zinc-900 | zinc-50 | Dark surfaces in light mode, light in dark |
+
+**Usage:**
 ```vue
-<p style="color: #000046">Total Locations</p>
-<div style="background-color: #45cf7b">...</div>
+<div class="bg-[var(--ui-bg-elevated)] border-[var(--ui-border)]">
+  <div class="bg-[var(--ui-bg-muted)]">Subtle section</div>
+</div>
 ```
 
-### Available Color Shades
+#### Text Tokens
 
-Both `navy` and `emerald` colors are available in the following shades:
-- `50`, `100`, `200`, `300`, `400`, `500`, `600`, `700`, `800`, `900`, `950`
+| Token | Light Mode | Dark Mode | Usage |
+|-------|------------|-----------|-------|
+| `--ui-text` | zinc-900 | zinc-100 | Primary text |
+| `--ui-text-muted` | zinc-600 | zinc-400 | Secondary/helper text |
+| `--ui-text-dimmed` | zinc-400 | zinc-600 | Disabled/inactive text |
+| `--ui-text-highlighted` | navy-700 | navy-300 | Important/emphasized text |
+| `--ui-text-inverted` | white | zinc-900 | Text on inverted backgrounds |
 
-**Common Usage:**
-- Text: `text-navy-500`, `text-emerald-400`
-- Background: `bg-navy-500`, `bg-emerald-400`
-- Borders: `border-navy-500`, `border-emerald-400`
-- Dark mode variants: `dark:text-navy-400`, `dark:bg-emerald-500`
+**Usage:**
+```vue
+<h1 class="text-[var(--ui-text-highlighted)]">Title</h1>
+<p class="text-[var(--ui-text-muted)]">Helper text</p>
+```
+
+#### Border Tokens
+
+| Token | Light Mode | Dark Mode | Usage |
+|-------|------------|-----------|-------|
+| `--ui-border` | zinc-300 | zinc-700 | Default borders |
+| `--ui-border-muted` | zinc-200 | zinc-800 | Subtle dividers |
+| `--ui-border-accented` | navy-300 | navy-700 | Emphasized borders |
+
+#### Interactive State Tokens
+
+| Token | Purpose |
+|-------|---------|
+| `--ui-primary-hover` | Primary button/link hover state |
+| `--ui-primary-active` | Primary button/link pressed state |
+| `--ui-primary-contrast` | Text color on primary backgrounds (white in light, black in dark) |
+| `--ui-bg-hover` | Background hover state |
+| `--ui-bg-active` | Background pressed state |
+| `--ui-ring` | Focus ring color |
+| `--ui-focus` | Focus indicator color |
+
+#### Feedback Tokens
+
+| Token | Light | Dark | Usage |
+|-------|-------|------|-------|
+| `--ui-success` | emerald-600 | emerald-500 | Success messages, approvals |
+| `--ui-warning` | amber-500 | amber-400 | Warnings, alerts |
+| `--ui-error` | red-600 | red-500 | Errors, critical issues |
+| `--ui-info` | blue-600 | blue-500 | Informational messages |
+
+### Business-Specific Tokens
+
+**Stock Status:**
+
+| Token | Light | Dark | Usage |
+|-------|-------|------|-------|
+| `--ui-stock-healthy` | emerald-600 | emerald-500 | Normal stock levels |
+| `--ui-stock-low` | amber-500 | amber-400 | Below minimum threshold |
+| `--ui-stock-critical` | red-600 | red-500 | Out of stock, urgent |
+| `--ui-stock-pending` | navy-500 | navy-400 | Stock in transfer |
+
+**Approval Workflow:**
+
+| Token | Light | Dark | Usage |
+|-------|-------|------|-------|
+| `--ui-status-draft` | zinc-500 | zinc-400 | Draft/unsaved state |
+| `--ui-status-pending` | navy-500 | navy-400 | Awaiting approval |
+| `--ui-status-approved` | emerald-600 | emerald-500 | Approved/completed |
+| `--ui-status-rejected` | red-600 | red-500 | Rejected/failed |
+
+**Period States:**
+
+| Token | Light | Dark | Usage |
+|-------|-------|------|-------|
+| `--ui-period-open` | emerald-600 | emerald-500 | Period accepting transactions |
+| `--ui-period-ready` | navy-500 | navy-400 | Location ready for close |
+| `--ui-period-closed` | zinc-500 | zinc-400 | Period locked |
+
+**Price Variance:**
+
+| Token | Usage |
+|-------|-------|
+| `--ui-variance-detected` | Price differs from expected (amber) |
+
+**Examples:**
+```vue
+<!-- Stock status badge -->
+<span :style="{ backgroundColor: 'var(--ui-stock-healthy)', color: 'white' }">
+  Healthy
+</span>
+
+<!-- Approval status -->
+<span :style="{ backgroundColor: 'var(--ui-status-pending)', color: 'white' }">
+  Pending Approval
+</span>
+```
+
+### Utility Classes
+
+The design system provides pre-built utility classes for common patterns:
+
+#### Surface/Card Classes
+
+```vue
+<!-- Elevated card with border and shadow -->
+<div class="card-elevated">
+  <h3>Card Title</h3>
+  <p>Card content</p>
+</div>
+
+<!-- Muted background card -->
+<div class="card-muted">
+  <p>Subtle card</p>
+</div>
+
+<!-- Inverted surface (dark in light mode) -->
+<div class="surface-inverted">
+  <p>Inverted content</p>
+</div>
+```
+
+#### Form Classes
+
+```vue
+<label class="form-label">Item Name</label>
+<input type="text" class="form-input" placeholder="Enter name" />
+<span class="form-error">This field is required</span>
+```
+
+#### Badge Classes
+
+**Standard Badges:**
+```vue
+<span class="badge-primary">Primary</span>
+<span class="badge-success">Success</span>
+<span class="badge-warning">Warning</span>
+<span class="badge-error">Error</span>
+<span class="badge-info">Info</span>
+```
+
+**Business-Specific Badges:**
+```vue
+<!-- Stock status -->
+<span class="badge-stock-healthy">Healthy Stock</span>
+<span class="badge-stock-low">Low Stock</span>
+<span class="badge-stock-critical">Critical</span>
+<span class="badge-stock-pending">In Transfer</span>
+
+<!-- Approval workflow -->
+<span class="badge-draft">Draft</span>
+<span class="badge-pending">Pending</span>
+<span class="badge-approved">Approved</span>
+<span class="badge-rejected">Rejected</span>
+```
+
+#### Typography Classes
+
+```vue
+<h1 class="text-display">Display Heading</h1>
+<h2 class="text-heading">Section Heading</h2>
+<h3 class="text-subheading">Subheading</h3>
+<p class="text-body">Body text</p>
+<span class="text-label">Label</span>
+<small class="text-caption">Caption text</small>
+```
+
+#### Interactive Classes
+
+```vue
+<!-- Focus ring -->
+<button class="focus-ring">Focused Button</button>
+
+<!-- Smooth transitions -->
+<div class="smooth-transition hover:bg-gray-100">Hover me</div>
+
+<!-- Hover lift effect -->
+<div class="hover-lift">Lifts on hover</div>
+
+<!-- Fade in animation -->
+<div class="fade-in">Fades in</div>
+```
 
 ### Nuxt UI Component Colors
 
-For Nuxt UI components, you can use color names directly:
-- Use `navy` for primary brand color
-- Use `emerald` for secondary/success color
-- Use `neutral` (zinc) for neutral UI elements
+**IMPORTANT:** Nuxt UI components use **semantic color names**, not custom color tokens.
 
-Example:
+Semantic colors are mapped to brand colors via CSS variables:
+- `"primary"` → Navy blue (#000046) via `--ui-primary`
+- `"secondary"` → Emerald green (#45cf7b) via `--ui-secondary`
+- `"success"`, `"info"`, `"warning"`, `"error"`, `"neutral"` → Standard semantic colors
+
+**Usage:**
 ```vue
-<UButton color="navy">Primary Action</UButton>
-<UButton color="emerald">Secondary Action</UButton>
-<UButton color="neutral" variant="ghost">Neutral Action</UButton>
+<!-- ✅ CORRECT - Use semantic color names -->
+<UButton color="primary">Primary Action</UButton>
+<UButton color="secondary">Secondary Action</UButton>
+<UButton color="success">Approve</UButton>
+<UButton color="error">Reject</UButton>
+
+<UBadge color="primary">Navy</UBadge>
+<UBadge color="secondary">Emerald</UBadge>
+
+<UAlert color="warning" title="Price Variance Detected" />
+
+<!-- ❌ WRONG - Custom color tokens don't work -->
+<UButton color="navy">Won't work</UButton>
+<UButton color="emerald">Won't work</UButton>
 ```
 
-**Note:** The `app.config.ts` color mapping has no effect with Tailwind CSS v4's `@theme` directive. Colors are defined only in `main.css`.
+### Color Usage Guidelines
 
-### Theme Configuration Files
+**Do's:**
+- ✅ Use semantic tokens (`var(--ui-bg-elevated)`) for custom components
+- ✅ Use utility classes (`.badge-stock-healthy`) when available
+- ✅ Use Tailwind color classes (`text-navy-500`) for direct color references
+- ✅ Use semantic colors (`color="primary"`) for Nuxt UI components
+- ✅ Support both light and dark modes
 
-1. **app/assets/css/main.css** - Defines ALL custom color palettes using `@theme` directive (this is the only place where colors are configured)
-2. **nuxt.config.ts** - Configures color mode (light/dark theme support)
-
-**Important:** `app.config.ts` color configuration is NOT needed and has no effect when using Tailwind CSS v4's `@theme` directive.
+**Don'ts:**
+- ❌ Never use inline styles with hex colors (`style="color: #000046"`)
+- ❌ Never use custom color names in Nuxt UI props (`color="navy"`)
+- ❌ Never hardcode colors that should adapt to dark mode
+- ❌ Never mix color systems (pick tokens OR Tailwind classes, be consistent)
 
 ### Dark Mode Support
 
-All components should support both light and dark modes:
+All components automatically support dark mode via the `.dark` class:
+
+```vue
+<template>
+  <div class="bg-[var(--ui-bg)] text-[var(--ui-text)]">
+    <!-- Automatically adapts to light/dark mode -->
+    <div class="bg-[var(--ui-bg-elevated)] border-[var(--ui-border)]">
+      <h1 class="text-[var(--ui-text-highlighted)]">Title</h1>
+      <p class="text-[var(--ui-text-muted)]">Description</p>
+    </div>
+  </div>
+</template>
+```
+
+**Or use Tailwind dark mode utilities:**
 ```vue
 <div class="bg-white dark:bg-gray-900">
   <h1 class="text-navy-500 dark:text-navy-400">Title</h1>
@@ -631,7 +888,70 @@ All components should support both light and dark modes:
 </div>
 ```
 
-Default mode is `light`, users can toggle between modes using the theme switcher in the navbar.
+### Accessibility
+
+**Focus States:**
+- All interactive elements have visible focus rings using `--ui-ring`
+- Use the `.focus-ring` utility class for consistent focus styling
+
+**Color Contrast:**
+- All text/background combinations meet WCAG AA standards
+- Token combinations are pre-validated for contrast
+
+**Reduced Motion:**
+- Animations respect `prefers-reduced-motion` media query
+- Transitions are disabled for users who prefer reduced motion
+
+### Tailwind CSS v4 Important Notes
+
+**@apply Directive Limitation:**
+
+Tailwind CSS v4 does NOT allow using `@apply` with custom class names. You can only use `@apply` with built-in Tailwind utilities.
+
+```css
+/* ❌ WRONG - Will cause build error */
+.badge-base {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full;
+}
+
+.badge-primary {
+  @apply badge-base; /* ERROR: Cannot apply unknown utility class */
+  background-color: var(--ui-primary);
+}
+
+/* ✅ CORRECT - Use direct CSS properties */
+.badge-primary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  background-color: var(--ui-primary);
+  color: var(--ui-primary-contrast);
+}
+
+/* ✅ ALSO CORRECT - @apply with built-in utilities only */
+.card-elevated {
+  @apply bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)];
+  @apply rounded-lg shadow-sm hover:shadow-md;
+  @apply transition-shadow duration-200;
+}
+```
+
+### Quick Reference
+
+**Page Background:** `bg-[var(--ui-bg)]`
+**Card Background:** `bg-[var(--ui-bg-elevated)] border-[var(--ui-border)]`
+**Primary Text:** `text-[var(--ui-text)]`
+**Muted Text:** `text-[var(--ui-text-muted)]`
+**Primary Button:** `<UButton color="primary">`
+**Success Badge:** `<span class="badge-success">Success</span>`
+**Stock Healthy:** `<span class="badge-stock-healthy">Healthy</span>`
+**Approval Pending:** `<span class="badge-pending">Pending</span>`
+
+For complete documentation, see `/project-docs/DESIGN_SYSTEM.md`
 
 ## Common Pitfalls to Avoid
 
@@ -643,7 +963,8 @@ Default mode is `light`, users can toggle between modes using the theme switcher
 6. **Never bypass approvals** - PRF/PO, Transfers, Period Close need proper workflow
 7. **Never forget audit trail** - Log who/when/what for all mutations
 8. **Never expose Supabase service key** - Server-only, never in client code
-9. **Never use inline color styles** - Always use Tailwind color tokens (text-navy-500, bg-emerald-400) instead of style="color: #000046"
+9. **Never use inline color styles** - Always use Tailwind color tokens (text-navy-500, bg-emerald-400) or Nuxt UI semantic color props (color="primary", color="secondary") instead of style="color: #000046"
+10. **Never use @apply with custom classes** - Tailwind CSS v4 only allows @apply with built-in utilities. Use direct CSS properties for custom classes instead.
 
 ## Performance Considerations
 

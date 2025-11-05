@@ -9,7 +9,8 @@
       "Bash(timeout 15 pnpm dev:*)",
       "Bash(pnpm dev)",
       "Bash(timeout /t 10)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []
