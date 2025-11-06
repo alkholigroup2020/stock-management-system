@@ -22,7 +22,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/eslint", "@nuxt/image", "@nuxt/ui"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "@nuxt/ui", "nuxt-auth-utils"],
 
   // Import Tailwind CSS
   css: ["~/assets/css/main.css"],
@@ -36,5 +36,20 @@ export default defineNuxtConfig({
     preference: "light", // Default to light mode
     fallback: "light",
     classSuffix: "", // Use class="dark" instead of class="dark-mode"
+  },
+
+  // Auth configuration using nuxt-auth-utils
+  auth: {
+    // Session configuration
+    session: {
+      // Use httpOnly cookies for security (prevents XSS attacks)
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // HTTPS only in production
+        sameSite: "lax", // CSRF protection
+      },
+      // JWT token expiration: 7 days (in seconds)
+      maxAge: 7 * 24 * 60 * 60, // 604800 seconds = 7 days
+    },
   },
 });
