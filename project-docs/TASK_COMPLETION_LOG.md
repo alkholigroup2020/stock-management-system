@@ -84,6 +84,14 @@ Successfully implemented all control and workflow models in the Prisma schema, c
 
 Updated all affected models with reverse relations: User includes created_ncrs, entered_pobs, requested_approvals, and reviewed_approvals; Location includes ncrs, pobs, and reconciliations; Period includes pobs and reconciliations; Delivery includes ncrs; DeliveryLine includes ncrs for price variance linking. Added comprehensive indexes on all foreign keys, type/status fields, dates, and auto_generated flag for efficient querying. Successfully validated with pnpm prisma validate (✓ schema is valid) and generated Prisma Client v6.18.0 in 251ms. All control models fully support business requirements including automatic price variance NCR generation, manday cost calculations, period-end reconciliation workflows, and multi-entity approval processes. Complete database schema now includes 24 models across 6 categories (Core, Period & Stock, Transactions, Transfers, Controls) ready for migration (task 1.2.8).
 
+### ✅ 1.2.8 Prisma Schema - Indexes & Relations
+
+**Completed:** November 6, 2025
+
+Successfully optimized the complete Prisma schema with comprehensive performance indexes and documented database constraints. Added 23 strategic indexes including single-field indexes on User (role, is_active, default_location_id), Location (type, is_active, manager_id), and Transfer (requested_by, created_by), plus composite indexes for common query patterns: UserLocation (user_id + access_level), PeriodLocation (period_id + status), Delivery (period_id + location_id, location_id + has_variance), Issue (period_id + location_id, location_id + cost_centre), Transfer (from_location_id + status, to_location_id + status), NCR (location_id + status, location_id + type), POB (period_id + location_id), and Approval (entity_type + entity_id, entity_type + status). These indexes optimize critical query patterns including role-based access control, location filtering, period operations, price variance detection, transfer workflows, and approval processing.
+
+Documented 8 check constraints for database integrity to be implemented in migrations: positive stock/WAC checks on LocationStock, positive price check on ItemPrice, different locations validation on Transfer, positive quantity checks on all transaction lines, positive value checks on transaction totals, positive people counts on POB, and period date range validation. Verified all 24 models have proper bidirectional relations with correct cascade behaviors (Cascade for dependent data, Restrict for referential integrity, SetNull for optional references). Successfully validated complete schema with pnpm prisma validate (✓ schema is valid) and generated Prisma Client v6.18.0 in 241ms with zero errors. Schema now fully optimized with 80+ indexes across all models, comprehensive relation mapping, and documented constraints ready for database migration (task 1.2.9).
+
 ---
 
-_Next: 1.2.8 Prisma Schema - Indexes & Relations_
+_Next: 1.2.9 Database Migration_

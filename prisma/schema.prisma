@@ -155,6 +155,9 @@ model User {
   requested_approvals Approval[]      @relation("ApprovalRequester")
   reviewed_approvals  Approval[]      @relation("ApprovalReviewer")
 
+  @@index([role]) // For role-based queries
+  @@index([is_active]) // For active user queries
+  @@index([default_location_id]) // For location default users
   @@map("users")
 }
 
@@ -186,6 +189,9 @@ model Location {
   pobs              POB[]
   reconciliations   Reconciliation[]
 
+  @@index([type]) // For location type filtering
+  @@index([is_active]) // For active location queries
+  @@index([manager_id]) // For manager location queries
   @@map("locations")
 }
 
@@ -205,6 +211,7 @@ model UserLocation {
   @@id([user_id, location_id])
   @@index([user_id])
   @@index([location_id])
+  @@index([user_id, access_level]) // For user permission queries
   @@map("user_locations")
 }
 
@@ -298,6 +305,7 @@ model PeriodLocation {
   @@index([period_id])
   @@index([location_id])
   @@index([status])
+  @@index([period_id, status]) // For period readiness queries
   @@map("period_locations")
 }
 
@@ -430,6 +438,8 @@ model Delivery {
   @@index([po_id])
   @@index([delivery_date])
   @@index([has_variance]) // For price variance queries
+  @@index([period_id, location_id]) // For location deliveries in period
+  @@index([location_id, has_variance]) // For price variance filtering by location
   @@map("deliveries")
 }
 
@@ -479,6 +489,8 @@ model Issue {
   @@index([location_id])
   @@index([issue_date])
   @@index([cost_centre])
+  @@index([period_id, location_id]) // For location issues in period
+  @@index([location_id, cost_centre]) // For cost centre filtering by location
   @@map("issues")
 }
 
@@ -533,6 +545,9 @@ model Transfer {
   @@index([status])
   @@index([request_date])
   @@index([transfer_date])
+  @@index([from_location_id, status]) // For outbound transfer queries by status
+  @@index([to_location_id, status]) // For inbound transfer queries by status
+  @@index([requested_by]) // For user's requested transfers
   @@map("transfers")
 }
 
@@ -588,6 +603,9 @@ model NCR {
   @@index([delivery_id])
   @@index([delivery_line_id])
   @@index([auto_generated])
+  @@index([location_id, status]) // For location NCR queries by status
+  @@index([location_id, type]) // For location NCR queries by type
+  @@index([created_by]) // For user's created NCRs
   @@map("ncrs")
 }
 
@@ -612,6 +630,7 @@ model POB {
   @@index([period_id])
   @@index([location_id])
   @@index([date])
+  @@index([period_id, location_id]) // For location POB queries in period
   @@map("pob")
 }
 
@@ -663,5 +682,72 @@ model Approval {
   @@index([status])
   @@index([requested_by])
   @@index([reviewed_by])
+  @@index([entity_type, entity_id]) // For finding approval by entity
+  @@index([entity_type, status]) // For filtering approvals by type and status
   @@map("approvals")
 }
+
+// ========================================
+// DATABASE CONSTRAINTS (To be implemented in migrations)
+// ========================================
+//
+// The following check constraints should be added in database migrations:
+//
+// 1. POSITIVE STOCK CHECK:
+//    ALTER TABLE location_stock ADD CONSTRAINT check_positive_stock
+//    CHECK (on_hand >= 0);
+//    - Prevents negative stock levels
+//
+// 2. POSITIVE WAC CHECK:
+//    ALTER TABLE location_stock ADD CONSTRAINT check_positive_wac
+//    CHECK (wac >= 0);
+//    - Ensures WAC is never negative
+//
+// 3. POSITIVE PRICE CHECK:
+//    ALTER TABLE item_prices ADD CONSTRAINT check_positive_price
+//    CHECK (price > 0);
+//    - Ensures item prices are always positive
+//
+// 4. DIFFERENT LOCATIONS FOR TRANSFERS:
+//    ALTER TABLE transfers ADD CONSTRAINT check_different_locations
+//    CHECK (from_location_id != to_location_id);
+//    - Prevents transfers from a location to itself
+//
+// 5. POSITIVE QUANTITY CHECKS:
+//    ALTER TABLE delivery_lines ADD CONSTRAINT check_positive_delivery_qty
+//    CHECK (quantity > 0);
+//
+//    ALTER TABLE issue_lines ADD CONSTRAINT check_positive_issue_qty
+//    CHECK (quantity > 0);
+//
+//    ALTER TABLE transfer_lines ADD CONSTRAINT check_positive_transfer_qty
+//    CHECK (quantity > 0);
+//    - Ensures all transaction quantities are positive
+//
+// 6. POSITIVE VALUE CHECKS:
+//    ALTER TABLE deliveries ADD CONSTRAINT check_positive_delivery_total
+//    CHECK (total_amount >= 0);
+//
+//    ALTER TABLE issues ADD CONSTRAINT check_positive_issue_total
+//    CHECK (total_value >= 0);
+//
+//    ALTER TABLE transfers ADD CONSTRAINT check_positive_transfer_total
+//    CHECK (total_value >= 0);
+//    - Ensures transaction totals are non-negative
+//
+// 7. POSITIVE PEOPLE COUNT:
+//    ALTER TABLE pob ADD CONSTRAINT check_positive_crew
+//    CHECK (crew_count >= 0);
+//
+//    ALTER TABLE pob ADD CONSTRAINT check_positive_extra
+//    CHECK (extra_count >= 0);
+//    - Ensures people counts are non-negative
+//
+// 8. PERIOD DATE RANGE:
+//    ALTER TABLE periods ADD CONSTRAINT check_period_dates
+//    CHECK (end_date > start_date);
+//    - Ensures period end date is after start date
+//
+// Note: These constraints will be added in the migration file (task 1.2.9)
+// to ensure data integrity at the database level.
+//

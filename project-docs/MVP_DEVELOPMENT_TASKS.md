@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 11
+- **Completed:** 12
 - **In Progress:** 0
-- **Remaining:** 189+
+- **Remaining:** 188+
 
 ---
 
@@ -236,18 +236,18 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.8 Prisma Schema - Indexes & Relations
 
-- [ ] Add indexes for performance
-  - [ ] Location queries
-  - [ ] Transfer queries
-  - [ ] Price variance queries
-  - [ ] Period operations
-  - [ ] User access
-- [ ] Define all model relations
-- [ ] Add check constraints
-  - [ ] Positive stock check
-  - [ ] Different locations for transfers
-  - [ ] Positive price check
-- [ ] Test schema compilation
+- [x] Add indexes for performance
+  - [x] Location queries
+  - [x] Transfer queries
+  - [x] Price variance queries
+  - [x] Period operations
+  - [x] User access
+- [x] Define all model relations
+- [x] Add check constraints
+  - [x] Positive stock check
+  - [x] Different locations for transfers
+  - [x] Positive price check
+- [x] Test schema compilation
 
 ### 1.2.9 Database Migration
 
