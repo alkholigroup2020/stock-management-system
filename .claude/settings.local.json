@@ -33,7 +33,8 @@
       "Bash(pnpm db:seed:*)",
       "Bash(node verify-seed.mjs:*)",
       "Bash(del test-password.json)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(pnpm list:*)"
     ],
     "deny": [],
     "ask": []

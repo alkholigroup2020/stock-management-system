@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 18
+- **Completed:** 19
 - **In Progress:** 0
-- **Remaining:** 182+
+- **Remaining:** 181+
 
 ---
 
@@ -327,17 +327,17 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.3.5 Auth Store (Pinia)
 
-- [ ] Create `stores/auth.ts`
-- [ ] Define auth state interface
-  - [ ] user (User | null)
-  - [ ] isAuthenticated (computed)
-  - [ ] role (computed)
-  - [ ] locations (computed)
-- [ ] Implement login action
-- [ ] Implement logout action
-- [ ] Implement fetchSession action
-- [ ] Implement location check helpers
-- [ ] Test store in components
+- [x] Create `stores/auth.ts`
+- [x] Define auth state interface
+  - [x] user (User | null)
+  - [x] isAuthenticated (computed)
+  - [x] role (computed)
+  - [x] locations (computed)
+- [x] Implement login action
+- [x] Implement logout action
+- [x] Implement fetchSession action
+- [x] Implement location check helpers
+- [x] Test store in components
 
 ### 1.3.6 Auth Composable
 
