@@ -62,6 +62,27 @@ enum PeriodLocationStatus {
   CLOSED          // Location closed for this period
 }
 
+// PRF (Purchase Request Form) status
+enum PRFStatus {
+  DRAFT           // PRF is being created
+  PENDING         // Awaiting approval
+  APPROVED        // Approved, can create PO
+  REJECTED        // Rejected by approver
+}
+
+// PO (Purchase Order) status
+enum POStatus {
+  OPEN            // PO is active
+  CLOSED          // PO is closed/completed
+}
+
+// Cost centre for issue transactions
+enum CostCentre {
+  FOOD            // Food cost
+  CLEAN           // Cleaning supplies
+  OTHER           // Other costs
+}
+
 // ========================================
 // CORE MODELS (Task 1.2.3)
 // ========================================
@@ -84,6 +105,10 @@ model User {
   managed_locations   Location[]      @relation("LocationManager")
   user_locations      UserLocation[]
   assigned_users      UserLocation[]  @relation("AssignedBy")
+  requested_prfs      PRF[]           @relation("PRFRequester")
+  approved_prfs       PRF[]           @relation("PRFApprover")
+  posted_deliveries   Delivery[]      @relation("DeliveryPoster")
+  posted_issues       Issue[]         @relation("IssuePoster")
 
   @@map("users")
 }
@@ -107,6 +132,9 @@ model Location {
   user_locations    UserLocation[]
   period_locations  PeriodLocation[]
   location_stock    LocationStock[]
+  prfs              PRF[]
+  deliveries        Delivery[]
+  issues            Issue[]
 
   @@map("locations")
 }
@@ -143,8 +171,10 @@ model Item {
   updated_at    DateTime         @updatedAt @db.Timestamptz
 
   // Relations
-  item_prices   ItemPrice[]
+  item_prices    ItemPrice[]
   location_stock LocationStock[]
+  delivery_lines DeliveryLine[]
+  issue_lines    IssueLine[]
 
   @@index([category])
   @@index([is_active])
@@ -159,6 +189,10 @@ model Supplier {
   contact       String?       @db.Text
   is_active     Boolean       @default(true)
   created_at    DateTime      @default(now()) @db.Timestamptz
+
+  // Relations
+  purchase_orders PO[]
+  deliveries      Delivery[]
 
   @@index([is_active])
   @@map("suppliers")
@@ -182,6 +216,9 @@ model Period {
   // Relations
   period_locations PeriodLocation[]
   item_prices      ItemPrice[]
+  prfs             PRF[]
+  deliveries       Delivery[]
+  issues           Issue[]
 
   @@index([status])
   @@index([start_date, end_date])
@@ -251,4 +288,159 @@ model LocationStock {
   @@index([item_id])
   @@index([on_hand]) // For low stock queries
   @@map("location_stock")
+}
+
+// ========================================
+// TRANSACTION MODELS (Task 1.2.5)
+// ========================================
+
+// PRF model - Purchase Request Form
+model PRF {
+  id            String        @id @default(uuid()) @db.Uuid
+  prf_no        String        @unique @db.VarChar(50) // e.g., "PRF-2025-001"
+  period_id     String        @db.Uuid
+  location_id   String        @db.Uuid
+  status        PRFStatus     @default(DRAFT)
+  requested_by  String        @db.Uuid // User who requested
+  approved_by   String?       @db.Uuid // User who approved/rejected
+  request_date  DateTime      @db.Date
+  approval_date DateTime?     @db.Date
+  notes         String?       @db.Text
+  created_at    DateTime      @default(now()) @db.Timestamptz
+  updated_at    DateTime      @updatedAt @db.Timestamptz
+
+  // Relations
+  period        Period        @relation(fields: [period_id], references: [id], onDelete: Restrict)
+  location      Location      @relation(fields: [location_id], references: [id], onDelete: Restrict)
+  requester     User          @relation("PRFRequester", fields: [requested_by], references: [id], onDelete: Restrict)
+  approver      User?         @relation("PRFApprover", fields: [approved_by], references: [id], onDelete: SetNull)
+  purchase_orders PO[]
+
+  @@index([period_id])
+  @@index([location_id])
+  @@index([status])
+  @@index([request_date])
+  @@map("prfs")
+}
+
+// PO model - Purchase Order
+model PO {
+  id            String        @id @default(uuid()) @db.Uuid
+  po_no         String        @unique @db.VarChar(50) // e.g., "PO-2025-001"
+  prf_id        String?       @db.Uuid // Optional link to PRF
+  supplier_id   String        @db.Uuid
+  status        POStatus      @default(OPEN)
+  total_amount  Decimal       @default(0) @db.Decimal(15, 2)
+  notes         String?       @db.Text
+  created_at    DateTime      @default(now()) @db.Timestamptz
+  updated_at    DateTime      @updatedAt @db.Timestamptz
+
+  // Relations
+  prf           PRF?          @relation(fields: [prf_id], references: [id], onDelete: SetNull)
+  supplier      Supplier      @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
+  deliveries    Delivery[]
+
+  @@index([prf_id])
+  @@index([supplier_id])
+  @@index([status])
+  @@map("purchase_orders")
+}
+
+// Delivery model - Goods receipt transaction
+model Delivery {
+  id            String          @id @default(uuid()) @db.Uuid
+  delivery_no   String          @unique @db.VarChar(50) // e.g., "DEL-2025-001"
+  period_id     String          @db.Uuid
+  location_id   String          @db.Uuid
+  supplier_id   String          @db.Uuid
+  po_id         String?         @db.Uuid // Optional link to PO
+  invoice_no    String?         @db.VarChar(100)
+  delivery_note String?         @db.Text
+  delivery_date DateTime        @db.Date
+  total_amount  Decimal         @default(0) @db.Decimal(15, 2)
+  has_variance  Boolean         @default(false) // True if any line has price variance
+  posted_by     String          @db.Uuid // User who posted
+  posted_at     DateTime        @default(now()) @db.Timestamptz
+
+  // Relations
+  period        Period          @relation(fields: [period_id], references: [id], onDelete: Restrict)
+  location      Location        @relation(fields: [location_id], references: [id], onDelete: Restrict)
+  supplier      Supplier        @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
+  po            PO?             @relation(fields: [po_id], references: [id], onDelete: SetNull)
+  poster        User            @relation("DeliveryPoster", fields: [posted_by], references: [id], onDelete: Restrict)
+  delivery_lines DeliveryLine[]
+
+  @@index([period_id])
+  @@index([location_id])
+  @@index([supplier_id])
+  @@index([po_id])
+  @@index([delivery_date])
+  @@index([has_variance]) // For price variance queries
+  @@map("deliveries")
+}
+
+// DeliveryLine model - Line items in delivery
+model DeliveryLine {
+  id             String      @id @default(uuid()) @db.Uuid
+  delivery_id    String      @db.Uuid
+  item_id        String      @db.Uuid
+  quantity       Decimal     @db.Decimal(15, 4)
+  unit_price     Decimal     @db.Decimal(15, 4) // Actual price from delivery
+  period_price   Decimal     @db.Decimal(15, 4) // Expected price from period
+  price_variance Decimal     @default(0) @db.Decimal(15, 4) // unit_price - period_price
+  line_value     Decimal     @db.Decimal(15, 2) // quantity × unit_price
+  ncr_id         String?     @db.Uuid // Link to auto-generated NCR (to be added in 1.2.7)
+
+  // Relations
+  delivery       Delivery    @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
+  item           Item        @relation(fields: [item_id], references: [id], onDelete: Restrict)
+
+  @@index([delivery_id])
+  @@index([item_id])
+  @@index([ncr_id])
+  @@map("delivery_lines")
+}
+
+// Issue model - Stock issue transaction
+model Issue {
+  id            String        @id @default(uuid()) @db.Uuid
+  issue_no      String        @unique @db.VarChar(50) // e.g., "ISS-2025-001"
+  period_id     String        @db.Uuid
+  location_id   String        @db.Uuid
+  issue_date    DateTime      @db.Date
+  cost_centre   CostCentre    @default(FOOD)
+  total_value   Decimal       @default(0) @db.Decimal(15, 2)
+  notes         String?       @db.Text
+  posted_by     String        @db.Uuid // User who posted
+  posted_at     DateTime      @default(now()) @db.Timestamptz
+
+  // Relations
+  period        Period        @relation(fields: [period_id], references: [id], onDelete: Restrict)
+  location      Location      @relation(fields: [location_id], references: [id], onDelete: Restrict)
+  poster        User          @relation("IssuePoster", fields: [posted_by], references: [id], onDelete: Restrict)
+  issue_lines   IssueLine[]
+
+  @@index([period_id])
+  @@index([location_id])
+  @@index([issue_date])
+  @@index([cost_centre])
+  @@map("issues")
+}
+
+// IssueLine model - Line items in issue
+model IssueLine {
+  id            String      @id @default(uuid()) @db.Uuid
+  issue_id      String      @db.Uuid
+  item_id       String      @db.Uuid
+  quantity      Decimal     @db.Decimal(15, 4)
+  wac_at_issue  Decimal     @db.Decimal(15, 4) // WAC at time of issue (not recalculated)
+  line_value    Decimal     @db.Decimal(15, 2) // quantity × wac_at_issue
+
+  // Relations
+  issue         Issue       @relation(fields: [issue_id], references: [id], onDelete: Cascade)
+  item          Item        @relation(fields: [item_id], references: [id], onDelete: Restrict)
+
+  @@index([issue_id])
+  @@index([item_id])
+  @@map("issue_lines")
 }

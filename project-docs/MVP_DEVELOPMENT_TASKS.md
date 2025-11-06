@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 8
+- **Completed:** 9
 - **In Progress:** 0
-- **Remaining:** 192+
+- **Remaining:** 191+
 
 ---
 
@@ -166,33 +166,33 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.5 Prisma Schema - Transaction Models
 
-- [ ] Define `PRF` model (Purchase Request Form)
-  - [ ] id, prf_no, period_id, location_id
-  - [ ] status (DRAFT/PENDING/APPROVED/REJECTED)
-  - [ ] requested_by, approved_by
-  - [ ] request_date, approval_date
-- [ ] Define `PO` model (Purchase Order)
-  - [ ] id, po_no, prf_id, supplier_id
-  - [ ] status (OPEN/CLOSED)
-  - [ ] total_amount, created_at
-- [ ] Define `Delivery` model
-  - [ ] id, delivery_no, period_id, location_id
-  - [ ] supplier_id, po_id (optional)
-  - [ ] invoice_no, delivery_note, delivery_date
-  - [ ] total_amount, has_variance
-  - [ ] posted_by, posted_at
-- [ ] Define `DeliveryLine` model
-  - [ ] id, delivery_id, item_id
-  - [ ] quantity, unit_price, period_price
-  - [ ] price_variance, line_value
-  - [ ] ncr_id (optional)
-- [ ] Define `Issue` model
-  - [ ] id, issue_no, period_id, location_id
-  - [ ] issue_date, cost_centre (FOOD/CLEAN/OTHER)
-  - [ ] total_value, posted_by, posted_at
-- [ ] Define `IssueLine` model
-  - [ ] id, issue_id, item_id
-  - [ ] quantity, wac_at_issue, line_value
+- [x] Define `PRF` model (Purchase Request Form)
+  - [x] id, prf_no, period_id, location_id
+  - [x] status (DRAFT/PENDING/APPROVED/REJECTED)
+  - [x] requested_by, approved_by
+  - [x] request_date, approval_date
+- [x] Define `PO` model (Purchase Order)
+  - [x] id, po_no, prf_id, supplier_id
+  - [x] status (OPEN/CLOSED)
+  - [x] total_amount, created_at
+- [x] Define `Delivery` model
+  - [x] id, delivery_no, period_id, location_id
+  - [x] supplier_id, po_id (optional)
+  - [x] invoice_no, delivery_note, delivery_date
+  - [x] total_amount, has_variance
+  - [x] posted_by, posted_at
+- [x] Define `DeliveryLine` model
+  - [x] id, delivery_id, item_id
+  - [x] quantity, unit_price, period_price
+  - [x] price_variance, line_value
+  - [x] ncr_id (optional)
+- [x] Define `Issue` model
+  - [x] id, issue_no, period_id, location_id
+  - [x] issue_date, cost_centre (FOOD/CLEAN/OTHER)
+  - [x] total_value, posted_by, posted_at
+- [x] Define `IssueLine` model
+  - [x] id, issue_id, item_id
+  - [x] quantity, wac_at_issue, line_value
 
 ### 1.2.6 Prisma Schema - Transfer Models
 
