@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 16
+- **Completed:** 17
 - **In Progress:** 0
-- **Remaining:** 184+
+- **Remaining:** 183+
 
 ---
 
@@ -292,24 +292,24 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.3.3 Auth API Routes
 
-- [ ] Create `server/api/auth/login.post.ts`
-  - [ ] Validate email and password (Zod schema)
-  - [ ] Query user from database
-  - [ ] Verify password
-  - [ ] Create session with user data
-  - [ ] Return user session (exclude password)
-  - [ ] Handle errors appropriately
-- [ ] Create `server/api/auth/logout.post.ts`
-  - [ ] Clear user session
-  - [ ] Return success response
-- [ ] Create `server/api/auth/session.get.ts`
-  - [ ] Get current session
-  - [ ] Return user or null
-- [ ] Create `server/api/auth/register.post.ts` (Admin only)
-  - [ ] Validate registration data
-  - [ ] Hash password
-  - [ ] Create user in database
-  - [ ] Return created user
+- [x] Create `server/api/auth/login.post.ts`
+  - [x] Validate email and password (Zod schema)
+  - [x] Query user from database
+  - [x] Verify password
+  - [x] Create session with user data
+  - [x] Return user session (exclude password)
+  - [x] Handle errors appropriately
+- [x] Create `server/api/auth/logout.post.ts`
+  - [x] Clear user session
+  - [x] Return success response
+- [x] Create `server/api/auth/session.get.ts`
+  - [x] Get current session
+  - [x] Return user or null
+- [x] Create `server/api/auth/register.post.ts` (Admin only)
+  - [x] Validate registration data
+  - [x] Hash password
+  - [x] Create user in database
+  - [x] Return created user
 
 ### 1.3.4 Auth Middleware
 
