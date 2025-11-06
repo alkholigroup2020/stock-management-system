@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 7
+- **Completed:** 8
 - **In Progress:** 0
-- **Remaining:** 193+
+- **Remaining:** 192+
 
 ---
 
@@ -142,27 +142,27 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.4 Prisma Schema - Period & Stock Models
 
-- [ ] Define `Period` model
-  - [ ] id, name, start_date, end_date
-  - [ ] status (DRAFT/OPEN/PENDING_CLOSE/APPROVED/CLOSED)
-  - [ ] approval_id, created_at, closed_at
-- [ ] Define `PeriodLocation` model
-  - [ ] period_id, location_id
-  - [ ] status (OPEN/READY/CLOSED)
-  - [ ] opening_value, closing_value
-  - [ ] snapshot_id, ready_at, closed_at
-  - [ ] PRIMARY KEY (period_id, location_id)
-- [ ] Define `ItemPrice` model
-  - [ ] id, item_id, period_id
-  - [ ] price, currency (default 'SAR')
-  - [ ] set_by, set_at
-  - [ ] UNIQUE (item_id, period_id)
-- [ ] Define `LocationStock` model
-  - [ ] location_id, item_id
-  - [ ] on_hand, wac (Weighted Average Cost)
-  - [ ] min_stock, max_stock
-  - [ ] last_counted, updated_at
-  - [ ] PRIMARY KEY (location_id, item_id)
+- [x] Define `Period` model
+  - [x] id, name, start_date, end_date
+  - [x] status (DRAFT/OPEN/PENDING_CLOSE/APPROVED/CLOSED)
+  - [x] approval_id, created_at, closed_at
+- [x] Define `PeriodLocation` model
+  - [x] period_id, location_id
+  - [x] status (OPEN/READY/CLOSED)
+  - [x] opening_value, closing_value
+  - [x] snapshot_id, ready_at, closed_at
+  - [x] PRIMARY KEY (period_id, location_id)
+- [x] Define `ItemPrice` model
+  - [x] id, item_id, period_id
+  - [x] price, currency (default 'SAR')
+  - [x] set_by, set_at
+  - [x] UNIQUE (item_id, period_id)
+- [x] Define `LocationStock` model
+  - [x] location_id, item_id
+  - [x] on_hand, wac (Weighted Average Cost)
+  - [x] min_stock, max_stock
+  - [x] last_counted, updated_at
+  - [x] PRIMARY KEY (location_id, item_id)
 
 ### 1.2.5 Prisma Schema - Transaction Models
 

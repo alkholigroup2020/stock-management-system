@@ -46,6 +46,22 @@ enum Unit {
   PACK        // Pack
 }
 
+// Period status for period lifecycle
+enum PeriodStatus {
+  DRAFT           // Period created but not yet opened
+  OPEN            // Period is active for transactions
+  PENDING_CLOSE   // Closing initiated, awaiting approval
+  APPROVED        // Close approved, ready to execute
+  CLOSED          // Period is closed
+}
+
+// Period-Location status for coordinated close
+enum PeriodLocationStatus {
+  OPEN            // Location can post transactions
+  READY           // Location ready for period close
+  CLOSED          // Location closed for this period
+}
+
 // ========================================
 // CORE MODELS (Task 1.2.3)
 // ========================================
@@ -74,21 +90,23 @@ model User {
 
 // Location model - Physical sites (Kitchen, Store, Central, Warehouse)
 model Location {
-  id                String          @id @default(uuid()) @db.Uuid
-  code              String          @unique @db.VarChar(10)
-  name              String          @db.VarChar(100)
+  id                String             @id @default(uuid()) @db.Uuid
+  code              String             @unique @db.VarChar(10)
+  name              String             @db.VarChar(100)
   type              LocationType
-  address           String?         @db.Text
-  manager_id        String?         @db.Uuid
-  timezone          String          @default("Asia/Riyadh") @db.VarChar(50)
-  is_active         Boolean         @default(true)
-  created_at        DateTime        @default(now()) @db.Timestamptz
-  updated_at        DateTime        @updatedAt @db.Timestamptz
+  address           String?            @db.Text
+  manager_id        String?            @db.Uuid
+  timezone          String             @default("Asia/Riyadh") @db.VarChar(50)
+  is_active         Boolean            @default(true)
+  created_at        DateTime           @default(now()) @db.Timestamptz
+  updated_at        DateTime           @updatedAt @db.Timestamptz
 
   // Relations
-  manager           User?           @relation("LocationManager", fields: [manager_id], references: [id], onDelete: SetNull)
-  default_for_users User[]          @relation("UserDefaultLocation")
+  manager           User?              @relation("LocationManager", fields: [manager_id], references: [id], onDelete: SetNull)
+  default_for_users User[]             @relation("UserDefaultLocation")
   user_locations    UserLocation[]
+  period_locations  PeriodLocation[]
+  location_stock    LocationStock[]
 
   @@map("locations")
 }
@@ -114,15 +132,19 @@ model UserLocation {
 
 // Item model - Product master (global across locations)
 model Item {
-  id            String        @id @default(uuid()) @db.Uuid
-  code          String        @unique @db.VarChar(50)
-  name          String        @db.VarChar(200)
+  id            String           @id @default(uuid()) @db.Uuid
+  code          String           @unique @db.VarChar(50)
+  name          String           @db.VarChar(200)
   unit          Unit
-  category      String?       @db.VarChar(50)
-  sub_category  String?       @db.VarChar(50)
-  is_active     Boolean       @default(true)
-  created_at    DateTime      @default(now()) @db.Timestamptz
-  updated_at    DateTime      @updatedAt @db.Timestamptz
+  category      String?          @db.VarChar(50)
+  sub_category  String?          @db.VarChar(50)
+  is_active     Boolean          @default(true)
+  created_at    DateTime         @default(now()) @db.Timestamptz
+  updated_at    DateTime         @updatedAt @db.Timestamptz
+
+  // Relations
+  item_prices   ItemPrice[]
+  location_stock LocationStock[]
 
   @@index([category])
   @@index([is_active])
@@ -140,4 +162,93 @@ model Supplier {
 
   @@index([is_active])
   @@map("suppliers")
+}
+
+// ========================================
+// PERIOD & STOCK MODELS (Task 1.2.4)
+// ========================================
+
+// Period model - Monthly accounting periods
+model Period {
+  id            String              @id @default(uuid()) @db.Uuid
+  name          String              @db.VarChar(100) // e.g., "January 2025"
+  start_date    DateTime            @db.Date
+  end_date      DateTime            @db.Date
+  status        PeriodStatus        @default(DRAFT)
+  approval_id   String?             @db.Uuid // Reference to Approval model (to be added in 1.2.7)
+  created_at    DateTime            @default(now()) @db.Timestamptz
+  closed_at     DateTime?           @db.Timestamptz
+
+  // Relations
+  period_locations PeriodLocation[]
+  item_prices      ItemPrice[]
+
+  @@index([status])
+  @@index([start_date, end_date])
+  @@map("periods")
+}
+
+// PeriodLocation model - Period status per location for coordinated close
+model PeriodLocation {
+  period_id      String                @db.Uuid
+  location_id    String                @db.Uuid
+  status         PeriodLocationStatus  @default(OPEN)
+  opening_value  Decimal?              @db.Decimal(15, 2) // Total opening stock value
+  closing_value  Decimal?              @db.Decimal(15, 2) // Total closing stock value
+  snapshot_id    String?               @db.Uuid // Reference to stock snapshot (JSON stored here or separate table)
+  snapshot_data  Json?                 // Stock snapshot at period close
+  ready_at       DateTime?             @db.Timestamptz
+  closed_at      DateTime?             @db.Timestamptz
+
+  // Relations
+  period         Period                @relation(fields: [period_id], references: [id], onDelete: Cascade)
+  location       Location              @relation(fields: [location_id], references: [id], onDelete: Cascade)
+
+  @@id([period_id, location_id])
+  @@index([period_id])
+  @@index([location_id])
+  @@index([status])
+  @@map("period_locations")
+}
+
+// ItemPrice model - Locked prices per period
+model ItemPrice {
+  id         String    @id @default(uuid()) @db.Uuid
+  item_id    String    @db.Uuid
+  period_id  String    @db.Uuid
+  price      Decimal   @db.Decimal(15, 4) // Unit price
+  currency   String    @default("SAR") @db.VarChar(3)
+  set_by     String?   @db.Uuid // User who set the price
+  set_at     DateTime  @default(now()) @db.Timestamptz
+
+  // Relations
+  item       Item      @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  period     Period    @relation(fields: [period_id], references: [id], onDelete: Cascade)
+
+  @@unique([item_id, period_id]) // One price per item per period
+  @@index([period_id])
+  @@index([item_id])
+  @@map("item_prices")
+}
+
+// LocationStock model - Current stock levels per location
+model LocationStock {
+  location_id  String    @db.Uuid
+  item_id      String    @db.Uuid
+  on_hand      Decimal   @default(0) @db.Decimal(15, 4) // Quantity on hand
+  wac          Decimal   @default(0) @db.Decimal(15, 4) // Weighted Average Cost
+  min_stock    Decimal?  @db.Decimal(15, 4) // Minimum stock level (optional)
+  max_stock    Decimal?  @db.Decimal(15, 4) // Maximum stock level (optional)
+  last_counted DateTime? @db.Timestamptz     // Last physical count date
+  updated_at   DateTime  @updatedAt @db.Timestamptz
+
+  // Relations
+  location     Location  @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  item         Item      @relation(fields: [item_id], references: [id], onDelete: Cascade)
+
+  @@id([location_id, item_id])
+  @@index([location_id])
+  @@index([item_id])
+  @@index([on_hand]) // For low stock queries
+  @@map("location_stock")
 }
