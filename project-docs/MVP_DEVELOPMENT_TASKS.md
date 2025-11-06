@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 9
+- **Completed:** 10
 - **In Progress:** 0
-- **Remaining:** 191+
+- **Remaining:** 190+
 
 ---
 
@@ -196,15 +196,15 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.6 Prisma Schema - Transfer Models
 
-- [ ] Define `Transfer` model
-  - [ ] id, transfer_no, from_location_id, to_location_id
-  - [ ] status (DRAFT/PENDING_APPROVAL/APPROVED/REJECTED/COMPLETED)
-  - [ ] requested_by, approved_by
-  - [ ] request_date, approval_date, transfer_date
-  - [ ] total_value, notes
-- [ ] Define `TransferLine` model
-  - [ ] id, transfer_id, item_id
-  - [ ] quantity, wac_at_transfer, line_value
+- [x] Define `Transfer` model
+  - [x] id, transfer_no, from_location_id, to_location_id
+  - [x] status (DRAFT/PENDING_APPROVAL/APPROVED/REJECTED/COMPLETED)
+  - [x] requested_by, approved_by
+  - [x] request_date, approval_date, transfer_date
+  - [x] total_value, notes
+- [x] Define `TransferLine` model
+  - [x] id, transfer_id, item_id
+  - [x] quantity, wac_at_transfer, line_value
 
 ### 1.2.7 Prisma Schema - Control Models
 

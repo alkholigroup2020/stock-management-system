@@ -2,7 +2,7 @@
 
 **Project:** Food Stock Control System - Multi-Location
 **Started:** November 4, 2025
-**Last Updated:** November 5, 2025
+**Last Updated:** November 6, 2025
 
 ---
 
@@ -68,6 +68,14 @@ Successfully implemented all transaction models in the Prisma schema, establishi
 
 Developed the Issue model for stock consumption tracking with unique issue numbers, period/location context, cost centre categorization (FOOD/CLEAN/OTHER), total value calculations, and user audit trail. Implemented the IssueLine model capturing item-level details with quantity tracking, WAC at time of issue (critical for correct valuation without recalculation), and automatic line value computation. Updated all existing models with reverse relations: User now includes requested_prfs, approved_prfs, posted_deliveries, and posted_issues arrays; Location includes prfs, deliveries, and issues arrays; Period includes prfs, deliveries, and issues arrays; Supplier includes purchase_orders and deliveries arrays; Item includes delivery_lines and issue_lines arrays. Added comprehensive performance indexes on all foreign keys (period_id, location_id, supplier_id, po_id, item_id), status fields, date fields (request_date, delivery_date, issue_date), cost_centre for filtering, has_variance for price variance queries, and ncr_id for NCR tracking. Successfully validated complete schema with pnpm prisma generate (✓ Generated Prisma Client v6.18.0) and pnpm prisma validate (✓ valid) with zero compilation errors. All transaction models fully support the critical business workflows including automatic price variance NCR generation on deliveries, WAC-based stock valuation on issues, purchase request approval flows, and comprehensive audit trails. Schema now complete through task 1.2.5 and ready for Transfer Models (task 1.2.6).
 
+### ✅ 1.2.6 Prisma Schema - Transfer Models
+
+**Completed:** November 6, 2025
+
+Successfully implemented inter-location transfer models in the Prisma schema, completing the core transaction entity set for multi-location stock movement tracking. Added the TransferStatus enum supporting the complete transfer lifecycle workflow (DRAFT/PENDING_APPROVAL/APPROVED/REJECTED/COMPLETED) with clear separation between approval and execution states. Created the Transfer model as the header-level transaction with unique transfer numbers (transfer_no format: TRF-2025-001), dual location references (from_location_id, to_location_id) enabling stock movement between any two locations, comprehensive approval workflow tracking (requested_by, approved_by with User relations), three-phase date tracking (request_date, approval_date, transfer_date), total value calculation for transfer cost tracking, and flexible notes field for transfer justification and details.
+
+Implemented the TransferLine model for item-level transfer details with item references, quantity tracking (4-decimal precision matching stock system), WAC at transfer time from source location (critical for accurate cost transfer without recalculation), and automatic line value computation (quantity × wac_at_transfer). Updated all affected models with reverse relations: User now includes requested_transfers and approved_transfers arrays supporting supervisor/admin approval workflows; Location includes transfers_from and transfers_to arrays enabling tracking of all inbound and outbound transfers per location; Item includes transfer_lines array for complete item movement history. Added strategic performance indexes on from_location_id and to_location_id for location-specific queries, status for workflow filtering, request_date and transfer_date for temporal analysis, plus standard indexes on transfer_id and item_id foreign keys in TransferLine. Successfully validated complete schema with pnpm prisma validate (✓ schema is valid) and pnpm prisma generate (✓ Generated Prisma Client v6.18.0 in 235ms) with zero compilation errors. Transfer models fully support the critical cross-location stock movement workflow including supervisor approval requirements, atomic stock updates on completion, WAC-based cost transfer maintaining location-specific costing, and comprehensive audit trail for compliance. All transaction models (PRF, PO, Delivery, Issue, Transfer) now complete and ready for Control Models (task 1.2.7: NCR, POB, Reconciliation, Approval).
+
 ---
 
-_Next: 1.2.6 Prisma Schema - Transfer Models_
+_Next: 1.2.7 Prisma Schema - Control Models_

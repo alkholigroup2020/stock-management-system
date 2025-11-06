@@ -83,6 +83,15 @@ enum CostCentre {
   OTHER           // Other costs
 }
 
+// Transfer status for transfer lifecycle
+enum TransferStatus {
+  DRAFT               // Transfer is being created
+  PENDING_APPROVAL    // Awaiting supervisor/admin approval
+  APPROVED            // Approved, ready to execute
+  REJECTED            // Rejected by approver
+  COMPLETED           // Transfer completed (stock moved)
+}
+
 // ========================================
 // CORE MODELS (Task 1.2.3)
 // ========================================
@@ -109,6 +118,8 @@ model User {
   approved_prfs       PRF[]           @relation("PRFApprover")
   posted_deliveries   Delivery[]      @relation("DeliveryPoster")
   posted_issues       Issue[]         @relation("IssuePoster")
+  requested_transfers Transfer[]      @relation("TransferRequester")
+  approved_transfers  Transfer[]      @relation("TransferApprover")
 
   @@map("users")
 }
@@ -135,6 +146,8 @@ model Location {
   prfs              PRF[]
   deliveries        Delivery[]
   issues            Issue[]
+  transfers_from    Transfer[]         @relation("TransferFrom")
+  transfers_to      Transfer[]         @relation("TransferTo")
 
   @@map("locations")
 }
@@ -175,6 +188,7 @@ model Item {
   location_stock LocationStock[]
   delivery_lines DeliveryLine[]
   issue_lines    IssueLine[]
+  transfer_lines TransferLine[]
 
   @@index([category])
   @@index([is_active])
@@ -443,4 +457,58 @@ model IssueLine {
   @@index([issue_id])
   @@index([item_id])
   @@map("issue_lines")
+}
+
+// ========================================
+// TRANSFER MODELS (Task 1.2.6)
+// ========================================
+
+// Transfer model - Inter-location stock transfers
+model Transfer {
+  id                String          @id @default(uuid()) @db.Uuid
+  transfer_no       String          @unique @db.VarChar(50) // e.g., "TRF-2025-001"
+  from_location_id  String          @db.Uuid
+  to_location_id    String          @db.Uuid
+  status            TransferStatus  @default(DRAFT)
+  requested_by      String          @db.Uuid // User who requested
+  approved_by       String?         @db.Uuid // User who approved/rejected
+  request_date      DateTime        @db.Date
+  approval_date     DateTime?       @db.Date
+  transfer_date     DateTime?       @db.Date // Date when transfer was completed
+  total_value       Decimal         @default(0) @db.Decimal(15, 2)
+  notes             String?         @db.Text
+  created_at        DateTime        @default(now()) @db.Timestamptz
+  updated_at        DateTime        @updatedAt @db.Timestamptz
+
+  // Relations
+  from_location     Location        @relation("TransferFrom", fields: [from_location_id], references: [id], onDelete: Restrict)
+  to_location       Location        @relation("TransferTo", fields: [to_location_id], references: [id], onDelete: Restrict)
+  requester         User            @relation("TransferRequester", fields: [requested_by], references: [id], onDelete: Restrict)
+  approver          User?           @relation("TransferApprover", fields: [approved_by], references: [id], onDelete: SetNull)
+  transfer_lines    TransferLine[]
+
+  @@index([from_location_id])
+  @@index([to_location_id])
+  @@index([status])
+  @@index([request_date])
+  @@index([transfer_date])
+  @@map("transfers")
+}
+
+// TransferLine model - Line items in transfer
+model TransferLine {
+  id              String      @id @default(uuid()) @db.Uuid
+  transfer_id     String      @db.Uuid
+  item_id         String      @db.Uuid
+  quantity        Decimal     @db.Decimal(15, 4)
+  wac_at_transfer Decimal     @db.Decimal(15, 4) // WAC from source location at time of transfer
+  line_value      Decimal     @db.Decimal(15, 2) // quantity × wac_at_transfer
+
+  // Relations
+  transfer        Transfer    @relation(fields: [transfer_id], references: [id], onDelete: Cascade)
+  item            Item        @relation(fields: [item_id], references: [id], onDelete: Restrict)
+
+  @@index([transfer_id])
+  @@index([item_id])
+  @@map("transfer_lines")
 }
