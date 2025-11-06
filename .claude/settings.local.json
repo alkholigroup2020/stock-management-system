@@ -31,7 +31,9 @@
       "Bash(del verify-tables.mjs)",
       "Bash(timeout 15 pnpm prisma studio:*)",
       "Bash(pnpm db:seed:*)",
-      "Bash(node verify-seed.mjs:*)"
+      "Bash(node verify-seed.mjs:*)",
+      "Bash(del test-password.json)",
+      "Bash(del:*)"
     ],
     "deny": [],
     "ask": []

@@ -39,17 +39,11 @@ export default defineNuxtConfig({
   },
 
   // Auth configuration using nuxt-auth-utils
-  auth: {
-    // Session configuration
-    session: {
-      // Use httpOnly cookies for security (prevents XSS attacks)
-      cookie: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // HTTPS only in production
-        sameSite: "lax", // CSRF protection
-      },
-      // JWT token expiration: 7 days (in seconds)
-      maxAge: 7 * 24 * 60 * 60, // 604800 seconds = 7 days
-    },
-  },
+  // Note: Session settings (httpOnly cookies, maxAge, etc.) are configured
+  // automatically by nuxt-auth-utils using the AUTH_SECRET environment variable.
+  // Default session settings:
+  // - httpOnly: true (XSS protection)
+  // - secure: true in production (HTTPS only)
+  // - sameSite: 'lax' (CSRF protection)
+  // - maxAge: 7 days (604800 seconds)
 });
