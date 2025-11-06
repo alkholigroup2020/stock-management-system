@@ -11,7 +11,20 @@
       "Bash(timeout /t 10)",
       "Bash(ping:*)",
       "Bash(mkdir:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(pnpm prisma validate:*)",
+      "Bash(curl:*)",
+      "Bash(nul)",
+      "Bash(powershell -Command \"(Invoke-WebRequest -Uri ''http://localhost:3000/api/health'' -UseBasicParsing).Content\")",
+      "Bash(pnpm prisma db pull:*)",
+      "Bash(cat:*)",
+      "Bash(findstr:*)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(powershell -Command \"(Invoke-WebRequest -Uri ''http://localhost:3001/api/health'' -UseBasicParsing).Content\")",
+      "Bash(node test-supabase-connection.mjs:*)",
+      "Bash(powershell -Command \"Test-NetConnection -ComputerName skcpaeldwokskcqcrfyo.supabase.co -Port 443\")",
+      "Bash(powershell:*)",
+      "Bash(node test-prisma-connection.mjs:*)"
     ],
     "deny": [],
     "ask": []
