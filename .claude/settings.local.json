@@ -25,7 +25,11 @@
       "Bash(powershell -Command \"Test-NetConnection -ComputerName skcpaeldwokskcqcrfyo.supabase.co -Port 443\")",
       "Bash(powershell:*)",
       "Bash(node test-prisma-connection.mjs:*)",
-      "Bash(pnpm prisma generate:*)"
+      "Bash(pnpm prisma generate:*)",
+      "Bash(pnpm prisma migrate:*)",
+      "Bash(node verify-tables.mjs:*)",
+      "Bash(del verify-tables.mjs)",
+      "Bash(timeout 15 pnpm prisma studio:*)"
     ],
     "deny": [],
     "ask": []
