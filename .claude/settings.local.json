@@ -34,7 +34,8 @@
       "Bash(node verify-seed.mjs:*)",
       "Bash(del test-password.json)",
       "Bash(del:*)",
-      "Bash(pnpm list:*)"
+      "Bash(pnpm list:*)",
+      "Bash(timeout /t 5)"
     ],
     "deny": [],
     "ask": []

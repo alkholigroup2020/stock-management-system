@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 19
+- **Completed:** 20
 - **In Progress:** 0
-- **Remaining:** 181+
+- **Remaining:** 180+
 
 ---
 
@@ -341,13 +341,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.3.6 Auth Composable
 
-- [ ] Create `composables/useAuth.ts`
-- [ ] Export auth store wrapper
-- [ ] Add helper methods
-  - [ ] hasRole(role)
-  - [ ] hasLocationAccess(locationId)
-  - [ ] isAdmin, isSupervisor, isOperator
-- [ ] Test composable in pages
+- [x] Create `composables/useAuth.ts`
+- [x] Export auth store wrapper
+- [x] Add helper methods
+  - [x] hasRole(role)
+  - [x] hasLocationAccess(locationId)
+  - [x] isAdmin, isSupervisor, isOperator
+- [x] Test composable in pages
 
 ### 1.3.7 Login Page
 
