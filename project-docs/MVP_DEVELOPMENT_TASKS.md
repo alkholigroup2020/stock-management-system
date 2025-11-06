@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 17
+- **Completed:** 18
 - **In Progress:** 0
-- **Remaining:** 183+
+- **Remaining:** 182+
 
 ---
 
@@ -313,17 +313,17 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.3.4 Auth Middleware
 
-- [ ] Create `server/middleware/auth.ts`
-  - [ ] Check if user session exists
-  - [ ] Throw 401 if not authenticated
-  - [ ] Attach user to event.context
-  - [ ] Apply to all /api/\* routes
-- [ ] Create `server/middleware/location-access.ts`
-  - [ ] Extract locationId from route params
-  - [ ] Check if user has access to location
-  - [ ] Throw 403 if access denied
-  - [ ] Apply to location-specific routes
-- [ ] Test middleware with various routes
+- [x] Create `server/middleware/auth.ts`
+  - [x] Check if user session exists
+  - [x] Throw 401 if not authenticated
+  - [x] Attach user to event.context
+  - [x] Apply to all /api/\* routes
+- [x] Create `server/middleware/location-access.ts`
+  - [x] Extract locationId from route params
+  - [x] Check if user has access to location
+  - [x] Throw 403 if access denied
+  - [x] Apply to location-specific routes
+- [x] Test middleware with various routes
 
 ### 1.3.5 Auth Store (Pinia)
 
