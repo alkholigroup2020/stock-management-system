@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 10
+- **Completed:** 11
 - **In Progress:** 0
-- **Remaining:** 190+
+- **Remaining:** 189+
 
 ---
 
@@ -208,31 +208,31 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.7 Prisma Schema - Control Models
 
-- [ ] Define `NCR` model (Non-Conformance Report)
-  - [ ] id, ncr_no, location_id
-  - [ ] type (MANUAL/PRICE_VARIANCE)
-  - [ ] auto_generated, delivery_id, delivery_line_id
-  - [ ] reason, quantity, value
-  - [ ] status (OPEN/SENT/CREDITED/REJECTED/RESOLVED)
-  - [ ] created_by, created_at, resolved_at
-- [ ] Define `POB` model (People on Board)
-  - [ ] id, period_id, location_id, date
-  - [ ] crew_count, extra_count
-  - [ ] total_count (GENERATED)
-  - [ ] entered_by, entered_at
-  - [ ] UNIQUE (period_id, location_id, date)
-- [ ] Define `Reconciliation` model
-  - [ ] id, period_id, location_id
-  - [ ] opening_stock, receipts, transfers_in, transfers_out
-  - [ ] issues, closing_stock, adjustments
-  - [ ] back_charges, credits, condemnations
-  - [ ] consumption (GENERATED), manday_cost (GENERATED)
-  - [ ] last_updated
-- [ ] Define `Approval` model
-  - [ ] id, entity_type (PRF/PO/PERIOD_CLOSE/TRANSFER)
-  - [ ] entity_id, status (PENDING/APPROVED/REJECTED)
-  - [ ] requested_by, reviewed_by
-  - [ ] requested_at, reviewed_at, comments
+- [x] Define `NCR` model (Non-Conformance Report)
+  - [x] id, ncr_no, location_id
+  - [x] type (MANUAL/PRICE_VARIANCE)
+  - [x] auto_generated, delivery_id, delivery_line_id
+  - [x] reason, quantity, value
+  - [x] status (OPEN/SENT/CREDITED/REJECTED/RESOLVED)
+  - [x] created_by, created_at, resolved_at
+- [x] Define `POB` model (People on Board)
+  - [x] id, period_id, location_id, date
+  - [x] crew_count, extra_count
+  - [x] total_count (GENERATED)
+  - [x] entered_by, entered_at
+  - [x] UNIQUE (period_id, location_id, date)
+- [x] Define `Reconciliation` model
+  - [x] id, period_id, location_id
+  - [x] opening_stock, receipts, transfers_in, transfers_out
+  - [x] issues, closing_stock, adjustments
+  - [x] back_charges, credits, condemnations
+  - [x] consumption (GENERATED), manday_cost (GENERATED)
+  - [x] last_updated
+- [x] Define `Approval` model
+  - [x] id, entity_type (PRF/PO/PERIOD_CLOSE/TRANSFER)
+  - [x] entity_id, status (PENDING/APPROVED/REJECTED)
+  - [x] requested_by, reviewed_by
+  - [x] requested_at, reviewed_at, comments
 
 ### 1.2.8 Prisma Schema - Indexes & Relations
 
