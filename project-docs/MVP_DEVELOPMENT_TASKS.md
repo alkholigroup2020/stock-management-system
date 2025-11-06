@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 6
+- **Completed:** 7
 - **In Progress:** 0
-- **Remaining:** 194+
+- **Remaining:** 193+
 
 ---
 
@@ -118,27 +118,27 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.3 Prisma Schema - Core Entities
 
-- [ ] Define `User` model
-  - [ ] id, username, email, full_name
-  - [ ] role (OPERATOR, SUPERVISOR, ADMIN)
-  - [ ] default_location_id, is_active
-  - [ ] created_at, last_login
-- [ ] Define `Location` model
-  - [ ] id, code, name, type (KITCHEN/STORE/CENTRAL/WAREHOUSE)
-  - [ ] address, manager_id, timezone
-  - [ ] is_active, created_at, updated_at
-- [ ] Define `UserLocation` model (join table)
-  - [ ] user_id, location_id
-  - [ ] access_level (VIEW/POST/MANAGE)
-  - [ ] assigned_at, assigned_by
-  - [ ] PRIMARY KEY (user_id, location_id)
-- [ ] Define `Item` model
-  - [ ] id, code, name, unit (ENUM)
-  - [ ] category, sub_category
-  - [ ] is_active, created_at, updated_at
-- [ ] Define `Supplier` model
-  - [ ] id, code, name, contact
-  - [ ] is_active, created_at
+- [x] Define `User` model
+  - [x] id, username, email, full_name
+  - [x] role (OPERATOR, SUPERVISOR, ADMIN)
+  - [x] default_location_id, is_active
+  - [x] created_at, last_login
+- [x] Define `Location` model
+  - [x] id, code, name, type (KITCHEN/STORE/CENTRAL/WAREHOUSE)
+  - [x] address, manager_id, timezone
+  - [x] is_active, created_at, updated_at
+- [x] Define `UserLocation` model (join table)
+  - [x] user_id, location_id
+  - [x] access_level (VIEW/POST/MANAGE)
+  - [x] assigned_at, assigned_by
+  - [x] PRIMARY KEY (user_id, location_id)
+- [x] Define `Item` model
+  - [x] id, code, name, unit (ENUM)
+  - [x] category, sub_category
+  - [x] is_active, created_at, updated_at
+- [x] Define `Supplier` model
+  - [x] id, code, name, contact
+  - [x] is_active, created_at
 
 ### 1.2.4 Prisma Schema - Period & Stock Models
 

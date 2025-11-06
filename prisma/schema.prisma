@@ -11,6 +11,133 @@ datasource db {
 }
 
 // ========================================
-// CORE MODELS
+// ENUMS
 // ========================================
-// These will be added in subsequent tasks (1.2.3 - 1.2.7)
+
+// User roles for role-based access control
+enum UserRole {
+  OPERATOR    // Can post deliveries/issues, view stock
+  SUPERVISOR  // Operator + approve transfers/PRF, manage reconciliations
+  ADMIN       // Supervisor + manage items/prices, close periods, system config
+}
+
+// Location types
+enum LocationType {
+  KITCHEN     // Kitchen location
+  STORE       // Store location
+  CENTRAL     // Central warehouse
+  WAREHOUSE   // Other warehouse
+}
+
+// User access level per location
+enum AccessLevel {
+  VIEW        // Read-only access
+  POST        // Can post transactions
+  MANAGE      // Full management access
+}
+
+// Item unit of measure
+enum Unit {
+  KG          // Kilograms
+  EA          // Each
+  LTR         // Liters
+  BOX         // Box
+  CASE        // Case
+  PACK        // Pack
+}
+
+// ========================================
+// CORE MODELS (Task 1.2.3)
+// ========================================
+
+// User model - System users with role-based access
+model User {
+  id                  String          @id @default(uuid()) @db.Uuid
+  username            String          @unique @db.VarChar(50)
+  email               String          @unique @db.VarChar(100)
+  full_name           String?         @db.VarChar(100)
+  role                UserRole        @default(OPERATOR)
+  password_hash       String          @db.VarChar(255) // Added for authentication
+  default_location_id String?         @db.Uuid
+  is_active           Boolean         @default(true)
+  created_at          DateTime        @default(now()) @db.Timestamptz
+  last_login          DateTime?       @db.Timestamptz
+
+  // Relations
+  default_location    Location?       @relation("UserDefaultLocation", fields: [default_location_id], references: [id], onDelete: SetNull)
+  managed_locations   Location[]      @relation("LocationManager")
+  user_locations      UserLocation[]
+  assigned_users      UserLocation[]  @relation("AssignedBy")
+
+  @@map("users")
+}
+
+// Location model - Physical sites (Kitchen, Store, Central, Warehouse)
+model Location {
+  id                String          @id @default(uuid()) @db.Uuid
+  code              String          @unique @db.VarChar(10)
+  name              String          @db.VarChar(100)
+  type              LocationType
+  address           String?         @db.Text
+  manager_id        String?         @db.Uuid
+  timezone          String          @default("Asia/Riyadh") @db.VarChar(50)
+  is_active         Boolean         @default(true)
+  created_at        DateTime        @default(now()) @db.Timestamptz
+  updated_at        DateTime        @updatedAt @db.Timestamptz
+
+  // Relations
+  manager           User?           @relation("LocationManager", fields: [manager_id], references: [id], onDelete: SetNull)
+  default_for_users User[]          @relation("UserDefaultLocation")
+  user_locations    UserLocation[]
+
+  @@map("locations")
+}
+
+// UserLocation model - Join table for user-location access control
+model UserLocation {
+  user_id       String        @db.Uuid
+  location_id   String        @db.Uuid
+  access_level  AccessLevel   @default(VIEW)
+  assigned_at   DateTime      @default(now()) @db.Timestamptz
+  assigned_by   String?       @db.Uuid
+
+  // Relations
+  user          User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  location      Location      @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  assigner      User?         @relation("AssignedBy", fields: [assigned_by], references: [id], onDelete: SetNull)
+
+  @@id([user_id, location_id])
+  @@index([user_id])
+  @@index([location_id])
+  @@map("user_locations")
+}
+
+// Item model - Product master (global across locations)
+model Item {
+  id            String        @id @default(uuid()) @db.Uuid
+  code          String        @unique @db.VarChar(50)
+  name          String        @db.VarChar(200)
+  unit          Unit
+  category      String?       @db.VarChar(50)
+  sub_category  String?       @db.VarChar(50)
+  is_active     Boolean       @default(true)
+  created_at    DateTime      @default(now()) @db.Timestamptz
+  updated_at    DateTime      @updatedAt @db.Timestamptz
+
+  @@index([category])
+  @@index([is_active])
+  @@map("items")
+}
+
+// Supplier model - Vendor information
+model Supplier {
+  id            String        @id @default(uuid()) @db.Uuid
+  code          String        @unique @db.VarChar(50)
+  name          String        @db.VarChar(200)
+  contact       String?       @db.Text
+  is_active     Boolean       @default(true)
+  created_at    DateTime      @default(now()) @db.Timestamptz
+
+  @@index([is_active])
+  @@map("suppliers")
+}
