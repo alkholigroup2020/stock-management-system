@@ -29,7 +29,9 @@
       "Bash(pnpm prisma migrate:*)",
       "Bash(node verify-tables.mjs:*)",
       "Bash(del verify-tables.mjs)",
-      "Bash(timeout 15 pnpm prisma studio:*)"
+      "Bash(timeout 15 pnpm prisma studio:*)",
+      "Bash(pnpm db:seed:*)",
+      "Bash(node verify-seed.mjs:*)"
     ],
     "deny": [],
     "ask": []

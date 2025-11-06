@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 13
+- **Completed:** 14
 - **In Progress:** 0
-- **Remaining:** 187+
+- **Remaining:** 186+
 
 ---
 
@@ -260,14 +260,14 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.2.10 Seed Data (Optional for Development)
 
-- [ ] Create `prisma/seed.ts` file
-- [ ] Add seed script to package.json
-- [ ] Create default admin user
-- [ ] Create test locations (2-3)
-- [ ] Create sample items (10-15)
-- [ ] Create test supplier
-- [ ] Run seed script
-- [ ] Verify seed data in Prisma Studio
+- [x] Create `prisma/seed.ts` file
+- [x] Add seed script to package.json
+- [x] Create default admin user
+- [x] Create test locations (2-3)
+- [x] Create sample items (10-15)
+- [x] Create test supplier
+- [x] Run seed script
+- [x] Verify seed data in Prisma Studio
 
 ---
 
