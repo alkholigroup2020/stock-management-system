@@ -12,7 +12,14 @@ const { login, isAuthenticated, error: authError } = useAuth()
 
 // Router for navigation
 const router = useRouter()
+const route = useRoute()
 const toast = useToast()
+
+// Get redirect URL from query parameter
+const redirectTo = computed(() => {
+  const redirect = route.query.redirect as string
+  return redirect && redirect !== '/login' ? redirect : '/'
+})
 
 // Form state
 const state = reactive({
@@ -36,14 +43,14 @@ type Schema = z.output<typeof schema>
 // Check if already authenticated on mount
 onMounted(async () => {
   if (isAuthenticated.value) {
-    await router.push('/')
+    await router.push(redirectTo.value)
   }
 })
 
 // Watch for changes in authentication status
 watch(isAuthenticated, (newValue) => {
   if (newValue) {
-    router.push('/')
+    router.push(redirectTo.value)
   }
 })
 
