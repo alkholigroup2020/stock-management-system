@@ -36,7 +36,12 @@
       "Bash(del:*)",
       "Bash(pnpm list:*)",
       "Bash(timeout /t 5)",
-      "Bash(timeout 3 ping:*)"
+      "Bash(timeout 3 ping:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_take_screenshot"
     ],
     "deny": [],
     "ask": []

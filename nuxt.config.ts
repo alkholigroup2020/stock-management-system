@@ -22,7 +22,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/eslint", "@nuxt/image", "@nuxt/ui", "nuxt-auth-utils"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "@nuxt/ui", "@pinia/nuxt", "nuxt-auth-utils"],
 
   // Import Tailwind CSS
   css: ["~/assets/css/main.css"],
