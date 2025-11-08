@@ -35,7 +35,8 @@
       "Bash(del test-password.json)",
       "Bash(del:*)",
       "Bash(pnpm list:*)",
-      "Bash(timeout /t 5)"
+      "Bash(timeout /t 5)",
+      "Bash(timeout 3 ping:*)"
     ],
     "deny": [],
     "ask": []
