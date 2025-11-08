@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "Deliveries - Food Stock Control System",
-  description: "Multi-location food inventory management system",
+  title: "Deliveries - Stock Management System",
+  description: "Multi-location inventory management system",
 });
 </script>
 

@@ -1,6 +1,6 @@
-# Food Stock Control System - Development Stack
+# Stock Management System - Development Stack
 
-**Project:** Food Stock Control System v1  
+**Project:** Stock Management System v1  
 **Document Version:** 1.1  
 **Date:** November 2, 2025  
 **Status:** Finalized
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document defines the complete technology stack for the Food Stock Control System MVP. All decisions have been finalized and agreed upon.
+This document defines the complete technology stack for the Stock Management System MVP. All decisions have been finalized and agreed upon.
 
 **Core Architecture:**
 - **Type:** Single-page Application (SPA) with API routes
@@ -105,9 +105,9 @@ This document defines the complete technology stack for the Food Stock Control S
 pwa: {
   registerType: 'autoUpdate',
   manifest: {
-    name: 'Food Stock Control System',
+    name: 'Stock Management System',
     short_name: 'FoodStock',
-    description: 'Food stock control and inventory management',
+    description: 'Stock control and inventory management',
     theme_color: '#ffffff',
     background_color: '#ffffff',
     display: 'standalone',
@@ -424,9 +424,9 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Food Stock Control System',
+      name: 'Stock Management System',
       short_name: 'FoodStock',
-      description: 'Food stock control and inventory management',
+      description: 'Stock control and inventory management',
       theme_color: '#ffffff',
       background_color: '#ffffff',
       display: 'standalone',

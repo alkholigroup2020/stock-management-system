@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "Dashboard - Food Stock Control System",
-  description: "Multi-location food inventory management system",
+  title: "Dashboard - Stock Management System",
+  description: "Multi-location inventory management system",
 });
 </script>
 

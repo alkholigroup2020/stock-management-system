@@ -8,11 +8,11 @@
 
 ## 0) Document Purpose
 
-This document explains how the multi-location food stock system will work: its architecture, user flows, data model, interfaces, and rules.
+This document explains how the multi-location stock management system will work: its architecture, user flows, data model, interfaces, and rules.
 
 ## 1) Summary
 
-A web application managing food stock across **multiple locations**. Core operations include deliveries, issues, transfers between locations, and coordinated month-end close.
+A web application managing stock across **multiple locations**. Core operations include deliveries, issues, transfers between locations, and coordinated month-end close.
 
 ### Main Goals
 

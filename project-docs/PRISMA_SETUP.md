@@ -2,7 +2,7 @@
 
 ## Overview
 
-Prisma has been successfully installed and configured for the Food Stock Control System. This document provides information about the setup, configuration, and known issues.
+Prisma has been successfully installed and configured for the Stock Management System. This document provides information about the setup, configuration, and known issues.
 
 ## Installation Status
 

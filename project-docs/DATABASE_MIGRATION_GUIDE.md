@@ -1,6 +1,6 @@
 # Database Migration Guide
 
-**Project:** Food Stock Control System - Multi-Location
+**Project:** Stock Management System - Multi-Location
 **Database:** PostgreSQL 15+ on Supabase
 **ORM:** Prisma 6.18.0
 

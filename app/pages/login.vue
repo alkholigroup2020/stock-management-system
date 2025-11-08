@@ -102,10 +102,10 @@ watch([() => state.email, () => state.password], () => {
       <!-- Header -->
       <div class="text-center">
         <h1 class="text-3xl font-bold text-[var(--ui-text)]">
-          Food Stock Control
+          Stock Management System
         </h1>
         <p class="mt-2 text-sm text-[var(--ui-text-muted)]">
-          Multi-Location Inventory Management System
+          Multi-Location Inventory Management
         </p>
       </div>
 
@@ -212,7 +212,7 @@ watch([() => state.email, () => state.password], () => {
       <!-- Footer Info -->
       <div class="text-center text-xs text-[var(--ui-text-muted)]">
         <p>
-          Food Stock Control System v1.0
+          Stock Management System v1.0
         </p>
         <p class="mt-1">
           © 2025 All rights reserved

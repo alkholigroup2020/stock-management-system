@@ -73,7 +73,7 @@ flowchart LR
 
 ## What This System Does
 
-The new Food Stock Control System helps you:
+The new Stock Management System helps you:
 âœ… **Add stock** when deliveries arrive
 âœ… **Subtract stock** when the kitchen uses items
 âœ… **Close the month** quickly with clear, accurate numbers

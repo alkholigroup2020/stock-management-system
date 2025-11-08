@@ -4,7 +4,7 @@
 
 **Last Updated:** November 2025
 
-**Purpose:** Define data objects, fields, and relationships for the multi-location food stock system
+**Purpose:** Define data objects, fields, and relationships for the multi-location stock management system
 
 **Implementation:** Prisma ORM with PostgreSQL (Supabase)
 

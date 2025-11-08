@@ -4,7 +4,7 @@
 
 **Last Updated:** November 2025
 
-**Purpose:** Define the backend API for the multi-location food stock control system
+**Purpose:** Define the backend API for the multi-location stock management system
 
 ## Overview
 

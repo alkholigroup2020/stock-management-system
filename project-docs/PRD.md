@@ -1,6 +1,6 @@
-# PRD_Food_Stock_Control_System
+# PRD_Stock_Management_System
 
-# PRD - Food Stock Control System
+# PRD - Stock Management System
 
 **Document owner:** Fawzy
 
@@ -14,7 +14,7 @@
 
 ### 1.1 Purpose
 
-Replace the legacy Excel workbook with a web application that tracks food stock end-to-end for **multiple locations** across accounting periods (monthly). The app makes daily work faster, reduces errors, and simplifies month-end across all sites.
+Replace the legacy Excel workbook with a web application that tracks stock end-to-end for **multiple locations** across accounting periods (monthly). The app makes daily work faster, reduces errors, and simplifies month-end across all sites.
 
 ### 1.2 Problem
 

@@ -1,4 +1,4 @@
-# PWA Implementation Guide - Food Stock Control System
+# PWA Implementation Guide - Stock Management System
 
 **Document Version:** 1.0  
 **Date:** November 2, 2025  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for implementing Progressive Web App (PWA) functionality in the Food Stock Control System using Nuxt 3 and Vite PWA.
+This guide provides step-by-step instructions for implementing Progressive Web App (PWA) functionality in the Stock Management System using Nuxt 3 and Vite PWA.
 
 ---
 
@@ -57,9 +57,9 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Food Stock Control System',
+      name: 'Stock Management System',
       short_name: 'FoodStock',
-      description: 'Food stock control and inventory management',
+      description: 'Stock control and inventory management',
       theme_color: '#000046', // Navy blue - primary brand color
       background_color: '#000046', // Navy blue - matches brand
       display: 'standalone',

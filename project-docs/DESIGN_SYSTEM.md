@@ -1,6 +1,6 @@
 # Design System
 
-**Food Stock Control System - Complete Design System Reference**
+**Stock Management System - Complete Design System Reference**
 
 Version: 1.0
 Last Updated: January 2025
@@ -25,7 +25,7 @@ Last Updated: January 2025
 
 ## Overview
 
-The Food Stock Control System uses a comprehensive, semantic design system built on:
+The Stock Management System uses a comprehensive, semantic design system built on:
 
 - **Tailwind CSS v4** with `@theme` directive for color palettes
 - **CSS Custom Properties** for semantic color tokens

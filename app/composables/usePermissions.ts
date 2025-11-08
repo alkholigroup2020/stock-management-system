@@ -2,7 +2,7 @@
  * Permissions Composable
  *
  * Provides granular permission checks for specific business operations
- * in the Food Stock Control System based on user roles and location access.
+ * in the Stock Management System based on user roles and location access.
  *
  * Role Hierarchy:
  * - OPERATOR: Basic operations (deliveries, issues, POB entry)

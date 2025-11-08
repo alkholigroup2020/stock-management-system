@@ -1,6 +1,6 @@
 # MVP
 
-# MVP - Multi-Location Food Stock System
+# MVP - Multi-Location Stock Management System
 
 **Last Updated:** November 2025
 

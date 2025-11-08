@@ -1,6 +1,6 @@
 # MVP Development Tasks - Complete Checklist
 
-**Project:** Food Stock Control System - Multi-Location
+**Project:** Stock Management System - Multi-Location
 **Version:** 1.0
 **Last Updated:** November 6, 2025
 **Target Completion:** December 15, 2025 (35 development days)
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This document contains a comprehensive, step-by-step task list for building the complete MVP of the Food Stock Control System. Tasks are organized by development slices as defined in [MVP.md](project-docs/MVP.md).
+This document contains a comprehensive, step-by-step task list for building the complete MVP of the Stock Management System. Tasks are organized by development slices as defined in [MVP.md](project-docs/MVP.md).
 
 **Development Timeline:**
 
