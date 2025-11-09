@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 29
+- **Completed:** 31
 - **In Progress:** 0
-- **Remaining:** 171+
+- **Remaining:** 169+
 
 ---
 
@@ -405,23 +405,23 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.4.2 App Navbar Component
 
-- [ ] Create `components/layout/AppNavbar.vue`
-- [ ] Design navbar UI
-  - [ ] App logo/title (use navy brand color)
-  - [ ] Current location selector
-  - [ ] Period indicator
-  - [ ] User menu (avatar, name, logout)
-  - [ ] Color mode toggle (light/dark)
-- [ ] Implement location switcher
-  - [ ] Fetch user locations
-  - [ ] Display dropdown
-  - [ ] Update active location in store
-- [ ] Implement user menu
-  - [ ] Display user name and role
-  - [ ] Logout button
-  - [ ] Profile link (optional)
-- [ ] Style with Tailwind (use brand colors)
-- [ ] Test navbar functionality
+- [x] Create `components/layout/AppNavbar.vue`
+- [x] Design navbar UI
+  - [x] App logo/title (use navy brand color)
+  - [x] Current location selector
+  - [x] Period indicator
+  - [x] User menu (avatar, name, logout)
+  - [x] Color mode toggle (light/dark)
+- [x] Implement location switcher
+  - [x] Fetch user locations
+  - [x] Display dropdown
+  - [x] Update active location in store
+- [x] Implement user menu
+  - [x] Display user name and role
+  - [x] Logout button
+  - [x] Profile link (optional)
+- [x] Style with Tailwind (use brand colors)
+- [x] Test navbar functionality
 
 ### 1.4.3 App Sidebar Navigation
 
@@ -464,19 +464,19 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.4.6 Global Stores
 
-- [ ] Create `stores/ui.ts`
-  - [ ] Sidebar collapsed state
-  - [ ] Modal states
-  - [ ] Toast queue
-- [ ] Create `stores/period.ts`
-  - [ ] Current period
-  - [ ] Period status
-  - [ ] Period actions (fetch, refresh)
-- [ ] Create `stores/location.ts`
-  - [ ] Active location
-  - [ ] User locations
-  - [ ] Location switching logic
-- [ ] Test stores
+- [x] Create `stores/ui.ts`
+  - [x] Sidebar collapsed state
+  - [x] Modal states
+  - [x] Toast queue
+- [x] Create `stores/period.ts`
+  - [x] Current period
+  - [x] Period status
+  - [x] Period actions (fetch, refresh)
+- [x] Create `stores/location.ts`
+  - [x] Active location
+  - [x] User locations
+  - [x] Location switching logic
+- [x] Test stores
 
 ---
 

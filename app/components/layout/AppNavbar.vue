@@ -90,6 +90,18 @@ const handleToggleMobileSidebar = () => {
           </NuxtLink>
         </div>
 
+        <!-- Center Section: Location & Period (if authenticated) -->
+        <div v-if="isAuthenticated" class="flex items-center gap-3">
+          <!-- Location Switcher -->
+          <LayoutLocationSwitcher />
+
+          <!-- Divider -->
+          <div class="hidden md:block h-6 w-px bg-[var(--ui-border)]" />
+
+          <!-- Period Indicator -->
+          <LayoutPeriodIndicator />
+        </div>
+
         <!-- Right Side Actions -->
         <div class="flex items-center gap-2">
           <!-- Theme Switcher -->
@@ -112,6 +124,7 @@ const handleToggleMobileSidebar = () => {
               variant="ghost"
               :label="user.full_name || user.email"
               trailing-icon="i-heroicons-chevron-down-20-solid"
+              class="hidden sm:flex"
             >
               <template #leading>
                 <UAvatar
@@ -119,6 +132,18 @@ const handleToggleMobileSidebar = () => {
                   size="xs"
                 />
               </template>
+            </UButton>
+
+            <!-- Mobile: Just show avatar -->
+            <UButton
+              color="neutral"
+              variant="ghost"
+              class="sm:hidden"
+            >
+              <UAvatar
+                :alt="user.full_name || user.email"
+                size="xs"
+              />
             </UButton>
           </UDropdown>
         </div>
