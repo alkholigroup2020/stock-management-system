@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 94
+- **Completed:** 107
 - **In Progress:** 0
-- **Remaining:** 106+
+- **Remaining:** 93+
 
 ---
 
@@ -618,19 +618,19 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.4 Create Item UI
 
-- [ ] Create `pages/items/create.vue`
-- [ ] Design item creation form
-  - [ ] Code input (unique)
-  - [ ] Name input
-  - [ ] Unit dropdown (KG, EA, LTR, BOX, CASE, PACK)
-  - [ ] Category input/dropdown
-  - [ ] Sub-category input (optional)
-- [ ] Implement form validation (Zod)
-- [ ] Implement submit handler
-  - [ ] Call API to create item
-  - [ ] Handle success (redirect to items list)
-  - [ ] Handle errors (display message)
-- [ ] Test item creation
+- [x] Create `pages/items/create.vue`
+- [x] Design item creation form
+  - [x] Code input (unique)
+  - [x] Name input
+  - [x] Unit dropdown (KG, EA, LTR, BOX, CASE, PACK)
+  - [x] Category input/dropdown
+  - [x] Sub-category input (optional)
+- [x] Implement form validation (Zod)
+- [x] Implement submit handler
+  - [x] Call API to create item
+  - [x] Handle success (redirect to items list)
+  - [x] Handle errors (display message)
+- [x] Test item creation
 
 ### 1.6.5 Edit Item UI
 

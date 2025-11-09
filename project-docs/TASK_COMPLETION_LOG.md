@@ -268,4 +268,12 @@ Successfully implemented comprehensive Items Page UI with full-featured table di
 
 ---
 
-_Next: 1.6.4 Create Item UI_
+### ✅ 1.6.4 Create Item UI
+
+**Completed:** November 9, 2025
+
+Successfully implemented complete Item Creation UI with comprehensive form validation and error handling. Created pages/items/create.vue featuring a clean, accessible form with all required fields (Code, Name, Unit, Category, Sub-Category) using Nuxt UI components for consistent styling. Implemented Zod validation schema matching API requirements with real-time field-level validation, clear error messaging, and form-wide validation on submit. Built responsive unit dropdown using USelectMenu component with six unit options (KG, EA, LTR, BOX, CASE, PACK) configured with proper value-key bindings and label/value pairs for correct display. Added comprehensive submit handler with $fetch API call, duplicate code error handling showing field-specific errors, success notification with toast, and automatic redirect to items list page. Implemented cancel handler with unsaved changes confirmation dialog and proper role-based page metadata (admin-only access via middleware). Successfully tested end-to-end flow creating test item (TEST001, Test Item for Demo, KG unit, Test Category) confirming form validation, dropdown functionality, API integration, success notification display, and redirect behavior all working correctly. Form styled throughout with design system tokens ensuring consistent branding and full light/dark mode support. Item creation UI now production-ready providing intuitive, error-resistant interface for adding new inventory items to the system.
+
+---
+
+_Next: 1.6.5 Edit Item UI_
