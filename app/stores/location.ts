@@ -71,13 +71,13 @@ export const useLocationStore = defineStore('location', {
             )
             if (defaultLoc) {
               this.activeLocationId = defaultLocationId
-            } else {
+            } else if (this.userLocations.length > 0) {
               // Fallback to first location
-              this.activeLocationId = this.userLocations[0].id
+              this.activeLocationId = this.userLocations[0]!.id
             }
-          } else {
+          } else if (this.userLocations.length > 0) {
             // No default, use first location
-            this.activeLocationId = this.userLocations[0].id
+            this.activeLocationId = this.userLocations[0]!.id
           }
         }
       } catch (err: any) {
