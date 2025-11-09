@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 47
+- **Completed:** 53
 - **In Progress:** 0
-- **Remaining:** 153+
+- **Remaining:** 147+
 
 ---
 
@@ -484,28 +484,28 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.5.1 Location API Routes
 
-- [ ] Create `server/api/locations/index.get.ts`
-  - [ ] Fetch all locations (with filters)
-  - [ ] Check user permissions
-  - [ ] Return locations list
-- [ ] Create `server/api/locations/index.post.ts`
-  - [ ] Validate location data (Zod)
-  - [ ] Check admin role
-  - [ ] Create location in database
-  - [ ] Return created location
-- [ ] Create `server/api/locations/[id].get.ts`
-  - [ ] Fetch single location by ID
-  - [ ] Check access permissions
-  - [ ] Return location details
-- [ ] Create `server/api/locations/[id].patch.ts`
-  - [ ] Validate update data
-  - [ ] Check admin role
-  - [ ] Update location in database
-  - [ ] Return updated location
-- [ ] Create `server/api/locations/[id]/users.get.ts`
-  - [ ] Fetch users assigned to location
-  - [ ] Return user list with access levels
-- [ ] Test all location API routes
+- [x] Create `server/api/locations/index.get.ts`
+  - [x] Fetch all locations (with filters)
+  - [x] Check user permissions
+  - [x] Return locations list
+- [x] Create `server/api/locations/index.post.ts`
+  - [x] Validate location data (Zod)
+  - [x] Check admin role
+  - [x] Create location in database
+  - [x] Return created location
+- [x] Create `server/api/locations/[id].get.ts`
+  - [x] Fetch single location by ID
+  - [x] Check access permissions
+  - [x] Return location details
+- [x] Create `server/api/locations/[id].patch.ts`
+  - [x] Validate update data
+  - [x] Check admin role
+  - [x] Update location in database
+  - [x] Return updated location
+- [x] Create `server/api/locations/[id]/users.get.ts`
+  - [x] Fetch users assigned to location
+  - [x] Return user list with access levels
+- [x] Test all location API routes
 
 ### 1.5.2 Location Management UI
 
