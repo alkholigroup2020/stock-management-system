@@ -226,4 +226,12 @@ Successfully implemented complete location management UI with responsive design 
 
 ---
 
-_Next: 1.5.3 User-Location Assignment_
+### ✅ 1.5.3 User-Location Assignment
+
+**Completed:** November 9, 2025
+
+Successfully implemented complete user-location assignment functionality with admin-controlled access management. Created POST /api/locations/:id/users endpoint for assigning users to locations with configurable access levels (VIEW, POST, MANAGE), validating user existence and active status, supporting both new assignments and updates to existing ones, and returning full assignment details with user/location info. Built DELETE /api/locations/:id/users/:userId endpoint for removing user assignments with safety check preventing removal of admin's last location to avoid lockout. Developed comprehensive location detail page (locations/[id]/index.vue) displaying location information, user assignments section with admin-only visibility, assigned users list showing user details with role and access level badges, individual remove buttons with confirmation, and modal for assigning new users. Implemented user assignment modal with user selection dropdown populated from active users, access level selector with descriptions, proper form validation using Zod, and success/error toast notifications. Added safety checks in UI template to handle undefined user objects gracefully. Successfully tested UI showing location details page with User Assignments section, modal opening correctly, and proper display of assignment interface with dropdowns for user selection and access levels.
+
+---
+
+_Next: 1.5.4 Location Switcher Component_
