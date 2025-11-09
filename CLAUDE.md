@@ -270,3 +270,4 @@ See `/project-docs/` for: **PRD**, **MVP**, **MVP_DEVELOPMENT_TASKS**, **TASK_CO
 - Email notifications (except critical)
 - Multi-currency
 - FIFO costing option
+- Use the "playwright" MCP after completing any task to check your work or when debugging any problem.
