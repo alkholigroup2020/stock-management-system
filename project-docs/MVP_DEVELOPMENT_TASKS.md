@@ -24,9 +24,9 @@ This document contains a comprehensive, step-by-step task list for building the 
 ## 📊 Progress Summary
 
 - **Total Tasks:** 200+
-- **Completed:** 84
+- **Completed:** 94
 - **In Progress:** 0
-- **Remaining:** 116+
+- **Remaining:** 106+
 
 ---
 
@@ -605,16 +605,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.3 Items Page UI
 
-- [ ] Create `pages/items/index.vue`
-  - [ ] Display items in table/grid
-  - [ ] Show: Code, Name, Unit, Category, On-Hand, WAC, Value
-  - [ ] Implement search functionality
-  - [ ] Implement category filter
-  - [ ] Add pagination controls
-  - [ ] Add "Create Item" button (admin only)
-  - [ ] Add "Edit" action per item (admin only)
-- [ ] Style items table (brand colors)
-- [ ] Test items page
+- [x] Create `pages/items/index.vue`
+  - [x] Display items in table/grid
+  - [x] Show: Code, Name, Unit, Category, On-Hand, WAC, Value
+  - [x] Implement search functionality
+  - [x] Implement category filter
+  - [x] Add pagination controls
+  - [x] Add "Create Item" button (admin only)
+  - [x] Add "Edit" action per item (admin only)
+- [x] Style items table (brand colors)
+- [x] Test items page
 
 ### 1.6.4 Create Item UI
 
