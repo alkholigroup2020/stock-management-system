@@ -588,20 +588,20 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.2 Item Price Management API
 
-- [ ] Create `server/api/periods/[periodId]/prices.get.ts`
-  - [ ] Fetch all item prices for period
-  - [ ] Return prices list
-- [ ] Create `server/api/periods/[periodId]/prices.post.ts`
-  - [ ] Validate price data (Zod schema)
-  - [ ] Check admin role
-  - [ ] Check period is not closed
-  - [ ] Bulk create/update item prices
-  - [ ] Return updated prices
-- [ ] Create `server/api/items/[itemId]/price.patch.ts`
-  - [ ] Update single item price for current period
-  - [ ] Check admin role
-  - [ ] Return updated price
-- [ ] Test price API routes
+- [x] Create `server/api/periods/[periodId]/prices.get.ts`
+  - [x] Fetch all item prices for period
+  - [x] Return prices list
+- [x] Create `server/api/periods/[periodId]/prices.post.ts`
+  - [x] Validate price data (Zod schema)
+  - [x] Check admin role
+  - [x] Check period is not closed
+  - [x] Bulk create/update item prices
+  - [x] Return updated prices
+- [x] Create `server/api/items/[itemId]/price.patch.ts`
+  - [x] Update single item price for current period
+  - [x] Check admin role
+  - [x] Return updated price
+- [x] Test price API routes
 
 ### 1.6.3 Items Page UI
 
