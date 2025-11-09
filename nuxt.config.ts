@@ -6,6 +6,12 @@ export default defineNuxtConfig({
   // SPA mode as per CLAUDE.md requirements
   ssr: false,
 
+  // Dev server configuration - hardcoded to port 3000
+  devServer: {
+    port: 3000,
+    host: 'localhost'
+  },
+
   // Runtime configuration for environment variables
   runtimeConfig: {
     // Private keys (server-only) - never exposed to client

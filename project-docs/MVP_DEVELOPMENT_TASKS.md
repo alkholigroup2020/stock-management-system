@@ -561,30 +561,30 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.1 Item API Routes
 
-- [ ] Create `server/api/items/index.get.ts`
-  - [ ] Fetch items with filters (category, search)
-  - [ ] Include location stock if locationId provided
-  - [ ] Support pagination
-  - [ ] Return items list
-- [ ] Create `server/api/items/index.post.ts`
-  - [ ] Validate item data (Zod)
-  - [ ] Check admin role
-  - [ ] Create item in database
-  - [ ] Return created item
-- [ ] Create `server/api/items/[id].get.ts`
-  - [ ] Fetch single item by ID
-  - [ ] Include stock data for all/specific locations
-  - [ ] Return item details
-- [ ] Create `server/api/items/[id].patch.ts`
-  - [ ] Validate update data
-  - [ ] Check admin role
-  - [ ] Update item in database
-  - [ ] Return updated item
-- [ ] Create `server/api/items/[id].delete.ts`
-  - [ ] Check admin role
-  - [ ] Check if item has transaction history
-  - [ ] Soft delete (set is_active = false)
-  - [ ] Return confirmation
+- [x] Create `server/api/items/index.get.ts`
+  - [x] Fetch items with filters (category, search)
+  - [x] Include location stock if locationId provided
+  - [x] Support pagination
+  - [x] Return items list
+- [x] Create `server/api/items/index.post.ts`
+  - [x] Validate item data (Zod)
+  - [x] Check admin role
+  - [x] Create item in database
+  - [x] Return created item
+- [x] Create `server/api/items/[id].get.ts`
+  - [x] Fetch single item by ID
+  - [x] Include stock data for all/specific locations
+  - [x] Return item details
+- [x] Create `server/api/items/[id].patch.ts`
+  - [x] Validate update data
+  - [x] Check admin role
+  - [x] Update item in database
+  - [x] Return updated item
+- [x] Create `server/api/items/[id].delete.ts`
+  - [x] Check admin role
+  - [x] Check if item has transaction history
+  - [x] Soft delete (set is_active = false)
+  - [x] Return confirmation
 
 ### 1.6.2 Item Price Management API
 

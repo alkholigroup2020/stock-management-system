@@ -242,4 +242,14 @@ Successfully implemented comprehensive location switcher component integrated in
 
 ---
 
-_Next: 1.6.1 Item API Routes_
+### ✅ 1.6.1 Item API Routes
+
+**Completed:** November 9, 2025
+
+Successfully implemented comprehensive Item API with five RESTful endpoints providing complete CRUD operations for item management. Created GET /api/items endpoint with advanced filtering (category, search, is_active), pagination support (default 50, max 200 items per page), optional location stock inclusion via locationId query parameter, and role-based access control restricting operators to assigned locations. Implemented POST /api/items endpoint for admin-only item creation with Zod validation for all fields (code auto-uppercase, name, unit enum, optional category/sub_category), duplicate code detection returning 409 conflict, and proper error handling. Built GET /api/items/:id endpoint fetching single item details with flexible stock data inclusion (specific location, all locations for admins/supervisors, or user-assigned locations for operators), comprehensive location information (id, code, name, type), and proper 404 handling for non-existent items.
+
+Developed PATCH /api/items/:id endpoint for admin-only updates supporting partial updates to all fields except code (name, unit, category, sub_category, is_active), validating at least one field provided, and returning updated item data. Created DELETE /api/items/:id endpoint implementing soft delete by setting is_active=false, checking for transaction history (delivery_lines, issue_lines, transfer_lines) and informing user if item has history, preventing data loss while maintaining referential integrity. All endpoints follow established patterns from location routes with consistent authentication checks via event.context.user, comprehensive Zod validation with detailed error messages, structured error responses (400 validation, 401 unauthorized, 403 forbidden, 404 not found, 409 conflict, 500 internal), and proper Prisma database integration with optimized queries. Endpoints compiled successfully in Nitro server with zero TypeScript errors, support pagination metadata (total, page, limit, totalPages, hasNextPage, hasPrevPage), include proper indexes for performance (category, is_active), and follow RESTful conventions throughout. Item API now production-ready with complete CRUD functionality, role-based permissions, comprehensive validation, and proper error handling ready for frontend item management UI implementation (task 1.6.2-1.6.7).
+
+---
+
+_Next: 1.6.2 Item Price Management API_

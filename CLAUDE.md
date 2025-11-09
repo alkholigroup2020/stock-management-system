@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Component Usage and Naming Conventions
 
 **Nuxt 4 Component Auto-Import:** Components in subdirectories combine folder path + filename.
+
 - `app/components/layout/AppNavbar.vue` → `<LayoutAppNavbar />`
 - `app/components/delivery/LineItem.vue` → `<DeliveryLineItem />`
 - Nested: `app/components/ui/form/Input.vue` → `<UiFormInput />`
@@ -23,6 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **CRITICAL:** Before implementing features, **always check official docs first** to avoid trial-and-error.
 
 **Key Resources:**
+
 - **Nuxt 4:** https://nuxt.com/docs
 - **Nuxt UI:** https://ui.nuxt.com
 - **Tailwind CSS:** https://tailwindcss.com/docs
@@ -121,6 +123,7 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 ### Critical Workflows
 
 **WAC Calculation:** `newWAC = (currentQty × currentWAC + receivedQty × receiptPrice) / (currentQty + receivedQty)`
+
 - Deliveries update WAC; Issues deduct at current WAC (no recalc)
 - Price variance auto-creates NCR
 
@@ -149,6 +152,7 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 ## PWA Implementation
 
 **Level 1 PWA:** Installable, offline-aware UI (no offline data in MVP)
+
 - Use `useOnlineStatus()` composable to detect offline state
 - Disable action buttons when offline: `<UButton :disabled="!isOnline">`
 - Static assets cached via Vite PWA; IndexedDB deferred to post-MVP
@@ -156,17 +160,20 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 ## Testing & Database (Not Yet Configured)
 
 **Testing (Planned):**
+
 - Unit tests: WAC calculations, reconciliation math (`/tests/unit/`)
 - API tests: Deliveries, issues, transfers, period close (`/tests/api/`)
 - Manual testing: Cross-location transfers, price variance NCRs, period close, PWA
 
 **Database Migrations (Planned):**
+
 - Dev: `pnpm db:push` (prototyping) or `pnpm db:migrate dev` (with history)
 - Production: `pnpm db:migrate deploy` (never use db:push in production)
 
 ## Role-Based Access Control
 
 **Roles:**
+
 - **Operator:** Post deliveries/issues, view stock (assigned locations)
 - **Supervisor:** Approve transfers/PRF, manage reconciliations (all locations)
 - **Admin:** Manage items/prices, close periods, system config (all locations)
@@ -188,6 +195,7 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 **Current:** Focus on frontend. Database, API routes, tests added later.
 
 **Future (when configured):**
+
 - Schema changes: Edit `prisma/schema.prisma` → `pnpm db:migrate dev` → Use generated types
 - API routes: Use `defineEventHandler`, access `event.context.user`, validate with middleware
 
@@ -195,7 +203,7 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 
 See `/project-docs/` for: **PRD**, **MVP**, **MVP_DEVELOPMENT_TASKS**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **DESIGN_SYSTEM**
 
-**IMPORTANT:** After completing main tasks from MVP_DEVELOPMENT_TASKS.md, update TASK_COMPLETION_LOG.md with 1-2 paragraph summary.
+**IMPORTANT:** After completing main tasks from MVP_DEVELOPMENT_TASKS.md, mark its sub-tasks as completed, and update TASK_COMPLETION_LOG.md with 1-2 paragraph summary.
 
 ## Currency and Localization
 
@@ -221,6 +229,7 @@ See `/project-docs/` for: **PRD**, **MVP**, **MVP_DEVELOPMENT_TASKS**, **TASK_CO
 **Nuxt UI Components:** Use semantic names: `color="primary"`, `color="secondary"`, `color="success"`, `color="error"` (NOT `color="navy"`)
 
 **Critical Rules:**
+
 - ✅ Use semantic tokens `var(--ui-*)` or utility classes
 - ✅ Nuxt UI: `<UButton color="primary">` (semantic names only)
 - ❌ Never inline hex: `style="color: #000046"`
