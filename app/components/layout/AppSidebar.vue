@@ -34,6 +34,12 @@ const allMenuItems: MenuItem[] = [
     // No permission check - all authenticated users can access
   },
   {
+    label: 'Locations',
+    icon: 'i-heroicons-map-pin',
+    to: '/locations',
+    permission: () => permissions.canManageLocations()
+  },
+  {
     label: 'POB',
     icon: 'i-heroicons-users',
     to: '/pob',
