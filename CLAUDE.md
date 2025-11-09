@@ -271,3 +271,4 @@ See `/project-docs/` for: **PRD**, **MVP**, **MVP_DEVELOPMENT_TASKS**, **TASK_CO
 - Multi-currency
 - FIFO costing option
 - Use the "playwright" MCP after completing any task to check your work or when debugging any problem.
+- Only use http://localhost:3000 as the only dev server.
