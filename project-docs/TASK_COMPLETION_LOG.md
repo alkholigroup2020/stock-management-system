@@ -276,4 +276,12 @@ Successfully implemented complete Item Creation UI with comprehensive form valid
 
 ---
 
-_Next: 1.6.5 Edit Item UI_
+### ✅ 1.6.5 Edit Item UI
+
+**Completed:** November 9, 2025
+
+Successfully implemented complete Item Edit UI with pre-filled form data and comprehensive update/deactivate functionality. Created pages/items/[id]/edit.vue featuring automatic data fetching on mount with loading and error states, form pre-population with existing item data (code, name, unit, category, sub-category), and read-only item code field preventing code changes. Implemented Zod validation matching API requirements with real-time field-level validation, change detection disabling update button when no modifications made, and comprehensive error handling for all API scenarios. Added deactivate functionality with confirmation dialog, informative messaging about transaction preservation, and proper success/error notifications. Successfully tested end-to-end with Playwright browser automation confirming form loads with correct data, item code properly disabled, update functionality working with success notification, redirect behavior, and deactivate button functioning with confirmation dialog and successful soft delete. Edit UI now production-ready providing intuitive interface for modifying inventory items with proper validation and user feedback.
+
+---
+
+_Next: 1.6.6 Set Item Prices UI_

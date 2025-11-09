@@ -634,13 +634,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.5 Edit Item UI
 
-- [ ] Create `pages/items/[id]/edit.vue`
-- [ ] Pre-fill form with existing item data
-- [ ] Allow editing all fields except code
-- [ ] Implement update handler
-- [ ] Handle success/error
-- [ ] Add "Deactivate" button (soft delete)
-- [ ] Test item editing
+- [x] Create `pages/items/[id]/edit.vue`
+- [x] Pre-fill form with existing item data
+- [x] Allow editing all fields except code
+- [x] Implement update handler
+- [x] Handle success/error
+- [x] Add "Deactivate" button (soft delete)
+- [x] Test item editing
 
 ### 1.6.6 Item Price Setting UI
 
