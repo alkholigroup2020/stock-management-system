@@ -892,19 +892,19 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.9.2 Stock Now Page
 
-- [ ] Create `pages/stock-now.vue`
-- [ ] Display stock table
-  - [ ] Item Code, Name, Unit, Category
-  - [ ] On-Hand, WAC, Total Value
-- [ ] Show total inventory value
-- [ ] Implement filters
-  - [ ] Category dropdown
-  - [ ] Low stock toggle
-  - [ ] Search by item name/code
-- [ ] Add location selector (for supervisors/admins)
-- [ ] Implement export to CSV (optional)
-- [ ] Style with brand colors
-- [ ] Test stock now page
+- [x] Create `pages/stock-now.vue`
+- [x] Display stock table
+  - [x] Item Code, Name, Unit, Category
+  - [x] On-Hand, WAC, Total Value
+- [x] Show total inventory value
+- [x] Implement filters
+  - [x] Category dropdown
+  - [x] Low stock toggle
+  - [x] Search by item name/code
+- [x] Add location selector (for supervisors/admins)
+- [x] Implement export to CSV (optional)
+- [x] Style with brand colors
+- [x] Test stock now page
 
 ### 1.9.3 Dashboard API
 
