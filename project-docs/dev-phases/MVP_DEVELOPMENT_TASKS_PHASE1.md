@@ -803,14 +803,14 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.8.2 Stock Validation Utility
 
-- [ ] Create `server/utils/stockValidation.ts`
-- [ ] Implement stock check function
+- [x] Create `server/utils/stockValidation.ts`
+- [x] Implement stock check function
   ```typescript
   validateSufficientStock(locationId, itemId, quantity): Promise<boolean>
   ```
-- [ ] Implement error response for insufficient stock
-  - [ ] Include item name, requested qty, available qty
-- [ ] Test stock validation
+- [x] Implement error response for insufficient stock
+  - [x] Include item name, requested qty, available qty
+- [x] Test stock validation
 
 ### 1.8.3 Issues List Page
 
