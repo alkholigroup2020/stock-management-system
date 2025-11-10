@@ -318,4 +318,12 @@ Successfully implemented comprehensive price variance detection system providing
 
 ---
 
-_Next: 1.7.3 Delivery API Routes_
+### ✅ 1.7.3 Delivery API Routes
+
+**Completed:** November 10, 2025
+
+Successfully implemented comprehensive Delivery API with three RESTful endpoints supporting goods receipt processing, automatic price variance detection, and WAC recalculation. Created GET /api/locations/:locationId/deliveries endpoint fetching deliveries for a location with advanced filtering (periodId, supplierId, date range, hasVariance), optional delivery lines inclusion via includeLines query parameter, and comprehensive related data (supplier, period, PO, poster, NCRs). Implemented POST /api/locations/:locationId/deliveries endpoint orchestrating complex delivery workflow with Zod validation for all fields (supplier, PO optional, invoice, delivery date, multi-line items), automatic delivery_no generation (format: DEL-YYYY-NNN), period status validation preventing posts to closed periods, location access checks restricting operators to assigned locations, and atomic Prisma transaction ensuring data consistency. Delivery creation processes each line by fetching period_price from ItemPrice table, calculating price variance (unit_price - period_price), automatically creating NCR via detectAndCreateNCR() if variance detected, updating/creating LocationStock records with new quantities, and recalculating WAC using calculateWAC() utility (newWAC = (currentQty × currentWAC + receivedQty × receiptPrice) / totalQty). Built GET /api/deliveries/:id endpoint fetching single delivery details with all lines including item info, associated NCRs, and comprehensive summary statistics (total lines, items count, variance lines, total variance amount, NCR count). All endpoints follow established patterns with proper authentication via event.context.user, role-based authorization (admins/supervisors full access, operators restricted to assigned locations), comprehensive Zod validation using error.issues property for error details, structured error responses (400 validation, 401 unauthorized, 403 forbidden, 404 not found, 500 internal), and proper Prisma database integration with transactions for atomicity. Fixed TypeScript compilation errors by correcting Zod error handling (error.issues vs error.errors) and adding type guards for conditional delivery_lines inclusion (Array.isArray check). Delivery API now production-ready providing complete goods receipt workflow with automatic price variance NCR generation, accurate WAC-based inventory valuation, and comprehensive audit trail supporting the critical business requirement of preventing unauthorized mid-period price changes through automatic quality control.
+
+---
+
+_Next: 1.7.4 Deliveries List Page_

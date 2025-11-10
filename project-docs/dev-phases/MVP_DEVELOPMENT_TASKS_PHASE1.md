@@ -681,29 +681,29 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.3 Delivery API Routes
 
-- [ ] Create `server/api/locations/[locationId]/deliveries/index.get.ts`
-  - [ ] Fetch deliveries for location
-  - [ ] Filter by period, supplier, date range
-  - [ ] Include delivery lines
-  - [ ] Return deliveries list
-- [ ] Create `server/api/locations/[locationId]/deliveries/index.post.ts`
-  - [ ] Validate delivery data (Zod)
-  - [ ] Check user has access to location
-  - [ ] Check period is open
-  - [ ] Start database transaction
-  - [ ] Create delivery record
-  - [ ] Process each delivery line:
-    - [ ] Check price variance against period price
-    - [ ] Create auto-NCR if variance detected
-    - [ ] Update location stock (quantity)
-    - [ ] Recalculate WAC
-  - [ ] Commit transaction
-  - [ ] Return delivery with variance info
-- [ ] Create `server/api/deliveries/[id].get.ts`
-  - [ ] Fetch single delivery by ID
-  - [ ] Include lines and NCRs
-  - [ ] Return delivery details
-- [ ] Test delivery API routes with price variance scenarios
+- [x] Create `server/api/locations/[locationId]/deliveries/index.get.ts`
+  - [x] Fetch deliveries for location
+  - [x] Filter by period, supplier, date range
+  - [x] Include delivery lines
+  - [x] Return deliveries list
+- [x] Create `server/api/locations/[locationId]/deliveries/index.post.ts`
+  - [x] Validate delivery data (Zod)
+  - [x] Check user has access to location
+  - [x] Check period is open
+  - [x] Start database transaction
+  - [x] Create delivery record
+  - [x] Process each delivery line:
+    - [x] Check price variance against period price
+    - [x] Create auto-NCR if variance detected
+    - [x] Update location stock (quantity)
+    - [x] Recalculate WAC
+  - [x] Commit transaction
+  - [x] Return delivery with variance info
+- [x] Create `server/api/deliveries/[id].get.ts`
+  - [x] Fetch single delivery by ID
+  - [x] Include lines and NCRs
+  - [x] Return delivery details
+- [x] Test delivery API routes with price variance scenarios
 
 ### 1.7.4 Deliveries List Page
 
