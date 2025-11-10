@@ -827,51 +827,51 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.8.4 Create Issue UI
 
-- [ ] Create `pages/issues/create.vue`
-- [ ] Design issue form
-  - [ ] Issue date picker
-  - [ ] Cost centre dropdown (FOOD/CLEAN/OTHER)
-  - [ ] Location display (current location)
-- [ ] Implement issue lines table
-  - [ ] Item selection dropdown
-  - [ ] Show current on-hand quantity
-  - [ ] Quantity input with validation
-  - [ ] WAC display (read-only)
-  - [ ] Line value (auto-calculated)
-  - [ ] Add/Remove line buttons
-- [ ] Show total value (auto-calculated)
-- [ ] Implement real-time stock check
-  - [ ] Show warning if quantity > on-hand
-  - [ ] Disable submit if any line exceeds stock
-- [ ] Implement form validation
-- [ ] Implement submit handler
-  - [ ] Call API to post issue
-  - [ ] Handle success (redirect to issues list)
-  - [ ] Handle errors (show insufficient stock message)
-- [ ] Test issue creation
+- [x] Create `pages/issues/create.vue`
+- [x] Design issue form
+  - [x] Issue date picker
+  - [x] Cost centre dropdown (FOOD/CLEAN/OTHER)
+  - [x] Location display (current location)
+- [x] Implement issue lines table
+  - [x] Item selection dropdown
+  - [x] Show current on-hand quantity
+  - [x] Quantity input with validation
+  - [x] WAC display (read-only)
+  - [x] Line value (auto-calculated)
+  - [x] Add/Remove line buttons
+- [x] Show total value (auto-calculated)
+- [x] Implement real-time stock check
+  - [x] Show warning if quantity > on-hand
+  - [x] Disable submit if any line exceeds stock
+- [x] Implement form validation
+- [x] Implement submit handler
+  - [x] Call API to post issue
+  - [x] Handle success (redirect to issues list)
+  - [x] Handle errors (show insufficient stock message)
+- [x] Test issue creation
 
 ### 1.8.5 Issue Detail Page
 
-- [ ] Create `pages/issues/[id].vue`
-- [ ] Display issue header
-  - [ ] Issue No, Date, Cost Centre, Location
-- [ ] Display issue lines table
-  - [ ] Item, Quantity, WAC, Value
-- [ ] Display total value
-- [ ] Add "Print" button (optional for MVP)
-- [ ] Test issue details
+- [x] Create `pages/issues/[id].vue`
+- [x] Display issue header
+  - [x] Issue No, Date, Cost Centre, Location
+- [x] Display issue lines table
+  - [x] Item, Quantity, WAC, Value
+- [x] Display total value
+- [x] Add "Print" button (optional for MVP)
+- [x] Test issue details
 
 ### 1.8.6 Components
 
-- [ ] Create `components/issue/IssueForm.vue`
-  - [ ] Reusable issue form component
-- [ ] Create `components/issue/IssueLineInput.vue`
-  - [ ] Single line input with stock validation
-  - [ ] Show on-hand quantity
-  - [ ] Real-time validation feedback
-- [ ] Create `components/common/StockAlert.vue`
-  - [ ] Alert for insufficient stock
-- [ ] Test components
+- [x] Create `components/issue/IssueForm.vue`
+  - [x] Reusable issue form component
+- [x] Create `components/issue/IssueLineInput.vue`
+  - [x] Single line input with stock validation
+  - [x] Show on-hand quantity
+  - [x] Real-time validation feedback
+- [x] Create `components/common/StockAlert.vue`
+  - [x] Alert for insufficient stock
+- [x] Test components
 
 ---
 

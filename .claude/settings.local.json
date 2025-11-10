@@ -67,7 +67,8 @@
       "Bash(node test-db-connection.mjs:*)",
       "Bash(node test-conn.mjs:*)",
       "Bash(node test-direct.mjs:*)",
-      "Bash(node test-pooler-6543.mjs:*)"
+      "Bash(node test-pooler-6543.mjs:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
