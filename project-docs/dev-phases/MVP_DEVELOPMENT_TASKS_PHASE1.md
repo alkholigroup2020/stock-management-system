@@ -761,13 +761,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.7 Components
 
-- [ ] Create `components/delivery/DeliveryForm.vue`
-  - [ ] Reusable delivery form component
-- [ ] Create `components/delivery/DeliveryLineInput.vue`
-  - [ ] Single line input with price variance check
-- [ ] Create `components/delivery/PriceVarianceAlert.vue`
-  - [ ] Alert component for price variance warnings
-- [ ] Test components
+- [x] Create `components/delivery/DeliveryForm.vue`
+  - [x] Reusable delivery form component
+- [x] Create `components/delivery/DeliveryLineInput.vue`
+  - [x] Single line input with price variance check
+- [x] Create `components/delivery/PriceVarianceAlert.vue`
+  - [x] Alert component for price variance warnings
+- [x] Test components
 
 ---
 
