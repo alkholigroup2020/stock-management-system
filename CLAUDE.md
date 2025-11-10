@@ -201,9 +201,11 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 
 ## Key Documentation Files
 
-See `/project-docs/` for: **PRD**, **MVP**, **MVP_DEVELOPMENT_TASKS**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **DESIGN_SYSTEM**
+See `/project-docs/` for: **PRD**, **MVP**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **DESIGN_SYSTEM**
 
-**IMPORTANT:** After completing main tasks from MVP_DEVELOPMENT_TASKS.md, mark its sub-tasks as completed, and update TASK_COMPLETION_LOG.md with 1-2 paragraph summary.
+See `project-docs/dev-phases/` for phased development plans.
+
+**IMPORTANT:** After completing main tasks from any task list in `project-docs/dev-phases/`, mark its sub-tasks as completed, and update TASK_COMPLETION_LOG.md with 1-2 paragraph summary.
 
 ## Currency and Localization
 
