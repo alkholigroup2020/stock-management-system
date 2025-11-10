@@ -879,16 +879,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.9.1 Stock Now API
 
-- [ ] Create `server/api/locations/[locationId]/stock.get.ts`
-  - [ ] Fetch location stock with item details
-  - [ ] Calculate total value
-  - [ ] Support filters (category, low stock)
-  - [ ] Return stock list
-- [ ] Create `server/api/stock/consolidated.get.ts`
-  - [ ] Fetch stock across all locations
-  - [ ] Aggregate totals
-  - [ ] Return consolidated view (supervisor/admin only)
-- [ ] Test stock API routes
+- [x] Create `server/api/locations/[locationId]/stock.get.ts`
+  - [x] Fetch location stock with item details
+  - [x] Calculate total value
+  - [x] Support filters (category, low stock)
+  - [x] Return stock list
+- [x] Create `server/api/stock/consolidated.get.ts`
+  - [x] Fetch stock across all locations
+  - [x] Aggregate totals
+  - [x] Return consolidated view (supervisor/admin only)
+- [x] Test stock API routes
 
 ### 1.9.2 Stock Now Page
 
