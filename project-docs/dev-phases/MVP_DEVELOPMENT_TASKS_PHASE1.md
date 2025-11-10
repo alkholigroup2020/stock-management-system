@@ -707,18 +707,18 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.4 Deliveries List Page
 
-- [ ] Create `pages/deliveries/index.vue`
-- [ ] Display deliveries table
-  - [ ] Delivery No, Date, Supplier, Invoice No, Total, Has Variance
-- [ ] Implement filters
-  - [ ] Date range
-  - [ ] Supplier
-  - [ ] Has variance (checkbox)
-- [ ] Add "New Delivery" button
-- [ ] Implement pagination
-- [ ] Add row click to view details
-- [ ] Style with brand colors
-- [ ] Test deliveries list
+- [x] Create `pages/deliveries/index.vue`
+- [x] Display deliveries table
+  - [x] Delivery No, Date, Supplier, Invoice No, Total, Has Variance
+- [x] Implement filters
+  - [x] Date range
+  - [x] Supplier
+  - [x] Has variance (checkbox)
+- [x] Add "New Delivery" button
+- [x] Implement pagination
+- [x] Add row click to view details
+- [x] Style with brand colors
+- [x] Test deliveries list
 
 ### 1.7.5 Create Delivery UI
 

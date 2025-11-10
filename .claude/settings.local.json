@@ -59,7 +59,8 @@
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
       "Bash(pnpm test:unit:*)",
-      "Bash(node test-delivery-api.mjs:*)"
+      "Bash(node test-delivery-api.mjs:*)",
+      "Bash(node test-deliveries-page.mjs:*)"
     ],
     "deny": [],
     "ask": []
