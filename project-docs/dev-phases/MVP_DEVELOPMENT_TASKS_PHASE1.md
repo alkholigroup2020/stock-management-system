@@ -748,16 +748,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.6 Delivery Detail Page
 
-- [ ] Create `pages/deliveries/[id].vue`
-- [ ] Display delivery header
-  - [ ] Delivery No, Date, Supplier, Invoice
-- [ ] Display delivery lines table
-  - [ ] Item, Quantity, Unit Price, Period Price, Variance, Value
-  - [ ] Highlight lines with variance
-- [ ] Display auto-generated NCRs
-  - [ ] Link to NCR details
-- [ ] Add "Print" button (optional for MVP)
-- [ ] Test delivery details
+- [x] Create `pages/deliveries/[id].vue`
+- [x] Display delivery header
+  - [x] Delivery No, Date, Supplier, Invoice
+- [x] Display delivery lines table
+  - [x] Item, Quantity, Unit Price, Period Price, Variance, Value
+  - [x] Highlight lines with variance
+- [x] Display auto-generated NCRs
+  - [x] Link to NCR details
+- [x] Add "Print" button (optional for MVP)
+- [x] Test delivery details
 
 ### 1.7.7 Components
 
