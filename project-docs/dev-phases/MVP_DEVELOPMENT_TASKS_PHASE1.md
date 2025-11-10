@@ -671,13 +671,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.2 Price Variance Detection
 
-- [ ] Create `server/utils/priceVariance.ts`
-- [ ] Implement price variance check
-  - [ ] Compare delivery price to period price
-  - [ ] Calculate variance amount
-  - [ ] Determine if NCR needed (threshold check)
-- [ ] Implement auto-NCR creation logic
-- [ ] Test price variance detection
+- [x] Create `server/utils/priceVariance.ts`
+- [x] Implement price variance check
+  - [x] Compare delivery price to period price
+  - [x] Calculate variance amount
+  - [x] Determine if NCR needed (threshold check)
+- [x] Implement auto-NCR creation logic
+- [x] Test price variance detection
 
 ### 1.7.3 Delivery API Routes
 

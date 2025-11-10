@@ -310,4 +310,12 @@ Successfully implemented comprehensive WAC (Weighted Average Cost) calculation u
 
 ---
 
-_Next: 1.7.2 Price Variance Detection_
+### ✅ 1.7.2 Price Variance Detection
+
+**Completed:** November 10, 2025
+
+Successfully implemented comprehensive price variance detection system providing automatic NCR (Non-Conformance Report) creation when delivery prices differ from period-locked prices. Created server/utils/priceVariance.ts utility with five core functions: checkPriceVariance() comparing delivery unit_price against period_price with detailed variance calculations (absolute variance, percentage variance, total variance amount), generateNCRNumber() creating sequential NCR numbers (format: NCR-YYYY-NNN), createPriceVarianceNCR() automatically generating NCR records with type=PRICE_VARIANCE and auto_generated=true, detectAndCreateNCR() orchestrating the complete detection and creation workflow, and validatePriceVarianceInputs() ensuring input data integrity. Implemented flexible threshold configuration supporting both percentage-based thresholds (e.g., 5% variance tolerance) and absolute amount thresholds (e.g., SAR 100 tolerance) with intelligent logic ensuring proper threshold evaluation only when explicitly configured. Created comprehensive test suite (tests/unit/priceVariance.test.ts) with 45 test cases covering standard calculations, Prisma Decimal support, threshold configurations, edge cases (zero prices, large quantities, small variances), decimal precision rounding, NCR number generation, NCR creation, and complete integration testing. All tests pass successfully validating correct variance detection, proper NCR creation with detailed reason messages, accurate threshold checks, and robust error handling. Price variance detection now production-ready providing critical business logic for automatic quality control, preventing unauthorized mid-period price changes, and maintaining audit trail for all price discrepancies.
+
+---
+
+_Next: 1.7.3 Delivery API Routes_
