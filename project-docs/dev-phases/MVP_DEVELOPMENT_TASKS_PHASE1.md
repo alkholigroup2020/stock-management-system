@@ -722,29 +722,29 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.5 Create Delivery UI
 
-- [ ] Create `pages/deliveries/create.vue`
-- [ ] Design delivery form
-  - [ ] Supplier dropdown
-  - [ ] PO selection (optional)
-  - [ ] Invoice number input
-  - [ ] Delivery note input
-  - [ ] Delivery date picker
-- [ ] Implement delivery lines table
-  - [ ] Item selection dropdown
-  - [ ] Quantity input
-  - [ ] Unit price input
-  - [ ] Line value (auto-calculated)
-  - [ ] Add/Remove line buttons
-- [ ] Show total amount (auto-calculated)
-- [ ] Show price variance warnings inline
-  - [ ] Highlight lines with price variance
-  - [ ] Show expected vs actual price
-- [ ] Implement form validation
-- [ ] Implement submit handler
-  - [ ] Call API to post delivery
-  - [ ] Handle success (show NCR info if created)
-  - [ ] Handle errors
-- [ ] Test delivery creation
+- [x] Create `pages/deliveries/create.vue`
+- [x] Design delivery form
+  - [x] Supplier dropdown
+  - [x] PO selection (optional)
+  - [x] Invoice number input
+  - [x] Delivery note input
+  - [x] Delivery date picker
+- [x] Implement delivery lines table
+  - [x] Item selection dropdown
+  - [x] Quantity input
+  - [x] Unit price input
+  - [x] Line value (auto-calculated)
+  - [x] Add/Remove line buttons
+- [x] Show total amount (auto-calculated)
+- [x] Show price variance warnings inline
+  - [x] Highlight lines with price variance
+  - [x] Show expected vs actual price
+- [x] Implement form validation
+- [x] Implement submit handler
+  - [x] Call API to post delivery
+  - [x] Handle success (show NCR info if created)
+  - [x] Handle errors
+- [x] Test delivery creation
 
 ### 1.7.6 Delivery Detail Page
 
