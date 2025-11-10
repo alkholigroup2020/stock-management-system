@@ -814,16 +814,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.8.3 Issues List Page
 
-- [ ] Create `pages/issues/index.vue`
-- [ ] Display issues table
-  - [ ] Issue No, Date, Cost Centre, Total Value
-- [ ] Implement filters
-  - [ ] Date range
-  - [ ] Cost centre (FOOD/CLEAN/OTHER)
-- [ ] Add "New Issue" button
-- [ ] Implement pagination
-- [ ] Add row click to view details
-- [ ] Test issues list
+- [x] Create `pages/issues/index.vue`
+- [x] Display issues table
+  - [x] Issue No, Date, Cost Centre, Total Value
+- [x] Implement filters
+  - [x] Date range
+  - [x] Cost centre (FOOD/CLEAN/OTHER)
+- [x] Add "New Issue" button
+- [x] Implement pagination
+- [x] Add row click to view details
+- [x] Test issues list
 
 ### 1.8.4 Create Issue UI
 

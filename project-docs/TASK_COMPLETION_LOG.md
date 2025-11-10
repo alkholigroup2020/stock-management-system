@@ -374,4 +374,12 @@ Successfully implemented comprehensive stock validation utility providing critic
 
 ---
 
-_Next: 1.8.3 Issues List Page_
+### ✅ 1.8.3 Issues List Page
+
+**Completed:** November 10, 2025
+
+Successfully implemented comprehensive Issues List Page providing complete view and management interface for stock consumption transactions. Created pages/issues/index.vue featuring responsive table display with four columns (Issue No, Date, Cost Centre with color-coded badges, Total Value in SAR). Implemented advanced filtering system with date range inputs (startDate, endDate) and cost centre dropdown (All/Food/Cleaning/Other) with Apply/Clear buttons and active filter chips for easy removal. Built intelligent pagination system showing first/last pages with ellipsis for long lists, Previous/Next navigation, and pagination info displaying current range. Added operator/admin-only "New Issue" button with canPostIssues permission check and row click handlers navigating to /issues/:id detail page. Implemented comprehensive loading states with spinner, error states with retry action using ErrorAlert component, and empty state with helpful messaging using EmptyState component differentiating between filtered and initial empty results. Integrated with location store automatically fetching issues for active location with watch handler refreshing data on location changes. All table data properly formatted using formatCurrency() and formatDate() utilities. Issues menu item already present in sidebar with file-minus icon and proper permission filtering. Issues List Page now production-ready providing intuitive interface for viewing and filtering stock consumption records with excellent UX, responsive design, and seamless integration with existing issue API routes supporting stock validation workflow.
+
+---
+
+_Next: 1.8.4 Create Issue UI_
