@@ -55,7 +55,9 @@
       "Bash(node test-items-api.mjs:*)",
       "mcp__playwright__browser_press_key",
       "Bash(node test-prices-page.mjs:*)",
-      "Bash(exit 0)"
+      "Bash(exit 0)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

@@ -171,7 +171,8 @@
             <tr
               v-for="item in items"
               :key="item.id"
-              class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+              @click="navigateTo(`/items/${item.id}`)"
             >
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-[var(--ui-text)]">
                 {{ item.code }}
@@ -210,7 +211,7 @@
                   variant="ghost"
                   size="xs"
                   icon="i-heroicons-pencil-square"
-                  @click="navigateTo(`/items/${item.id}/edit`)"
+                  @click.stop="navigateTo(`/items/${item.id}/edit`)"
                 >
                   Edit
                 </UButton>

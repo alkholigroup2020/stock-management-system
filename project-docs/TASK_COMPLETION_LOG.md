@@ -292,4 +292,14 @@ Successfully implemented comprehensive Item Price Setting UI enabling period-bas
 
 ---
 
-_Next: 1.6.7 Location Stock Display_
+### ✅ 1.6.7 Location Stock Display
+
+**Completed:** November 10, 2025
+
+Successfully implemented Location Stock Display component and item detail page providing comprehensive multi-location inventory visibility. Created ItemLocationStockTable component (app/components/item/LocationStockTable.vue) displaying stock levels across all locations with columns for Location name/code, Type badge with color coding (Kitchen/Store/Central/Warehouse), On-Hand quantity with 4-decimal precision, WAC in SAR currency, and calculated Total Value per location with Grand Total footer. Built responsive table layout with empty state messaging when no stock data available and proper formatting using Intl.NumberFormat for currency (SAR) and quantities.
+
+Developed comprehensive item detail page (app/pages/items/[id]/index.vue) featuring breadcrumb navigation, complete item information card showing all metadata (code, name, unit, category, sub-category, status, timestamps), Stock Levels section with toggle functionality for admins/supervisors to view all locations or just assigned locations, LocationStockTable integration with dynamic data loading, and Quick Actions card providing shortcuts to Record Delivery and Record Issue workflows. Enhanced items list page with clickable table rows navigating to item details and @click.stop on Edit buttons to prevent row click propagation. Successfully tested end-to-end with Playwright browser automation confirming item detail page loads correctly, displays stock for Main Kitchen location (100 KG @ SAR 10.00 = SAR 1,000.00), "Show All Locations" toggle functional with proper state management, and all UI components rendering with proper brand colors and responsive design. Location Stock Display now production-ready providing essential inventory visibility across multiple locations critical for stock management operations.
+
+---
+
+_Next: 1.7.1 WAC Calculation Utility_

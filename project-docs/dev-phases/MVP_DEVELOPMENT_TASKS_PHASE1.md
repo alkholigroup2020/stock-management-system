@@ -646,14 +646,14 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.7 Location Stock Display
 
-- [ ] Create `components/item/LocationStockTable.vue`
-- [ ] Display stock levels per location
-  - [ ] Location name
-  - [ ] On-Hand quantity
-  - [ ] WAC
-  - [ ] Total value
-- [ ] Implement on items detail page
-- [ ] Test stock display
+- [x] Create `components/item/LocationStockTable.vue`
+- [x] Display stock levels per location
+  - [x] Location name
+  - [x] On-Hand quantity
+  - [x] WAC
+  - [x] Total value
+- [x] Implement on items detail page
+- [x] Test stock display
 
 ---
 
