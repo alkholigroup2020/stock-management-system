@@ -302,4 +302,12 @@ Developed comprehensive item detail page (app/pages/items/[id]/index.vue) featur
 
 ---
 
-_Next: 1.7.1 WAC Calculation Utility_
+### ✅ 1.7.1 WAC Calculation Utility
+
+**Completed:** November 10, 2025
+
+Successfully implemented comprehensive WAC (Weighted Average Cost) calculation utility providing the core inventory valuation logic for the Stock Management System. Created server/utils/wac.ts with calculateWAC() function implementing the formula: `newWAC = (currentQty × currentWAC + receivedQty × receiptPrice) / (currentQty + receivedQty)`. Function returns complete calculation result including newWAC, newQuantity, newValue, currentValue, and receiptValue with proper precision (4 decimals for WAC/quantities, 2 decimals for currency). Implemented comprehensive input validation preventing negative values, zero quantities, and non-finite numbers with clear error messages. Added helper functions previewWAC(), calculateReceiptValueImpact(), and validateWACInputs() for API integration. Installed vitest (v4.0.8) testing framework and created extensive test suite (tests/unit/wac.test.ts) with 38 test cases covering standard calculations, edge cases (zero stock, price increases/decreases, decimal precision), error handling, business scenarios, and all helper functions. All tests pass successfully validating correct WAC calculations, proper rounding, and robust error handling. Created comprehensive documentation (project-docs/WAC_CALCULATION_GUIDE.md) explaining formula, business context, implementation details, examples, validation rules, API integration patterns, and troubleshooting guidance. Added test scripts to package.json (test, test:watch, test:ui, test:unit) enabling easy test execution. WAC utility now production-ready providing accurate, tested, and well-documented inventory valuation calculations critical for delivery processing, automatic price variance detection, and period-end reconciliations.
+
+---
+
+_Next: 1.7.2 Price Variance Detection_

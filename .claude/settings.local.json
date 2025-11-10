@@ -57,7 +57,8 @@
       "Bash(node test-prices-page.mjs:*)",
       "Bash(exit 0)",
       "Bash(netstat:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(pnpm test:unit:*)"
     ],
     "deny": [],
     "ask": []

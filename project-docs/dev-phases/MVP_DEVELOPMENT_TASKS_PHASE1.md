@@ -661,13 +661,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.7.1 WAC Calculation Utility
 
-- [ ] Create `server/utils/wac.ts`
-- [ ] Implement WAC calculation function
+- [x] Create `server/utils/wac.ts`
+- [x] Implement WAC calculation function
   ```typescript
   calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice): number
   ```
-- [ ] Add tests for WAC calculation
-- [ ] Document WAC formula
+- [x] Add tests for WAC calculation
+- [x] Document WAC formula
 
 ### 1.7.2 Price Variance Detection
 

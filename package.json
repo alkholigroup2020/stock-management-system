@@ -10,6 +10,10 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:unit": "vitest run tests/unit",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
@@ -39,6 +43,8 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "prisma": "^6.18.0"
+    "@vitest/ui": "^4.0.8",
+    "prisma": "^6.18.0",
+    "vitest": "^4.0.8"
   }
 }
