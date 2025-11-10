@@ -180,6 +180,109 @@ async function main() {
     console.log(`  - ${item.code}: ${item.name} (${item.unit})`);
   });
 
+  // ========================================
+  // 5. CREATE TEST PERIOD
+  // ========================================
+  console.log('\n📅 Creating test period...');
+
+  // Get current date for period
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0-11
+  const currentYear = now.getFullYear();
+
+  // Create period for current month
+  const startDate = new Date(currentYear, currentMonth, 1); // First day of month
+  const endDate = new Date(currentYear, currentMonth + 1, 0); // Last day of month
+
+  const periodName = `${startDate.toLocaleString('en-US', { month: 'long' })} ${currentYear}`;
+
+  // Check if period already exists
+  let testPeriod = await prisma.period.findFirst({
+    where: {
+      name: periodName,
+    },
+  });
+
+  // Create if doesn't exist
+  if (!testPeriod) {
+    testPeriod = await prisma.period.create({
+      data: {
+        name: periodName,
+        start_date: startDate,
+        end_date: endDate,
+        status: 'OPEN',
+      },
+    });
+    console.log(`✓ Period created: ${testPeriod.name} (${testPeriod.status})`);
+  } else {
+    console.log(`✓ Period already exists: ${testPeriod.name} (${testPeriod.status})`);
+  }
+
+  console.log(`  Start: ${testPeriod.start_date.toLocaleDateString()}`);
+  console.log(`  End: ${testPeriod.end_date.toLocaleDateString()}`);
+
+  // Create period locations for all locations
+  await prisma.periodLocation.createMany({
+    data: [
+      {
+        period_id: testPeriod.id,
+        location_id: mainKitchen.id,
+        status: 'OPEN',
+        opening_value: 0,
+      },
+      {
+        period_id: testPeriod.id,
+        location_id: centralStore.id,
+        status: 'OPEN',
+        opening_value: 0,
+      },
+      {
+        period_id: testPeriod.id,
+        location_id: warehouse.id,
+        status: 'OPEN',
+        opening_value: 0,
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log(`✓ Created period locations for all locations\n`);
+
+  // ========================================
+  // 6. CREATE SAMPLE LOCATION STOCK
+  // ========================================
+  console.log('📊 Creating sample location stock...');
+
+  // Get all created items
+  const allItems = await prisma.item.findMany({
+    where: { is_active: true },
+  });
+
+  // Create stock for main kitchen with sample WAC values
+  const stockData = allItems.map((item) => ({
+    location_id: mainKitchen.id,
+    item_id: item.id,
+    on_hand: 100.0, // Sample quantity
+    wac: 10.0, // Sample WAC
+    min_stock: 20.0,
+    max_stock: 200.0,
+  }));
+
+  for (const stock of stockData) {
+    await prisma.locationStock.upsert({
+      where: {
+        location_id_item_id: {
+          location_id: stock.location_id,
+          item_id: stock.item_id,
+        },
+      },
+      update: {},
+      create: stock,
+    });
+  }
+
+  console.log(`✓ Created stock for ${stockData.length} items in ${mainKitchen.name}\n`);
+
   console.log('\n✅ Database seed completed successfully!\n');
   console.log('📝 Summary:');
   console.log('─'.repeat(50));
@@ -187,6 +290,8 @@ async function main() {
   console.log(`  • 3 Locations (Kitchen, Central Store, Warehouse)`);
   console.log(`  • 1 Supplier (Al-Safi Danone)`);
   console.log(`  • ${items.length} Items (across 4 categories)`);
+  console.log(`  • 1 Period (${testPeriod.name} - OPEN)`);
+  console.log(`  • ${stockData.length} Stock records (Main Kitchen)`);
   console.log('─'.repeat(50));
   console.log('\n🔐 Login Credentials:');
   console.log('  Email: admin@foodstock.local');

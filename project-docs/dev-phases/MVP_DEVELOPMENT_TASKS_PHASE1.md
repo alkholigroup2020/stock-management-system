@@ -633,16 +633,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.6.6 Item Price Setting UI
 
-- [ ] Create `pages/periods/[periodId]/prices.vue`
-- [ ] Display all items with current prices
-- [ ] Show: Item, Current Price, Period Price, Update
-- [ ] Allow bulk price update
-  - [ ] Editable price column
-  - [ ] "Save All" button
-- [ ] Show warning if prices differ from WAC
-- [ ] Implement price update handler
-- [ ] Handle success/error
-- [ ] Test price setting
+- [x] Create `pages/periods/[periodId]/prices.vue`
+- [x] Display all items with current prices
+- [x] Show: Item, Current Price, Period Price, Update
+- [x] Allow bulk price update
+  - [x] Editable price column
+  - [x] "Save All" button
+- [x] Show warning if prices differ from WAC
+- [x] Implement price update handler
+- [x] Handle success/error
+- [x] Test price setting
 
 ### 1.6.7 Location Stock Display
 

@@ -53,7 +53,9 @@
       "WebFetch(domain:ui.nuxt.com)",
       "mcp__playwright__browser_handle_dialog",
       "Bash(node test-items-api.mjs:*)",
-      "mcp__playwright__browser_press_key"
+      "mcp__playwright__browser_press_key",
+      "Bash(node test-prices-page.mjs:*)",
+      "Bash(exit 0)"
     ],
     "deny": [],
     "ask": []
