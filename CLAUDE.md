@@ -283,3 +283,19 @@ See `project-docs/dev-phases/` for phased development plans.
 - FIFO costing option
 - Use the "playwright" MCP after completing any task to check your work or when debugging any problem.
 - Only use http://localhost:3000 as the only dev server.
+
+## Development Troubleshooting Stories
+
+### Supabase Database Connection Error
+
+**Issue:** Prisma couldn't connect to Supabase with error "Can't reach database server at aws-1-ap-southeast-2.pooler.supabase.com:5432"
+
+**Root Cause:** Incorrect port number in `DATABASE_URL`. Supabase session pooler requires **port 6543** for Transaction mode (used by Prisma), not port 5432 (which is for direct connections only).
+
+**Solution:** Updated `.env` to use correct connection string:
+
+```
+DATABASE_URL="postgresql://postgres.[PROJECT]:[PASSWORD]@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
+```
+
+**Key Learning:** Supabase offers three connection modes - Direct (port 5432), Session pooler (port 5432), and Transaction pooler (port 6543). Prisma requires Transaction mode pooler due to its connection requirements.

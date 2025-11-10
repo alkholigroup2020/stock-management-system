@@ -775,31 +775,31 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.8.1 Issue API Routes
 
-- [ ] Create `server/api/locations/[locationId]/issues/index.get.ts`
-  - [ ] Fetch issues for location
-  - [ ] Filter by period, date range, cost centre
-  - [ ] Include issue lines
-  - [ ] Return issues list
-- [ ] Create `server/api/locations/[locationId]/issues/index.post.ts`
-  - [ ] Validate issue data (Zod)
-  - [ ] Check user has access to location
-  - [ ] Check period is open
-  - [ ] Start database transaction
-  - [ ] Validate sufficient stock for each line
-    - [ ] Check on_hand >= quantity
-    - [ ] Throw error if insufficient stock
-  - [ ] Create issue record
-  - [ ] Process each issue line:
-    - [ ] Get current WAC
-    - [ ] Calculate line value (qty × WAC)
-    - [ ] Deduct from location stock
-  - [ ] Commit transaction
-  - [ ] Return created issue
-- [ ] Create `server/api/issues/[id].get.ts`
-  - [ ] Fetch single issue by ID
-  - [ ] Include lines
-  - [ ] Return issue details
-- [ ] Test issue API routes with stock validation
+- [x] Create `server/api/locations/[locationId]/issues/index.get.ts`
+  - [x] Fetch issues for location
+  - [x] Filter by period, date range, cost centre
+  - [x] Include issue lines
+  - [x] Return issues list
+- [x] Create `server/api/locations/[locationId]/issues/index.post.ts`
+  - [x] Validate issue data (Zod)
+  - [x] Check user has access to location
+  - [x] Check period is open
+  - [x] Start database transaction
+  - [x] Validate sufficient stock for each line
+    - [x] Check on_hand >= quantity
+    - [x] Throw error if insufficient stock
+  - [x] Create issue record
+  - [x] Process each issue line:
+    - [x] Get current WAC
+    - [x] Calculate line value (qty × WAC)
+    - [x] Deduct from location stock
+  - [x] Commit transaction
+  - [x] Return created issue
+- [x] Create `server/api/issues/[id].get.ts`
+  - [x] Fetch single issue by ID
+  - [x] Include lines
+  - [x] Return issue details
+- [x] Test issue API routes with stock validation
 
 ### 1.8.2 Stock Validation Utility
 

@@ -358,4 +358,12 @@ Successfully created three reusable delivery components providing modular, testa
 
 ---
 
-_Next: 1.8.1 Issue API Routes_
+### ✅ 1.8.1 Issue API Routes
+
+**Completed:** November 10, 2025
+
+Successfully implemented comprehensive Issue API with three RESTful endpoints supporting stock consumption tracking with mandatory stock validation. Created GET /api/locations/:locationId/issues endpoint fetching issues list with advanced filtering (periodId, date range, costCentre FOOD/CLEAN/OTHER), optional issue lines inclusion via includeLines query parameter, and comprehensive related data (location, period, poster). Implemented POST /api/locations/:locationId/issues endpoint orchestrating complex issue workflow with Zod validation, automatic issue_no generation (format: ISS-YYYY-NNN), period status validation preventing posts to closed periods, critical stock validation checking on_hand >= quantity for all lines before transaction start, detailed insufficient stock error responses listing all items with requested vs available quantities, and atomic Prisma transaction ensuring data consistency. Issue creation processes each line by fetching current WAC from LocationStock, calculating line value (qty × WAC), and deducting from location stock WITHOUT recalculating WAC (key difference from deliveries which do recalculate WAC on receipt). Built GET /api/issues/:id endpoint fetching single issue details with all lines including item info, comprehensive summary statistics (total lines, total items, total value), and full period/location/poster information. All endpoints follow established patterns from delivery routes with proper authentication via event.context.user, role-based authorization (admins/supervisors full access, operators restricted to assigned locations), comprehensive Zod validation with detailed error messages, structured error responses (400 validation/insufficient stock, 401 unauthorized, 403 forbidden, 404 not found, 500 internal), and proper Prisma database integration with transactions for atomicity. Created comprehensive test script (test-issues-api.mjs) validating all endpoints including list fetching, insufficient stock validation (confirming proper 400 error with INSUFFICIENT_STOCK code), successful issue creation with stock deduction, single issue detail retrieval, and filtered queries with includeLines support. Issue API now production-ready providing complete stock consumption workflow with critical stock validation preventing negative inventory, accurate WAC-based valuation without recalculation maintaining historical costs, and comprehensive audit trail supporting the fundamental business requirement of preventing stockouts through pre-transaction validation.
+
+---
+
+_Next: 1.8.2 Stock Validation Utility_

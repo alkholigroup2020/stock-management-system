@@ -61,7 +61,13 @@
       "Bash(pnpm test:unit:*)",
       "Bash(node test-delivery-api.mjs:*)",
       "Bash(node test-deliveries-page.mjs:*)",
-      "Bash(node test-delivery-detail.mjs:*)"
+      "Bash(node test-delivery-detail.mjs:*)",
+      "Bash(node test-issues-api.mjs:*)",
+      "Bash(timeout:*)",
+      "Bash(node test-db-connection.mjs:*)",
+      "Bash(node test-conn.mjs:*)",
+      "Bash(node test-direct.mjs:*)",
+      "Bash(node test-pooler-6543.mjs:*)"
     ],
     "deny": [],
     "ask": []
