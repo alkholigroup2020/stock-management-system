@@ -921,31 +921,31 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.9.4 Dashboard Page
 
-- [ ] Create `pages/index.vue` (dashboard)
-- [ ] Design dashboard layout
-  - [ ] 4 metric cards at top (receipts, issues, mandays, days left)
-  - [ ] Recent deliveries section
-  - [ ] Recent issues section
-  - [ ] Quick actions (buttons to common pages)
-- [ ] Implement metric cards
-  - [ ] Use brand colors (navy, emerald)
-  - [ ] Display values with SAR formatting
-  - [ ] Add icons
-- [ ] Implement recent activity lists
-  - [ ] Deliveries: No, Date, Supplier, Amount
-  - [ ] Issues: No, Date, Cost Centre, Amount
-  - [ ] Click to view details
-- [ ] Add location selector (for multi-location users)
-- [ ] Add period indicator
-- [ ] Test dashboard
+- [x] Create `pages/index.vue` (dashboard)
+- [x] Design dashboard layout
+  - [x] 4 metric cards at top (receipts, issues, mandays, days left)
+  - [x] Recent deliveries section
+  - [x] Recent issues section
+  - [x] Quick actions (buttons to common pages)
+- [x] Implement metric cards
+  - [x] Use brand colors (navy, emerald)
+  - [x] Display values with SAR formatting
+  - [x] Add icons
+- [x] Implement recent activity lists
+  - [x] Deliveries: No, Date, Supplier, Amount
+  - [x] Issues: No, Date, Cost Centre, Amount
+  - [x] Click to view details
+- [x] Add location selector (for multi-location users)
+- [x] Add period indicator
+- [x] Test dashboard
 
 ### 1.9.5 Dashboard Components
 
-- [ ] Create `components/dashboard/MetricCard.vue`
-  - [ ] Reusable metric card with icon, label, value
-- [ ] Create `components/dashboard/RecentActivity.vue`
-  - [ ] List of recent transactions
-- [ ] Test components
+- [x] Create `components/dashboard/MetricCard.vue`
+  - [x] Reusable metric card with icon, label, value
+- [x] Create `components/dashboard/RecentActivity.vue`
+  - [x] List of recent transactions
+- [x] Test components
 
 ---
 
