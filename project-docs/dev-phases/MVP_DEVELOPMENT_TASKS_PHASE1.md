@@ -908,16 +908,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 1.9.3 Dashboard API
 
-- [ ] Create `server/api/locations/[locationId]/dashboard.get.ts`
-  - [ ] Fetch period totals for location
-    - [ ] Total receipts
-    - [ ] Total issues
-    - [ ] Total mandays
-    - [ ] Days left in period
-  - [ ] Fetch recent deliveries (last 5)
-  - [ ] Fetch recent issues (last 5)
-  - [ ] Return dashboard data
-- [ ] Test dashboard API
+- [x] Create `server/api/locations/[locationId]/dashboard.get.ts`
+  - [x] Fetch period totals for location
+    - [x] Total receipts
+    - [x] Total issues
+    - [x] Total mandays
+    - [x] Days left in period
+  - [x] Fetch recent deliveries (last 5)
+  - [x] Fetch recent issues (last 5)
+  - [x] Return dashboard data
+- [x] Test dashboard API
 
 ### 1.9.4 Dashboard Page
 
