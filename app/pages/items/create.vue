@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-4 md:p-6">
+  <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-2">
@@ -12,10 +12,10 @@
           Back
         </UButton>
       </div>
-      <h1 class="text-2xl md:text-3xl font-bold text-[var(--ui-text)]">
+      <h1 class="text-2xl md:text-3xl font-bold text-default">
         Create New Item
       </h1>
-      <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+      <p class="mt-1 text-sm text-muted">
         Add a new inventory item to the system
       </p>
     </div>
@@ -28,7 +28,7 @@
           <div>
             <label for="code" class="form-label">
               Item Code
-              <span class="text-[var(--ui-error)]">*</span>
+              <span class="text-error">*</span>
             </label>
             <UInput
               id="code"
@@ -40,10 +40,10 @@
               @blur="validateField('code')"
               @input="form.code = form.code.toUpperCase()"
             />
-            <p v-if="errors.code" class="mt-1 text-sm text-[var(--ui-error)]">
+            <p v-if="errors.code" class="mt-1 text-sm text-error">
               {{ errors.code }}
             </p>
-            <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+            <p class="mt-1 text-xs text-muted">
               Unique identifier for the item (automatically converted to uppercase)
             </p>
           </div>
@@ -52,7 +52,7 @@
           <div>
             <label for="name" class="form-label">
               Item Name
-              <span class="text-[var(--ui-error)]">*</span>
+              <span class="text-error">*</span>
             </label>
             <UInput
               id="name"
@@ -63,7 +63,7 @@
               :error="!!errors.name"
               @blur="validateField('name')"
             />
-            <p v-if="errors.name" class="mt-1 text-sm text-[var(--ui-error)]">
+            <p v-if="errors.name" class="mt-1 text-sm text-error">
               {{ errors.name }}
             </p>
           </div>
@@ -72,7 +72,7 @@
           <div>
             <label for="unit" class="form-label">
               Unit of Measure
-              <span class="text-[var(--ui-error)]">*</span>
+              <span class="text-error">*</span>
             </label>
             <USelectMenu
               v-model="form.unit"
@@ -84,10 +84,10 @@
               :error="!!errors.unit"
               @update:model-value="validateField('unit')"
             />
-            <p v-if="errors.unit" class="mt-1 text-sm text-[var(--ui-error)]">
+            <p v-if="errors.unit" class="mt-1 text-sm text-error">
               {{ errors.unit }}
             </p>
-            <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+            <p class="mt-1 text-xs text-muted">
               How this item is measured (KG = Kilograms, EA = Each, LTR = Liters, etc.)
             </p>
           </div>
@@ -106,10 +106,10 @@
               :error="!!errors.category"
               @blur="validateField('category')"
             />
-            <p v-if="errors.category" class="mt-1 text-sm text-[var(--ui-error)]">
+            <p v-if="errors.category" class="mt-1 text-sm text-error">
               {{ errors.category }}
             </p>
-            <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+            <p class="mt-1 text-xs text-muted">
               Optional: Main category for organizing items
             </p>
           </div>
@@ -128,16 +128,16 @@
               :error="!!errors.sub_category"
               @blur="validateField('sub_category')"
             />
-            <p v-if="errors.sub_category" class="mt-1 text-sm text-[var(--ui-error)]">
+            <p v-if="errors.sub_category" class="mt-1 text-sm text-error">
               {{ errors.sub_category }}
             </p>
-            <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+            <p class="mt-1 text-xs text-muted">
               Optional: Sub-category for further organization
             </p>
           </div>
 
           <!-- Form Actions -->
-          <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-[var(--ui-border)]">
+          <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default">
             <UButton
               type="button"
               color="neutral"

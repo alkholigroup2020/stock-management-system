@@ -718,6 +718,7 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 - **Never hardcode colors** that should adapt to theme
 - **Never mix systems**: Pick semantic tokens OR Tailwind classes, be consistent within a component
 - **Never use @apply with custom classes**: Tailwind CSS v4 only allows `@apply` with built-in utilities (see below)
+- **Never use @utility with pseudo-elements**: `@utility` directive requires alphanumeric names only, cannot include `::placeholder`, `:hover`, etc.
 
 ### When to Use What
 
@@ -792,6 +793,53 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 - All badge utility classes in `main.css` use direct CSS properties
 - Form and card classes can still use `@apply` with Tailwind's built-in utilities
 - This ensures compatibility with Tailwind CSS v4's architecture
+
+### Tailwind CSS v4 @utility Directive Limitation ⚠️
+
+**IMPORTANT:** Tailwind CSS v4's `@utility` directive requires utility names to be **alphanumeric only** (starting with a lowercase letter). It does NOT support pseudo-elements or pseudo-classes in the utility name itself.
+
+**❌ WRONG - Will cause build error:**
+
+```css
+@utility placeholder-muted::placeholder {
+  color: var(--ui-text-muted);
+}
+
+@utility hover-primary:hover {
+  color: var(--ui-primary);
+}
+```
+
+**Error message:**
+```
+@utility placeholder-muted::placeholder defines an invalid utility name.
+Utilities should be alphanumeric and start with a lowercase letter.
+```
+
+**✅ CORRECT - Use regular CSS classes for pseudo-elements/classes:**
+
+```css
+.placeholder-muted::placeholder {
+  color: var(--ui-text-muted);
+}
+
+.hover-primary:hover {
+  color: var(--ui-primary);
+}
+```
+
+**When to use `@utility`:**
+
+- Simple utilities without pseudo-elements/classes
+- Utilities that need to be applied via Tailwind's utility system
+- Single property utilities like `@utility bg-elevated { background-color: var(--ui-bg-elevated); }`
+
+**When to use regular CSS classes:**
+
+- Pseudo-elements (::placeholder, ::before, ::after)
+- Pseudo-classes (:hover, :focus, :active)
+- Complex multi-property patterns
+- Business-specific badge and card classes
 
 ---
 
@@ -907,6 +955,7 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 - [ ] Cards use `.card-elevated` or `.card-muted`
 - [ ] No inline hex colors in templates
 - [ ] No direct color class usage on business elements (use tokens)
+- [ ] No `@utility` directives with pseudo-elements in CSS files
 - [ ] Focus states are visible on all interactive elements
 - [ ] Screen reader testing passes
 - [ ] Color contrast passes WCAG AA

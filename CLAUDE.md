@@ -248,6 +248,7 @@ See `project-docs/dev-phases/` for phased development plans.
 - ❌ Never inline hex: `style="color: #000046"`
 - ❌ Never custom names in Nuxt UI: `color="navy"`
 - ❌ Tailwind v4: Cannot `@apply` custom classes, only built-in utilities
+- ❌ Tailwind v4: Cannot use `@utility` with pseudo-elements (::placeholder, ::before, etc.)
 
 **Quick Ref:** Page: `bg-[var(--ui-bg)]`, Card: `bg-[var(--ui-bg-elevated)] border-[var(--ui-border)]`, Button: `<UButton color="primary">`, Badge: `<span class="badge-stock-healthy">`
 
@@ -263,6 +264,7 @@ See `project-docs/dev-phases/` for phased development plans.
 8. **Never expose Supabase service key** - Server-only, never in client code
 9. **Never use inline color styles** - Always use Tailwind color tokens (text-navy-500, bg-emerald-400) or Nuxt UI semantic color props (color="primary", color="secondary") instead of style="color: #000046"
 10. **Never use @apply with custom classes** - Tailwind CSS v4 only allows @apply with built-in utilities. Use direct CSS properties for custom classes instead.
+11. **Never use @utility with pseudo-elements** - Tailwind CSS v4's @utility directive requires alphanumeric names only. Use regular CSS classes for pseudo-elements like `.placeholder-muted::placeholder` instead of `@utility placeholder-muted::placeholder`.
 
 ## Performance Considerations
 

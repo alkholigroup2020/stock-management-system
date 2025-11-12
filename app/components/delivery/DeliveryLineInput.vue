@@ -145,10 +145,10 @@ const handleRemove = () => {
 
     <!-- Period Price -->
     <td class="px-4 py-3">
-      <span v-if="line.period_price !== undefined" class="text-sm text-[var(--ui-text-muted)]">
+      <span v-if="line.period_price !== undefined" class="text-sm text-muted">
         {{ formatCurrency(line.period_price) }}
       </span>
-      <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+      <span v-else class="text-sm text-muted">-</span>
     </td>
 
     <!-- Variance -->
@@ -164,12 +164,12 @@ const handleRemove = () => {
           {{ formatCurrency(line.price_variance) }}
         </span>
       </div>
-      <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+      <span v-else class="text-sm text-muted">-</span>
     </td>
 
     <!-- Line Value -->
     <td class="px-4 py-3 text-right">
-      <span class="text-sm font-medium text-[var(--ui-text)]">
+      <span class="text-sm font-medium text-default">
         {{ formatCurrency(line.line_value) }}
       </span>
     </td>

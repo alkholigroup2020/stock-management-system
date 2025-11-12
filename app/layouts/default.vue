@@ -31,7 +31,7 @@ provide("sidebarState", {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)]">
+  <div class="min-h-screen bg-default">
     <!-- App Navbar -->
     <LayoutAppNavbar
       @toggle-sidebar="toggleSidebar"
@@ -60,12 +60,10 @@ provide("sidebarState", {
         </div>
 
         <!-- Optional Footer -->
-        <footer
-          class="mt-auto border-t border-[var(--ui-border)] bg-[var(--ui-bg-elevated)]"
-        >
+        <footer class="mt-auto border-t border-default bg-elevated">
           <div class="container mx-auto px-4 py-4 max-w-7xl">
             <div
-              class="flex flex-col md:flex-row justify-between items-center text-sm text-[var(--ui-text-muted)]"
+              class="flex flex-col md:flex-row justify-between items-center text-sm text-muted"
             >
               <p>
                 &copy; {{ new Date().getFullYear() }} Stock Management System.

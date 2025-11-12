@@ -112,7 +112,7 @@
           </UFormGroup>
 
           <!-- Submit Buttons -->
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
             <UButton
               color="neutral"
               variant="ghost"

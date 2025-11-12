@@ -242,19 +242,19 @@ watch(lines, () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-6">
+  <div class="min-h-screen bg-default p-6">
     <!-- Page Header -->
     <PageHeader
       title="New Delivery"
       icon="truck"
     >
       <template #breadcrumbs>
-        <nav class="flex items-center space-x-2 text-sm text-[var(--ui-text-muted)]">
-          <NuxtLink to="/" class="hover:text-[var(--ui-primary)]">Home</NuxtLink>
+        <nav class="flex items-center space-x-2 text-sm text-muted">
+          <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
           <span>/</span>
-          <NuxtLink to="/deliveries" class="hover:text-[var(--ui-primary)]">Deliveries</NuxtLink>
+          <NuxtLink to="/deliveries" class="hover:text-primary">Deliveries</NuxtLink>
           <span>/</span>
-          <span class="text-[var(--ui-text)]">New</span>
+          <span class="text-default">New</span>
         </nav>
       </template>
     </PageHeader>
@@ -264,7 +264,7 @@ watch(lines, () => {
       <!-- Delivery Header Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Information</h2>
+          <h2 class="text-lg font-semibold text-default">Delivery Information</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -324,7 +324,7 @@ watch(lines, () => {
       <UCard class="card-elevated">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Items</h2>
+            <h2 class="text-lg font-semibold text-default">Delivery Items</h2>
             <UButton
               icon="i-lucide-plus"
               color="primary"
@@ -350,19 +350,19 @@ watch(lines, () => {
 
         <!-- Lines Table -->
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <table class="min-w-full divide-y divide-default">
             <thead>
-              <tr class="bg-[var(--ui-bg)]">
-                <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Item</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Quantity</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Unit Price</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Period Price</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Variance</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-[var(--ui-text-muted)] uppercase">Line Value</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-[var(--ui-text-muted)] uppercase">Action</th>
+              <tr class="bg-default">
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Quantity</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Unit Price</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Period Price</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Variance</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">Line Value</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">Action</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[var(--ui-border)]">
+            <tbody class="divide-y divide-default">
               <tr
                 v-for="line in lines"
                 :key="line.id"
@@ -407,10 +407,10 @@ watch(lines, () => {
 
                 <!-- Period Price -->
                 <td class="px-4 py-3">
-                  <span v-if="line.period_price !== undefined" class="text-sm text-[var(--ui-text-muted)]">
+                  <span v-if="line.period_price !== undefined" class="text-sm text-muted">
                     {{ formatCurrency(line.period_price) }}
                   </span>
-                  <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+                  <span v-else class="text-sm text-muted">-</span>
                 </td>
 
                 <!-- Variance -->
@@ -426,12 +426,12 @@ watch(lines, () => {
                       {{ formatCurrency(line.price_variance) }}
                     </span>
                   </div>
-                  <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+                  <span v-else class="text-sm text-muted">-</span>
                 </td>
 
                 <!-- Line Value -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-[var(--ui-text)]">
+                  <span class="text-sm font-medium text-default">
                     {{ formatCurrency(line.line_value) }}
                   </span>
                 </td>
@@ -451,7 +451,7 @@ watch(lines, () => {
 
               <!-- Empty State -->
               <tr v-if="lines.length === 0">
-                <td colspan="7" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
+                <td colspan="7" class="px-4 py-8 text-center text-muted">
                   No items added yet. Click "Add Item" to start.
                 </td>
               </tr>
@@ -460,14 +460,14 @@ watch(lines, () => {
         </div>
 
         <!-- Summary -->
-        <div class="mt-4 pt-4 border-t border-[var(--ui-border)]">
+        <div class="mt-4 pt-4 border-t border-default">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-[var(--ui-text-muted)]">
+            <div class="text-sm text-muted">
               {{ lines.length }} item(s)
             </div>
             <div class="text-right">
-              <div class="text-sm text-[var(--ui-text-muted)]">Total Amount</div>
-              <div class="text-2xl font-bold text-[var(--ui-primary)]">
+              <div class="text-sm text-muted">Total Amount</div>
+              <div class="text-2xl font-bold text-primary">
                 {{ formatCurrency(totalAmount) }}
               </div>
             </div>

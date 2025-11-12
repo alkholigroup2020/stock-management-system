@@ -6,10 +6,10 @@
       icon="i-lucide-tag"
     >
       <template #breadcrumbs>
-        <nav class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
-          <NuxtLink to="/" class="hover:text-[var(--ui-text)]">Dashboard</NuxtLink>
+        <nav class="flex items-center gap-2 text-sm text-muted">
+          <NuxtLink to="/" class="hover:text-default">Dashboard</NuxtLink>
           <span>/</span>
-          <span class="text-[var(--ui-text)]">Set Prices</span>
+          <span class="text-default">Set Prices</span>
         </nav>
       </template>
 
@@ -32,8 +32,8 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">{{ periodData.name }}</h2>
-            <p class="text-sm text-[var(--ui-text-muted)]">
+            <h2 class="text-lg font-semibold text-default">{{ periodData.name }}</h2>
+            <p class="text-sm text-muted">
               {{ formatDateRange(periodData.start_date, periodData.end_date) }}
             </p>
           </div>
@@ -64,7 +64,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
           <!-- Search -->
           <div class="flex-1">
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-2">
+            <label class="block text-sm font-medium text-muted mb-2">
               Search Items
             </label>
             <UInput
@@ -87,7 +87,7 @@
 
           <!-- Category Filter -->
           <div class="sm:w-64">
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-2">
+            <label class="block text-sm font-medium text-muted mb-2">
               Category
             </label>
             <USelectMenu
@@ -129,19 +129,19 @@
         <!-- Statistics -->
         <div class="mb-4 flex flex-wrap gap-4 text-sm">
           <div>
-            <span class="text-[var(--ui-text-muted)]">Total Items:</span>
-            <span class="ml-2 font-semibold text-[var(--ui-text)]">{{ pricesData.length }}</span>
+            <span class="text-muted">Total Items:</span>
+            <span class="ml-2 font-semibold text-default">{{ pricesData.length }}</span>
           </div>
           <div>
-            <span class="text-[var(--ui-text-muted)]">Prices Set:</span>
-            <span class="ml-2 font-semibold text-[var(--ui-text)]">{{ pricesSetCount }}</span>
+            <span class="text-muted">Prices Set:</span>
+            <span class="ml-2 font-semibold text-default">{{ pricesSetCount }}</span>
           </div>
           <div>
-            <span class="text-[var(--ui-text-muted)]">Prices Missing:</span>
-            <span class="ml-2 font-semibold text-[var(--ui-text)]">{{ pricesMissingCount }}</span>
+            <span class="text-muted">Prices Missing:</span>
+            <span class="ml-2 font-semibold text-default">{{ pricesMissingCount }}</span>
           </div>
           <div v-if="hasChanges" class="ml-auto">
-            <span class="text-[var(--ui-text-muted)]">Unsaved Changes:</span>
+            <span class="text-muted">Unsaved Changes:</span>
             <span class="ml-2 font-semibold text-amber-600">{{ changesCount }}</span>
           </div>
         </div>
@@ -150,44 +150,44 @@
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
-              <tr class="border-b border-[var(--ui-border)]">
-                <th class="px-4 py-3 text-left text-sm font-semibold text-[var(--ui-text)]">Code</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-[var(--ui-text)]">Item Name</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-[var(--ui-text)]">Unit</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-[var(--ui-text)]">Category</th>
-                <th class="px-4 py-3 text-right text-sm font-semibold text-[var(--ui-text)]">Current WAC</th>
-                <th class="px-4 py-3 text-right text-sm font-semibold text-[var(--ui-text)]">Period Price</th>
-                <th class="px-4 py-3 text-center text-sm font-semibold text-[var(--ui-text)]">Status</th>
+              <tr class="border-b border-default">
+                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Code</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Item Name</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Unit</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Category</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-default">Current WAC</th>
+                <th class="px-4 py-3 text-right text-sm font-semibold text-default">Period Price</th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-default">Status</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="item in filteredPrices"
                 :key="item.item_id"
-                class="border-b border-[var(--ui-border)] hover:bg-[var(--ui-bg-elevated)]"
+                class="border-b border-default hover:bg-elevated"
               >
                 <!-- Code -->
-                <td class="px-4 py-3 text-sm text-[var(--ui-text)]">
+                <td class="px-4 py-3 text-sm text-default">
                   {{ item.item_code }}
                 </td>
 
                 <!-- Item Name -->
-                <td class="px-4 py-3 text-sm text-[var(--ui-text)]">
+                <td class="px-4 py-3 text-sm text-default">
                   {{ item.item_name }}
                 </td>
 
                 <!-- Unit -->
-                <td class="px-4 py-3 text-sm text-[var(--ui-text-muted)]">
+                <td class="px-4 py-3 text-sm text-muted">
                   {{ item.item_unit }}
                 </td>
 
                 <!-- Category -->
-                <td class="px-4 py-3 text-sm text-[var(--ui-text-muted)]">
+                <td class="px-4 py-3 text-sm text-muted">
                   {{ item.item_category || '-' }}
                 </td>
 
                 <!-- Current WAC -->
-                <td class="px-4 py-3 text-right text-sm text-[var(--ui-text-muted)]">
+                <td class="px-4 py-3 text-right text-sm text-muted">
                   {{ item.wac !== null ? formatCurrency(item.wac) : '-' }}
                 </td>
 
@@ -261,7 +261,7 @@
 
     <!-- Footer Actions -->
     <div v-if="pricesData && pricesData.length > 0" class="mt-6 flex items-center justify-between">
-      <div class="text-sm text-[var(--ui-text-muted)]">
+      <div class="text-sm text-muted">
         <span v-if="hasChanges">
           <UIcon name="i-lucide-alert-circle" class="inline h-4 w-4" />
           You have unsaved changes. Click "Save All Prices" to apply them.

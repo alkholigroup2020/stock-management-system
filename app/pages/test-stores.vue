@@ -1,32 +1,32 @@
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-6">
+  <div class="min-h-screen bg-default p-6">
     <div class="max-w-7xl mx-auto space-y-6">
       <!-- Page Header -->
-      <div class="bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] rounded-lg p-6">
-        <h1 class="text-3xl font-bold text-[var(--ui-text)]">
+      <div class="bg-elevated border border-default rounded-lg p-6">
+        <h1 class="text-3xl font-bold text-default">
           Global Stores Test Page
         </h1>
-        <p class="text-[var(--ui-text-muted)] mt-2">
+        <p class="text-muted mt-2">
           Testing UI Store, Period Store, and Location Store
         </p>
       </div>
 
       <!-- UI Store Tests -->
-      <div class="bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-[var(--ui-text)] mb-4">
+      <div class="bg-elevated border border-default rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-default mb-4">
           UI Store
         </h2>
 
         <div class="space-y-4">
           <!-- Sidebar State -->
           <div>
-            <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+            <h3 class="text-lg font-semibold text-default mb-2">
               Sidebar State
             </h3>
             <div class="flex items-center gap-4">
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Desktop Sidebar Collapsed:
-                <span class="font-mono text-[var(--ui-text)]">{{ uiStore.sidebarCollapsed }}</span>
+                <span class="font-mono text-default">{{ uiStore.sidebarCollapsed }}</span>
               </p>
               <UButton
                 @click="uiStore.toggleSidebar()"
@@ -37,9 +37,9 @@
               </UButton>
             </div>
             <div class="flex items-center gap-4 mt-2">
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Mobile Sidebar Open:
-                <span class="font-mono text-[var(--ui-text)]">{{ uiStore.mobileSidebarOpen }}</span>
+                <span class="font-mono text-default">{{ uiStore.mobileSidebarOpen }}</span>
               </p>
               <UButton
                 @click="uiStore.toggleMobileSidebar()"
@@ -53,7 +53,7 @@
 
           <!-- Toast Queue -->
           <div>
-            <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+            <h3 class="text-lg font-semibold text-default mb-2">
               Toast Notifications
             </h3>
             <div class="flex gap-2 flex-wrap">
@@ -70,15 +70,15 @@
                 Info Toast
               </UButton>
             </div>
-            <p class="text-[var(--ui-text-muted)] mt-2">
+            <p class="text-muted mt-2">
               Active Toasts:
-              <span class="font-mono text-[var(--ui-text)]">{{ uiStore.activeToasts.length }}</span>
+              <span class="font-mono text-default">{{ uiStore.activeToasts.length }}</span>
             </p>
           </div>
 
           <!-- Modal State -->
           <div>
-            <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+            <h3 class="text-lg font-semibold text-default mb-2">
               Modal Management
             </h3>
             <div class="flex gap-2 flex-wrap">
@@ -96,13 +96,13 @@
               </UButton>
             </div>
             <div class="mt-2 space-y-1">
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Modal 1 Open:
-                <span class="font-mono text-[var(--ui-text)]">{{ uiStore.isModalOpen('test-modal-1') }}</span>
+                <span class="font-mono text-default">{{ uiStore.isModalOpen('test-modal-1') }}</span>
               </p>
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Modal 2 Open:
-                <span class="font-mono text-[var(--ui-text)]">{{ uiStore.isModalOpen('test-modal-2') }}</span>
+                <span class="font-mono text-default">{{ uiStore.isModalOpen('test-modal-2') }}</span>
               </p>
             </div>
           </div>
@@ -110,8 +110,8 @@
       </div>
 
       <!-- Period Store Tests -->
-      <div class="bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-[var(--ui-text)] mb-4">
+      <div class="bg-elevated border border-default rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-default mb-4">
           Period Store
         </h2>
 
@@ -137,11 +137,11 @@
 
           <!-- Period Info -->
           <div v-if="periodStore.currentPeriod" class="space-y-2">
-            <p class="text-[var(--ui-text-muted)]">
+            <p class="text-muted">
               Period Name:
-              <span class="font-semibold text-[var(--ui-text)]">{{ periodStore.periodName }}</span>
+              <span class="font-semibold text-default">{{ periodStore.periodName }}</span>
             </p>
-            <p class="text-[var(--ui-text-muted)]">
+            <p class="text-muted">
               Status:
               <UBadge
                 :color="periodStore.isPeriodOpen ? 'success' : 'warning'"
@@ -150,13 +150,13 @@
                 {{ periodStore.periodStatus }}
               </UBadge>
             </p>
-            <p class="text-[var(--ui-text-muted)]">
+            <p class="text-muted">
               Date Range:
-              <span class="font-mono text-[var(--ui-text)]">{{ periodStore.periodDateRange }}</span>
+              <span class="font-mono text-default">{{ periodStore.periodDateRange }}</span>
             </p>
-            <p class="text-[var(--ui-text-muted)]">
+            <p class="text-muted">
               Days Remaining:
-              <span class="font-semibold text-[var(--ui-text)]">{{ periodStore.daysRemaining }}</span>
+              <span class="font-semibold text-default">{{ periodStore.daysRemaining }}</span>
             </p>
           </div>
 
@@ -182,8 +182,8 @@
       </div>
 
       <!-- Location Store Tests -->
-      <div class="bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-[var(--ui-text)] mb-4">
+      <div class="bg-elevated border border-default rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-default mb-4">
           Location Store
         </h2>
 
@@ -201,25 +201,25 @@
 
           <!-- Active Location -->
           <div v-if="locationStore.activeLocation">
-            <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+            <h3 class="text-lg font-semibold text-default mb-2">
               Active Location
             </h3>
             <div class="space-y-2">
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Code:
-                <span class="font-mono text-[var(--ui-text)]">{{ locationStore.activeLocation.code }}</span>
+                <span class="font-mono text-default">{{ locationStore.activeLocation.code }}</span>
               </p>
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Name:
-                <span class="font-semibold text-[var(--ui-text)]">{{ locationStore.activeLocation.name }}</span>
+                <span class="font-semibold text-default">{{ locationStore.activeLocation.name }}</span>
               </p>
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Type:
                 <UBadge color="primary" variant="subtle">
                   {{ locationStore.activeLocation.type }}
                 </UBadge>
               </p>
-              <p class="text-[var(--ui-text-muted)]">
+              <p class="text-muted">
                 Access Level:
                 <UBadge color="success" variant="subtle">
                   {{ locationStore.activeLocation.access_level || 'FULL' }}
@@ -230,21 +230,21 @@
 
           <!-- All Locations -->
           <div v-if="locationStore.hasLocations">
-            <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+            <h3 class="text-lg font-semibold text-default mb-2">
               All User Locations ({{ locationStore.userLocations.length }})
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div
                 v-for="location in locationStore.userLocations"
                 :key="location.id"
-                class="p-4 border border-[var(--ui-border)] rounded-lg"
+                class="p-4 border border-default rounded-lg"
                 :class="{
                   'bg-navy-50 dark:bg-navy-900/20 border-navy-300 dark:border-navy-700': location.id === locationStore.activeLocationId
                 }"
               >
-                <p class="font-semibold text-[var(--ui-text)]">{{ location.name }}</p>
-                <p class="text-sm text-[var(--ui-text-muted)] font-mono">{{ location.code }}</p>
-                <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+                <p class="font-semibold text-default">{{ location.name }}</p>
+                <p class="text-sm text-muted font-mono">{{ location.code }}</p>
+                <p class="text-sm text-muted mt-1">
                   {{ location.type }}
                 </p>
                 <UButton
@@ -291,8 +291,8 @@
       </div>
 
       <!-- Test Results Summary -->
-      <div class="bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-[var(--ui-text)] mb-4">
+      <div class="bg-elevated border border-default rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-default mb-4">
           Test Results Summary
         </h2>
 
@@ -302,21 +302,21 @@
               :name="uiStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
               :class="uiStore ? 'text-emerald-500' : 'text-red-500'"
             />
-            <span class="text-[var(--ui-text)]">UI Store: {{ uiStore ? 'Initialized' : 'Not Initialized' }}</span>
+            <span class="text-default">UI Store: {{ uiStore ? 'Initialized' : 'Not Initialized' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <UIcon
               :name="periodStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
               :class="periodStore ? 'text-emerald-500' : 'text-red-500'"
             />
-            <span class="text-[var(--ui-text)]">Period Store: {{ periodStore ? 'Initialized' : 'Not Initialized' }}</span>
+            <span class="text-default">Period Store: {{ periodStore ? 'Initialized' : 'Not Initialized' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <UIcon
               :name="locationStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
               :class="locationStore ? 'text-emerald-500' : 'text-red-500'"
             />
-            <span class="text-[var(--ui-text)]">Location Store: {{ locationStore ? 'Initialized' : 'Not Initialized' }}</span>
+            <span class="text-default">Location Store: {{ locationStore ? 'Initialized' : 'Not Initialized' }}</span>
           </div>
         </div>
       </div>

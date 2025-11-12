@@ -102,7 +102,7 @@ const itemsText = computed(() => {
           class="flex items-center justify-between text-sm"
         >
           <span class="font-medium">{{ item.item_name }}</span>
-          <span class="text-[var(--ui-text-muted)]">
+          <span class="text-muted">
             Requested: <span class="font-semibold">{{ item.requested }}</span>
             / Available: <span class="font-semibold">{{ item.available }}</span>
           </span>

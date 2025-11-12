@@ -20,7 +20,7 @@
     <p
       v-if="text"
       :class="[
-        'text-[var(--ui-text-muted)]',
+        'text-muted',
         centerContent ? 'mt-3' : 'ml-3',
         textSizeClasses
       ]"
@@ -92,9 +92,9 @@ const textSizeClasses = computed(() => {
 // Color classes for spinner
 const colorClasses = computed(() => {
   const colors = {
-    primary: 'text-[var(--ui-primary)]',
+    primary: 'text-primary',
     secondary: 'text-[var(--ui-secondary)]',
-    neutral: 'text-[var(--ui-text-muted)]'
+    neutral: 'text-muted'
   }
   return colors[props.color]
 })

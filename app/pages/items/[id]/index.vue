@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-4 md:p-6">
+  <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />
@@ -33,7 +33,7 @@
           <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
               <button
-                class="inline-flex items-center text-sm text-[var(--ui-text-muted)] hover:text-[var(--ui-text)]"
+                class="inline-flex items-center text-sm text-muted hover:text-default"
                 @click="navigateTo('/items')"
               >
                 <UIcon name="i-heroicons-cube" class="w-4 h-4 mr-2" />
@@ -42,8 +42,8 @@
             </li>
             <li aria-current="page">
               <div class="flex items-center">
-                <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-[var(--ui-text-muted)]" />
-                <span class="ml-1 text-sm font-medium text-[var(--ui-text)] md:ml-2">
+                <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-muted" />
+                <span class="ml-1 text-sm font-medium text-default md:ml-2">
                   {{ item.code }}
                 </span>
               </div>
@@ -54,7 +54,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div class="flex items-center gap-3">
-              <h1 class="text-2xl md:text-3xl font-bold text-[var(--ui-text)]">
+              <h1 class="text-2xl md:text-3xl font-bold text-default">
                 {{ item.name }}
               </h1>
               <UBadge
@@ -66,7 +66,7 @@
                 Inactive
               </UBadge>
             </div>
-            <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+            <p class="mt-1 text-sm text-muted">
               Item Code: {{ item.code }}
             </p>
           </div>
@@ -88,7 +88,7 @@
       <!-- Item Information Card -->
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+          <h2 class="text-lg font-semibold text-default">
             Item Information
           </h2>
         </template>
@@ -96,27 +96,27 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Code -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Item Code
             </label>
-            <p class="text-base font-semibold text-[var(--ui-text)]">
+            <p class="text-base font-semibold text-default">
               {{ item.code }}
             </p>
           </div>
 
           <!-- Name -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Item Name
             </label>
-            <p class="text-base font-semibold text-[var(--ui-text)]">
+            <p class="text-base font-semibold text-default">
               {{ item.name }}
             </p>
           </div>
 
           <!-- Unit -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Unit of Measure
             </label>
             <UBadge color="primary" variant="subtle" size="md">
@@ -126,27 +126,27 @@
 
           <!-- Category -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Category
             </label>
-            <p class="text-base text-[var(--ui-text)]">
+            <p class="text-base text-default">
               {{ item.category || '-' }}
             </p>
           </div>
 
           <!-- Sub-Category -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Sub-Category
             </label>
-            <p class="text-base text-[var(--ui-text)]">
+            <p class="text-base text-default">
               {{ item.sub_category || '-' }}
             </p>
           </div>
 
           <!-- Status -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Status
             </label>
             <UBadge
@@ -160,20 +160,20 @@
 
           <!-- Created At -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Created
             </label>
-            <p class="text-base text-[var(--ui-text)]">
+            <p class="text-base text-default">
               {{ formatDate(item.created_at) }}
             </p>
           </div>
 
           <!-- Updated At -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text-muted)] mb-1">
+            <label class="block text-sm font-medium text-muted mb-1">
               Last Updated
             </label>
-            <p class="text-base text-[var(--ui-text)]">
+            <p class="text-base text-default">
               {{ formatDate(item.updated_at) }}
             </p>
           </div>
@@ -184,7 +184,7 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+            <h2 class="text-lg font-semibold text-default">
               Stock Levels
             </h2>
             <UButton
@@ -226,7 +226,7 @@
       <!-- Quick Actions Card -->
       <UCard v-if="canPostDeliveries() || canPostIssues()">
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+          <h2 class="text-lg font-semibold text-default">
             Quick Actions
           </h2>
         </template>

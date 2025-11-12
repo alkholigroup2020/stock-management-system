@@ -217,43 +217,134 @@
 }
 
 /* ============================================
+   CUSTOM TAILWIND UTILITIES
+   ============================================ */
+
+/* Background utilities */
+@utility bg-default {
+  background-color: var(--ui-bg);
+}
+
+@utility bg-elevated {
+  background-color: var(--ui-bg-elevated);
+}
+
+@utility bg-muted {
+  background-color: var(--ui-bg-muted);
+}
+
+@utility bg-accented {
+  background-color: var(--ui-bg-accented);
+}
+
+@utility bg-inverted {
+  background-color: var(--ui-bg-inverted);
+}
+
+/* Text color utilities */
+@utility text-default {
+  color: var(--ui-text);
+}
+
+@utility text-primary {
+  color: var(--ui-primary);
+}
+
+@utility text-error {
+  color: var(--ui-error);
+}
+
+@utility text-muted {
+  color: var(--ui-text-muted);
+}
+
+@utility text-dimmed {
+  color: var(--ui-text-dimmed);
+}
+
+@utility text-highlighted {
+  color: var(--ui-text-highlighted);
+}
+
+@utility text-inverted {
+  color: var(--ui-text-inverted);
+}
+
+/* Border color utilities */
+@utility border-default {
+  border-color: var(--ui-border);
+}
+
+@utility border-muted {
+  border-color: var(--ui-border-muted);
+}
+
+@utility border-accented {
+  border-color: var(--ui-border-accented);
+}
+
+@utility border-inverted {
+  border-color: var(--ui-border-inverted);
+}
+
+/* Divide color utilities */
+@utility divide-default {
+  border-color: var(--ui-border);
+}
+
+/* Ring/Focus utilities */
+@utility ring-primary {
+  --tw-ring-color: var(--ui-ring);
+}
+
+@utility ring-offset-elevated {
+  --tw-ring-offset-color: var(--ui-bg-elevated);
+}
+
+/* Placeholder utilities */
+.placeholder-muted::placeholder {
+  color: var(--ui-text-muted);
+}
+
+/* ============================================
    UTILITY CLASSES
    ============================================ */
 
 /* ===== Surface/Card Classes ===== */
 .card-elevated {
-  @apply bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)];
+  @apply bg-elevated border border-default;
   @apply rounded-lg shadow-sm hover:shadow-md;
   @apply transition-shadow duration-200;
 }
 
 .card-muted {
-  @apply bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)];
+  @apply bg-muted border border-muted;
   @apply rounded-lg;
 }
 
 .surface-inverted {
-  @apply bg-[var(--ui-bg-inverted)] text-[var(--ui-text-inverted)];
-  @apply border border-[var(--ui-border-inverted)];
+  @apply bg-inverted text-inverted;
+  @apply border border-inverted;
   @apply rounded-lg;
 }
 
 /* ===== Form Classes ===== */
 .form-input {
   @apply w-full px-4 py-2.5 rounded-lg;
-  @apply bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)];
-  @apply text-[var(--ui-text)] placeholder-[var(--ui-text-muted)];
-  @apply focus:ring-2 focus:ring-[var(--ui-ring)] focus:border-transparent;
+  @apply bg-elevated border border-default;
+  @apply text-default placeholder-muted;
+  @apply focus:ring-2 focus:ring-primary focus:border-transparent;
   @apply transition-all duration-200;
 }
 
 .form-label {
   @apply block text-sm font-medium;
-  @apply text-[var(--ui-text)] mb-1.5;
+  @apply text-default mb-1.5;
 }
 
 .form-error {
-  @apply text-sm text-[var(--ui-error)] mt-1;
+  @apply text-sm mt-1;
+  color: var(--ui-error);
 }
 
 /* ===== Status Badge Classes ===== */
@@ -447,8 +538,8 @@
 
 /* ===== Interactive & Accessibility Classes ===== */
 .focus-ring {
-  @apply focus:ring-2 focus:ring-[var(--ui-ring)] focus:ring-offset-2;
-  @apply focus:ring-offset-[var(--ui-bg-elevated)];
+  @apply focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  @apply focus:ring-offset-elevated;
   @apply focus:outline-none;
 }
 

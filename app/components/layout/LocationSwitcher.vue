@@ -110,7 +110,7 @@ const currentLocationIcon = computed(() => {
     <!-- Loading State -->
     <div v-if="locationStore.loading" class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-lucide-loader-2" class="animate-spin w-4 h-4" />
-      <span class="text-sm text-[var(--ui-text-muted)]">Loading...</span>
+      <span class="text-sm text-muted">Loading...</span>
     </div>
 
     <!-- Location Dropdown -->
@@ -150,7 +150,7 @@ const currentLocationIcon = computed(() => {
             <p class="font-medium text-sm truncate">{{ item.label }}</p>
             <p
               v-if="item.description"
-              class="text-xs text-[var(--ui-text-muted)] truncate"
+              class="text-xs text-muted truncate"
             >
               {{ item.description }}
             </p>
@@ -158,7 +158,8 @@ const currentLocationIcon = computed(() => {
           <UIcon
             v-if="item.active"
             name="i-lucide-check"
-            class="w-4 h-4 text-[var(--ui-success)] flex-shrink-0"
+            class="w-4 h-4 flex-shrink-0"
+            style="color: var(--ui-success)"
           />
         </div>
       </template>
@@ -167,7 +168,7 @@ const currentLocationIcon = computed(() => {
     <!-- No Location State -->
     <div v-else class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-500" />
-      <span class="text-sm text-[var(--ui-text-muted)] hidden sm:inline"
+      <span class="text-sm text-muted hidden sm:inline"
         >No location</span
       >
     </div>

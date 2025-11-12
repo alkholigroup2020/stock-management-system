@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)]">
+  <div class="min-h-screen bg-default">
     <!-- Page Header Component Test -->
     <CommonPageHeader
       title="Global UI Components"
@@ -22,7 +22,7 @@
     <div class="container mx-auto px-6 py-8 space-y-12">
       <!-- 1. Loading Spinner Tests -->
       <section>
-        <h2 class="text-xl font-bold text-[var(--ui-text)] mb-4">1. LoadingSpinner Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">1. LoadingSpinner Component</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Small -->
           <UCard>
@@ -60,7 +60,7 @@
 
       <!-- 2. Error Alert Tests -->
       <section>
-        <h2 class="text-xl font-bold text-[var(--ui-text)] mb-4">2. ErrorAlert Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">2. ErrorAlert Component</h2>
         <div class="space-y-4">
           <!-- Error -->
           <CommonErrorAlert
@@ -106,7 +106,7 @@
 
       <!-- 3. Empty State Tests -->
       <section>
-        <h2 class="text-xl font-bold text-[var(--ui-text)] mb-4">3. EmptyState Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">3. EmptyState Component</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Default Empty State -->
           <UCard>
@@ -148,7 +148,7 @@
 
       <!-- 4. Page Header Variations -->
       <section>
-        <h2 class="text-xl font-bold text-[var(--ui-text)] mb-4">4. PageHeader Component Variations</h2>
+        <h2 class="text-xl font-bold text-default mb-4">4. PageHeader Component Variations</h2>
         <div class="space-y-4">
           <!-- With Icon and Badge -->
           <UCard>
@@ -200,7 +200,7 @@
 
       <!-- 5. Data Table Tests -->
       <section>
-        <h2 class="text-xl font-bold text-[var(--ui-text)] mb-4">5. DataTable Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">5. DataTable Component</h2>
 
         <!-- Loading State -->
         <UCard class="mb-4">

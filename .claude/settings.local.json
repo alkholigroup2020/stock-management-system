@@ -6,7 +6,10 @@
       "Bash(timeout 120 pnpm typecheck:*)",
       "Bash(echo:*)",
       "Bash(npx tsc:*)",
-      "Bash(timeout 90 pnpm typecheck:*)"
+      "Bash(timeout 90 pnpm typecheck:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File:*)",
+      "Bash(pnpm dev:*)"
     ],
     "deny": [],
     "ask": []

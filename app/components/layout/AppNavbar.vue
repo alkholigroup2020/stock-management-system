@@ -1,55 +1,59 @@
 <script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
+import { useAuth } from "~/composables/useAuth";
 
 // Emits
 const emit = defineEmits<{
-  toggleSidebar: []
-  toggleMobileSidebar: []
-}>()
+  toggleSidebar: [];
+  toggleMobileSidebar: [];
+}>();
 
 // Color mode
-const colorMode = useColorMode()
-const isDark = computed(() => colorMode.value === "dark")
+const colorMode = useColorMode();
+const isDark = computed(() => colorMode.value === "dark");
 
 const toggleTheme = () => {
-  colorMode.preference = colorMode.value === "dark" ? "light" : "dark"
-}
+  colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
+};
 
 // Auth
-const { user, isAuthenticated, logout } = useAuth()
+const { user, isAuthenticated, logout } = useAuth();
 
 // User menu
 const userMenuItems = [
-  [{
-    label: 'Profile',
-    icon: 'i-heroicons-user',
-    click: () => {
-      // Navigate to profile page (to be implemented)
-    }
-  }],
-  [{
-    label: 'Logout',
-    icon: 'i-heroicons-arrow-right-on-rectangle',
-    click: async () => {
-      await logout()
-      await navigateTo('/login')
-    }
-  }]
-]
+  [
+    {
+      label: "Profile",
+      icon: "i-heroicons-user",
+      click: () => {
+        // Navigate to profile page (to be implemented)
+      },
+    },
+  ],
+  [
+    {
+      label: "Logout",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+      click: async () => {
+        await logout();
+        await navigateTo("/login");
+      },
+    },
+  ],
+];
 
 // Handle sidebar toggle
 const handleToggleSidebar = () => {
-  emit('toggleSidebar')
-}
+  emit("toggleSidebar");
+};
 
 const handleToggleMobileSidebar = () => {
-  emit('toggleMobileSidebar')
-}
+  emit("toggleMobileSidebar");
+};
 </script>
 
 <template>
   <header
-    class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-[var(--ui-border)] bg-[var(--ui-bg-elevated)]"
+    class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-default bg-elevated"
   >
     <div class="w-full h-full px-4">
       <nav class="flex items-center justify-between h-full">
@@ -78,14 +82,14 @@ const handleToggleMobileSidebar = () => {
           <!-- Logo/Brand -->
           <NuxtLink to="/" class="flex items-center gap-2">
             <div
-              class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-navy-500 to-emerald-400"
+              class="flex items-center justify-center w-10 h-10 rounded-lg bg-linear-to-br from-navy-500 to-emerald-400"
             >
               <span class="text-white font-bold text-xl">SM</span>
             </div>
             <div class="hidden md:flex flex-col">
-              <span
-                class="text-base font-bold text-navy-600 dark:text-navy-400"
-              >Stock Management</span>
+              <span class="text-base font-bold text-navy-600 dark:text-navy-400"
+                >Stock Management</span
+              >
             </div>
           </NuxtLink>
         </div>
@@ -96,7 +100,7 @@ const handleToggleMobileSidebar = () => {
           <LayoutLocationSwitcher />
 
           <!-- Divider -->
-          <div class="hidden md:block h-6 w-px bg-[var(--ui-border)]" />
+          <div class="hidden md:block h-6 w-px bg-border" />
 
           <!-- Period Indicator -->
           <LayoutPeriodIndicator />
@@ -106,7 +110,9 @@ const handleToggleMobileSidebar = () => {
         <div class="flex items-center gap-2">
           <!-- Theme Switcher -->
           <UButton
-            :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
+            :icon="
+              isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'
+            "
             color="neutral"
             variant="ghost"
             aria-label="Toggle theme"
@@ -127,23 +133,13 @@ const handleToggleMobileSidebar = () => {
               class="hidden sm:flex"
             >
               <template #leading>
-                <UAvatar
-                  :alt="user.full_name || user.email"
-                  size="xs"
-                />
+                <UAvatar :alt="user.full_name || user.email" size="xs" />
               </template>
             </UButton>
 
             <!-- Mobile: Just show avatar -->
-            <UButton
-              color="neutral"
-              variant="ghost"
-              class="sm:hidden"
-            >
-              <UAvatar
-                :alt="user.full_name || user.email"
-                size="xs"
-              />
+            <UButton color="neutral" variant="ghost" class="sm:hidden">
+              <UAvatar :alt="user.full_name || user.email" size="xs" />
             </UButton>
           </UDropdown>
         </div>

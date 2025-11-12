@@ -78,7 +78,7 @@ const handleRemove = () => {
     <!-- On Hand -->
     <td class="px-4 py-3">
       <div v-if="line.item_id" class="flex items-center space-x-2">
-        <span class="text-sm font-medium text-[var(--ui-text)]">
+        <span class="text-sm font-medium text-default">
           {{ line.on_hand.toFixed(4) }}
         </span>
         <UIcon
@@ -87,7 +87,7 @@ const handleRemove = () => {
           class="text-red-500"
         />
       </div>
-      <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+      <span v-else class="text-sm text-muted">-</span>
     </td>
 
     <!-- Quantity -->
@@ -105,15 +105,15 @@ const handleRemove = () => {
 
     <!-- WAC (Read-only) -->
     <td class="px-4 py-3">
-      <span v-if="line.item_id" class="text-sm text-[var(--ui-text-muted)]">
+      <span v-if="line.item_id" class="text-sm text-muted">
         {{ formatCurrency(line.wac) }}
       </span>
-      <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+      <span v-else class="text-sm text-muted">-</span>
     </td>
 
     <!-- Line Value -->
     <td class="px-4 py-3 text-right">
-      <span class="text-sm font-medium text-[var(--ui-text)]">
+      <span class="text-sm font-medium text-default">
         {{ formatCurrency(line.line_value) }}
       </span>
     </td>

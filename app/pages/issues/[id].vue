@@ -124,22 +124,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-6">
+  <div class="min-h-screen bg-default p-6">
     <!-- Page Header -->
     <PageHeader title="Issue Details" icon="file-minus">
       <template #breadcrumbs>
         <nav
-          class="flex items-center space-x-2 text-sm text-[var(--ui-text-muted)]"
+          class="flex items-center space-x-2 text-sm text-muted"
         >
-          <NuxtLink to="/" class="hover:text-[var(--ui-primary)]"
+          <NuxtLink to="/" class="hover:text-primary"
             >Home</NuxtLink
           >
           <span>/</span>
-          <NuxtLink to="/issues" class="hover:text-[var(--ui-primary)]"
+          <NuxtLink to="/issues" class="hover:text-primary"
             >Issues</NuxtLink
           >
           <span>/</span>
-          <span class="text-[var(--ui-text)]">{{
+          <span class="text-default">{{
             issue?.issue_no || "Loading..."
           }}</span>
         </nav>
@@ -176,10 +176,10 @@ onMounted(() => {
         <template #header>
           <div class="flex items-start justify-between">
             <div>
-              <h2 class="text-2xl font-bold text-[var(--ui-text)]">
+              <h2 class="text-2xl font-bold text-default">
                 {{ issue.issue_no }}
               </h2>
-              <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+              <p class="mt-1 text-sm text-muted">
                 Posted on {{ formatDate(issue.issue_date) }}
               </p>
             </div>
@@ -196,38 +196,38 @@ onMounted(() => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Location -->
           <div>
-            <div class="text-sm text-[var(--ui-text-muted)]">Location</div>
-            <div class="mt-1 font-medium text-[var(--ui-text)]">
+            <div class="text-sm text-muted">Location</div>
+            <div class="mt-1 font-medium text-default">
               {{ issue.location?.name }}
             </div>
-            <div class="text-xs text-[var(--ui-text-muted)]">
+            <div class="text-xs text-muted">
               {{ issue.location?.code }}
             </div>
           </div>
 
           <!-- Period -->
           <div>
-            <div class="text-sm text-[var(--ui-text-muted)]">Period</div>
-            <div class="mt-1 font-medium text-[var(--ui-text)]">
+            <div class="text-sm text-muted">Period</div>
+            <div class="mt-1 font-medium text-default">
               {{ issue.period?.name }}
             </div>
           </div>
 
           <!-- Posted By -->
           <div>
-            <div class="text-sm text-[var(--ui-text-muted)]">Posted By</div>
-            <div class="mt-1 font-medium text-[var(--ui-text)]">
+            <div class="text-sm text-muted">Posted By</div>
+            <div class="mt-1 font-medium text-default">
               {{ issue.poster?.full_name }}
             </div>
-            <div class="text-xs text-[var(--ui-text-muted)]">
+            <div class="text-xs text-muted">
               {{ formatDateTime(issue.posted_at) }}
             </div>
           </div>
 
           <!-- Total Value -->
           <div>
-            <div class="text-sm text-[var(--ui-text-muted)]">Total Value</div>
-            <div class="mt-1 text-2xl font-bold text-[var(--ui-primary)]">
+            <div class="text-sm text-muted">Total Value</div>
+            <div class="mt-1 text-2xl font-bold text-primary">
               {{ formatCurrency(issue.total_value) }}
             </div>
           </div>
@@ -237,50 +237,50 @@ onMounted(() => {
       <!-- Issue Lines Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+          <h2 class="text-lg font-semibold text-default">
             Issue Items
           </h2>
         </template>
 
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <table class="min-w-full divide-y divide-default">
             <thead>
-              <tr class="bg-[var(--ui-bg)]">
+              <tr class="bg-default">
                 <th
-                  class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase"
+                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
                 >
                   Item
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-medium text-[var(--ui-text-muted)] uppercase"
+                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
                 >
                   Quantity
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-medium text-[var(--ui-text-muted)] uppercase"
+                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
                 >
                   WAC
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-medium text-[var(--ui-text-muted)] uppercase"
+                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
                 >
                   Line Value
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[var(--ui-border)]">
+            <tbody class="divide-y divide-default">
               <tr v-for="line in issue.lines" :key="line.id">
                 <!-- Item -->
                 <td class="px-4 py-3">
-                  <div class="font-medium text-[var(--ui-text)]">
+                  <div class="font-medium text-default">
                     {{ line.item?.name }}
                   </div>
-                  <div class="text-sm text-[var(--ui-text-muted)]">
+                  <div class="text-sm text-muted">
                     {{ line.item?.code }} - {{ line.item?.unit }}
                   </div>
                   <div
                     v-if="line.item?.category"
-                    class="text-xs text-[var(--ui-text-muted)]"
+                    class="text-xs text-muted"
                   >
                     {{ line.item.category }}
                   </div>
@@ -288,21 +288,21 @@ onMounted(() => {
 
                 <!-- Quantity -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-[var(--ui-text)]">
+                  <span class="text-sm font-medium text-default">
                     {{ typeof line.quantity === 'number' ? line.quantity.toFixed(4) : parseFloat(line.quantity).toFixed(4) }}
                   </span>
                 </td>
 
                 <!-- WAC -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm text-[var(--ui-text-muted)]">
+                  <span class="text-sm text-muted">
                     {{ formatCurrency(line.wac_at_issue) }}
                   </span>
                 </td>
 
                 <!-- Line Value -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-[var(--ui-text)]">
+                  <span class="text-sm font-medium text-default">
                     {{ formatCurrency(line.line_value) }}
                   </span>
                 </td>
@@ -312,15 +312,15 @@ onMounted(() => {
         </div>
 
         <!-- Summary -->
-        <div class="mt-4 pt-4 border-t border-[var(--ui-border)]">
+        <div class="mt-4 pt-4 border-t border-default">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-[var(--ui-text-muted)]">
+            <div class="text-sm text-muted">
               Total: {{ issue.summary.total_lines }} line(s),
               {{ issue.summary.total_items }} item(s)
             </div>
             <div class="text-right">
-              <div class="text-sm text-[var(--ui-text-muted)]">Grand Total</div>
-              <div class="text-2xl font-bold text-[var(--ui-primary)]">
+              <div class="text-sm text-muted">Grand Total</div>
+              <div class="text-2xl font-bold text-primary">
                 {{ formatCurrency(issue.summary.total_value) }}
               </div>
             </div>

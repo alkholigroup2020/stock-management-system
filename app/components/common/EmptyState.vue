@@ -24,7 +24,7 @@
     <!-- Title -->
     <h3
       :class="[
-        'font-semibold text-[var(--ui-text)] mb-2',
+        'font-semibold text-default mb-2',
         titleSizeClasses
       ]"
     >
@@ -35,7 +35,7 @@
     <p
       v-if="description"
       :class="[
-        'text-[var(--ui-text-muted)] max-w-md mb-6',
+        'text-muted max-w-md mb-6',
         descriptionSizeClasses
       ]"
     >
@@ -142,12 +142,12 @@ const iconSizeClasses = computed(() => {
 
 // Icon color classes
 const iconColorClasses = computed(() => {
-  return 'text-[var(--ui-text-muted)]'
+  return 'text-muted'
 })
 
 // Icon background classes
 const iconBgClasses = computed(() => {
-  return 'bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]'
+  return 'bg-elevated border border-default'
 })
 
 // Title size classes

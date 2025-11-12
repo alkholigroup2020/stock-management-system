@@ -116,7 +116,7 @@ const handleCancel = () => {
     <!-- Issue Header Card -->
     <UCard class="card-elevated">
       <template #header>
-        <h2 class="text-lg font-semibold text-[var(--ui-text)]">Issue Information</h2>
+        <h2 class="text-lg font-semibold text-default">Issue Information</h2>
       </template>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -159,7 +159,7 @@ const handleCancel = () => {
     <UCard class="card-elevated">
       <template #header>
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Issue Items</h2>
+          <h2 class="text-lg font-semibold text-default">Issue Items</h2>
           <UButton
             icon="i-lucide-plus"
             color="primary"
@@ -185,18 +185,18 @@ const handleCancel = () => {
 
       <!-- Lines Table -->
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+        <table class="min-w-full divide-y divide-default">
           <thead>
-            <tr class="bg-[var(--ui-bg)]">
-              <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">On Hand</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">Quantity</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-[var(--ui-text-muted)] uppercase">WAC</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-[var(--ui-text-muted)] uppercase">Line Value</th>
-              <th class="px-4 py-3 text-center text-xs font-medium text-[var(--ui-text-muted)] uppercase">Action</th>
+            <tr class="bg-default">
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">On Hand</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Quantity</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">WAC</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">Line Value</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">Action</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--ui-border)]">
+          <tbody class="divide-y divide-default">
             <IssueLineInput
               v-for="line in lines"
               :key="line.id"
@@ -210,7 +210,7 @@ const handleCancel = () => {
 
             <!-- Empty State -->
             <tr v-if="lines.length === 0">
-              <td colspan="6" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
+              <td colspan="6" class="px-4 py-8 text-center text-muted">
                 No items added yet. Click "Add Item" to start.
               </td>
             </tr>
@@ -219,14 +219,14 @@ const handleCancel = () => {
       </div>
 
       <!-- Summary -->
-      <div class="mt-4 pt-4 border-t border-[var(--ui-border)]">
+      <div class="mt-4 pt-4 border-t border-default">
         <div class="flex justify-between items-center">
-          <div class="text-sm text-[var(--ui-text-muted)]">
+          <div class="text-sm text-muted">
             {{ lines.length }} item(s)
           </div>
           <div class="text-right">
-            <div class="text-sm text-[var(--ui-text-muted)]">Total Value</div>
-            <div class="text-2xl font-bold text-[var(--ui-primary)]">
+            <div class="text-sm text-muted">Total Value</div>
+            <div class="text-2xl font-bold text-primary">
               {{ formatCurrency(totalValue) }}
             </div>
           </div>

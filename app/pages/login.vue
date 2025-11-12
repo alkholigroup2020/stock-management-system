@@ -97,14 +97,14 @@ watch([() => state.email, () => state.password], () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[var(--ui-bg)] px-4 py-12 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
       <!-- Header -->
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-[var(--ui-text)]">
+        <h1 class="text-3xl font-bold text-default">
           Stock Management System
         </h1>
-        <p class="mt-2 text-sm text-[var(--ui-text-muted)]">
+        <p class="mt-2 text-sm text-muted">
           Multi-Location Inventory Management
         </p>
       </div>
@@ -113,10 +113,10 @@ watch([() => state.email, () => state.password], () => {
       <UCard class="card-elevated">
         <template #header>
           <div class="text-center">
-            <h2 class="text-2xl font-semibold text-[var(--ui-text)]">
+            <h2 class="text-2xl font-semibold text-default">
               Sign in to your account
             </h2>
-            <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+            <p class="mt-1 text-sm text-muted">
               Enter your credentials to access the system
             </p>
           </div>
@@ -198,7 +198,7 @@ watch([() => state.email, () => state.password], () => {
         </UForm>
 
         <template #footer>
-          <div class="text-center text-sm text-[var(--ui-text-muted)]">
+          <div class="text-center text-sm text-muted">
             <p>
               Default credentials for testing:
             </p>
@@ -210,7 +210,7 @@ watch([() => state.email, () => state.password], () => {
       </UCard>
 
       <!-- Footer Info -->
-      <div class="text-center text-xs text-[var(--ui-text-muted)]">
+      <div class="text-center text-xs text-muted">
         <p>
           Stock Management System v1.0
         </p>

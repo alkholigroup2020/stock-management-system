@@ -436,10 +436,7 @@ watch(
     <div class="page-header-section">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <UIcon
-            name="i-lucide-package"
-            class="text-3xl text-[var(--ui-primary)]"
-          />
+          <UIcon name="i-lucide-package" class="text-3xl text-primary" />
           <div>
             <h1 class="page-title">Stock Now</h1>
             <p class="page-subtitle">Real-time inventory levels</p>
@@ -502,20 +499,15 @@ watch(
       <div class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-[var(--ui-text-muted)]">
-              Total Inventory Value
-            </p>
-            <p class="text-2xl font-bold text-[var(--ui-primary)] mt-1">
+            <p class="text-sm text-muted">Total Inventory Value</p>
+            <p class="text-2xl font-bold text-primary mt-1">
               {{ formatCurrency(totalInventoryValue) }}
             </p>
           </div>
           <div
-            class="w-12 h-12 rounded-lg bg-[var(--ui-primary)]/10 flex items-center justify-center"
+            class="w-12 h-12 rounded-lg bg-(--ui-primary)/10 flex items-center justify-center"
           >
-            <UIcon
-              name="i-lucide-coins"
-              class="text-2xl text-[var(--ui-primary)]"
-            />
+            <UIcon name="i-lucide-coins" class="text-2xl text-primary" />
           </div>
         </div>
       </div>
@@ -524,8 +516,8 @@ watch(
       <div class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-[var(--ui-text-muted)]">Total Items</p>
-            <p class="text-2xl font-bold text-[var(--ui-text)] mt-1">
+            <p class="text-sm text-muted">Total Items</p>
+            <p class="text-2xl font-bold text-default mt-1">
               {{ totalItems }}
             </p>
           </div>
@@ -544,8 +536,8 @@ watch(
       >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-[var(--ui-text-muted)]">Active Locations</p>
-            <p class="text-2xl font-bold text-[var(--ui-text)] mt-1">
+            <p class="text-sm text-muted">Active Locations</p>
+            <p class="text-2xl font-bold text-default mt-1">
               {{ consolidatedData.total_locations }}
             </p>
           </div>
@@ -561,11 +553,11 @@ watch(
       <div v-else-if="stockData?.location" class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-[var(--ui-text-muted)]">Current Location</p>
-            <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
+            <p class="text-sm text-muted">Current Location</p>
+            <p class="text-lg font-semibold text-default mt-1">
               {{ stockData.location.name }}
             </p>
-            <p class="text-xs text-[var(--ui-text-muted)]">
+            <p class="text-xs text-muted">
               {{ stockData.location.code }}
             </p>
           </div>
@@ -667,7 +659,7 @@ watch(
               <p class="font-medium">{{ (row as any).item_name }}</p>
               <p
                 v-if="(row as any).item_sub_category"
-                class="text-xs text-[var(--ui-text-muted)]"
+                class="text-xs text-muted"
               >
                 {{ (row as any).item_sub_category }}
               </p>
@@ -688,7 +680,7 @@ watch(
             >
               {{ (row as any).item_category }}
             </UBadge>
-            <span v-else class="text-[var(--ui-text-muted)]">-</span>
+            <span v-else class="text-muted">-</span>
           </template>
 
           <!-- On Hand -->
@@ -740,7 +732,7 @@ watch(
               <p class="font-medium">{{ (row as any).item_name }}</p>
               <p
                 v-if="(row as any).item_sub_category"
-                class="text-xs text-[var(--ui-text-muted)]"
+                class="text-xs text-muted"
               >
                 {{ (row as any).item_sub_category }}
               </p>
@@ -761,7 +753,7 @@ watch(
             >
               {{ (row as any).item_category }}
             </UBadge>
-            <span v-else class="text-[var(--ui-text-muted)]">-</span>
+            <span v-else class="text-muted">-</span>
           </template>
 
           <!-- Total On Hand -->

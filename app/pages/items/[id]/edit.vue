@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-4 md:p-6">
+  <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
       <div class="text-center">
-        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-[var(--ui-primary)]" />
-        <p class="mt-4 text-sm text-[var(--ui-text-muted)]">Loading item...</p>
+        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />
+        <p class="mt-4 text-sm text-muted">Loading item...</p>
       </div>
     </div>
 
@@ -12,9 +12,9 @@
     <div v-else-if="loadError" class="flex items-center justify-center min-h-[400px]">
       <UCard class="max-w-md">
         <div class="text-center">
-          <UIcon name="i-heroicons-exclamation-triangle" class="w-12 h-12 text-[var(--ui-error)] mx-auto mb-4" />
-          <h2 class="text-xl font-semibold text-[var(--ui-text)] mb-2">Error Loading Item</h2>
-          <p class="text-sm text-[var(--ui-text-muted)] mb-4">{{ loadError }}</p>
+          <UIcon name="i-heroicons-exclamation-triangle" class="w-12 h-12 text-error mx-auto mb-4" />
+          <h2 class="text-xl font-semibold text-default mb-2">Error Loading Item</h2>
+          <p class="text-sm text-muted mb-4">{{ loadError }}</p>
           <UButton color="primary" @click="router.push('/items')">
             Back to Items
           </UButton>
@@ -36,10 +36,10 @@
             Back
           </UButton>
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold text-[var(--ui-text)]">
+        <h1 class="text-2xl md:text-3xl font-bold text-default">
           Edit Item
         </h1>
-        <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+        <p class="mt-1 text-sm text-muted">
           Update item details
         </p>
       </div>
@@ -60,7 +60,7 @@
                 disabled
                 class="opacity-60"
               />
-              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+              <p class="mt-1 text-xs text-muted">
                 Item code cannot be changed
               </p>
             </div>
@@ -69,7 +69,7 @@
             <div>
               <label for="name" class="form-label">
                 Item Name
-                <span class="text-[var(--ui-error)]">*</span>
+                <span class="text-error">*</span>
               </label>
               <UInput
                 id="name"
@@ -80,7 +80,7 @@
                 :error="!!errors.name"
                 @blur="validateField('name')"
               />
-              <p v-if="errors.name" class="mt-1 text-sm text-[var(--ui-error)]">
+              <p v-if="errors.name" class="mt-1 text-sm text-error">
                 {{ errors.name }}
               </p>
             </div>
@@ -89,7 +89,7 @@
             <div>
               <label for="unit" class="form-label">
                 Unit of Measure
-                <span class="text-[var(--ui-error)]">*</span>
+                <span class="text-error">*</span>
               </label>
               <USelectMenu
                 v-model="form.unit"
@@ -101,10 +101,10 @@
                 :error="!!errors.unit"
                 @update:model-value="validateField('unit')"
               />
-              <p v-if="errors.unit" class="mt-1 text-sm text-[var(--ui-error)]">
+              <p v-if="errors.unit" class="mt-1 text-sm text-error">
                 {{ errors.unit }}
               </p>
-              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+              <p class="mt-1 text-xs text-muted">
                 How this item is measured (KG = Kilograms, EA = Each, LTR = Liters, etc.)
               </p>
             </div>
@@ -123,10 +123,10 @@
                 :error="!!errors.category"
                 @blur="validateField('category')"
               />
-              <p v-if="errors.category" class="mt-1 text-sm text-[var(--ui-error)]">
+              <p v-if="errors.category" class="mt-1 text-sm text-error">
                 {{ errors.category }}
               </p>
-              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+              <p class="mt-1 text-xs text-muted">
                 Optional: Main category for organizing items
               </p>
             </div>
@@ -145,16 +145,16 @@
                 :error="!!errors.sub_category"
                 @blur="validateField('sub_category')"
               />
-              <p v-if="errors.sub_category" class="mt-1 text-sm text-[var(--ui-error)]">
+              <p v-if="errors.sub_category" class="mt-1 text-sm text-error">
                 {{ errors.sub_category }}
               </p>
-              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+              <p class="mt-1 text-xs text-muted">
                 Optional: Sub-category for further organization
               </p>
             </div>
 
             <!-- Form Actions -->
-            <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-[var(--ui-border)]">
+            <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default">
               <UButton
                 type="button"
                 color="neutral"

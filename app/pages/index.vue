@@ -197,8 +197,8 @@ const handleRetry = () => {
   <div class="p-6 space-y-6">
     <!-- Page Header -->
     <div>
-      <h1 class="text-3xl font-bold text-[var(--ui-text)] mb-2">Dashboard</h1>
-      <div v-if="dashboardData?.location" class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
+      <h1 class="text-3xl font-bold text-default mb-2">Dashboard</h1>
+      <div v-if="dashboardData?.location" class="flex items-center gap-2 text-sm text-muted">
         <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
         <span>{{ dashboardData.location.name }}</span>
         <span v-if="dashboardData.period" class="ml-2">
@@ -270,8 +270,8 @@ const handleRetry = () => {
       <UCard class="card-elevated">
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-zap" class="w-5 h-5 text-[var(--ui-text-muted)]" />
-            <h3 class="text-lg font-semibold text-[var(--ui-text)]">Quick Actions</h3>
+            <UIcon name="i-lucide-zap" class="w-5 h-5 text-muted" />
+            <h3 class="text-lg font-semibold text-default">Quick Actions</h3>
           </div>
         </template>
 

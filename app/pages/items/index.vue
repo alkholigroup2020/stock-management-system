@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-4 md:p-6">
+  <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-[var(--ui-text)]">
+          <h1 class="text-2xl md:text-3xl font-bold text-default">
             Items
           </h1>
-          <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+          <p class="mt-1 text-sm text-muted">
             Manage inventory items and view stock levels
           </p>
         </div>
@@ -62,7 +62,7 @@
         >
           Search: {{ searchQuery }}
           <button
-            class="ml-1 hover:text-[var(--ui-error)]"
+            class="ml-1 hover:text-error"
             @click="clearSearch"
           >
             <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
@@ -77,7 +77,7 @@
         >
           Category: {{ selectedCategory }}
           <button
-            class="ml-1 hover:text-[var(--ui-error)]"
+            class="ml-1 hover:text-error"
             @click="clearCategory"
           >
             <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
@@ -108,11 +108,11 @@
     <!-- Empty State -->
     <UCard v-else-if="items.length === 0 && !loading">
       <div class="text-center py-12">
-        <UIcon name="i-heroicons-inbox" class="w-16 h-16 mx-auto text-[var(--ui-text-muted)] mb-4" />
-        <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+        <UIcon name="i-heroicons-inbox" class="w-16 h-16 mx-auto text-muted mb-4" />
+        <h3 class="text-lg font-semibold text-default mb-2">
           No items found
         </h3>
-        <p class="text-sm text-[var(--ui-text-muted)] mb-6">
+        <p class="text-sm text-muted mb-6">
           {{ searchQuery || selectedCategory
             ? 'Try adjusting your filters'
             : 'Get started by creating your first item'
@@ -138,46 +138,46 @@
     <!-- Items Table -->
     <UCard v-else>
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+        <table class="min-w-full divide-y divide-default">
           <thead>
-            <tr class="bg-[var(--ui-bg-elevated)]">
-              <th class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+            <tr class="bg-elevated">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider">
                 Code
               </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider">
                 Name
               </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider">
                 Unit
               </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider">
                 Category
               </th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider">
                 On-Hand
               </th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider">
                 WAC
               </th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider">
                 Value
               </th>
-              <th v-if="canEditItems()" class="px-4 py-3 text-right text-xs font-semibold text-[var(--ui-text)] uppercase tracking-wider">
+              <th v-if="canEditItems()" class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--ui-border)]">
+          <tbody class="divide-y divide-default">
             <tr
               v-for="item in items"
               :key="item.id"
-              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+              class="hover:bg-elevated transition-colors cursor-pointer"
               @click="navigateTo(`/items/${item.id}`)"
             >
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-[var(--ui-text)]">
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-default">
                 {{ item.code }}
               </td>
-              <td class="px-4 py-4 text-sm text-[var(--ui-text)]">
+              <td class="px-4 py-4 text-sm text-default">
                 <div class="flex items-center gap-2">
                   {{ item.name }}
                   <UBadge
@@ -190,19 +190,19 @@
                   </UBadge>
                 </div>
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-[var(--ui-text-muted)]">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-muted">
                 {{ item.unit }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-[var(--ui-text-muted)]">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-muted">
                 {{ item.category || '-' }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-right text-[var(--ui-text)]">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-right text-default">
                 {{ formatQuantity(getStockData(item).onHand) }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-right text-[var(--ui-text)]">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-right text-default">
                 {{ formatCurrency(getStockData(item).wac) }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-[var(--ui-text)]">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-default">
                 {{ formatCurrency(getStockData(item).value) }}
               </td>
               <td v-if="canEditItems()" class="px-4 py-4 whitespace-nowrap text-sm text-right">
@@ -222,20 +222,20 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination.totalPages > 1" class="mt-6 border-t border-[var(--ui-border)] pt-4">
+      <div v-if="pagination.totalPages > 1" class="mt-6 border-t border-default pt-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <!-- Pagination Info -->
-          <div class="text-sm text-[var(--ui-text-muted)]">
+          <div class="text-sm text-muted">
             Showing
-            <span class="font-medium text-[var(--ui-text)]">
+            <span class="font-medium text-default">
               {{ (pagination.page - 1) * pagination.limit + 1 }}
             </span>
             to
-            <span class="font-medium text-[var(--ui-text)]">
+            <span class="font-medium text-default">
               {{ Math.min(pagination.page * pagination.limit, pagination.total) }}
             </span>
             of
-            <span class="font-medium text-[var(--ui-text)]">
+            <span class="font-medium text-default">
               {{ pagination.total }}
             </span>
             items
@@ -264,7 +264,7 @@
                 >
                   {{ pageNum }}
                 </UButton>
-                <span v-else class="px-2 text-[var(--ui-text-muted)]">...</span>
+                <span v-else class="px-2 text-muted">...</span>
               </template>
             </div>
 

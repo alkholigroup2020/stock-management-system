@@ -216,15 +216,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--ui-bg)] p-4 md:p-6">
+  <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-[var(--ui-text)]">
+          <h1 class="text-2xl font-bold text-default">
             Issues
           </h1>
-          <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+          <p class="mt-1 text-sm text-muted">
             View and manage stock issues for {{ locationStore.activeLocation?.name }}
           </p>
         </div>
@@ -240,8 +240,8 @@ onMounted(async () => {
     </div>
 
     <!-- Filters -->
-    <div class="mb-6 rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] p-4">
-      <h2 class="mb-4 text-sm font-semibold text-[var(--ui-text)]">Filters</h2>
+    <div class="mb-6 rounded-lg border border-default bg-elevated p-4">
+      <h2 class="mb-4 text-sm font-semibold text-default">Filters</h2>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <!-- Date Range Start -->
@@ -305,7 +305,7 @@ onMounted(async () => {
 
       <!-- Active Filters -->
       <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap gap-2">
-        <span class="text-sm text-[var(--ui-text-muted)]">Active filters:</span>
+        <span class="text-sm text-muted">Active filters:</span>
         <UBadge
           v-for="filter in activeFilters"
           :key="filter.key"
@@ -336,32 +336,32 @@ onMounted(async () => {
     <!-- Issues Table -->
     <div
       v-else-if="hasIssues"
-      class="overflow-hidden rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)]"
+      class="overflow-hidden rounded-lg border border-default bg-elevated"
     >
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="border-b border-[var(--ui-border)] bg-zinc-50 dark:bg-zinc-900">
+          <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
             <tr>
               <th
                 v-for="col in columns"
                 :key="col.key"
-                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--ui-text-muted)]"
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted"
               >
                 {{ col.label }}
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--ui-border)]">
+          <tbody class="divide-y divide-default">
             <tr
               v-for="issue in issues"
               :key="issue.id"
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(issue)"
             >
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-[var(--ui-text)]">
+              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
                 {{ issue.issue_no }}
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm text-[var(--ui-text)]">
+              <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
                 {{ formatDate(issue.issue_date) }}
               </td>
               <td class="px-4 py-3 text-sm">
@@ -372,7 +372,7 @@ onMounted(async () => {
                   {{ issue.cost_centre }}
                 </UBadge>
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-[var(--ui-text)]">
+              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
                 {{ formatCurrency(issue.total_value) }}
               </td>
             </tr>
@@ -383,9 +383,9 @@ onMounted(async () => {
       <!-- Pagination -->
       <div
         v-if="pagination.totalPages > 1"
-        class="flex items-center justify-between border-t border-[var(--ui-border)] px-4 py-3"
+        class="flex items-center justify-between border-t border-default px-4 py-3"
       >
-        <div class="text-sm text-[var(--ui-text-muted)]">
+        <div class="text-sm text-muted">
           {{ paginationInfo }}
         </div>
         <div class="flex gap-1">
@@ -408,7 +408,7 @@ onMounted(async () => {
             </UButton>
             <span
               v-else-if="page === 2 || page === pagination.totalPages - 1"
-              class="flex items-center px-2 text-[var(--ui-text-muted)]"
+              class="flex items-center px-2 text-muted"
             >
               ...
             </span>

@@ -42,7 +42,7 @@
       <!-- Basic Info Card -->
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+          <h2 class="text-lg font-semibold text-default">
             Location Information
           </h2>
         </template>
@@ -50,7 +50,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="form-label">Code</label>
-            <p class="text-[var(--ui-text)] font-mono">{{ location.code }}</p>
+            <p class="text-default font-mono">{{ location.code }}</p>
           </div>
           <div>
             <label class="form-label">Type</label>
@@ -74,15 +74,15 @@
           </div>
           <div v-if="location.timezone">
             <label class="form-label">Timezone</label>
-            <p class="text-[var(--ui-text)]">{{ location.timezone }}</p>
+            <p class="text-default">{{ location.timezone }}</p>
           </div>
           <div v-if="location.address" class="md:col-span-2">
             <label class="form-label">Address</label>
-            <p class="text-[var(--ui-text)]">{{ location.address }}</p>
+            <p class="text-default">{{ location.address }}</p>
           </div>
           <div v-if="location.manager">
             <label class="form-label">Manager</label>
-            <p class="text-[var(--ui-text)]">{{ location.manager.full_name || location.manager.username }}</p>
+            <p class="text-default">{{ location.manager.full_name || location.manager.username }}</p>
           </div>
         </div>
       </UCard>
@@ -91,7 +91,7 @@
       <UCard v-if="canManageLocations()">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+            <h2 class="text-lg font-semibold text-default">
               User Assignments
             </h2>
             <UButton
@@ -111,21 +111,21 @@
         </div>
 
         <div v-else-if="assignedUsers.length === 0" class="text-center py-8">
-          <p class="text-[var(--ui-text-muted)]">No users assigned to this location</p>
+          <p class="text-muted">No users assigned to this location</p>
         </div>
 
         <div v-else class="space-y-3">
           <div
             v-for="assignment in assignedUsers"
             :key="assignment.user_id"
-            class="flex items-center justify-between p-4 rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg)]"
+            class="flex items-center justify-between p-4 rounded-lg border border-default bg-default"
           >
             <div v-if="assignment.user" class="flex-1">
-              <p class="font-medium text-[var(--ui-text)]">
+              <p class="font-medium text-default">
                 {{ assignment.user.full_name || assignment.user.username }}
               </p>
               <div class="flex items-center gap-3 mt-1">
-                <p class="text-sm text-[var(--ui-text-muted)]">
+                <p class="text-sm text-muted">
                   {{ assignment.user.email }}
                 </p>
                 <UBadge
@@ -164,7 +164,7 @@
     <UModal v-model="isAssignModalOpen">
       <UCard>
         <template #header>
-          <h3 class="text-lg font-semibold text-[var(--ui-text)]">
+          <h3 class="text-lg font-semibold text-default">
             Assign User to {{ location?.name }}
           </h3>
         </template>
@@ -206,7 +206,7 @@
             </UFormGroup>
 
             <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
               <UButton
                 color="neutral"
                 variant="ghost"
