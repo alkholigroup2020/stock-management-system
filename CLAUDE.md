@@ -26,11 +26,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Key Resources:**
 
 - **Nuxt 4:** https://nuxt.com/docs
-- **Nuxt UI:** https://ui.nuxt.com
+- **Nuxt UI:** https://ui.nuxt.com (MCP server: `nuxt-ui-remote` available for component lookup)
 - **Tailwind CSS:** https://tailwindcss.com/docs
 - **Prisma:** https://www.prisma.io/docs
 - **Pinia:** https://pinia.vuejs.org
 - **Vue 3:** https://vuejs.org/guide
+
+**MCP Servers Available:**
+
+- **nuxt-ui-remote:** HTTP MCP server for Nuxt UI documentation at https://ui.nuxt.com/mcp
+  - Use this to look up component APIs, props, slots, and examples
+  - Query component specifications before implementing UI features
 
 **Key Business Concepts:**
 

@@ -204,13 +204,6 @@ const handleNavigate = () => {
             </NuxtLink>
           </template>
         </nav>
-
-        <!-- Sidebar Footer (Optional) -->
-        <div class="sticky bottom-0 p-4 border-t border-default bg-elevated">
-          <div class="text-xs text-muted text-center">
-            Stock Management v1.0.0
-          </div>
-        </div>
       </aside>
     </Transition>
   </div>

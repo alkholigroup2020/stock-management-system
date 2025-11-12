@@ -3,7 +3,7 @@
     :class="[
       'border-b border-default bg-default',
       paddingClasses,
-      stickyHeader ? 'sticky top-0 z-10' : '',
+      stickyHeader ? 'sticky top-16 z-10' : '',
     ]"
   >
     <div
