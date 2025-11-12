@@ -148,17 +148,14 @@ const currentLocationIcon = computed(() => {
           <UIcon :name="item.icon" class="w-4 h-4" :class="item.iconClass" />
           <div class="flex-1 min-w-0">
             <p class="font-medium text-sm truncate">{{ item.label }}</p>
-            <p
-              v-if="item.description"
-              class="text-xs text-muted truncate"
-            >
+            <p v-if="item.description" class="text-xs text-muted truncate">
               {{ item.description }}
             </p>
           </div>
           <UIcon
             v-if="item.active"
             name="i-lucide-check"
-            class="w-4 h-4 flex-shrink-0"
+            class="w-4 h-4 shrink-0"
             style="color: var(--ui-success)"
           />
         </div>
@@ -168,9 +165,7 @@ const currentLocationIcon = computed(() => {
     <!-- No Location State -->
     <div v-else class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-500" />
-      <span class="text-sm text-muted hidden sm:inline"
-        >No location</span
-      >
+      <span class="text-sm text-muted hidden sm:inline">No location</span>
     </div>
   </div>
 </template>
