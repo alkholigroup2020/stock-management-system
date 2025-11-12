@@ -163,13 +163,13 @@ function calculateTotalValue(onHand: number | string, wac: number | string): num
   return quantity * cost
 }
 
-function getLocationTypeColor(type: string): string {
-  const colorMap: Record<string, string> = {
-    KITCHEN: 'orange',
-    STORE: 'blue',
-    CENTRAL: 'purple',
-    WAREHOUSE: 'gray',
+function getLocationTypeColor(type: string): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' {
+  const colorMap: Record<string, 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral'> = {
+    KITCHEN: 'warning',
+    STORE: 'info',
+    CENTRAL: 'secondary',
+    WAREHOUSE: 'neutral',
   }
-  return colorMap[type] || 'gray'
+  return colorMap[type] || 'neutral'
 }
 </script>

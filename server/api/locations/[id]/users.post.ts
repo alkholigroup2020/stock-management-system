@@ -8,23 +8,32 @@
 
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
+import type { UserRole } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
+// User session type
+interface UserSession {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 // Request body validation schema
 const assignUserSchema = z.object({
   user_id: z.string().uuid('Invalid user ID format'),
-  access_level: z.enum(['VIEW', 'POST', 'MANAGE'], {
-    errorMap: () => ({ message: 'Access level must be VIEW, POST, or MANAGE' }),
-  }),
+  access_level: z.enum(['VIEW', 'POST', 'MANAGE']).describe('Access level must be VIEW, POST, or MANAGE'),
 })
 
 export default defineEventHandler(async (event) => {
   try {
     // Get authenticated user from session
     const session = await getUserSession(event)
+    const authUser = session?.user as UserSession | undefined
 
-    if (!session?.user?.id) {
+    if (!authUser?.id) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Unauthorized',
@@ -36,7 +45,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Only admins can assign users to locations
-    if (session.user.role !== 'ADMIN') {
+    if (authUser.role !== 'ADMIN') {
       throw createError({
         statusCode: 403,
         statusMessage: 'Forbidden',
@@ -136,7 +145,7 @@ export default defineEventHandler(async (event) => {
         },
         data: {
           access_level: validatedData.access_level,
-          assigned_by: session.user.id,
+          assigned_by: authUser.id,
           assigned_at: new Date(),
         },
         include: {
@@ -181,7 +190,7 @@ export default defineEventHandler(async (event) => {
         user_id: validatedData.user_id,
         location_id: locationId,
         access_level: validatedData.access_level,
-        assigned_by: session.user.id,
+        assigned_by: authUser.id,
       },
       include: {
         user: {
@@ -217,22 +226,22 @@ export default defineEventHandler(async (event) => {
       assignment,
       updated: false,
     }
-  } catch (error: any) {
+  } catch (error) {
     // Handle Zod validation errors
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Validation Error',
         data: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors,
+          details: error.issues,
         },
       })
     }
 
     // Re-throw H3 errors
-    if (error.statusCode) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
 

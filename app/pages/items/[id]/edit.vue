@@ -251,7 +251,7 @@ const originalData = ref<any>(null)
 const form = reactive({
   code: '',
   name: '',
-  unit: null as string | null,
+  unit: undefined as string | undefined,
   category: '',
   sub_category: '',
 })
@@ -266,9 +266,7 @@ const errors = reactive({
 // Validation schema (matches API schema)
 const itemSchema = z.object({
   name: z.string().min(1, 'Item name is required').max(200, 'Item name must be 200 characters or less'),
-  unit: z.enum(['KG', 'EA', 'LTR', 'BOX', 'CASE', 'PACK'], {
-    errorMap: () => ({ message: 'Please select a valid unit' }),
-  }),
+  unit: z.enum(['KG', 'EA', 'LTR', 'BOX', 'CASE', 'PACK']).optional(),
   category: z.string().max(50, 'Category must be 50 characters or less').optional(),
   sub_category: z.string().max(50, 'Sub-category must be 50 characters or less').optional(),
 })
@@ -325,7 +323,7 @@ function validateField(field: keyof typeof errors) {
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      errors[field] = error.errors[0]?.message || 'Invalid value'
+      errors[field] = error.issues[0]?.message || 'Invalid value'
     }
   }
 }
@@ -354,7 +352,7 @@ function validateForm(): boolean {
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Set errors for each field
-      error.errors.forEach((err) => {
+      error.issues.forEach((err: z.ZodIssue) => {
         const field = err.path[0] as keyof typeof errors
         if (field) {
           errors[field] = err.message
@@ -412,7 +410,7 @@ async function handleSubmit() {
     toast.add({
       title: 'No Changes',
       description: 'No changes were made to the item',
-      color: 'amber',
+      color: 'warning',
     })
     return
   }
@@ -456,9 +454,9 @@ async function handleSubmit() {
       // Set field-specific errors if available
       if (error.data.details) {
         error.data.details.forEach((err: any) => {
-          const field = err.path?.[0] as keyof typeof errors
-          if (field && field !== 'code') {
-            errors[field] = err.message
+          const field = err.path?.[0]
+          if (field && field in errors) {
+            errors[field as keyof typeof errors] = err.message
           }
         })
       }

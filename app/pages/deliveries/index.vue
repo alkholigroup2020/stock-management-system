@@ -78,11 +78,11 @@ const paginationInfo = computed(() => {
 
 // Active filters
 const activeFilters = computed(() => {
-  const filters: Array<{ key: string; label: string; value: any }> = []
+  const activeFiltersList: Array<{ key: string; label: string; value: any }> = []
   if (filters.supplierId) {
     const supplier = suppliers.value.find((s) => s.id === filters.supplierId)
     if (supplier) {
-      filters.push({
+      activeFiltersList.push({
         key: 'supplierId',
         label: 'Supplier',
         value: supplier.name,
@@ -90,27 +90,27 @@ const activeFilters = computed(() => {
     }
   }
   if (filters.hasVariance) {
-    filters.push({
+    activeFiltersList.push({
       key: 'hasVariance',
       label: 'Has Price Variance',
       value: 'Yes',
     })
   }
   if (filters.startDate) {
-    filters.push({
+    activeFiltersList.push({
       key: 'startDate',
       label: 'Start Date',
       value: formatDate(filters.startDate),
     })
   }
   if (filters.endDate) {
-    filters.push({
+    activeFiltersList.push({
       key: 'endDate',
       label: 'End Date',
       value: formatDate(filters.endDate),
     })
   }
-  return filters
+  return activeFiltersList
 })
 
 // Table columns
@@ -247,7 +247,7 @@ onMounted(async () => {
             View and manage deliveries for {{ locationStore.activeLocation?.name }}
           </p>
         </div>
-        <div v-if="canPostDeliveries" class="flex gap-2">
+        <div v-if="canPostDeliveries()" class="flex gap-2">
           <UButton
             color="primary"
             icon="i-lucide-plus"
@@ -404,7 +404,7 @@ onMounted(async () => {
               <td class="px-4 py-3 text-sm">
                 <UBadge
                   v-if="delivery.has_variance"
-                  color="amber"
+                  color="warning"
                   variant="soft"
                   class="inline-flex items-center gap-1"
                 >
@@ -474,7 +474,7 @@ onMounted(async () => {
           : 'No deliveries have been recorded yet. Click the button above to create your first delivery.'
       "
     >
-      <template v-if="canPostDeliveries" #action>
+      <template v-if="canPostDeliveries()" #action>
         <UButton
           color="primary"
           icon="i-lucide-plus"

@@ -141,20 +141,20 @@ function getVarianceBadgeColor(variance: number): string {
 }
 
 // Get NCR status color
-function getNcrStatusColor(status: string): string {
+function getNcrStatusColor(status: string): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' {
   switch (status) {
     case 'OPEN':
-      return 'amber'
+      return 'warning'
     case 'SENT':
-      return 'blue'
+      return 'info'
     case 'CREDITED':
-      return 'emerald'
+      return 'success'
     case 'REJECTED':
-      return 'red'
+      return 'error'
     case 'RESOLVED':
-      return 'gray'
+      return 'neutral'
     default:
-      return 'gray'
+      return 'neutral'
   }
 }
 
@@ -188,7 +188,7 @@ onMounted(async () => {
           <div class="flex items-center gap-2 mb-2">
             <UButton
               icon="i-lucide-arrow-left"
-              color="gray"
+              color="neutral"
               variant="ghost"
               size="sm"
               @click="goBack"
@@ -207,7 +207,7 @@ onMounted(async () => {
         </div>
         <div class="flex gap-2">
           <UButton
-            color="gray"
+            color="neutral"
             variant="outline"
             icon="i-lucide-printer"
             label="Print"
@@ -256,7 +256,7 @@ onMounted(async () => {
             </div>
             <UBadge
               v-if="delivery.has_variance"
-              color="amber"
+              color="warning"
               variant="soft"
               size="lg"
               class="inline-flex items-center gap-1"
@@ -291,7 +291,7 @@ onMounted(async () => {
                 <dd class="text-sm font-medium text-[var(--ui-text)]">
                   {{ delivery.po.po_no }}
                   <UBadge
-                    :color="delivery.po.status === 'OPEN' ? 'emerald' : 'gray'"
+                    :color="delivery.po.status === 'OPEN' ? 'success' : 'neutral'"
                     variant="soft"
                     size="xs"
                     class="ml-2"
@@ -508,7 +508,7 @@ onMounted(async () => {
             <h2 class="text-lg font-semibold text-[var(--ui-text)]">
               Non-Conformance Reports (NCRs)
             </h2>
-            <UBadge color="amber" variant="soft">
+            <UBadge color="warning" variant="soft">
               {{ delivery.ncrs.length }}
             </UBadge>
           </div>
@@ -530,7 +530,7 @@ onMounted(async () => {
                   </UBadge>
                   <UBadge
                     v-if="ncr.type === 'PRICE_VARIANCE'"
-                    color="amber"
+                    color="warning"
                     variant="soft"
                     size="xs"
                   >

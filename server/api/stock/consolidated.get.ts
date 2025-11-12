@@ -227,7 +227,7 @@ export default defineEventHandler(async (event) => {
         data: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: error.errors,
+          details: error.issues,
         },
       })
     }

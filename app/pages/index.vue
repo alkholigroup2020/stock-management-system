@@ -223,7 +223,7 @@ const handleRetry = () => {
     <UAlert
       v-else-if="!dashboardData?.period"
       icon="i-lucide-alert-triangle"
-      color="amber"
+      color="warning"
       variant="subtle"
       title="No Active Period"
       description="There is no currently open period. Some features may be limited."

@@ -166,6 +166,7 @@
 
 <script setup lang="ts">
 import { z } from 'zod'
+import type { LocationType } from '@prisma/client'
 
 definePageMeta({
   middleware: ['role'],
@@ -177,38 +178,51 @@ definePageMeta({
 const route = useRoute()
 const toast = useAppToast()
 
-// State
-const loading = ref(true)
-const error = ref<string | null>(null)
-const submitting = ref(false)
-const loadingManagers = ref(false)
-const managerOptions = ref<any[]>([{ label: 'No Manager', value: null }])
-
-// Form data
-const formData = reactive({
-  code: '',
-  name: '',
-  type: null as string | null,
-  address: '',
-  manager_id: null as string | null,
-  timezone: 'Asia/Riyadh',
-  is_active: true,
-})
-
 // Validation schema
 const schema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE'], {
-    required_error: 'Location type is required',
-  }),
+  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE']).describe('Location type is required'),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().max(50),
   is_active: z.boolean(),
 })
 
+type FormData = z.infer<typeof schema>
+
+interface ManagerOption {
+  label: string
+  value: string | null
+}
+
+// State
+const loading = ref(true)
+const error = ref<string | null>(null)
+const submitting = ref(false)
+const loadingManagers = ref(false)
+const managerOptions = ref<ManagerOption[]>([{ label: 'No Manager', value: null }])
+
+// Form data - properly typed
+const formData = reactive<{
+  code: string
+  name: string
+  type: LocationType | undefined
+  address: string
+  manager_id: string | undefined
+  timezone: string
+  is_active: boolean
+}>({
+  code: '',
+  name: '',
+  type: undefined,
+  address: '',
+  manager_id: undefined,
+  timezone: 'Asia/Riyadh',
+  is_active: true,
+})
+
 // Type options
-const typeOptions = [
+const typeOptions: Array<{ label: string; value: LocationType }> = [
   { label: 'Kitchen', value: 'KITCHEN' },
   { label: 'Store', value: 'STORE' },
   { label: 'Central', value: 'CENTRAL' },
@@ -222,22 +236,35 @@ const fetchLocation = async () => {
 
   try {
     const locationId = route.params.id as string
-    const response = await $fetch(`/api/locations/${locationId}`)
 
+    interface LocationResponse {
+      location: {
+        code: string
+        name: string
+        type: LocationType | null
+        address: string | null
+        manager_id: string | null
+        timezone: string | null
+        is_active: boolean
+      }
+    }
+
+    const response = await $fetch<LocationResponse>(`/api/locations/${locationId}`)
     const location = response.location
 
     // Pre-fill form with existing data
     formData.code = location.code
     formData.name = location.name
-    formData.type = location.type
-    formData.address = location.address || ''
-    formData.manager_id = location.manager_id || null
-    formData.timezone = location.timezone || 'Asia/Riyadh'
+    formData.type = location.type ?? undefined
+    formData.address = location.address ?? ''
+    formData.manager_id = location.manager_id ?? undefined
+    formData.timezone = location.timezone ?? 'Asia/Riyadh'
     formData.is_active = location.is_active
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error fetching location:', err)
-    error.value = err.data?.message || 'Failed to fetch location details'
-    toast.error('Error', error.value)
+    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch location details'
+    error.value = errorMessage
+    toast.error('Error', { description: errorMessage })
   } finally {
     loading.value = false
   }
@@ -253,7 +280,7 @@ const fetchManagers = async () => {
     managerOptions.value = [
       { label: 'No Manager', value: null },
     ]
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error fetching managers:', err)
   } finally {
     loadingManagers.value = false
@@ -281,12 +308,12 @@ const onSubmit = async () => {
       body: payload,
     })
 
-    toast.success('Success', 'Location updated successfully')
-    navigateTo('/locations')
-  } catch (err: any) {
+    toast.success('Success', { description: 'Location updated successfully' })
+    await navigateTo('/locations')
+  } catch (err) {
     console.error('Error updating location:', err)
-    const message = err.data?.message || 'Failed to update location'
-    toast.error('Error', message)
+    const errorMessage = err instanceof Error ? err.message : 'Failed to update location'
+    toast.error('Error', { description: errorMessage })
   } finally {
     submitting.value = false
   }

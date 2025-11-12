@@ -62,6 +62,31 @@ export function formatDate(date: Date | string | null | undefined): string {
 }
 
 /**
+ * Format a date and time as DD/MM/YYYY HH:MM
+ * @param date - The date to format
+ * @returns Formatted datetime string (e.g., "01/11/2025 14:30")
+ */
+export function formatDateTime(date: Date | string | null | undefined): string {
+  if (!date) {
+    return ''
+  }
+
+  const d = typeof date === 'string' ? new Date(date) : date
+
+  if (isNaN(d.getTime())) {
+    return ''
+  }
+
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  const hours = String(d.getHours()).padStart(2, '0')
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`
+}
+
+/**
  * Format a number with specified decimal places
  * @param num - The number to format
  * @param decimals - Number of decimal places (default: 2)

@@ -171,7 +171,7 @@
 
         <UForm
           :schema="assignUserSchema"
-          :state="assignFormData"
+          :state="(assignFormData as any)"
           @submit="submitUserAssignment"
         >
           <div class="space-y-4">
@@ -260,16 +260,14 @@ const removingUserId = ref<string | null>(null)
 
 // Assign form data
 const assignFormData = reactive({
-  user_id: null as string | null,
-  access_level: null as string | null,
+  user_id: '',
+  access_level: '',
 })
 
 // Validation schema
 const assignUserSchema = z.object({
   user_id: z.string().uuid('Please select a user'),
-  access_level: z.enum(['VIEW', 'POST', 'MANAGE'], {
-    errorMap: () => ({ message: 'Please select an access level' }),
-  }),
+  access_level: z.enum(['VIEW', 'POST', 'MANAGE']).describe('Please select an access level'),
 })
 
 // Access level options
@@ -280,8 +278,8 @@ const accessLevelOptions = [
 ]
 
 // Computed
-const locationTypeColor = computed(() => {
-  const colors: Record<string, string> = {
+const locationTypeColor = computed((): 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
+  const colors: Record<string, 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'> = {
     KITCHEN: 'warning',
     STORE: 'success',
     CENTRAL: 'primary',
@@ -291,8 +289,8 @@ const locationTypeColor = computed(() => {
 })
 
 // Helper functions
-const roleColor = (role: string) => {
-  const colors: Record<string, string> = {
+const roleColor = (role: string): 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
+  const colors: Record<string, 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'> = {
     ADMIN: 'error',
     SUPERVISOR: 'warning',
     OPERATOR: 'primary',
@@ -300,8 +298,8 @@ const roleColor = (role: string) => {
   return colors[role] || 'neutral'
 }
 
-const accessLevelColor = (level: string) => {
-  const colors: Record<string, string> = {
+const accessLevelColor = (level: string): 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
+  const colors: Record<string, 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'> = {
     MANAGE: 'success',
     POST: 'primary',
     VIEW: 'neutral',
@@ -316,13 +314,13 @@ const fetchLocationDetails = async () => {
 
   try {
     const locationId = route.params.id as string
-    const response = await $fetch(`/api/locations/${locationId}`)
+    const response = await $fetch<{ location: any }>(`/api/locations/${locationId}`)
 
     location.value = response.location
   } catch (err: any) {
     console.error('Error fetching location details:', err)
     error.value = err.data?.message || 'Failed to fetch location details'
-    toast.error('Error', error.value)
+    toast.error('Error', { description: error.value || undefined })
   } finally {
     loading.value = false
   }
@@ -336,12 +334,12 @@ const fetchAssignedUsers = async () => {
 
   try {
     const locationId = route.params.id as string
-    const response = await $fetch(`/api/locations/${locationId}/users`)
+    const response = await $fetch<{ users: any[] }>(`/api/locations/${locationId}/users`)
 
     assignedUsers.value = response.users || []
   } catch (err: any) {
     console.error('Error fetching assigned users:', err)
-    toast.error('Error', 'Failed to load assigned users')
+    toast.error('Error', { description: 'Failed to load assigned users' })
   } finally {
     loadingUsers.value = false
   }
@@ -352,7 +350,7 @@ const fetchAvailableUsers = async () => {
   loadingAvailableUsers.value = true
 
   try {
-    const response = await $fetch('/api/users', {
+    const response = await $fetch<{ users: any[] }>('/api/users', {
       query: { is_active: true },
     })
 
@@ -363,7 +361,7 @@ const fetchAvailableUsers = async () => {
     }))
   } catch (err: any) {
     console.error('Error fetching available users:', err)
-    toast.error('Error', 'Failed to load users')
+    toast.error('Error', { description: 'Failed to load users' })
   } finally {
     loadingAvailableUsers.value = false
   }
@@ -371,8 +369,8 @@ const fetchAvailableUsers = async () => {
 
 // Open assign user modal
 const openAssignUserModal = () => {
-  assignFormData.user_id = null
-  assignFormData.access_level = null
+  assignFormData.user_id = ''
+  assignFormData.access_level = ''
   isAssignModalOpen.value = true
   fetchAvailableUsers()
 }
@@ -394,7 +392,7 @@ const submitUserAssignment = async () => {
       body: payload,
     })
 
-    toast.success('Success', response.message)
+    toast.success('Success', { description: response.message })
     isAssignModalOpen.value = false
 
     // Refresh assigned users list
@@ -402,7 +400,7 @@ const submitUserAssignment = async () => {
   } catch (err: any) {
     console.error('Error assigning user:', err)
     const message = err.data?.message || 'Failed to assign user'
-    toast.error('Error', message)
+    toast.error('Error', { description: message })
   } finally {
     submittingAssignment.value = false
   }
@@ -419,18 +417,18 @@ const removeUserAssignment = async (userId: string, userName: string) => {
   try {
     const locationId = route.params.id as string
 
-    const response = await $fetch(`/api/locations/${locationId}/users/${userId}`, {
+    const response = await $fetch<{ message: string }>(`/api/locations/${locationId}/users/${userId}`, {
       method: 'DELETE',
     })
 
-    toast.success('Success', response.message)
+    toast.success('Success', { description: response.message })
 
     // Refresh assigned users list
     await fetchAssignedUsers()
   } catch (err: any) {
     console.error('Error removing user assignment:', err)
     const message = err.data?.message || 'Failed to remove user assignment'
-    toast.error('Error', message)
+    toast.error('Error', { description: message })
   } finally {
     removingUserId.value = null
   }

@@ -209,20 +209,7 @@ const handleCancel = () => {
             value-attribute="id"
             placeholder="Select supplier"
             searchable
-          >
-            <template #label>
-              <span v-if="formData.supplier_id">
-                {{ suppliers.find(s => s.id === formData.supplier_id)?.name }}
-              </span>
-              <span v-else class="text-[var(--ui-text-muted)]">Select supplier</span>
-            </template>
-            <template #option="{ option }">
-              <div>
-                <div class="font-medium">{{ option.name }}</div>
-                <div class="text-sm text-[var(--ui-text-muted)]">{{ option.code }}</div>
-              </div>
-            </template>
-          </USelectMenu>
+          />
         </div>
 
         <!-- PO (Optional) -->

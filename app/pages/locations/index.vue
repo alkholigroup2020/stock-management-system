@@ -101,10 +101,44 @@
 
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
+import type { LocationType } from '@prisma/client'
 
 definePageMeta({
   layout: 'default',
 })
+
+// Types
+interface LocationItem {
+  id: string
+  code: string
+  name: string
+  type: LocationType
+  address?: string | null
+  manager?: {
+    id: string
+    username: string
+    full_name?: string | null
+  } | null
+  is_active: boolean
+  _count?: {
+    user_locations?: number
+    location_stock?: number
+  }
+}
+
+interface LocationsResponse {
+  locations: LocationItem[]
+}
+
+interface TypeOption {
+  label: string
+  value: LocationType | null
+}
+
+interface StatusOption {
+  label: string
+  value: boolean | null
+}
 
 // Composables
 const { canManageLocations } = usePermissions()
@@ -113,16 +147,16 @@ const toast = useAppToast()
 // State
 const loading = ref(false)
 const error = ref<string | null>(null)
-const locations = ref<any[]>([])
+const locations = ref<LocationItem[]>([])
 
 const filters = reactive({
   search: '',
-  type: null as string | null,
+  type: null as LocationType | null,
   is_active: null as boolean | null,
 })
 
 // Filter options
-const typeOptions = [
+const typeOptions: TypeOption[] = [
   { label: 'All Types', value: null },
   { label: 'Kitchen', value: 'KITCHEN' },
   { label: 'Store', value: 'STORE' },
@@ -130,7 +164,7 @@ const typeOptions = [
   { label: 'Warehouse', value: 'WAREHOUSE' },
 ]
 
-const statusOptions = [
+const statusOptions: StatusOption[] = [
   { label: 'All Statuses', value: null },
   { label: 'Active', value: true },
   { label: 'Inactive', value: false },
@@ -142,7 +176,7 @@ const fetchLocations = async () => {
   error.value = null
 
   try {
-    const query: Record<string, any> = {}
+    const query: Record<string, string | boolean> = {}
 
     if (filters.search) {
       query.search = filters.search
@@ -154,15 +188,16 @@ const fetchLocations = async () => {
       query.is_active = filters.is_active
     }
 
-    const response = await $fetch('/api/locations', {
+    const response = await $fetch<LocationsResponse>('/api/locations', {
       query,
     })
 
     locations.value = response.locations || []
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error fetching locations:', err)
-    error.value = err.data?.message || 'Failed to fetch locations'
-    toast.error('Error', error.value)
+    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch locations'
+    error.value = errorMessage
+    toast.error('Error', { description: errorMessage })
   } finally {
     loading.value = false
   }
@@ -174,11 +209,11 @@ const debouncedFetch = useDebounceFn(() => {
 }, 500)
 
 // Handlers
-const handleEdit = (location: any) => {
+const handleEdit = (location: LocationItem) => {
   navigateTo(`/locations/${location.id}/edit`)
 }
 
-const handleViewDetails = (location: any) => {
+const handleViewDetails = (location: LocationItem) => {
   navigateTo(`/locations/${location.id}`)
 }
 

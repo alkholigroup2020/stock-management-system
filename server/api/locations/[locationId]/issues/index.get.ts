@@ -16,6 +16,16 @@
 
 import prisma from '../../../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 // Query schema for validation
 const querySchema = z.object({
@@ -27,7 +37,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -75,7 +85,7 @@ export default defineEventHandler(async (event) => {
     const { periodId, startDate, endDate, costCentre, includeLines } = querySchema.parse(query)
 
     // Build where clause for issues
-    const where: any = {
+    const where: Record<string, unknown> = {
       location_id: locationId,
     }
 
@@ -84,13 +94,14 @@ export default defineEventHandler(async (event) => {
     }
 
     if (startDate || endDate) {
-      where.issue_date = {}
+      const issueDateFilter: Record<string, Date> = {}
       if (startDate) {
-        where.issue_date.gte = new Date(startDate)
+        issueDateFilter.gte = new Date(startDate)
       }
       if (endDate) {
-        where.issue_date.lte = new Date(endDate)
+        issueDateFilter.lte = new Date(endDate)
       }
+      where.issue_date = issueDateFilter
     }
 
     if (costCentre) {
@@ -149,13 +160,22 @@ export default defineEventHandler(async (event) => {
         period: issue.period,
         poster: issue.poster,
         lines: includeLines === 'true' && Array.isArray(issue.issue_lines)
-          ? issue.issue_lines.map((line: any) => ({
-              id: line.id,
-              item: line.item,
-              quantity: line.quantity,
-              wac_at_issue: line.wac_at_issue,
-              line_value: line.line_value,
-            }))
+          ? issue.issue_lines.map((line: unknown) => {
+              const issueLine = line as {
+                id: string
+                item: { id: string; code: string; name: string; unit: string }
+                quantity: number
+                wac_at_issue: number
+                line_value: number
+              }
+              return {
+                id: issueLine.id,
+                item: issueLine.item,
+                quantity: issueLine.quantity,
+                wac_at_issue: issueLine.wac_at_issue,
+                line_value: issueLine.line_value,
+              }
+            })
           : undefined,
       })),
       count: issues.length,

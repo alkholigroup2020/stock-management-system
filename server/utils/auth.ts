@@ -63,7 +63,9 @@ export async function hashUserPassword(password: string): Promise<string> {
     return hash;
   } catch (error) {
     throw new Error(
-      `Failed to hash password: ${error instanceof Error ? error.message : "Unknown error"}`,
+      `Failed to hash password: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
     );
   }
 }
@@ -83,12 +85,13 @@ export async function hashUserPassword(password: string): Promise<string> {
  */
 export async function verifyUserPassword(
   password: string,
-  hashedPassword: string,
+  hashedPassword: string
 ): Promise<boolean> {
   try {
     const isMatch = await bcrypt.compare(password, hashedPassword);
     return isMatch;
   } catch (error) {
+    console.error("🚀 ~ verifyUserPassword ~ error:", error);
     // If verification fails, return false (invalid password)
     // Don't throw error to avoid leaking information
     return false;
@@ -108,7 +111,7 @@ export async function verifyUserPassword(
  * }
  */
 export function validatePasswordStrength(
-  password: string,
+  password: string
 ): PasswordStrengthResult {
   const errors: string[] = [];
   let strength: "weak" | "medium" | "strong" = "weak";
@@ -116,7 +119,7 @@ export function validatePasswordStrength(
   // Check minimum length
   if (password.length < PASSWORD_MIN_LENGTH) {
     errors.push(
-      `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`,
+      `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`
     );
   }
 
@@ -138,7 +141,7 @@ export function validatePasswordStrength(
   // Check for special character
   if (!/[@$!%*?&]/.test(password)) {
     errors.push(
-      "Password must contain at least one special character (@$!%*?&)",
+      "Password must contain at least one special character (@$!%*?&)"
     );
   }
 

@@ -139,14 +139,8 @@ const handleCancel = () => {
             option-attribute="label"
             value-attribute="value"
             placeholder="Select cost centre"
-            @update:model-value="emit('update:costCentre', $event)"
-          >
-            <template #label>
-              <span>
-                {{ costCentreOptions.find(c => c.value === costCentre)?.label }}
-              </span>
-            </template>
-          </USelectMenu>
+            @update:model-value="emit('update:costCentre', $event as 'FOOD' | 'CLEAN' | 'OTHER')"
+          />
         </div>
 
         <!-- Location (Read-only) -->

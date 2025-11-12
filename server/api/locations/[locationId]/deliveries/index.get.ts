@@ -17,6 +17,16 @@
 
 import prisma from '../../../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 // Query schema for validation
 const querySchema = z.object({
@@ -29,7 +39,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -77,7 +87,7 @@ export default defineEventHandler(async (event) => {
     const { periodId, supplierId, startDate, endDate, hasVariance, includeLines } = querySchema.parse(query)
 
     // Build where clause for deliveries
-    const where: any = {
+    const where: Record<string, unknown> = {
       location_id: locationId,
     }
 
@@ -90,13 +100,14 @@ export default defineEventHandler(async (event) => {
     }
 
     if (startDate || endDate) {
-      where.delivery_date = {}
+      const deliveryDateFilter: Record<string, Date> = {}
       if (startDate) {
-        where.delivery_date.gte = new Date(startDate)
+        deliveryDateFilter.gte = new Date(startDate)
       }
       if (endDate) {
-        where.delivery_date.lte = new Date(endDate)
+        deliveryDateFilter.lte = new Date(endDate)
       }
+      where.delivery_date = deliveryDateFilter
     }
 
     if (hasVariance) {
@@ -182,15 +193,26 @@ export default defineEventHandler(async (event) => {
         poster: delivery.poster,
         ncrs: delivery.ncrs,
         lines: includeLines === 'true' && Array.isArray(delivery.delivery_lines)
-          ? delivery.delivery_lines.map((line: any) => ({
-              id: line.id,
-              item: line.item,
-              quantity: line.quantity,
-              unit_price: line.unit_price,
-              period_price: line.period_price,
-              price_variance: line.price_variance,
-              line_value: line.line_value,
-            }))
+          ? delivery.delivery_lines.map((line: unknown) => {
+              const deliveryLine = line as {
+                id: string
+                item: { id: string; code: string; name: string; unit: string }
+                quantity: number
+                unit_price: number
+                period_price: number
+                price_variance: number
+                line_value: number
+              }
+              return {
+                id: deliveryLine.id,
+                item: deliveryLine.item,
+                quantity: deliveryLine.quantity,
+                unit_price: deliveryLine.unit_price,
+                period_price: deliveryLine.period_price,
+                price_variance: deliveryLine.price_variance,
+                line_value: deliveryLine.line_value,
+              }
+            })
           : undefined,
       })),
       count: deliveries.length,

@@ -40,6 +40,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Price Variance Detection:** Automatic NCR generation when delivery prices differ from locked period prices
 - **Approval Workflows:** PRF/PO and Transfers require Supervisor approval; Period Close requires Admin approval
 
+#### Before being done with any task, follow this checklist:
+
+- [ ] Run `pnpm typecheck` - must show **zero errors**
+- [ ] No `any` types in the code
+- [ ] All error handlers use proper type guards
+- [ ] All interfaces are properly defined
+- [ ] API responses are properly typed
+- [ ] Prisma Decimal types handled correctly
+
+**If typecheck fails, the task is NOT complete.**
+
 ## Development Commands
 
 **Package Manager:** pnpm (required)

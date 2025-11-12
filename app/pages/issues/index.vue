@@ -186,12 +186,12 @@ function goToNewIssue() {
 }
 
 // Badge color for cost centre
-function getCostCentreColor(costCentre: string) {
+function getCostCentreColor(costCentre: string): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' {
   switch (costCentre) {
     case 'FOOD':
-      return 'emerald'
+      return 'success'
     case 'CLEAN':
-      return 'blue'
+      return 'info'
     case 'OTHER':
       return 'neutral'
     default:
@@ -228,7 +228,7 @@ onMounted(async () => {
             View and manage stock issues for {{ locationStore.activeLocation?.name }}
           </p>
         </div>
-        <div v-if="canPostIssues" class="flex gap-2">
+        <div v-if="canPostIssues()" class="flex gap-2">
           <UButton
             color="primary"
             icon="i-lucide-plus"
@@ -436,7 +436,7 @@ onMounted(async () => {
           : 'No issues have been recorded yet. Click the button above to create your first issue.'
       "
     >
-      <template v-if="canPostIssues" #action>
+      <template v-if="canPostIssues()" #action>
         <UButton
           color="primary"
           icon="i-lucide-plus"

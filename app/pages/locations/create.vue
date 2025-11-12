@@ -21,7 +21,7 @@
     <UCard class="max-w-3xl">
       <UForm
         :schema="schema"
-        :state="formData"
+        :state="(formData as any)"
         @submit="onSubmit"
       >
         <div class="space-y-6">
@@ -157,9 +157,9 @@ const managerOptions = ref<any[]>([{ label: 'No Manager', value: null }])
 const formData = reactive({
   code: '',
   name: '',
-  type: null as string | null,
+  type: undefined as string | undefined,
   address: '',
-  manager_id: null as string | null,
+  manager_id: undefined as string | undefined,
   timezone: 'Asia/Riyadh',
 })
 
@@ -167,9 +167,7 @@ const formData = reactive({
 const schema = z.object({
   code: z.string().min(1, 'Code is required').max(10, 'Code must be at most 10 characters'),
   name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE'], {
-    required_error: 'Location type is required',
-  }),
+  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE']).describe('Location type is required'),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().max(50).default('Asia/Riyadh'),
@@ -188,7 +186,7 @@ const fetchManagers = async () => {
   loadingManagers.value = true
 
   try {
-    const response = await $fetch('/api/users', {
+    const response = await $fetch<{ users: any[] }>('/api/users', {
       query: { is_active: true },
     })
 
@@ -202,7 +200,7 @@ const fetchManagers = async () => {
     ]
   } catch (err: any) {
     console.error('Error fetching managers:', err)
-    toast.warning('Warning', 'Could not load manager list')
+    toast.warning('Warning', { description: 'Could not load manager list' })
   } finally {
     loadingManagers.value = false
   }
@@ -227,12 +225,12 @@ const onSubmit = async () => {
       body: payload,
     })
 
-    toast.success('Success', 'Location created successfully')
+    toast.success('Success', { description: 'Location created successfully' })
     navigateTo('/locations')
   } catch (err: any) {
     console.error('Error creating location:', err)
     const message = err.data?.message || 'Failed to create location'
-    toast.error('Error', message)
+    toast.error('Error', { description: message })
   } finally {
     submitting.value = false
   }

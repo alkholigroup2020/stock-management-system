@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Unit } from '@prisma/client';
 import { hash } from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -135,7 +135,7 @@ async function main() {
   // ========================================
   console.log('📦 Creating sample items...');
 
-  const items = [
+  const items: Array<{ code: string; name: string; unit: Unit; category: string; sub_category: string }> = [
     // Dairy & Eggs
     { code: 'DAIRY-001', name: 'Fresh Milk - Full Fat', unit: 'LTR', category: 'Dairy', sub_category: 'Milk' },
     { code: 'DAIRY-002', name: 'Eggs - Large Grade A', unit: 'EA', category: 'Dairy', sub_category: 'Eggs' },
@@ -167,7 +167,7 @@ async function main() {
       create: {
         code: item.code,
         name: item.name,
-        unit: item.unit as any,
+        unit: item.unit,
         category: item.category,
         sub_category: item.sub_category,
         is_active: true,

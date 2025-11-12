@@ -11,7 +11,7 @@ export interface ToastMessage {
 export interface ModalState {
   isOpen: boolean
   component?: string
-  props?: Record<string, any>
+  props?: Record<string, unknown>
 }
 
 export interface UIState {
@@ -156,7 +156,7 @@ export const useUIStore = defineStore('ui', {
     /**
      * Open a modal
      */
-    openModal(modalId: string, component?: string, props?: Record<string, any>) {
+    openModal(modalId: string, component?: string, props?: Record<string, unknown>) {
       this.modals[modalId] = {
         isOpen: true,
         component,

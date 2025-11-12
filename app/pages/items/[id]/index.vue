@@ -16,11 +16,11 @@
       :actions="[
         {
           label: 'Back to Items',
-          onClick: () => navigateTo('/items')
+          onClick: () => { navigateTo('/items') }
         },
         {
           label: 'Retry',
-          onClick: () => fetchItem()
+          onClick: () => { fetchItem() }
         }
       ]"
     />
@@ -218,7 +218,7 @@
         <!-- Location Stock Table Component -->
         <ItemLocationStockTable
           v-else
-          :location-stock="item.location_stock"
+          :location-stock="item.location_stock as any"
           :show-totals="true"
         />
       </UCard>
@@ -261,15 +261,17 @@ import type { Item, LocationStock } from '@prisma/client'
 import dayjs from 'dayjs'
 
 // Type for Item with location stock
+type LocationStockWithLocation = LocationStock & {
+  location: {
+    id: string
+    code: string
+    name: string
+    type: 'KITCHEN' | 'STORE' | 'CENTRAL' | 'WAREHOUSE'
+  }
+}
+
 interface ItemWithStock extends Item {
-  location_stock?: Array<LocationStock & {
-    location: {
-      id: string
-      code: string
-      name: string
-      type: 'KITCHEN' | 'STORE' | 'CENTRAL' | 'WAREHOUSE'
-    }
-  }>
+  location_stock?: LocationStockWithLocation[]
 }
 
 // Composables
@@ -317,7 +319,7 @@ async function fetchItem() {
     console.error('Error fetching item:', err)
     toast.add({
       title: 'Error',
-      description: error.value,
+      description: error.value || undefined,
       color: 'error',
     })
   } finally {

@@ -179,7 +179,7 @@ const submitDelivery = async () => {
         po_id: formData.value.po_id || null,
         invoice_no: formData.value.invoice_no,
         delivery_note: formData.value.delivery_note || null,
-        delivery_date: new Date(formData.value.delivery_date).toISOString(),
+        delivery_date: formData.value.delivery_date ? new Date(formData.value.delivery_date).toISOString() : new Date().toISOString(),
         lines: linesData,
       }
     })
@@ -190,10 +190,14 @@ const submitDelivery = async () => {
     if (ncrCount > 0) {
       toast.warning(
         'Delivery created with price variances',
-        `${ncrCount} NCR(s) automatically generated for price variances`
+        {
+          description: `${ncrCount} NCR(s) automatically generated for price variances`
+        }
       )
     } else {
-      toast.success('Delivery created successfully')
+      toast.success('Delivery created successfully', {
+        description: 'Delivery record has been saved'
+      })
     }
 
     // Redirect to delivery detail page
@@ -274,20 +278,7 @@ watch(lines, () => {
               value-attribute="id"
               placeholder="Select supplier"
               searchable
-            >
-              <template #label>
-                <span v-if="formData.supplier_id">
-                  {{ suppliers.find(s => s.id === formData.supplier_id)?.name }}
-                </span>
-                <span v-else class="text-[var(--ui-text-muted)]">Select supplier</span>
-              </template>
-              <template #option="{ option }">
-                <div>
-                  <div class="font-medium">{{ option.name }}</div>
-                  <div class="text-sm text-[var(--ui-text-muted)]">{{ option.code }}</div>
-                </div>
-              </template>
-            </USelectMenu>
+            />
           </div>
 
           <!-- PO (Optional) -->
@@ -387,20 +378,7 @@ watch(lines, () => {
                     placeholder="Select item"
                     searchable
                     class="min-w-[200px]"
-                  >
-                    <template #label>
-                      <span v-if="line.item_id">
-                        {{ getItemById(line.item_id)?.name }}
-                      </span>
-                      <span v-else class="text-[var(--ui-text-muted)]">Select item</span>
-                    </template>
-                    <template #option="{ option }">
-                      <div>
-                        <div class="font-medium">{{ option.name }}</div>
-                        <div class="text-xs text-[var(--ui-text-muted)]">{{ option.code }} - {{ option.unit }}</div>
-                      </div>
-                    </template>
-                  </USelectMenu>
+                  />
                 </td>
 
                 <!-- Quantity -->
@@ -462,7 +440,7 @@ watch(lines, () => {
                 <td class="px-4 py-3 text-center">
                   <UButton
                     icon="i-lucide-trash-2"
-                    color="red"
+                    color="error"
                     variant="ghost"
                     size="sm"
                     :disabled="lines.length === 1"
@@ -500,7 +478,7 @@ watch(lines, () => {
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
         <UButton
-          color="gray"
+          color="neutral"
           variant="soft"
           @click="cancel"
           :disabled="loading"

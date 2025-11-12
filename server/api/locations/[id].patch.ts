@@ -17,6 +17,16 @@
 
 import prisma from '../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 // Request body schema for validation
 const updateLocationSchema = z.object({
@@ -29,7 +39,7 @@ const updateLocationSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -155,13 +165,13 @@ export default defineEventHandler(async (event) => {
         data: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid location data',
-          details: error.errors,
+          details: error.issues,
         },
       })
     }
 
     // Re-throw if already a createError
-    if ((error as any).statusCode) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
 

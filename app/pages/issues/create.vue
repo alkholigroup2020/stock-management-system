@@ -170,13 +170,15 @@ const submitIssue = async () => {
     const result: any = await $fetch(`/api/locations/${locationStore.activeLocation.id}/issues`, {
       method: 'POST',
       body: {
-        issue_date: new Date(formData.value.issue_date).toISOString(),
+        issue_date: formData.value.issue_date ? new Date(formData.value.issue_date).toISOString() : new Date().toISOString(),
         cost_centre: formData.value.cost_centre,
         lines: linesData,
       }
     })
 
-    toast.success('Issue created successfully')
+    toast.success('Issue created successfully', {
+      description: 'Issue record has been saved'
+    })
 
     // Redirect to issue detail page
     router.push(`/issues/${result.id}`)
@@ -189,9 +191,13 @@ const submitIssue = async () => {
       const itemList = items.map((item: any) =>
         `${item.item_name}: requested ${item.requested}, available ${item.available}`
       ).join('; ')
-      toast.error('Insufficient Stock', `Cannot post issue. ${itemList}`)
+      toast.error('Insufficient Stock', {
+        description: `Cannot post issue. ${itemList}`
+      })
     } else {
-      toast.error('Failed to create issue', error.data?.message || error.message)
+      toast.error('Failed to create issue', {
+        description: error.data?.message || error.message
+      })
     }
   } finally {
     loading.value = false
@@ -277,13 +283,7 @@ watch(lines, () => {
               option-attribute="label"
               value-attribute="value"
               placeholder="Select cost centre"
-            >
-              <template #label>
-                <span>
-                  {{ costCentreOptions.find(c => c.value === formData.cost_centre)?.label }}
-                </span>
-              </template>
-            </USelectMenu>
+            />
           </div>
 
           <!-- Location (Read-only) -->
@@ -355,25 +355,7 @@ watch(lines, () => {
                     placeholder="Select item"
                     searchable
                     class="min-w-[200px]"
-                  >
-                    <template #label>
-                      <span v-if="line.item_id">
-                        {{ getItemById(line.item_id)?.name }}
-                      </span>
-                      <span v-else class="text-[var(--ui-text-muted)]">Select item</span>
-                    </template>
-                    <template #option="{ option }">
-                      <div>
-                        <div class="font-medium">{{ option.name }}</div>
-                        <div class="text-xs text-[var(--ui-text-muted)]">
-                          {{ option.code }} - {{ option.unit }}
-                          <span v-if="stockLevels[option.id]" class="ml-2">
-                            (Stock: {{ stockLevels[option.id].on_hand }})
-                          </span>
-                        </div>
-                      </div>
-                    </template>
-                  </USelectMenu>
+                  />
                 </td>
 
                 <!-- On Hand -->
@@ -422,7 +404,7 @@ watch(lines, () => {
                 <td class="px-4 py-3 text-center">
                   <UButton
                     icon="i-lucide-trash-2"
-                    color="red"
+                    color="error"
                     variant="ghost"
                     size="sm"
                     :disabled="lines.length === 1"

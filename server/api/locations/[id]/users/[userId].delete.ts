@@ -7,15 +7,26 @@
  */
 
 import { PrismaClient } from '@prisma/client'
+import type { UserRole } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
+// User session type
+interface UserSession {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 export default defineEventHandler(async (event) => {
   try {
     // Get authenticated user from session
     const session = await getUserSession(event)
+    const authUser = session?.user as UserSession | undefined
 
-    if (!session?.user?.id) {
+    if (!authUser?.id) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Unauthorized',
@@ -27,7 +38,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Only admins can remove user assignments
-    if (session.user.role !== 'ADMIN') {
+    if (authUser.role !== 'ADMIN') {
       throw createError({
         statusCode: 403,
         statusMessage: 'Forbidden',
@@ -147,9 +158,9 @@ export default defineEventHandler(async (event) => {
         location_name: existingAssignment.location.name,
       },
     }
-  } catch (error: any) {
+  } catch (error) {
     // Re-throw H3 errors
-    if (error.statusCode) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
 

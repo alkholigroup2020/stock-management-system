@@ -10,14 +10,22 @@
  * - ADMIN: Full system access including items, prices, users, period close
  */
 
-import type { UserRole } from '@prisma/client'
+// import type { UserRole } from "@prisma/client";
 
 /**
  * Main permissions composable
  * Returns all permission check functions for use in components
  */
 export function usePermissions() {
-  const { user, isAuthenticated, role, hasLocationAccess, isAdmin, isSupervisor, isOperator } = useAuth()
+  const {
+    user,
+    isAuthenticated,
+    // role,
+    hasLocationAccess,
+    isAdmin,
+    isSupervisor,
+    // isOperator,
+  } = useAuth();
 
   // ==================== DELIVERY PERMISSIONS ====================
 
@@ -33,21 +41,21 @@ export function usePermissions() {
    * @returns true if user can post deliveries at the location
    */
   const canPostDeliveries = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id
-    if (!targetLocationId) return false
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
     // Admins and Supervisors have access to all locations
-    if (isAdmin.value || isSupervisor.value) return true
+    if (isAdmin.value || isSupervisor.value) return true;
 
     // Operators need POST or MANAGE access level
     const accessLevel = user.value.locations.find(
       (loc) => loc.location_id === targetLocationId
-    )?.access_level
+    )?.access_level;
 
-    return accessLevel === 'POST' || accessLevel === 'MANAGE'
-  }
+    return accessLevel === "POST" || accessLevel === "MANAGE";
+  };
 
   // ==================== ISSUE PERMISSIONS ====================
 
@@ -63,21 +71,21 @@ export function usePermissions() {
    * @returns true if user can post issues at the location
    */
   const canPostIssues = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id
-    if (!targetLocationId) return false
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
     // Admins and Supervisors have access to all locations
-    if (isAdmin.value || isSupervisor.value) return true
+    if (isAdmin.value || isSupervisor.value) return true;
 
     // Operators need POST or MANAGE access level
     const accessLevel = user.value.locations.find(
       (loc) => loc.location_id === targetLocationId
-    )?.access_level
+    )?.access_level;
 
-    return accessLevel === 'POST' || accessLevel === 'MANAGE'
-  }
+    return accessLevel === "POST" || accessLevel === "MANAGE";
+  };
 
   // ==================== ITEM MANAGEMENT PERMISSIONS ====================
 
@@ -91,24 +99,24 @@ export function usePermissions() {
    * @returns true if user can edit items
    */
   const canEditItems = (): boolean => {
-    return isAdmin.value
-  }
+    return isAdmin.value;
+  };
 
   /**
    * Check if user can create new items
    * Alias for canEditItems
    */
   const canCreateItems = (): boolean => {
-    return canEditItems()
-  }
+    return canEditItems();
+  };
 
   /**
    * Check if user can deactivate items
    * Alias for canEditItems
    */
   const canDeactivateItems = (): boolean => {
-    return canEditItems()
-  }
+    return canEditItems();
+  };
 
   /**
    * Check if user can set item prices for a period
@@ -119,8 +127,8 @@ export function usePermissions() {
    * @returns true if user can set item prices
    */
   const canSetItemPrices = (): boolean => {
-    return isAdmin.value
-  }
+    return isAdmin.value;
+  };
 
   // ==================== PERIOD MANAGEMENT PERMISSIONS ====================
 
@@ -134,16 +142,16 @@ export function usePermissions() {
    * @returns true if user can close periods
    */
   const canClosePeriod = (): boolean => {
-    return isAdmin.value
-  }
+    return isAdmin.value;
+  };
 
   /**
    * Check if user can create/open a new period
    * Alias for canClosePeriod
    */
   const canOpenPeriod = (): boolean => {
-    return canClosePeriod()
-  }
+    return canClosePeriod();
+  };
 
   /**
    * Check if user can mark a location as ready for period close
@@ -156,11 +164,11 @@ export function usePermissions() {
    * @returns true if user can mark location ready
    */
   const canMarkLocationReady = (locationId: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
-    if (!isSupervisor.value && !isAdmin.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
+    if (!isSupervisor.value && !isAdmin.value) return false;
 
-    return hasLocationAccess(locationId)
-  }
+    return hasLocationAccess(locationId);
+  };
 
   // ==================== TRANSFER PERMISSIONS ====================
 
@@ -176,9 +184,9 @@ export function usePermissions() {
    * @returns true if user can create a transfer
    */
   const canCreateTransfer = (fromLocationId: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
-    return hasLocationAccess(fromLocationId)
-  }
+    if (!isAuthenticated.value || !user.value) return false;
+    return hasLocationAccess(fromLocationId);
+  };
 
   /**
    * Check if user can approve or reject transfer requests
@@ -190,8 +198,8 @@ export function usePermissions() {
    * @returns true if user can approve transfers
    */
   const canApproveTransfers = (): boolean => {
-    return isSupervisor.value || isAdmin.value
-  }
+    return isSupervisor.value || isAdmin.value;
+  };
 
   // ==================== RECONCILIATION PERMISSIONS ====================
 
@@ -206,13 +214,13 @@ export function usePermissions() {
    * @returns true if user can edit reconciliations
    */
   const canEditReconciliations = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
-    if (!isSupervisor.value && !isAdmin.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
+    if (!isSupervisor.value && !isAdmin.value) return false;
 
-    if (!locationId) return true // Admins/Supervisors can edit in general
+    if (!locationId) return true; // Admins/Supervisors can edit in general
 
-    return hasLocationAccess(locationId)
-  }
+    return hasLocationAccess(locationId);
+  };
 
   /**
    * Check if user can view consolidated reconciliations (all locations)
@@ -223,8 +231,8 @@ export function usePermissions() {
    * @returns true if user can view consolidated reconciliations
    */
   const canViewConsolidatedReconciliations = (): boolean => {
-    return isSupervisor.value || isAdmin.value
-  }
+    return isSupervisor.value || isAdmin.value;
+  };
 
   // ==================== POB (People on Board) PERMISSIONS ====================
 
@@ -240,13 +248,13 @@ export function usePermissions() {
    * @returns true if user can enter POB
    */
   const canEnterPOB = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id
-    if (!targetLocationId) return false
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
-    return hasLocationAccess(targetLocationId)
-  }
+    return hasLocationAccess(targetLocationId);
+  };
 
   // ==================== NCR PERMISSIONS ====================
 
@@ -262,13 +270,13 @@ export function usePermissions() {
    * @returns true if user can create NCRs
    */
   const canCreateNCR = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id
-    if (!targetLocationId) return false
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
-    return hasLocationAccess(targetLocationId)
-  }
+    return hasLocationAccess(targetLocationId);
+  };
 
   /**
    * Check if user can update NCR status
@@ -281,13 +289,13 @@ export function usePermissions() {
    * @returns true if user can update NCR status
    */
   const canUpdateNCRStatus = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
-    if (!isSupervisor.value && !isAdmin.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
+    if (!isSupervisor.value && !isAdmin.value) return false;
 
-    if (!locationId) return true
+    if (!locationId) return true;
 
-    return hasLocationAccess(locationId)
-  }
+    return hasLocationAccess(locationId);
+  };
 
   // ==================== USER MANAGEMENT PERMISSIONS ====================
 
@@ -300,16 +308,16 @@ export function usePermissions() {
    * @returns true if user can manage users
    */
   const canManageUsers = (): boolean => {
-    return isAdmin.value
-  }
+    return isAdmin.value;
+  };
 
   /**
    * Check if user can assign users to locations
    * Alias for canManageUsers
    */
   const canAssignUserLocations = (): boolean => {
-    return canManageUsers()
-  }
+    return canManageUsers();
+  };
 
   // ==================== LOCATION MANAGEMENT PERMISSIONS ====================
 
@@ -322,8 +330,8 @@ export function usePermissions() {
    * @returns true if user can manage locations
    */
   const canManageLocations = (): boolean => {
-    return isAdmin.value
-  }
+    return isAdmin.value;
+  };
 
   // ==================== SUPPLIER MANAGEMENT PERMISSIONS ====================
 
@@ -336,8 +344,8 @@ export function usePermissions() {
    * @returns true if user can manage suppliers
    */
   const canManageSuppliers = (): boolean => {
-    return isAdmin.value
-  }
+    return isAdmin.value;
+  };
 
   // ==================== REPORTING PERMISSIONS ====================
 
@@ -352,12 +360,12 @@ export function usePermissions() {
    * @returns true if user can view reports
    */
   const canViewReports = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
 
-    if (!locationId) return true // All authenticated users can view some reports
+    if (!locationId) return true; // All authenticated users can view some reports
 
-    return hasLocationAccess(locationId)
-  }
+    return hasLocationAccess(locationId);
+  };
 
   /**
    * Check if user can export reports
@@ -368,8 +376,8 @@ export function usePermissions() {
    * @returns true if user can export reports
    */
   const canExportReports = (): boolean => {
-    return isSupervisor.value || isAdmin.value
-  }
+    return isSupervisor.value || isAdmin.value;
+  };
 
   // ==================== STOCK PERMISSIONS ====================
 
@@ -384,13 +392,13 @@ export function usePermissions() {
    * @returns true if user can view stock
    */
   const canViewStock = (locationId?: string): boolean => {
-    if (!isAuthenticated.value || !user.value) return false
+    if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id
-    if (!targetLocationId) return false
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
-    return hasLocationAccess(targetLocationId)
-  }
+    return hasLocationAccess(targetLocationId);
+  };
 
   // ==================== RETURN ALL PERMISSION FUNCTIONS ====================
 
@@ -443,5 +451,5 @@ export function usePermissions() {
 
     // Stock
     canViewStock,
-  }
+  };
 }

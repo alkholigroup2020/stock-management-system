@@ -18,6 +18,22 @@
 
 import prisma from '../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface UserLocation {
+  location_id: string
+  access_level: string
+}
+
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+  locations?: UserLocation[]
+}
 
 // Query schema for validation
 const querySchema = z.object({
@@ -25,12 +41,12 @@ const querySchema = z.object({
   search: z.string().optional(),
   locationId: z.string().uuid().optional(),
   is_active: z.string().transform((val) => val === 'true').optional(),
-  page: z.string().transform((val) => parseInt(val, 10)).default('1'),
-  limit: z.string().transform((val) => Math.min(parseInt(val, 10), 200)).default('50'),
+  page: z.coerce.number().default(1),
+  limit: z.coerce.number().max(200).default(50),
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -49,7 +65,7 @@ export default defineEventHandler(async (event) => {
     const { category, search, locationId, is_active, page, limit } = querySchema.parse(query)
 
     // Build where clause based on filters
-    const where: any = {}
+    const where: Record<string, unknown> = {}
 
     // Filter by category if provided
     if (category) {
@@ -74,13 +90,13 @@ export default defineEventHandler(async (event) => {
     const take = limit
 
     // Build include clause
-    const include: any = {}
+    const include: Record<string, unknown> = {}
 
     // Include location stock if locationId is provided
     if (locationId) {
       // Check if user has access to this location
       if (user.role === 'OPERATOR') {
-        const hasAccess = user.locations?.some((loc: any) => loc.location_id === locationId)
+        const hasAccess = user.locations?.some((loc) => loc.location_id === locationId)
         if (!hasAccess) {
           throw createError({
             statusCode: 403,
@@ -149,7 +165,7 @@ export default defineEventHandler(async (event) => {
         data: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: error.errors,
+          details: error.issues,
         },
       })
     }

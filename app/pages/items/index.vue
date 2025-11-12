@@ -369,7 +369,7 @@ async function fetchItems() {
     console.error('Error fetching items:', err)
     toast.add({
       title: 'Error',
-      description: error.value,
+      description: error.value || undefined,
       color: 'error',
     })
   } finally {

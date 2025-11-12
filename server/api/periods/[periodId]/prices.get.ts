@@ -13,6 +13,16 @@
 
 import prisma from '../../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 // Query schema for validation
 const querySchema = z.object({
@@ -21,7 +31,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -69,7 +79,7 @@ export default defineEventHandler(async (event) => {
     const { search, category } = querySchema.parse(query)
 
     // Build where clause for items
-    const itemWhere: any = {
+    const itemWhere: Record<string, unknown> = {
       is_active: true,
     }
 
@@ -140,7 +150,7 @@ export default defineEventHandler(async (event) => {
         data: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: error.errors,
+          details: error.issues,
         },
       })
     }

@@ -71,16 +71,16 @@ const handleViewAll = () => {
 }
 
 // Map badge colors to Nuxt UI colors
-const getBadgeColor = (color?: string) => {
-  const colorMap: Record<string, string> = {
+const getBadgeColor = (color?: string): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' => {
+  const colorMap: Record<string, 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral'> = {
     primary: 'primary',
-    secondary: 'primary',
-    success: 'green',
-    error: 'red',
-    warning: 'amber',
-    neutral: 'gray',
+    secondary: 'secondary',
+    success: 'success',
+    error: 'error',
+    warning: 'warning',
+    neutral: 'neutral',
   }
-  return colorMap[color || 'neutral'] || 'gray'
+  return colorMap[color || 'neutral'] || 'neutral'
 }
 </script>
 

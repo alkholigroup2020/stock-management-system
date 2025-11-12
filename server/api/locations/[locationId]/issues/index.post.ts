@@ -21,6 +21,16 @@
 
 import prisma from '../../../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+}
 
 // Issue line schema
 const issueLineSchema = z.object({
@@ -64,7 +74,8 @@ async function generateIssueNumber(year?: number): Promise<string> {
   }
 
   // Extract number from last issue and increment
-  const lastNumber = parseInt(lastIssue.issue_no.split('-')[2], 10)
+  const parts = lastIssue.issue_no.split('-')
+  const lastNumber = parseInt(parts[2] || '0', 10)
   const nextNumber = lastNumber + 1
 
   // Pad with zeros to 3 digits
@@ -72,7 +83,7 @@ async function generateIssueNumber(year?: number): Promise<string> {
 }
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -297,7 +308,7 @@ export default defineEventHandler(async (event) => {
       })
 
       let totalValue = 0
-      const createdLines: any[] = []
+      const createdLines: unknown[] = []
 
       // Process each issue line
       for (const lineData of data.lines) {
@@ -381,18 +392,27 @@ export default defineEventHandler(async (event) => {
         posted_at: result.issue.posted_at,
         period: result.issue.period,
         poster: result.issue.poster,
-        lines: result.lines.map((line) => ({
-          id: line.id,
-          item: {
-            id: line.item.id,
-            code: line.item.code,
-            name: line.item.name,
-            unit: line.item.unit,
-          },
-          quantity: line.quantity,
-          wac_at_issue: line.wac_at_issue,
-          line_value: line.line_value,
-        })),
+        lines: result.lines.map((line: unknown) => {
+          const issueLine = line as {
+            id: string
+            item: { id: string; code: string; name: string; unit: string }
+            quantity: number
+            wac_at_issue: number
+            line_value: number
+          }
+          return {
+            id: issueLine.id,
+            item: {
+              id: issueLine.item.id,
+              code: issueLine.item.code,
+              name: issueLine.item.name,
+              unit: issueLine.item.unit,
+            },
+            quantity: issueLine.quantity,
+            wac_at_issue: issueLine.wac_at_issue,
+            line_value: issueLine.line_value,
+          }
+        }),
       },
     }
   } catch (error) {

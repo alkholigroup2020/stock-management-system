@@ -1,5 +1,15 @@
-import { z } from 'zod'
-import prisma from '../../../utils/prisma'
+// import { z } from 'zod'
+import prisma from "../../../utils/prisma";
+import type { UserRole } from "@prisma/client";
+
+// User session type
+interface AuthUser {
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  default_location_id: string | null;
+}
 
 /**
  * GET /api/locations/:locationId/dashboard
@@ -14,37 +24,37 @@ import prisma from '../../../utils/prisma'
  */
 export default defineEventHandler(async (event) => {
   // Auth check (handled by auth middleware)
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined;
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
-      data: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-    })
+      statusMessage: "Unauthorized",
+      data: { code: "UNAUTHORIZED", message: "Authentication required" },
+    });
   }
 
   // Get locationId from params
-  const locationId = getRouterParam(event, 'locationId')
+  const locationId = getRouterParam(event, "locationId");
   if (!locationId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Bad Request',
-      data: { code: 'VALIDATION_ERROR', message: 'Location ID is required' },
-    })
+      statusMessage: "Bad Request",
+      data: { code: "VALIDATION_ERROR", message: "Location ID is required" },
+    });
   }
 
   try {
     // Check location exists
     const location = await prisma.location.findUnique({
       where: { id: locationId },
-    })
+    });
 
     if (!location) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
-        data: { code: 'NOT_FOUND', message: 'Location not found' },
-      })
+        statusMessage: "Not Found",
+        data: { code: "NOT_FOUND", message: "Location not found" },
+      });
     }
 
     // Check location access (handled by location-access middleware)
@@ -53,9 +63,9 @@ export default defineEventHandler(async (event) => {
 
     // Fetch current open period
     const currentPeriod = await prisma.period.findFirst({
-      where: { status: 'OPEN' },
-      orderBy: { start_date: 'desc' },
-    })
+      where: { status: "OPEN" },
+      orderBy: { start_date: "desc" },
+    });
 
     if (!currentPeriod) {
       // No active period - return minimal data
@@ -74,13 +84,16 @@ export default defineEventHandler(async (event) => {
         },
         recentDeliveries: [],
         recentIssues: [],
-      }
+      };
     }
 
     // Calculate days left in period
-    const today = new Date()
-    const endDate = new Date(currentPeriod.end_date)
-    const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)))
+    const today = new Date();
+    const endDate = new Date(currentPeriod.end_date);
+    const daysLeft = Math.max(
+      0,
+      Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    );
 
     // Fetch period totals for location
     const [totalReceipts, totalIssues, totalMandays] = await Promise.all([
@@ -117,7 +130,7 @@ export default defineEventHandler(async (event) => {
           extra_count: true,
         },
       }),
-    ])
+    ]);
 
     // Fetch recent deliveries (last 5)
     const recentDeliveries = await prisma.delivery.findMany({
@@ -135,10 +148,10 @@ export default defineEventHandler(async (event) => {
         },
       },
       orderBy: {
-        delivery_date: 'desc',
+        delivery_date: "desc",
       },
       take: 5,
-    })
+    });
 
     // Fetch recent issues (last 5)
     const recentIssues = await prisma.issue.findMany({
@@ -147,10 +160,10 @@ export default defineEventHandler(async (event) => {
         period_id: currentPeriod.id,
       },
       orderBy: {
-        issue_date: 'desc',
+        issue_date: "desc",
       },
       take: 5,
-    })
+    });
 
     // Return dashboard data
     return {
@@ -169,7 +182,9 @@ export default defineEventHandler(async (event) => {
       totals: {
         receipts: totalReceipts._sum.total_amount?.toNumber() || 0,
         issues: totalIssues._sum.total_value?.toNumber() || 0,
-        mandays: (totalMandays._sum.crew_count || 0) + (totalMandays._sum.extra_count || 0),
+        mandays:
+          (totalMandays._sum.crew_count || 0) +
+          (totalMandays._sum.extra_count || 0),
         daysLeft,
       },
       recentDeliveries: recentDeliveries.map((delivery) => ({
@@ -188,23 +203,23 @@ export default defineEventHandler(async (event) => {
         cost_centre: issue.cost_centre,
         total_value: issue.total_value.toNumber(),
       })),
-    }
-  } catch (error: any) {
+    };
+  } catch (error) {
     // Handle known errors
-    if (error.statusCode) {
-      throw error
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
     }
 
     // Handle unexpected errors
-    console.error('Dashboard fetch error:', error)
+    console.error("Dashboard fetch error:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch dashboard data',
-        details: error.message,
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch dashboard data",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-    })
+    });
   }
-})
+});

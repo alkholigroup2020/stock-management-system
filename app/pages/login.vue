@@ -72,9 +72,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     })
 
     // Redirect to dashboard (handled by watch on isAuthenticated)
-  } catch (err: any) {
+  } catch (err) {
     // Handle login errors
-    const message = err?.message || authError.value || 'Login failed. Please check your credentials.'
+    const message = err instanceof Error ? err.message : authError.value || 'Login failed. Please check your credentials.'
     errorMessage.value = message
 
     toast.add({

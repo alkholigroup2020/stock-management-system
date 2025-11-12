@@ -72,25 +72,7 @@ const handleRemove = () => {
         searchable
         class="min-w-[200px]"
         @update:model-value="emit('update:line', line)"
-      >
-        <template #label>
-          <span v-if="line.item_id">
-            {{ getItemById(line.item_id)?.name }}
-          </span>
-          <span v-else class="text-[var(--ui-text-muted)]">Select item</span>
-        </template>
-        <template #option="{ option }">
-          <div>
-            <div class="font-medium">{{ option.name }}</div>
-            <div class="text-xs text-[var(--ui-text-muted)]">
-              {{ option.code }} - {{ option.unit }}
-              <span v-if="stockLevels[option.id]" class="ml-2">
-                (Stock: {{ stockLevels[option.id].on_hand.toFixed(4) }})
-              </span>
-            </div>
-          </div>
-        </template>
-      </USelectMenu>
+      />
     </td>
 
     <!-- On Hand -->
@@ -140,7 +122,7 @@ const handleRemove = () => {
     <td class="px-4 py-3 text-center">
       <UButton
         icon="i-lucide-trash-2"
-        color="red"
+        color="error"
         variant="ghost"
         size="sm"
         :disabled="!canRemove"

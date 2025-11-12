@@ -71,12 +71,11 @@
               v-model="searchQuery"
               icon="i-lucide-search"
               placeholder="Search by name or code..."
-              :ui="{ icon: { trailing: { pointer: '' } } }"
             >
               <template #trailing>
                 <UButton
                   v-if="searchQuery"
-                  color="gray"
+                  color="neutral"
                   variant="link"
                   icon="i-lucide-x"
                   :padded="false"
@@ -103,7 +102,7 @@
           <!-- Clear Filters -->
           <UButton
             v-if="searchQuery || selectedCategory"
-            color="gray"
+            color="neutral"
             variant="soft"
             icon="i-lucide-filter-x"
             @click="clearFilters"
@@ -212,7 +211,7 @@
                     <!-- Modified Indicator -->
                     <UBadge
                       v-if="item.isModified"
-                      color="amber"
+                      color="warning"
                       variant="subtle"
                       size="xs"
                     >
@@ -461,23 +460,23 @@ async function handleSaveAll() {
       }))
 
     if (modifiedPrices.length === 0) {
-      toast.warning('No Changes', 'No prices to save')
+      toast.warning('No Changes', { description: 'No prices to save' })
       return
     }
 
     // Send update request
-    const response = await $fetch(`/api/periods/${periodId.value}/prices`, {
+    const response = await $fetch<{ updated_count: number }>(`/api/periods/${periodId.value}/prices`, {
       method: 'POST',
       body: { prices: modifiedPrices },
     })
 
-    toast.success('Prices Updated', `Successfully updated ${response.updated_count} item prices`)
+    toast.success('Prices Updated', { description: `Successfully updated ${response.updated_count} item prices` })
 
     // Refresh data
     await fetchPrices()
   } catch (err: any) {
     console.error('Error saving prices:', err)
-    toast.error('Save Failed', err.data?.message || 'Failed to save prices')
+    toast.error('Save Failed', { description: err.data?.message || 'Failed to save prices' })
   } finally {
     saving.value = false
   }

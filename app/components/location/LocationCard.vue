@@ -161,9 +161,9 @@ const locationTypeClass = computed(() => {
   return classes[props.location.type] || 'bg-zinc-100 dark:bg-zinc-800'
 })
 
-const locationTypeBadgeColor = computed(() => {
-  const colors = {
-    KITCHEN: 'amber',
+const locationTypeBadgeColor = computed((): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' => {
+  const colors: Record<string, 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral'> = {
+    KITCHEN: 'warning',
     STORE: 'success',
     CENTRAL: 'primary',
     WAREHOUSE: 'neutral',

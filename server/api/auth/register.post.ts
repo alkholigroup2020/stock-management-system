@@ -12,6 +12,15 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// User session type
+interface UserSession {
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  default_location_id: string | null;
+}
+
 // Validation schema for user registration
 const registerSchema = z.object({
   username: z
@@ -59,7 +68,9 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if ((session.user as any).role !== "ADMIN") {
+    const user = session.user as UserSession;
+
+    if (user.role !== "ADMIN") {
       throw createError({
         statusCode: 403,
         statusMessage: "Forbidden",

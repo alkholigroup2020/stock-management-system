@@ -12,6 +12,24 @@
  * - Operators only have access to their assigned locations
  */
 
+import type { UserRole } from '@prisma/client'
+
+// User location type
+interface UserLocation {
+  location_id: string
+  access_level: string
+}
+
+// User session type
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+  locations?: UserLocation[]
+}
+
 export default defineEventHandler(async (event) => {
   // Get the request path
   const path = event.node.req.url || "";
@@ -30,7 +48,7 @@ export default defineEventHandler(async (event) => {
   const locationId = match[1];
 
   // Get user from context (set by auth middleware)
-  const user = event.context.user;
+  const user = event.context.user as AuthUser | undefined;
 
   // If no user in context, skip (auth middleware will handle)
   if (!user) {
@@ -46,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
   // For Operators, check if they have access to this location
   const hasAccess = user.locations?.some(
-    (loc: any) => loc.location_id === locationId,
+    (loc) => loc.location_id === locationId,
   );
 
   if (!hasAccess) {
@@ -67,7 +85,7 @@ export default defineEventHandler(async (event) => {
   // Log access for debugging (optional, remove in production)
   if (process.env.NODE_ENV === "development") {
     console.log(
-      `[Location Access] User ${(user as any).username} (${(user as any).role}) accessing location ${locationId}`,
+      `[Location Access] User ${user.username} (${user.role}) accessing location ${locationId}`,
     );
   }
 });

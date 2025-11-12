@@ -10,6 +10,8 @@
  * - Detailed error responses: Include item name, requested/available qty
  */
 
+import { createError } from 'h3'
+import prisma from './prisma'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -99,7 +101,6 @@ export async function validateSufficientStock(
   itemId: string,
   quantity: number
 ): Promise<StockValidationResult> {
-  const prisma = usePrisma()
 
   // Fetch location stock with item details
   const locationStock = await prisma.locationStock.findUnique({
@@ -243,7 +244,6 @@ export async function validateAndThrowIfInsufficientStock(
   locationId: string,
   items: Array<{ itemId: string; quantity: number }>
 ): Promise<void> {
-  const prisma = usePrisma()
 
   // Fetch location details for error message
   const location = await prisma.location.findUnique({
@@ -287,7 +287,6 @@ export async function getCurrentStockLevel(
   locationId: string,
   itemId: string
 ): Promise<number> {
-  const prisma = usePrisma()
 
   const locationStock = await prisma.locationStock.findUnique({
     where: {

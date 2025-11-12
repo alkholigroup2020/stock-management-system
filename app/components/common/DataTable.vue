@@ -31,13 +31,18 @@
 
     <!-- Data Table -->
     <div v-else class="overflow-x-auto">
-      <UTable
-        :data="paginatedData"
-        :columns="normalizedColumns"
-      >
+      <UTable :data="paginatedData" :columns="normalizedColumns">
         <!-- Custom column slots -->
-        <template v-for="column in columns" :key="column.key" #[`${column.key}-data`]="{ row }">
-          <slot :name="`column-${column.key}`" :row="row" :value="getRowValue(row, column.key)">
+        <template
+          v-for="column in columns"
+          :key="column.key"
+          #[`${column.key}-data`]="{ row }"
+        >
+          <slot
+            :name="`column-${column.key}`"
+            :row="row"
+            :value="getRowValue(row, column.key)"
+          >
             {{ getRowValue(row, column.key) }}
           </slot>
         </template>
@@ -51,11 +56,12 @@
       <!-- Pagination -->
       <div
         v-if="showPagination && totalPages > 1"
-        class="flex items-center justify-between px-4 py-3 border-t border-[var(--ui-border)]"
+        class="flex items-center justify-between px-4 py-3 border-t border-default"
       >
         <!-- Page info -->
-        <div class="text-sm text-[var(--ui-text-muted)]">
-          Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ data.length }} results
+        <div class="text-sm text-muted">
+          Showing {{ startIndex + 1 }} to {{ endIndex }} of
+          {{ data.length }} results
         </div>
 
         <!-- Pagination controls -->
@@ -99,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref } from "vue";
 
 /**
  * DataTable Component
@@ -121,153 +127,153 @@ import { computed, ref } from 'vue'
  */
 
 interface Column {
-  key: string
-  label: string
-  sortable?: boolean
-  class?: string
+  key: string;
+  label: string;
+  sortable?: boolean;
+  class?: string;
 }
 
 interface Props {
   /** Table data */
-  data?: any[]
+  data?: any[];
   /** Column definitions */
-  columns: Column[]
+  columns: Column[];
   /** Loading state */
-  loading?: boolean
+  loading?: boolean;
   /** Error message */
-  error?: string
+  error?: string;
   /** Error title */
-  errorTitle?: string
+  errorTitle?: string;
   /** Show retry button on error */
-  showRetry?: boolean
+  showRetry?: boolean;
   /** Loading spinner size */
-  loadingSize?: 'sm' | 'md' | 'lg' | 'xl'
+  loadingSize?: "sm" | "md" | "lg" | "xl";
   /** Empty state icon */
-  emptyIcon?: string
+  emptyIcon?: string;
   /** Empty state title */
-  emptyTitle?: string
+  emptyTitle?: string;
   /** Empty state description */
-  emptyDescription?: string
+  emptyDescription?: string;
   /** Show empty action button */
-  showEmptyAction?: boolean
+  showEmptyAction?: boolean;
   /** Empty action button text */
-  emptyActionText?: string
+  emptyActionText?: string;
   /** Empty action button icon */
-  emptyActionIcon?: string
+  emptyActionIcon?: string;
   /** Enable pagination */
-  showPagination?: boolean
+  showPagination?: boolean;
   /** Items per page */
-  pageSize?: number
+  pageSize?: number;
   /** Enable row selection */
-  selectable?: boolean
+  selectable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],
   loading: false,
-  error: '',
-  errorTitle: 'Error loading data',
+  error: "",
+  errorTitle: "Error loading data",
   showRetry: true,
-  loadingSize: 'md',
-  emptyIcon: 'i-heroicons-inbox',
-  emptyTitle: 'No data available',
-  emptyDescription: 'There are no items to display.',
+  loadingSize: "md",
+  emptyIcon: "i-heroicons-inbox",
+  emptyTitle: "No data available",
+  emptyDescription: "There are no items to display.",
   showEmptyAction: false,
-  emptyActionText: 'Create New',
-  emptyActionIcon: 'i-heroicons-plus',
+  emptyActionText: "Create New",
+  emptyActionIcon: "i-heroicons-plus",
   showPagination: false,
   pageSize: 10,
-  selectable: false
-})
+  selectable: false,
+});
 
 const emit = defineEmits<{
-  retry: []
-  emptyAction: []
-  select: [rows: any[]]
-}>()
+  retry: [];
+  emptyAction: [];
+  select: [rows: any[]];
+}>();
 
 // Pagination state
-const currentPage = ref(1)
+const currentPage = ref(1);
 
 // Normalize columns to ensure they have both key and id for UTable compatibility
 const normalizedColumns = computed(() => {
-  return props.columns.map(col => ({
+  return props.columns.map((col) => ({
     ...col,
     key: col.key,
-    id: col.key
-  }))
-})
+    id: col.key,
+  }));
+});
 
 // Helper function to safely get row value
 const getRowValue = (row: any, key: string) => {
-  return row?.[key] ?? ''
-}
+  return row?.[key] ?? "";
+};
 
 // Pagination calculations
 const totalPages = computed(() => {
-  if (!props.showPagination || !props.data) return 1
-  return Math.ceil(props.data.length / props.pageSize)
-})
+  if (!props.showPagination || !props.data) return 1;
+  return Math.ceil(props.data.length / props.pageSize);
+});
 
 const startIndex = computed(() => {
-  if (!props.showPagination) return 0
-  return (currentPage.value - 1) * props.pageSize
-})
+  if (!props.showPagination) return 0;
+  return (currentPage.value - 1) * props.pageSize;
+});
 
 const endIndex = computed(() => {
-  if (!props.showPagination) return props.data?.length || 0
-  return Math.min(startIndex.value + props.pageSize, props.data?.length || 0)
-})
+  if (!props.showPagination) return props.data?.length || 0;
+  return Math.min(startIndex.value + props.pageSize, props.data?.length || 0);
+});
 
 const paginatedData = computed(() => {
-  if (!props.showPagination) return props.data
-  return props.data?.slice(startIndex.value, endIndex.value) || []
-})
+  if (!props.showPagination) return props.data;
+  return props.data?.slice(startIndex.value, endIndex.value) || [];
+});
 
 // Visible page numbers (max 5)
 const visiblePages = computed(() => {
-  const pages: number[] = []
-  const total = totalPages.value
-  const current = currentPage.value
+  const pages: number[] = [];
+  const total = totalPages.value;
+  const current = currentPage.value;
 
   if (total <= 5) {
     for (let i = 1; i <= total; i++) {
-      pages.push(i)
+      pages.push(i);
     }
   } else {
     if (current <= 3) {
-      pages.push(1, 2, 3, 4, 5)
+      pages.push(1, 2, 3, 4, 5);
     } else if (current >= total - 2) {
-      pages.push(total - 4, total - 3, total - 2, total - 1, total)
+      pages.push(total - 4, total - 3, total - 2, total - 1, total);
     } else {
-      pages.push(current - 2, current - 1, current, current + 1, current + 2)
+      pages.push(current - 2, current - 1, current, current + 1, current + 2);
     }
   }
 
-  return pages
-})
+  return pages;
+});
 
 // Go to specific page
 const goToPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
+    currentPage.value = page;
   }
-}
+};
 
 // Handle retry
 const handleRetry = () => {
-  emit('retry')
-}
+  emit("retry");
+};
 
 // Handle empty action
 const handleEmptyAction = () => {
-  emit('emptyAction')
-}
+  emit("emptyAction");
+};
 
 // Expose methods for parent component
 defineExpose({
   goToPage,
   currentPage,
-  totalPages
-})
+  totalPages,
+});
 </script>

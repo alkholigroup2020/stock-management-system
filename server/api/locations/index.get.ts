@@ -15,6 +15,22 @@
 
 import prisma from '../../utils/prisma'
 import { z } from 'zod'
+import type { UserRole } from '@prisma/client'
+
+// User session type
+interface UserLocation {
+  location_id: string
+  access_level: string
+}
+
+interface AuthUser {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  default_location_id: string | null
+  locations?: UserLocation[]
+}
 
 // Query schema for validation
 const querySchema = z.object({
@@ -24,7 +40,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user as AuthUser | undefined
 
   if (!user) {
     throw createError({
@@ -43,7 +59,7 @@ export default defineEventHandler(async (event) => {
     const { type, is_active, search } = querySchema.parse(query)
 
     // Build where clause based on filters
-    const where: any = {}
+    const where: Record<string, unknown> = {}
 
     // Filter by type if provided
     if (type) {
@@ -94,7 +110,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // OPERATOR can only view assigned locations
-    const userLocationIds = user.locations?.map((loc: any) => loc.location_id) || []
+    const userLocationIds = user.locations?.map((loc) => loc.location_id) || []
 
     if (userLocationIds.length === 0) {
       return {
@@ -141,7 +157,7 @@ export default defineEventHandler(async (event) => {
         data: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: error.errors,
+          details: error.issues,
         },
       })
     }

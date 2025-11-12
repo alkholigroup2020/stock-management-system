@@ -299,6 +299,16 @@ definePageMeta({
   layout: 'default'
 })
 
+// Types
+interface TableRow {
+  id: number
+  code: string
+  name: string
+  category: string
+  unit: string
+  status: 'Active' | 'Inactive'
+}
+
 // Table columns (with id property for UTable compatibility)
 const tableColumns = [
   { key: 'code', label: 'Code', id: 'code' },
@@ -310,7 +320,7 @@ const tableColumns = [
 ]
 
 // Sample table data
-const tableData = ref([
+const tableData = ref<TableRow[]>([
   { id: 1, code: 'ITM-001', name: 'Milk Fresh', category: 'Dairy', unit: 'LTR', status: 'Active' },
   { id: 2, code: 'ITM-002', name: 'Tomatoes', category: 'Vegetables', unit: 'KG', status: 'Active' },
   { id: 3, code: 'ITM-003', name: 'Chicken Breast', category: 'Meat', unit: 'KG', status: 'Active' },
@@ -346,18 +356,21 @@ const handleTableRetry = () => {
   alert('Table retry action triggered')
 }
 
-const handleEdit = (row: any) => {
-  console.log('Edit row:', row)
-  alert(`Edit: ${row.name}`)
+const handleEdit = (row: unknown) => {
+  const tableRow = row as TableRow
+  console.log('Edit row:', tableRow)
+  alert(`Edit: ${tableRow.name}`)
 }
 
-const handleDelete = (row: any) => {
-  console.log('Delete row:', row)
-  alert(`Delete: ${row.name}`)
+const handleDelete = (row: unknown) => {
+  const tableRow = row as TableRow
+  console.log('Delete row:', tableRow)
+  alert(`Delete: ${tableRow.name}`)
 }
 
-const handleView = (row: any) => {
-  console.log('View row:', row)
-  alert(`View: ${row.name}`)
+const handleView = (row: unknown) => {
+  const tableRow = row as TableRow
+  console.log('View row:', tableRow)
+  alert(`View: ${tableRow.name}`)
 }
 </script>

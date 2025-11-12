@@ -116,20 +116,7 @@ const handleRemove = () => {
         placeholder="Select item"
         searchable
         class="min-w-[200px]"
-      >
-        <template #label>
-          <span v-if="selectedItem">
-            {{ selectedItem.name }}
-          </span>
-          <span v-else class="text-[var(--ui-text-muted)]">Select item</span>
-        </template>
-        <template #option="{ option }">
-          <div>
-            <div class="font-medium">{{ option.name }}</div>
-            <div class="text-xs text-[var(--ui-text-muted)]">{{ option.code }} - {{ option.unit }}</div>
-          </div>
-        </template>
-      </USelectMenu>
+      />
     </td>
 
     <!-- Quantity -->
