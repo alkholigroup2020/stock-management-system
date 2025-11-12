@@ -150,22 +150,17 @@ const handleNavigate = () => {
     </Transition>
 
     <!-- Sidebar -->
-    <Transition
-      enter-active-class="transition-transform duration-300"
-      enter-from-class="-translate-x-full"
-      enter-to-class="translate-x-0"
-      leave-active-class="transition-transform duration-300"
-      leave-from-class="translate-x-0"
-      leave-to-class="-translate-x-full"
+    <aside
+      class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-elevated border-r border-default z-40 overflow-y-auto transition-transform duration-300"
+      :class="{
+        // Mobile behavior (< lg): Only show when mobile menu is open
+        '-translate-x-full': !isMobileOpen,
+        'translate-x-0': isMobileOpen,
+        // Desktop behavior (>= lg): Show/hide based on desktop sidebar state
+        'lg:-translate-x-full': !isOpen,
+        'lg:translate-x-0': isOpen,
+      }"
     >
-      <aside
-        v-if="isOpen || isMobileOpen"
-        class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-elevated border-r border-default z-40 overflow-y-auto transition-transform duration-300"
-        :class="{
-          'translate-x-0': isOpen || isMobileOpen,
-          '-translate-x-full lg:translate-x-0': !isOpen && !isMobileOpen,
-        }"
-      >
         <!-- Sidebar Content -->
         <nav class="p-4 space-y-1">
           <!-- Navigation Items -->
@@ -205,7 +200,6 @@ const handleNavigate = () => {
           </template>
         </nav>
       </aside>
-    </Transition>
   </div>
 </template>
 

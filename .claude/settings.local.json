@@ -18,7 +18,11 @@
       "mcp__playwright__browser_evaluate",
       "mcp__playwright__browser_resize",
       "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_press_key"
+      "mcp__playwright__browser_press_key",
+      "Bash(timeout 10 bash:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(cat:*)",
+      "Bash(timeout 15 bash:*)"
     ],
     "deny": [],
     "ask": []

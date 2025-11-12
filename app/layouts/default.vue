@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, provide } from "vue";
 
 // Sidebar state management
 const isSidebarOpen = ref(true);
@@ -39,7 +39,7 @@ provide("sidebarState", {
     />
 
     <!-- Content wrapper with sidebar and main -->
-    <div class="flex flex-1 pt-16 pb-20">
+    <div class="flex flex-1 pt-16 pb-14">
       <!-- Sidebar for Desktop -->
       <LayoutAppSidebar
         :is-open="isSidebarOpen"
@@ -49,10 +49,10 @@ provide("sidebarState", {
 
       <!-- Main Content Area -->
       <main
-        class="flex flex-col flex-1 transition-all duration-300"
+        class="flex flex-col flex-1 transition-all duration-300 ml-0"
         :class="{
-          'ml-64': isSidebarOpen,
-          'ml-0': !isSidebarOpen,
+          'lg:ml-64': isSidebarOpen,
+          'lg:ml-0': !isSidebarOpen,
         }"
       >
         <div class="container mx-auto px-4 py-6 max-w-7xl">
@@ -64,15 +64,16 @@ provide("sidebarState", {
 
     <!-- Footer (Fixed at Bottom of Viewport) -->
     <footer class="fixed bottom-0 left-0 right-0 border-t border-default bg-elevated z-40">
-      <div class="container mx-auto px-4 py-4 max-w-7xl">
+      <div class="container mx-auto px-4 py-2 max-w-7xl">
         <div
-          class="flex flex-col md:flex-row justify-between items-center text-sm text-muted"
+          class="flex flex-row justify-between items-center text-xs text-muted"
         >
           <p>
-            &copy; {{ new Date().getFullYear() }} Stock Management System.
+            &copy; {{ new Date().getFullYear() }}
+            <span class="hidden sm:inline">Stock Management System.</span>
             All rights reserved.
           </p>
-          <p class="mt-2 md:mt-0">Version 1.0.0</p>
+          <p>Version 1.0.0</p>
         </div>
       </div>
     </footer>
