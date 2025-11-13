@@ -271,7 +271,7 @@ const handleRetry = () => {
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-zap" class="w-5 h-5 text-muted" />
-            <h3 class="text-lg font-semibold text-default">Quick Actions</h3>
+            <h2 class="text-lg font-semibold text-default">Quick Actions</h2>
           </div>
         </template>
 

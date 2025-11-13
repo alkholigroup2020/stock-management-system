@@ -22,7 +22,18 @@
       "Bash(timeout 10 bash:*)",
       "Bash(npx vue-tsc:*)",
       "Bash(cat:*)",
-      "Bash(timeout 15 bash:*)"
+      "Bash(timeout 15 bash:*)",
+      "Bash(timeout 60 pnpm build:*)",
+      "mcp__playwright__browser_close",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm exec playwright:*)",
+      "mcp__nuxt-ui-remote__get_component",
+      "Bash(timeout 60 pnpm typecheck:*)",
+      "Bash(npx lighthouse:*)",
+      "Bash(timeout 60 bash:*)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(timeout 180 npx:*)"
     ],
     "deny": [],
     "ask": []

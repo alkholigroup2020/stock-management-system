@@ -157,7 +157,7 @@
    ============================================ */
 .dark {
   /* ===== Primary & Secondary Brand Colors ===== */
-  --ui-primary: var(--color-navy-400);
+  --ui-primary: var(--color-navy-200);
   --ui-secondary: var(--color-emerald-400);
 
   /* ===== Background Tokens ===== */
@@ -171,49 +171,49 @@
   --ui-text: var(--color-zinc-100);
   --ui-text-muted: var(--color-zinc-400);
   --ui-text-dimmed: var(--color-zinc-600);
-  --ui-text-highlighted: var(--color-navy-300);
+  --ui-text-highlighted: var(--color-navy-100);
   --ui-text-inverted: var(--color-zinc-900);
 
   /* ===== Border Tokens ===== */
   --ui-border: var(--color-zinc-700);
   --ui-border-muted: var(--color-zinc-800);
-  --ui-border-accented: var(--color-navy-700);
+  --ui-border-accented: var(--color-navy-300);
   --ui-border-inverted: var(--color-zinc-300);
 
   /* ===== Interactive State Tokens ===== */
-  --ui-primary-hover: var(--color-navy-500);
-  --ui-primary-active: var(--color-navy-600);
+  --ui-primary-hover: var(--color-navy-100);
+  --ui-primary-active: var(--color-navy-50);
   --ui-primary-contrast: #000000;
   --ui-bg-hover: var(--color-zinc-800);
   --ui-bg-active: var(--color-zinc-700);
 
   /* ===== Focus & Accessibility ===== */
-  --ui-ring: var(--color-navy-400);
-  --ui-focus: var(--color-navy-400);
+  --ui-ring: var(--color-navy-300);
+  --ui-focus: var(--color-navy-300);
   --ui-shadow: rgba(0, 0, 0, 0.4);
 
   /* ===== Feedback Tokens (Dark Mode Adjustments) ===== */
-  --ui-success: var(--color-emerald-500);
-  --ui-warning: var(--color-amber-400);
-  --ui-error: var(--color-red-500);
-  --ui-info: var(--color-blue-500);
+  --ui-success: var(--color-emerald-400);
+  --ui-warning: var(--color-amber-300);
+  --ui-error: var(--color-red-400);
+  --ui-info: var(--color-blue-400);
 
   /* ===== Business-Specific Tokens (Dark Mode) ===== */
-  --ui-stock-healthy: var(--color-emerald-500);
-  --ui-stock-low: var(--color-amber-400);
-  --ui-stock-critical: var(--color-red-500);
-  --ui-stock-pending: var(--color-navy-400);
+  --ui-stock-healthy: var(--color-emerald-400);
+  --ui-stock-low: var(--color-amber-300);
+  --ui-stock-critical: var(--color-red-400);
+  --ui-stock-pending: var(--color-navy-300);
 
   --ui-status-draft: var(--color-zinc-400);
-  --ui-status-pending: var(--color-navy-400);
-  --ui-status-approved: var(--color-emerald-500);
-  --ui-status-rejected: var(--color-red-500);
+  --ui-status-pending: var(--color-navy-300);
+  --ui-status-approved: var(--color-emerald-400);
+  --ui-status-rejected: var(--color-red-400);
 
-  --ui-period-open: var(--color-emerald-500);
-  --ui-period-ready: var(--color-navy-400);
+  --ui-period-open: var(--color-emerald-400);
+  --ui-period-ready: var(--color-navy-300);
   --ui-period-closed: var(--color-zinc-400);
 
-  --ui-variance-detected: var(--color-amber-400);
+  --ui-variance-detected: var(--color-amber-300);
 }
 
 /* ============================================

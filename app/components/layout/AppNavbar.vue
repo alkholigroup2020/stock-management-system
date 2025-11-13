@@ -87,7 +87,7 @@ const handleToggleMobileSidebar = () => {
               <span class="text-white font-bold text-xl">SM</span>
             </div>
             <div class="hidden md:flex flex-col">
-              <span class="text-base font-bold text-navy-600 dark:text-navy-400"
+              <span class="text-base font-bold text-navy-800 dark:text-navy-200"
                 >Stock Management</span
               >
             </div>

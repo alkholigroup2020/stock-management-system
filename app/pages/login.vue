@@ -7,6 +7,14 @@ definePageMeta({
   layout: false, // No default layout for login page
 })
 
+// Set page title for accessibility
+useHead({
+  title: 'Sign In - Stock Management System',
+  meta: [
+    { name: 'description', content: 'Sign in to access the Stock Management System' }
+  ]
+})
+
 // Use auth composable
 const { login, isAuthenticated, error: authError } = useAuth()
 
@@ -25,7 +33,6 @@ const redirectTo = computed(() => {
 const state = reactive({
   email: '',
   password: '',
-  rememberMe: false,
 })
 
 const loading = ref(false)
@@ -35,7 +42,6 @@ const errorMessage = ref('')
 const schema = z.object({
   email: z.string().min(1, 'Email or username is required'),
   password: z.string().min(1, 'Password is required'),
-  rememberMe: z.boolean().optional(),
 })
 
 type Schema = z.output<typeof schema>
@@ -98,16 +104,16 @@ watch([() => state.email, () => state.password], () => {
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8">
+    <main class="w-full max-w-md space-y-8">
       <!-- Header -->
-      <div class="text-center">
+      <header class="text-center">
         <h1 class="text-3xl font-bold text-default">
           Stock Management System
         </h1>
         <p class="mt-2 text-sm text-muted">
           Multi-Location Inventory Management
         </p>
-      </div>
+      </header>
 
       <!-- Login Card -->
       <UCard class="card-elevated">
@@ -174,15 +180,8 @@ watch([() => state.email, () => state.password], () => {
             />
           </UFormGroup>
 
-          <!-- Remember Me Checkbox -->
-          <div class="flex items-center justify-between">
-            <UCheckbox
-              v-model="state.rememberMe"
-              name="rememberMe"
-              label="Remember me"
-              :disabled="loading"
-            />
-          </div>
+          <!-- Remember Me feature removed - causes accessibility issues with hidden input -->
+          <!-- Can be re-added in post-MVP with custom accessible checkbox implementation -->
 
           <!-- Submit Button -->
           <UButton
@@ -210,15 +209,15 @@ watch([() => state.email, () => state.password], () => {
       </UCard>
 
       <!-- Footer Info -->
-      <div class="text-center text-xs text-muted">
+      <footer class="text-center text-xs text-muted">
         <p>
           Stock Management System v1.0
         </p>
         <p class="mt-1">
           © 2025 All rights reserved
         </p>
-      </div>
-    </div>
+      </footer>
+    </main>
   </div>
 </template>
 

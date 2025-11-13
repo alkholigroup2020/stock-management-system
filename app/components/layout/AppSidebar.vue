@@ -161,45 +161,53 @@ const handleNavigate = () => {
         'lg:translate-x-0': isOpen,
       }"
     >
-        <!-- Sidebar Content -->
-        <nav class="p-4 space-y-1">
-          <!-- Navigation Items -->
-          <template v-for="(item, index) in navigationMenu" :key="index">
-            <!-- Menu Item -->
-            <NuxtLink
-              :to="item.to"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+      <!-- Sidebar Content -->
+      <nav class="p-4 space-y-1">
+        <!-- Navigation Items -->
+        <template v-for="(item, index) in navigationMenu" :key="index">
+          <!-- Menu Item -->
+          <NuxtLink
+            :to="item.to"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+            :class="{
+              'bg-navy-50 dark:bg-navy-900/30 text-navy-700 dark:text-navy-300 border border-navy-200 dark:border-navy-700':
+                isActiveRoute(item.to),
+              'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100':
+                !isActiveRoute(item.to),
+            }"
+            @click="handleNavigate"
+          >
+            <!-- Icon -->
+            <UIcon
+              :name="item.icon"
+              class="w-5 h-5 shrink-0"
               :class="{
-                'bg-navy-50 dark:bg-navy-900/30 text-navy-700 dark:text-navy-300 border border-navy-200 dark:border-navy-700':
-                  isActiveRoute(item.to),
-                'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100':
+                'text-navy-800 dark:text-navy-200': isActiveRoute(item.to),
+                'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300':
                   !isActiveRoute(item.to),
               }"
-              @click="handleNavigate"
+            />
+
+            <!-- Label -->
+            <span
+              class="flex-1"
+              :class="{
+                'text-navy-800 dark:text-navy-200': isActiveRoute(item.to),
+                'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300':
+                  !isActiveRoute(item.to),
+              }"
+              >{{ item.label }}</span
             >
-              <!-- Icon -->
-              <UIcon
-                :name="item.icon"
-                class="w-5 h-5 shrink-0"
-                :class="{
-                  'text-navy-600 dark:text-navy-400': isActiveRoute(item.to),
-                  'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300':
-                    !isActiveRoute(item.to),
-                }"
-              />
 
-              <!-- Label -->
-              <span class="flex-1">{{ item.label }}</span>
-
-              <!-- Active Indicator -->
-              <div
-                v-if="isActiveRoute(item.to)"
-                class="w-1.5 h-1.5 rounded-full bg-emerald-500"
-              />
-            </NuxtLink>
-          </template>
-        </nav>
-      </aside>
+            <!-- Active Indicator -->
+            <div
+              v-if="isActiveRoute(item.to)"
+              class="w-1.5 h-1.5 rounded-full bg-emerald-500"
+            />
+          </NuxtLink>
+        </template>
+      </nav>
+    </aside>
   </div>
 </template>
 

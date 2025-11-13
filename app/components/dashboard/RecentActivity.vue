@@ -121,7 +121,7 @@ const getBadgeColor = (
             :name="`i-lucide-${icon}`"
             class="w-5 h-5 text-muted"
           />
-          <h3 class="text-lg font-semibold text-default">{{ title }}</h3>
+          <h2 class="text-lg font-semibold text-default">{{ title }}</h2>
         </div>
         <UButton
           v-if="viewAllRoute"

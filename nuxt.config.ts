@@ -52,4 +52,19 @@ export default defineNuxtConfig({
   // - secure: true in production (HTTPS only)
   // - sameSite: 'lax' (CSRF protection)
   // - maxAge: 7 days (604800 seconds)
+
+  // Accessibility: Set HTML lang attribute
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: 'en'
+      },
+      title: 'Stock Management System',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Multi-Location Inventory Management System' }
+      ]
+    }
+  }
 });
