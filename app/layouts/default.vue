@@ -63,7 +63,9 @@ provide("sidebarState", {
     </div>
 
     <!-- Footer (Fixed at Bottom of Viewport) -->
-    <footer class="fixed bottom-0 left-0 right-0 border-t border-default bg-elevated z-40">
+    <footer
+      class="fixed bottom-0 left-0 right-0 border-t border-default bg-elevated z-40"
+    >
       <div class="container mx-auto px-4 py-2 max-w-7xl">
         <div
           class="flex flex-row justify-between items-center text-xs text-muted"

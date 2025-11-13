@@ -12,34 +12,34 @@
  * - User must have access to the issue's location
  */
 
-import prisma from '../../utils/prisma'
+import prisma from "../../utils/prisma";
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user;
 
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: "Unauthorized",
       data: {
-        code: 'NOT_AUTHENTICATED',
-        message: 'You must be logged in to access this resource',
+        code: "NOT_AUTHENTICATED",
+        message: "You must be logged in to access this resource",
       },
-    })
+    });
   }
 
   try {
-    const issueId = getRouterParam(event, 'id')
+    const issueId = getRouterParam(event, "id");
 
     if (!issueId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'MISSING_ISSUE_ID',
-          message: 'Issue ID is required',
+          code: "MISSING_ISSUE_ID",
+          message: "Issue ID is required",
         },
-      })
+      });
     }
 
     // Fetch issue with all related data
@@ -86,27 +86,27 @@ export default defineEventHandler(async (event) => {
           },
           orderBy: {
             item: {
-              name: 'asc',
+              name: "asc",
             },
           },
         },
       },
-    })
+    });
 
     if (!issue) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
+        statusMessage: "Not Found",
         data: {
-          code: 'ISSUE_NOT_FOUND',
-          message: 'Issue not found',
+          code: "ISSUE_NOT_FOUND",
+          message: "Issue not found",
         },
-      })
+      });
     }
 
     // Check if user has access to the issue's location
     // Admin and Supervisor have access to all locations
-    if (user.role !== 'ADMIN' && user.role !== 'SUPERVISOR') {
+    if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
       const userLocation = await prisma.userLocation.findUnique({
         where: {
           user_id_location_id: {
@@ -114,17 +114,17 @@ export default defineEventHandler(async (event) => {
             location_id: issue.location_id,
           },
         },
-      })
+      });
 
       if (!userLocation) {
         throw createError({
           statusCode: 403,
-          statusMessage: 'Forbidden',
+          statusMessage: "Forbidden",
           data: {
-            code: 'LOCATION_ACCESS_DENIED',
-            message: 'You do not have access to this issue\'s location',
+            code: "LOCATION_ACCESS_DENIED",
+            message: "You do not have access to this issue's location",
           },
-        })
+        });
       }
     }
 
@@ -149,25 +149,28 @@ export default defineEventHandler(async (event) => {
         })),
         summary: {
           total_lines: issue.issue_lines.length,
-          total_items: issue.issue_lines.reduce((sum, line) => sum + parseFloat(line.quantity.toString()), 0),
+          total_items: issue.issue_lines.reduce(
+            (sum, line) => sum + parseFloat(line.quantity.toString()),
+            0
+          ),
           total_value: issue.total_value,
         },
       },
-    }
+    };
   } catch (error) {
     // Re-throw createError errors
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
     }
 
-    console.error('Error fetching issue:', error)
+    console.error("Error fetching issue:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch issue',
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch issue",
       },
-    })
+    });
   }
-})
+});

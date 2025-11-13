@@ -10,43 +10,43 @@
  * - Detailed error responses: Include item name, requested/available qty
  */
 
-import { createError } from 'h3'
-import prisma from './prisma'
-import type { Prisma } from '@prisma/client'
+import { createError } from "h3";
+import prisma from "./prisma";
+import type { Prisma } from "@prisma/client";
 
 /**
  * Stock validation result interface
  */
 export interface StockValidationResult {
-  isValid: boolean
-  itemId: string
-  itemCode: string
-  itemName: string
-  unit: string
-  requestedQuantity: number
-  availableQuantity: number
-  shortfall?: number
+  isValid: boolean;
+  itemId: string;
+  itemCode: string;
+  itemName: string;
+  unit: string;
+  requestedQuantity: number;
+  availableQuantity: number;
+  shortfall?: number;
 }
 
 /**
  * Insufficient stock error details
  */
 export interface InsufficientStockError {
-  code: 'INSUFFICIENT_STOCK'
-  message: string
+  code: "INSUFFICIENT_STOCK";
+  message: string;
   details: {
-    locationId: string
-    locationName: string
+    locationId: string;
+    locationName: string;
     insufficientItems: Array<{
-      itemId: string
-      itemCode: string
-      itemName: string
-      unit: string
-      requestedQuantity: number
-      availableQuantity: number
-      shortfall: number
-    }>
-  }
+      itemId: string;
+      itemCode: string;
+      itemName: string;
+      unit: string;
+      requestedQuantity: number;
+      availableQuantity: number;
+      shortfall: number;
+    }>;
+  };
 }
 
 /**
@@ -62,13 +62,13 @@ export function checkStockSufficiency(
   availableQuantity: number,
   requestedQuantity: number,
   itemDetails: {
-    itemId: string
-    itemCode: string
-    itemName: string
-    unit: string
+    itemId: string;
+    itemCode: string;
+    itemName: string;
+    unit: string;
   }
 ): StockValidationResult {
-  const isValid = availableQuantity >= requestedQuantity
+  const isValid = availableQuantity >= requestedQuantity;
 
   const result: StockValidationResult = {
     isValid,
@@ -78,13 +78,13 @@ export function checkStockSufficiency(
     unit: itemDetails.unit,
     requestedQuantity,
     availableQuantity,
-  }
+  };
 
   if (!isValid) {
-    result.shortfall = requestedQuantity - availableQuantity
+    result.shortfall = requestedQuantity - availableQuantity;
   }
 
-  return result
+  return result;
 }
 
 /**
@@ -101,7 +101,6 @@ export async function validateSufficientStock(
   itemId: string,
   quantity: number
 ): Promise<StockValidationResult> {
-
   // Fetch location stock with item details
   const locationStock = await prisma.locationStock.findUnique({
     where: {
@@ -119,21 +118,19 @@ export async function validateSufficientStock(
         },
       },
     },
-  })
+  });
 
   // If no stock record exists, treat as zero stock
-  const availableQuantity = locationStock?.on_hand
-    ? Number(locationStock.on_hand)
-    : 0
+  const availableQuantity = locationStock?.on_hand ? Number(locationStock.on_hand) : 0;
 
   const itemDetails = {
     itemId,
-    itemCode: locationStock?.item.code || 'UNKNOWN',
-    itemName: locationStock?.item.name || 'Unknown Item',
-    unit: locationStock?.item.unit || 'EA',
-  }
+    itemCode: locationStock?.item.code || "UNKNOWN",
+    itemName: locationStock?.item.name || "Unknown Item",
+    unit: locationStock?.item.unit || "EA",
+  };
 
-  return checkStockSufficiency(availableQuantity, quantity, itemDetails)
+  return checkStockSufficiency(availableQuantity, quantity, itemDetails);
 }
 
 /**
@@ -147,18 +144,14 @@ export async function validateSufficientStockBulk(
   locationId: string,
   items: Array<{ itemId: string; quantity: number }>
 ): Promise<StockValidationResult[]> {
-  const results: StockValidationResult[] = []
+  const results: StockValidationResult[] = [];
 
   for (const item of items) {
-    const result = await validateSufficientStock(
-      locationId,
-      item.itemId,
-      item.quantity
-    )
-    results.push(result)
+    const result = await validateSufficientStock(locationId, item.itemId, item.quantity);
+    results.push(result);
   }
 
-  return results
+  return results;
 }
 
 /**
@@ -167,10 +160,8 @@ export async function validateSufficientStockBulk(
  * @param validationResults - Array of validation results
  * @returns boolean - True if all items have sufficient stock
  */
-export function hasAllSufficientStock(
-  validationResults: StockValidationResult[]
-): boolean {
-  return validationResults.every((result) => result.isValid)
+export function hasAllSufficientStock(validationResults: StockValidationResult[]): boolean {
+  return validationResults.every((result) => result.isValid);
 }
 
 /**
@@ -182,7 +173,7 @@ export function hasAllSufficientStock(
 export function getInsufficientStockItems(
   validationResults: StockValidationResult[]
 ): StockValidationResult[] {
-  return validationResults.filter((result) => !result.isValid)
+  return validationResults.filter((result) => !result.isValid);
 }
 
 /**
@@ -203,10 +194,10 @@ export function createInsufficientStockError(
       (item) =>
         `${item.itemName} (${item.itemCode}): requested ${item.requestedQuantity} ${item.unit}, available ${item.availableQuantity} ${item.unit}`
     )
-    .join('; ')
+    .join("; ");
 
   const error: InsufficientStockError = {
-    code: 'INSUFFICIENT_STOCK',
+    code: "INSUFFICIENT_STOCK",
     message: `Insufficient stock for ${insufficientItems.length} item(s) at location ${locationName}. ${itemsText}`,
     details: {
       locationId,
@@ -221,13 +212,13 @@ export function createInsufficientStockError(
         shortfall: item.shortfall || 0,
       })),
     },
-  }
+  };
 
   return createError({
     statusCode: 400,
-    statusMessage: 'Bad Request',
+    statusMessage: "Bad Request",
     data: error,
-  })
+  });
 }
 
 /**
@@ -244,35 +235,30 @@ export async function validateAndThrowIfInsufficientStock(
   locationId: string,
   items: Array<{ itemId: string; quantity: number }>
 ): Promise<void> {
-
   // Fetch location details for error message
   const location = await prisma.location.findUnique({
     where: { id: locationId },
     select: { name: true },
-  })
+  });
 
   if (!location) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Not Found',
+      statusMessage: "Not Found",
       data: {
-        code: 'LOCATION_NOT_FOUND',
-        message: 'Location not found',
+        code: "LOCATION_NOT_FOUND",
+        message: "Location not found",
       },
-    })
+    });
   }
 
   // Validate all items
-  const validationResults = await validateSufficientStockBulk(locationId, items)
+  const validationResults = await validateSufficientStockBulk(locationId, items);
 
   // Check if all items have sufficient stock
   if (!hasAllSufficientStock(validationResults)) {
-    const insufficientItems = getInsufficientStockItems(validationResults)
-    throw createInsufficientStockError(
-      locationId,
-      location.name,
-      insufficientItems
-    )
+    const insufficientItems = getInsufficientStockItems(validationResults);
+    throw createInsufficientStockError(locationId, location.name, insufficientItems);
   }
 }
 
@@ -283,11 +269,7 @@ export async function validateAndThrowIfInsufficientStock(
  * @param itemId - The item ID
  * @returns Promise<number> - Current on-hand quantity (0 if no stock record)
  */
-export async function getCurrentStockLevel(
-  locationId: string,
-  itemId: string
-): Promise<number> {
-
+export async function getCurrentStockLevel(locationId: string, itemId: string): Promise<number> {
   const locationStock = await prisma.locationStock.findUnique({
     where: {
       location_id_item_id: {
@@ -298,9 +280,9 @@ export async function getCurrentStockLevel(
     select: {
       on_hand: true,
     },
-  })
+  });
 
-  return locationStock?.on_hand ? Number(locationStock.on_hand) : 0
+  return locationStock?.on_hand ? Number(locationStock.on_hand) : 0;
 }
 
 /**
@@ -310,12 +292,9 @@ export async function getCurrentStockLevel(
  * @param itemId - The item ID
  * @returns Promise<boolean> - True if stock exists (on_hand > 0)
  */
-export async function hasStock(
-  locationId: string,
-  itemId: string
-): Promise<boolean> {
-  const currentStock = await getCurrentStockLevel(locationId, itemId)
-  return currentStock > 0
+export async function hasStock(locationId: string, itemId: string): Promise<boolean> {
+  const currentStock = await getCurrentStockLevel(locationId, itemId);
+  return currentStock > 0;
 }
 
 /**
@@ -325,16 +304,13 @@ export async function hasStock(
  * @param fieldName - Name of the field for error message
  * @throws Error if quantity is not positive
  */
-export function validatePositiveQuantity(
-  quantity: number,
-  fieldName: string = 'quantity'
-): void {
+export function validatePositiveQuantity(quantity: number, fieldName: string = "quantity"): void {
   if (quantity <= 0) {
-    throw new Error(`${fieldName} must be greater than zero`)
+    throw new Error(`${fieldName} must be greater than zero`);
   }
 
   if (!Number.isFinite(quantity)) {
-    throw new Error(`${fieldName} must be a valid number`)
+    throw new Error(`${fieldName} must be a valid number`);
   }
 }
 
@@ -348,7 +324,7 @@ export function validatePositiveQuantities(
   items: Array<{ quantity: number; itemName?: string }>
 ): void {
   items.forEach((item, index) => {
-    const fieldName = item.itemName || `item ${index + 1} quantity`
-    validatePositiveQuantity(item.quantity, fieldName)
-  })
+    const fieldName = item.itemName || `item ${index + 1} quantity`;
+    validatePositiveQuantity(item.quantity, fieldName);
+  });
 }

@@ -16,123 +16,123 @@
  * - Updates existing price or creates new one
  */
 
-import prisma from '../../../utils/prisma'
-import { z } from 'zod'
-import { Decimal } from '@prisma/client/runtime/library'
+import prisma from "../../../utils/prisma";
+import { z } from "zod";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // Request body schema
 const updatePriceSchema = z.object({
   price: z.number().positive(),
   period_id: z.string().uuid().optional(),
-})
+});
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user;
 
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: "Unauthorized",
       data: {
-        code: 'NOT_AUTHENTICATED',
-        message: 'You must be logged in to access this resource',
+        code: "NOT_AUTHENTICATED",
+        message: "You must be logged in to access this resource",
       },
-    })
+    });
   }
 
   // Check if user is ADMIN
-  if (user.role !== 'ADMIN') {
+  if (user.role !== "ADMIN") {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Forbidden',
+      statusMessage: "Forbidden",
       data: {
-        code: 'INSUFFICIENT_PERMISSIONS',
-        message: 'Only admins can update item prices',
+        code: "INSUFFICIENT_PERMISSIONS",
+        message: "Only admins can update item prices",
       },
-    })
+    });
   }
 
   try {
-    const itemId = getRouterParam(event, 'itemId')
+    const itemId = getRouterParam(event, "itemId");
 
     if (!itemId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'MISSING_ITEM_ID',
-          message: 'Item ID is required',
+          code: "MISSING_ITEM_ID",
+          message: "Item ID is required",
         },
-      })
+      });
     }
 
     // Check if item exists
     const item = await prisma.item.findUnique({
       where: { id: itemId },
-    })
+    });
 
     if (!item) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
+        statusMessage: "Not Found",
         data: {
-          code: 'ITEM_NOT_FOUND',
-          message: 'Item not found',
+          code: "ITEM_NOT_FOUND",
+          message: "Item not found",
         },
-      })
+      });
     }
 
     if (!item.is_active) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'ITEM_INACTIVE',
-          message: 'Cannot set price for inactive item',
+          code: "ITEM_INACTIVE",
+          message: "Cannot set price for inactive item",
         },
-      })
+      });
     }
 
     // Parse and validate request body
-    const body = await readBody(event)
-    const { price, period_id } = updatePriceSchema.parse(body)
+    const body = await readBody(event);
+    const { price, period_id } = updatePriceSchema.parse(body);
 
     // Get period (use provided or find current open period)
-    let period
+    let period;
     if (period_id) {
       period = await prisma.period.findUnique({
         where: { id: period_id },
-      })
+      });
     } else {
       // Find current open period
       period = await prisma.period.findFirst({
-        where: { status: 'OPEN' },
-        orderBy: { start_date: 'desc' },
-      })
+        where: { status: "OPEN" },
+        orderBy: { start_date: "desc" },
+      });
     }
 
     if (!period) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
+        statusMessage: "Not Found",
         data: {
-          code: 'NO_OPEN_PERIOD',
+          code: "NO_OPEN_PERIOD",
           message: period_id
-            ? 'Period not found'
-            : 'No open period found. Please create and open a period first.',
+            ? "Period not found"
+            : "No open period found. Please create and open a period first.",
         },
-      })
+      });
     }
 
-    if (period.status === 'CLOSED') {
+    if (period.status === "CLOSED") {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'PERIOD_CLOSED',
-          message: 'Cannot set prices for a closed period',
+          code: "PERIOD_CLOSED",
+          message: "Cannot set prices for a closed period",
         },
-      })
+      });
     }
 
     // Upsert the item price
@@ -152,7 +152,7 @@ export default defineEventHandler(async (event) => {
         item_id: itemId,
         period_id: period.id,
         price: new Decimal(price),
-        currency: 'SAR',
+        currency: "SAR",
         set_by: user.id,
       },
       include: {
@@ -173,39 +173,39 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    })
+    });
 
     return {
-      message: 'Item price updated successfully',
+      message: "Item price updated successfully",
       item_price: itemPrice,
-    }
+    };
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'VALIDATION_ERROR',
-          message: 'Invalid price data',
+          code: "VALIDATION_ERROR",
+          message: "Invalid price data",
           details: error.issues,
         },
-      })
+      });
     }
 
     // Re-throw createError errors
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
     }
 
-    console.error('Error updating item price:', error)
+    console.error("Error updating item price:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to update item price',
+        code: "INTERNAL_ERROR",
+        message: "Failed to update item price",
       },
-    })
+    });
   }
-})
+});

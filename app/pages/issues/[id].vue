@@ -74,13 +74,18 @@ async function fetchIssue() {
   error.value = null;
 
   try {
-    const data = await $fetch(`/api/issues/${issueId.value}`) as unknown;
+    const data = (await $fetch(`/api/issues/${issueId.value}`)) as unknown;
     // API returns { issue: {...} }, extract the issue object
     const response = data as { issue: Issue };
     issue.value = response.issue;
   } catch (err) {
     error.value =
-      err && typeof err === "object" && "data" in err && err.data && typeof err.data === "object" && "message" in err.data
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
         ? String(err.data.message)
         : "Failed to fetch issue details";
     console.error("Error fetching issue:", err);
@@ -128,16 +133,10 @@ onMounted(() => {
     <!-- Page Header -->
     <PageHeader title="Issue Details" icon="file-minus">
       <template #breadcrumbs>
-        <nav
-          class="flex items-center space-x-2 text-sm text-muted"
-        >
-          <NuxtLink to="/" class="hover:text-primary"
-            >Home</NuxtLink
-          >
+        <nav class="flex items-center space-x-2 text-sm text-muted">
+          <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
           <span>/</span>
-          <NuxtLink to="/issues" class="hover:text-primary"
-            >Issues</NuxtLink
-          >
+          <NuxtLink to="/issues" class="hover:text-primary">Issues</NuxtLink>
           <span>/</span>
           <span class="text-default">{{
             issue?.issue_no || "Loading..."
@@ -237,9 +236,7 @@ onMounted(() => {
       <!-- Issue Lines Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">
-            Issue Items
-          </h2>
+          <h2 class="text-lg font-semibold text-default">Issue Items</h2>
         </template>
 
         <div class="overflow-x-auto">
@@ -278,10 +275,7 @@ onMounted(() => {
                   <div class="text-sm text-muted">
                     {{ line.item?.code }} - {{ line.item?.unit }}
                   </div>
-                  <div
-                    v-if="line.item?.category"
-                    class="text-xs text-muted"
-                  >
+                  <div v-if="line.item?.category" class="text-xs text-muted">
                     {{ line.item.category }}
                   </div>
                 </td>
@@ -289,7 +283,11 @@ onMounted(() => {
                 <!-- Quantity -->
                 <td class="px-4 py-3 text-right">
                   <span class="text-sm font-medium text-default">
-                    {{ typeof line.quantity === 'number' ? line.quantity.toFixed(4) : parseFloat(line.quantity).toFixed(4) }}
+                    {{
+                      typeof line.quantity === "number"
+                        ? line.quantity.toFixed(4)
+                        : parseFloat(line.quantity).toFixed(4)
+                    }}
                   </span>
                 </td>
 

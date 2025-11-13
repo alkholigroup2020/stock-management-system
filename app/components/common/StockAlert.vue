@@ -11,77 +11,77 @@ interface Props {
   /**
    * Alert variant
    */
-  variant?: 'subtle' | 'solid' | 'outline'
+  variant?: "subtle" | "solid" | "outline";
   /**
    * Alert type/severity
    */
-  type?: 'error' | 'warning' | 'info'
+  type?: "error" | "warning" | "info";
   /**
    * Alert title
    */
-  title?: string
+  title?: string;
   /**
    * Alert message/description
    */
-  message: string
+  message: string;
   /**
    * Optional item details causing the alert
    */
   items?: Array<{
-    item_name: string
-    requested: number
-    available: number
-  }>
+    item_name: string;
+    requested: number;
+    available: number;
+  }>;
   /**
    * Whether alert is dismissible
    */
-  dismissible?: boolean
+  dismissible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'subtle',
-  type: 'error',
+  variant: "subtle",
+  type: "error",
   title: undefined,
   dismissible: false,
-})
+});
 
 // Computed
 const color = computed(() => {
   switch (props.type) {
-    case 'error':
-      return 'error'
-    case 'warning':
-      return 'warning'
-    case 'info':
-      return 'primary'
+    case "error":
+      return "error";
+    case "warning":
+      return "warning";
+    case "info":
+      return "primary";
     default:
-      return 'error'
+      return "error";
   }
-})
+});
 
 const icon = computed(() => {
   switch (props.type) {
-    case 'error':
-      return 'i-lucide-alert-circle'
-    case 'warning':
-      return 'i-lucide-alert-triangle'
-    case 'info':
-      return 'i-lucide-info'
+    case "error":
+      return "i-lucide-alert-circle";
+    case "warning":
+      return "i-lucide-alert-triangle";
+    case "info":
+      return "i-lucide-info";
     default:
-      return 'i-lucide-alert-circle'
+      return "i-lucide-alert-circle";
   }
-})
+});
 
 const itemsText = computed(() => {
-  if (!props.items || props.items.length === 0) return ''
+  if (!props.items || props.items.length === 0) return "";
 
   return props.items
     .map(
-      item =>
+      (item) =>
         `${item.item_name}: requested ${item.requested}, available ${item.available}`
     )
-    .join('; ')
-})
+    .join("; ");
+});
 </script>
 
 <template>
@@ -89,8 +89,12 @@ const itemsText = computed(() => {
     :icon="icon"
     :color="color"
     :variant="variant"
-    :title="title || (type === 'error' ? 'Insufficient Stock' : 'Stock Warning')"
-    :description="items && items.length > 0 ? `${message} ${itemsText}` : message"
+    :title="
+      title || (type === 'error' ? 'Insufficient Stock' : 'Stock Warning')
+    "
+    :description="
+      items && items.length > 0 ? `${message} ${itemsText}` : message
+    "
     :dismissible="dismissible"
   >
     <!-- Item Details -->
@@ -103,8 +107,8 @@ const itemsText = computed(() => {
         >
           <span class="font-medium">{{ item.item_name }}</span>
           <span class="text-muted">
-            Requested: <span class="font-semibold">{{ item.requested }}</span>
-            / Available: <span class="font-semibold">{{ item.available }}</span>
+            Requested: <span class="font-semibold">{{ item.requested }}</span> /
+            Available: <span class="font-semibold">{{ item.available }}</span>
           </span>
         </div>
       </div>

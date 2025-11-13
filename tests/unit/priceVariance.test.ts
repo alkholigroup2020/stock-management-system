@@ -249,29 +249,19 @@ describe("checkPriceVariance", () => {
     });
 
     it("should throw error for NaN inputs", () => {
-      expect(() => checkPriceVariance(NaN, 25, 100)).toThrow(
-        "Invalid unit price"
-      );
+      expect(() => checkPriceVariance(NaN, 25, 100)).toThrow("Invalid unit price");
 
-      expect(() => checkPriceVariance(25, NaN, 100)).toThrow(
-        "Invalid period price"
-      );
+      expect(() => checkPriceVariance(25, NaN, 100)).toThrow("Invalid period price");
 
       expect(() => checkPriceVariance(25, 25, NaN)).toThrow("Invalid quantity");
     });
 
     it("should throw error for Infinity inputs", () => {
-      expect(() => checkPriceVariance(Infinity, 25, 100)).toThrow(
-        "Invalid unit price"
-      );
+      expect(() => checkPriceVariance(Infinity, 25, 100)).toThrow("Invalid unit price");
 
-      expect(() => checkPriceVariance(25, Infinity, 100)).toThrow(
-        "Invalid period price"
-      );
+      expect(() => checkPriceVariance(25, Infinity, 100)).toThrow("Invalid period price");
 
-      expect(() => checkPriceVariance(25, 25, Infinity)).toThrow(
-        "Invalid quantity"
-      );
+      expect(() => checkPriceVariance(25, 25, Infinity)).toThrow("Invalid quantity");
     });
   });
 });
@@ -507,9 +497,9 @@ describe("createPriceVarianceNCR", () => {
       createdBy: "user-123",
     };
 
-    await expect(
-      createPriceVarianceNCR(mockPrisma, invalidData)
-    ).rejects.toThrow("Missing required fields for NCR creation");
+    await expect(createPriceVarianceNCR(mockPrisma, invalidData)).rejects.toThrow(
+      "Missing required fields for NCR creation"
+    );
   });
 });
 
@@ -632,36 +622,28 @@ describe("validatePriceVarianceInputs", () => {
     const result = validatePriceVarianceInputs(-10, 25, 100);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain(
-      "Unit price must be a positive finite number"
-    );
+    expect(result.errors).toContain("Unit price must be a positive finite number");
   });
 
   it("should reject negative period price", () => {
     const result = validatePriceVarianceInputs(25, -10, 100);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain(
-      "Period price must be a positive finite number"
-    );
+    expect(result.errors).toContain("Period price must be a positive finite number");
   });
 
   it("should reject zero quantity", () => {
     const result = validatePriceVarianceInputs(25, 25, 0);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain(
-      "Quantity must be a positive finite number"
-    );
+    expect(result.errors).toContain("Quantity must be a positive finite number");
   });
 
   it("should reject negative quantity", () => {
     const result = validatePriceVarianceInputs(25, 25, -100);
 
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain(
-      "Quantity must be a positive finite number"
-    );
+    expect(result.errors).toContain("Quantity must be a positive finite number");
   });
 
   it("should reject NaN values", () => {

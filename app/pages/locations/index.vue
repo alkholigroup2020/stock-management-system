@@ -1,10 +1,7 @@
 <template>
   <div>
     <!-- Page Header -->
-    <PageHeader
-      title="Locations"
-      icon="i-lucide-map-pin"
-    >
+    <PageHeader title="Locations" icon="i-lucide-map-pin">
       <template #actions>
         <UButton
           v-if="canManageLocations"
@@ -61,11 +58,7 @@
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      :message="error"
-      @retry="fetchLocations"
-    />
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchLocations" />
 
     <!-- Empty State -->
     <EmptyState
@@ -100,130 +93,131 @@
 </template>
 
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import type { LocationType } from '@prisma/client'
+import { useDebounceFn } from "@vueuse/core";
+import type { LocationType } from "@prisma/client";
 
 definePageMeta({
-  layout: 'default',
-})
+  layout: "default",
+});
 
 // Types
 interface LocationItem {
-  id: string
-  code: string
-  name: string
-  type: LocationType
-  address?: string | null
+  id: string;
+  code: string;
+  name: string;
+  type: LocationType;
+  address?: string | null;
   manager?: {
-    id: string
-    username: string
-    full_name?: string | null
-  } | null
-  is_active: boolean
+    id: string;
+    username: string;
+    full_name?: string | null;
+  } | null;
+  is_active: boolean;
   _count?: {
-    user_locations?: number
-    location_stock?: number
-  }
+    user_locations?: number;
+    location_stock?: number;
+  };
 }
 
 interface LocationsResponse {
-  locations: LocationItem[]
+  locations: LocationItem[];
 }
 
 interface TypeOption {
-  label: string
-  value: LocationType | null
+  label: string;
+  value: LocationType | null;
 }
 
 interface StatusOption {
-  label: string
-  value: boolean | null
+  label: string;
+  value: boolean | null;
 }
 
 // Composables
-const { canManageLocations } = usePermissions()
-const toast = useAppToast()
+const { canManageLocations } = usePermissions();
+const toast = useAppToast();
 
 // State
-const loading = ref(false)
-const error = ref<string | null>(null)
-const locations = ref<LocationItem[]>([])
+const loading = ref(false);
+const error = ref<string | null>(null);
+const locations = ref<LocationItem[]>([]);
 
 const filters = reactive({
-  search: '',
+  search: "",
   type: null as LocationType | null,
   is_active: null as boolean | null,
-})
+});
 
 // Filter options
 const typeOptions: TypeOption[] = [
-  { label: 'All Types', value: null },
-  { label: 'Kitchen', value: 'KITCHEN' },
-  { label: 'Store', value: 'STORE' },
-  { label: 'Central', value: 'CENTRAL' },
-  { label: 'Warehouse', value: 'WAREHOUSE' },
-]
+  { label: "All Types", value: null },
+  { label: "Kitchen", value: "KITCHEN" },
+  { label: "Store", value: "STORE" },
+  { label: "Central", value: "CENTRAL" },
+  { label: "Warehouse", value: "WAREHOUSE" },
+];
 
 const statusOptions: StatusOption[] = [
-  { label: 'All Statuses', value: null },
-  { label: 'Active', value: true },
-  { label: 'Inactive', value: false },
-]
+  { label: "All Statuses", value: null },
+  { label: "Active", value: true },
+  { label: "Inactive", value: false },
+];
 
 // Fetch locations
 const fetchLocations = async () => {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const query: Record<string, string | boolean> = {}
+    const query: Record<string, string | boolean> = {};
 
     if (filters.search) {
-      query.search = filters.search
+      query.search = filters.search;
     }
     if (filters.type) {
-      query.type = filters.type
+      query.type = filters.type;
     }
     if (filters.is_active !== null) {
-      query.is_active = filters.is_active
+      query.is_active = filters.is_active;
     }
 
-    const response = await $fetch<LocationsResponse>('/api/locations', {
+    const response = await $fetch<LocationsResponse>("/api/locations", {
       query,
-    })
+    });
 
-    locations.value = response.locations || []
+    locations.value = response.locations || [];
   } catch (err) {
-    console.error('Error fetching locations:', err)
-    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch locations'
-    error.value = errorMessage
-    toast.error('Error', { description: errorMessage })
+    console.error("Error fetching locations:", err);
+    const errorMessage =
+      err instanceof Error ? err.message : "Failed to fetch locations";
+    error.value = errorMessage;
+    toast.error("Error", { description: errorMessage });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Debounced search
 const debouncedFetch = useDebounceFn(() => {
-  fetchLocations()
-}, 500)
+  fetchLocations();
+}, 500);
 
 // Handlers
 const handleEdit = (location: LocationItem) => {
-  navigateTo(`/locations/${location.id}/edit`)
-}
+  navigateTo(`/locations/${location.id}/edit`);
+};
 
 const handleViewDetails = (location: LocationItem) => {
-  navigateTo(`/locations/${location.id}`)
-}
+  navigateTo(`/locations/${location.id}`);
+};
 
 // Lifecycle
 onMounted(() => {
-  fetchLocations()
-})
+  fetchLocations();
+});
 
 // Set page title
 useHead({
-  title: 'Locations - Stock Management System',
-})
+  title: "Locations - Stock Management System",
+});
 </script>

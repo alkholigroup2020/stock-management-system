@@ -11,15 +11,15 @@
  * - Excludes auth-related routes (/api/auth/*)
  */
 
-import type { UserRole } from '@prisma/client'
+import type { UserRole } from "@prisma/client";
 
 // User session type
 interface AuthUser {
-  id: string
-  username: string
-  email: string
-  role: UserRole
-  default_location_id: string | null
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  default_location_id: string | null;
 }
 
 export default defineEventHandler(async (event) => {
@@ -69,9 +69,7 @@ export default defineEventHandler(async (event) => {
 
   // Log authentication for debugging (optional, remove in production)
   if (process.env.NODE_ENV === "development") {
-    const authUser = session.user as AuthUser
-    console.log(
-      `[Auth] User ${authUser.username} accessing ${path}`,
-    );
+    const authUser = session.user as AuthUser;
+    console.log(`[Auth] User ${authUser.username} accessing ${path}`);
   }
 });

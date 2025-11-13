@@ -7,22 +7,19 @@
       icon="i-heroicons-cube"
       badge="Testing"
       badge-color="primary"
-      :breadcrumbs="[
-        { label: 'Home', to: '/' },
-        { label: 'Testing' }
-      ]"
+      :breadcrumbs="[{ label: 'Home', to: '/' }, { label: 'Testing' }]"
     >
       <template #actions>
-        <UButton color="primary" icon="i-heroicons-plus">
-          Create New
-        </UButton>
+        <UButton color="primary" icon="i-heroicons-plus"> Create New </UButton>
       </template>
     </CommonPageHeader>
 
     <div class="container mx-auto px-6 py-8 space-y-12">
       <!-- 1. Loading Spinner Tests -->
       <section>
-        <h2 class="text-xl font-bold text-default mb-4">1. LoadingSpinner Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">
+          1. LoadingSpinner Component
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Small -->
           <UCard>
@@ -53,14 +50,20 @@
             <template #header>
               <h3 class="text-sm font-semibold">XL Secondary</h3>
             </template>
-            <CommonLoadingSpinner size="xl" color="secondary" text="Syncing..." />
+            <CommonLoadingSpinner
+              size="xl"
+              color="secondary"
+              text="Syncing..."
+            />
           </UCard>
         </div>
       </section>
 
       <!-- 2. Error Alert Tests -->
       <section>
-        <h2 class="text-xl font-bold text-default mb-4">2. ErrorAlert Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">
+          2. ErrorAlert Component
+        </h2>
         <div class="space-y-4">
           <!-- Error -->
           <CommonErrorAlert
@@ -106,7 +109,9 @@
 
       <!-- 3. Empty State Tests -->
       <section>
-        <h2 class="text-xl font-bold text-default mb-4">3. EmptyState Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">
+          3. EmptyState Component
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Default Empty State -->
           <UCard>
@@ -148,7 +153,9 @@
 
       <!-- 4. Page Header Variations -->
       <section>
-        <h2 class="text-xl font-bold text-default mb-4">4. PageHeader Component Variations</h2>
+        <h2 class="text-xl font-bold text-default mb-4">
+          4. PageHeader Component Variations
+        </h2>
         <div class="space-y-4">
           <!-- With Icon and Badge -->
           <UCard>
@@ -160,7 +167,9 @@
               badge-color="success"
             >
               <template #actions>
-                <UButton color="primary" icon="i-heroicons-plus">New Item</UButton>
+                <UButton color="primary" icon="i-heroicons-plus"
+                  >New Item</UButton
+                >
               </template>
             </CommonPageHeader>
           </UCard>
@@ -174,7 +183,7 @@
               :breadcrumbs="[
                 { label: 'Dashboard', to: '/' },
                 { label: 'Items', to: '/items' },
-                { label: 'Edit' }
+                { label: 'Edit' },
               ]"
             >
               <template #actions>
@@ -186,10 +195,7 @@
 
           <!-- Small Size -->
           <UCard>
-            <CommonPageHeader
-              title="Quick Actions"
-              size="sm"
-            >
+            <CommonPageHeader title="Quick Actions" size="sm">
               <template #actions>
                 <UButton size="xs" variant="ghost">Help</UButton>
               </template>
@@ -200,17 +206,16 @@
 
       <!-- 5. Data Table Tests -->
       <section>
-        <h2 class="text-xl font-bold text-default mb-4">5. DataTable Component</h2>
+        <h2 class="text-xl font-bold text-default mb-4">
+          5. DataTable Component
+        </h2>
 
         <!-- Loading State -->
         <UCard class="mb-4">
           <template #header>
             <h3 class="text-sm font-semibold">Loading State</h3>
           </template>
-          <CommonDataTable
-            :columns="tableColumns"
-            :loading="true"
-          />
+          <CommonDataTable :columns="tableColumns" :loading="true" />
         </UCard>
 
         <!-- Error State -->
@@ -254,10 +259,21 @@
           >
             <template #actions="{ row }">
               <div class="flex gap-2">
-                <UButton size="xs" variant="ghost" icon="i-heroicons-pencil" @click="handleEdit(row)">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  icon="i-heroicons-pencil"
+                  @click="handleEdit(row)"
+                >
                   Edit
                 </UButton>
-                <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-trash" @click="handleDelete(row)">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  color="error"
+                  icon="i-heroicons-trash"
+                  @click="handleDelete(row)"
+                >
                   Delete
                 </UButton>
               </div>
@@ -292,85 +308,169 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 // Page metadata
 definePageMeta({
-  layout: 'default'
-})
+  layout: "default",
+});
 
 // Types
 interface TableRow {
-  id: number
-  code: string
-  name: string
-  category: string
-  unit: string
-  status: 'Active' | 'Inactive'
+  id: number;
+  code: string;
+  name: string;
+  category: string;
+  unit: string;
+  status: "Active" | "Inactive";
 }
 
 // Table columns (with id property for UTable compatibility)
 const tableColumns = [
-  { key: 'code', label: 'Code', id: 'code' },
-  { key: 'name', label: 'Name', id: 'name' },
-  { key: 'category', label: 'Category', id: 'category' },
-  { key: 'unit', label: 'Unit', id: 'unit' },
-  { key: 'status', label: 'Status', id: 'status' },
-  { key: 'actions', label: 'Actions', id: 'actions' }
-]
+  { key: "code", label: "Code", id: "code" },
+  { key: "name", label: "Name", id: "name" },
+  { key: "category", label: "Category", id: "category" },
+  { key: "unit", label: "Unit", id: "unit" },
+  { key: "status", label: "Status", id: "status" },
+  { key: "actions", label: "Actions", id: "actions" },
+];
 
 // Sample table data
 const tableData = ref<TableRow[]>([
-  { id: 1, code: 'ITM-001', name: 'Milk Fresh', category: 'Dairy', unit: 'LTR', status: 'Active' },
-  { id: 2, code: 'ITM-002', name: 'Tomatoes', category: 'Vegetables', unit: 'KG', status: 'Active' },
-  { id: 3, code: 'ITM-003', name: 'Chicken Breast', category: 'Meat', unit: 'KG', status: 'Active' },
-  { id: 4, code: 'ITM-004', name: 'Rice Basmati', category: 'Dry Goods', unit: 'KG', status: 'Active' },
-  { id: 5, code: 'ITM-005', name: 'Olive Oil', category: 'Cooking Oils', unit: 'LTR', status: 'Active' },
-  { id: 6, code: 'ITM-006', name: 'Onions', category: 'Vegetables', unit: 'KG', status: 'Active' },
-  { id: 7, code: 'ITM-007', name: 'Cheese Cheddar', category: 'Dairy', unit: 'KG', status: 'Inactive' },
-  { id: 8, code: 'ITM-008', name: 'Flour White', category: 'Dry Goods', unit: 'KG', status: 'Active' },
-  { id: 9, code: 'ITM-009', name: 'Sugar White', category: 'Dry Goods', unit: 'KG', status: 'Active' },
-  { id: 10, code: 'ITM-010', name: 'Salt', category: 'Dry Goods', unit: 'KG', status: 'Active' },
-  { id: 11, code: 'ITM-011', name: 'Pepper Black', category: 'Spices', unit: 'KG', status: 'Active' },
-  { id: 12, code: 'ITM-012', name: 'Beef Ground', category: 'Meat', unit: 'KG', status: 'Active' }
-])
+  {
+    id: 1,
+    code: "ITM-001",
+    name: "Milk Fresh",
+    category: "Dairy",
+    unit: "LTR",
+    status: "Active",
+  },
+  {
+    id: 2,
+    code: "ITM-002",
+    name: "Tomatoes",
+    category: "Vegetables",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 3,
+    code: "ITM-003",
+    name: "Chicken Breast",
+    category: "Meat",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 4,
+    code: "ITM-004",
+    name: "Rice Basmati",
+    category: "Dry Goods",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 5,
+    code: "ITM-005",
+    name: "Olive Oil",
+    category: "Cooking Oils",
+    unit: "LTR",
+    status: "Active",
+  },
+  {
+    id: 6,
+    code: "ITM-006",
+    name: "Onions",
+    category: "Vegetables",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 7,
+    code: "ITM-007",
+    name: "Cheese Cheddar",
+    category: "Dairy",
+    unit: "KG",
+    status: "Inactive",
+  },
+  {
+    id: 8,
+    code: "ITM-008",
+    name: "Flour White",
+    category: "Dry Goods",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 9,
+    code: "ITM-009",
+    name: "Sugar White",
+    category: "Dry Goods",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 10,
+    code: "ITM-010",
+    name: "Salt",
+    category: "Dry Goods",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 11,
+    code: "ITM-011",
+    name: "Pepper Black",
+    category: "Spices",
+    unit: "KG",
+    status: "Active",
+  },
+  {
+    id: 12,
+    code: "ITM-012",
+    name: "Beef Ground",
+    category: "Meat",
+    unit: "KG",
+    status: "Active",
+  },
+]);
 
 // Event handlers
 const handleRetry = () => {
-  console.log('Retry clicked')
-  alert('Retry action triggered')
-}
+  console.log("Retry clicked");
+  alert("Retry action triggered");
+};
 
 const handleCreate = () => {
-  console.log('Create clicked')
-  alert('Create action triggered')
-}
+  console.log("Create clicked");
+  alert("Create action triggered");
+};
 
 const handleTutorial = () => {
-  console.log('Tutorial clicked')
-  alert('Tutorial action triggered')
-}
+  console.log("Tutorial clicked");
+  alert("Tutorial action triggered");
+};
 
 const handleTableRetry = () => {
-  console.log('Table retry clicked')
-  alert('Table retry action triggered')
-}
+  console.log("Table retry clicked");
+  alert("Table retry action triggered");
+};
 
 const handleEdit = (row: unknown) => {
-  const tableRow = row as TableRow
-  console.log('Edit row:', tableRow)
-  alert(`Edit: ${tableRow.name}`)
-}
+  const tableRow = row as TableRow;
+  console.log("Edit row:", tableRow);
+  alert(`Edit: ${tableRow.name}`);
+};
 
 const handleDelete = (row: unknown) => {
-  const tableRow = row as TableRow
-  console.log('Delete row:', tableRow)
-  alert(`Delete: ${tableRow.name}`)
-}
+  const tableRow = row as TableRow;
+  console.log("Delete row:", tableRow);
+  alert(`Delete: ${tableRow.name}`);
+};
 
 const handleView = (row: unknown) => {
-  const tableRow = row as TableRow
-  console.log('View row:', tableRow)
-  alert(`View: ${tableRow.name}`)
-}
+  const tableRow = row as TableRow;
+  console.log("View row:", tableRow);
+  alert(`View: ${tableRow.name}`);
+};
 </script>

@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { usePeriodStore } from '~/stores/period'
+import { usePeriodStore } from "~/stores/period";
 
-const periodStore = usePeriodStore()
+const periodStore = usePeriodStore();
 
 // Fetch current period on mount
 onMounted(async () => {
-  await periodStore.fetchCurrentPeriod()
-})
+  await periodStore.fetchCurrentPeriod();
+});
 
 // Compute badge color based on period status
 const badgeColor = computed(() => {
-  if (!periodStore.currentPeriod) return 'neutral'
+  if (!periodStore.currentPeriod) return "neutral";
 
   switch (periodStore.currentPeriod.status) {
-    case 'OPEN':
-      return 'success'
-    case 'PENDING_CLOSE':
-      return 'warning'
-    case 'CLOSED':
-      return 'neutral'
-    case 'DRAFT':
-      return 'neutral'
+    case "OPEN":
+      return "success";
+    case "PENDING_CLOSE":
+      return "warning";
+    case "CLOSED":
+      return "neutral";
+    case "DRAFT":
+      return "neutral";
     default:
-      return 'neutral'
+      return "neutral";
   }
-})
+});
 
 // Format status text
 const statusText = computed(() => {
-  if (!periodStore.currentPeriod) return 'No Period'
+  if (!periodStore.currentPeriod) return "No Period";
 
   return periodStore.currentPeriod.status
-    .split('_')
-    .map(word => word.charAt(0) + word.slice(1).toLowerCase())
-    .join(' ')
-})
+    .split("_")
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
+});
 </script>
 
 <template>

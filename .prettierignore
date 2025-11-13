@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+.nuxt
+.output
+
+# Build output
+dist
+.vercel
+.netlify
+
+# Environment
+.env
+.env.*
+
+# Cache
+.cache
+.turbo
+
+# Generated files
+*.lock
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Prisma
+prisma/migrations
+
+# Test coverage
+coverage
+
+# Playwright
+test-results
+playwright-report

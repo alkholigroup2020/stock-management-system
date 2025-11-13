@@ -10,6 +10,8 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,ts,vue,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,vue,json,css,md}\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -46,6 +48,7 @@
     "@playwright/test": "^1.56.1",
     "@types/bcrypt": "^6.0.0",
     "@vitest/ui": "^4.0.8",
+    "prettier": "^3.6.2",
     "prisma": "^6.18.0",
     "vitest": "^4.0.8"
   }

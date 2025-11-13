@@ -13,7 +13,7 @@
  * @module server/utils/priceVariance
  */
 
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from "@prisma/client";
 
 /**
  * Price variance detection result
@@ -96,19 +96,19 @@ export function checkPriceVariance(
   config: PriceVarianceConfig = {}
 ): PriceVarianceResult {
   // Convert Prisma.Decimal to number for calculations
-  const actualPrice = typeof unitPrice === 'number' ? unitPrice : unitPrice.toNumber();
-  const expectedPrice = typeof periodPrice === 'number' ? periodPrice : periodPrice.toNumber();
-  const qty = typeof quantity === 'number' ? quantity : quantity.toNumber();
+  const actualPrice = typeof unitPrice === "number" ? unitPrice : unitPrice.toNumber();
+  const expectedPrice = typeof periodPrice === "number" ? periodPrice : periodPrice.toNumber();
+  const qty = typeof quantity === "number" ? quantity : quantity.toNumber();
 
   // Validate inputs
   if (!Number.isFinite(actualPrice) || actualPrice < 0) {
-    throw new Error('Invalid unit price: must be a positive finite number');
+    throw new Error("Invalid unit price: must be a positive finite number");
   }
   if (!Number.isFinite(expectedPrice) || expectedPrice < 0) {
-    throw new Error('Invalid period price: must be a positive finite number');
+    throw new Error("Invalid period price: must be a positive finite number");
   }
   if (!Number.isFinite(qty) || qty <= 0) {
-    throw new Error('Invalid quantity: must be a positive finite number');
+    throw new Error("Invalid quantity: must be a positive finite number");
   }
 
   // Calculate variance (positive = price increase, negative = price decrease)
@@ -116,9 +116,8 @@ export function checkPriceVariance(
 
   // Calculate percentage variance relative to expected price
   // Handle division by zero (if period_price is 0, any non-zero price is 100% variance)
-  const variancePercent = expectedPrice > 0
-    ? (variance / expectedPrice) * 100
-    : (actualPrice > 0 ? 100 : 0);
+  const variancePercent =
+    expectedPrice > 0 ? (variance / expectedPrice) * 100 : actualPrice > 0 ? 100 : 0;
 
   // Calculate total variance amount (variance × quantity)
   const varianceAmount = variance * qty;
@@ -140,11 +139,11 @@ export function checkPriceVariance(
 
   // If no thresholds configured, any variance triggers NCR
   // If thresholds configured, check if any threshold is exceeded
-  const exceedsThreshold = hasVariance && (
-    (!hasPercentThreshold && !hasAmountThreshold) || // No thresholds = any variance
-    exceedsPercentThreshold ||
-    exceedsAmountThreshold
-  );
+  const exceedsThreshold =
+    hasVariance &&
+    ((!hasPercentThreshold && !hasAmountThreshold) || // No thresholds = any variance
+      exceedsPercentThreshold ||
+      exceedsAmountThreshold);
 
   return {
     hasVariance,
@@ -166,10 +165,7 @@ export function checkPriceVariance(
  * @param year - Year for NCR numbering (defaults to current year)
  * @returns Next available NCR number
  */
-export async function generateNCRNumber(
-  prisma: any,
-  year?: number
-): Promise<string> {
+export async function generateNCRNumber(prisma: any, year?: number): Promise<string> {
   const currentYear = year || new Date().getFullYear();
   const prefix = `NCR-${currentYear}-`;
 
@@ -181,7 +177,7 @@ export async function generateNCRNumber(
       },
     },
     orderBy: {
-      ncr_no: 'desc',
+      ncr_no: "desc",
     },
     select: {
       ncr_no: true,
@@ -194,11 +190,11 @@ export async function generateNCRNumber(
   }
 
   // Extract number from last NCR and increment
-  const lastNumber = parseInt(lastNCR.ncr_no.split('-')[2], 10);
+  const lastNumber = parseInt(lastNCR.ncr_no.split("-")[2], 10);
   const nextNumber = lastNumber + 1;
 
   // Pad with zeros to 3 digits
-  return `${prefix}${nextNumber.toString().padStart(3, '0')}`;
+  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
 }
 
 /**
@@ -232,25 +228,28 @@ export async function generateNCRNumber(
  * });
  * ```
  */
-export async function createPriceVarianceNCR(
-  prisma: any,
-  data: PriceVarianceNCRData
-) {
+export async function createPriceVarianceNCR(prisma: any, data: PriceVarianceNCRData) {
   // Validate required data
-  if (!data.locationId || !data.deliveryId || !data.deliveryLineId || !data.itemId || !data.createdBy) {
-    throw new Error('Missing required fields for NCR creation');
+  if (
+    !data.locationId ||
+    !data.deliveryId ||
+    !data.deliveryLineId ||
+    !data.itemId ||
+    !data.createdBy
+  ) {
+    throw new Error("Missing required fields for NCR creation");
   }
 
   // Generate NCR number
   const ncrNo = await generateNCRNumber(prisma);
 
   // Format reason message with variance details
-  const varianceType = data.variance > 0 ? 'increase' : 'decrease';
-  const variancePercent = data.expectedPrice > 0
-    ? ((data.variance / data.expectedPrice) * 100).toFixed(2)
-    : '100.00';
+  const varianceType = data.variance > 0 ? "increase" : "decrease";
+  const variancePercent =
+    data.expectedPrice > 0 ? ((data.variance / data.expectedPrice) * 100).toFixed(2) : "100.00";
 
-  const reason = `Automatic NCR for price variance detected on delivery.\n\n` +
+  const reason =
+    `Automatic NCR for price variance detected on delivery.\n\n` +
     `Item: ${data.itemName} (${data.itemCode})\n` +
     `Quantity: ${data.quantity}\n` +
     `Expected Price (Period): SAR ${data.expectedPrice.toFixed(4)}\n` +
@@ -264,14 +263,14 @@ export async function createPriceVarianceNCR(
     data: {
       ncr_no: ncrNo,
       location_id: data.locationId,
-      type: 'PRICE_VARIANCE',
+      type: "PRICE_VARIANCE",
       auto_generated: true,
       delivery_id: data.deliveryId,
       delivery_line_id: data.deliveryLineId,
       reason,
       quantity: data.quantity,
       value: Math.abs(data.varianceAmount), // Store absolute value
-      status: 'OPEN',
+      status: "OPEN",
       created_by: data.createdBy,
     },
     include: {
@@ -363,7 +362,7 @@ export async function detectAndCreateNCR(
       itemId: params.itemId,
       itemName: params.itemName,
       itemCode: params.itemCode,
-      quantity: typeof params.quantity === 'number' ? params.quantity : params.quantity.toNumber(),
+      quantity: typeof params.quantity === "number" ? params.quantity : params.quantity.toNumber(),
       actualPrice: varianceResult.actualPrice,
       expectedPrice: varianceResult.expectedPrice,
       variance: varianceResult.variance,
@@ -395,20 +394,20 @@ export function validatePriceVarianceInputs(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
-  const actualPrice = typeof unitPrice === 'number' ? unitPrice : unitPrice.toNumber();
-  const expectedPrice = typeof periodPrice === 'number' ? periodPrice : periodPrice.toNumber();
-  const qty = typeof quantity === 'number' ? quantity : quantity.toNumber();
+  const actualPrice = typeof unitPrice === "number" ? unitPrice : unitPrice.toNumber();
+  const expectedPrice = typeof periodPrice === "number" ? periodPrice : periodPrice.toNumber();
+  const qty = typeof quantity === "number" ? quantity : quantity.toNumber();
 
   if (!Number.isFinite(actualPrice) || actualPrice < 0) {
-    errors.push('Unit price must be a positive finite number');
+    errors.push("Unit price must be a positive finite number");
   }
 
   if (!Number.isFinite(expectedPrice) || expectedPrice < 0) {
-    errors.push('Period price must be a positive finite number');
+    errors.push("Period price must be a positive finite number");
   }
 
   if (!Number.isFinite(qty) || qty <= 0) {
-    errors.push('Quantity must be a positive finite number');
+    errors.push("Quantity must be a positive finite number");
   }
 
   return {

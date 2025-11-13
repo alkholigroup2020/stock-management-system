@@ -6,129 +6,133 @@
  * recent activity, and quick actions for the active location.
  */
 
-import type { Delivery } from '@prisma/client'
-import type { Issue } from '@prisma/client'
-import { formatCurrency, formatDate } from '~/utils/format'
+import type { Delivery } from "@prisma/client";
+import type { Issue } from "@prisma/client";
+import { formatCurrency, formatDate } from "~/utils/format";
 
 interface DashboardData {
   location: {
-    id: string
-    code: string
-    name: string
-  }
+    id: string;
+    code: string;
+    name: string;
+  };
   period: {
-    id: string
-    name: string
-    start_date: string
-    end_date: string
-    status: string
-  } | null
+    id: string;
+    name: string;
+    start_date: string;
+    end_date: string;
+    status: string;
+  } | null;
   totals: {
-    total_receipts: number
-    total_issues: number
-    total_mandays: number
-    days_left: number
-  }
-  recent_deliveries: Array<Delivery & {
-    supplier: { name: string; code: string }
-  }>
-  recent_issues: Array<Issue & {
-    cost_centre: string
-  }>
+    total_receipts: number;
+    total_issues: number;
+    total_mandays: number;
+    days_left: number;
+  };
+  recent_deliveries: Array<
+    Delivery & {
+      supplier: { name: string; code: string };
+    }
+  >;
+  recent_issues: Array<
+    Issue & {
+      cost_centre: string;
+    }
+  >;
 }
 
 // Composables
-const locationStore = useLocationStore()
-const router = useRouter()
+const locationStore = useLocationStore();
+const router = useRouter();
 
 // Page metadata
 definePageMeta({
-  layout: 'default',
-})
+  layout: "default",
+});
 
 useHead({
-  title: 'Dashboard - Stock Management',
-})
+  title: "Dashboard - Stock Management",
+});
 
 // Reactive state
-const loading = ref(true)
-const error = ref<string | null>(null)
-const dashboardData = ref<DashboardData | null>(null)
+const loading = ref(true);
+const error = ref<string | null>(null);
+const dashboardData = ref<DashboardData | null>(null);
 
 // Fetch dashboard data
 const fetchDashboardData = async () => {
   if (!locationStore.activeLocation) {
-    error.value = 'Please select a location'
-    loading.value = false
-    return
+    error.value = "Please select a location";
+    loading.value = false;
+    return;
   }
 
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
     const data = await $fetch<DashboardData>(
       `/api/locations/${locationStore.activeLocation.id}/dashboard`
-    )
-    dashboardData.value = data
+    );
+    dashboardData.value = data;
   } catch (err: any) {
-    console.error('Failed to fetch dashboard data:', err)
-    error.value = err?.data?.message || 'Failed to load dashboard data'
+    console.error("Failed to fetch dashboard data:", err);
+    error.value = err?.data?.message || "Failed to load dashboard data";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Fetch data on mount
 onMounted(() => {
-  fetchDashboardData()
-})
+  fetchDashboardData();
+});
 
 // Watch for location changes
 watch(
   () => locationStore.activeLocation?.id,
   () => {
-    fetchDashboardData()
+    fetchDashboardData();
   }
-)
+);
 
 // Computed: Metric cards data
 const metricCards = computed(() => {
-  if (!dashboardData.value) return []
+  if (!dashboardData.value) return [];
 
-  const { totals } = dashboardData.value
+  const { totals } = dashboardData.value;
 
   return [
     {
-      label: 'Total Receipts',
+      label: "Total Receipts",
       value: formatCurrency(totals.total_receipts || 0),
-      icon: 'package-check',
-      color: 'primary' as const,
+      icon: "package-check",
+      color: "primary" as const,
     },
     {
-      label: 'Total Issues',
+      label: "Total Issues",
       value: formatCurrency(totals.total_issues || 0),
-      icon: 'file-minus',
-      color: 'secondary' as const,
+      icon: "file-minus",
+      color: "secondary" as const,
     },
     {
-      label: 'Total Mandays',
+      label: "Total Mandays",
       value: (totals.total_mandays || 0).toString(),
-      icon: 'users',
-      color: 'success' as const,
+      icon: "users",
+      color: "success" as const,
     },
     {
-      label: 'Days Left in Period',
+      label: "Days Left in Period",
       value: (totals.days_left || 0).toString(),
-      icon: 'calendar-days',
-      color: 'neutral' as const,
+      icon: "calendar-days",
+      color: "neutral" as const,
     },
-  ]
-})
+  ];
+});
 
 // Computed: Recent deliveries activity items
 const recentDeliveriesItems = computed(() => {
-  if (!dashboardData.value?.recent_deliveries) return []
+  if (!dashboardData.value?.recent_deliveries) return [];
 
   return dashboardData.value.recent_deliveries.map((delivery) => ({
     id: delivery.id,
@@ -136,15 +140,15 @@ const recentDeliveriesItems = computed(() => {
     secondary: formatDate(delivery.delivery_date),
     tertiary: `${delivery.supplier.name} (${delivery.supplier.code})`,
     amount: formatCurrency(Number(delivery.total_amount)),
-    badge: delivery.has_variance ? 'Price Variance' : undefined,
-    badgeColor: delivery.has_variance ? ('warning' as const) : undefined,
-    icon: 'package',
-  }))
-})
+    badge: delivery.has_variance ? "Price Variance" : undefined,
+    badgeColor: delivery.has_variance ? ("warning" as const) : undefined,
+    icon: "package",
+  }));
+});
 
 // Computed: Recent issues activity items
 const recentIssuesItems = computed(() => {
-  if (!dashboardData.value?.recent_issues) return []
+  if (!dashboardData.value?.recent_issues) return [];
 
   return dashboardData.value.recent_issues.map((issue) => ({
     id: issue.id,
@@ -152,45 +156,45 @@ const recentIssuesItems = computed(() => {
     secondary: formatDate(issue.issue_date),
     tertiary: `Cost Centre: ${issue.cost_centre}`,
     amount: formatCurrency(Number(issue.total_value)),
-    icon: 'file-minus',
-  }))
-})
+    icon: "file-minus",
+  }));
+});
 
 // Quick actions
 const quickActions = [
   {
-    label: 'Record Delivery',
-    icon: 'package-plus',
-    color: 'primary' as const,
-    route: '/deliveries/create',
+    label: "Record Delivery",
+    icon: "package-plus",
+    color: "primary" as const,
+    route: "/deliveries/create",
   },
   {
-    label: 'Record Issue',
-    icon: 'file-minus',
-    color: 'primary' as const,
-    route: '/issues/create',
+    label: "Record Issue",
+    icon: "file-minus",
+    color: "primary" as const,
+    route: "/issues/create",
   },
   {
-    label: 'View Stock',
-    icon: 'boxes',
-    color: 'primary' as const,
-    route: '/stock-now',
+    label: "View Stock",
+    icon: "boxes",
+    color: "primary" as const,
+    route: "/stock-now",
   },
   {
-    label: 'Enter POB',
-    icon: 'users',
-    color: 'primary' as const,
-    route: '/pob',
+    label: "Enter POB",
+    icon: "users",
+    color: "primary" as const,
+    route: "/pob",
   },
-]
+];
 
 const handleQuickAction = (route: string) => {
-  router.push(route)
-}
+  router.push(route);
+};
 
 const handleRetry = () => {
-  fetchDashboardData()
-}
+  fetchDashboardData();
+};
 </script>
 
 <template>
@@ -198,7 +202,10 @@ const handleRetry = () => {
     <!-- Page Header -->
     <div>
       <h1 class="text-3xl font-bold text-default mb-2">Dashboard</h1>
-      <div v-if="dashboardData?.location" class="flex items-center gap-2 text-sm text-muted">
+      <div
+        v-if="dashboardData?.location"
+        class="flex items-center gap-2 text-sm text-muted"
+      >
         <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
         <span>{{ dashboardData.location.name }}</span>
         <span v-if="dashboardData.period" class="ml-2">
@@ -213,11 +220,7 @@ const handleRetry = () => {
     </div>
 
     <!-- Error State -->
-    <CommonErrorAlert
-      v-else-if="error"
-      :title="error"
-      @retry="handleRetry"
-    />
+    <CommonErrorAlert v-else-if="error" :title="error" @retry="handleRetry" />
 
     <!-- No Active Period Warning -->
     <UAlert

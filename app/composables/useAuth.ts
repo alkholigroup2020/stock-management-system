@@ -107,8 +107,12 @@ export const useAuth = () => {
      * @param roles - Array of roles to check
      * @returns boolean
      */
-    hasAnyRole: (roles: Array<"ADMIN" | "SUPERVISOR" | "OPERATOR">): boolean => {
-      return roles.includes(authStore.role as "ADMIN" | "SUPERVISOR" | "OPERATOR");
+    hasAnyRole: (
+      roles: Array<"ADMIN" | "SUPERVISOR" | "OPERATOR">
+    ): boolean => {
+      return roles.includes(
+        authStore.role as "ADMIN" | "SUPERVISOR" | "OPERATOR"
+      );
     },
 
     /**
@@ -137,7 +141,9 @@ export const useAuth = () => {
      * @param locationId - Location ID to check
      * @returns Access level ('VIEW', 'POST', 'MANAGE') or null
      */
-    getLocationAccessLevel: (locationId: string): "VIEW" | "POST" | "MANAGE" | null => {
+    getLocationAccessLevel: (
+      locationId: string
+    ): "VIEW" | "POST" | "MANAGE" | null => {
       return authStore.getLocationAccessLevel(locationId);
     },
 
@@ -177,7 +183,10 @@ export const useAuth = () => {
      * @param password - User's password
      * @returns Promise with success status and optional message
      */
-    login: async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+    login: async (
+      email: string,
+      password: string
+    ): Promise<{ success: boolean; message?: string }> => {
       return await authStore.login(email, password);
     },
 
@@ -193,7 +202,10 @@ export const useAuth = () => {
      * Fetch the current session from the server
      * @returns Promise with success and authenticated status
      */
-    fetchSession: async (): Promise<{ success: boolean; authenticated: boolean }> => {
+    fetchSession: async (): Promise<{
+      success: boolean;
+      authenticated: boolean;
+    }> => {
       return await authStore.fetchSession();
     },
 

@@ -164,8 +164,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Forbidden",
         data: {
           code: "INSUFFICIENT_PERMISSIONS",
-          message:
-            "You do not have permission to post deliveries at this location",
+          message: "You do not have permission to post deliveries at this location",
         },
       });
     }
@@ -288,9 +287,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "MISSING_PERIOD_PRICES",
-          message: `Period prices not set for items: ${missingItems.join(
-            ", "
-          )}`,
+          message: `Period prices not set for items: ${missingItems.join(", ")}`,
           details: { missing_item_ids: missingPrices },
         },
       });
@@ -391,12 +388,7 @@ export default defineEventHandler(async (event) => {
           const receivedQty = lineData.quantity;
           const receiptPrice = lineData.unit_price;
 
-          const wacResult = calculateWAC(
-            currentQty,
-            currentWAC,
-            receivedQty,
-            receiptPrice
-          );
+          const wacResult = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice);
 
           await tx.locationStock.update({
             where: {
@@ -485,14 +477,14 @@ export default defineEventHandler(async (event) => {
         poster: result.delivery.poster,
         lines: result.lines.map((line: unknown) => {
           const deliveryLine = line as {
-            id: string
-            item: { id: string; code: string; name: string; unit: string }
-            quantity: number
-            unit_price: number
-            period_price: number
-            price_variance: number
-            line_value: number
-          }
+            id: string;
+            item: { id: string; code: string; name: string; unit: string };
+            quantity: number;
+            unit_price: number;
+            period_price: number;
+            price_variance: number;
+            line_value: number;
+          };
           return {
             id: deliveryLine.id,
             item: {
@@ -506,23 +498,23 @@ export default defineEventHandler(async (event) => {
             period_price: deliveryLine.period_price,
             price_variance: deliveryLine.price_variance,
             line_value: deliveryLine.line_value,
-          }
+          };
         }),
         ncrs: result.ncrs.map((ncr: unknown) => {
           const ncrData = ncr as {
-            id: string
-            ncr_no: string
-            type: string
-            value: number
-            reason: string
-          }
+            id: string;
+            ncr_no: string;
+            type: string;
+            value: number;
+            reason: string;
+          };
           return {
             id: ncrData.id,
             ncr_no: ncrData.ncr_no,
             type: ncrData.type,
             value: ncrData.value,
             reason: ncrData.reason,
-          }
+          };
         }),
       },
     };

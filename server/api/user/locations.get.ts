@@ -1,73 +1,73 @@
-import prisma from '../../utils/prisma'
+import prisma from "../../utils/prisma";
 
 export default defineEventHandler(async (event) => {
   // Get user from session (auth middleware attaches it to event.context)
-  const user = event.context.user
+  const user = event.context.user;
 
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: "Unauthorized",
       data: {
-        code: 'UNAUTHORIZED',
-        message: 'You must be logged in to access this resource'
-      }
-    })
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to access this resource",
+      },
+    });
   }
 
   try {
     // For ADMIN and SUPERVISOR, return all active locations
-    if (user.role === 'ADMIN' || user.role === 'SUPERVISOR') {
+    if (user.role === "ADMIN" || user.role === "SUPERVISOR") {
       const locations = await prisma.location.findMany({
         where: {
-          is_active: true
+          is_active: true,
         },
         orderBy: {
-          name: 'asc'
-        }
-      })
+          name: "asc",
+        },
+      });
 
       // Add MANAGE access level for all locations
       const locationsWithAccess = locations.map((loc) => ({
         ...loc,
-        access_level: 'MANAGE' as const
-      }))
+        access_level: "MANAGE" as const,
+      }));
 
       return {
-        locations: locationsWithAccess
-      }
+        locations: locationsWithAccess,
+      };
     }
 
     // For OPERATOR, return only assigned locations
     const userLocations = await prisma.userLocation.findMany({
       where: {
-        user_id: user.id
+        user_id: user.id,
       },
       include: {
-        location: true
-      }
-    })
+        location: true,
+      },
+    });
 
     // Filter active locations and map to include access level
     const locationsWithAccess = userLocations
       .filter((ul) => ul.location.is_active)
       .map((ul) => ({
         ...ul.location,
-        access_level: ul.access_level
-      }))
+        access_level: ul.access_level,
+      }));
 
     return {
-      locations: locationsWithAccess
-    }
+      locations: locationsWithAccess,
+    };
   } catch (error) {
-    console.error('Error fetching user locations:', error)
+    console.error("Error fetching user locations:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch user locations'
-      }
-    })
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch user locations",
+      },
+    });
   }
-})
+});

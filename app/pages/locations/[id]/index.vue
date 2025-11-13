@@ -27,7 +27,11 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
-      <LoadingSpinner size="lg" color="primary" text="Loading location details..." />
+      <LoadingSpinner
+        size="lg"
+        color="primary"
+        text="Loading location details..."
+      />
     </div>
 
     <!-- Error State -->
@@ -54,11 +58,7 @@
           </div>
           <div>
             <label class="form-label">Type</label>
-            <UBadge
-              :color="locationTypeColor"
-              variant="subtle"
-              size="lg"
-            >
+            <UBadge :color="locationTypeColor" variant="subtle" size="lg">
               {{ location.type }}
             </UBadge>
           </div>
@@ -69,7 +69,7 @@
               variant="subtle"
               size="lg"
             >
-              {{ location.is_active ? 'Active' : 'Inactive' }}
+              {{ location.is_active ? "Active" : "Inactive" }}
             </UBadge>
           </div>
           <div v-if="location.timezone">
@@ -82,7 +82,9 @@
           </div>
           <div v-if="location.manager">
             <label class="form-label">Manager</label>
-            <p class="text-default">{{ location.manager.full_name || location.manager.username }}</p>
+            <p class="text-default">
+              {{ location.manager.full_name || location.manager.username }}
+            </p>
           </div>
         </div>
       </UCard>
@@ -91,9 +93,7 @@
       <UCard v-if="canManageLocations()">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-default">
-              User Assignments
-            </h2>
+            <h2 class="text-lg font-semibold text-default">User Assignments</h2>
             <UButton
               color="primary"
               icon="i-lucide-user-plus"
@@ -151,7 +151,12 @@
               icon="i-lucide-x"
               size="sm"
               :loading="removingUserId === assignment.user_id"
-              @click="removeUserAssignment(assignment.user_id, assignment.user.full_name || assignment.user.username)"
+              @click="
+                removeUserAssignment(
+                  assignment.user_id,
+                  assignment.user.full_name || assignment.user.username
+                )
+              "
             >
               Remove
             </UButton>
@@ -176,11 +181,7 @@
         >
           <div class="space-y-4">
             <!-- User Selection -->
-            <UFormGroup
-              label="User"
-              name="user_id"
-              required
-            >
+            <UFormGroup label="User" name="user_id" required>
               <USelectMenu
                 v-model="assignFormData.user_id"
                 :options="availableUsers"
@@ -206,7 +207,9 @@
             </UFormGroup>
 
             <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+            <div
+              class="flex items-center justify-end gap-3 pt-4 border-t border-default"
+            >
               <UButton
                 color="neutral"
                 variant="ghost"
@@ -232,218 +235,284 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+import { z } from "zod";
 
 definePageMeta({
-  layout: 'default',
-})
+  layout: "default",
+});
 
 // Composables
-const route = useRoute()
-const toast = useAppToast()
-const { canManageLocations } = usePermissions()
+const route = useRoute();
+const toast = useAppToast();
+const { canManageLocations } = usePermissions();
 
 // State
-const loading = ref(true)
-const error = ref<string | null>(null)
-const location = ref<any>(null)
+const loading = ref(true);
+const error = ref<string | null>(null);
+const location = ref<any>(null);
 
-const loadingUsers = ref(false)
-const assignedUsers = ref<any[]>([])
+const loadingUsers = ref(false);
+const assignedUsers = ref<any[]>([]);
 
-const loadingAvailableUsers = ref(false)
-const availableUsers = ref<any[]>([])
+const loadingAvailableUsers = ref(false);
+const availableUsers = ref<any[]>([]);
 
-const isAssignModalOpen = ref(false)
-const submittingAssignment = ref(false)
-const removingUserId = ref<string | null>(null)
+const isAssignModalOpen = ref(false);
+const submittingAssignment = ref(false);
+const removingUserId = ref<string | null>(null);
 
 // Assign form data
 const assignFormData = reactive({
-  user_id: '',
-  access_level: '',
-})
+  user_id: "",
+  access_level: "",
+});
 
 // Validation schema
 const assignUserSchema = z.object({
-  user_id: z.string().uuid('Please select a user'),
-  access_level: z.enum(['VIEW', 'POST', 'MANAGE']).describe('Please select an access level'),
-})
+  user_id: z.string().uuid("Please select a user"),
+  access_level: z
+    .enum(["VIEW", "POST", "MANAGE"])
+    .describe("Please select an access level"),
+});
 
 // Access level options
 const accessLevelOptions = [
-  { label: 'View Only', value: 'VIEW' },
-  { label: 'Post Transactions', value: 'POST' },
-  { label: 'Full Management', value: 'MANAGE' },
-]
+  { label: "View Only", value: "VIEW" },
+  { label: "Post Transactions", value: "POST" },
+  { label: "Full Management", value: "MANAGE" },
+];
 
 // Computed
-const locationTypeColor = computed((): 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
-  const colors: Record<string, 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'> = {
-    KITCHEN: 'warning',
-    STORE: 'success',
-    CENTRAL: 'primary',
-    WAREHOUSE: 'neutral',
+const locationTypeColor = computed(
+  ():
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "neutral" => {
+    const colors: Record<
+      string,
+      | "error"
+      | "info"
+      | "primary"
+      | "secondary"
+      | "success"
+      | "warning"
+      | "neutral"
+    > = {
+      KITCHEN: "warning",
+      STORE: "success",
+      CENTRAL: "primary",
+      WAREHOUSE: "neutral",
+    };
+    return colors[location.value?.type] || "neutral";
   }
-  return colors[location.value?.type] || 'neutral'
-})
+);
 
 // Helper functions
-const roleColor = (role: string): 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
-  const colors: Record<string, 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'> = {
-    ADMIN: 'error',
-    SUPERVISOR: 'warning',
-    OPERATOR: 'primary',
-  }
-  return colors[role] || 'neutral'
-}
+const roleColor = (
+  role: string
+):
+  | "error"
+  | "info"
+  | "primary"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "neutral" => {
+  const colors: Record<
+    string,
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "neutral"
+  > = {
+    ADMIN: "error",
+    SUPERVISOR: "warning",
+    OPERATOR: "primary",
+  };
+  return colors[role] || "neutral";
+};
 
-const accessLevelColor = (level: string): 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral' => {
-  const colors: Record<string, 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'> = {
-    MANAGE: 'success',
-    POST: 'primary',
-    VIEW: 'neutral',
-  }
-  return colors[level] || 'neutral'
-}
+const accessLevelColor = (
+  level: string
+):
+  | "error"
+  | "info"
+  | "primary"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "neutral" => {
+  const colors: Record<
+    string,
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "neutral"
+  > = {
+    MANAGE: "success",
+    POST: "primary",
+    VIEW: "neutral",
+  };
+  return colors[level] || "neutral";
+};
 
 // Fetch location details
 const fetchLocationDetails = async () => {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const locationId = route.params.id as string
-    const response = await $fetch<{ location: any }>(`/api/locations/${locationId}`)
+    const locationId = route.params.id as string;
+    const response = await $fetch<{ location: any }>(
+      `/api/locations/${locationId}`
+    );
 
-    location.value = response.location
+    location.value = response.location;
   } catch (err: any) {
-    console.error('Error fetching location details:', err)
-    error.value = err.data?.message || 'Failed to fetch location details'
-    toast.error('Error', { description: error.value || undefined })
+    console.error("Error fetching location details:", err);
+    error.value = err.data?.message || "Failed to fetch location details";
+    toast.error("Error", { description: error.value || undefined });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Fetch assigned users
 const fetchAssignedUsers = async () => {
-  if (!canManageLocations()) return
+  if (!canManageLocations()) return;
 
-  loadingUsers.value = true
+  loadingUsers.value = true;
 
   try {
-    const locationId = route.params.id as string
-    const response = await $fetch<{ users: any[] }>(`/api/locations/${locationId}/users`)
+    const locationId = route.params.id as string;
+    const response = await $fetch<{ users: any[] }>(
+      `/api/locations/${locationId}/users`
+    );
 
-    assignedUsers.value = response.users || []
+    assignedUsers.value = response.users || [];
   } catch (err: any) {
-    console.error('Error fetching assigned users:', err)
-    toast.error('Error', { description: 'Failed to load assigned users' })
+    console.error("Error fetching assigned users:", err);
+    toast.error("Error", { description: "Failed to load assigned users" });
   } finally {
-    loadingUsers.value = false
+    loadingUsers.value = false;
   }
-}
+};
 
 // Fetch available users for assignment
 const fetchAvailableUsers = async () => {
-  loadingAvailableUsers.value = true
+  loadingAvailableUsers.value = true;
 
   try {
-    const response = await $fetch<{ users: any[] }>('/api/users', {
+    const response = await $fetch<{ users: any[] }>("/api/users", {
       query: { is_active: true },
-    })
+    });
 
-    const users = response.users || []
+    const users = response.users || [];
     availableUsers.value = users.map((user: any) => ({
       label: `${user.full_name || user.username} (${user.email})`,
       value: user.id,
-    }))
+    }));
   } catch (err: any) {
-    console.error('Error fetching available users:', err)
-    toast.error('Error', { description: 'Failed to load users' })
+    console.error("Error fetching available users:", err);
+    toast.error("Error", { description: "Failed to load users" });
   } finally {
-    loadingAvailableUsers.value = false
+    loadingAvailableUsers.value = false;
   }
-}
+};
 
 // Open assign user modal
 const openAssignUserModal = () => {
-  assignFormData.user_id = ''
-  assignFormData.access_level = ''
-  isAssignModalOpen.value = true
-  fetchAvailableUsers()
-}
+  assignFormData.user_id = "";
+  assignFormData.access_level = "";
+  isAssignModalOpen.value = true;
+  fetchAvailableUsers();
+};
 
 // Submit user assignment
 const submitUserAssignment = async () => {
-  submittingAssignment.value = true
+  submittingAssignment.value = true;
 
   try {
-    const locationId = route.params.id as string
+    const locationId = route.params.id as string;
 
     const payload = {
       user_id: assignFormData.user_id,
       access_level: assignFormData.access_level,
-    }
+    };
 
     const response = await $fetch(`/api/locations/${locationId}/users`, {
-      method: 'POST',
+      method: "POST",
       body: payload,
-    })
+    });
 
-    toast.success('Success', { description: response.message })
-    isAssignModalOpen.value = false
+    toast.success("Success", { description: response.message });
+    isAssignModalOpen.value = false;
 
     // Refresh assigned users list
-    await fetchAssignedUsers()
+    await fetchAssignedUsers();
   } catch (err: any) {
-    console.error('Error assigning user:', err)
-    const message = err.data?.message || 'Failed to assign user'
-    toast.error('Error', { description: message })
+    console.error("Error assigning user:", err);
+    const message = err.data?.message || "Failed to assign user";
+    toast.error("Error", { description: message });
   } finally {
-    submittingAssignment.value = false
+    submittingAssignment.value = false;
   }
-}
+};
 
 // Remove user assignment
 const removeUserAssignment = async (userId: string, userName: string) => {
-  if (!confirm(`Are you sure you want to remove ${userName} from this location?`)) {
-    return
+  if (
+    !confirm(`Are you sure you want to remove ${userName} from this location?`)
+  ) {
+    return;
   }
 
-  removingUserId.value = userId
+  removingUserId.value = userId;
 
   try {
-    const locationId = route.params.id as string
+    const locationId = route.params.id as string;
 
-    const response = await $fetch<{ message: string }>(`/api/locations/${locationId}/users/${userId}`, {
-      method: 'DELETE',
-    })
+    const response = await $fetch<{ message: string }>(
+      `/api/locations/${locationId}/users/${userId}`,
+      {
+        method: "DELETE",
+      }
+    );
 
-    toast.success('Success', { description: response.message })
+    toast.success("Success", { description: response.message });
 
     // Refresh assigned users list
-    await fetchAssignedUsers()
+    await fetchAssignedUsers();
   } catch (err: any) {
-    console.error('Error removing user assignment:', err)
-    const message = err.data?.message || 'Failed to remove user assignment'
-    toast.error('Error', { description: message })
+    console.error("Error removing user assignment:", err);
+    const message = err.data?.message || "Failed to remove user assignment";
+    toast.error("Error", { description: message });
   } finally {
-    removingUserId.value = null
+    removingUserId.value = null;
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
-  await fetchLocationDetails()
+  await fetchLocationDetails();
   if (canManageLocations()) {
-    await fetchAssignedUsers()
+    await fetchAssignedUsers();
   }
-})
+});
 
 // Set page title
 useHead({
-  title: () => `${location.value?.name || 'Location'} - Stock Management System`,
-})
+  title: () =>
+    `${location.value?.name || "Location"} - Stock Management System`,
+});
 </script>

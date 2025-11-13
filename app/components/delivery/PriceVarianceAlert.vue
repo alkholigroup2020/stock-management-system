@@ -7,40 +7,42 @@
  */
 
 interface Props {
-  varianceCount: number
-  totalVarianceAmount?: number
-  variant?: 'subtle' | 'solid' | 'outline'
-  showDetails?: boolean
+  varianceCount: number;
+  totalVarianceAmount?: number;
+  variant?: "subtle" | "solid" | "outline";
+  showDetails?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'subtle',
+  variant: "subtle",
   showDetails: true,
   totalVarianceAmount: 0,
-})
+});
 
 // Format currency for display
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-SA', {
-    style: 'currency',
-    currency: 'SAR',
+  return new Intl.NumberFormat("en-SA", {
+    style: "currency",
+    currency: "SAR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
-}
+  }).format(amount);
+};
 
 // Computed message
 const message = computed(() => {
-  const count = props.varianceCount
-  const plural = count === 1 ? 'item has' : 'items have'
-  const baseMessage = `${count} ${plural} price variance.`
+  const count = props.varianceCount;
+  const plural = count === 1 ? "item has" : "items have";
+  const baseMessage = `${count} ${plural} price variance.`;
 
   if (props.showDetails && props.totalVarianceAmount !== 0) {
-    return `${baseMessage} Total variance: ${formatCurrency(props.totalVarianceAmount)}. NCRs will be automatically generated.`
+    return `${baseMessage} Total variance: ${formatCurrency(
+      props.totalVarianceAmount
+    )}. NCRs will be automatically generated.`;
   }
 
-  return `${baseMessage} NCRs will be automatically generated.`
-})
+  return `${baseMessage} NCRs will be automatically generated.`;
+});
 </script>
 
 <template>

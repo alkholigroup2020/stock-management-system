@@ -92,7 +92,9 @@
   /* ===== Background Tokens ===== */
   --ui-bg: var(--color-zinc-50); /* Page background */
   --ui-bg-elevated: #ffffff; /* Cards, modals, elevated surfaces */
-  --ui-bg-muted: var(--color-zinc-100); /* Subtle backgrounds, disabled states */
+  --ui-bg-muted: var(
+    --color-zinc-100
+  ); /* Subtle backgrounds, disabled states */
   --ui-bg-accented: var(--color-navy-50); /* Highlighted sections */
   --ui-bg-inverted: var(--color-zinc-900); /* Dark backgrounds in light mode */
 
@@ -141,12 +143,16 @@
   --ui-status-rejected: var(--color-red-600); /* Rejected/failed */
 
   /* Period States */
-  --ui-period-open: var(--color-emerald-600); /* Period accepting transactions */
+  --ui-period-open: var(
+    --color-emerald-600
+  ); /* Period accepting transactions */
   --ui-period-ready: var(--color-navy-500); /* Location ready for close */
   --ui-period-closed: var(--color-zinc-500); /* Period locked */
 
   /* Price Variance */
-  --ui-variance-detected: var(--color-amber-500); /* Price differs from expected */
+  --ui-variance-detected: var(
+    --color-amber-500
+  ); /* Price differs from expected */
 
   /* ===== Utility Tokens ===== */
   --ui-radius: 0.5rem; /* Default border radius */

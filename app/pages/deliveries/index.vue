@@ -1,63 +1,63 @@
 <script setup lang="ts">
-import { formatCurrency, formatDate } from '~/utils/format'
+import { formatCurrency, formatDate } from "~/utils/format";
 
 // SEO
 useSeoMeta({
-  title: 'Deliveries - Stock Management System',
-  description: 'View and manage deliveries and goods receipts',
-})
+  title: "Deliveries - Stock Management System",
+  description: "View and manage deliveries and goods receipts",
+});
 
 // No middleware needed - auth.global will handle authentication automatically
 
 // Composables
-const router = useRouter()
-const locationStore = useLocationStore()
-const { canPostDeliveries } = usePermissions()
-const toast = useAppToast()
+const router = useRouter();
+const locationStore = useLocationStore();
+const { canPostDeliveries } = usePermissions();
+const toast = useAppToast();
 
 // Types
 interface Delivery {
-  id: string
-  delivery_no: string
-  delivery_date: string
-  invoice_no: string | null
-  total_amount: number
-  has_variance: boolean
+  id: string;
+  delivery_no: string;
+  delivery_date: string;
+  invoice_no: string | null;
+  total_amount: number;
+  has_variance: boolean;
   supplier: {
-    id: string
-    name: string
-    code: string
-  }
+    id: string;
+    name: string;
+    code: string;
+  };
   period: {
-    id: string
-    name: string
-  }
-  posted_at: string
+    id: string;
+    name: string;
+  };
+  posted_at: string;
   posted_by_user: {
-    full_name: string
-  }
+    full_name: string;
+  };
 }
 
 interface Supplier {
-  id: string
-  name: string
-  code: string
+  id: string;
+  name: string;
+  code: string;
 }
 
 // State
-const loading = ref(false)
-const error = ref<string | null>(null)
-const deliveries = ref<Delivery[]>([])
-const suppliers = ref<Supplier[]>([])
+const loading = ref(false);
+const error = ref<string | null>(null);
+const deliveries = ref<Delivery[]>([]);
+const suppliers = ref<Supplier[]>([]);
 
 // Filters
 const filters = reactive({
-  search: '',
-  supplierId: '',
+  search: "",
+  supplierId: "",
   hasVariance: false,
-  startDate: '',
-  endDate: '',
-})
+  startDate: "",
+  endDate: "",
+});
 
 // Pagination
 const pagination = reactive({
@@ -65,186 +65,190 @@ const pagination = reactive({
   limit: 50,
   total: 0,
   totalPages: 0,
-})
+});
 
 // Computed
-const activeLocationId = computed(() => locationStore.activeLocationId)
-const hasDeliveries = computed(() => deliveries.value.length > 0)
+const activeLocationId = computed(() => locationStore.activeLocationId);
+const hasDeliveries = computed(() => deliveries.value.length > 0);
 const paginationInfo = computed(() => {
-  const start = (pagination.page - 1) * pagination.limit + 1
-  const end = Math.min(pagination.page * pagination.limit, pagination.total)
-  return `${start}-${end} of ${pagination.total}`
-})
+  const start = (pagination.page - 1) * pagination.limit + 1;
+  const end = Math.min(pagination.page * pagination.limit, pagination.total);
+  return `${start}-${end} of ${pagination.total}`;
+});
 
 // Active filters
 const activeFilters = computed(() => {
-  const activeFiltersList: Array<{ key: string; label: string; value: any }> = []
+  const activeFiltersList: Array<{ key: string; label: string; value: any }> =
+    [];
   if (filters.supplierId) {
-    const supplier = suppliers.value.find((s) => s.id === filters.supplierId)
+    const supplier = suppliers.value.find((s) => s.id === filters.supplierId);
     if (supplier) {
       activeFiltersList.push({
-        key: 'supplierId',
-        label: 'Supplier',
+        key: "supplierId",
+        label: "Supplier",
         value: supplier.name,
-      })
+      });
     }
   }
   if (filters.hasVariance) {
     activeFiltersList.push({
-      key: 'hasVariance',
-      label: 'Has Price Variance',
-      value: 'Yes',
-    })
+      key: "hasVariance",
+      label: "Has Price Variance",
+      value: "Yes",
+    });
   }
   if (filters.startDate) {
     activeFiltersList.push({
-      key: 'startDate',
-      label: 'Start Date',
+      key: "startDate",
+      label: "Start Date",
       value: formatDate(filters.startDate),
-    })
+    });
   }
   if (filters.endDate) {
     activeFiltersList.push({
-      key: 'endDate',
-      label: 'End Date',
+      key: "endDate",
+      label: "End Date",
       value: formatDate(filters.endDate),
-    })
+    });
   }
-  return activeFiltersList
-})
+  return activeFiltersList;
+});
 
 // Table columns
 const columns = [
-  { key: 'delivery_no', label: 'Delivery No' },
-  { key: 'delivery_date', label: 'Date' },
-  { key: 'supplier', label: 'Supplier' },
-  { key: 'invoice_no', label: 'Invoice No' },
-  { key: 'total_amount', label: 'Total Amount' },
-  { key: 'has_variance', label: 'Price Variance' },
-]
+  { key: "delivery_no", label: "Delivery No" },
+  { key: "delivery_date", label: "Date" },
+  { key: "supplier", label: "Supplier" },
+  { key: "invoice_no", label: "Invoice No" },
+  { key: "total_amount", label: "Total Amount" },
+  { key: "has_variance", label: "Price Variance" },
+];
 
 // Fetch deliveries
 async function fetchDeliveries() {
   if (!activeLocationId.value) {
-    error.value = 'No active location selected'
-    return
+    error.value = "No active location selected";
+    return;
   }
 
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
     const params = new URLSearchParams({
       page: pagination.page.toString(),
       limit: pagination.limit.toString(),
-    })
+    });
 
-    if (filters.supplierId) params.append('supplierId', filters.supplierId)
-    if (filters.hasVariance) params.append('hasVariance', 'true')
-    if (filters.startDate) params.append('startDate', filters.startDate)
-    if (filters.endDate) params.append('endDate', filters.endDate)
+    if (filters.supplierId) params.append("supplierId", filters.supplierId);
+    if (filters.hasVariance) params.append("hasVariance", "true");
+    if (filters.startDate) params.append("startDate", filters.startDate);
+    if (filters.endDate) params.append("endDate", filters.endDate);
 
     const response = await $fetch<{
-      deliveries: Delivery[]
+      deliveries: Delivery[];
       pagination: {
-        total: number
-        page: number
-        limit: number
-        totalPages: number
-      }
-    }>(`/api/locations/${activeLocationId.value}/deliveries?${params}`)
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      };
+    }>(`/api/locations/${activeLocationId.value}/deliveries?${params}`);
 
-    deliveries.value = response.deliveries
-    pagination.total = response.pagination.total
-    pagination.totalPages = response.pagination.totalPages
+    deliveries.value = response.deliveries;
+    pagination.total = response.pagination.total;
+    pagination.totalPages = response.pagination.totalPages;
   } catch (err: any) {
-    error.value = err?.data?.message || 'Failed to fetch deliveries'
-    console.error('Error fetching deliveries:', err)
+    error.value = err?.data?.message || "Failed to fetch deliveries";
+    console.error("Error fetching deliveries:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 // Fetch suppliers
 async function fetchSuppliers() {
   try {
-    const response = await $fetch<{ suppliers: Supplier[] }>('/api/suppliers')
-    suppliers.value = response.suppliers
+    const response = await $fetch<{ suppliers: Supplier[] }>("/api/suppliers");
+    suppliers.value = response.suppliers;
   } catch (err: any) {
-    console.error('Error fetching suppliers:', err)
+    console.error("Error fetching suppliers:", err);
   }
 }
 
 // Filter handlers
 function clearFilter(key: string) {
-  ;(filters as any)[key] = key === 'hasVariance' ? false : ''
-  pagination.page = 1
-  fetchDeliveries()
+  (filters as any)[key] = key === "hasVariance" ? false : "";
+  pagination.page = 1;
+  fetchDeliveries();
 }
 
 function applyFilters() {
-  pagination.page = 1
-  fetchDeliveries()
+  pagination.page = 1;
+  fetchDeliveries();
 }
 
 // Pagination handlers
 function goToPage(page: number) {
   if (page >= 1 && page <= pagination.totalPages) {
-    pagination.page = page
-    fetchDeliveries()
+    pagination.page = page;
+    fetchDeliveries();
   }
 }
 
 function previousPage() {
   if (pagination.page > 1) {
-    goToPage(pagination.page - 1)
+    goToPage(pagination.page - 1);
   }
 }
 
 function nextPage() {
   if (pagination.page < pagination.totalPages) {
-    goToPage(pagination.page + 1)
+    goToPage(pagination.page + 1);
   }
 }
 
 // Row click handler
 function handleRowClick(delivery: Delivery) {
-  router.push(`/deliveries/${delivery.id}`)
+  router.push(`/deliveries/${delivery.id}`);
 }
 
 // Navigation
 function goToNewDelivery() {
-  router.push('/deliveries/create')
+  router.push("/deliveries/create");
 }
 
 // Watch location changes
 watch(activeLocationId, () => {
   if (activeLocationId.value) {
-    pagination.page = 1
-    fetchDeliveries()
+    pagination.page = 1;
+    fetchDeliveries();
   }
-})
+});
 
 // Initial load
 onMounted(async () => {
-  await fetchSuppliers()
+  await fetchSuppliers();
   if (activeLocationId.value) {
-    await fetchDeliveries()
+    await fetchDeliveries();
   }
-})
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
         <div>
           <h1 class="text-2xl font-bold text-default">
             Deliveries & Goods Receipts
           </h1>
           <p class="mt-1 text-sm text-muted">
-            View and manage deliveries for {{ locationStore.activeLocation?.name }}
+            View and manage deliveries for
+            {{ locationStore.activeLocation?.name }}
           </p>
         </div>
         <div v-if="canPostDeliveries()" class="flex gap-2">
@@ -290,7 +294,11 @@ onMounted(async () => {
           <label class="form-label">Supplier</label>
           <select v-model="filters.supplierId" class="form-input w-full">
             <option value="">All Suppliers</option>
-            <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
+            <option
+              v-for="supplier in suppliers"
+              :key="supplier.id"
+              :value="supplier.id"
+            >
               {{ supplier.name }} ({{ supplier.code }})
             </option>
           </select>
@@ -319,14 +327,16 @@ onMounted(async () => {
           variant="outline"
           icon="i-lucide-x"
           label="Clear All"
-          @click="() => {
-            filters.search = ''
-            filters.supplierId = ''
-            filters.hasVariance = false
-            filters.startDate = ''
-            filters.endDate = ''
-            applyFilters()
-          }"
+          @click="
+            () => {
+              filters.search = '';
+              filters.supplierId = '';
+              filters.hasVariance = false;
+              filters.startDate = '';
+              filters.endDate = '';
+              applyFilters();
+            }
+          "
         />
       </div>
 
@@ -385,7 +395,9 @@ onMounted(async () => {
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(delivery)"
             >
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td
+                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
+              >
                 {{ delivery.delivery_no }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
@@ -393,12 +405,16 @@ onMounted(async () => {
               </td>
               <td class="px-4 py-3 text-sm text-default">
                 <div class="font-medium">{{ delivery.supplier.name }}</div>
-                <div class="text-xs text-muted">{{ delivery.supplier.code }}</div>
+                <div class="text-xs text-muted">
+                  {{ delivery.supplier.code }}
+                </div>
               </td>
               <td class="px-4 py-3 text-sm text-default">
-                {{ delivery.invoice_no || '—' }}
+                {{ delivery.invoice_no || "—" }}
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td
+                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
+              >
                 {{ formatCurrency(delivery.total_amount) }}
               </td>
               <td class="px-4 py-3 text-sm">
@@ -437,7 +453,11 @@ onMounted(async () => {
 
           <template v-for="page in pagination.totalPages" :key="page">
             <UButton
-              v-if="page === 1 || page === pagination.totalPages || Math.abs(page - pagination.page) <= 1"
+              v-if="
+                page === 1 ||
+                page === pagination.totalPages ||
+                Math.abs(page - pagination.page) <= 1
+              "
               :color="page === pagination.page ? 'primary' : 'neutral'"
               :variant="page === pagination.page ? 'solid' : 'outline'"
               @click="goToPage(page)"

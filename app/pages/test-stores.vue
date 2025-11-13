@@ -3,9 +3,7 @@
     <div class="max-w-7xl mx-auto space-y-6">
       <!-- Page Header -->
       <div class="bg-elevated border border-default rounded-lg p-6">
-        <h1 class="text-3xl font-bold text-default">
-          Global Stores Test Page
-        </h1>
+        <h1 class="text-3xl font-bold text-default">Global Stores Test Page</h1>
         <p class="text-muted mt-2">
           Testing UI Store, Period Store, and Location Store
         </p>
@@ -13,9 +11,7 @@
 
       <!-- UI Store Tests -->
       <div class="bg-elevated border border-default rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-default mb-4">
-          UI Store
-        </h2>
+        <h2 class="text-2xl font-bold text-default mb-4">UI Store</h2>
 
         <div class="space-y-4">
           <!-- Sidebar State -->
@@ -26,12 +22,14 @@
             <div class="flex items-center gap-4">
               <p class="text-muted">
                 Desktop Sidebar Collapsed:
-                <span class="font-mono text-default">{{ uiStore.sidebarCollapsed }}</span>
+                <span class="font-mono text-default">{{
+                  uiStore.sidebarCollapsed
+                }}</span>
               </p>
               <UButton
-                @click="uiStore.toggleSidebar()"
                 color="primary"
                 size="sm"
+                @click="uiStore.toggleSidebar()"
               >
                 Toggle Desktop Sidebar
               </UButton>
@@ -39,12 +37,14 @@
             <div class="flex items-center gap-4 mt-2">
               <p class="text-muted">
                 Mobile Sidebar Open:
-                <span class="font-mono text-default">{{ uiStore.mobileSidebarOpen }}</span>
+                <span class="font-mono text-default">{{
+                  uiStore.mobileSidebarOpen
+                }}</span>
               </p>
               <UButton
-                @click="uiStore.toggleMobileSidebar()"
                 color="primary"
                 size="sm"
+                @click="uiStore.toggleMobileSidebar()"
               >
                 Toggle Mobile Sidebar
               </UButton>
@@ -57,22 +57,44 @@
               Toast Notifications
             </h3>
             <div class="flex gap-2 flex-wrap">
-              <UButton @click="uiStore.showSuccess('Success!', 'This is a success message')" color="success" size="sm">
+              <UButton
+                color="success"
+                size="sm"
+                @click="
+                  uiStore.showSuccess('Success!', 'This is a success message')
+                "
+              >
                 Success Toast
               </UButton>
-              <UButton @click="uiStore.showError('Error!', 'This is an error message')" color="error" size="sm">
+              <UButton
+                color="error"
+                size="sm"
+                @click="uiStore.showError('Error!', 'This is an error message')"
+              >
                 Error Toast
               </UButton>
-              <UButton @click="uiStore.showWarning('Warning!', 'This is a warning message')" color="warning" size="sm">
+              <UButton
+                color="warning"
+                size="sm"
+                @click="
+                  uiStore.showWarning('Warning!', 'This is a warning message')
+                "
+              >
                 Warning Toast
               </UButton>
-              <UButton @click="uiStore.showInfo('Info!', 'This is an info message')" color="primary" size="sm">
+              <UButton
+                color="primary"
+                size="sm"
+                @click="uiStore.showInfo('Info!', 'This is an info message')"
+              >
                 Info Toast
               </UButton>
             </div>
             <p class="text-muted mt-2">
               Active Toasts:
-              <span class="font-mono text-default">{{ uiStore.activeToasts.length }}</span>
+              <span class="font-mono text-default">{{
+                uiStore.activeToasts.length
+              }}</span>
             </p>
           </div>
 
@@ -82,27 +104,47 @@
               Modal Management
             </h3>
             <div class="flex gap-2 flex-wrap">
-              <UButton @click="openTestModal('test-modal-1')" color="primary" size="sm">
+              <UButton
+                color="primary"
+                size="sm"
+                @click="openTestModal('test-modal-1')"
+              >
                 Open Modal 1
               </UButton>
-              <UButton @click="openTestModal('test-modal-2')" color="primary" size="sm">
+              <UButton
+                color="primary"
+                size="sm"
+                @click="openTestModal('test-modal-2')"
+              >
                 Open Modal 2
               </UButton>
-              <UButton @click="uiStore.closeModal('test-modal-1')" variant="outline" size="sm">
+              <UButton
+                variant="outline"
+                size="sm"
+                @click="uiStore.closeModal('test-modal-1')"
+              >
                 Close Modal 1
               </UButton>
-              <UButton @click="uiStore.closeModal('test-modal-2')" variant="outline" size="sm">
+              <UButton
+                variant="outline"
+                size="sm"
+                @click="uiStore.closeModal('test-modal-2')"
+              >
                 Close Modal 2
               </UButton>
             </div>
             <div class="mt-2 space-y-1">
               <p class="text-muted">
                 Modal 1 Open:
-                <span class="font-mono text-default">{{ uiStore.isModalOpen('test-modal-1') }}</span>
+                <span class="font-mono text-default">{{
+                  uiStore.isModalOpen("test-modal-1")
+                }}</span>
               </p>
               <p class="text-muted">
                 Modal 2 Open:
-                <span class="font-mono text-default">{{ uiStore.isModalOpen('test-modal-2') }}</span>
+                <span class="font-mono text-default">{{
+                  uiStore.isModalOpen("test-modal-2")
+                }}</span>
               </p>
             </div>
           </div>
@@ -111,25 +153,23 @@
 
       <!-- Period Store Tests -->
       <div class="bg-elevated border border-default rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-default mb-4">
-          Period Store
-        </h2>
+        <h2 class="text-2xl font-bold text-default mb-4">Period Store</h2>
 
         <div class="space-y-4">
           <!-- Fetch Period -->
           <div>
             <UButton
-              @click="periodStore.fetchCurrentPeriod()"
               :loading="periodStore.loading"
               color="primary"
+              @click="periodStore.fetchCurrentPeriod()"
             >
               Fetch Current Period
             </UButton>
             <UButton
-              @click="periodStore.refresh()"
               :loading="periodStore.loading"
               color="secondary"
               class="ml-2"
+              @click="periodStore.refresh()"
             >
               Refresh Period
             </UButton>
@@ -139,7 +179,9 @@
           <div v-if="periodStore.currentPeriod" class="space-y-2">
             <p class="text-muted">
               Period Name:
-              <span class="font-semibold text-default">{{ periodStore.periodName }}</span>
+              <span class="font-semibold text-default">{{
+                periodStore.periodName
+              }}</span>
             </p>
             <p class="text-muted">
               Status:
@@ -152,11 +194,15 @@
             </p>
             <p class="text-muted">
               Date Range:
-              <span class="font-mono text-default">{{ periodStore.periodDateRange }}</span>
+              <span class="font-mono text-default">{{
+                periodStore.periodDateRange
+              }}</span>
             </p>
             <p class="text-muted">
               Days Remaining:
-              <span class="font-semibold text-default">{{ periodStore.daysRemaining }}</span>
+              <span class="font-semibold text-default">{{
+                periodStore.daysRemaining
+              }}</span>
             </p>
           </div>
 
@@ -175,7 +221,9 @@
               title="Error"
               :description="periodStore.error"
               color="error"
-              :actions="[{ label: 'Clear', onClick: () => periodStore.clearError() }]"
+              :actions="[
+                { label: 'Clear', onClick: () => periodStore.clearError() },
+              ]"
             />
           </div>
         </div>
@@ -183,17 +231,15 @@
 
       <!-- Location Store Tests -->
       <div class="bg-elevated border border-default rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-default mb-4">
-          Location Store
-        </h2>
+        <h2 class="text-2xl font-bold text-default mb-4">Location Store</h2>
 
         <div class="space-y-4">
           <!-- Fetch Locations -->
           <div>
             <UButton
-              @click="locationStore.fetchUserLocations()"
               :loading="locationStore.loading"
               color="primary"
+              @click="locationStore.fetchUserLocations()"
             >
               Fetch User Locations
             </UButton>
@@ -207,11 +253,15 @@
             <div class="space-y-2">
               <p class="text-muted">
                 Code:
-                <span class="font-mono text-default">{{ locationStore.activeLocation.code }}</span>
+                <span class="font-mono text-default">{{
+                  locationStore.activeLocation.code
+                }}</span>
               </p>
               <p class="text-muted">
                 Name:
-                <span class="font-semibold text-default">{{ locationStore.activeLocation.name }}</span>
+                <span class="font-semibold text-default">{{
+                  locationStore.activeLocation.name
+                }}</span>
               </p>
               <p class="text-muted">
                 Type:
@@ -222,7 +272,7 @@
               <p class="text-muted">
                 Access Level:
                 <UBadge color="success" variant="subtle">
-                  {{ locationStore.activeLocation.access_level || 'FULL' }}
+                  {{ locationStore.activeLocation.access_level || "FULL" }}
                 </UBadge>
               </p>
             </div>
@@ -239,7 +289,8 @@
                 :key="location.id"
                 class="p-4 border border-default rounded-lg"
                 :class="{
-                  'bg-navy-50 dark:bg-navy-900/20 border-navy-300 dark:border-navy-700': location.id === locationStore.activeLocationId
+                  'bg-navy-50 dark:bg-navy-900/20 border-navy-300 dark:border-navy-700':
+                    location.id === locationStore.activeLocationId,
                 }"
               >
                 <p class="font-semibold text-default">{{ location.name }}</p>
@@ -249,20 +300,15 @@
                 </p>
                 <UButton
                   v-if="location.id !== locationStore.activeLocationId"
-                  @click="switchToLocation(location.id)"
                   color="primary"
                   variant="outline"
                   size="xs"
                   class="mt-2"
+                  @click="switchToLocation(location.id)"
                 >
                   Switch to This Location
                 </UButton>
-                <UBadge
-                  v-else
-                  color="success"
-                  variant="subtle"
-                  class="mt-2"
-                >
+                <UBadge v-else color="success" variant="subtle" class="mt-2">
                   Active
                 </UBadge>
               </div>
@@ -284,7 +330,9 @@
               title="Error"
               :description="locationStore.error"
               color="error"
-              :actions="[{ label: 'Clear', onClick: () => locationStore.clearError() }]"
+              :actions="[
+                { label: 'Clear', onClick: () => locationStore.clearError() },
+              ]"
             />
           </div>
         </div>
@@ -302,21 +350,33 @@
               :name="uiStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
               :class="uiStore ? 'text-emerald-500' : 'text-red-500'"
             />
-            <span class="text-default">UI Store: {{ uiStore ? 'Initialized' : 'Not Initialized' }}</span>
+            <span class="text-default"
+              >UI Store: {{ uiStore ? "Initialized" : "Not Initialized" }}</span
+            >
           </div>
           <div class="flex items-center gap-2">
             <UIcon
-              :name="periodStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
+              :name="
+                periodStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'
+              "
               :class="periodStore ? 'text-emerald-500' : 'text-red-500'"
             />
-            <span class="text-default">Period Store: {{ periodStore ? 'Initialized' : 'Not Initialized' }}</span>
+            <span class="text-default"
+              >Period Store:
+              {{ periodStore ? "Initialized" : "Not Initialized" }}</span
+            >
           </div>
           <div class="flex items-center gap-2">
             <UIcon
-              :name="locationStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
+              :name="
+                locationStore ? 'i-lucide-check-circle' : 'i-lucide-x-circle'
+              "
               :class="locationStore ? 'text-emerald-500' : 'text-red-500'"
             />
-            <span class="text-default">Location Store: {{ locationStore ? 'Initialized' : 'Not Initialized' }}</span>
+            <span class="text-default"
+              >Location Store:
+              {{ locationStore ? "Initialized" : "Not Initialized" }}</span
+            >
           </div>
         </div>
       </div>
@@ -325,37 +385,40 @@
 </template>
 
 <script setup lang="ts">
-import { useUIStore } from '~/stores/ui'
-import { usePeriodStore } from '~/stores/period'
-import { useLocationStore } from '~/stores/location'
+import { useUIStore } from "~/stores/ui";
+import { usePeriodStore } from "~/stores/period";
+import { useLocationStore } from "~/stores/location";
 
 definePageMeta({
-  layout: 'default'
-})
+  layout: "default",
+});
 
-const uiStore = useUIStore()
-const periodStore = usePeriodStore()
-const locationStore = useLocationStore()
+const uiStore = useUIStore();
+const periodStore = usePeriodStore();
+const locationStore = useLocationStore();
 
 // Auto-fetch on mount
 onMounted(() => {
-  periodStore.fetchCurrentPeriod()
-  locationStore.fetchUserLocations()
-})
+  periodStore.fetchCurrentPeriod();
+  locationStore.fetchUserLocations();
+});
 
 // Helper function to open test modal
 function openTestModal(modalId: string) {
-  uiStore.openModal(modalId, 'TestComponent', { test: 'data' })
+  uiStore.openModal(modalId, "TestComponent", { test: "data" });
 }
 
 // Helper function to switch location with toast
 async function switchToLocation(locationId: string) {
-  const success = await locationStore.switchLocation(locationId)
+  const success = await locationStore.switchLocation(locationId);
   if (success) {
-    const location = locationStore.getLocationById(locationId)
-    uiStore.showSuccess('Location Switched', `Now viewing ${location?.name}`)
+    const location = locationStore.getLocationById(locationId);
+    uiStore.showSuccess("Location Switched", `Now viewing ${location?.name}`);
   } else {
-    uiStore.showError('Switch Failed', locationStore.error || 'Failed to switch location')
+    uiStore.showError(
+      "Switch Failed",
+      locationStore.error || "Failed to switch location"
+    );
   }
 }
 </script>

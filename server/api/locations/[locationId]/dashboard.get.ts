@@ -182,9 +182,7 @@ export default defineEventHandler(async (event) => {
       totals: {
         receipts: totalReceipts._sum.total_amount?.toNumber() || 0,
         issues: totalIssues._sum.total_value?.toNumber() || 0,
-        mandays:
-          (totalMandays._sum.crew_count || 0) +
-          (totalMandays._sum.extra_count || 0),
+        mandays: (totalMandays._sum.crew_count || 0) + (totalMandays._sum.extra_count || 0),
         daysLeft,
       },
       recentDeliveries: recentDeliveries.map((delivery) => ({

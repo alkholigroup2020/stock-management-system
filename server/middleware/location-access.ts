@@ -12,22 +12,22 @@
  * - Operators only have access to their assigned locations
  */
 
-import type { UserRole } from '@prisma/client'
+import type { UserRole } from "@prisma/client";
 
 // User location type
 interface UserLocation {
-  location_id: string
-  access_level: string
+  location_id: string;
+  access_level: string;
 }
 
 // User session type
 interface AuthUser {
-  id: string
-  username: string
-  email: string
-  role: UserRole
-  default_location_id: string | null
-  locations?: UserLocation[]
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  default_location_id: string | null;
+  locations?: UserLocation[];
 }
 
 export default defineEventHandler(async (event) => {
@@ -63,9 +63,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // For Operators, check if they have access to this location
-  const hasAccess = user.locations?.some(
-    (loc) => loc.location_id === locationId,
-  );
+  const hasAccess = user.locations?.some((loc) => loc.location_id === locationId);
 
   if (!hasAccess) {
     throw createError({
@@ -85,7 +83,7 @@ export default defineEventHandler(async (event) => {
   // Log access for debugging (optional, remove in production)
   if (process.env.NODE_ENV === "development") {
     console.log(
-      `[Location Access] User ${user.username} (${user.role}) accessing location ${locationId}`,
+      `[Location Access] User ${user.username} (${user.role}) accessing location ${locationId}`
     );
   }
 });

@@ -7,7 +7,7 @@
  * WAC display, and line value calculation.
  */
 
-import { formatCurrency } from '~/utils/format'
+import { formatCurrency } from "~/utils/format";
 
 // Props
 interface Props {
@@ -15,52 +15,50 @@ interface Props {
    * Issue line data
    */
   line: {
-    id: string
-    item_id: string
-    quantity: string
-    wac: number
-    line_value: number
-    on_hand: number
-    has_insufficient_stock: boolean
-  }
+    id: string;
+    item_id: string;
+    quantity: string;
+    wac: number;
+    line_value: number;
+    on_hand: number;
+    has_insufficient_stock: boolean;
+  };
   /**
    * Available items for selection
    */
-  items: any[]
+  items: any[];
   /**
    * Stock levels map (itemId -> { on_hand, wac })
    */
-  stockLevels: Record<string, { on_hand: number; wac: number }>
+  stockLevels: Record<string, { on_hand: number; wac: number }>;
   /**
    * Whether remove button is enabled
    */
-  canRemove?: boolean
+  canRemove?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   canRemove: true,
-})
+});
 
 // Emits
 const emit = defineEmits<{
-  'update:line': [value: any]
-  'remove': []
-}>()
+  "update:line": [value: any];
+  remove: [];
+}>();
 
 // Methods
 const getItemById = (itemId: string) => {
-  return props.items.find(item => item.id === itemId)
-}
+  return props.items.find((item) => item.id === itemId);
+};
 
 const handleRemove = () => {
-  emit('remove')
-}
+  emit("remove");
+};
 </script>
 
 <template>
-  <tr
-    :class="{ 'bg-red-50 dark:bg-red-950/20': line.has_insufficient_stock }"
-  >
+  <tr :class="{ 'bg-red-50 dark:bg-red-950/20': line.has_insufficient_stock }">
     <!-- Item Selection -->
     <td class="px-4 py-3">
       <USelectMenu

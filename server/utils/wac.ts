@@ -20,15 +20,15 @@
  */
 export interface WACCalculationResult {
   /** The newly calculated Weighted Average Cost */
-  newWAC: number
+  newWAC: number;
   /** The new total quantity after receipt (currentQty + receivedQty) */
-  newQuantity: number
+  newQuantity: number;
   /** The new total value (newQuantity × newWAC) */
-  newValue: number
+  newValue: number;
   /** The current stock value before receipt */
-  currentValue: number
+  currentValue: number;
   /** The receipt value (receivedQty × receiptPrice) */
-  receiptValue: number
+  receiptValue: number;
 }
 
 /**
@@ -74,49 +74,47 @@ export function calculateWAC(
   receiptPrice: number
 ): WACCalculationResult {
   // Input validation
-  if (typeof currentQty !== 'number' || !Number.isFinite(currentQty)) {
-    throw new Error('Invalid currentQty: must be a finite number')
+  if (typeof currentQty !== "number" || !Number.isFinite(currentQty)) {
+    throw new Error("Invalid currentQty: must be a finite number");
   }
-  if (typeof currentWAC !== 'number' || !Number.isFinite(currentWAC)) {
-    throw new Error('Invalid currentWAC: must be a finite number')
+  if (typeof currentWAC !== "number" || !Number.isFinite(currentWAC)) {
+    throw new Error("Invalid currentWAC: must be a finite number");
   }
-  if (typeof receivedQty !== 'number' || !Number.isFinite(receivedQty)) {
-    throw new Error('Invalid receivedQty: must be a finite number')
+  if (typeof receivedQty !== "number" || !Number.isFinite(receivedQty)) {
+    throw new Error("Invalid receivedQty: must be a finite number");
   }
-  if (typeof receiptPrice !== 'number' || !Number.isFinite(receiptPrice)) {
-    throw new Error('Invalid receiptPrice: must be a finite number')
+  if (typeof receiptPrice !== "number" || !Number.isFinite(receiptPrice)) {
+    throw new Error("Invalid receiptPrice: must be a finite number");
   }
 
   if (currentQty < 0) {
-    throw new Error('Invalid currentQty: cannot be negative')
+    throw new Error("Invalid currentQty: cannot be negative");
   }
   if (currentWAC < 0) {
-    throw new Error('Invalid currentWAC: cannot be negative')
+    throw new Error("Invalid currentWAC: cannot be negative");
   }
   if (receivedQty <= 0) {
-    throw new Error('Invalid receivedQty: must be greater than zero')
+    throw new Error("Invalid receivedQty: must be greater than zero");
   }
   if (receiptPrice < 0) {
-    throw new Error('Invalid receiptPrice: cannot be negative')
+    throw new Error("Invalid receiptPrice: cannot be negative");
   }
 
   // Calculate current stock value
-  const currentValue = currentQty * currentWAC
+  const currentValue = currentQty * currentWAC;
 
   // Calculate receipt value
-  const receiptValue = receivedQty * receiptPrice
+  const receiptValue = receivedQty * receiptPrice;
 
   // Calculate new quantity
-  const newQuantity = currentQty + receivedQty
+  const newQuantity = currentQty + receivedQty;
 
   // Calculate new WAC
   // Edge case: If current stock is zero, WAC is simply the receipt price
-  const newWAC = newQuantity > 0
-    ? (currentValue + receiptValue) / newQuantity
-    : 0
+  const newWAC = newQuantity > 0 ? (currentValue + receiptValue) / newQuantity : 0;
 
   // Calculate new total value
-  const newValue = newQuantity * newWAC
+  const newValue = newQuantity * newWAC;
 
   // Round to 4 decimal places for precision (database stores up to 4 decimals)
   return {
@@ -124,8 +122,8 @@ export function calculateWAC(
     newQuantity: Math.round(newQuantity * 10000) / 10000,
     newValue: Math.round(newValue * 100) / 100, // Round currency to 2 decimals
     currentValue: Math.round(currentValue * 100) / 100,
-    receiptValue: Math.round(receiptValue * 100) / 100
-  }
+    receiptValue: Math.round(receiptValue * 100) / 100,
+  };
 }
 
 /**
@@ -147,8 +145,8 @@ export function previewWAC(
   receivedQty: number,
   receiptPrice: number
 ): number {
-  const result = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice)
-  return result.newWAC
+  const result = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice);
+  return result.newWAC;
 }
 
 /**
@@ -169,8 +167,8 @@ export function calculateReceiptValueImpact(
   receivedQty: number,
   receiptPrice: number
 ): number {
-  const result = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice)
-  return result.receiptValue
+  const result = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice);
+  return result.receiptValue;
 }
 
 /**
@@ -192,34 +190,34 @@ export function validateWACInputs(
   receiptPrice: number
 ): { valid: boolean; error?: string } {
   try {
-    if (typeof currentQty !== 'number' || !Number.isFinite(currentQty)) {
-      return { valid: false, error: 'currentQty must be a finite number' }
+    if (typeof currentQty !== "number" || !Number.isFinite(currentQty)) {
+      return { valid: false, error: "currentQty must be a finite number" };
     }
-    if (typeof currentWAC !== 'number' || !Number.isFinite(currentWAC)) {
-      return { valid: false, error: 'currentWAC must be a finite number' }
+    if (typeof currentWAC !== "number" || !Number.isFinite(currentWAC)) {
+      return { valid: false, error: "currentWAC must be a finite number" };
     }
-    if (typeof receivedQty !== 'number' || !Number.isFinite(receivedQty)) {
-      return { valid: false, error: 'receivedQty must be a finite number' }
+    if (typeof receivedQty !== "number" || !Number.isFinite(receivedQty)) {
+      return { valid: false, error: "receivedQty must be a finite number" };
     }
-    if (typeof receiptPrice !== 'number' || !Number.isFinite(receiptPrice)) {
-      return { valid: false, error: 'receiptPrice must be a finite number' }
+    if (typeof receiptPrice !== "number" || !Number.isFinite(receiptPrice)) {
+      return { valid: false, error: "receiptPrice must be a finite number" };
     }
 
     if (currentQty < 0) {
-      return { valid: false, error: 'currentQty cannot be negative' }
+      return { valid: false, error: "currentQty cannot be negative" };
     }
     if (currentWAC < 0) {
-      return { valid: false, error: 'currentWAC cannot be negative' }
+      return { valid: false, error: "currentWAC cannot be negative" };
     }
     if (receivedQty <= 0) {
-      return { valid: false, error: 'receivedQty must be greater than zero' }
+      return { valid: false, error: "receivedQty must be greater than zero" };
     }
     if (receiptPrice < 0) {
-      return { valid: false, error: 'receiptPrice cannot be negative' }
+      return { valid: false, error: "receiptPrice cannot be negative" };
     }
 
-    return { valid: true }
+    return { valid: true };
   } catch (error) {
-    return { valid: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    return { valid: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }

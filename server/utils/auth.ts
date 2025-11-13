@@ -22,8 +22,7 @@ const SALT_ROUNDS = 10;
  * - At least one special character
  */
 const PASSWORD_MIN_LENGTH = 8;
-const PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
 
 /**
  * Zod schema for password validation
@@ -63,9 +62,7 @@ export async function hashUserPassword(password: string): Promise<string> {
     return hash;
   } catch (error) {
     throw new Error(
-      `Failed to hash password: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
+      `Failed to hash password: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }
@@ -110,17 +107,13 @@ export async function verifyUserPassword(
  *   console.error('Password errors:', result.errors);
  * }
  */
-export function validatePasswordStrength(
-  password: string
-): PasswordStrengthResult {
+export function validatePasswordStrength(password: string): PasswordStrengthResult {
   const errors: string[] = [];
   let strength: "weak" | "medium" | "strong" = "weak";
 
   // Check minimum length
   if (password.length < PASSWORD_MIN_LENGTH) {
-    errors.push(
-      `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`
-    );
+    errors.push(`Password must be at least ${PASSWORD_MIN_LENGTH} characters long`);
   }
 
   // Check for lowercase letter
@@ -140,9 +133,7 @@ export function validatePasswordStrength(
 
   // Check for special character
   if (!/[@$!%*?&]/.test(password)) {
-    errors.push(
-      "Password must contain at least one special character (@$!%*?&)"
-    );
+    errors.push("Password must contain at least one special character (@$!%*?&)");
   }
 
   // Determine strength
@@ -152,13 +143,9 @@ export function validatePasswordStrength(
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[@$!%*?&]/.test(password);
 
-  const criteriaMet = [
-    hasMinLength,
-    hasLowercase,
-    hasUppercase,
-    hasNumber,
-    hasSpecial,
-  ].filter(Boolean).length;
+  const criteriaMet = [hasMinLength, hasLowercase, hasUppercase, hasNumber, hasSpecial].filter(
+    Boolean
+  ).length;
 
   if (criteriaMet === 5 && password.length >= 12) {
     strength = "strong";

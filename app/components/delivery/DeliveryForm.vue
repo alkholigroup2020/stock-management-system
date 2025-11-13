@@ -21,134 +21,138 @@
  */
 
 interface Supplier {
-  id: string
-  code: string
-  name: string
-  contact?: string | null
+  id: string;
+  code: string;
+  name: string;
+  contact?: string | null;
 }
 
 interface Item {
-  id: string
-  code: string
-  name: string
-  unit: string
-  category?: string | null
-  sub_category?: string | null
+  id: string;
+  code: string;
+  name: string;
+  unit: string;
+  category?: string | null;
+  sub_category?: string | null;
 }
 
 interface DeliveryLine {
-  id: string
-  item_id: string
-  quantity: string
-  unit_price: string
-  line_value: number
-  price_variance: number
-  has_variance: boolean
-  period_price?: number
+  id: string;
+  item_id: string;
+  quantity: string;
+  unit_price: string;
+  line_value: number;
+  price_variance: number;
+  has_variance: boolean;
+  period_price?: number;
 }
 
 interface FormData {
-  supplier_id: string
-  po_id: string | null
-  invoice_no: string
-  delivery_note: string
-  delivery_date: string
+  supplier_id: string;
+  po_id: string | null;
+  invoice_no: string;
+  delivery_note: string;
+  delivery_date: string;
 }
 
 interface Props {
-  suppliers: Supplier[]
-  items: Item[]
-  periodPrices: Record<string, number>
-  loading?: boolean
-  initialData?: Partial<FormData>
-  initialLines?: DeliveryLine[]
+  suppliers: Supplier[];
+  items: Item[];
+  periodPrices: Record<string, number>;
+  loading?: boolean;
+  initialData?: Partial<FormData>;
+  initialLines?: DeliveryLine[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   initialData: () => ({
-    supplier_id: '',
+    supplier_id: "",
     po_id: null,
-    invoice_no: '',
-    delivery_note: '',
-    delivery_date: new Date().toISOString().split('T')[0], // Today's date
+    invoice_no: "",
+    delivery_note: "",
+    delivery_date: new Date().toISOString().split("T")[0], // Today's date
   }),
   initialLines: () => [],
-})
+});
 
 // Emits
 const emit = defineEmits<{
-  'submit': [data: { formData: FormData; lines: DeliveryLine[] }]
-  'cancel': []
-}>()
+  submit: [data: { formData: FormData; lines: DeliveryLine[] }];
+  cancel: [];
+}>();
 
 // Form state
 const formData = ref<FormData>({
-  supplier_id: props.initialData?.supplier_id || '',
+  supplier_id: props.initialData?.supplier_id || "",
   po_id: props.initialData?.po_id || null,
-  invoice_no: props.initialData?.invoice_no || '',
-  delivery_note: props.initialData?.delivery_note || '',
-  delivery_date: (props.initialData?.delivery_date || new Date().toISOString().split('T')[0]) as string,
-})
+  invoice_no: props.initialData?.invoice_no || "",
+  delivery_note: props.initialData?.delivery_note || "",
+  delivery_date: (props.initialData?.delivery_date ||
+    new Date().toISOString().split("T")[0]) as string,
+});
 
 // Delivery lines state
 const lines = ref<DeliveryLine[]>(
-  props.initialLines.length > 0
-    ? props.initialLines
-    : []
-)
+  props.initialLines.length > 0 ? props.initialLines : []
+);
 
 // Add initial empty line if no lines provided
 onMounted(() => {
   if (lines.value.length === 0) {
-    addLine()
+    addLine();
   }
-})
+});
 
 // Add line
 const addLine = () => {
   lines.value.push({
     id: crypto.randomUUID(),
-    item_id: '',
-    quantity: '',
-    unit_price: '',
+    item_id: "",
+    quantity: "",
+    unit_price: "",
     line_value: 0,
     price_variance: 0,
     has_variance: false,
-  })
-}
+  });
+};
 
 // Remove line
 const removeLine = (id: string) => {
-  lines.value = lines.value.filter(line => line.id !== id)
-}
+  lines.value = lines.value.filter((line) => line.id !== id);
+};
 
 // Update line
 const updateLine = (updatedLine: DeliveryLine) => {
-  const index = lines.value.findIndex(line => line.id === updatedLine.id)
+  const index = lines.value.findIndex((line) => line.id === updatedLine.id);
   if (index !== -1) {
-    lines.value[index] = updatedLine
+    lines.value[index] = updatedLine;
   }
-}
+};
 
 // Computed
 const totalAmount = computed(() => {
-  return lines.value.reduce((sum, line) => sum + line.line_value, 0)
-})
+  return lines.value.reduce((sum, line) => sum + line.line_value, 0);
+});
 
 const hasVarianceLines = computed(() => {
-  return lines.value.some(line => line.has_variance)
-})
+  return lines.value.some((line) => line.has_variance);
+});
 
 const varianceCount = computed(() => {
-  return lines.value.filter(line => line.has_variance).length
-})
+  return lines.value.filter((line) => line.has_variance).length;
+});
 
 const totalVarianceAmount = computed(() => {
   return lines.value.reduce((sum, line) => {
-    return sum + (line.has_variance ? line.price_variance * parseFloat(line.quantity || '0') : 0)
-  }, 0)
-})
+    return (
+      sum +
+      (line.has_variance
+        ? line.price_variance * parseFloat(line.quantity || "0")
+        : 0)
+    );
+  }, 0);
+});
 
 const isFormValid = computed(() => {
   return (
@@ -156,38 +160,40 @@ const isFormValid = computed(() => {
     formData.value.invoice_no &&
     formData.value.delivery_date &&
     lines.value.length > 0 &&
-    lines.value.every(line => line.item_id && line.quantity && line.unit_price)
-  )
-})
+    lines.value.every(
+      (line) => line.item_id && line.quantity && line.unit_price
+    )
+  );
+});
 
-const canRemoveLine = computed(() => lines.value.length > 1)
+const canRemoveLine = computed(() => lines.value.length > 1);
 
 // Format currency
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-SA', {
-    style: 'currency',
-    currency: 'SAR',
+  return new Intl.NumberFormat("en-SA", {
+    style: "currency",
+    currency: "SAR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
-}
+  }).format(amount);
+};
 
 // Submit handler
 const handleSubmit = () => {
   if (!isFormValid.value) {
-    return
+    return;
   }
 
-  emit('submit', {
+  emit("submit", {
     formData: formData.value,
     lines: lines.value,
-  })
-}
+  });
+};
 
 // Cancel handler
 const handleCancel = () => {
-  emit('cancel')
-}
+  emit("cancel");
+};
 </script>
 
 <template>
@@ -233,10 +239,7 @@ const handleCancel = () => {
         <!-- Delivery Date -->
         <div>
           <label class="form-label">Delivery Date *</label>
-          <UInput
-            v-model="formData.delivery_date"
-            type="date"
-          />
+          <UInput v-model="formData.delivery_date" type="date" />
         </div>
 
         <!-- Delivery Note -->
@@ -282,13 +285,41 @@ const handleCancel = () => {
         <table class="min-w-full divide-y divide-default">
           <thead>
             <tr class="bg-default">
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Quantity</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Unit Price</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Period Price</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Variance</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">Line Value</th>
-              <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">Action</th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Item
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Quantity
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Unit Price
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Period Price
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Variance
+              </th>
+              <th
+                class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
+              >
+                Line Value
+              </th>
+              <th
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
+              >
+                Action
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-default">
@@ -316,9 +347,7 @@ const handleCancel = () => {
       <!-- Summary -->
       <div class="mt-4 pt-4 border-t border-default">
         <div class="flex justify-between items-center">
-          <div class="text-sm text-muted">
-            {{ lines.length }} item(s)
-          </div>
+          <div class="text-sm text-muted">{{ lines.length }} item(s)</div>
           <div class="text-right">
             <div class="text-sm text-muted">Total Amount</div>
             <div class="text-2xl font-bold text-primary">

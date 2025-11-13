@@ -13,66 +13,66 @@
  * - Stock items count
  */
 
-import prisma from '../../utils/prisma'
-import type { UserRole } from '@prisma/client'
+import prisma from "../../utils/prisma";
+import type { UserRole } from "@prisma/client";
 
 // User session type
 interface UserLocation {
-  location_id: string
-  access_level: string
+  location_id: string;
+  access_level: string;
 }
 
 interface AuthUser {
-  id: string
-  username: string
-  email: string
-  role: UserRole
-  default_location_id: string | null
-  locations?: UserLocation[]
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  default_location_id: string | null;
+  locations?: UserLocation[];
 }
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user as AuthUser | undefined
+  const user = event.context.user as AuthUser | undefined;
 
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: "Unauthorized",
       data: {
-        code: 'NOT_AUTHENTICATED',
-        message: 'You must be logged in to access this resource',
+        code: "NOT_AUTHENTICATED",
+        message: "You must be logged in to access this resource",
       },
-    })
+    });
   }
 
   try {
     // Get location ID from route params
-    const locationId = getRouterParam(event, 'id')
+    const locationId = getRouterParam(event, "id");
 
     if (!locationId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'MISSING_PARAMETER',
-          message: 'Location ID is required',
+          code: "MISSING_PARAMETER",
+          message: "Location ID is required",
         },
-      })
+      });
     }
 
     // Check access permissions for OPERATOR role
-    if (user.role === 'OPERATOR') {
-      const userLocationIds = user.locations?.map((loc) => loc.location_id) || []
+    if (user.role === "OPERATOR") {
+      const userLocationIds = user.locations?.map((loc) => loc.location_id) || [];
 
       if (!userLocationIds.includes(locationId)) {
         throw createError({
           statusCode: 403,
-          statusMessage: 'Forbidden',
+          statusMessage: "Forbidden",
           data: {
-            code: 'LOCATION_ACCESS_DENIED',
-            message: 'You do not have access to this location',
+            code: "LOCATION_ACCESS_DENIED",
+            message: "You do not have access to this location",
           },
-        })
+        });
       }
     }
 
@@ -99,36 +99,36 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-    })
+    });
 
     if (!location) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
+        statusMessage: "Not Found",
         data: {
-          code: 'LOCATION_NOT_FOUND',
-          message: 'Location not found',
+          code: "LOCATION_NOT_FOUND",
+          message: "Location not found",
         },
-      })
+      });
     }
 
     return {
       location,
-    }
+    };
   } catch (error) {
     // Re-throw if already a createError
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
     }
 
-    console.error('Error fetching location:', error)
+    console.error("Error fetching location:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch location',
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch location",
       },
-    })
+    });
   }
-})
+});

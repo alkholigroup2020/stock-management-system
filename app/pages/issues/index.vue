@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import { formatCurrency, formatDate } from '~/utils/format'
+import { formatCurrency, formatDate } from "~/utils/format";
 
 // SEO
 useSeoMeta({
-  title: 'Issues - Stock Management System',
-  description: 'View and manage stock issues',
-})
+  title: "Issues - Stock Management System",
+  description: "View and manage stock issues",
+});
 
 // Composables
-const router = useRouter()
-const locationStore = useLocationStore()
-const { canPostIssues } = usePermissions()
-const toast = useAppToast()
+const router = useRouter();
+const locationStore = useLocationStore();
+const { canPostIssues } = usePermissions();
+const toast = useAppToast();
 
 // Types
 interface Issue {
-  id: string
-  issue_no: string
-  issue_date: string
-  cost_centre: 'FOOD' | 'CLEAN' | 'OTHER'
-  total_value: number
+  id: string;
+  issue_no: string;
+  issue_date: string;
+  cost_centre: "FOOD" | "CLEAN" | "OTHER";
+  total_value: number;
   period: {
-    id: string
-    name: string
-  }
-  posted_at: string
+    id: string;
+    name: string;
+  };
+  posted_at: string;
   posted_by_user: {
-    full_name: string
-  }
+    full_name: string;
+  };
 }
 
 // State
-const loading = ref(false)
-const error = ref<string | null>(null)
-const issues = ref<Issue[]>([])
+const loading = ref(false);
+const error = ref<string | null>(null);
+const issues = ref<Issue[]>([]);
 
 // Filters
 const filters = reactive({
-  costCentre: '',
-  startDate: '',
-  endDate: '',
-})
+  costCentre: "",
+  startDate: "",
+  endDate: "",
+});
 
 // Pagination
 const pagination = reactive({
@@ -48,184 +48,194 @@ const pagination = reactive({
   limit: 50,
   total: 0,
   totalPages: 0,
-})
+});
 
 // Computed
-const activeLocationId = computed(() => locationStore.activeLocationId)
-const hasIssues = computed(() => issues.value.length > 0)
+const activeLocationId = computed(() => locationStore.activeLocationId);
+const hasIssues = computed(() => issues.value.length > 0);
 const paginationInfo = computed(() => {
-  const start = (pagination.page - 1) * pagination.limit + 1
-  const end = Math.min(pagination.page * pagination.limit, pagination.total)
-  return `${start}-${end} of ${pagination.total}`
-})
+  const start = (pagination.page - 1) * pagination.limit + 1;
+  const end = Math.min(pagination.page * pagination.limit, pagination.total);
+  return `${start}-${end} of ${pagination.total}`;
+});
 
 // Active filters
 const activeFilters = computed(() => {
-  const activeFilters: Array<{ key: string; label: string; value: any }> = []
+  const activeFilters: Array<{ key: string; label: string; value: any }> = [];
   if (filters.costCentre) {
     activeFilters.push({
-      key: 'costCentre',
-      label: 'Cost Centre',
+      key: "costCentre",
+      label: "Cost Centre",
       value: filters.costCentre,
-    })
+    });
   }
   if (filters.startDate) {
     activeFilters.push({
-      key: 'startDate',
-      label: 'Start Date',
+      key: "startDate",
+      label: "Start Date",
       value: formatDate(filters.startDate),
-    })
+    });
   }
   if (filters.endDate) {
     activeFilters.push({
-      key: 'endDate',
-      label: 'End Date',
+      key: "endDate",
+      label: "End Date",
       value: formatDate(filters.endDate),
-    })
+    });
   }
-  return activeFilters
-})
+  return activeFilters;
+});
 
 // Cost centre options
 const costCentreOptions = [
-  { value: '', label: 'All Cost Centres' },
-  { value: 'FOOD', label: 'Food' },
-  { value: 'CLEAN', label: 'Cleaning' },
-  { value: 'OTHER', label: 'Other' },
-]
+  { value: "", label: "All Cost Centres" },
+  { value: "FOOD", label: "Food" },
+  { value: "CLEAN", label: "Cleaning" },
+  { value: "OTHER", label: "Other" },
+];
 
 // Table columns
 const columns = [
-  { key: 'issue_no', label: 'Issue No' },
-  { key: 'issue_date', label: 'Date' },
-  { key: 'cost_centre', label: 'Cost Centre' },
-  { key: 'total_value', label: 'Total Value' },
-]
+  { key: "issue_no", label: "Issue No" },
+  { key: "issue_date", label: "Date" },
+  { key: "cost_centre", label: "Cost Centre" },
+  { key: "total_value", label: "Total Value" },
+];
 
 // Fetch issues
 async function fetchIssues() {
   if (!activeLocationId.value) {
-    error.value = 'No active location selected'
-    return
+    error.value = "No active location selected";
+    return;
   }
 
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
     const params = new URLSearchParams({
       page: pagination.page.toString(),
       limit: pagination.limit.toString(),
-    })
+    });
 
-    if (filters.costCentre) params.append('costCentre', filters.costCentre)
-    if (filters.startDate) params.append('startDate', filters.startDate)
-    if (filters.endDate) params.append('endDate', filters.endDate)
+    if (filters.costCentre) params.append("costCentre", filters.costCentre);
+    if (filters.startDate) params.append("startDate", filters.startDate);
+    if (filters.endDate) params.append("endDate", filters.endDate);
 
     const response = await $fetch<{
-      issues: Issue[]
+      issues: Issue[];
       pagination: {
-        total: number
-        page: number
-        limit: number
-        totalPages: number
-      }
-    }>(`/api/locations/${activeLocationId.value}/issues?${params}`)
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      };
+    }>(`/api/locations/${activeLocationId.value}/issues?${params}`);
 
-    issues.value = response.issues
-    pagination.total = response.pagination.total
-    pagination.totalPages = response.pagination.totalPages
+    issues.value = response.issues;
+    pagination.total = response.pagination.total;
+    pagination.totalPages = response.pagination.totalPages;
   } catch (err: any) {
-    error.value = err?.data?.message || 'Failed to fetch issues'
-    console.error('Error fetching issues:', err)
+    error.value = err?.data?.message || "Failed to fetch issues";
+    console.error("Error fetching issues:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 // Filter handlers
 function clearFilter(key: string) {
-  ;(filters as any)[key] = ''
-  pagination.page = 1
-  fetchIssues()
+  (filters as any)[key] = "";
+  pagination.page = 1;
+  fetchIssues();
 }
 
 function applyFilters() {
-  pagination.page = 1
-  fetchIssues()
+  pagination.page = 1;
+  fetchIssues();
 }
 
 // Pagination handlers
 function goToPage(page: number) {
   if (page >= 1 && page <= pagination.totalPages) {
-    pagination.page = page
-    fetchIssues()
+    pagination.page = page;
+    fetchIssues();
   }
 }
 
 function previousPage() {
   if (pagination.page > 1) {
-    goToPage(pagination.page - 1)
+    goToPage(pagination.page - 1);
   }
 }
 
 function nextPage() {
   if (pagination.page < pagination.totalPages) {
-    goToPage(pagination.page + 1)
+    goToPage(pagination.page + 1);
   }
 }
 
 // Row click handler
 function handleRowClick(issue: Issue) {
-  router.push(`/issues/${issue.id}`)
+  router.push(`/issues/${issue.id}`);
 }
 
 // Navigation
 function goToNewIssue() {
-  router.push('/issues/create')
+  router.push("/issues/create");
 }
 
 // Badge color for cost centre
-function getCostCentreColor(costCentre: string): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' {
+function getCostCentreColor(
+  costCentre: string
+):
+  | "primary"
+  | "secondary"
+  | "success"
+  | "error"
+  | "warning"
+  | "info"
+  | "neutral" {
   switch (costCentre) {
-    case 'FOOD':
-      return 'success'
-    case 'CLEAN':
-      return 'info'
-    case 'OTHER':
-      return 'neutral'
+    case "FOOD":
+      return "success";
+    case "CLEAN":
+      return "info";
+    case "OTHER":
+      return "neutral";
     default:
-      return 'neutral'
+      return "neutral";
   }
 }
 
 // Watch location changes
 watch(activeLocationId, () => {
   if (activeLocationId.value) {
-    pagination.page = 1
-    fetchIssues()
+    pagination.page = 1;
+    fetchIssues();
   }
-})
+});
 
 // Initial load
 onMounted(async () => {
   if (activeLocationId.value) {
-    await fetchIssues()
+    await fetchIssues();
   }
-})
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
         <div>
-          <h1 class="text-2xl font-bold text-default">
-            Issues
-          </h1>
+          <h1 class="text-2xl font-bold text-default">Issues</h1>
           <p class="mt-1 text-sm text-muted">
-            View and manage stock issues for {{ locationStore.activeLocation?.name }}
+            View and manage stock issues for
+            {{ locationStore.activeLocation?.name }}
           </p>
         </div>
         <div v-if="canPostIssues()" class="flex gap-2">
@@ -294,12 +304,14 @@ onMounted(async () => {
           variant="outline"
           icon="i-lucide-x"
           label="Clear All"
-          @click="() => {
-            filters.costCentre = ''
-            filters.startDate = ''
-            filters.endDate = ''
-            applyFilters()
-          }"
+          @click="
+            () => {
+              filters.costCentre = '';
+              filters.startDate = '';
+              filters.endDate = '';
+              applyFilters();
+            }
+          "
         />
       </div>
 
@@ -358,7 +370,9 @@ onMounted(async () => {
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(issue)"
             >
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td
+                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
+              >
                 {{ issue.issue_no }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
@@ -372,7 +386,9 @@ onMounted(async () => {
                   {{ issue.cost_centre }}
                 </UBadge>
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td
+                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
+              >
                 {{ formatCurrency(issue.total_value) }}
               </td>
             </tr>
@@ -399,7 +415,11 @@ onMounted(async () => {
 
           <template v-for="page in pagination.totalPages" :key="page">
             <UButton
-              v-if="page === 1 || page === pagination.totalPages || Math.abs(page - pagination.page) <= 1"
+              v-if="
+                page === 1 ||
+                page === pagination.totalPages ||
+                Math.abs(page - pagination.page) <= 1
+              "
               :color="page === pagination.page ? 'primary' : 'neutral'"
               :variant="page === pagination.page ? 'solid' : 'outline'"
               @click="goToPage(page)"

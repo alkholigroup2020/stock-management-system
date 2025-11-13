@@ -13,95 +13,100 @@
  */
 
 interface Item {
-  id: string
-  code: string
-  name: string
-  unit: string
-  category?: string | null
-  sub_category?: string | null
+  id: string;
+  code: string;
+  name: string;
+  unit: string;
+  category?: string | null;
+  sub_category?: string | null;
 }
 
 interface DeliveryLine {
-  id: string
-  item_id: string
-  quantity: string
-  unit_price: string
-  line_value: number
-  price_variance: number
-  has_variance: boolean
-  period_price?: number
+  id: string;
+  item_id: string;
+  quantity: string;
+  unit_price: string;
+  line_value: number;
+  price_variance: number;
+  has_variance: boolean;
+  period_price?: number;
 }
 
 interface Props {
-  line: DeliveryLine
-  items: Item[]
-  periodPrices: Record<string, number>
-  canRemove?: boolean
+  line: DeliveryLine;
+  items: Item[];
+  periodPrices: Record<string, number>;
+  canRemove?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   canRemove: true,
-})
+});
 
 // Emits
 const emit = defineEmits<{
-  'update:line': [line: DeliveryLine]
-  'remove': [lineId: string]
-}>()
+  "update:line": [line: DeliveryLine];
+  remove: [lineId: string];
+}>();
 
 // Local reactive copy of line
 const localLine = computed({
   get: () => props.line,
-  set: (value) => emit('update:line', value),
-})
+  set: (value) => emit("update:line", value),
+});
 
 // Get item by ID
 const selectedItem = computed(() => {
-  return props.items.find(item => item.id === localLine.value.item_id)
-})
+  return props.items.find((item) => item.id === localLine.value.item_id);
+});
 
 // Update line calculations
 const updateCalculations = () => {
-  const quantity = parseFloat(localLine.value.quantity) || 0
-  const unitPrice = parseFloat(localLine.value.unit_price) || 0
-  localLine.value.line_value = quantity * unitPrice
+  const quantity = parseFloat(localLine.value.quantity) || 0;
+  const unitPrice = parseFloat(localLine.value.unit_price) || 0;
+  localLine.value.line_value = quantity * unitPrice;
 
   // Check for price variance
-  const periodPrice = props.periodPrices[localLine.value.item_id]
+  const periodPrice = props.periodPrices[localLine.value.item_id];
   if (periodPrice !== undefined && unitPrice > 0) {
-    localLine.value.period_price = periodPrice
-    localLine.value.price_variance = unitPrice - periodPrice
-    localLine.value.has_variance = Math.abs(localLine.value.price_variance) > 0.01 // Variance threshold
+    localLine.value.period_price = periodPrice;
+    localLine.value.price_variance = unitPrice - periodPrice;
+    localLine.value.has_variance =
+      Math.abs(localLine.value.price_variance) > 0.01; // Variance threshold
   } else {
-    localLine.value.period_price = undefined
-    localLine.value.price_variance = 0
-    localLine.value.has_variance = false
+    localLine.value.period_price = undefined;
+    localLine.value.price_variance = 0;
+    localLine.value.has_variance = false;
   }
-}
+};
 
 // Watch for changes and update calculations
 watch(
-  () => [localLine.value.item_id, localLine.value.quantity, localLine.value.unit_price],
+  () => [
+    localLine.value.item_id,
+    localLine.value.quantity,
+    localLine.value.unit_price,
+  ],
   () => {
-    updateCalculations()
+    updateCalculations();
   },
   { immediate: true }
-)
+);
 
 // Format currency
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-SA', {
-    style: 'currency',
-    currency: 'SAR',
+  return new Intl.NumberFormat("en-SA", {
+    style: "currency",
+    currency: "SAR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
-}
+  }).format(amount);
+};
 
 // Remove line handler
 const handleRemove = () => {
-  emit('remove', localLine.value.id)
-}
+  emit("remove", localLine.value.id);
+};
 </script>
 
 <template>
@@ -158,7 +163,9 @@ const handleRemove = () => {
         <span
           :class="[
             'text-sm font-medium',
-            line.price_variance > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'
+            line.price_variance > 0
+              ? 'text-red-600 dark:text-red-400'
+              : 'text-emerald-600 dark:text-emerald-400',
           ]"
         >
           {{ formatCurrency(line.price_variance) }}

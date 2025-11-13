@@ -46,8 +46,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Price Variance Detection:** Automatic NCR generation when delivery prices differ from locked period prices
 - **Approval Workflows:** PRF/PO and Transfers require Supervisor approval; Period Close requires Admin approval
 
+### Code Formatting Standards
+
+**CRITICAL:** All code must follow the project's Prettier configuration to ensure consistency with VS Code's format-on-save.
+
+**Formatting Rules (configured in `.prettierrc`):**
+
+- **Semicolons:** Always use semicolons (`;`)
+- **Quotes:** Use double quotes (`"`) not single quotes
+- **Indentation:** 2 spaces (never tabs)
+- **Line Width:** 100 characters maximum
+- **Arrow Functions:** Always use parentheses around parameters: `(x) => x` not `x => x`
+- **Trailing Commas:** ES5 style (objects/arrays only, not function parameters)
+- **Vue Files:** Do not indent `<script>` and `<style>` blocks
+
+**Commands:**
+```bash
+pnpm format        # Format all files
+pnpm format:check  # Check formatting (CI)
+```
+
+**IMPORTANT:** When writing or editing code, follow these exact formatting rules so that when the user saves the file in VS Code, no formatting changes occur.
+
 #### Before being done with any task, follow this checklist:
 
+- [ ] Code follows Prettier formatting rules (double quotes, semicolons, 2 spaces)
 - [ ] Run `pnpm typecheck` - must show **zero errors**
 - [ ] No `any` types in the code
 - [ ] All error handlers use proper type guards
@@ -55,18 +78,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [ ] API responses are properly typed
 - [ ] Prisma Decimal types handled correctly
 
-**If typecheck fails, the task is NOT complete.**
+**If typecheck fails or formatting is inconsistent, the task is NOT complete.**
 
 ## Development Commands
 
 **Package Manager:** pnpm (required)
 
 ```bash
-pnpm install    # Install dependencies
-pnpm dev        # Dev server (localhost:3000)
-pnpm build      # Production build
-pnpm typecheck  # Type checking
-pnpm lint       # Linting
+pnpm install       # Install dependencies
+pnpm dev           # Dev server (localhost:3000)
+pnpm build         # Production build
+pnpm typecheck     # Type checking
+pnpm lint          # Linting
+pnpm format        # Format all files with Prettier
+pnpm format:check  # Check if files are properly formatted
 
 # Database (when configured): db:push, db:migrate, db:studio
 # Testing (when configured): test, test:unit, test:api

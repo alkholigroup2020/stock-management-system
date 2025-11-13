@@ -7,108 +7,108 @@
  * dynamic multi-line management, stock validation, and totals.
  */
 
-import { formatCurrency } from '~/utils/format'
+import { formatCurrency } from "~/utils/format";
 
 // Props
 interface Props {
   /**
    * Issue date (YYYY-MM-DD format)
    */
-  issueDate: string
+  issueDate: string;
   /**
    * Cost centre (FOOD/CLEAN/OTHER)
    */
-  costCentre: 'FOOD' | 'CLEAN' | 'OTHER'
+  costCentre: "FOOD" | "CLEAN" | "OTHER";
   /**
    * Current location name (read-only display)
    */
-  locationName: string
+  locationName: string;
   /**
    * Array of issue lines
    */
   lines: Array<{
-    id: string
-    item_id: string
-    quantity: string
-    wac: number
-    line_value: number
-    on_hand: number
-    has_insufficient_stock: boolean
-  }>
+    id: string;
+    item_id: string;
+    quantity: string;
+    wac: number;
+    line_value: number;
+    on_hand: number;
+    has_insufficient_stock: boolean;
+  }>;
   /**
    * Available items for selection
    */
-  items: any[]
+  items: any[];
   /**
    * Stock levels map (itemId -> { on_hand, wac })
    */
-  stockLevels: Record<string, { on_hand: number; wac: number }>
+  stockLevels: Record<string, { on_hand: number; wac: number }>;
   /**
    * Whether form is submitting
    */
-  loading?: boolean
+  loading?: boolean;
   /**
    * Whether form is valid
    */
-  isValid?: boolean
+  isValid?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   isValid: false,
-})
+});
 
 // Emits
 const emit = defineEmits<{
-  'update:issueDate': [value: string]
-  'update:costCentre': [value: 'FOOD' | 'CLEAN' | 'OTHER']
-  'update:lines': [value: any[]]
-  'add-line': []
-  'remove-line': [id: string]
-  'submit': []
-  'cancel': []
-}>()
+  "update:issueDate": [value: string];
+  "update:costCentre": [value: "FOOD" | "CLEAN" | "OTHER"];
+  "update:lines": [value: any[]];
+  "add-line": [];
+  "remove-line": [id: string];
+  submit: [];
+  cancel: [];
+}>();
 
 // Cost centre options
 const costCentreOptions = [
-  { value: 'FOOD', label: 'Food' },
-  { value: 'CLEAN', label: 'Cleaning' },
-  { value: 'OTHER', label: 'Other' },
-]
+  { value: "FOOD", label: "Food" },
+  { value: "CLEAN", label: "Cleaning" },
+  { value: "OTHER", label: "Other" },
+];
 
 // Computed
 const totalValue = computed(() => {
-  return props.lines.reduce((sum, line) => sum + line.line_value, 0)
-})
+  return props.lines.reduce((sum, line) => sum + line.line_value, 0);
+});
 
 const hasInsufficientStock = computed(() => {
-  return props.lines.some(line => line.has_insufficient_stock)
-})
+  return props.lines.some((line) => line.has_insufficient_stock);
+});
 
 const insufficientStockCount = computed(() => {
-  return props.lines.filter(line => line.has_insufficient_stock).length
-})
+  return props.lines.filter((line) => line.has_insufficient_stock).length;
+});
 
 // Methods
 const getItemById = (itemId: string) => {
-  return props.items.find(item => item.id === itemId)
-}
+  return props.items.find((item) => item.id === itemId);
+};
 
 const handleAddLine = () => {
-  emit('add-line')
-}
+  emit("add-line");
+};
 
 const handleRemoveLine = (id: string) => {
-  emit('remove-line', id)
-}
+  emit("remove-line", id);
+};
 
 const handleSubmit = () => {
-  emit('submit')
-}
+  emit("submit");
+};
 
 const handleCancel = () => {
-  emit('cancel')
-}
+  emit("cancel");
+};
 </script>
 
 <template>
@@ -139,18 +139,16 @@ const handleCancel = () => {
             option-attribute="label"
             value-attribute="value"
             placeholder="Select cost centre"
-            @update:model-value="emit('update:costCentre', $event as 'FOOD' | 'CLEAN' | 'OTHER')"
+            @update:model-value="
+              emit('update:costCentre', $event as 'FOOD' | 'CLEAN' | 'OTHER')
+            "
           />
         </div>
 
         <!-- Location (Read-only) -->
         <div>
           <label class="form-label">Location</label>
-          <UInput
-            :model-value="locationName"
-            readonly
-            disabled
-          />
+          <UInput :model-value="locationName" readonly disabled />
         </div>
       </div>
     </UCard>
@@ -188,12 +186,36 @@ const handleCancel = () => {
         <table class="min-w-full divide-y divide-default">
           <thead>
             <tr class="bg-default">
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">On Hand</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Quantity</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">WAC</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">Line Value</th>
-              <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">Action</th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Item
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                On Hand
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                Quantity
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
+              >
+                WAC
+              </th>
+              <th
+                class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
+              >
+                Line Value
+              </th>
+              <th
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
+              >
+                Action
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-default">
@@ -221,9 +243,7 @@ const handleCancel = () => {
       <!-- Summary -->
       <div class="mt-4 pt-4 border-t border-default">
         <div class="flex justify-between items-center">
-          <div class="text-sm text-muted">
-            {{ lines.length }} item(s)
-          </div>
+          <div class="text-sm text-muted">{{ lines.length }} item(s)</div>
           <div class="text-right">
             <div class="text-sm text-muted">Total Value</div>
             <div class="text-2xl font-bold text-primary">

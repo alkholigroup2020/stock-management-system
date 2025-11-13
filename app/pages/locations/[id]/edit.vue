@@ -1,10 +1,7 @@
 <template>
   <div>
     <!-- Page Header -->
-    <PageHeader
-      title="Edit Location"
-      icon="i-lucide-edit"
-    >
+    <PageHeader title="Edit Location" icon="i-lucide-edit">
       <template #actions>
         <UButton
           color="neutral"
@@ -23,19 +20,11 @@
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      :message="error"
-      @retry="fetchLocation"
-    />
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchLocation" />
 
     <!-- Form Card -->
     <UCard v-else class="max-w-3xl">
-      <UForm
-        :schema="schema"
-        :state="formData"
-        @submit="onSubmit"
-      >
+      <UForm :schema="schema" :state="formData" @submit="onSubmit">
         <div class="space-y-6">
           <!-- Code (Read-only) -->
           <UFormGroup
@@ -43,19 +32,11 @@
             name="code"
             help="Code cannot be changed after creation"
           >
-            <UInput
-              v-model="formData.code"
-              icon="i-lucide-hash"
-              disabled
-            />
+            <UInput v-model="formData.code" icon="i-lucide-hash" disabled />
           </UFormGroup>
 
           <!-- Name -->
-          <UFormGroup
-            label="Location Name"
-            name="name"
-            required
-          >
+          <UFormGroup label="Location Name" name="name" required>
             <UInput
               v-model="formData.name"
               placeholder="Enter location name"
@@ -65,11 +46,7 @@
           </UFormGroup>
 
           <!-- Type -->
-          <UFormGroup
-            label="Location Type"
-            name="type"
-            required
-          >
+          <UFormGroup label="Location Type" name="type" required>
             <USelectMenu
               v-model="formData.type"
               :options="typeOptions"
@@ -127,20 +104,19 @@
             name="is_active"
             help="Inactive locations are hidden from most views"
           >
-            <UToggle
-              v-model="formData.is_active"
-              :disabled="submitting"
-            >
+            <UToggle v-model="formData.is_active" :disabled="submitting">
               <template #label>
                 <span class="text-sm text-default">
-                  {{ formData.is_active ? 'Active' : 'Inactive' }}
+                  {{ formData.is_active ? "Active" : "Inactive" }}
                 </span>
               </template>
             </UToggle>
           </UFormGroup>
 
           <!-- Submit Buttons -->
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+          <div
+            class="flex items-center justify-end gap-3 pt-4 border-t border-default"
+          >
             <UButton
               color="neutral"
               variant="ghost"
@@ -165,134 +141,142 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
-import type { LocationType } from '@prisma/client'
+import { z } from "zod";
+import type { LocationType } from "@prisma/client";
 
 definePageMeta({
-  middleware: ['role'],
-  roleRequired: 'ADMIN',
-  layout: 'default',
-})
+  middleware: ["role"],
+  roleRequired: "ADMIN",
+  layout: "default",
+});
 
 // Composables
-const route = useRoute()
-const toast = useAppToast()
+const route = useRoute();
+const toast = useAppToast();
 
 // Validation schema
 const schema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE']).describe('Location type is required'),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be at most 100 characters"),
+  type: z
+    .enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"])
+    .describe("Location type is required"),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().max(50),
   is_active: z.boolean(),
-})
+});
 
-type FormData = z.infer<typeof schema>
+type FormData = z.infer<typeof schema>;
 
 interface ManagerOption {
-  label: string
-  value: string | null
+  label: string;
+  value: string | null;
 }
 
 // State
-const loading = ref(true)
-const error = ref<string | null>(null)
-const submitting = ref(false)
-const loadingManagers = ref(false)
-const managerOptions = ref<ManagerOption[]>([{ label: 'No Manager', value: null }])
+const loading = ref(true);
+const error = ref<string | null>(null);
+const submitting = ref(false);
+const loadingManagers = ref(false);
+const managerOptions = ref<ManagerOption[]>([
+  { label: "No Manager", value: null },
+]);
 
 // Form data - properly typed
 const formData = reactive<{
-  code: string
-  name: string
-  type: LocationType | undefined
-  address: string
-  manager_id: string | undefined
-  timezone: string
-  is_active: boolean
+  code: string;
+  name: string;
+  type: LocationType | undefined;
+  address: string;
+  manager_id: string | undefined;
+  timezone: string;
+  is_active: boolean;
 }>({
-  code: '',
-  name: '',
+  code: "",
+  name: "",
   type: undefined,
-  address: '',
+  address: "",
   manager_id: undefined,
-  timezone: 'Asia/Riyadh',
+  timezone: "Asia/Riyadh",
   is_active: true,
-})
+});
 
 // Type options
 const typeOptions: Array<{ label: string; value: LocationType }> = [
-  { label: 'Kitchen', value: 'KITCHEN' },
-  { label: 'Store', value: 'STORE' },
-  { label: 'Central', value: 'CENTRAL' },
-  { label: 'Warehouse', value: 'WAREHOUSE' },
-]
+  { label: "Kitchen", value: "KITCHEN" },
+  { label: "Store", value: "STORE" },
+  { label: "Central", value: "CENTRAL" },
+  { label: "Warehouse", value: "WAREHOUSE" },
+];
 
 // Fetch location details
 const fetchLocation = async () => {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const locationId = route.params.id as string
+    const locationId = route.params.id as string;
 
     interface LocationResponse {
       location: {
-        code: string
-        name: string
-        type: LocationType | null
-        address: string | null
-        manager_id: string | null
-        timezone: string | null
-        is_active: boolean
-      }
+        code: string;
+        name: string;
+        type: LocationType | null;
+        address: string | null;
+        manager_id: string | null;
+        timezone: string | null;
+        is_active: boolean;
+      };
     }
 
-    const response = await $fetch<LocationResponse>(`/api/locations/${locationId}`)
-    const location = response.location
+    const response = await $fetch<LocationResponse>(
+      `/api/locations/${locationId}`
+    );
+    const location = response.location;
 
     // Pre-fill form with existing data
-    formData.code = location.code
-    formData.name = location.name
-    formData.type = location.type ?? undefined
-    formData.address = location.address ?? ''
-    formData.manager_id = location.manager_id ?? undefined
-    formData.timezone = location.timezone ?? 'Asia/Riyadh'
-    formData.is_active = location.is_active
+    formData.code = location.code;
+    formData.name = location.name;
+    formData.type = location.type ?? undefined;
+    formData.address = location.address ?? "";
+    formData.manager_id = location.manager_id ?? undefined;
+    formData.timezone = location.timezone ?? "Asia/Riyadh";
+    formData.is_active = location.is_active;
   } catch (err) {
-    console.error('Error fetching location:', err)
-    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch location details'
-    error.value = errorMessage
-    toast.error('Error', { description: errorMessage })
+    console.error("Error fetching location:", err);
+    const errorMessage =
+      err instanceof Error ? err.message : "Failed to fetch location details";
+    error.value = errorMessage;
+    toast.error("Error", { description: errorMessage });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Fetch managers (active users for dropdown)
 const fetchManagers = async () => {
-  loadingManagers.value = true
+  loadingManagers.value = true;
 
   try {
     // For now, just provide a no manager option
     // In a real app, you would fetch users from /api/users
-    managerOptions.value = [
-      { label: 'No Manager', value: null },
-    ]
+    managerOptions.value = [{ label: "No Manager", value: null }];
   } catch (err) {
-    console.error('Error fetching managers:', err)
+    console.error("Error fetching managers:", err);
   } finally {
-    loadingManagers.value = false
+    loadingManagers.value = false;
   }
-}
+};
 
 // Submit handler
 const onSubmit = async () => {
-  submitting.value = true
+  submitting.value = true;
 
   try {
-    const locationId = route.params.id as string
+    const locationId = route.params.id as string;
 
     const payload = {
       name: formData.name,
@@ -301,32 +285,33 @@ const onSubmit = async () => {
       manager_id: formData.manager_id || null,
       timezone: formData.timezone,
       is_active: formData.is_active,
-    }
+    };
 
     await $fetch(`/api/locations/${locationId}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: payload,
-    })
+    });
 
-    toast.success('Success', { description: 'Location updated successfully' })
-    await navigateTo('/locations')
+    toast.success("Success", { description: "Location updated successfully" });
+    await navigateTo("/locations");
   } catch (err) {
-    console.error('Error updating location:', err)
-    const errorMessage = err instanceof Error ? err.message : 'Failed to update location'
-    toast.error('Error', { description: errorMessage })
+    console.error("Error updating location:", err);
+    const errorMessage =
+      err instanceof Error ? err.message : "Failed to update location";
+    toast.error("Error", { description: errorMessage });
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  fetchLocation()
-  fetchManagers()
-})
+  fetchLocation();
+  fetchManagers();
+});
 
 // Set page title
 useHead({
-  title: 'Edit Location - Stock Management System',
-})
+  title: "Edit Location - Stock Management System",
+});
 </script>

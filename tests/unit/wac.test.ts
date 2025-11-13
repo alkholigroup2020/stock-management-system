@@ -117,9 +117,7 @@ describe("WAC Calculation Utility", () => {
 
       // Check that WAC has max 4 decimal places
       const wacString = result.newWAC.toString();
-      const decimals = wacString.includes(".")
-        ? wacString.split(".")[1].length
-        : 0;
+      const decimals = wacString.includes(".") ? wacString.split(".")[1].length : 0;
       expect(decimals).toBeLessThanOrEqual(4);
     });
 
@@ -128,9 +126,7 @@ describe("WAC Calculation Utility", () => {
 
       // Check that values have max 2 decimal places
       const valueString = result.newValue.toString();
-      const decimals = valueString.includes(".")
-        ? valueString.split(".")[1].length
-        : 0;
+      const decimals = valueString.includes(".") ? valueString.split(".")[1].length : 0;
       expect(decimals).toBeLessThanOrEqual(2);
     });
   });

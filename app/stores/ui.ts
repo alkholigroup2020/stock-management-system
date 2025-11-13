@@ -1,46 +1,46 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 export interface ToastMessage {
-  id: string
-  type: 'success' | 'error' | 'warning' | 'info'
-  title: string
-  description?: string
-  timeout?: number
+  id: string;
+  type: "success" | "error" | "warning" | "info";
+  title: string;
+  description?: string;
+  timeout?: number;
 }
 
 export interface ModalState {
-  isOpen: boolean
-  component?: string
-  props?: Record<string, unknown>
+  isOpen: boolean;
+  component?: string;
+  props?: Record<string, unknown>;
 }
 
 export interface UIState {
-  sidebarCollapsed: boolean
-  mobileSidebarOpen: boolean
-  toasts: ToastMessage[]
-  modals: Record<string, ModalState>
+  sidebarCollapsed: boolean;
+  mobileSidebarOpen: boolean;
+  toasts: ToastMessage[];
+  modals: Record<string, ModalState>;
 }
 
-export const useUIStore = defineStore('ui', {
+export const useUIStore = defineStore("ui", {
   state: (): UIState => ({
     sidebarCollapsed: false,
     mobileSidebarOpen: false,
     toasts: [],
-    modals: {}
+    modals: {},
   }),
 
   getters: {
     // Get active toasts
     activeToasts: (state: UIState): ToastMessage[] => {
-      return state.toasts
+      return state.toasts;
     },
 
     // Check if a modal is open
     isModalOpen: (state: UIState) => {
       return (modalId: string): boolean => {
-        return state.modals[modalId]?.isOpen || false
-      }
-    }
+        return state.modals[modalId]?.isOpen || false;
+      };
+    },
   },
 
   actions: {
@@ -48,60 +48,60 @@ export const useUIStore = defineStore('ui', {
      * Toggle sidebar collapse state (desktop)
      */
     toggleSidebar() {
-      this.sidebarCollapsed = !this.sidebarCollapsed
+      this.sidebarCollapsed = !this.sidebarCollapsed;
     },
 
     /**
      * Set sidebar collapsed state
      */
     setSidebarCollapsed(collapsed: boolean) {
-      this.sidebarCollapsed = collapsed
+      this.sidebarCollapsed = collapsed;
     },
 
     /**
      * Toggle mobile sidebar
      */
     toggleMobileSidebar() {
-      this.mobileSidebarOpen = !this.mobileSidebarOpen
+      this.mobileSidebarOpen = !this.mobileSidebarOpen;
     },
 
     /**
      * Close mobile sidebar
      */
     closeMobileSidebar() {
-      this.mobileSidebarOpen = false
+      this.mobileSidebarOpen = false;
     },
 
     /**
      * Add a toast message
      */
-    addToast(toast: Omit<ToastMessage, 'id'>): string {
-      const id = `toast-${Date.now()}-${Math.random()}`
+    addToast(toast: Omit<ToastMessage, "id">): string {
+      const id = `toast-${Date.now()}-${Math.random()}`;
       const newToast: ToastMessage = {
         id,
         ...toast,
-        timeout: toast.timeout || 5000
-      }
+        timeout: toast.timeout || 5000,
+      };
 
-      this.toasts.push(newToast)
+      this.toasts.push(newToast);
 
       // Auto-remove after timeout
       if (newToast.timeout && newToast.timeout > 0) {
         setTimeout(() => {
-          this.removeToast(id)
-        }, newToast.timeout)
+          this.removeToast(id);
+        }, newToast.timeout);
       }
 
-      return id
+      return id;
     },
 
     /**
      * Remove a toast message
      */
     removeToast(id: string) {
-      const index = this.toasts.findIndex((t) => t.id === id)
+      const index = this.toasts.findIndex((t) => t.id === id);
       if (index !== -1) {
-        this.toasts.splice(index, 1)
+        this.toasts.splice(index, 1);
       }
     },
 
@@ -110,11 +110,11 @@ export const useUIStore = defineStore('ui', {
      */
     showSuccess(title: string, description?: string, timeout?: number) {
       return this.addToast({
-        type: 'success',
+        type: "success",
         title,
         description,
-        timeout
-      })
+        timeout,
+      });
     },
 
     /**
@@ -122,11 +122,11 @@ export const useUIStore = defineStore('ui', {
      */
     showError(title: string, description?: string, timeout?: number) {
       return this.addToast({
-        type: 'error',
+        type: "error",
         title,
         description,
-        timeout
-      })
+        timeout,
+      });
     },
 
     /**
@@ -134,11 +134,11 @@ export const useUIStore = defineStore('ui', {
      */
     showWarning(title: string, description?: string, timeout?: number) {
       return this.addToast({
-        type: 'warning',
+        type: "warning",
         title,
         description,
-        timeout
-      })
+        timeout,
+      });
     },
 
     /**
@@ -146,22 +146,26 @@ export const useUIStore = defineStore('ui', {
      */
     showInfo(title: string, description?: string, timeout?: number) {
       return this.addToast({
-        type: 'info',
+        type: "info",
         title,
         description,
-        timeout
-      })
+        timeout,
+      });
     },
 
     /**
      * Open a modal
      */
-    openModal(modalId: string, component?: string, props?: Record<string, unknown>) {
+    openModal(
+      modalId: string,
+      component?: string,
+      props?: Record<string, unknown>
+    ) {
       this.modals[modalId] = {
         isOpen: true,
         component,
-        props
-      }
+        props,
+      };
     },
 
     /**
@@ -169,7 +173,7 @@ export const useUIStore = defineStore('ui', {
      */
     closeModal(modalId: string) {
       if (this.modals[modalId]) {
-        this.modals[modalId].isOpen = false
+        this.modals[modalId].isOpen = false;
       }
     },
 
@@ -177,10 +181,10 @@ export const useUIStore = defineStore('ui', {
      * Reset store state
      */
     reset() {
-      this.sidebarCollapsed = false
-      this.mobileSidebarOpen = false
-      this.toasts = []
-      this.modals = {}
-    }
-  }
-})
+      this.sidebarCollapsed = false;
+      this.mobileSidebarOpen = false;
+      this.toasts = [];
+      this.modals = {};
+    },
+  },
+});

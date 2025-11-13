@@ -44,7 +44,8 @@
               {{ errors.code }}
             </p>
             <p class="mt-1 text-xs text-muted">
-              Unique identifier for the item (automatically converted to uppercase)
+              Unique identifier for the item (automatically converted to
+              uppercase)
             </p>
           </div>
 
@@ -88,15 +89,14 @@
               {{ errors.unit }}
             </p>
             <p class="mt-1 text-xs text-muted">
-              How this item is measured (KG = Kilograms, EA = Each, LTR = Liters, etc.)
+              How this item is measured (KG = Kilograms, EA = Each, LTR =
+              Liters, etc.)
             </p>
           </div>
 
           <!-- Category -->
           <div>
-            <label for="category" class="form-label">
-              Category
-            </label>
+            <label for="category" class="form-label"> Category </label>
             <UInput
               id="category"
               v-model="form.category"
@@ -116,9 +116,7 @@
 
           <!-- Sub-Category -->
           <div>
-            <label for="sub_category" class="form-label">
-              Sub-Category
-            </label>
+            <label for="sub_category" class="form-label"> Sub-Category </label>
             <UInput
               id="sub_category"
               v-model="form.sub_category"
@@ -137,7 +135,9 @@
           </div>
 
           <!-- Form Actions -->
-          <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default">
+          <div
+            class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default"
+          >
             <UButton
               type="button"
               color="neutral"
@@ -157,7 +157,7 @@
               :disabled="isSubmitting || !isFormValid"
               class="w-full sm:w-auto"
             >
-              {{ isSubmitting ? 'Creating...' : 'Create Item' }}
+              {{ isSubmitting ? "Creating..." : "Create Item" }}
             </UButton>
           </div>
         </div>
@@ -167,76 +167,88 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+import { z } from "zod";
 
 // Page metadata
 definePageMeta({
-  middleware: ['role'],
-  roleRequired: 'ADMIN',
-  layout: 'default',
-})
+  middleware: ["role"],
+  roleRequired: "ADMIN",
+  layout: "default",
+});
 
 // Composables
-const { canEditItems } = usePermissions()
-const toast = useToast()
-const router = useRouter()
+const { canEditItems } = usePermissions();
+const toast = useToast();
+const router = useRouter();
 
 // Check permission
 if (!canEditItems()) {
-  navigateTo('/')
+  navigateTo("/");
 }
 
 // Unit options
 const unitOptions = [
-  { label: 'KG - Kilograms', value: 'KG' },
-  { label: 'EA - Each', value: 'EA' },
-  { label: 'LTR - Liters', value: 'LTR' },
-  { label: 'BOX - Box', value: 'BOX' },
-  { label: 'CASE - Case', value: 'CASE' },
-  { label: 'PACK - Pack', value: 'PACK' },
-]
+  { label: "KG - Kilograms", value: "KG" },
+  { label: "EA - Each", value: "EA" },
+  { label: "LTR - Liters", value: "LTR" },
+  { label: "BOX - Box", value: "BOX" },
+  { label: "CASE - Case", value: "CASE" },
+  { label: "PACK - Pack", value: "PACK" },
+];
 
 // Form state
 const form = reactive({
-  code: '',
-  name: '',
+  code: "",
+  name: "",
   unit: undefined as string | undefined,
-  category: '',
-  sub_category: '',
-})
+  category: "",
+  sub_category: "",
+});
 
 const errors = reactive({
-  code: '',
-  name: '',
-  unit: '',
-  category: '',
-  sub_category: '',
-})
+  code: "",
+  name: "",
+  unit: "",
+  category: "",
+  sub_category: "",
+});
 
-const isSubmitting = ref(false)
+const isSubmitting = ref(false);
 
 // Validation schema (matches API schema)
 const itemSchema = z.object({
-  code: z.string().min(1, 'Item code is required').max(50, 'Item code must be 50 characters or less'),
-  name: z.string().min(1, 'Item name is required').max(200, 'Item name must be 200 characters or less'),
-  unit: z.enum(['KG', 'EA', 'LTR', 'BOX', 'CASE', 'PACK']).optional(),
-  category: z.string().max(50, 'Category must be 50 characters or less').optional(),
-  sub_category: z.string().max(50, 'Sub-category must be 50 characters or less').optional(),
-})
+  code: z
+    .string()
+    .min(1, "Item code is required")
+    .max(50, "Item code must be 50 characters or less"),
+  name: z
+    .string()
+    .min(1, "Item name is required")
+    .max(200, "Item name must be 200 characters or less"),
+  unit: z.enum(["KG", "EA", "LTR", "BOX", "CASE", "PACK"]).optional(),
+  category: z
+    .string()
+    .max(50, "Category must be 50 characters or less")
+    .optional(),
+  sub_category: z
+    .string()
+    .max(50, "Sub-category must be 50 characters or less")
+    .optional(),
+});
 
 /**
  * Validate a single field
  */
 function validateField(field: keyof typeof form) {
   try {
-    const fieldSchema = itemSchema.shape[field]
+    const fieldSchema = itemSchema.shape[field];
     if (fieldSchema) {
-      fieldSchema.parse(form[field])
-      errors[field] = ''
+      fieldSchema.parse(form[field]);
+      errors[field] = "";
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      errors[field] = error.issues[0]?.message || 'Invalid value'
+      errors[field] = error.issues[0]?.message || "Invalid value";
     }
   }
 }
@@ -253,27 +265,27 @@ function validateForm(): boolean {
       unit: form.unit,
       category: form.category || undefined,
       sub_category: form.sub_category || undefined,
-    }
+    };
 
-    itemSchema.parse(data)
+    itemSchema.parse(data);
 
     // Clear all errors
     Object.keys(errors).forEach((key) => {
-      errors[key as keyof typeof errors] = ''
-    })
+      errors[key as keyof typeof errors] = "";
+    });
 
-    return true
+    return true;
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Set errors for each field
       error.issues.forEach((err: z.ZodIssue) => {
-        const field = err.path[0] as keyof typeof errors
+        const field = err.path[0] as keyof typeof errors;
         if (field) {
-          errors[field] = err.message
+          errors[field] = err.message;
         }
-      })
+      });
     }
-    return false
+    return false;
   }
 }
 
@@ -290,8 +302,8 @@ const isFormValid = computed(() => {
     !errors.unit &&
     !errors.category &&
     !errors.sub_category
-  )
-})
+  );
+});
 
 /**
  * Handle form submission
@@ -300,14 +312,14 @@ async function handleSubmit() {
   // Validate form first
   if (!validateForm()) {
     toast.add({
-      title: 'Validation Error',
-      description: 'Please fix the errors in the form',
-      color: 'error',
-    })
-    return
+      title: "Validation Error",
+      description: "Please fix the errors in the form",
+      color: "error",
+    });
+    return;
   }
 
-  isSubmitting.value = true
+  isSubmitting.value = true;
 
   try {
     // Prepare data for API
@@ -317,66 +329,69 @@ async function handleSubmit() {
       unit: form.unit,
       category: form.category || undefined,
       sub_category: form.sub_category || undefined,
-    }
+    };
 
     // Call API to create item
-    const response = await $fetch<{ item: any; message: string }>('/api/items', {
-      method: 'POST',
-      body: data,
-    })
+    const response = await $fetch<{ item: any; message: string }>(
+      "/api/items",
+      {
+        method: "POST",
+        body: data,
+      }
+    );
 
     // Show success message
     toast.add({
-      title: 'Success',
-      description: response.message || 'Item created successfully',
-      color: 'success',
-    })
+      title: "Success",
+      description: response.message || "Item created successfully",
+      color: "success",
+    });
 
     // Redirect to items list
-    router.push('/items')
+    router.push("/items");
   } catch (error: any) {
-    console.error('Error creating item:', error)
+    console.error("Error creating item:", error);
 
     // Handle specific error cases
-    if (error?.data?.code === 'DUPLICATE_CODE') {
-      errors.code = error.data.message || 'Item code already exists'
+    if (error?.data?.code === "DUPLICATE_CODE") {
+      errors.code = error.data.message || "Item code already exists";
       toast.add({
-        title: 'Duplicate Code',
+        title: "Duplicate Code",
         description: errors.code,
-        color: 'error',
-      })
-    } else if (error?.data?.code === 'VALIDATION_ERROR') {
+        color: "error",
+      });
+    } else if (error?.data?.code === "VALIDATION_ERROR") {
       toast.add({
-        title: 'Validation Error',
-        description: error.data.message || 'Invalid item data',
-        color: 'error',
-      })
+        title: "Validation Error",
+        description: error.data.message || "Invalid item data",
+        color: "error",
+      });
 
       // Set field-specific errors if available
       if (error.data.details) {
         error.data.details.forEach((err: any) => {
-          const field = err.path?.[0] as keyof typeof errors
+          const field = err.path?.[0] as keyof typeof errors;
           if (field) {
-            errors[field] = err.message
+            errors[field] = err.message;
           }
-        })
+        });
       }
-    } else if (error?.data?.code === 'INSUFFICIENT_PERMISSIONS') {
+    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
       toast.add({
-        title: 'Access Denied',
-        description: 'You do not have permission to create items',
-        color: 'error',
-      })
-      router.push('/items')
+        title: "Access Denied",
+        description: "You do not have permission to create items",
+        color: "error",
+      });
+      router.push("/items");
     } else {
       toast.add({
-        title: 'Error',
-        description: error?.data?.message || 'Failed to create item',
-        color: 'error',
-      })
+        title: "Error",
+        description: error?.data?.message || "Failed to create item",
+        color: "error",
+      });
     }
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
 }
 
@@ -391,14 +406,16 @@ function handleCancel() {
     form.unit ||
     form.category ||
     form.sub_category
-  )
+  );
 
   if (hasChanges) {
     // Could add a confirmation modal here
-    const confirmed = confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')
-    if (!confirmed) return
+    const confirmed = confirm(
+      "Are you sure you want to cancel? Any unsaved changes will be lost."
+    );
+    if (!confirmed) return;
   }
 
-  router.push('/items')
+  router.push("/items");
 }
 </script>

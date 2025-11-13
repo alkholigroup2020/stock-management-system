@@ -12,68 +12,71 @@
  * - Operators only see stock for their assigned locations
  */
 
-import prisma from '../../utils/prisma'
-import { z } from 'zod'
-import type { UserRole } from '@prisma/client'
+import prisma from "../../utils/prisma";
+import { z } from "zod";
+import type { UserRole } from "@prisma/client";
 
 // User session type
 interface UserLocation {
-  location_id: string
-  access_level: string
+  location_id: string;
+  access_level: string;
 }
 
 interface AuthUser {
-  id: string
-  username: string
-  email: string
-  role: UserRole
-  default_location_id: string | null
-  locations?: UserLocation[]
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  default_location_id: string | null;
+  locations?: UserLocation[];
 }
 
 // Query schema for validation
 const querySchema = z.object({
   locationId: z.string().uuid().optional(),
-  includeAllStock: z.string().transform((val) => val === 'true').optional(),
-})
+  includeAllStock: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
+});
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user as AuthUser | undefined
+  const user = event.context.user as AuthUser | undefined;
 
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: "Unauthorized",
       data: {
-        code: 'NOT_AUTHENTICATED',
-        message: 'You must be logged in to access this resource',
+        code: "NOT_AUTHENTICATED",
+        message: "You must be logged in to access this resource",
       },
-    })
+    });
   }
 
   try {
-    const id = getRouterParam(event, 'id')
+    const id = getRouterParam(event, "id");
 
     if (!id) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'MISSING_ID',
-          message: 'Item ID is required',
+          code: "MISSING_ID",
+          message: "Item ID is required",
         },
-      })
+      });
     }
 
     // Parse and validate query parameters
-    const query = await getQuery(event)
-    const { locationId, includeAllStock } = querySchema.parse(query)
+    const query = await getQuery(event);
+    const { locationId, includeAllStock } = querySchema.parse(query);
 
     // Build include clause
-    const include: Record<string, unknown> = {}
+    const include: Record<string, unknown> = {};
 
     // Include location stock based on query parameters
-    if (includeAllStock && (user.role === 'ADMIN' || user.role === 'SUPERVISOR')) {
+    if (includeAllStock && (user.role === "ADMIN" || user.role === "SUPERVISOR")) {
       // Include all location stock for admins/supervisors
       include.location_stock = {
         include: {
@@ -88,23 +91,23 @@ export default defineEventHandler(async (event) => {
         },
         orderBy: {
           location: {
-            name: 'asc',
+            name: "asc",
           },
         },
-      }
+      };
     } else if (locationId) {
       // Check if user has access to the requested location
-      if (user.role === 'OPERATOR') {
-        const hasAccess = user.locations?.some((loc) => loc.location_id === locationId)
+      if (user.role === "OPERATOR") {
+        const hasAccess = user.locations?.some((loc) => loc.location_id === locationId);
         if (!hasAccess) {
           throw createError({
             statusCode: 403,
-            statusMessage: 'Forbidden',
+            statusMessage: "Forbidden",
             data: {
-              code: 'LOCATION_ACCESS_DENIED',
-              message: 'You do not have access to this location',
+              code: "LOCATION_ACCESS_DENIED",
+              message: "You do not have access to this location",
             },
-          })
+          });
         }
       }
 
@@ -123,10 +126,10 @@ export default defineEventHandler(async (event) => {
             },
           },
         },
-      }
-    } else if (user.role === 'OPERATOR') {
+      };
+    } else if (user.role === "OPERATOR") {
       // For operators without specific locationId, include stock from their assigned locations
-      const userLocationIds = user.locations?.map((loc) => loc.location_id) || []
+      const userLocationIds = user.locations?.map((loc) => loc.location_id) || [];
       if (userLocationIds.length > 0) {
         include.location_stock = {
           where: {
@@ -144,10 +147,10 @@ export default defineEventHandler(async (event) => {
           },
           orderBy: {
             location: {
-              name: 'asc',
+              name: "asc",
             },
           },
-        }
+        };
       }
     }
 
@@ -155,47 +158,47 @@ export default defineEventHandler(async (event) => {
     const item = await prisma.item.findUnique({
       where: { id },
       include,
-    })
+    });
 
     if (!item) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found',
+        statusMessage: "Not Found",
         data: {
-          code: 'ITEM_NOT_FOUND',
-          message: 'Item not found',
+          code: "ITEM_NOT_FOUND",
+          message: "Item not found",
         },
-      })
+      });
     }
 
-    return { item }
+    return { item };
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'VALIDATION_ERROR',
-          message: 'Invalid query parameters',
+          code: "VALIDATION_ERROR",
+          message: "Invalid query parameters",
           details: error.issues,
         },
-      })
+      });
     }
 
     // Re-throw createError errors
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
     }
 
-    console.error('Error fetching item:', error)
+    console.error("Error fetching item:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch item',
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch item",
       },
-    })
+    });
   }
-})
+});

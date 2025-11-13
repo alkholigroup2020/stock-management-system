@@ -309,9 +309,7 @@ describe("Stock Validation Utility", () => {
         { quantity: 0, itemName: "Item 2" },
       ];
 
-      expect(() => validatePositiveQuantities(items)).toThrow(
-        "Item 2 must be greater than zero"
-      );
+      expect(() => validatePositiveQuantities(items)).toThrow("Item 2 must be greater than zero");
     });
 
     it("should throw when any quantity is negative", () => {
@@ -320,9 +318,7 @@ describe("Stock Validation Utility", () => {
         { quantity: -5, itemName: "Item 2" },
       ];
 
-      expect(() => validatePositiveQuantities(items)).toThrow(
-        "Item 2 must be greater than zero"
-      );
+      expect(() => validatePositiveQuantities(items)).toThrow("Item 2 must be greater than zero");
     });
 
     it("should use fallback item name when itemName not provided", () => {

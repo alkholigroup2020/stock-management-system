@@ -11,53 +11,53 @@
  * - SUPERVISOR/ADMIN only (multi-location view)
  */
 
-import prisma from '../../utils/prisma'
-import { z } from 'zod'
+import prisma from "../../utils/prisma";
+import { z } from "zod";
 
 // Query schema for validation
 const querySchema = z.object({
   category: z.string().optional(),
-  lowStock: z.enum(['true', 'false']).optional(),
-})
+  lowStock: z.enum(["true", "false"]).optional(),
+});
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
+  const user = event.context.user;
 
   if (!user) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized',
+      statusMessage: "Unauthorized",
       data: {
-        code: 'NOT_AUTHENTICATED',
-        message: 'You must be logged in to access this resource',
+        code: "NOT_AUTHENTICATED",
+        message: "You must be logged in to access this resource",
       },
-    })
+    });
   }
 
   // Check if user is SUPERVISOR or ADMIN
-  if (user.role !== 'SUPERVISOR' && user.role !== 'ADMIN') {
+  if (user.role !== "SUPERVISOR" && user.role !== "ADMIN") {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Forbidden',
+      statusMessage: "Forbidden",
       data: {
-        code: 'INSUFFICIENT_PERMISSIONS',
-        message: 'Only supervisors and administrators can view consolidated stock',
+        code: "INSUFFICIENT_PERMISSIONS",
+        message: "Only supervisors and administrators can view consolidated stock",
       },
-    })
+    });
   }
 
   try {
     // Parse and validate query parameters
-    const query = await getQuery(event)
-    const { category, lowStock } = querySchema.parse(query)
+    const query = await getQuery(event);
+    const { category, lowStock } = querySchema.parse(query);
 
     // Build where clause for items
     const itemWhere: any = {
       is_active: true,
-    }
+    };
 
     if (category) {
-      itemWhere.category = category
+      itemWhere.category = category;
     }
 
     // Fetch all locations
@@ -69,8 +69,8 @@ export default defineEventHandler(async (event) => {
         name: true,
         type: true,
       },
-      orderBy: { name: 'asc' },
-    })
+      orderBy: { name: "asc" },
+    });
 
     // Fetch all stock across all locations
     const allStock = await prisma.locationStock.findMany({
@@ -100,43 +100,41 @@ export default defineEventHandler(async (event) => {
       },
       orderBy: {
         item: {
-          name: 'asc',
+          name: "asc",
         },
       },
-    })
+    });
 
     // Group stock by item and aggregate across locations
     const stockByItem = new Map<
       string,
       {
-        item: any
-        total_on_hand: number
-        total_value: number
+        item: any;
+        total_on_hand: number;
+        total_value: number;
         locations: Array<{
-          location_id: string
-          location_code: string
-          location_name: string
-          location_type: string
-          on_hand: number
-          wac: number
-          value: number
-          min_stock: number | null
-          max_stock: number | null
-          is_low_stock: boolean
-        }>
+          location_id: string;
+          location_code: string;
+          location_name: string;
+          location_type: string;
+          on_hand: number;
+          wac: number;
+          value: number;
+          min_stock: number | null;
+          max_stock: number | null;
+          is_low_stock: boolean;
+        }>;
       }
-    >()
+    >();
 
     // Process each stock record
     for (const stock of allStock) {
-      const itemId = stock.item.id
-      const onHand = parseFloat(stock.on_hand.toString())
-      const wac = parseFloat(stock.wac.toString())
-      const value = onHand * wac
+      const itemId = stock.item.id;
+      const onHand = parseFloat(stock.on_hand.toString());
+      const wac = parseFloat(stock.wac.toString());
+      const value = onHand * wac;
       const isLowStock =
-        stock.min_stock !== null
-          ? onHand < parseFloat(stock.min_stock.toString())
-          : false
+        stock.min_stock !== null ? onHand < parseFloat(stock.min_stock.toString()) : false;
 
       if (!stockByItem.has(itemId)) {
         stockByItem.set(itemId, {
@@ -144,12 +142,12 @@ export default defineEventHandler(async (event) => {
           total_on_hand: 0,
           total_value: 0,
           locations: [],
-        })
+        });
       }
 
-      const itemData = stockByItem.get(itemId)!
-      itemData.total_on_hand += onHand
-      itemData.total_value += value
+      const itemData = stockByItem.get(itemId)!;
+      itemData.total_on_hand += onHand;
+      itemData.total_value += value;
       itemData.locations.push({
         location_id: stock.location.id,
         location_code: stock.location.code,
@@ -161,35 +159,30 @@ export default defineEventHandler(async (event) => {
         min_stock: stock.min_stock ? parseFloat(stock.min_stock.toString()) : null,
         max_stock: stock.max_stock ? parseFloat(stock.max_stock.toString()) : null,
         is_low_stock: isLowStock,
-      })
+      });
     }
 
     // Convert map to array
-    let consolidatedStock = Array.from(stockByItem.values())
+    let consolidatedStock = Array.from(stockByItem.values());
 
     // Filter low stock if requested
-    if (lowStock === 'true') {
+    if (lowStock === "true") {
       consolidatedStock = consolidatedStock.filter((item) =>
         item.locations.some((loc) => loc.is_low_stock)
-      )
+      );
     }
 
     // Calculate grand totals
-    const grandTotalValue = consolidatedStock.reduce(
-      (sum, item) => sum + item.total_value,
-      0
-    )
+    const grandTotalValue = consolidatedStock.reduce((sum, item) => sum + item.total_value, 0);
 
     // Calculate totals by location
     const locationTotals = locations.map((location) => {
-      const locationStock = allStock.filter(
-        (s) => s.location.id === location.id
-      )
+      const locationStock = allStock.filter((s) => s.location.id === location.id);
       const totalValue = locationStock.reduce((sum, s) => {
-        const qty = parseFloat(s.on_hand.toString())
-        const wac = parseFloat(s.wac.toString())
-        return sum + qty * wac
-      }, 0)
+        const qty = parseFloat(s.on_hand.toString());
+        const wac = parseFloat(s.wac.toString());
+        return sum + qty * wac;
+      }, 0);
 
       return {
         location_id: location.id,
@@ -198,8 +191,8 @@ export default defineEventHandler(async (event) => {
         location_type: location.type,
         total_value: totalValue,
         item_count: locationStock.length,
-      }
-    })
+      };
+    });
 
     return {
       consolidated_stock: consolidatedStock.map((item) => ({
@@ -217,34 +210,34 @@ export default defineEventHandler(async (event) => {
       grand_total_value: grandTotalValue,
       total_items: consolidatedStock.length,
       total_locations: locations.length,
-    }
+    };
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Bad Request',
+        statusMessage: "Bad Request",
         data: {
-          code: 'VALIDATION_ERROR',
-          message: 'Invalid query parameters',
+          code: "VALIDATION_ERROR",
+          message: "Invalid query parameters",
           details: error.issues,
         },
-      })
+      });
     }
 
     // Re-throw createError errors
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      throw error
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
     }
 
-    console.error('Error fetching consolidated stock:', error)
+    console.error("Error fetching consolidated stock:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: "Internal Server Error",
       data: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch consolidated stock',
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch consolidated stock",
       },
-    })
+    });
   }
-})
+});

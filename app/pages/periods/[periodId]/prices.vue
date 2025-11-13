@@ -1,10 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <!-- Page Header -->
-    <PageHeader
-      title="Set Item Prices"
-      icon="i-lucide-tag"
-    >
+    <PageHeader title="Set Item Prices" icon="i-lucide-tag">
       <template #breadcrumbs>
         <nav class="flex items-center gap-2 text-sm text-muted">
           <NuxtLink to="/" class="hover:text-default">Dashboard</NuxtLink>
@@ -32,7 +29,9 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-lg font-semibold text-default">{{ periodData.name }}</h2>
+            <h2 class="text-lg font-semibold text-default">
+              {{ periodData.name }}
+            </h2>
             <p class="text-sm text-muted">
               {{ formatDateRange(periodData.start_date, periodData.end_date) }}
             </p>
@@ -114,14 +113,15 @@
     </div>
 
     <!-- Loading State -->
-    <LoadingSpinner v-if="loading" size="lg" text="Loading prices..." class="my-12" />
+    <LoadingSpinner
+      v-if="loading"
+      size="lg"
+      text="Loading prices..."
+      class="my-12"
+    />
 
     <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      :error="error"
-      :retry="fetchPrices"
-    />
+    <ErrorAlert v-else-if="error" :error="error" :retry="fetchPrices" />
 
     <!-- Prices Table -->
     <div v-else-if="pricesData">
@@ -130,19 +130,27 @@
         <div class="mb-4 flex flex-wrap gap-4 text-sm">
           <div>
             <span class="text-muted">Total Items:</span>
-            <span class="ml-2 font-semibold text-default">{{ pricesData.length }}</span>
+            <span class="ml-2 font-semibold text-default">{{
+              pricesData.length
+            }}</span>
           </div>
           <div>
             <span class="text-muted">Prices Set:</span>
-            <span class="ml-2 font-semibold text-default">{{ pricesSetCount }}</span>
+            <span class="ml-2 font-semibold text-default">{{
+              pricesSetCount
+            }}</span>
           </div>
           <div>
             <span class="text-muted">Prices Missing:</span>
-            <span class="ml-2 font-semibold text-default">{{ pricesMissingCount }}</span>
+            <span class="ml-2 font-semibold text-default">{{
+              pricesMissingCount
+            }}</span>
           </div>
           <div v-if="hasChanges" class="ml-auto">
             <span class="text-muted">Unsaved Changes:</span>
-            <span class="ml-2 font-semibold text-amber-600">{{ changesCount }}</span>
+            <span class="ml-2 font-semibold text-amber-600">{{
+              changesCount
+            }}</span>
           </div>
         </div>
 
@@ -151,13 +159,41 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-default">
-                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Code</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Item Name</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Unit</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-default">Category</th>
-                <th class="px-4 py-3 text-right text-sm font-semibold text-default">Current WAC</th>
-                <th class="px-4 py-3 text-right text-sm font-semibold text-default">Period Price</th>
-                <th class="px-4 py-3 text-center text-sm font-semibold text-default">Status</th>
+                <th
+                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                >
+                  Code
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                >
+                  Item Name
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                >
+                  Unit
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                >
+                  Category
+                </th>
+                <th
+                  class="px-4 py-3 text-right text-sm font-semibold text-default"
+                >
+                  Current WAC
+                </th>
+                <th
+                  class="px-4 py-3 text-right text-sm font-semibold text-default"
+                >
+                  Period Price
+                </th>
+                <th
+                  class="px-4 py-3 text-center text-sm font-semibold text-default"
+                >
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -183,12 +219,12 @@
 
                 <!-- Category -->
                 <td class="px-4 py-3 text-sm text-muted">
-                  {{ item.item_category || '-' }}
+                  {{ item.item_category || "-" }}
                 </td>
 
                 <!-- Current WAC -->
                 <td class="px-4 py-3 text-right text-sm text-muted">
-                  {{ item.wac !== null ? formatCurrency(item.wac) : '-' }}
+                  {{ item.wac !== null ? formatCurrency(item.wac) : "-" }}
                 </td>
 
                 <!-- Period Price (Editable) -->
@@ -199,7 +235,10 @@
                     step="0.01"
                     min="0"
                     placeholder="0.00"
-                    :disabled="periodData?.status === 'CLOSED' || !permissions.canSetItemPrices"
+                    :disabled="
+                      periodData?.status === 'CLOSED' ||
+                      !permissions.canSetItemPrices
+                    "
                     class="w-32 ml-auto"
                     @input="handlePriceChange(item)"
                   />
@@ -260,15 +299,16 @@
     </div>
 
     <!-- Footer Actions -->
-    <div v-if="pricesData && pricesData.length > 0" class="mt-6 flex items-center justify-between">
+    <div
+      v-if="pricesData && pricesData.length > 0"
+      class="mt-6 flex items-center justify-between"
+    >
       <div class="text-sm text-muted">
         <span v-if="hasChanges">
           <UIcon name="i-lucide-alert-circle" class="inline h-4 w-4" />
           You have unsaved changes. Click "Save All Prices" to apply them.
         </span>
-        <span v-else>
-          All prices are saved.
-        </span>
+        <span v-else> All prices are saved. </span>
       </div>
 
       <UButton
@@ -287,168 +327,180 @@
 </template>
 
 <script setup lang="ts">
-import { formatCurrency, formatDateRange } from '~/utils/format'
+import { formatCurrency, formatDateRange } from "~/utils/format";
 
 // Props and route
-const route = useRoute()
-const periodId = computed(() => route.params.periodId as string)
+const route = useRoute();
+const periodId = computed(() => route.params.periodId as string);
 
 // Composables
-const { canSetItemPrices } = usePermissions()
-const permissions = { canSetItemPrices }
-const toast = useAppToast()
-const locationStore = useLocationStore()
+const { canSetItemPrices } = usePermissions();
+const permissions = { canSetItemPrices };
+const toast = useAppToast();
+const locationStore = useLocationStore();
 
 // State
-const loading = ref(true)
-const saving = ref(false)
-const error = ref<string | null>(null)
-const periodData = ref<any>(null)
-const pricesData = ref<any[]>([])
-const originalPrices = ref<Map<string, number | null>>(new Map())
+const loading = ref(true);
+const saving = ref(false);
+const error = ref<string | null>(null);
+const periodData = ref<any>(null);
+const pricesData = ref<any[]>([]);
+const originalPrices = ref<Map<string, number | null>>(new Map());
 
 // Filters
-const searchQuery = ref('')
-const selectedCategory = ref('')
+const searchQuery = ref("");
+const selectedCategory = ref("");
 
 // Fetch prices on mount
 onMounted(async () => {
-  await fetchPrices()
-})
+  await fetchPrices();
+});
 
 // Fetch location stock for WAC comparison
-const locationStock = ref<Map<string, number>>(new Map())
+const locationStock = ref<Map<string, number>>(new Map());
 
 async function fetchPrices() {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
     // Fetch period prices
-    const response = await $fetch(`/api/periods/${periodId.value}/prices`)
-    periodData.value = response.period
+    const response = await $fetch(`/api/periods/${periodId.value}/prices`);
+    periodData.value = response.period;
 
     // Fetch location stock for current location to get WAC values
-    const activeLocationId = locationStore.activeLocation?.id
+    const activeLocationId = locationStore.activeLocation?.id;
     if (activeLocationId) {
-      const stockResponse = await $fetch(`/api/locations/${activeLocationId}/stock`)
+      const stockResponse = await $fetch(
+        `/api/locations/${activeLocationId}/stock`
+      );
       if (stockResponse.stock) {
         stockResponse.stock.forEach((s: any) => {
-          locationStock.value.set(s.item_id, parseFloat(s.wac) || 0)
-        })
+          locationStock.value.set(s.item_id, parseFloat(s.wac) || 0);
+        });
       }
     }
 
     // Process prices data
     pricesData.value = response.prices.map((item: any) => {
-      const wac = locationStock.value.get(item.item_id) || null
-      const currentPrice = item.price ? parseFloat(item.price.toString()) : null
+      const wac = locationStock.value.get(item.item_id) || null;
+      const currentPrice = item.price
+        ? parseFloat(item.price.toString())
+        : null;
 
       return {
         ...item,
         wac,
-        editedPrice: currentPrice !== null ? currentPrice.toString() : '',
+        editedPrice: currentPrice !== null ? currentPrice.toString() : "",
         originalPrice: currentPrice,
         isModified: false,
         hasPriceVariance: false,
-      }
-    })
+      };
+    });
 
     // Store original prices
     pricesData.value.forEach((item) => {
-      originalPrices.value.set(item.item_id, item.originalPrice)
-    })
+      originalPrices.value.set(item.item_id, item.originalPrice);
+    });
   } catch (err: any) {
-    console.error('Error fetching prices:', err)
-    error.value = err.data?.message || 'Failed to load prices'
+    console.error("Error fetching prices:", err);
+    error.value = err.data?.message || "Failed to load prices";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 // Handle price change
 function handlePriceChange(item: any) {
-  const editedValue = item.editedPrice ? parseFloat(item.editedPrice) : null
-  const originalValue = originalPrices.value.get(item.item_id)
+  const editedValue = item.editedPrice ? parseFloat(item.editedPrice) : null;
+  const originalValue = originalPrices.value.get(item.item_id);
 
   // Check if modified
-  item.isModified = editedValue !== originalValue
+  item.isModified = editedValue !== originalValue;
 
   // Check for price variance (>10% difference from WAC)
   if (editedValue !== null && item.wac !== null) {
-    const variance = Math.abs((editedValue - item.wac) / item.wac) * 100
-    item.hasPriceVariance = variance > 10
+    const variance = Math.abs((editedValue - item.wac) / item.wac) * 100;
+    item.hasPriceVariance = variance > 10;
   } else {
-    item.hasPriceVariance = false
+    item.hasPriceVariance = false;
   }
 }
 
 // Computed properties
 const categoryOptions = computed(() => {
-  const categories = new Set<string>()
+  const categories = new Set<string>();
   pricesData.value.forEach((item) => {
     if (item.item_category) {
-      categories.add(item.item_category)
+      categories.add(item.item_category);
     }
-  })
+  });
   return [
-    { label: 'All Categories', value: '' },
-    ...Array.from(categories).sort().map((cat) => ({ label: cat, value: cat })),
-  ]
-})
+    { label: "All Categories", value: "" },
+    ...Array.from(categories)
+      .sort()
+      .map((cat) => ({ label: cat, value: cat })),
+  ];
+});
 
 const filteredPrices = computed(() => {
-  let filtered = pricesData.value
+  let filtered = pricesData.value;
 
   // Filter by search
   if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
+    const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(
       (item) =>
         item.item_name.toLowerCase().includes(query) ||
         item.item_code.toLowerCase().includes(query)
-    )
+    );
   }
 
   // Filter by category
   if (selectedCategory.value) {
-    filtered = filtered.filter((item) => item.item_category === selectedCategory.value)
+    filtered = filtered.filter(
+      (item) => item.item_category === selectedCategory.value
+    );
   }
 
-  return filtered
-})
+  return filtered;
+});
 
 const pricesSetCount = computed(() => {
-  return pricesData.value.filter((item) => item.has_price).length
-})
+  return pricesData.value.filter((item) => item.has_price).length;
+});
 
 const pricesMissingCount = computed(() => {
-  return pricesData.value.filter((item) => !item.has_price).length
-})
+  return pricesData.value.filter((item) => !item.has_price).length;
+});
 
 const hasChanges = computed(() => {
-  return pricesData.value.some((item) => item.isModified)
-})
+  return pricesData.value.some((item) => item.isModified);
+});
 
 const changesCount = computed(() => {
-  return pricesData.value.filter((item) => item.isModified).length
-})
+  return pricesData.value.filter((item) => item.isModified).length;
+});
 
 const canSave = computed(() => {
-  return hasChanges.value && periodData.value?.status !== 'CLOSED' && permissions.canSetItemPrices
-})
+  return (
+    hasChanges.value &&
+    periodData.value?.status !== "CLOSED" &&
+    permissions.canSetItemPrices
+  );
+});
 
 // Clear filters
 function clearFilters() {
-  searchQuery.value = ''
-  selectedCategory.value = ''
+  searchQuery.value = "";
+  selectedCategory.value = "";
 }
 
 // Save all prices
 async function handleSaveAll() {
-  if (!canSave.value) return
+  if (!canSave.value) return;
 
-  saving.value = true
+  saving.value = true;
 
   try {
     // Collect modified prices
@@ -457,39 +509,46 @@ async function handleSaveAll() {
       .map((item) => ({
         item_id: item.item_id,
         price: parseFloat(item.editedPrice),
-      }))
+      }));
 
     if (modifiedPrices.length === 0) {
-      toast.warning('No Changes', { description: 'No prices to save' })
-      return
+      toast.warning("No Changes", { description: "No prices to save" });
+      return;
     }
 
     // Send update request
-    const response = await $fetch<{ updated_count: number }>(`/api/periods/${periodId.value}/prices`, {
-      method: 'POST',
-      body: { prices: modifiedPrices },
-    })
+    const response = await $fetch<{ updated_count: number }>(
+      `/api/periods/${periodId.value}/prices`,
+      {
+        method: "POST",
+        body: { prices: modifiedPrices },
+      }
+    );
 
-    toast.success('Prices Updated', { description: `Successfully updated ${response.updated_count} item prices` })
+    toast.success("Prices Updated", {
+      description: `Successfully updated ${response.updated_count} item prices`,
+    });
 
     // Refresh data
-    await fetchPrices()
+    await fetchPrices();
   } catch (err: any) {
-    console.error('Error saving prices:', err)
-    toast.error('Save Failed', { description: err.data?.message || 'Failed to save prices' })
+    console.error("Error saving prices:", err);
+    toast.error("Save Failed", {
+      description: err.data?.message || "Failed to save prices",
+    });
   } finally {
-    saving.value = false
+    saving.value = false;
   }
 }
 
 // Page metadata
 definePageMeta({
-  middleware: ['role'],
-  roleRequired: 'ADMIN',
-})
+  middleware: ["role"],
+  roleRequired: "ADMIN",
+});
 
 // Page title
 useHead({
-  title: 'Set Item Prices - SM Stock Management',
-})
+  title: "Set Item Prices - SM Stock Management",
+});
 </script>

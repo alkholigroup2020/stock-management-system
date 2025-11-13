@@ -1,10 +1,7 @@
 <template>
   <div>
     <!-- Page Header -->
-    <PageHeader
-      title="Create Location"
-      icon="i-lucide-plus"
-    >
+    <PageHeader title="Create Location" icon="i-lucide-plus">
       <template #actions>
         <UButton
           color="neutral"
@@ -19,11 +16,7 @@
 
     <!-- Form Card -->
     <UCard class="max-w-3xl">
-      <UForm
-        :schema="schema"
-        :state="(formData as any)"
-        @submit="onSubmit"
-      >
+      <UForm :schema="schema" :state="(formData as any)" @submit="onSubmit">
         <div class="space-y-6">
           <!-- Code -->
           <UFormGroup
@@ -41,11 +34,7 @@
           </UFormGroup>
 
           <!-- Name -->
-          <UFormGroup
-            label="Location Name"
-            name="name"
-            required
-          >
+          <UFormGroup label="Location Name" name="name" required>
             <UInput
               v-model="formData.name"
               placeholder="Enter location name"
@@ -55,11 +44,7 @@
           </UFormGroup>
 
           <!-- Type -->
-          <UFormGroup
-            label="Location Type"
-            name="type"
-            required
-          >
+          <UFormGroup label="Location Type" name="type" required>
             <USelectMenu
               v-model="formData.type"
               :options="typeOptions"
@@ -112,7 +97,9 @@
           </UFormGroup>
 
           <!-- Submit Buttons -->
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+          <div
+            class="flex items-center justify-end gap-3 pt-4 border-t border-default"
+          >
             <UButton
               color="neutral"
               variant="ghost"
@@ -137,78 +124,86 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+import { z } from "zod";
 
 definePageMeta({
-  middleware: ['role'],
-  roleRequired: 'ADMIN',
-  layout: 'default',
-})
+  middleware: ["role"],
+  roleRequired: "ADMIN",
+  layout: "default",
+});
 
 // Composables
-const toast = useAppToast()
+const toast = useAppToast();
 
 // State
-const submitting = ref(false)
-const loadingManagers = ref(false)
-const managerOptions = ref<any[]>([{ label: 'No Manager', value: null }])
+const submitting = ref(false);
+const loadingManagers = ref(false);
+const managerOptions = ref<any[]>([{ label: "No Manager", value: null }]);
 
 // Form data
 const formData = reactive({
-  code: '',
-  name: '',
+  code: "",
+  name: "",
   type: undefined as string | undefined,
-  address: '',
+  address: "",
   manager_id: undefined as string | undefined,
-  timezone: 'Asia/Riyadh',
-})
+  timezone: "Asia/Riyadh",
+});
 
 // Validation schema
 const schema = z.object({
-  code: z.string().min(1, 'Code is required').max(10, 'Code must be at most 10 characters'),
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be at most 100 characters'),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE']).describe('Location type is required'),
+  code: z
+    .string()
+    .min(1, "Code is required")
+    .max(10, "Code must be at most 10 characters"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be at most 100 characters"),
+  type: z
+    .enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"])
+    .describe("Location type is required"),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional().nullable(),
-  timezone: z.string().max(50).default('Asia/Riyadh'),
-})
+  timezone: z.string().max(50).default("Asia/Riyadh"),
+});
 
 // Type options
 const typeOptions = [
-  { label: 'Kitchen', value: 'KITCHEN' },
-  { label: 'Store', value: 'STORE' },
-  { label: 'Central', value: 'CENTRAL' },
-  { label: 'Warehouse', value: 'WAREHOUSE' },
-]
+  { label: "Kitchen", value: "KITCHEN" },
+  { label: "Store", value: "STORE" },
+  { label: "Central", value: "CENTRAL" },
+  { label: "Warehouse", value: "WAREHOUSE" },
+];
 
 // Fetch managers (active users for dropdown)
 const fetchManagers = async () => {
-  loadingManagers.value = true
+  loadingManagers.value = true;
 
   try {
-    const response = await $fetch<{ users: any[] }>('/api/users', {
+    const response = await $fetch<{ users: any[] }>("/api/users", {
       query: { is_active: true },
-    })
+    });
 
-    const users = response.users || []
+    const users = response.users || [];
     managerOptions.value = [
-      { label: 'No Manager', value: null },
+      { label: "No Manager", value: null },
       ...users.map((user: any) => ({
         label: user.full_name || user.username,
         value: user.id,
       })),
-    ]
+    ];
   } catch (err: any) {
-    console.error('Error fetching managers:', err)
-    toast.warning('Warning', { description: 'Could not load manager list' })
+    console.error("Error fetching managers:", err);
+    toast.warning("Warning", { description: "Could not load manager list" });
   } finally {
-    loadingManagers.value = false
+    loadingManagers.value = false;
   }
-}
+};
 
 // Submit handler
 const onSubmit = async () => {
-  submitting.value = true
+  submitting.value = true;
 
   try {
     const payload = {
@@ -218,31 +213,31 @@ const onSubmit = async () => {
       address: formData.address || undefined,
       manager_id: formData.manager_id || undefined,
       timezone: formData.timezone,
-    }
+    };
 
-    await $fetch('/api/locations', {
-      method: 'POST',
+    await $fetch("/api/locations", {
+      method: "POST",
       body: payload,
-    })
+    });
 
-    toast.success('Success', { description: 'Location created successfully' })
-    navigateTo('/locations')
+    toast.success("Success", { description: "Location created successfully" });
+    navigateTo("/locations");
   } catch (err: any) {
-    console.error('Error creating location:', err)
-    const message = err.data?.message || 'Failed to create location'
-    toast.error('Error', { description: message })
+    console.error("Error creating location:", err);
+    const message = err.data?.message || "Failed to create location";
+    toast.error("Error", { description: message });
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  fetchManagers()
-})
+  fetchManagers();
+});
 
 // Set page title
 useHead({
-  title: 'Create Location - Stock Management System',
-})
+  title: "Create Location - Stock Management System",
+});
 </script>

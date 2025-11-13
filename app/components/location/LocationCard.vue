@@ -25,7 +25,7 @@
           :color="location.is_active ? 'success' : 'neutral'"
           variant="subtle"
         >
-          {{ location.is_active ? 'Active' : 'Inactive' }}
+          {{ location.is_active ? "Active" : "Inactive" }}
         </UBadge>
       </div>
     </template>
@@ -57,7 +57,10 @@
       </div>
 
       <!-- Stats -->
-      <div v-if="showStats" class="flex items-center gap-4 pt-2 border-t border-default">
+      <div
+        v-if="showStats"
+        class="flex items-center gap-4 pt-2 border-t border-default"
+      >
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-users" class="w-4 h-4 text-muted" />
           <span class="text-sm text-muted">
@@ -103,29 +106,29 @@
 
 <script setup lang="ts">
 interface Location {
-  id: string
-  code: string
-  name: string
-  type: 'KITCHEN' | 'STORE' | 'CENTRAL' | 'WAREHOUSE'
-  address?: string | null
+  id: string;
+  code: string;
+  name: string;
+  type: "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
+  address?: string | null;
   manager?: {
-    id: string
-    username: string
-    full_name?: string | null
-  } | null
-  is_active: boolean
+    id: string;
+    username: string;
+    full_name?: string | null;
+  } | null;
+  is_active: boolean;
   _count?: {
-    user_locations?: number
-    location_stock?: number
-  }
+    user_locations?: number;
+    location_stock?: number;
+  };
 }
 
 interface Props {
-  location: Location
-  showViewDetails?: boolean
-  showEdit?: boolean
-  showStats?: boolean
-  canEdit?: boolean
+  location: Location;
+  showViewDetails?: boolean;
+  showEdit?: boolean;
+  showStats?: boolean;
+  canEdit?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -133,51 +136,71 @@ const props = withDefaults(defineProps<Props>(), {
   showEdit: true,
   showStats: true,
   canEdit: true,
-})
+});
 
 defineEmits<{
-  'view-details': [location: Location]
-  edit: [location: Location]
-}>()
+  "view-details": [location: Location];
+  edit: [location: Location];
+}>();
 
 // Computed properties for location type styling
 const locationIcon = computed(() => {
   const icons = {
-    KITCHEN: 'i-lucide-chef-hat',
-    STORE: 'i-lucide-store',
-    CENTRAL: 'i-lucide-warehouse',
-    WAREHOUSE: 'i-lucide-package-2',
-  }
-  return icons[props.location.type] || 'i-lucide-map-pin'
-})
+    KITCHEN: "i-lucide-chef-hat",
+    STORE: "i-lucide-store",
+    CENTRAL: "i-lucide-warehouse",
+    WAREHOUSE: "i-lucide-package-2",
+  };
+  return icons[props.location.type] || "i-lucide-map-pin";
+});
 
 const locationTypeClass = computed(() => {
   const classes = {
-    KITCHEN: 'bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
-    STORE: 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400',
-    CENTRAL: 'bg-navy-100 dark:bg-navy-900/20 text-navy-700 dark:text-navy-400',
-    WAREHOUSE: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400',
-  }
-  return classes[props.location.type] || 'bg-zinc-100 dark:bg-zinc-800'
-})
+    KITCHEN:
+      "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
+    STORE:
+      "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400",
+    CENTRAL: "bg-navy-100 dark:bg-navy-900/20 text-navy-700 dark:text-navy-400",
+    WAREHOUSE: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400",
+  };
+  return classes[props.location.type] || "bg-zinc-100 dark:bg-zinc-800";
+});
 
-const locationTypeBadgeColor = computed((): 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral' => {
-  const colors: Record<string, 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral'> = {
-    KITCHEN: 'warning',
-    STORE: 'success',
-    CENTRAL: 'primary',
-    WAREHOUSE: 'neutral',
+const locationTypeBadgeColor = computed(
+  ():
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "warning"
+    | "info"
+    | "neutral" => {
+    const colors: Record<
+      string,
+      | "primary"
+      | "secondary"
+      | "success"
+      | "error"
+      | "warning"
+      | "info"
+      | "neutral"
+    > = {
+      KITCHEN: "warning",
+      STORE: "success",
+      CENTRAL: "primary",
+      WAREHOUSE: "neutral",
+    };
+    return colors[props.location.type] || "neutral";
   }
-  return colors[props.location.type] || 'neutral'
-})
+);
 
 const formatLocationType = (type: string) => {
   const labels = {
-    KITCHEN: 'Kitchen',
-    STORE: 'Store',
-    CENTRAL: 'Central',
-    WAREHOUSE: 'Warehouse',
-  }
-  return labels[type as keyof typeof labels] || type
-}
+    KITCHEN: "Kitchen",
+    STORE: "Store",
+    CENTRAL: "Central",
+    WAREHOUSE: "Warehouse",
+  };
+  return labels[type as keyof typeof labels] || type;
+};
 </script>
