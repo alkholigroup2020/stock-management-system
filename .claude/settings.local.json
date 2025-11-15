@@ -43,7 +43,14 @@
       "mcp__nuxt-ui-remote__get_documentation_page",
       "WebFetch(domain:api.github.com)",
       "mcp__playwright__browser_console_messages",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(find:*)",
+      "Bash(for component in \"DataTable\" \"EmptyState\" \"ErrorAlert\" \"LoadingSpinner\" \"PageHeader\" \"StockAlert\" \"MetricCard\" \"RecentActivity\" \"DeliveryForm\" \"DeliveryLineInput\" \"PriceVarianceAlert\" \"IssueForm\" \"IssueLineInput\" \"LocationStockTable\" \"LocationSwitcher\" \"PeriodIndicator\" \"LocationCard\" \"PermissionCheck\")",
+      "Bash(do echo \"=== $component ===\")",
+      "Bash(done)",
+      "Bash(rm:*)",
+      "Bash(dir:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

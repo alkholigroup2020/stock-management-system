@@ -80,6 +80,46 @@ pnpm format:check  # Check formatting (CI)
 
 **If typecheck fails or formatting is inconsistent, the task is NOT complete.**
 
+### Page Layout Standards
+
+**CRITICAL:** All pages must follow consistent padding standards for a unified user experience.
+
+**Padding Rules:**
+
+- **All pages (except login):** Use `p-4 md:p-6` for responsive padding
+  - Mobile: `p-4` (1rem / 16px)
+  - Tablet/Desktop: `md:p-6` (1.5rem / 24px)
+- **Login page:** Special centered layout with `px-4 py-12 sm:px-6 lg:px-8`
+- **Wrapper element:** Apply padding to the outermost `<div>` in the `<template>`
+- **Full-height pages:** Combine with `min-h-screen bg-default` for consistent full-page layouts
+
+**Examples:**
+
+```vue
+<!-- Standard page layout -->
+<template>
+  <div class="p-4 md:p-6">
+    <!-- Page content -->
+  </div>
+</template>
+
+<!-- Full-height page layout -->
+<template>
+  <div class="min-h-screen bg-default p-4 md:p-6">
+    <!-- Page content -->
+  </div>
+</template>
+
+<!-- Login page (exception) -->
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8">
+    <!-- Centered content -->
+  </div>
+</template>
+```
+
+**IMPORTANT:** Never use inconsistent padding values like `p-6`, `p-3`, or mixed values. Always use the unified `p-4 md:p-6` pattern for all pages except login.
+
 ## Development Commands
 
 **Package Manager:** pnpm (required)

@@ -99,9 +99,7 @@ const isFormValid = computed(() => {
     formData.value.issue_date &&
     formData.value.cost_centre &&
     lines.value.length > 0 &&
-    lines.value.every(
-      (line) => line.item_id && line.quantity && parseFloat(line.quantity) > 0
-    ) &&
+    lines.value.every((line) => line.item_id && line.quantity && parseFloat(line.quantity) > 0) &&
     !hasInsufficientStock.value
   );
 });
@@ -171,19 +169,16 @@ const submitIssue = async () => {
     }));
 
     // Submit issue
-    const result: any = await $fetch(
-      `/api/locations/${locationStore.activeLocation.id}/issues`,
-      {
-        method: "POST",
-        body: {
-          issue_date: formData.value.issue_date
-            ? new Date(formData.value.issue_date).toISOString()
-            : new Date().toISOString(),
-          cost_centre: formData.value.cost_centre,
-          lines: linesData,
-        },
-      }
-    );
+    const result: any = await $fetch(`/api/locations/${locationStore.activeLocation.id}/issues`, {
+      method: "POST",
+      body: {
+        issue_date: formData.value.issue_date
+          ? new Date(formData.value.issue_date).toISOString()
+          : new Date().toISOString(),
+        cost_centre: formData.value.cost_centre,
+        lines: linesData,
+      },
+    });
 
     toast.success("Issue created successfully", {
       description: "Issue record has been saved",
@@ -195,10 +190,7 @@ const submitIssue = async () => {
     console.error("Issue submission error:", error);
 
     // Check for insufficient stock error
-    if (
-      error.data?.code === "INSUFFICIENT_STOCK" &&
-      error.data?.details?.insufficient_items
-    ) {
+    if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
       const items = error.data.details.insufficient_items;
       const itemList = items
         .map(
@@ -258,7 +250,7 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen bg-default p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <PageHeader title="New Issue" icon="file-minus">
       <template #breadcrumbs>
@@ -302,11 +294,7 @@ watch(
           <!-- Location (Read-only) -->
           <div>
             <label class="form-label">Location</label>
-            <UInput
-              :model-value="locationStore.activeLocation?.name"
-              readonly
-              disabled
-            />
+            <UInput :model-value="locationStore.activeLocation?.name" readonly disabled />
           </div>
         </div>
       </UCard>
@@ -316,13 +304,7 @@ watch(
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-default">Issue Items</h2>
-            <UButton
-              icon="i-lucide-plus"
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="addLine"
-            >
+            <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" @click="addLine">
               Add Item
             </UButton>
           </div>
@@ -344,34 +326,18 @@ watch(
           <table class="min-w-full divide-y divide-default">
             <thead>
               <tr class="bg-default">
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
-                  Item
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                   On Hand
                 </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                   Quantity
                 </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
-                  WAC
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">WAC</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
                   Line Value
                 </th>
-                <th
-                  class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">
                   Action
                 </th>
               </tr>
@@ -478,14 +444,7 @@ watch(
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton
-          color="neutral"
-          variant="soft"
-          @click="cancel"
-          :disabled="loading"
-        >
-          Cancel
-        </UButton>
+        <UButton color="neutral" variant="soft" @click="cancel" :disabled="loading">Cancel</UButton>
         <UButton
           color="primary"
           :loading="loading"

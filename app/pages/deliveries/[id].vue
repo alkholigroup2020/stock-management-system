@@ -108,15 +108,9 @@ const delivery = ref<Delivery | null>(null);
 
 // Computed
 const deliveryId = computed(() => route.params.id as string);
-const hasVarianceLines = computed(
-  () => delivery.value?.summary.variance_lines ?? 0 > 0
-);
-const varianceLinesCount = computed(
-  () => delivery.value?.summary.variance_lines ?? 0
-);
-const totalVarianceAmount = computed(
-  () => delivery.value?.summary.total_variance_amount ?? 0
-);
+const hasVarianceLines = computed(() => delivery.value?.summary.variance_lines ?? 0 > 0);
+const varianceLinesCount = computed(() => delivery.value?.summary.variance_lines ?? 0);
+const totalVarianceAmount = computed(() => delivery.value?.summary.total_variance_amount ?? 0);
 
 // Fetch delivery details
 async function fetchDelivery() {
@@ -129,9 +123,7 @@ async function fetchDelivery() {
   error.value = null;
 
   try {
-    const response = await $fetch<{ delivery: Delivery }>(
-      `/api/deliveries/${deliveryId.value}`
-    );
+    const response = await $fetch<{ delivery: Delivery }>(`/api/deliveries/${deliveryId.value}`);
     delivery.value = response.delivery;
   } catch (err: any) {
     error.value = err?.data?.message || "Failed to fetch delivery details";
@@ -151,14 +143,7 @@ function getVarianceBadgeColor(variance: number): string {
 // Get NCR status color
 function getNcrStatusColor(
   status: string
-):
-  | "primary"
-  | "secondary"
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "neutral" {
+): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
   switch (status) {
     case "OPEN":
       return "warning";
@@ -197,12 +182,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
-      <div
-        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-      >
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div class="flex items-center gap-2 mb-2">
             <UButton
@@ -217,13 +200,9 @@ onMounted(async () => {
           <nav class="flex items-center space-x-2 text-sm text-muted ml-10">
             <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
             <span>/</span>
-            <NuxtLink to="/deliveries" class="hover:text-primary"
-              >Deliveries</NuxtLink
-            >
+            <NuxtLink to="/deliveries" class="hover:text-primary">Deliveries</NuxtLink>
             <span>/</span>
-            <span class="text-default">{{
-              delivery?.delivery_no || "Loading..."
-            }}</span>
+            <span class="text-default">{{ delivery?.delivery_no || "Loading..." }}</span>
           </nav>
         </div>
         <div class="flex gap-2">
@@ -244,12 +223,7 @@ onMounted(async () => {
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      :message="error"
-      @retry="fetchDelivery"
-      class="mb-6"
-    />
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchDelivery" class="mb-6" />
 
     <!-- Delivery Details -->
     <div v-else-if="delivery" class="space-y-6">
@@ -294,9 +268,7 @@ onMounted(async () => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Delivery Information -->
           <div>
-            <h3 class="text-sm font-semibold text-muted uppercase mb-3">
-              Delivery Information
-            </h3>
+            <h3 class="text-sm font-semibold text-muted uppercase mb-3">Delivery Information</h3>
             <dl class="space-y-2">
               <div>
                 <dt class="text-sm text-muted">Delivery Date</dt>
@@ -315,9 +287,7 @@ onMounted(async () => {
                 <dd class="text-sm font-medium text-default">
                   {{ delivery.po.po_no }}
                   <UBadge
-                    :color="
-                      delivery.po.status === 'OPEN' ? 'success' : 'neutral'
-                    "
+                    :color="delivery.po.status === 'OPEN' ? 'success' : 'neutral'"
                     variant="soft"
                     size="xs"
                     class="ml-2"
@@ -331,9 +301,7 @@ onMounted(async () => {
 
           <!-- Supplier Information -->
           <div>
-            <h3 class="text-sm font-semibold text-muted uppercase mb-3">
-              Supplier
-            </h3>
+            <h3 class="text-sm font-semibold text-muted uppercase mb-3">Supplier</h3>
             <dl class="space-y-2">
               <div>
                 <dt class="text-sm text-muted">Name</dt>
@@ -358,17 +326,13 @@ onMounted(async () => {
 
           <!-- Location & Period -->
           <div>
-            <h3 class="text-sm font-semibold text-muted uppercase mb-3">
-              Location & Period
-            </h3>
+            <h3 class="text-sm font-semibold text-muted uppercase mb-3">Location & Period</h3>
             <dl class="space-y-2">
               <div>
                 <dt class="text-sm text-muted">Location</dt>
                 <dd class="text-sm font-medium text-default">
                   {{ delivery.location.name }}
-                  <span class="text-xs text-muted"
-                    >({{ delivery.location.code }})</span
-                  >
+                  <span class="text-xs text-muted">({{ delivery.location.code }})</span>
                 </dd>
               </div>
               <div>
@@ -382,13 +346,8 @@ onMounted(async () => {
         </div>
 
         <!-- Delivery Note -->
-        <div
-          v-if="delivery.delivery_note"
-          class="mt-6 pt-6 border-t border-default"
-        >
-          <h3 class="text-sm font-semibold text-muted uppercase mb-2">
-            Delivery Note
-          </h3>
+        <div v-if="delivery.delivery_note" class="mt-6 pt-6 border-t border-default">
+          <h3 class="text-sm font-semibold text-muted uppercase mb-2">Delivery Note</h3>
           <p class="text-sm text-default">{{ delivery.delivery_note }}</p>
         </div>
       </UCard>
@@ -456,9 +415,7 @@ onMounted(async () => {
                   </div>
                   <div class="text-xs text-muted">
                     {{ line.item.code }} · {{ line.item.unit }}
-                    <span v-if="line.item.category">
-                      · {{ line.item.category }}</span
-                    >
+                    <span v-if="line.item.category">· {{ line.item.category }}</span>
                   </div>
                 </td>
 
@@ -468,29 +425,19 @@ onMounted(async () => {
                 </td>
 
                 <!-- Unit Price -->
-                <td
-                  class="px-4 py-3 text-right text-sm font-medium text-default"
-                >
+                <td class="px-4 py-3 text-right text-sm font-medium text-default">
                   {{ formatCurrency(line.unit_price) }}
                 </td>
 
                 <!-- Period Price -->
                 <td class="px-4 py-3 text-right text-sm text-muted">
-                  {{
-                    line.period_price ? formatCurrency(line.period_price) : "—"
-                  }}
+                  {{ line.period_price ? formatCurrency(line.period_price) : "—" }}
                 </td>
 
                 <!-- Variance -->
                 <td class="px-4 py-3 text-right">
-                  <div
-                    v-if="line.has_variance"
-                    class="flex items-center justify-end gap-2"
-                  >
-                    <UIcon
-                      name="i-lucide-alert-triangle"
-                      class="text-amber-500 h-4 w-4"
-                    />
+                  <div v-if="line.has_variance" class="flex items-center justify-end gap-2">
+                    <UIcon name="i-lucide-alert-triangle" class="text-amber-500 h-4 w-4" />
                     <div class="text-right">
                       <div
                         :class="[
@@ -502,10 +449,7 @@ onMounted(async () => {
                       >
                         {{ formatCurrency(line.price_variance) }}
                       </div>
-                      <div
-                        v-if="line.variance_percentage"
-                        class="text-xs text-muted"
-                      >
+                      <div v-if="line.variance_percentage" class="text-xs text-muted">
                         ({{ line.variance_percentage }}%)
                       </div>
                     </div>
@@ -514,9 +458,7 @@ onMounted(async () => {
                 </td>
 
                 <!-- Line Value -->
-                <td
-                  class="px-4 py-3 text-right text-sm font-semibold text-default"
-                >
+                <td class="px-4 py-3 text-right text-sm font-semibold text-default">
                   {{ formatCurrency(line.line_value) }}
                 </td>
               </tr>
@@ -534,21 +476,13 @@ onMounted(async () => {
                   {{ delivery.summary.total_lines }}
                 </span>
               </div>
-              <div
-                v-if="hasVarianceLines"
-                class="flex justify-between items-center"
-              >
+              <div v-if="hasVarianceLines" class="flex justify-between items-center">
                 <span class="text-sm text-muted">Items with Variance:</span>
-                <span
-                  class="text-sm font-medium text-amber-600 dark:text-amber-400"
-                >
+                <span class="text-sm font-medium text-amber-600 dark:text-amber-400">
                   {{ varianceLinesCount }}
                 </span>
               </div>
-              <div
-                v-if="hasVarianceLines"
-                class="flex justify-between items-center"
-              >
+              <div v-if="hasVarianceLines" class="flex justify-between items-center">
                 <span class="text-sm text-muted">Total Variance:</span>
                 <span
                   :class="[
@@ -561,12 +495,8 @@ onMounted(async () => {
                   {{ formatCurrency(totalVarianceAmount) }}
                 </span>
               </div>
-              <div
-                class="flex justify-between items-center pt-2 border-t border-default"
-              >
-                <span class="text-base font-semibold text-default"
-                  >Total Amount:</span
-                >
+              <div class="flex justify-between items-center pt-2 border-t border-default">
+                <span class="text-base font-semibold text-default">Total Amount:</span>
                 <span class="text-xl font-bold text-primary">
                   {{ formatCurrency(delivery.total_amount) }}
                 </span>
@@ -580,13 +510,8 @@ onMounted(async () => {
       <UCard v-if="delivery.ncrs.length > 0" class="card-elevated">
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon
-              name="i-lucide-alert-octagon"
-              class="h-5 w-5 text-amber-500"
-            />
-            <h2 class="text-lg font-semibold text-default">
-              Non-Conformance Reports (NCRs)
-            </h2>
+            <UIcon name="i-lucide-alert-octagon" class="h-5 w-5 text-amber-500" />
+            <h2 class="text-lg font-semibold text-default">Non-Conformance Reports (NCRs)</h2>
             <UBadge color="warning" variant="soft">
               {{ delivery.ncrs.length }}
             </UBadge>
@@ -603,14 +528,8 @@ onMounted(async () => {
             <div class="flex items-start justify-between">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="font-semibold text-default">{{
-                    ncr.ncr_no
-                  }}</span>
-                  <UBadge
-                    :color="getNcrStatusColor(ncr.status)"
-                    variant="soft"
-                    size="xs"
-                  >
+                  <span class="font-semibold text-default">{{ ncr.ncr_no }}</span>
+                  <UBadge :color="getNcrStatusColor(ncr.status)" variant="soft" size="xs">
                     {{ ncr.status }}
                   </UBadge>
                   <UBadge

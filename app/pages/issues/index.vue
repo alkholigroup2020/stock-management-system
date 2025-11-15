@@ -188,14 +188,7 @@ function goToNewIssue() {
 // Badge color for cost centre
 function getCostCentreColor(
   costCentre: string
-):
-  | "primary"
-  | "secondary"
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "neutral" {
+): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
   switch (costCentre) {
     case "FOOD":
       return "success";
@@ -225,12 +218,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
-      <div
-        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-      >
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-default">Issues</h1>
           <p class="mt-1 text-sm text-muted">
@@ -239,12 +230,7 @@ onMounted(async () => {
           </p>
         </div>
         <div v-if="canPostIssues()" class="flex gap-2">
-          <UButton
-            color="primary"
-            icon="i-lucide-plus"
-            label="New Issue"
-            @click="goToNewIssue"
-          />
+          <UButton color="primary" icon="i-lucide-plus" label="New Issue" @click="goToNewIssue" />
         </div>
       </div>
     </div>
@@ -280,11 +266,7 @@ onMounted(async () => {
         <div>
           <label class="form-label">Cost Centre</label>
           <select v-model="filters.costCentre" class="form-input w-full">
-            <option
-              v-for="option in costCentreOptions"
-              :key="option.value"
-              :value="option.value"
-            >
+            <option v-for="option in costCentreOptions" :key="option.value" :value="option.value">
               {{ option.label }}
             </option>
           </select>
@@ -333,12 +315,7 @@ onMounted(async () => {
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-if="error"
-      :message="error"
-      @retry="fetchIssues"
-      class="mb-6"
-    />
+    <ErrorAlert v-if="error" :message="error" @retry="fetchIssues" class="mb-6" />
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-12">
@@ -346,10 +323,7 @@ onMounted(async () => {
     </div>
 
     <!-- Issues Table -->
-    <div
-      v-else-if="hasIssues"
-      class="overflow-hidden rounded-lg border border-default bg-elevated"
-    >
+    <div v-else-if="hasIssues" class="overflow-hidden rounded-lg border border-default bg-elevated">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
@@ -370,25 +344,18 @@ onMounted(async () => {
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(issue)"
             >
-              <td
-                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
-              >
+              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
                 {{ issue.issue_no }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
                 {{ formatDate(issue.issue_date) }}
               </td>
               <td class="px-4 py-3 text-sm">
-                <UBadge
-                  :color="getCostCentreColor(issue.cost_centre)"
-                  variant="soft"
-                >
+                <UBadge :color="getCostCentreColor(issue.cost_centre)" variant="soft">
                   {{ issue.cost_centre }}
                 </UBadge>
               </td>
-              <td
-                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
-              >
+              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
                 {{ formatCurrency(issue.total_value) }}
               </td>
             </tr>
@@ -457,12 +424,7 @@ onMounted(async () => {
       "
     >
       <template v-if="canPostIssues()" #action>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          label="New Issue"
-          @click="goToNewIssue"
-        />
+        <UButton color="primary" icon="i-lucide-plus" label="New Issue" @click="goToNewIssue" />
       </template>
     </EmptyState>
   </div>

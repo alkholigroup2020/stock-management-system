@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 py-6">
+  <div class="container mx-auto p-4 md:p-6">
     <!-- Page Header -->
     <PageHeader title="Set Item Prices" icon="i-lucide-tag">
       <template #breadcrumbs>

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-2">
@@ -12,12 +12,8 @@
           Back
         </UButton>
       </div>
-      <h1 class="text-2xl md:text-3xl font-bold text-default">
-        Create New Item
-      </h1>
-      <p class="mt-1 text-sm text-muted">
-        Add a new inventory item to the system
-      </p>
+      <h1 class="text-2xl md:text-3xl font-bold text-default">Create New Item</h1>
+      <p class="mt-1 text-sm text-muted">Add a new inventory item to the system</p>
     </div>
 
     <!-- Form Card -->
@@ -44,8 +40,7 @@
               {{ errors.code }}
             </p>
             <p class="mt-1 text-xs text-muted">
-              Unique identifier for the item (automatically converted to
-              uppercase)
+              Unique identifier for the item (automatically converted to uppercase)
             </p>
           </div>
 
@@ -89,14 +84,13 @@
               {{ errors.unit }}
             </p>
             <p class="mt-1 text-xs text-muted">
-              How this item is measured (KG = Kilograms, EA = Each, LTR =
-              Liters, etc.)
+              How this item is measured (KG = Kilograms, EA = Each, LTR = Liters, etc.)
             </p>
           </div>
 
           <!-- Category -->
           <div>
-            <label for="category" class="form-label"> Category </label>
+            <label for="category" class="form-label">Category</label>
             <UInput
               id="category"
               v-model="form.category"
@@ -109,14 +103,12 @@
             <p v-if="errors.category" class="mt-1 text-sm text-error">
               {{ errors.category }}
             </p>
-            <p class="mt-1 text-xs text-muted">
-              Optional: Main category for organizing items
-            </p>
+            <p class="mt-1 text-xs text-muted">Optional: Main category for organizing items</p>
           </div>
 
           <!-- Sub-Category -->
           <div>
-            <label for="sub_category" class="form-label"> Sub-Category </label>
+            <label for="sub_category" class="form-label">Sub-Category</label>
             <UInput
               id="sub_category"
               v-model="form.sub_category"
@@ -129,15 +121,11 @@
             <p v-if="errors.sub_category" class="mt-1 text-sm text-error">
               {{ errors.sub_category }}
             </p>
-            <p class="mt-1 text-xs text-muted">
-              Optional: Sub-category for further organization
-            </p>
+            <p class="mt-1 text-xs text-muted">Optional: Sub-category for further organization</p>
           </div>
 
           <!-- Form Actions -->
-          <div
-            class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default"
-          >
+          <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default">
             <UButton
               type="button"
               color="neutral"
@@ -226,14 +214,8 @@ const itemSchema = z.object({
     .min(1, "Item name is required")
     .max(200, "Item name must be 200 characters or less"),
   unit: z.enum(["KG", "EA", "LTR", "BOX", "CASE", "PACK"]).optional(),
-  category: z
-    .string()
-    .max(50, "Category must be 50 characters or less")
-    .optional(),
-  sub_category: z
-    .string()
-    .max(50, "Sub-category must be 50 characters or less")
-    .optional(),
+  category: z.string().max(50, "Category must be 50 characters or less").optional(),
+  sub_category: z.string().max(50, "Sub-category must be 50 characters or less").optional(),
 });
 
 /**
@@ -332,13 +314,10 @@ async function handleSubmit() {
     };
 
     // Call API to create item
-    const response = await $fetch<{ item: any; message: string }>(
-      "/api/items",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
+    const response = await $fetch<{ item: any; message: string }>("/api/items", {
+      method: "POST",
+      body: data,
+    });
 
     // Show success message
     toast.add({
@@ -400,19 +379,11 @@ async function handleSubmit() {
  */
 function handleCancel() {
   // Check if form has been modified
-  const hasChanges = !!(
-    form.code ||
-    form.name ||
-    form.unit ||
-    form.category ||
-    form.sub_category
-  );
+  const hasChanges = !!(form.code || form.name || form.unit || form.category || form.sub_category);
 
   if (hasChanges) {
     // Could add a confirmation modal here
-    const confirmed = confirm(
-      "Are you sure you want to cancel? Any unsaved changes will be lost."
-    );
+    const confirmed = confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
     if (!confirmed) return;
   }
 

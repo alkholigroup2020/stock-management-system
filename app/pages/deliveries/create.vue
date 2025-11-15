@@ -96,9 +96,7 @@ const isFormValid = computed(() => {
     formData.value.invoice_no &&
     formData.value.delivery_date &&
     lines.value.length > 0 &&
-    lines.value.every(
-      (line) => line.item_id && line.quantity && line.unit_price
-    )
+    lines.value.every((line) => line.item_id && line.quantity && line.unit_price)
   );
 });
 
@@ -137,9 +135,7 @@ const fetchPeriodPrices = async () => {
   if (!periodStore.currentPeriod?.id) return;
 
   try {
-    const data: any = await $fetch(
-      `/api/periods/${periodStore.currentPeriod.id}/prices`
-    );
+    const data: any = await $fetch(`/api/periods/${periodStore.currentPeriod.id}/prices`);
     // Build map of itemId -> price
     periodPrices.value = {};
     data.forEach((priceItem: any) => {
@@ -212,10 +208,7 @@ const submitDelivery = async () => {
     router.push(`/deliveries/${result.id}`);
   } catch (error: any) {
     console.error("Delivery submission error:", error);
-    toast.error(
-      "Failed to create delivery",
-      error.data?.message || error.message
-    );
+    toast.error("Failed to create delivery", error.data?.message || error.message);
   } finally {
     loading.value = false;
   }
@@ -253,16 +246,14 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen bg-default p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <PageHeader title="New Delivery" icon="truck">
       <template #breadcrumbs>
         <nav class="flex items-center space-x-2 text-sm text-muted">
           <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
           <span>/</span>
-          <NuxtLink to="/deliveries" class="hover:text-primary"
-            >Deliveries</NuxtLink
-          >
+          <NuxtLink to="/deliveries" class="hover:text-primary">Deliveries</NuxtLink>
           <span>/</span>
           <span class="text-default">New</span>
         </nav>
@@ -274,9 +265,7 @@ watch(
       <!-- Delivery Header Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">
-            Delivery Information
-          </h2>
+          <h2 class="text-lg font-semibold text-default">Delivery Information</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,19 +285,13 @@ watch(
           <!-- PO (Optional) -->
           <div>
             <label class="form-label">Purchase Order (Optional)</label>
-            <UInput
-              v-model="formData.po_id"
-              placeholder="PO number if applicable"
-            />
+            <UInput v-model="formData.po_id" placeholder="PO number if applicable" />
           </div>
 
           <!-- Invoice Number -->
           <div>
             <label class="form-label">Invoice Number *</label>
-            <UInput
-              v-model="formData.invoice_no"
-              placeholder="Enter invoice number"
-            />
+            <UInput v-model="formData.invoice_no" placeholder="Enter invoice number" />
           </div>
 
           <!-- Delivery Date -->
@@ -334,13 +317,7 @@ watch(
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-default">Delivery Items</h2>
-            <UButton
-              icon="i-lucide-plus"
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="addLine"
-            >
+            <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" @click="addLine">
               Add Item
             </UButton>
           </div>
@@ -362,39 +339,23 @@ watch(
           <table class="min-w-full divide-y divide-default">
             <thead>
               <tr class="bg-default">
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
-                  Item
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                   Quantity
                 </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                   Unit Price
                 </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                   Period Price
                 </th>
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                   Variance
                 </th>
-                <th
-                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
                   Line Value
                 </th>
-                <th
-                  class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">
                   Action
                 </th>
               </tr>
@@ -446,10 +407,7 @@ watch(
 
                 <!-- Period Price -->
                 <td class="px-4 py-3">
-                  <span
-                    v-if="line.period_price !== undefined"
-                    class="text-sm text-muted"
-                  >
+                  <span v-if="line.period_price !== undefined" class="text-sm text-muted">
                     {{ formatCurrency(line.period_price) }}
                   </span>
                   <span v-else class="text-sm text-muted">-</span>
@@ -457,14 +415,8 @@ watch(
 
                 <!-- Variance -->
                 <td class="px-4 py-3">
-                  <div
-                    v-if="line.has_variance"
-                    class="flex items-center space-x-2"
-                  >
-                    <UIcon
-                      name="i-lucide-alert-triangle"
-                      class="text-amber-500"
-                    />
+                  <div v-if="line.has_variance" class="flex items-center space-x-2">
+                    <UIcon name="i-lucide-alert-triangle" class="text-amber-500" />
                     <span
                       :class="[
                         'text-sm font-medium',
@@ -525,14 +477,7 @@ watch(
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton
-          color="neutral"
-          variant="soft"
-          @click="cancel"
-          :disabled="loading"
-        >
-          Cancel
-        </UButton>
+        <UButton color="neutral" variant="soft" @click="cancel" :disabled="loading">Cancel</UButton>
         <UButton
           color="primary"
           :loading="loading"

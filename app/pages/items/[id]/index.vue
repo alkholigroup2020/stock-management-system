@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />
@@ -16,12 +16,16 @@
       :actions="[
         {
           label: 'Back to Items',
-          onClick: () => { navigateTo('/items') }
+          onClick: () => {
+            navigateTo('/items');
+          },
         },
         {
           label: 'Retry',
-          onClick: () => { fetchItem() }
-        }
+          onClick: () => {
+            fetchItem();
+          },
+        },
       ]"
     />
 
@@ -57,18 +61,11 @@
               <h1 class="text-2xl md:text-3xl font-bold text-default">
                 {{ item.name }}
               </h1>
-              <UBadge
-                v-if="!item.is_active"
-                color="neutral"
-                variant="subtle"
-                size="md"
-              >
+              <UBadge v-if="!item.is_active" color="neutral" variant="subtle" size="md">
                 Inactive
               </UBadge>
             </div>
-            <p class="mt-1 text-sm text-muted">
-              Item Code: {{ item.code }}
-            </p>
+            <p class="mt-1 text-sm text-muted">Item Code: {{ item.code }}</p>
           </div>
 
           <!-- Action Buttons -->
@@ -88,17 +85,13 @@
       <!-- Item Information Card -->
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold text-default">
-            Item Information
-          </h2>
+          <h2 class="text-lg font-semibold text-default">Item Information</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Code -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Item Code
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Item Code</label>
             <p class="text-base font-semibold text-default">
               {{ item.code }}
             </p>
@@ -106,9 +99,7 @@
 
           <!-- Name -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Item Name
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Item Name</label>
             <p class="text-base font-semibold text-default">
               {{ item.name }}
             </p>
@@ -116,9 +107,7 @@
 
           <!-- Unit -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Unit of Measure
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Unit of Measure</label>
             <UBadge color="primary" variant="subtle" size="md">
               {{ item.unit }}
             </UBadge>
@@ -126,43 +115,31 @@
 
           <!-- Category -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Category
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Category</label>
             <p class="text-base text-default">
-              {{ item.category || '-' }}
+              {{ item.category || "-" }}
             </p>
           </div>
 
           <!-- Sub-Category -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Sub-Category
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Sub-Category</label>
             <p class="text-base text-default">
-              {{ item.sub_category || '-' }}
+              {{ item.sub_category || "-" }}
             </p>
           </div>
 
           <!-- Status -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Status
-            </label>
-            <UBadge
-              :color="item.is_active ? 'success' : 'neutral'"
-              variant="subtle"
-              size="md"
-            >
-              {{ item.is_active ? 'Active' : 'Inactive' }}
+            <label class="block text-sm font-medium text-muted mb-1">Status</label>
+            <UBadge :color="item.is_active ? 'success' : 'neutral'" variant="subtle" size="md">
+              {{ item.is_active ? "Active" : "Inactive" }}
             </UBadge>
           </div>
 
           <!-- Created At -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Created
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Created</label>
             <p class="text-base text-default">
               {{ formatDate(item.created_at) }}
             </p>
@@ -170,9 +147,7 @@
 
           <!-- Updated At -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">
-              Last Updated
-            </label>
+            <label class="block text-sm font-medium text-muted mb-1">Last Updated</label>
             <p class="text-base text-default">
               {{ formatDate(item.updated_at) }}
             </p>
@@ -184,9 +159,7 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-default">
-              Stock Levels
-            </h2>
+            <h2 class="text-lg font-semibold text-default">Stock Levels</h2>
             <UButton
               v-if="!showAllLocations && (isAdmin || isSupervisor)"
               color="primary"
@@ -195,7 +168,7 @@
               icon="i-heroicons-arrow-path"
               @click="toggleShowAllLocations"
             >
-              {{ loadingStock ? 'Loading...' : 'Show All Locations' }}
+              {{ loadingStock ? "Loading..." : "Show All Locations" }}
             </UButton>
             <UButton
               v-else-if="showAllLocations"
@@ -226,9 +199,7 @@
       <!-- Quick Actions Card -->
       <UCard v-if="canPostDeliveries() || canPostIssues()">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">
-            Quick Actions
-          </h2>
+          <h2 class="text-lg font-semibold text-default">Quick Actions</h2>
         </template>
 
         <div class="flex flex-wrap gap-3">
@@ -257,73 +228,73 @@
 </template>
 
 <script setup lang="ts">
-import type { Item, LocationStock } from '@prisma/client'
-import dayjs from 'dayjs'
+import type { Item, LocationStock } from "@prisma/client";
+import dayjs from "dayjs";
 
 // Type for Item with location stock
 type LocationStockWithLocation = LocationStock & {
   location: {
-    id: string
-    code: string
-    name: string
-    type: 'KITCHEN' | 'STORE' | 'CENTRAL' | 'WAREHOUSE'
-  }
-}
+    id: string;
+    code: string;
+    name: string;
+    type: "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
+  };
+};
 
 interface ItemWithStock extends Item {
-  location_stock?: LocationStockWithLocation[]
+  location_stock?: LocationStockWithLocation[];
 }
 
 // Composables
-const route = useRoute()
-const { canEditItems, canPostDeliveries, canPostIssues } = usePermissions()
-const authStore = useAuthStore()
-const toast = useToast()
+const route = useRoute();
+const { canEditItems, canPostDeliveries, canPostIssues } = usePermissions();
+const authStore = useAuthStore();
+const toast = useToast();
 
 // Computed properties for roles
-const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
-const isSupervisor = computed(() => authStore.user?.role === 'SUPERVISOR')
+const isAdmin = computed(() => authStore.user?.role === "ADMIN");
+const isSupervisor = computed(() => authStore.user?.role === "SUPERVISOR");
 
 // Reactive state
-const item = ref<ItemWithStock | null>(null)
-const loading = ref(false)
-const loadingStock = ref(false)
-const error = ref<string | null>(null)
-const showAllLocations = ref(false)
+const item = ref<ItemWithStock | null>(null);
+const loading = ref(false);
+const loadingStock = ref(false);
+const error = ref<string | null>(null);
+const showAllLocations = ref(false);
 
 /**
  * Fetch item from the API
  */
 async function fetchItem() {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const itemId = route.params.id as string
+    const itemId = route.params.id as string;
 
-    const params: Record<string, string> = {}
+    const params: Record<string, string> = {};
 
     // Determine whether to include all locations or just user's locations
     if (showAllLocations.value && (isAdmin.value || isSupervisor.value)) {
-      params.includeAllStock = 'true'
+      params.includeAllStock = "true";
     }
 
     const response = await $fetch<{ item: ItemWithStock }>(`/api/items/${itemId}`, {
-      method: 'GET',
+      method: "GET",
       query: params,
-    })
+    });
 
-    item.value = response.item
+    item.value = response.item;
   } catch (err: any) {
-    error.value = err?.data?.message || 'Failed to load item'
-    console.error('Error fetching item:', err)
+    error.value = err?.data?.message || "Failed to load item";
+    console.error("Error fetching item:", err);
     toast.add({
-      title: 'Error',
+      title: "Error",
       description: error.value || undefined,
-      color: 'error',
-    })
+      color: "error",
+    });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
@@ -331,33 +302,33 @@ async function fetchItem() {
  * Toggle showing all locations (for admins/supervisors)
  */
 async function toggleShowAllLocations() {
-  showAllLocations.value = !showAllLocations.value
-  loadingStock.value = true
+  showAllLocations.value = !showAllLocations.value;
+  loadingStock.value = true;
 
   try {
-    const itemId = route.params.id as string
+    const itemId = route.params.id as string;
 
-    const params: Record<string, string> = {}
+    const params: Record<string, string> = {};
 
     if (showAllLocations.value) {
-      params.includeAllStock = 'true'
+      params.includeAllStock = "true";
     }
 
     const response = await $fetch<{ item: ItemWithStock }>(`/api/items/${itemId}`, {
-      method: 'GET',
+      method: "GET",
       query: params,
-    })
+    });
 
-    item.value = response.item
+    item.value = response.item;
   } catch (err: any) {
     toast.add({
-      title: 'Error',
-      description: err?.data?.message || 'Failed to load stock data',
-      color: 'error',
-    })
-    console.error('Error fetching stock:', err)
+      title: "Error",
+      description: err?.data?.message || "Failed to load stock data",
+      color: "error",
+    });
+    console.error("Error fetching stock:", err);
   } finally {
-    loadingStock.value = false
+    loadingStock.value = false;
   }
 }
 
@@ -365,14 +336,14 @@ async function toggleShowAllLocations() {
  * Format date for display
  */
 function formatDate(date: string | Date | null | undefined): string {
-  if (!date) return '-'
-  return dayjs(date).format('DD/MM/YYYY HH:mm')
+  if (!date) return "-";
+  return dayjs(date).format("DD/MM/YYYY HH:mm");
 }
 
 // Fetch item on mount
 onMounted(() => {
-  fetchItem()
-})
+  fetchItem();
+});
 
 // No need for explicit auth middleware since it's global
 </script>

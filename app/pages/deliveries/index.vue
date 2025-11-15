@@ -78,8 +78,7 @@ const paginationInfo = computed(() => {
 
 // Active filters
 const activeFilters = computed(() => {
-  const activeFiltersList: Array<{ key: string; label: string; value: any }> =
-    [];
+  const activeFiltersList: Array<{ key: string; label: string; value: any }> = [];
   if (filters.supplierId) {
     const supplier = suppliers.value.find((s) => s.id === filters.supplierId);
     if (supplier) {
@@ -236,16 +235,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <div class="mb-6">
-      <div
-        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-      >
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-default">
-            Deliveries & Goods Receipts
-          </h1>
+          <h1 class="text-2xl font-bold text-default">Deliveries & Goods Receipts</h1>
           <p class="mt-1 text-sm text-muted">
             View and manage deliveries for
             {{ locationStore.activeLocation?.name }}
@@ -294,11 +289,7 @@ onMounted(async () => {
           <label class="form-label">Supplier</label>
           <select v-model="filters.supplierId" class="form-input w-full">
             <option value="">All Suppliers</option>
-            <option
-              v-for="supplier in suppliers"
-              :key="supplier.id"
-              :value="supplier.id"
-            >
+            <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
               {{ supplier.name }} ({{ supplier.code }})
             </option>
           </select>
@@ -306,11 +297,7 @@ onMounted(async () => {
 
         <!-- Has Variance Filter -->
         <div class="flex items-end">
-          <UCheckbox
-            v-model="filters.hasVariance"
-            label="Has Price Variance"
-            class="text-sm"
-          />
+          <UCheckbox v-model="filters.hasVariance" label="Has Price Variance" class="text-sm" />
         </div>
       </div>
 
@@ -358,12 +345,7 @@ onMounted(async () => {
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-if="error"
-      :message="error"
-      @retry="fetchDeliveries"
-      class="mb-6"
-    />
+    <ErrorAlert v-if="error" :message="error" @retry="fetchDeliveries" class="mb-6" />
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-12">
@@ -395,9 +377,7 @@ onMounted(async () => {
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(delivery)"
             >
-              <td
-                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
-              >
+              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
                 {{ delivery.delivery_no }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
@@ -412,9 +392,7 @@ onMounted(async () => {
               <td class="px-4 py-3 text-sm text-default">
                 {{ delivery.invoice_no || "—" }}
               </td>
-              <td
-                class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default"
-              >
+              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
                 {{ formatCurrency(delivery.total_amount) }}
               </td>
               <td class="px-4 py-3 text-sm">

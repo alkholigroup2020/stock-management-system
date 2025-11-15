@@ -97,14 +97,7 @@ async function fetchIssue() {
 // Get cost centre badge color
 function getCostCentreColor(
   costCentre: string
-):
-  | "primary"
-  | "secondary"
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "neutral" {
+): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
   switch (costCentre) {
     case "FOOD":
       return "success";
@@ -129,7 +122,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-default p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Page Header -->
     <PageHeader title="Issue Details" icon="file-minus">
       <template #breadcrumbs>
@@ -138,18 +131,11 @@ onMounted(() => {
           <span>/</span>
           <NuxtLink to="/issues" class="hover:text-primary">Issues</NuxtLink>
           <span>/</span>
-          <span class="text-default">{{
-            issue?.issue_no || "Loading..."
-          }}</span>
+          <span class="text-default">{{ issue?.issue_no || "Loading..." }}</span>
         </nav>
       </template>
       <template #actions>
-        <UButton
-          color="neutral"
-          variant="soft"
-          icon="i-lucide-arrow-left"
-          @click="goBack"
-        >
+        <UButton color="neutral" variant="soft" icon="i-lucide-arrow-left" @click="goBack">
           Back to Issues
         </UButton>
       </template>
@@ -161,12 +147,7 @@ onMounted(() => {
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      :message="error"
-      class="mt-6"
-      @retry="fetchIssue"
-    />
+    <ErrorAlert v-else-if="error" :message="error" class="mt-6" @retry="fetchIssue" />
 
     <!-- Issue Details -->
     <div v-else-if="issue" class="mt-6 space-y-6">
@@ -178,15 +159,9 @@ onMounted(() => {
               <h2 class="text-2xl font-bold text-default">
                 {{ issue.issue_no }}
               </h2>
-              <p class="mt-1 text-sm text-muted">
-                Posted on {{ formatDate(issue.issue_date) }}
-              </p>
+              <p class="mt-1 text-sm text-muted">Posted on {{ formatDate(issue.issue_date) }}</p>
             </div>
-            <UBadge
-              :color="getCostCentreColor(issue.cost_centre)"
-              variant="soft"
-              size="lg"
-            >
+            <UBadge :color="getCostCentreColor(issue.cost_centre)" variant="soft" size="lg">
               {{ issue.cost_centre }}
             </UBadge>
           </div>
@@ -243,24 +218,12 @@ onMounted(() => {
           <table class="min-w-full divide-y divide-default">
             <thead>
               <tr class="bg-default">
-                <th
-                  class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
-                >
-                  Item
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
                   Quantity
                 </th>
-                <th
-                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
-                >
-                  WAC
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-xs font-medium text-muted uppercase"
-                >
+                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">WAC</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
                   Line Value
                 </th>
               </tr>

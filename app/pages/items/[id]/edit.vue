@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="bg-default p-4 md:p-6">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
       <div class="text-center">
@@ -12,12 +12,13 @@
     <div v-else-if="loadError" class="flex items-center justify-center min-h-[400px]">
       <UCard class="max-w-md">
         <div class="text-center">
-          <UIcon name="i-heroicons-exclamation-triangle" class="w-12 h-12 text-error mx-auto mb-4" />
+          <UIcon
+            name="i-heroicons-exclamation-triangle"
+            class="w-12 h-12 text-error mx-auto mb-4"
+          />
           <h2 class="text-xl font-semibold text-default mb-2">Error Loading Item</h2>
           <p class="text-sm text-muted mb-4">{{ loadError }}</p>
-          <UButton color="primary" @click="router.push('/items')">
-            Back to Items
-          </UButton>
+          <UButton color="primary" @click="router.push('/items')">Back to Items</UButton>
         </div>
       </UCard>
     </div>
@@ -36,12 +37,8 @@
             Back
           </UButton>
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold text-default">
-          Edit Item
-        </h1>
-        <p class="mt-1 text-sm text-muted">
-          Update item details
-        </p>
+        <h1 class="text-2xl md:text-3xl font-bold text-default">Edit Item</h1>
+        <p class="mt-1 text-sm text-muted">Update item details</p>
       </div>
 
       <!-- Form Card -->
@@ -50,19 +47,9 @@
           <div class="space-y-6">
             <!-- Item Code (Read-only) -->
             <div>
-              <label for="code" class="form-label">
-                Item Code
-              </label>
-              <UInput
-                id="code"
-                v-model="form.code"
-                size="lg"
-                disabled
-                class="opacity-60"
-              />
-              <p class="mt-1 text-xs text-muted">
-                Item code cannot be changed
-              </p>
+              <label for="code" class="form-label">Item Code</label>
+              <UInput id="code" v-model="form.code" size="lg" disabled class="opacity-60" />
+              <p class="mt-1 text-xs text-muted">Item code cannot be changed</p>
             </div>
 
             <!-- Item Name -->
@@ -111,9 +98,7 @@
 
             <!-- Category -->
             <div>
-              <label for="category" class="form-label">
-                Category
-              </label>
+              <label for="category" class="form-label">Category</label>
               <UInput
                 id="category"
                 v-model="form.category"
@@ -126,16 +111,12 @@
               <p v-if="errors.category" class="mt-1 text-sm text-error">
                 {{ errors.category }}
               </p>
-              <p class="mt-1 text-xs text-muted">
-                Optional: Main category for organizing items
-              </p>
+              <p class="mt-1 text-xs text-muted">Optional: Main category for organizing items</p>
             </div>
 
             <!-- Sub-Category -->
             <div>
-              <label for="sub_category" class="form-label">
-                Sub-Category
-              </label>
+              <label for="sub_category" class="form-label">Sub-Category</label>
               <UInput
                 id="sub_category"
                 v-model="form.sub_category"
@@ -148,9 +129,7 @@
               <p v-if="errors.sub_category" class="mt-1 text-sm text-error">
                 {{ errors.sub_category }}
               </p>
-              <p class="mt-1 text-xs text-muted">
-                Optional: Sub-category for further organization
-              </p>
+              <p class="mt-1 text-xs text-muted">Optional: Sub-category for further organization</p>
             </div>
 
             <!-- Form Actions -->
@@ -181,7 +160,7 @@
                 @click="handleDeactivate"
                 class="w-full sm:w-auto"
               >
-                {{ isDeactivating ? 'Deactivating...' : 'Deactivate' }}
+                {{ isDeactivating ? "Deactivating..." : "Deactivate" }}
               </UButton>
 
               <!-- Update Button -->
@@ -193,7 +172,7 @@
                 :disabled="isSubmitting || isDeactivating || !isFormValid || !hasChanges"
                 class="w-full sm:w-auto"
               >
-                {{ isSubmitting ? 'Updating...' : 'Update Item' }}
+                {{ isSubmitting ? "Updating..." : "Update Item" }}
               </UButton>
             </div>
           </div>
@@ -204,110 +183,113 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+import { z } from "zod";
 
 // Page metadata
 definePageMeta({
-  middleware: ['role'],
-  roleRequired: 'ADMIN',
-  layout: 'default',
-})
+  middleware: ["role"],
+  roleRequired: "ADMIN",
+  layout: "default",
+});
 
 // Composables
-const { canEditItems } = usePermissions()
-const toast = useToast()
-const router = useRouter()
-const route = useRoute()
+const { canEditItems } = usePermissions();
+const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
 // Check permission
 if (!canEditItems()) {
-  navigateTo('/')
+  navigateTo("/");
 }
 
 // Get item ID from route
-const itemId = route.params.id as string
+const itemId = route.params.id as string;
 
 // Unit options
 const unitOptions = [
-  { label: 'KG - Kilograms', value: 'KG' },
-  { label: 'EA - Each', value: 'EA' },
-  { label: 'LTR - Liters', value: 'LTR' },
-  { label: 'BOX - Box', value: 'BOX' },
-  { label: 'CASE - Case', value: 'CASE' },
-  { label: 'PACK - Pack', value: 'PACK' },
-]
+  { label: "KG - Kilograms", value: "KG" },
+  { label: "EA - Each", value: "EA" },
+  { label: "LTR - Liters", value: "LTR" },
+  { label: "BOX - Box", value: "BOX" },
+  { label: "CASE - Case", value: "CASE" },
+  { label: "PACK - Pack", value: "PACK" },
+];
 
 // Loading states
-const isLoading = ref(true)
-const loadError = ref('')
-const isSubmitting = ref(false)
-const isDeactivating = ref(false)
+const isLoading = ref(true);
+const loadError = ref("");
+const isSubmitting = ref(false);
+const isDeactivating = ref(false);
 
 // Item data
-const item = ref<any>(null)
-const originalData = ref<any>(null)
+const item = ref<any>(null);
+const originalData = ref<any>(null);
 
 // Form state
 const form = reactive({
-  code: '',
-  name: '',
+  code: "",
+  name: "",
   unit: undefined as string | undefined,
-  category: '',
-  sub_category: '',
-})
+  category: "",
+  sub_category: "",
+});
 
 const errors = reactive({
-  name: '',
-  unit: '',
-  category: '',
-  sub_category: '',
-})
+  name: "",
+  unit: "",
+  category: "",
+  sub_category: "",
+});
 
 // Validation schema (matches API schema)
 const itemSchema = z.object({
-  name: z.string().min(1, 'Item name is required').max(200, 'Item name must be 200 characters or less'),
-  unit: z.enum(['KG', 'EA', 'LTR', 'BOX', 'CASE', 'PACK']).optional(),
-  category: z.string().max(50, 'Category must be 50 characters or less').optional(),
-  sub_category: z.string().max(50, 'Sub-category must be 50 characters or less').optional(),
-})
+  name: z
+    .string()
+    .min(1, "Item name is required")
+    .max(200, "Item name must be 200 characters or less"),
+  unit: z.enum(["KG", "EA", "LTR", "BOX", "CASE", "PACK"]).optional(),
+  category: z.string().max(50, "Category must be 50 characters or less").optional(),
+  sub_category: z.string().max(50, "Sub-category must be 50 characters or less").optional(),
+});
 
 /**
  * Fetch item data on mount
  */
 async function fetchItem() {
-  isLoading.value = true
-  loadError.value = ''
+  isLoading.value = true;
+  loadError.value = "";
 
   try {
-    const response = await $fetch<{ item: any }>(`/api/items/${itemId}`)
-    item.value = response.item
+    const response = await $fetch<{ item: any }>(`/api/items/${itemId}`);
+    item.value = response.item;
 
     // Populate form with existing data
-    form.code = response.item.code
-    form.name = response.item.name
-    form.unit = response.item.unit
-    form.category = response.item.category || ''
-    form.sub_category = response.item.sub_category || ''
+    form.code = response.item.code;
+    form.name = response.item.name;
+    form.unit = response.item.unit;
+    form.category = response.item.category || "";
+    form.sub_category = response.item.sub_category || "";
 
     // Store original data for change detection
     originalData.value = {
       name: response.item.name,
       unit: response.item.unit,
-      category: response.item.category || '',
-      sub_category: response.item.sub_category || '',
-    }
+      category: response.item.category || "",
+      sub_category: response.item.sub_category || "",
+    };
   } catch (error: any) {
-    console.error('Error fetching item:', error)
+    console.error("Error fetching item:", error);
 
-    if (error?.data?.code === 'ITEM_NOT_FOUND') {
-      loadError.value = 'Item not found'
-    } else if (error?.data?.code === 'INSUFFICIENT_PERMISSIONS') {
-      loadError.value = 'You do not have permission to edit this item'
+    if (error?.data?.code === "ITEM_NOT_FOUND") {
+      loadError.value = "Item not found";
+    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
+      loadError.value = "You do not have permission to edit this item";
     } else {
-      loadError.value = error?.data?.message || 'Failed to load item'
+      loadError.value = error?.data?.message || "Failed to load item";
     }
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 
@@ -316,14 +298,14 @@ async function fetchItem() {
  */
 function validateField(field: keyof typeof errors) {
   try {
-    const fieldSchema = itemSchema.shape[field]
+    const fieldSchema = itemSchema.shape[field];
     if (fieldSchema) {
-      fieldSchema.parse(form[field])
-      errors[field] = ''
+      fieldSchema.parse(form[field]);
+      errors[field] = "";
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      errors[field] = error.issues[0]?.message || 'Invalid value'
+      errors[field] = error.issues[0]?.message || "Invalid value";
     }
   }
 }
@@ -339,27 +321,27 @@ function validateForm(): boolean {
       unit: form.unit,
       category: form.category || undefined,
       sub_category: form.sub_category || undefined,
-    }
+    };
 
-    itemSchema.parse(data)
+    itemSchema.parse(data);
 
     // Clear all errors
     Object.keys(errors).forEach((key) => {
-      errors[key as keyof typeof errors] = ''
-    })
+      errors[key as keyof typeof errors] = "";
+    });
 
-    return true
+    return true;
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Set errors for each field
       error.issues.forEach((err: z.ZodIssue) => {
-        const field = err.path[0] as keyof typeof errors
+        const field = err.path[0] as keyof typeof errors;
         if (field) {
-          errors[field] = err.message
+          errors[field] = err.message;
         }
-      })
+      });
     }
-    return false
+    return false;
   }
 }
 
@@ -374,22 +356,22 @@ const isFormValid = computed(() => {
     !errors.unit &&
     !errors.category &&
     !errors.sub_category
-  )
-})
+  );
+});
 
 /**
  * Check if form has changes
  */
 const hasChanges = computed(() => {
-  if (!originalData.value) return false
+  if (!originalData.value) return false;
 
   return (
     form.name !== originalData.value.name ||
     form.unit !== originalData.value.unit ||
     form.category !== originalData.value.category ||
     form.sub_category !== originalData.value.sub_category
-  )
-})
+  );
+});
 
 /**
  * Handle form submission
@@ -398,91 +380,92 @@ async function handleSubmit() {
   // Validate form first
   if (!validateForm()) {
     toast.add({
-      title: 'Validation Error',
-      description: 'Please fix the errors in the form',
-      color: 'error',
-    })
-    return
+      title: "Validation Error",
+      description: "Please fix the errors in the form",
+      color: "error",
+    });
+    return;
   }
 
   // Check if there are changes
   if (!hasChanges.value) {
     toast.add({
-      title: 'No Changes',
-      description: 'No changes were made to the item',
-      color: 'warning',
-    })
-    return
+      title: "No Changes",
+      description: "No changes were made to the item",
+      color: "warning",
+    });
+    return;
   }
 
-  isSubmitting.value = true
+  isSubmitting.value = true;
 
   try {
     // Prepare data for API (only send changed fields)
-    const data: any = {}
-    if (form.name !== originalData.value.name) data.name = form.name
-    if (form.unit !== originalData.value.unit) data.unit = form.unit
-    if (form.category !== originalData.value.category) data.category = form.category || null
-    if (form.sub_category !== originalData.value.sub_category) data.sub_category = form.sub_category || null
+    const data: any = {};
+    if (form.name !== originalData.value.name) data.name = form.name;
+    if (form.unit !== originalData.value.unit) data.unit = form.unit;
+    if (form.category !== originalData.value.category) data.category = form.category || null;
+    if (form.sub_category !== originalData.value.sub_category)
+      data.sub_category = form.sub_category || null;
 
     // Call API to update item
     const response = await $fetch<{ item: any; message: string }>(`/api/items/${itemId}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: data,
-    })
+    });
 
     // Show success message
     toast.add({
-      title: 'Success',
-      description: response.message || 'Item updated successfully',
-      color: 'success',
-    })
+      title: "Success",
+      description: response.message || "Item updated successfully",
+      color: "success",
+    });
 
     // Redirect to items list
-    router.push('/items')
+    router.push("/items");
   } catch (error: any) {
-    console.error('Error updating item:', error)
+    console.error("Error updating item:", error);
 
     // Handle specific error cases
-    if (error?.data?.code === 'VALIDATION_ERROR') {
+    if (error?.data?.code === "VALIDATION_ERROR") {
       toast.add({
-        title: 'Validation Error',
-        description: error.data.message || 'Invalid item data',
-        color: 'error',
-      })
+        title: "Validation Error",
+        description: error.data.message || "Invalid item data",
+        color: "error",
+      });
 
       // Set field-specific errors if available
       if (error.data.details) {
         error.data.details.forEach((err: any) => {
-          const field = err.path?.[0]
+          const field = err.path?.[0];
           if (field && field in errors) {
-            errors[field as keyof typeof errors] = err.message
+            errors[field as keyof typeof errors] = err.message;
           }
-        })
+        });
       }
-    } else if (error?.data?.code === 'ITEM_NOT_FOUND') {
+    } else if (error?.data?.code === "ITEM_NOT_FOUND") {
       toast.add({
-        title: 'Item Not Found',
-        description: 'The item you are trying to edit does not exist',
-        color: 'error',
-      })
-      router.push('/items')
-    } else if (error?.data?.code === 'INSUFFICIENT_PERMISSIONS') {
+        title: "Item Not Found",
+        description: "The item you are trying to edit does not exist",
+        color: "error",
+      });
+      router.push("/items");
+    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
       toast.add({
-        title: 'Access Denied',
-        description: 'You do not have permission to update items',
-        color: 'error',
-      })
-      router.push('/items')
+        title: "Access Denied",
+        description: "You do not have permission to update items",
+        color: "error",
+      });
+      router.push("/items");
     } else {
       toast.add({
-        title: 'Error',
-        description: error?.data?.message || 'Failed to update item',
-        color: 'error',
-      })
+        title: "Error",
+        description: error?.data?.message || "Failed to update item",
+        color: "error",
+      });
     }
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
 }
 
@@ -493,54 +476,57 @@ async function handleDeactivate() {
   // Confirm deactivation
   const confirmed = confirm(
     `Are you sure you want to deactivate "${item.value?.name}"?\n\n` +
-    'This will prevent the item from being used in new transactions, but existing records will remain.'
-  )
+      "This will prevent the item from being used in new transactions, but existing records will remain."
+  );
 
-  if (!confirmed) return
+  if (!confirmed) return;
 
-  isDeactivating.value = true
+  isDeactivating.value = true;
 
   try {
     // Call API to deactivate item
-    const response = await $fetch<{ item: any; message: string; deactivated: boolean }>(`/api/items/${itemId}`, {
-      method: 'DELETE',
-    })
+    const response = await $fetch<{ item: any; message: string; deactivated: boolean }>(
+      `/api/items/${itemId}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     // Show success message
     toast.add({
-      title: 'Success',
-      description: response.message || 'Item deactivated successfully',
-      color: 'success',
-    })
+      title: "Success",
+      description: response.message || "Item deactivated successfully",
+      color: "success",
+    });
 
     // Redirect to items list
-    router.push('/items')
+    router.push("/items");
   } catch (error: any) {
-    console.error('Error deactivating item:', error)
+    console.error("Error deactivating item:", error);
 
     // Handle specific error cases
-    if (error?.data?.code === 'ITEM_NOT_FOUND') {
+    if (error?.data?.code === "ITEM_NOT_FOUND") {
       toast.add({
-        title: 'Item Not Found',
-        description: 'The item you are trying to deactivate does not exist',
-        color: 'error',
-      })
-      router.push('/items')
-    } else if (error?.data?.code === 'INSUFFICIENT_PERMISSIONS') {
+        title: "Item Not Found",
+        description: "The item you are trying to deactivate does not exist",
+        color: "error",
+      });
+      router.push("/items");
+    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
       toast.add({
-        title: 'Access Denied',
-        description: 'You do not have permission to deactivate items',
-        color: 'error',
-      })
+        title: "Access Denied",
+        description: "You do not have permission to deactivate items",
+        color: "error",
+      });
     } else {
       toast.add({
-        title: 'Error',
-        description: error?.data?.message || 'Failed to deactivate item',
-        color: 'error',
-      })
+        title: "Error",
+        description: error?.data?.message || "Failed to deactivate item",
+        color: "error",
+      });
     }
   } finally {
-    isDeactivating.value = false
+    isDeactivating.value = false;
   }
 }
 
@@ -550,15 +536,15 @@ async function handleDeactivate() {
 function handleCancel() {
   // Check if form has been modified
   if (hasChanges.value) {
-    const confirmed = confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')
-    if (!confirmed) return
+    const confirmed = confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
+    if (!confirmed) return;
   }
 
-  router.push('/items')
+  router.push("/items");
 }
 
 // Fetch item data on mount
 onMounted(() => {
-  fetchItem()
-})
+  fetchItem();
+});
 </script>
