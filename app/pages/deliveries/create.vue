@@ -265,7 +265,7 @@ watch(
       <!-- Delivery Header Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">Delivery Information</h2>
+          <h2 class="text-subheading font-semibold">Delivery Information</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -316,7 +316,7 @@ watch(
       <UCard class="card-elevated">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-default">Delivery Items</h2>
+            <h2 class="text-subheading font-semibold">Delivery Items</h2>
             <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" @click="addLine">
               Add Item
             </UButton>
@@ -407,10 +407,10 @@ watch(
 
                 <!-- Period Price -->
                 <td class="px-4 py-3">
-                  <span v-if="line.period_price !== undefined" class="text-sm text-muted">
+                  <span v-if="line.period_price !== undefined" class="text-caption">
                     {{ formatCurrency(line.period_price) }}
                   </span>
-                  <span v-else class="text-sm text-muted">-</span>
+                  <span v-else class="text-caption">-</span>
                 </td>
 
                 <!-- Variance -->
@@ -428,12 +428,12 @@ watch(
                       {{ formatCurrency(line.price_variance) }}
                     </span>
                   </div>
-                  <span v-else class="text-sm text-muted">-</span>
+                  <span v-else class="text-caption">-</span>
                 </td>
 
                 <!-- Line Value -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-default">
+                  <span class="text-body font-medium">
                     {{ formatCurrency(line.line_value) }}
                   </span>
                 </td>
@@ -464,10 +464,10 @@ watch(
         <!-- Summary -->
         <div class="mt-4 pt-4 border-t border-default">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-muted">{{ lines.length }} item(s)</div>
+            <div class="text-caption">{{ lines.length }} item(s)</div>
             <div class="text-right">
-              <div class="text-sm text-muted">Total Amount</div>
-              <div class="text-2xl font-bold text-primary">
+              <div class="text-caption">Total Amount</div>
+              <div class="text-heading font-bold text-primary">
                 {{ formatCurrency(totalAmount) }}
               </div>
             </div>

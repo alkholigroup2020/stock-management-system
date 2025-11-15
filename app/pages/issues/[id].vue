@@ -126,12 +126,12 @@ onMounted(() => {
     <!-- Page Header -->
     <PageHeader title="Issue Details" icon="file-minus">
       <template #breadcrumbs>
-        <nav class="flex items-center space-x-2 text-sm text-muted">
+        <nav class="flex items-center space-x-2 text-caption">
           <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
           <span>/</span>
           <NuxtLink to="/issues" class="hover:text-primary">Issues</NuxtLink>
           <span>/</span>
-          <span class="text-default">{{ issue?.issue_no || "Loading..." }}</span>
+          <span>{{ issue?.issue_no || "Loading..." }}</span>
         </nav>
       </template>
       <template #actions>
@@ -156,10 +156,10 @@ onMounted(() => {
         <template #header>
           <div class="flex items-start justify-between">
             <div>
-              <h2 class="text-2xl font-bold text-default">
+              <h2 class="text-heading font-bold">
                 {{ issue.issue_no }}
               </h2>
-              <p class="mt-1 text-sm text-muted">Posted on {{ formatDate(issue.issue_date) }}</p>
+              <p class="mt-1 text-caption">Posted on {{ formatDate(issue.issue_date) }}</p>
             </div>
             <UBadge :color="getCostCentreColor(issue.cost_centre)" variant="soft" size="lg">
               {{ issue.cost_centre }}
@@ -170,38 +170,38 @@ onMounted(() => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Location -->
           <div>
-            <div class="text-sm text-muted">Location</div>
-            <div class="mt-1 font-medium text-default">
+            <div class="text-caption">Location</div>
+            <div class="mt-1 font-medium">
               {{ issue.location?.name }}
             </div>
-            <div class="text-xs text-muted">
+            <div class="text-caption">
               {{ issue.location?.code }}
             </div>
           </div>
 
           <!-- Period -->
           <div>
-            <div class="text-sm text-muted">Period</div>
-            <div class="mt-1 font-medium text-default">
+            <div class="text-caption">Period</div>
+            <div class="mt-1 font-medium">
               {{ issue.period?.name }}
             </div>
           </div>
 
           <!-- Posted By -->
           <div>
-            <div class="text-sm text-muted">Posted By</div>
-            <div class="mt-1 font-medium text-default">
+            <div class="text-caption">Posted By</div>
+            <div class="mt-1 font-medium">
               {{ issue.poster?.full_name }}
             </div>
-            <div class="text-xs text-muted">
+            <div class="text-caption">
               {{ formatDateTime(issue.posted_at) }}
             </div>
           </div>
 
           <!-- Total Value -->
           <div>
-            <div class="text-sm text-muted">Total Value</div>
-            <div class="mt-1 text-2xl font-bold text-primary">
+            <div class="text-caption">Total Value</div>
+            <div class="mt-1 text-heading font-bold text-primary">
               {{ formatCurrency(issue.total_value) }}
             </div>
           </div>
@@ -211,19 +211,19 @@ onMounted(() => {
       <!-- Issue Lines Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">Issue Items</h2>
+          <h2 class="text-subheading font-semibold">Issue Items</h2>
         </template>
 
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-default">
             <thead>
               <tr class="bg-default">
-                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
+                <th class="px-4 py-3 text-left text-label uppercase">Item</th>
+                <th class="px-4 py-3 text-right text-label uppercase">
                   Quantity
                 </th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">WAC</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
+                <th class="px-4 py-3 text-right text-label uppercase">WAC</th>
+                <th class="px-4 py-3 text-right text-label uppercase">
                   Line Value
                 </th>
               </tr>
@@ -232,20 +232,20 @@ onMounted(() => {
               <tr v-for="line in issue.lines" :key="line.id">
                 <!-- Item -->
                 <td class="px-4 py-3">
-                  <div class="font-medium text-default">
+                  <div class="font-medium">
                     {{ line.item?.name }}
                   </div>
-                  <div class="text-sm text-muted">
+                  <div class="text-caption">
                     {{ line.item?.code }} - {{ line.item?.unit }}
                   </div>
-                  <div v-if="line.item?.category" class="text-xs text-muted">
+                  <div v-if="line.item?.category" class="text-caption">
                     {{ line.item.category }}
                   </div>
                 </td>
 
                 <!-- Quantity -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-default">
+                  <span class="text-body font-medium">
                     {{
                       typeof line.quantity === "number"
                         ? line.quantity.toFixed(4)
@@ -256,14 +256,14 @@ onMounted(() => {
 
                 <!-- WAC -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm text-muted">
+                  <span class="text-caption">
                     {{ formatCurrency(line.wac_at_issue) }}
                   </span>
                 </td>
 
                 <!-- Line Value -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-default">
+                  <span class="text-body font-medium">
                     {{ formatCurrency(line.line_value) }}
                   </span>
                 </td>
@@ -275,13 +275,13 @@ onMounted(() => {
         <!-- Summary -->
         <div class="mt-4 pt-4 border-t border-default">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-muted">
+            <div class="text-caption">
               Total: {{ issue.summary.total_lines }} line(s),
               {{ issue.summary.total_items }} item(s)
             </div>
             <div class="text-right">
-              <div class="text-sm text-muted">Grand Total</div>
-              <div class="text-2xl font-bold text-primary">
+              <div class="text-caption">Grand Total</div>
+              <div class="text-heading font-bold text-primary">
                 {{ formatCurrency(issue.summary.total_value) }}
               </div>
             </div>

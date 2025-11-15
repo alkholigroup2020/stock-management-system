@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Global font size scale - reduces all text by one step */
+html {
+  font-size: 88%; /* 14.08px base instead of 16px */
+}
+
 @theme {
   /* Navy Blue - Primary Brand Color (#000046) */
   --color-navy-50: #e6e6f0;
@@ -79,6 +84,21 @@
   --color-blue-800: #1e40af;
   --color-blue-900: #1e3a8a;
   --color-blue-950: #172554;
+
+  /* Font Size Customization - Shifted down by one level */
+  --font-size-xs: 0.6875rem; /* 11px - smaller than default xs (12px) */
+  --font-size-sm: 0.75rem; /* 12px - was xs */
+  --font-size-base: 0.875rem; /* 14px - was sm */
+  --font-size-lg: 1rem; /* 16px - was base */
+  --font-size-xl: 1.125rem; /* 18px - was lg */
+  --font-size-2xl: 1.25rem; /* 20px - was xl */
+  --font-size-3xl: 1.5rem; /* 24px - was 2xl */
+  --font-size-4xl: 1.875rem; /* 30px - was 3xl */
+  --font-size-5xl: 2.25rem; /* 36px - was 4xl */
+  --font-size-6xl: 3rem; /* 48px - was 5xl */
+  --font-size-7xl: 3.75rem; /* 60px - was 6xl */
+  --font-size-8xl: 4.5rem; /* 72px - was 7xl */
+  --font-size-9xl: 6rem; /* 96px - was 8xl */
 }
 
 /* ============================================
@@ -92,9 +112,7 @@
   /* ===== Background Tokens ===== */
   --ui-bg: var(--color-zinc-50); /* Page background */
   --ui-bg-elevated: #ffffff; /* Cards, modals, elevated surfaces */
-  --ui-bg-muted: var(
-    --color-zinc-100
-  ); /* Subtle backgrounds, disabled states */
+  --ui-bg-muted: var(--color-zinc-100); /* Subtle backgrounds, disabled states */
   --ui-bg-accented: var(--color-navy-50); /* Highlighted sections */
   --ui-bg-inverted: var(--color-zinc-900); /* Dark backgrounds in light mode */
 
@@ -143,16 +161,12 @@
   --ui-status-rejected: var(--color-red-600); /* Rejected/failed */
 
   /* Period States */
-  --ui-period-open: var(
-    --color-emerald-600
-  ); /* Period accepting transactions */
+  --ui-period-open: var(--color-emerald-600); /* Period accepting transactions */
   --ui-period-ready: var(--color-navy-500); /* Location ready for close */
   --ui-period-closed: var(--color-zinc-500); /* Period locked */
 
   /* Price Variance */
-  --ui-variance-detected: var(
-    --color-amber-500
-  ); /* Price differs from expected */
+  --ui-variance-detected: var(--color-amber-500); /* Price differs from expected */
 
   /* ===== Utility Tokens ===== */
   --ui-radius: 0.5rem; /* Default border radius */
@@ -317,40 +331,44 @@
    ============================================ */
 
 /* ===== Surface/Card Classes ===== */
-.card-elevated {
-  @apply bg-elevated border border-default;
-  @apply rounded-lg shadow-sm hover:shadow-md;
-  @apply transition-shadow duration-200;
-}
+@layer components {
+  .card-elevated {
+    @apply bg-elevated border border-default;
+    @apply rounded-lg shadow-sm hover:shadow-md;
+    @apply transition-shadow duration-200;
+  }
 
-.card-muted {
-  @apply bg-muted border border-muted;
-  @apply rounded-lg;
-}
+  .card-muted {
+    @apply bg-muted border border-muted;
+    @apply rounded-lg;
+  }
 
-.surface-inverted {
-  @apply bg-inverted text-inverted;
-  @apply border border-inverted;
-  @apply rounded-lg;
+  .surface-inverted {
+    @apply bg-inverted text-inverted;
+    @apply border border-inverted;
+    @apply rounded-lg;
+  }
 }
 
 /* ===== Form Classes ===== */
-.form-input {
-  @apply w-full px-4 py-2.5 rounded-lg;
-  @apply bg-elevated border border-default;
-  @apply text-default placeholder-muted;
-  @apply focus:ring-2 focus:ring-primary focus:border-transparent;
-  @apply transition-all duration-200;
-}
+@layer components {
+  .form-input {
+    @apply w-full px-4 py-2.5 rounded-lg;
+    @apply bg-elevated border border-default;
+    @apply text-default placeholder-muted;
+    @apply focus:ring-2 focus:ring-primary focus:border-transparent;
+    @apply transition-all duration-200;
+  }
 
-.form-label {
-  @apply block text-sm font-medium;
-  @apply text-default mb-1.5;
-}
+  .form-label {
+    @apply block text-xs font-medium;
+    @apply text-default mb-1.5;
+  }
 
-.form-error {
-  @apply text-sm mt-1;
-  color: var(--ui-error);
+  .form-error {
+    @apply text-xs mt-1;
+    color: var(--ui-error);
+  }
 }
 
 /* ===== Status Badge Classes ===== */
@@ -512,58 +530,64 @@
 }
 
 /* ===== Typography Classes ===== */
-.text-display {
-  @apply text-4xl font-bold;
-  color: var(--ui-text-highlighted);
-}
+@layer utilities {
+  .text-display {
+    @apply text-3xl font-bold;
+    color: var(--ui-text-highlighted);
+  }
 
-.text-heading {
-  @apply text-2xl font-semibold;
-  color: var(--ui-text);
-}
+  .text-heading {
+    @apply text-xl font-semibold;
+    color: var(--ui-text);
+  }
 
-.text-subheading {
-  @apply text-lg font-medium;
-  color: var(--ui-text);
-}
+  .text-subheading {
+    @apply text-base font-medium;
+    color: var(--ui-text);
+  }
 
-.text-label {
-  @apply text-sm font-medium;
-  color: var(--ui-text-muted);
-}
+  .text-label {
+    @apply text-xs font-medium;
+    color: var(--ui-text-muted);
+  }
 
-.text-body {
-  @apply text-base;
-  color: var(--ui-text);
-}
+  .text-body {
+    @apply text-sm;
+    color: var(--ui-text);
+  }
 
-.text-caption {
-  @apply text-sm;
-  color: var(--ui-text-muted);
+  .text-caption {
+    @apply text-xs;
+    color: var(--ui-text-muted);
+  }
 }
 
 /* ===== Interactive & Accessibility Classes ===== */
-.focus-ring {
-  @apply focus:ring-2 focus:ring-primary focus:ring-offset-2;
-  @apply focus:ring-offset-elevated;
-  @apply focus:outline-none;
-}
+@layer utilities {
+  .focus-ring {
+    @apply focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    @apply focus:ring-offset-elevated;
+    @apply focus:outline-none;
+  }
 
-.smooth-transition {
-  @apply transition-all duration-200 ease-in-out;
-}
+  .smooth-transition {
+    @apply transition-all duration-200 ease-in-out;
+  }
 
-.hover-lift {
-  @apply transition-transform duration-200;
-}
+  .hover-lift {
+    @apply transition-transform duration-200;
+  }
 
-.hover-lift:hover {
-  @apply -translate-y-0.5;
+  .hover-lift:hover {
+    @apply -translate-y-0.5;
+  }
 }
 
 /* ===== Animation Classes ===== */
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+@layer utilities {
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
 }
 
 @keyframes fadeIn {
@@ -578,10 +602,12 @@
 }
 
 /* ===== Accessibility Classes ===== */
-.sr-only {
-  @apply absolute w-px h-px p-0 -m-px overflow-hidden;
-  @apply whitespace-nowrap border-0;
-  clip: rect(0, 0, 0, 0);
+@layer utilities {
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden;
+    @apply whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
 }
 
 /* ===== Reduced Motion Support ===== */

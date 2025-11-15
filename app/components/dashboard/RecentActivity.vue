@@ -121,7 +121,7 @@ const getBadgeColor = (
             :name="`i-lucide-${icon}`"
             class="w-5 h-5 text-muted"
           />
-          <h2 class="text-lg font-semibold text-default">{{ title }}</h2>
+          <h2 class="text-subheading">{{ title }}</h2>
         </div>
         <UButton
           v-if="viewAllRoute"
@@ -147,7 +147,7 @@ const getBadgeColor = (
     <!-- Empty State -->
     <div v-else-if="items.length === 0" class="py-8 text-center">
       <UIcon name="i-lucide-inbox" class="w-12 h-12 mx-auto mb-3 text-muted" />
-      <p class="text-sm text-muted">{{ emptyMessage }}</p>
+      <p class="text-caption">{{ emptyMessage }}</p>
     </div>
 
     <!-- Activity List -->
@@ -174,7 +174,7 @@ const getBadgeColor = (
             <!-- Text Content -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
-                <p class="text-sm font-medium text-default truncate">
+                <p class="text-body font-medium truncate">
                   {{ item.primary }}
                 </p>
                 <UBadge
@@ -186,10 +186,10 @@ const getBadgeColor = (
                   {{ item.badge }}
                 </UBadge>
               </div>
-              <p class="text-xs text-muted mb-0.5">
+              <p class="text-caption mb-0.5">
                 {{ item.secondary }}
               </p>
-              <p v-if="item.tertiary" class="text-xs text-muted truncate">
+              <p v-if="item.tertiary" class="text-caption truncate">
                 {{ item.tertiary }}
               </p>
             </div>
@@ -197,7 +197,7 @@ const getBadgeColor = (
 
           <!-- Right Side: Amount -->
           <div v-if="item.amount" class="shrink-0 text-right">
-            <p class="text-sm font-semibold text-default">
+            <p class="text-body font-semibold">
               {{ item.amount }}
             </p>
           </div>

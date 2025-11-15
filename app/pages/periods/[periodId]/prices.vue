@@ -3,10 +3,10 @@
     <!-- Page Header -->
     <PageHeader title="Set Item Prices" icon="i-lucide-tag">
       <template #breadcrumbs>
-        <nav class="flex items-center gap-2 text-sm text-muted">
-          <NuxtLink to="/" class="hover:text-default">Dashboard</NuxtLink>
+        <nav class="flex items-center gap-2 text-caption">
+          <NuxtLink to="/">Dashboard</NuxtLink>
           <span>/</span>
-          <span class="text-default">Set Prices</span>
+          <span>Set Prices</span>
         </nav>
       </template>
 
@@ -29,10 +29,10 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-lg font-semibold text-default">
+            <h2 class="text-subheading font-semibold">
               {{ periodData.name }}
             </h2>
-            <p class="text-sm text-muted">
+            <p class="text-caption">
               {{ formatDateRange(periodData.start_date, periodData.end_date) }}
             </p>
           </div>
@@ -63,7 +63,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
           <!-- Search -->
           <div class="flex-1">
-            <label class="block text-sm font-medium text-muted mb-2">
+            <label class="block text-label mb-2">
               Search Items
             </label>
             <UInput
@@ -86,7 +86,7 @@
 
           <!-- Category Filter -->
           <div class="sm:w-64">
-            <label class="block text-sm font-medium text-muted mb-2">
+            <label class="block text-label mb-2">
               Category
             </label>
             <USelectMenu
@@ -127,27 +127,27 @@
     <div v-else-if="pricesData">
       <UCard>
         <!-- Statistics -->
-        <div class="mb-4 flex flex-wrap gap-4 text-sm">
+        <div class="mb-4 flex flex-wrap gap-4 text-caption">
           <div>
-            <span class="text-muted">Total Items:</span>
-            <span class="ml-2 font-semibold text-default">{{
+            <span>Total Items:</span>
+            <span class="ml-2 font-semibold">{{
               pricesData.length
             }}</span>
           </div>
           <div>
-            <span class="text-muted">Prices Set:</span>
-            <span class="ml-2 font-semibold text-default">{{
+            <span>Prices Set:</span>
+            <span class="ml-2 font-semibold">{{
               pricesSetCount
             }}</span>
           </div>
           <div>
-            <span class="text-muted">Prices Missing:</span>
-            <span class="ml-2 font-semibold text-default">{{
+            <span>Prices Missing:</span>
+            <span class="ml-2 font-semibold">{{
               pricesMissingCount
             }}</span>
           </div>
           <div v-if="hasChanges" class="ml-auto">
-            <span class="text-muted">Unsaved Changes:</span>
+            <span>Unsaved Changes:</span>
             <span class="ml-2 font-semibold text-amber-600">{{
               changesCount
             }}</span>
@@ -160,37 +160,37 @@
             <thead>
               <tr class="border-b border-default">
                 <th
-                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                  class="px-4 py-3 text-left text-label"
                 >
                   Code
                 </th>
                 <th
-                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                  class="px-4 py-3 text-left text-label"
                 >
                   Item Name
                 </th>
                 <th
-                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                  class="px-4 py-3 text-left text-label"
                 >
                   Unit
                 </th>
                 <th
-                  class="px-4 py-3 text-left text-sm font-semibold text-default"
+                  class="px-4 py-3 text-left text-label"
                 >
                   Category
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-sm font-semibold text-default"
+                  class="px-4 py-3 text-right text-label"
                 >
                   Current WAC
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-sm font-semibold text-default"
+                  class="px-4 py-3 text-right text-label"
                 >
                   Period Price
                 </th>
                 <th
-                  class="px-4 py-3 text-center text-sm font-semibold text-default"
+                  class="px-4 py-3 text-center text-label"
                 >
                   Status
                 </th>
@@ -203,27 +203,27 @@
                 class="border-b border-default hover:bg-elevated"
               >
                 <!-- Code -->
-                <td class="px-4 py-3 text-sm text-default">
+                <td class="px-4 py-3 text-body">
                   {{ item.item_code }}
                 </td>
 
                 <!-- Item Name -->
-                <td class="px-4 py-3 text-sm text-default">
+                <td class="px-4 py-3 text-body">
                   {{ item.item_name }}
                 </td>
 
                 <!-- Unit -->
-                <td class="px-4 py-3 text-sm text-muted">
+                <td class="px-4 py-3 text-caption">
                   {{ item.item_unit }}
                 </td>
 
                 <!-- Category -->
-                <td class="px-4 py-3 text-sm text-muted">
+                <td class="px-4 py-3 text-caption">
                   {{ item.item_category || "-" }}
                 </td>
 
                 <!-- Current WAC -->
-                <td class="px-4 py-3 text-right text-sm text-muted">
+                <td class="px-4 py-3 text-right text-caption">
                   {{ item.wac !== null ? formatCurrency(item.wac) : "-" }}
                 </td>
 
@@ -303,7 +303,7 @@
       v-if="pricesData && pricesData.length > 0"
       class="mt-6 flex items-center justify-between"
     >
-      <div class="text-sm text-muted">
+      <div class="text-caption">
         <span v-if="hasChanges">
           <UIcon name="i-lucide-alert-circle" class="inline h-4 w-4" />
           You have unsaved changes. Click "Save All Prices" to apply them.

@@ -12,8 +12,8 @@
           Back
         </UButton>
       </div>
-      <h1 class="text-2xl md:text-3xl font-bold text-default">Create New Item</h1>
-      <p class="mt-1 text-sm text-muted">Add a new inventory item to the system</p>
+      <h1 class="text-heading md:text-display font-bold">Create New Item</h1>
+      <p class="mt-1 text-caption">Add a new inventory item to the system</p>
     </div>
 
     <!-- Form Card -->
@@ -36,10 +36,10 @@
               @blur="validateField('code')"
               @input="form.code = form.code.toUpperCase()"
             />
-            <p v-if="errors.code" class="mt-1 text-sm text-error">
+            <p v-if="errors.code" class="mt-1 text-caption text-error">
               {{ errors.code }}
             </p>
-            <p class="mt-1 text-xs text-muted">
+            <p class="mt-1 text-caption">
               Unique identifier for the item (automatically converted to uppercase)
             </p>
           </div>

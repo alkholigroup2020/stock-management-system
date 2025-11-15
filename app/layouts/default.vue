@@ -138,8 +138,8 @@ const toggleTheme = () => {
               <span class="text-white font-bold text-sm">SM</span>
             </div>
             <div v-if="!collapsed" class="flex flex-col min-w-0">
-              <span class="text-sm font-semibold truncate">Stock</span>
-              <span class="text-xs text-muted truncate">Management</span>
+              <span class="text-label truncate">Stock</span>
+              <span class="text-caption truncate">Management</span>
             </div>
           </NuxtLink>
         </template>
@@ -199,12 +199,12 @@ const toggleTheme = () => {
         <!-- Header/Navbar -->
         <template #header>
           <div
-            class="flex items-center justify-between w-full h-10 px-4 sm:px-6 border-b border-default bg-elevated"
+            class="flex items-center justify-between w-full h-12 px-4 sm:px-6 border-b border-default bg-elevated"
           >
             <!-- Left: Sidebar collapse and title -->
             <div class="flex items-center gap-4">
               <UDashboardSidebarCollapse size="md" />
-              <h1 class="text-sm font-semibold text-default">{{ pageTitle }}</h1>
+              <h1 class="text-default">{{ pageTitle }}</h1>
             </div>
 
             <!-- Center section: Location and Period indicators -->
@@ -251,16 +251,14 @@ const toggleTheme = () => {
         <!-- Footer -->
         <template #footer>
           <footer class="border-t border-default bg-elevated w-full h-fit-content">
-            <div class="px-4 sm:px-6 py-1">
-              <div
-                class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-[10px] text-muted"
-              >
-                <p>
+            <div class="px-4 sm:px-6 py-2">
+              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <p class="text-caption">
                   &copy; {{ new Date().getFullYear() }}
                   <span class="hidden sm:inline">Stock Management System.</span>
                   All rights reserved.
                 </p>
-                <p class="hidden sm:block">Version 1.0.0</p>
+                <p class="hidden sm:block text-caption">Version 1.0.0</p>
               </div>
             </div>
           </footer>

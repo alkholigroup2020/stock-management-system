@@ -59,7 +59,7 @@
         class="flex items-center justify-between px-4 py-3 border-t border-default"
       >
         <!-- Page info -->
-        <div class="text-sm text-muted">
+        <div class="text-caption">
           Showing {{ startIndex + 1 }} to {{ endIndex }} of
           {{ data.length }} results
         </div>

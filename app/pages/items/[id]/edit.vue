@@ -37,8 +37,8 @@
             Back
           </UButton>
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold text-default">Edit Item</h1>
-        <p class="mt-1 text-sm text-muted">Update item details</p>
+        <h1 class="text-heading md:text-display font-bold">Edit Item</h1>
+        <p class="mt-1 text-caption">Update item details</p>
       </div>
 
       <!-- Form Card -->

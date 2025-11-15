@@ -95,8 +95,8 @@
           name="i-heroicons-inbox"
           class="w-16 h-16 mx-auto text-muted mb-4"
         />
-        <h3 class="text-lg font-semibold text-default mb-2">No items found</h3>
-        <p class="text-sm text-muted mb-6">
+        <h3 class="text-subheading font-semibold mb-2">No items found</h3>
+        <p class="text-caption mb-6">
           {{
             searchQuery || selectedCategory
               ? "Try adjusting your filters"
@@ -123,43 +123,43 @@
           <thead>
             <tr class="bg-elevated">
               <th
-                class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-left text-label uppercase tracking-wider"
               >
                 Code
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-left text-label uppercase tracking-wider"
               >
                 Name
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-left text-label uppercase tracking-wider"
               >
                 Unit
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-left text-label uppercase tracking-wider"
               >
                 Category
               </th>
               <th
-                class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-right text-label uppercase tracking-wider"
               >
                 On-Hand
               </th>
               <th
-                class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-right text-label uppercase tracking-wider"
               >
                 WAC
               </th>
               <th
-                class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-right text-label uppercase tracking-wider"
               >
                 Value
               </th>
               <th
                 v-if="canEditItems()"
-                class="px-4 py-3 text-right text-xs font-semibold text-default uppercase tracking-wider"
+                class="px-4 py-3 text-right text-label uppercase tracking-wider"
               >
                 Actions
               </th>
@@ -173,11 +173,11 @@
               @click="navigateTo(`/items/${item.id}`)"
             >
               <td
-                class="px-4 py-4 whitespace-nowrap text-sm font-medium text-default"
+                class="px-4 py-4 whitespace-nowrap text-body font-medium"
               >
                 {{ item.code }}
               </td>
-              <td class="px-4 py-4 text-sm text-default">
+              <td class="px-4 py-4 text-body">
                 <div class="flex items-center gap-2">
                   {{ item.name }}
                   <UBadge
@@ -190,24 +190,24 @@
                   </UBadge>
                 </div>
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-muted">
+              <td class="px-4 py-4 whitespace-nowrap text-caption">
                 {{ item.unit }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-muted">
+              <td class="px-4 py-4 whitespace-nowrap text-caption">
                 {{ item.category || "-" }}
               </td>
               <td
-                class="px-4 py-4 whitespace-nowrap text-sm text-right text-default"
+                class="px-4 py-4 whitespace-nowrap text-body text-right"
               >
                 {{ formatQuantity(getStockData(item).onHand) }}
               </td>
               <td
-                class="px-4 py-4 whitespace-nowrap text-sm text-right text-default"
+                class="px-4 py-4 whitespace-nowrap text-body text-right"
               >
                 {{ formatCurrency(getStockData(item).wac) }}
               </td>
               <td
-                class="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-default"
+                class="px-4 py-4 whitespace-nowrap text-body text-right font-medium"
               >
                 {{ formatCurrency(getStockData(item).value) }}
               </td>
@@ -239,19 +239,19 @@
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <!-- Pagination Info -->
-          <div class="text-sm text-muted">
+          <div class="text-caption">
             Showing
-            <span class="font-medium text-default">
+            <span class="font-medium">
               {{ (pagination.page - 1) * pagination.limit + 1 }}
             </span>
             to
-            <span class="font-medium text-default">
+            <span class="font-medium">
               {{
                 Math.min(pagination.page * pagination.limit, pagination.total)
               }}
             </span>
             of
-            <span class="font-medium text-default">
+            <span class="font-medium">
               {{ pagination.total }}
             </span>
             items

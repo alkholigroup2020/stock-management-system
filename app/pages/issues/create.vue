@@ -254,12 +254,12 @@ watch(
     <!-- Page Header -->
     <PageHeader title="New Issue" icon="file-minus">
       <template #breadcrumbs>
-        <nav class="flex items-center space-x-2 text-sm text-muted">
+        <nav class="flex items-center space-x-2 text-caption">
           <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
           <span>/</span>
           <NuxtLink to="/issues" class="hover:text-primary">Issues</NuxtLink>
           <span>/</span>
-          <span class="text-default">New</span>
+          <span>New</span>
         </nav>
       </template>
     </PageHeader>
@@ -269,7 +269,7 @@ watch(
       <!-- Issue Header Card -->
       <UCard class="card-elevated">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">Issue Information</h2>
+          <h2 class="text-subheading font-semibold">Issue Information</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -303,7 +303,7 @@ watch(
       <UCard class="card-elevated">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-default">Issue Items</h2>
+            <h2 class="text-subheading font-semibold">Issue Items</h2>
             <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" @click="addLine">
               Add Item
             </UButton>
@@ -326,18 +326,18 @@ watch(
           <table class="min-w-full divide-y divide-default">
             <thead>
               <tr class="bg-default">
-                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                <th class="px-4 py-3 text-left text-label uppercase">Item</th>
+                <th class="px-4 py-3 text-left text-label uppercase">
                   On Hand
                 </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
+                <th class="px-4 py-3 text-left text-label uppercase">
                   Quantity
                 </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase">WAC</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase">
+                <th class="px-4 py-3 text-left text-label uppercase">WAC</th>
+                <th class="px-4 py-3 text-right text-label uppercase">
                   Line Value
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase">
+                <th class="px-4 py-3 text-center text-label uppercase">
                   Action
                 </th>
               </tr>
@@ -366,7 +366,7 @@ watch(
                 <!-- On Hand -->
                 <td class="px-4 py-3">
                   <div v-if="line.item_id" class="flex items-center space-x-2">
-                    <span class="text-sm font-medium text-default">
+                    <span class="text-body font-medium">
                       {{ line.on_hand.toFixed(4) }}
                     </span>
                     <UIcon
@@ -375,7 +375,7 @@ watch(
                       class="text-red-500"
                     />
                   </div>
-                  <span v-else class="text-sm text-muted">-</span>
+                  <span v-else class="text-caption">-</span>
                 </td>
 
                 <!-- Quantity -->
@@ -392,15 +392,15 @@ watch(
 
                 <!-- WAC (Read-only) -->
                 <td class="px-4 py-3">
-                  <span v-if="line.item_id" class="text-sm text-muted">
+                  <span v-if="line.item_id" class="text-caption">
                     {{ formatCurrency(line.wac) }}
                   </span>
-                  <span v-else class="text-sm text-muted">-</span>
+                  <span v-else class="text-caption">-</span>
                 </td>
 
                 <!-- Line Value -->
                 <td class="px-4 py-3 text-right">
-                  <span class="text-sm font-medium text-default">
+                  <span class="text-body font-medium">
                     {{ formatCurrency(line.line_value) }}
                   </span>
                 </td>
@@ -420,7 +420,7 @@ watch(
 
               <!-- Empty State -->
               <tr v-if="lines.length === 0">
-                <td colspan="6" class="px-4 py-8 text-center text-muted">
+                <td colspan="6" class="px-4 py-8 text-center text-caption">
                   No items added yet. Click "Add Item" to start.
                 </td>
               </tr>
@@ -431,10 +431,10 @@ watch(
         <!-- Summary -->
         <div class="mt-4 pt-4 border-t border-default">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-muted">{{ lines.length }} item(s)</div>
+            <div class="text-caption">{{ lines.length }} item(s)</div>
             <div class="text-right">
-              <div class="text-sm text-muted">Total Value</div>
-              <div class="text-2xl font-bold text-primary">
+              <div class="text-caption">Total Value</div>
+              <div class="text-heading font-bold text-primary">
                 {{ formatCurrency(totalValue) }}
               </div>
             </div>

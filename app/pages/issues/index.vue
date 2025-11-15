@@ -223,8 +223,8 @@ onMounted(async () => {
     <div class="mb-6">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-default">Issues</h1>
-          <p class="mt-1 text-sm text-muted">
+          <h1 class="text-heading font-bold">Issues</h1>
+          <p class="mt-1 text-caption">
             View and manage stock issues for
             {{ locationStore.activeLocation?.name }}
           </p>
@@ -237,7 +237,7 @@ onMounted(async () => {
 
     <!-- Filters -->
     <div class="mb-6 rounded-lg border border-default bg-elevated p-4">
-      <h2 class="mb-4 text-sm font-semibold text-default">Filters</h2>
+      <h2 class="mb-4 text-label font-semibold">Filters</h2>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <!-- Date Range Start -->
@@ -299,7 +299,7 @@ onMounted(async () => {
 
       <!-- Active Filters -->
       <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap gap-2">
-        <span class="text-sm text-muted">Active filters:</span>
+        <span class="text-caption">Active filters:</span>
         <UBadge
           v-for="filter in activeFilters"
           :key="filter.key"
@@ -331,7 +331,7 @@ onMounted(async () => {
               <th
                 v-for="col in columns"
                 :key="col.key"
-                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted"
+                class="px-4 py-3 text-left text-label uppercase tracking-wider"
               >
                 {{ col.label }}
               </th>
@@ -344,18 +344,18 @@ onMounted(async () => {
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(issue)"
             >
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
                 {{ issue.issue_no }}
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
+              <td class="whitespace-nowrap px-4 py-3 text-body">
                 {{ formatDate(issue.issue_date) }}
               </td>
-              <td class="px-4 py-3 text-sm">
+              <td class="px-4 py-3">
                 <UBadge :color="getCostCentreColor(issue.cost_centre)" variant="soft">
                   {{ issue.cost_centre }}
                 </UBadge>
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
                 {{ formatCurrency(issue.total_value) }}
               </td>
             </tr>
@@ -368,7 +368,7 @@ onMounted(async () => {
         v-if="pagination.totalPages > 1"
         class="flex items-center justify-between border-t border-default px-4 py-3"
       >
-        <div class="text-sm text-muted">
+        <div class="text-caption">
           {{ paginationInfo }}
         </div>
         <div class="flex gap-1">

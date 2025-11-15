@@ -115,8 +115,8 @@ watch([() => state.email, () => state.password], () => {
     <main class="w-full max-w-md space-y-8">
       <!-- Header -->
       <header class="text-center">
-        <h1 class="text-3xl font-bold text-default">Stock Management System</h1>
-        <p class="mt-2 text-sm text-muted">
+        <h1 class="text-display">Stock Management System</h1>
+        <p class="mt-2 text-caption">
           Multi-Location Inventory Management
         </p>
       </header>
@@ -125,10 +125,10 @@ watch([() => state.email, () => state.password], () => {
       <UCard class="card-elevated">
         <template #header>
           <div class="text-center">
-            <h2 class="text-2xl font-semibold text-default">
+            <h2 class="text-heading">
               Sign in to your account
             </h2>
-            <p class="mt-1 text-sm text-muted">
+            <p class="mt-1 text-caption">
               Enter your credentials to access the system
             </p>
           </div>
@@ -200,9 +200,9 @@ watch([() => state.email, () => state.password], () => {
         </UForm>
 
         <template #footer>
-          <div class="text-center text-sm text-muted">
+          <div class="text-center text-caption">
             <p>Default credentials for testing:</p>
-            <p class="mt-1 font-mono text-xs">
+            <p class="mt-1 font-mono text-caption">
               admin@foodstock.local / Admin@123
             </p>
           </div>
@@ -210,7 +210,7 @@ watch([() => state.email, () => state.password], () => {
       </UCard>
 
       <!-- Footer Info -->
-      <footer class="text-center text-xs text-muted">
+      <footer class="text-center text-caption">
         <p>Stock Management System v1.0</p>
         <p class="mt-1">© 2025 All rights reserved</p>
       </footer>

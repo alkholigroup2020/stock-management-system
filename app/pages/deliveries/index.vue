@@ -240,8 +240,8 @@ onMounted(async () => {
     <div class="mb-6">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-default">Deliveries & Goods Receipts</h1>
-          <p class="mt-1 text-sm text-muted">
+          <h1 class="text-heading font-bold">Deliveries & Goods Receipts</h1>
+          <p class="mt-1 text-caption">
             View and manage deliveries for
             {{ locationStore.activeLocation?.name }}
           </p>
@@ -259,7 +259,7 @@ onMounted(async () => {
 
     <!-- Filters -->
     <div class="mb-6 rounded-lg border border-default bg-elevated p-4">
-      <h2 class="mb-4 text-sm font-semibold text-default">Filters</h2>
+      <h2 class="mb-4 text-label font-semibold">Filters</h2>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <!-- Date Range Start -->
@@ -297,7 +297,7 @@ onMounted(async () => {
 
         <!-- Has Variance Filter -->
         <div class="flex items-end">
-          <UCheckbox v-model="filters.hasVariance" label="Has Price Variance" class="text-sm" />
+          <UCheckbox v-model="filters.hasVariance" label="Has Price Variance" class="text-body" />
         </div>
       </div>
 
@@ -329,7 +329,7 @@ onMounted(async () => {
 
       <!-- Active Filters -->
       <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap gap-2">
-        <span class="text-sm text-muted">Active filters:</span>
+        <span class="text-caption">Active filters:</span>
         <UBadge
           v-for="filter in activeFilters"
           :key="filter.key"
@@ -377,25 +377,25 @@ onMounted(async () => {
               class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               @click="handleRowClick(delivery)"
             >
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
                 {{ delivery.delivery_no }}
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm text-default">
+              <td class="whitespace-nowrap px-4 py-3 text-body">
                 {{ formatDate(delivery.delivery_date) }}
               </td>
-              <td class="px-4 py-3 text-sm text-default">
+              <td class="px-4 py-3 text-body">
                 <div class="font-medium">{{ delivery.supplier.name }}</div>
-                <div class="text-xs text-muted">
+                <div class="text-caption">
                   {{ delivery.supplier.code }}
                 </div>
               </td>
-              <td class="px-4 py-3 text-sm text-default">
+              <td class="px-4 py-3 text-body">
                 {{ delivery.invoice_no || "—" }}
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-default">
+              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
                 {{ formatCurrency(delivery.total_amount) }}
               </td>
-              <td class="px-4 py-3 text-sm">
+              <td class="px-4 py-3 text-body">
                 <UBadge
                   v-if="delivery.has_variance"
                   color="warning"
@@ -417,7 +417,7 @@ onMounted(async () => {
         v-if="pagination.totalPages > 1"
         class="flex items-center justify-between border-t border-default px-4 py-3"
       >
-        <div class="text-sm text-muted">
+        <div class="text-caption">
           {{ paginationInfo }}
         </div>
         <div class="flex gap-1">

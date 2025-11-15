@@ -12,10 +12,10 @@
               <UIcon :name="locationIcon" class="w-6 h-6" />
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-default">
+              <h3 class="text-subheading">
                 {{ location.name }}
               </h3>
-              <p class="text-sm text-muted">
+              <p class="text-caption">
                 {{ location.code }}
               </p>
             </div>
@@ -35,7 +35,7 @@
       <!-- Location Type -->
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-map-pin" class="w-4 h-4 text-muted" />
-        <span class="text-sm text-muted">Type:</span>
+        <span class="text-caption">Type:</span>
         <UBadge :color="locationTypeBadgeColor" variant="subtle" size="sm">
           {{ formatLocationType(location.type) }}
         </UBadge>
@@ -44,14 +44,14 @@
       <!-- Address -->
       <div v-if="location.address" class="flex items-start gap-2">
         <UIcon name="i-lucide-map" class="w-4 h-4 text-muted mt-0.5" />
-        <span class="text-sm text-default">{{ location.address }}</span>
+        <span class="text-body">{{ location.address }}</span>
       </div>
 
       <!-- Manager -->
       <div v-if="location.manager" class="flex items-center gap-2">
         <UIcon name="i-lucide-user" class="w-4 h-4 text-muted" />
-        <span class="text-sm text-muted">Manager:</span>
-        <span class="text-sm text-default">
+        <span class="text-caption">Manager:</span>
+        <span class="text-body">
           {{ location.manager.full_name || location.manager.username }}
         </span>
       </div>
@@ -63,13 +63,13 @@
       >
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-users" class="w-4 h-4 text-muted" />
-          <span class="text-sm text-muted">
+          <span class="text-caption">
             {{ location._count?.user_locations || 0 }} users
           </span>
         </div>
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-package" class="w-4 h-4 text-muted" />
-          <span class="text-sm text-muted">
+          <span class="text-caption">
             {{ location._count?.location_stock || 0 }} items
           </span>
         </div>

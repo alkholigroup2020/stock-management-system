@@ -83,17 +83,17 @@ const trendIcon = computed(() => {
 
       <!-- Text Content -->
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-muted mb-1">
+        <p class="text-label mb-1">
           {{ label }}
         </p>
-        <p class="text-2xl font-bold text-default mb-2">
+        <p class="text-heading font-bold mb-2">
           {{ value }}
         </p>
 
         <!-- Trend Indicator -->
         <div
           v-if="trend"
-          class="flex items-center gap-1 text-sm"
+          class="flex items-center gap-1 text-body"
           :class="trendColorClass"
         >
           <UIcon :name="`i-lucide-${trendIcon}`" class="w-4 h-4" />

@@ -195,9 +195,9 @@ onMounted(async () => {
               size="sm"
               @click="goBack"
             />
-            <h1 class="text-2xl font-bold text-default">Delivery Details</h1>
+            <h1 class="text-heading font-bold">Delivery Details</h1>
           </div>
-          <nav class="flex items-center space-x-2 text-sm text-muted ml-10">
+          <nav class="flex items-center space-x-2 text-caption ml-10">
             <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
             <span>/</span>
             <NuxtLink to="/deliveries" class="hover:text-primary">Deliveries</NuxtLink>
@@ -244,10 +244,10 @@ onMounted(async () => {
         <template #header>
           <div class="flex items-start justify-between">
             <div>
-              <h2 class="text-xl font-bold text-default">
+              <h2 class="text-subheading font-bold">
                 {{ delivery.delivery_no }}
               </h2>
-              <p class="text-sm text-muted mt-1">
+              <p class="text-caption mt-1">
                 Posted by {{ delivery.poster.full_name }} on
                 {{ formatDateTime(delivery.posted_at) }}
               </p>
@@ -268,23 +268,23 @@ onMounted(async () => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Delivery Information -->
           <div>
-            <h3 class="text-sm font-semibold text-muted uppercase mb-3">Delivery Information</h3>
+            <h3 class="text-label uppercase mb-3">Delivery Information</h3>
             <dl class="space-y-2">
               <div>
-                <dt class="text-sm text-muted">Delivery Date</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Delivery Date</dt>
+                <dd class="text-body font-medium">
                   {{ formatDate(delivery.delivery_date) }}
                 </dd>
               </div>
               <div>
-                <dt class="text-sm text-muted">Invoice Number</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Invoice Number</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.invoice_no || "—" }}
                 </dd>
               </div>
               <div v-if="delivery.po">
-                <dt class="text-sm text-muted">Purchase Order</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Purchase Order</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.po.po_no }}
                   <UBadge
                     :color="delivery.po.status === 'OPEN' ? 'success' : 'neutral'"
@@ -301,23 +301,23 @@ onMounted(async () => {
 
           <!-- Supplier Information -->
           <div>
-            <h3 class="text-sm font-semibold text-muted uppercase mb-3">Supplier</h3>
+            <h3 class="text-label uppercase mb-3">Supplier</h3>
             <dl class="space-y-2">
               <div>
-                <dt class="text-sm text-muted">Name</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Name</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.supplier.name }}
                 </dd>
               </div>
               <div>
-                <dt class="text-sm text-muted">Code</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Code</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.supplier.code }}
                 </dd>
               </div>
               <div v-if="delivery.supplier.contact">
-                <dt class="text-sm text-muted">Contact</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Contact</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.supplier.contact }}
                 </dd>
               </div>
@@ -326,18 +326,18 @@ onMounted(async () => {
 
           <!-- Location & Period -->
           <div>
-            <h3 class="text-sm font-semibold text-muted uppercase mb-3">Location & Period</h3>
+            <h3 class="text-label uppercase mb-3">Location & Period</h3>
             <dl class="space-y-2">
               <div>
-                <dt class="text-sm text-muted">Location</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Location</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.location.name }}
-                  <span class="text-xs text-muted">({{ delivery.location.code }})</span>
+                  <span class="text-caption">({{ delivery.location.code }})</span>
                 </dd>
               </div>
               <div>
-                <dt class="text-sm text-muted">Period</dt>
-                <dd class="text-sm font-medium text-default">
+                <dt class="text-caption">Period</dt>
+                <dd class="text-body font-medium">
                   {{ delivery.period.name }}
                 </dd>
               </div>
@@ -347,8 +347,8 @@ onMounted(async () => {
 
         <!-- Delivery Note -->
         <div v-if="delivery.delivery_note" class="mt-6 pt-6 border-t border-default">
-          <h3 class="text-sm font-semibold text-muted uppercase mb-2">Delivery Note</h3>
-          <p class="text-sm text-default">{{ delivery.delivery_note }}</p>
+          <h3 class="text-label uppercase mb-2">Delivery Note</h3>
+          <p class="text-body">{{ delivery.delivery_note }}</p>
         </div>
       </UCard>
 
@@ -356,8 +356,8 @@ onMounted(async () => {
       <UCard class="card-elevated">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-default">Delivery Items</h2>
-            <div class="text-sm text-muted">
+            <h2 class="text-subheading font-semibold">Delivery Items</h2>
+            <div class="text-caption">
               {{ delivery.summary.total_lines }} item(s),
               {{ delivery.summary.total_items.toFixed(2) }} total units
             </div>
@@ -369,32 +369,32 @@ onMounted(async () => {
             <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
               <tr>
                 <th
-                  class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted"
+                  class="px-4 py-3 text-left text-label uppercase tracking-wider"
                 >
                   Item
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted"
+                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
                 >
                   Quantity
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted"
+                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
                 >
                   Unit Price
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted"
+                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
                 >
                   Period Price
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted"
+                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
                 >
                   Variance
                 </th>
                 <th
-                  class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted"
+                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
                 >
                   Line Value
                 </th>
@@ -410,27 +410,27 @@ onMounted(async () => {
               >
                 <!-- Item -->
                 <td class="px-4 py-3">
-                  <div class="font-medium text-sm text-default">
+                  <div class="font-medium text-body">
                     {{ line.item.name }}
                   </div>
-                  <div class="text-xs text-muted">
+                  <div class="text-caption">
                     {{ line.item.code }} · {{ line.item.unit }}
                     <span v-if="line.item.category">· {{ line.item.category }}</span>
                   </div>
                 </td>
 
                 <!-- Quantity -->
-                <td class="px-4 py-3 text-right text-sm text-default">
+                <td class="px-4 py-3 text-right text-body">
                   {{ line.quantity.toFixed(4) }}
                 </td>
 
                 <!-- Unit Price -->
-                <td class="px-4 py-3 text-right text-sm font-medium text-default">
+                <td class="px-4 py-3 text-right text-body font-medium">
                   {{ formatCurrency(line.unit_price) }}
                 </td>
 
                 <!-- Period Price -->
-                <td class="px-4 py-3 text-right text-sm text-muted">
+                <td class="px-4 py-3 text-right text-caption">
                   {{ line.period_price ? formatCurrency(line.period_price) : "—" }}
                 </td>
 
@@ -441,7 +441,7 @@ onMounted(async () => {
                     <div class="text-right">
                       <div
                         :class="[
-                          'text-sm font-medium',
+                          'text-body font-medium',
                           line.price_variance > 0
                             ? 'text-red-600 dark:text-red-400'
                             : 'text-emerald-600 dark:text-emerald-400',
@@ -449,16 +449,16 @@ onMounted(async () => {
                       >
                         {{ formatCurrency(line.price_variance) }}
                       </div>
-                      <div v-if="line.variance_percentage" class="text-xs text-muted">
+                      <div v-if="line.variance_percentage" class="text-caption">
                         ({{ line.variance_percentage }}%)
                       </div>
                     </div>
                   </div>
-                  <span v-else class="text-sm text-muted">—</span>
+                  <span v-else class="text-caption">—</span>
                 </td>
 
                 <!-- Line Value -->
-                <td class="px-4 py-3 text-right text-sm font-semibold text-default">
+                <td class="px-4 py-3 text-right text-body font-semibold">
                   {{ formatCurrency(line.line_value) }}
                 </td>
               </tr>
@@ -471,22 +471,22 @@ onMounted(async () => {
           <div class="flex justify-end">
             <div class="space-y-2 min-w-[300px]">
               <div class="flex justify-between items-center">
-                <span class="text-sm text-muted">Total Items:</span>
-                <span class="text-sm font-medium text-default">
+                <span class="text-caption">Total Items:</span>
+                <span class="text-body font-medium">
                   {{ delivery.summary.total_lines }}
                 </span>
               </div>
               <div v-if="hasVarianceLines" class="flex justify-between items-center">
-                <span class="text-sm text-muted">Items with Variance:</span>
-                <span class="text-sm font-medium text-amber-600 dark:text-amber-400">
+                <span class="text-caption">Items with Variance:</span>
+                <span class="text-body font-medium text-amber-600 dark:text-amber-400">
                   {{ varianceLinesCount }}
                 </span>
               </div>
               <div v-if="hasVarianceLines" class="flex justify-between items-center">
-                <span class="text-sm text-muted">Total Variance:</span>
+                <span class="text-caption">Total Variance:</span>
                 <span
                   :class="[
-                    'text-sm font-medium',
+                    'text-body font-medium',
                     totalVarianceAmount > 0
                       ? 'text-red-600 dark:text-red-400'
                       : 'text-emerald-600 dark:text-emerald-400',
@@ -496,8 +496,8 @@ onMounted(async () => {
                 </span>
               </div>
               <div class="flex justify-between items-center pt-2 border-t border-default">
-                <span class="text-base font-semibold text-default">Total Amount:</span>
-                <span class="text-xl font-bold text-primary">
+                <span class="text-body font-semibold">Total Amount:</span>
+                <span class="text-subheading font-bold text-primary">
                   {{ formatCurrency(delivery.total_amount) }}
                 </span>
               </div>
@@ -511,7 +511,7 @@ onMounted(async () => {
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-alert-octagon" class="h-5 w-5 text-amber-500" />
-            <h2 class="text-lg font-semibold text-default">Non-Conformance Reports (NCRs)</h2>
+            <h2 class="text-subheading font-semibold">Non-Conformance Reports (NCRs)</h2>
             <UBadge color="warning" variant="soft">
               {{ delivery.ncrs.length }}
             </UBadge>
@@ -541,10 +541,10 @@ onMounted(async () => {
                     Auto-Generated
                   </UBadge>
                 </div>
-                <p v-if="ncr.reason" class="text-sm text-muted mb-2">
+                <p v-if="ncr.reason" class="text-caption mb-2">
                   {{ ncr.reason }}
                 </p>
-                <div class="flex items-center gap-4 text-xs text-muted">
+                <div class="flex items-center gap-4 text-caption">
                   <span>Created: {{ formatDate(ncr.created_at) }}</span>
                   <span>By: {{ ncr.creator.full_name }}</span>
                   <span v-if="ncr.quantity">Qty: {{ ncr.quantity }}</span>

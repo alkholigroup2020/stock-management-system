@@ -438,8 +438,8 @@ watch(
         <div class="flex items-center gap-3">
           <UIcon name="i-lucide-package" class="text-3xl text-primary" />
           <div>
-            <h1 class="page-title">Stock Now</h1>
-            <p class="page-subtitle">Real-time inventory levels</p>
+            <h1 class="text-heading">Stock Now</h1>
+            <p class="text-caption">Real-time inventory levels</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -499,8 +499,8 @@ watch(
       <div class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-muted">Total Inventory Value</p>
-            <p class="text-2xl font-bold text-primary mt-1">
+            <p class="text-caption">Total Inventory Value</p>
+            <p class="text-heading font-bold text-primary mt-1">
               {{ formatCurrency(totalInventoryValue) }}
             </p>
           </div>
@@ -516,8 +516,8 @@ watch(
       <div class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-muted">Total Items</p>
-            <p class="text-2xl font-bold text-default mt-1">
+            <p class="text-caption">Total Items</p>
+            <p class="text-heading font-bold text-default mt-1">
               {{ totalItems }}
             </p>
           </div>
@@ -536,8 +536,8 @@ watch(
       >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-muted">Active Locations</p>
-            <p class="text-2xl font-bold text-default mt-1">
+            <p class="text-caption">Active Locations</p>
+            <p class="text-heading font-bold text-default mt-1">
               {{ consolidatedData.total_locations }}
             </p>
           </div>
@@ -553,11 +553,11 @@ watch(
       <div v-else-if="stockData?.location" class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-muted">Current Location</p>
-            <p class="text-lg font-semibold text-default mt-1">
+            <p class="text-caption">Current Location</p>
+            <p class="text-subheading text-default mt-1">
               {{ stockData.location.name }}
             </p>
-            <p class="text-xs text-muted">
+            <p class="text-caption">
               {{ stockData.location.code }}
             </p>
           </div>
@@ -650,7 +650,7 @@ watch(
         >
           <!-- Item Code -->
           <template #item_code-data="{ row }">
-            <span class="font-mono text-sm">{{ (row as any).item_code }}</span>
+            <span class="font-mono text-body">{{ (row as any).item_code }}</span>
           </template>
 
           <!-- Item Name -->
@@ -659,7 +659,7 @@ watch(
               <p class="font-medium">{{ (row as any).item_name }}</p>
               <p
                 v-if="(row as any).item_sub_category"
-                class="text-xs text-muted"
+                class="text-caption"
               >
                 {{ (row as any).item_sub_category }}
               </p>
@@ -668,7 +668,7 @@ watch(
 
           <!-- Unit -->
           <template #item_unit-data="{ row }">
-            <span class="text-sm">{{ (row as any).item_unit }}</span>
+            <span class="text-body">{{ (row as any).item_unit }}</span>
           </template>
 
           <!-- Category -->
@@ -702,7 +702,7 @@ watch(
 
           <!-- WAC -->
           <template #wac-data="{ row }">
-            <span class="text-sm">{{ formatCurrency((row as any).wac) }}</span>
+            <span class="text-body">{{ formatCurrency((row as any).wac) }}</span>
           </template>
 
           <!-- Value -->
@@ -723,7 +723,7 @@ watch(
         >
           <!-- Item Code -->
           <template #item_code-data="{ row }">
-            <span class="font-mono text-sm">{{ (row as any).item_code }}</span>
+            <span class="font-mono text-body">{{ (row as any).item_code }}</span>
           </template>
 
           <!-- Item Name -->
@@ -732,7 +732,7 @@ watch(
               <p class="font-medium">{{ (row as any).item_name }}</p>
               <p
                 v-if="(row as any).item_sub_category"
-                class="text-xs text-muted"
+                class="text-caption"
               >
                 {{ (row as any).item_sub_category }}
               </p>
@@ -741,7 +741,7 @@ watch(
 
           <!-- Unit -->
           <template #item_unit-data="{ row }">
-            <span class="text-sm">{{ (row as any).item_unit }}</span>
+            <span class="text-body">{{ (row as any).item_unit }}</span>
           </template>
 
           <!-- Category -->
@@ -798,16 +798,5 @@ watch(
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--ui-border);
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--ui-text);
-}
-
-.page-subtitle {
-  font-size: 0.875rem;
-  color: var(--ui-text-muted);
 }
 </style>

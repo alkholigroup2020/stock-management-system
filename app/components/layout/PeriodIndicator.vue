@@ -49,7 +49,7 @@ const statusText = computed(() => {
       <!-- Desktop & Tablet: Show period name and status only -->
       <div class="hidden md:flex items-center gap-2">
         <UIcon name="i-heroicons-calendar" class="text-muted" />
-        <span class="text-xs font-medium text-default">
+        <span class="text-label font-medium">
           {{ periodStore.periodName }}
         </span>
         <UBadge :color="badgeColor" variant="soft" size="xs">
@@ -71,7 +71,7 @@ const statusText = computed(() => {
     <!-- No Period State -->
     <div v-else class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-heroicons-exclamation-triangle" class="text-amber-500" />
-      <span class="text-xs text-muted hidden md:inline">No active period</span>
+      <span class="text-caption hidden md:inline">No active period</span>
     </div>
   </div>
 </template>

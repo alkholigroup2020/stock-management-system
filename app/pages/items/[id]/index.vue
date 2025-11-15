@@ -58,14 +58,14 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div class="flex items-center gap-3">
-              <h1 class="text-2xl md:text-3xl font-bold text-default">
+              <h1 class="text-heading md:text-display font-bold">
                 {{ item.name }}
               </h1>
               <UBadge v-if="!item.is_active" color="neutral" variant="subtle" size="md">
                 Inactive
               </UBadge>
             </div>
-            <p class="mt-1 text-sm text-muted">Item Code: {{ item.code }}</p>
+            <p class="mt-1 text-caption">Item Code: {{ item.code }}</p>
           </div>
 
           <!-- Action Buttons -->
@@ -85,29 +85,29 @@
       <!-- Item Information Card -->
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold text-default">Item Information</h2>
+          <h2 class="text-subheading font-semibold">Item Information</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Code -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Item Code</label>
-            <p class="text-base font-semibold text-default">
+            <label class="block text-label mb-1">Item Code</label>
+            <p class="text-body font-semibold">
               {{ item.code }}
             </p>
           </div>
 
           <!-- Name -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Item Name</label>
-            <p class="text-base font-semibold text-default">
+            <label class="block text-label mb-1">Item Name</label>
+            <p class="text-body font-semibold">
               {{ item.name }}
             </p>
           </div>
 
           <!-- Unit -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Unit of Measure</label>
+            <label class="block text-label mb-1">Unit of Measure</label>
             <UBadge color="primary" variant="subtle" size="md">
               {{ item.unit }}
             </UBadge>
@@ -115,23 +115,23 @@
 
           <!-- Category -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Category</label>
-            <p class="text-base text-default">
+            <label class="block text-label mb-1">Category</label>
+            <p class="text-body">
               {{ item.category || "-" }}
             </p>
           </div>
 
           <!-- Sub-Category -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Sub-Category</label>
-            <p class="text-base text-default">
+            <label class="block text-label mb-1">Sub-Category</label>
+            <p class="text-body">
               {{ item.sub_category || "-" }}
             </p>
           </div>
 
           <!-- Status -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Status</label>
+            <label class="block text-label mb-1">Status</label>
             <UBadge :color="item.is_active ? 'success' : 'neutral'" variant="subtle" size="md">
               {{ item.is_active ? "Active" : "Inactive" }}
             </UBadge>
@@ -139,16 +139,16 @@
 
           <!-- Created At -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Created</label>
-            <p class="text-base text-default">
+            <label class="block text-label mb-1">Created</label>
+            <p class="text-body">
               {{ formatDate(item.created_at) }}
             </p>
           </div>
 
           <!-- Updated At -->
           <div>
-            <label class="block text-sm font-medium text-muted mb-1">Last Updated</label>
-            <p class="text-base text-default">
+            <label class="block text-label mb-1">Last Updated</label>
+            <p class="text-body">
               {{ formatDate(item.updated_at) }}
             </p>
           </div>
@@ -159,7 +159,7 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-default">Stock Levels</h2>
+            <h2 class="text-subheading font-semibold">Stock Levels</h2>
             <UButton
               v-if="!showAllLocations && (isAdmin || isSupervisor)"
               color="primary"
@@ -199,7 +199,7 @@
       <!-- Quick Actions Card -->
       <UCard v-if="canPostDeliveries() || canPostIssues()">
         <template #header>
-          <h2 class="text-lg font-semibold text-default">Quick Actions</h2>
+          <h2 class="text-subheading font-semibold">Quick Actions</h2>
         </template>
 
         <div class="flex flex-wrap gap-3">

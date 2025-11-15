@@ -201,10 +201,10 @@ const handleRetry = () => {
   <div class="p-4 md:p-6 space-y-6">
     <!-- Page Header -->
     <div>
-      <h1 class="text-3xl font-bold text-default mb-2">Dashboard</h1>
+      <h1 class="text-display mb-2">Dashboard</h1>
       <div
         v-if="dashboardData?.location"
-        class="flex items-center gap-2 text-sm text-muted"
+        class="flex items-center gap-2 text-caption"
       >
         <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
         <span>{{ dashboardData.location.name }}</span>
@@ -274,7 +274,7 @@ const handleRetry = () => {
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-zap" class="w-5 h-5 text-muted" />
-            <h2 class="text-lg font-semibold text-default">Quick Actions</h2>
+            <h2 class="text-subheading">Quick Actions</h2>
           </div>
         </template>
 

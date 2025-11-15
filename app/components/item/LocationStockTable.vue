@@ -2,7 +2,7 @@
   <div class="space-y-4">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-default">
+      <h3 class="text-subheading">
         Stock Levels by Location
       </h3>
       <UBadge v-if="totalLocations > 0" color="primary" variant="subtle">
@@ -59,10 +59,10 @@
           >
             <td class="px-4 py-3 whitespace-nowrap">
               <div class="flex flex-col">
-                <span class="text-sm font-medium text-default">
+                <span class="text-body font-medium">
                   {{ stock.location.name }}
                 </span>
-                <span class="text-xs text-muted">
+                <span class="text-caption">
                   {{ stock.location.code }}
                 </span>
               </div>
@@ -77,17 +77,17 @@
               </UBadge>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-right">
-              <span class="text-sm text-default">
+              <span class="text-body">
                 {{ formatQuantity(stock.on_hand) }}
               </span>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-right">
-              <span class="text-sm text-default">
+              <span class="text-body">
                 {{ formatCurrency(stock.wac) }}
               </span>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-right">
-              <span class="text-sm font-medium text-default">
+              <span class="text-body font-medium">
                 {{
                   formatCurrency(calculateTotalValue(stock.on_hand, stock.wac))
                 }}
@@ -99,12 +99,12 @@
           <tr>
             <td
               colspan="4"
-              class="px-4 py-3 text-right text-sm font-semibold text-default"
+              class="px-4 py-3 text-right text-body font-semibold"
             >
               Grand Total:
             </td>
             <td
-              class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-default"
+              class="px-4 py-3 whitespace-nowrap text-right text-body font-bold"
             >
               {{ formatCurrency(grandTotal) }}
             </td>
@@ -123,8 +123,8 @@
           name="i-heroicons-inbox"
           class="w-12 h-12 mx-auto mb-3 opacity-50"
         />
-        <p class="text-sm font-medium">No stock data available</p>
-        <p class="text-xs mt-1">
+        <p class="text-body font-medium">No stock data available</p>
+        <p class="text-caption mt-1">
           This item has no stock recorded in any location.
         </p>
       </div>
