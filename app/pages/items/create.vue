@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-default p-4 md:p-6">
+  <div class="bg-default">
     <!-- Page Header -->
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-2">

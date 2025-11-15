@@ -431,7 +431,7 @@ watch(
 </script>
 
 <template>
-  <div class="p-4 md:p-6 max-w-7xl mx-auto">
+  <div class="max-w-7xl mx-auto">
     <!-- Page Header -->
     <div class="page-header-section">
       <div class="flex items-center justify-between">

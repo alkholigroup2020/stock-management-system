@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 md:p-6">
+  <div>
     <!-- Action Bar -->
     <div v-if="canEditItems()" class="mb-6 flex justify-end">
       <UButton

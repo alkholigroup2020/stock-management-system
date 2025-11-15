@@ -250,7 +250,7 @@ watch(
 </script>
 
 <template>
-  <div class="bg-default p-4 md:p-6">
+  <div class="bg-default">
     <!-- Page Header -->
     <PageHeader title="New Issue" icon="file-minus">
       <template #breadcrumbs>

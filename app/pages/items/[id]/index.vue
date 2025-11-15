@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-default p-4 md:p-6">
+  <div class="bg-default">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />

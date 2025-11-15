@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 md:p-6">
+  <div>
     <!-- Page Header -->
     <PageHeader title="Create Location" icon="i-lucide-plus">
       <template #actions>

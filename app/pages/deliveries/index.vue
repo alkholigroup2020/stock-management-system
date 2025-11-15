@@ -235,7 +235,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-default p-4 md:p-6">
+  <div class="bg-default">
     <!-- Page Header -->
     <div class="mb-6">
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

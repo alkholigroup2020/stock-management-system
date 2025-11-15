@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-default p-4 md:p-6">
+  <div class="bg-default">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
       <div class="text-center">

@@ -243,7 +243,7 @@ const toggleTheme = () => {
 
         <!-- Body content -->
         <template #body>
-          <div class="p-4 sm:p-6">
+          <div class="py-2 px-4 sm:px-12 xl:py-4 xl:px-16">
             <slot />
           </div>
         </template>
