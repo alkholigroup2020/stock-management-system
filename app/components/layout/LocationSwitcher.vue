@@ -35,10 +35,7 @@ const getLocationIconClass = (type: string): string => {
 
 // Compute dropdown items for UDropdown
 const locationItems = computed(() => {
-  if (
-    !locationStore.userLocations ||
-    locationStore.userLocations.length === 0
-  ) {
+  if (!locationStore.userLocations || locationStore.userLocations.length === 0) {
     return [
       [
         {
@@ -81,9 +78,7 @@ const locationItems = computed(() => {
         } catch (error: unknown) {
           console.error("Error switching location:", error);
           const message =
-            error instanceof Error
-              ? error.message
-              : String(error) || "Failed to switch location";
+            error instanceof Error ? error.message : String(error) || "Failed to switch location";
           toast.error("Error", {
             description: message,
           });
@@ -110,7 +105,7 @@ const currentLocationIcon = computed(() => {
     <!-- Loading State -->
     <div v-if="locationStore.loading" class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-lucide-loader-2" class="animate-spin w-4 h-4" />
-      <span class="text-sm text-muted">Loading...</span>
+      <span class="text-xs text-muted">Loading...</span>
     </div>
 
     <!-- Location Dropdown -->
@@ -126,7 +121,7 @@ const currentLocationIcon = computed(() => {
           variant="ghost"
           :label="currentLocation.name"
           trailing-icon="i-lucide-chevron-down"
-          class="hidden sm:flex"
+          class="hidden sm:flex text-xs"
         >
           <template #leading>
             <UIcon :name="currentLocationIcon" class="w-4 h-4" />
@@ -147,7 +142,7 @@ const currentLocationIcon = computed(() => {
         <div class="flex items-center gap-3 w-full">
           <UIcon :name="item.icon" class="w-4 h-4" :class="item.iconClass" />
           <div class="flex-1 min-w-0">
-            <p class="font-medium text-sm truncate">{{ item.label }}</p>
+            <p class="font-medium text-xs truncate">{{ item.label }}</p>
             <p v-if="item.description" class="text-xs text-muted truncate">
               {{ item.description }}
             </p>
@@ -165,7 +160,7 @@ const currentLocationIcon = computed(() => {
     <!-- No Location State -->
     <div v-else class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-500" />
-      <span class="text-sm text-muted hidden sm:inline">No location</span>
+      <span class="text-xs text-muted hidden sm:inline">No location</span>
     </div>
   </div>
 </template>

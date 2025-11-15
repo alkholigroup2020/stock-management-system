@@ -162,48 +162,40 @@ const handleNavigate = () => {
       }"
     >
       <!-- Sidebar Content -->
-      <nav class="p-4 space-y-1">
+      <nav class="px-3 py-4 space-y-1">
         <!-- Navigation Items -->
         <template v-for="(item, index) in navigationMenu" :key="index">
           <!-- Menu Item -->
           <NuxtLink
             :to="item.to"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group relative"
             :class="{
-              'bg-navy-50 dark:bg-navy-900/30 text-navy-700 dark:text-navy-300 border border-navy-200 dark:border-navy-700':
-                isActiveRoute(item.to),
-              'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100':
+              'bg-primary/10 dark:bg-primary/15 text-primary dark:text-primary': isActiveRoute(
+                item.to
+              ),
+              'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50':
                 !isActiveRoute(item.to),
             }"
             @click="handleNavigate"
           >
+            <!-- Left active indicator bar -->
+            <div
+              v-if="isActiveRoute(item.to)"
+              class="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-primary rounded-r-full"
+            />
+
             <!-- Icon -->
             <UIcon
               :name="item.icon"
-              class="w-5 h-5 shrink-0"
+              class="w-4 h-4 shrink-0 transition-transform duration-150 group-hover:scale-110"
               :class="{
-                'text-navy-800 dark:text-navy-200': isActiveRoute(item.to),
-                'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300':
-                  !isActiveRoute(item.to),
+                'text-primary dark:text-primary': isActiveRoute(item.to),
+                'text-zinc-500 dark:text-zinc-500': !isActiveRoute(item.to),
               }"
             />
 
             <!-- Label -->
-            <span
-              class="flex-1"
-              :class="{
-                'text-navy-800 dark:text-navy-200': isActiveRoute(item.to),
-                'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300':
-                  !isActiveRoute(item.to),
-              }"
-              >{{ item.label }}</span
-            >
-
-            <!-- Active Indicator -->
-            <div
-              v-if="isActiveRoute(item.to)"
-              class="w-1.5 h-1.5 rounded-full bg-emerald-500"
-            />
+            <span class="flex-1">{{ item.label }}</span>
           </NuxtLink>
         </template>
       </nav>

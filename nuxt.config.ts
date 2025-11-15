@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   // Dev server configuration - hardcoded to port 3000
   devServer: {
     port: 3000,
-    host: 'localhost'
+    host: "localhost",
   },
 
   // Runtime configuration for environment variables
@@ -34,8 +34,9 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   // Nuxt UI configuration
-  // Note: Custom colors are configured via CSS variables in main.css
-  // No need to register colors here when using CSS variables approach
+  // Note: Colors are defined via CSS variables in assets/css/main.css
+  // Primary color: Navy Blue (#000046)
+  // Secondary color: Emerald Green (#45cf7b)
 
   // Color mode configuration for dark/light theme support
   colorMode: {
@@ -57,14 +58,14 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        lang: 'en'
+        lang: "en",
       },
-      title: 'Stock Management System',
+      title: "Stock Management System",
       meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Multi-Location Inventory Management System' }
-      ]
-    }
-  }
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { name: "description", content: "Multi-Location Inventory Management System" },
+      ],
+    },
+  },
 });

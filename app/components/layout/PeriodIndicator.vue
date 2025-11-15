@@ -46,26 +46,10 @@ const statusText = computed(() => {
 
     <!-- Period Info -->
     <div v-else-if="periodStore.currentPeriod" class="flex items-center gap-2">
-      <!-- Desktop: Show full info -->
-      <div class="hidden lg:flex items-center gap-2">
+      <!-- Desktop & Tablet: Show period name and status only -->
+      <div class="hidden md:flex items-center gap-2">
         <UIcon name="i-heroicons-calendar" class="text-muted" />
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-default">
-            {{ periodStore.periodName }}
-          </span>
-          <span class="text-xs text-muted">
-            {{ periodStore.periodDateRange }}
-          </span>
-        </div>
-        <UBadge :color="badgeColor" variant="soft" size="xs">
-          {{ statusText }}
-        </UBadge>
-      </div>
-
-      <!-- Tablet: Show period name and status -->
-      <div class="hidden md:flex lg:hidden items-center gap-2">
-        <UIcon name="i-heroicons-calendar" class="text-muted" />
-        <span class="text-sm font-medium text-default">
+        <span class="text-xs font-medium text-default">
           {{ periodStore.periodName }}
         </span>
         <UBadge :color="badgeColor" variant="soft" size="xs">
@@ -74,10 +58,7 @@ const statusText = computed(() => {
       </div>
 
       <!-- Mobile: Just show icon with tooltip -->
-      <UTooltip
-        :text="`${periodStore.periodName} - ${statusText}`"
-        class="md:hidden"
-      >
+      <UTooltip :text="`${periodStore.periodName} - ${statusText}`" class="md:hidden">
         <UButton
           color="neutral"
           variant="ghost"
@@ -90,7 +71,7 @@ const statusText = computed(() => {
     <!-- No Period State -->
     <div v-else class="flex items-center gap-2 px-3 py-2">
       <UIcon name="i-heroicons-exclamation-triangle" class="text-amber-500" />
-      <span class="text-sm text-muted hidden md:inline">No active period</span>
+      <span class="text-xs text-muted hidden md:inline">No active period</span>
     </div>
   </div>
 </template>

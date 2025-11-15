@@ -33,7 +33,17 @@
       "Bash(timeout 60 bash:*)",
       "Bash(taskkill:*)",
       "Bash(curl:*)",
-      "Bash(timeout 180 npx:*)"
+      "Bash(timeout 180 npx:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "mcp__playwright__browser_fill_form",
+      "WebSearch",
+      "mcp__nuxt-ui-remote__list_templates",
+      "mcp__nuxt-ui-remote__get_template",
+      "mcp__nuxt-ui-remote__get_documentation_page",
+      "WebFetch(domain:api.github.com)",
+      "mcp__playwright__browser_console_messages",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,29 +1,15 @@
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
-    <!-- Page Header -->
-    <div class="mb-6">
-      <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+  <div>
+    <!-- Action Bar -->
+    <div v-if="canEditItems()" class="mb-6 flex justify-end">
+      <UButton
+        color="primary"
+        size="lg"
+        icon="i-heroicons-plus"
+        @click="navigateTo('/items/create')"
       >
-        <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-default">Items</h1>
-          <p class="mt-1 text-sm text-muted">
-            Manage inventory items and view stock levels
-          </p>
-        </div>
-
-        <!-- Create Item Button (Admin Only) -->
-        <div v-if="canEditItems()">
-          <UButton
-            color="primary"
-            size="lg"
-            icon="i-heroicons-plus"
-            @click="navigateTo('/items/create')"
-          >
-            Create Item
-          </UButton>
-        </div>
-      </div>
+        Create Item
+      </UButton>
     </div>
 
     <!-- Filters Card -->
