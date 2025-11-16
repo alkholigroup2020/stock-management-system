@@ -64,18 +64,13 @@ Colors in this system map directly to business logic and user intent:
 **Tailwind prefix:** `navy` (e.g., `navy-500`, `navy-700`)
 
 **Full palette:**
+
 ```css
---color-navy-50: #e6e6f0   /* Lightest */
---color-navy-100: #b3b3d9
---color-navy-200: #8080c2
---color-navy-300: #4d4dab
---color-navy-400: #26269b  /* Dark mode primary */
---color-navy-500: #000046  /* Light mode primary, brand color */
---color-navy-600: #00003f
---color-navy-700: #000037
---color-navy-800: #00002f
---color-navy-900: #000020
---color-navy-950: #000010  /* Darkest */
+--color-navy-50: #e6e6f0 /* Lightest */ --color-navy-100: #b3b3d9 --color-navy-200: #8080c2
+  --color-navy-300: #4d4dab --color-navy-400: #26269b /* Dark mode primary */
+  --color-navy-500: #000046 /* Light mode primary, brand color */ --color-navy-600: #00003f
+  --color-navy-700: #000037 --color-navy-800: #00002f --color-navy-900: #000020
+  --color-navy-950: #000010 /* Darkest */;
 ```
 
 ### Secondary Color - Emerald Green (#45cf7b)
@@ -87,48 +82,44 @@ Colors in this system map directly to business logic and user intent:
 **Tailwind prefix:** `emerald` (e.g., `emerald-400`, `emerald-600`)
 
 **Full palette:**
+
 ```css
---color-emerald-50: #edfcf4
---color-emerald-400: #45cf7b  /* Brand emerald green */
---color-emerald-600: #1f9a4c
---color-emerald-950: #0a2916
+--color-emerald-50: #edfcf4 --color-emerald-400: #45cf7b /* Brand emerald green */
+  --color-emerald-600: #1f9a4c --color-emerald-950: #0a2916;
 ```
 
 ### Supporting Colors
 
 **Zinc (Neutral/Gray):**
+
 ```css
---color-zinc-50: #fafafa   /* Very light gray backgrounds */
---color-zinc-300: #d4d4d8  /* Borders */
---color-zinc-600: #52525b  /* Muted text */
---color-zinc-900: #18181b  /* Primary text */
---color-zinc-950: #09090b  /* Darkest gray */
+--color-zinc-50: #fafafa /* Very light gray backgrounds */ --color-zinc-300: #d4d4d8 /* Borders */
+  --color-zinc-600: #52525b /* Muted text */ --color-zinc-900: #18181b /* Primary text */
+  --color-zinc-950: #09090b /* Darkest gray */;
 ```
 
 **Amber (Warning):**
+
 ```css
---color-amber-50: #fffbeb
---color-amber-500: #f59e0b  /* Warning color */
---color-amber-950: #451a03
+--color-amber-50: #fffbeb --color-amber-500: #f59e0b /* Warning color */ --color-amber-950: #451a03;
 ```
 
 **Red (Error/Critical):**
+
 ```css
---color-red-50: #fef2f2
---color-red-600: #dc2626    /* Error color */
---color-red-950: #450a0a
+--color-red-50: #fef2f2 --color-red-600: #dc2626 /* Error color */ --color-red-950: #450a0a;
 ```
 
 **Blue (Info):**
+
 ```css
---color-blue-50: #eff6ff
---color-blue-600: #2563eb  /* Info color */
---color-blue-950: #172554
+--color-blue-50: #eff6ff --color-blue-600: #2563eb /* Info color */ --color-blue-950: #172554;
 ```
 
 ### Color Usage Rules
 
 **✅ DO:**
+
 - Use Tailwind color tokens (e.g., `text-navy-500`, `bg-emerald-400`)
 - Support both light and dark modes using `dark:` variant
 - Use semantic color naming for Nuxt UI components (`color="primary"`, `color="secondary"`)
@@ -136,6 +127,7 @@ Colors in this system map directly to business logic and user intent:
 - Use business tokens for domain concepts (`--ui-stock-low`, not `--color-amber-500`)
 
 **❌ DON'T:**
+
 - Never use inline styles with hex colors (e.g., `style="color: #000046"`)
 - Never use custom color names in Nuxt UI props (e.g., `color="navy"` won't work)
 - Don't configure colors in `app.config.ts` (has no effect with Tailwind v4 `@theme`)
@@ -150,14 +142,17 @@ Colors in this system map directly to business logic and user intent:
 **CRITICAL:** All pages must follow consistent padding standards for a unified user experience.
 
 **Standard Pages:**
+
 - Use `p-4 md:p-6` for responsive padding
   - Mobile: `p-4` (1rem / 16px)
   - Tablet/Desktop: `md:p-6` (1.5rem / 24px)
 
 **Login Page Exception:**
+
 - Special centered layout with `px-4 py-12 sm:px-6 lg:px-8`
 
 **Full-Height Pages:**
+
 - Combine with `min-h-screen bg-default` for consistent full-page layouts
 
 **Examples:**
@@ -205,18 +200,21 @@ Colors in this system map directly to business logic and user intent:
 **Section 1 - Page Header:**
 
 **Left side:** Page title with icon, location indicator, and period
+
 - Page title (e.g., "Dashboard", "Issues", "Items")
 - Icon representing the page
 - Location display: Current location name OR "All Locations" for global pages
 - Period display: Current period name (e.g., "November 2025")
 
 **Right side:** Action buttons (if applicable)
+
 - Primary actions (e.g., "New Delivery", "New Issue", "Create Item")
 - Secondary actions (e.g., "Export CSV", "Back", "Print")
 
 **NO subtitle descriptions** - Keep headers clean and minimal
 
 **Section 2 - Filters/Search (if applicable):**
+
 - Always in a separate card below the header
 - Consistent spacing: `space-y-6` between sections
 - Filter controls in grid layout
@@ -241,6 +239,7 @@ Colors in this system map directly to business logic and user intent:
 ```
 
 **Location Scope:**
+
 - `location-scope="current"` for location-specific pages (Dashboard, Stock Now, Deliveries, Issues)
 - `location-scope="all"` for global pages (Items, Locations)
 
@@ -251,6 +250,7 @@ Colors in this system map directly to business logic and user intent:
 **Nav buttons:** Dashboard · POB · Items & Prices · Orders · Deliveries · Issues · NCR · Stock Now · Reconciliations · Period Close
 
 **Rules:**
+
 - Use simple words, same order as the daily flow
 - Keep navigation consistent across all pages
 - Highlight active page
@@ -279,6 +279,7 @@ Elevated card with border, shadow, and hover effect.
 ```
 
 **Usage:**
+
 ```vue
 <div class="card-elevated p-6">
   <h3>Stock Summary</h3>
@@ -350,6 +351,7 @@ Consistent input field styling.
 ```
 
 **Usage:**
+
 ```vue
 <label class="form-label" for="itemName">Item Name</label>
 <input id="itemName" class="form-input" type="text" />
@@ -385,16 +387,22 @@ All badge classes extend `.badge-base`:
 **Standard Badges:**
 
 ```vue
-<span class="badge-primary">Primary</span>     <!-- Navy -->
-<span class="badge-success">Success</span>     <!-- Emerald -->
-<span class="badge-warning">Warning</span>     <!-- Amber -->
-<span class="badge-error">Error</span>         <!-- Red -->
-<span class="badge-info">Info</span>           <!-- Blue -->
+<span class="badge-primary">Primary</span>
+<!-- Navy -->
+<span class="badge-success">Success</span>
+<!-- Emerald -->
+<span class="badge-warning">Warning</span>
+<!-- Amber -->
+<span class="badge-error">Error</span>
+<!-- Red -->
+<span class="badge-info">Info</span>
+<!-- Blue -->
 ```
 
 **Business-Specific Badges:**
 
 **Stock Status:**
+
 ```vue
 <span class="badge-stock-healthy">Healthy</span>
 <span class="badge-stock-low">Low Stock</span>
@@ -403,6 +411,7 @@ All badge classes extend `.badge-base`:
 ```
 
 **Approval Workflow:**
+
 ```vue
 <span class="badge-draft">Draft</span>
 <span class="badge-pending">Pending</span>
@@ -413,24 +422,28 @@ All badge classes extend `.badge-base`:
 ### Button Styles
 
 **Primary button:** Navy filled
+
 ```vue
 <UButton color="primary">Primary Action</UButton>
 <!-- Renders as: bg-navy-500, white text, hover:bg-navy-600 -->
 ```
 
 **Secondary button:** Emerald bordered
+
 ```vue
 <UButton color="secondary" variant="outline">Secondary Action</UButton>
 <!-- Renders as: border-emerald-400, text-emerald-600 -->
 ```
 
 **Success indicators:**
+
 ```vue
 <UButton color="success">Approve</UButton>
 <!-- Renders as: bg-emerald-400, white text -->
 ```
 
 **Status badges for buttons:**
+
 - Navy for active/pending states
 - Emerald for completed/approved states
 
@@ -498,7 +511,14 @@ Subtle lift effect on hover.
 ### Font Stack
 
 ```css
-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+font-family:
+  system-ui,
+  -apple-system,
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  Arial,
+  sans-serif;
 ```
 
 ---
@@ -516,15 +536,6 @@ font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Ari
 | `--ui-bg-muted`    | zinc-100 (#f4f4f5) | zinc-800 (#27272a) | Subtle backgrounds, disabled input fields  |
 | `--ui-bg-accented` | navy-50 (#e6e6f0)  | navy-950 (#000010) | Highlighted sections, featured areas       |
 | `--ui-bg-inverted` | zinc-900 (#18181b) | zinc-50 (#fafafa)  | Dark surfaces in light mode, light in dark |
-
-**Example:**
-```vue
-<div class="bg-[var(--ui-bg)]">
-  <div class="bg-[var(--ui-bg-elevated)] border-[var(--ui-border)]">
-    <!-- Card content -->
-  </div>
-</div>
-```
 
 ### Text Tokens
 
@@ -616,6 +627,7 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 ✅ White on `--ui-stock-healthy` = 4.6:1
 
 **Rules:**
+
 - Maintain sufficient contrast ratios (WCAG AA minimum)
 - Support both light and dark modes
 - Use color AND text/icons (don't rely on color alone)
@@ -716,6 +728,7 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 ```
 
 **Error message:**
+
 ```
 @utility placeholder-muted::placeholder defines an invalid utility name.
 Utilities should be alphanumeric and start with a lowercase letter.
@@ -734,11 +747,13 @@ Utilities should be alphanumeric and start with a lowercase letter.
 ```
 
 **When to use `@utility`:**
+
 - Simple utilities without pseudo-elements/classes
 - Utilities that need to be applied via Tailwind's utility system
 - Single property utilities like `@utility bg-elevated { background-color: var(--ui-bg-elevated); }`
 
 **When to use regular CSS classes:**
+
 - Pseudo-elements (::placeholder, ::before, ::after)
 - Pseudo-classes (:hover, :focus, :active)
 - Complex multi-property patterns
@@ -751,6 +766,7 @@ Utilities should be alphanumeric and start with a lowercase letter.
 ### Progressive Web App Features
 
 **Level 1 PWA (MVP):**
+
 - ✅ Installable (Add to Home Screen)
 - ✅ Offline UI with clear messaging
 - ✅ Cached static assets (CSS, JS, images)
@@ -759,11 +775,13 @@ Utilities should be alphanumeric and start with a lowercase letter.
 - ✅ Auto-update on new deployment
 
 **Offline Behavior:**
+
 - **Works Offline:** View cached pages, previously loaded data, interface navigation
 - **Requires Connection:** Post deliveries/issues, fetch fresh data, period close
 - **User Experience:** Clear "You're offline" banner, disabled buttons with tooltips, green "Back online" notification
 
 **Design Implications:**
+
 - Use `useOnlineStatus()` composable to detect offline state
 - Disable action buttons when offline: `<UButton :disabled="!isOnline">`
 - Show clear offline indicators in UI
@@ -824,20 +842,24 @@ Utilities should be alphanumeric and start with a lowercase letter.
 ### When to Use What
 
 **Semantic Tokens (`var(--ui-*)`):**
+
 - Custom components not using Nuxt UI
 - Business logic-driven colors (stock status, approvals)
 - Backgrounds, text, borders that need to adapt to dark mode
 
 **Tailwind Color Classes (`text-navy-500`):**
+
 - Quick prototyping
 - One-off designs
 - When you need a specific shade
 
 **Nuxt UI Semantic Colors (`color="primary"`):**
+
 - All Nuxt UI components (UButton, UAlert, UBadge, etc.)
 - Standard feedback colors (success, warning, error)
 
 **Utility Classes (`.badge-stock-healthy`):**
+
 - Common patterns used multiple times
 - Consistency across the app
 - Business-specific UI elements
@@ -882,12 +904,8 @@ Utilities should be alphanumeric and start with a lowercase letter.
 
       <!-- Actions -->
       <div class="flex gap-3 pt-4">
-        <UButton color="primary" type="submit" :loading="loading">
-          Post Delivery
-        </UButton>
-        <UButton color="neutral" variant="outline" @click="cancel">
-          Cancel
-        </UButton>
+        <UButton color="primary" type="submit" :loading="loading">Post Delivery</UButton>
+        <UButton color="neutral" variant="outline" @click="cancel">Cancel</UButton>
       </div>
     </form>
   </div>

@@ -164,27 +164,35 @@ const recentIssuesItems = computed(() => {
 const quickActions = [
   {
     label: "Record Delivery",
+    description: "Post new goods receipts",
     icon: "package-plus",
     color: "primary" as const,
     route: "/deliveries/create",
+    gradient: "from-navy-500 to-navy-600",
   },
   {
     label: "Record Issue",
+    description: "Issue stock to cost centres",
     icon: "file-minus",
-    color: "primary" as const,
+    color: "secondary" as const,
     route: "/issues/create",
+    gradient: "from-emerald-500 to-emerald-600",
   },
   {
     label: "View Stock",
+    description: "Check current inventory",
     icon: "boxes",
-    color: "primary" as const,
+    color: "success" as const,
     route: "/stock-now",
+    gradient: "from-blue-500 to-blue-600",
   },
   {
     label: "Enter POB",
+    description: "Record persons on board",
     icon: "users",
-    color: "primary" as const,
+    color: "warning" as const,
     route: "/pob",
+    gradient: "from-amber-500 to-amber-600",
   },
 ];
 
@@ -264,29 +272,61 @@ const handleRetry = () => {
       </div>
 
       <!-- Quick Actions -->
-      <UCard class="card-elevated">
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-zap" class="w-5 h-5 text-muted" />
-            <h2 class="text-subheading">Quick Actions</h2>
-          </div>
-        </template>
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <UIcon name="i-lucide-zap" class="w-5 h-5 text-muted" />
+          <h2 class="text-subheading">Quick Actions</h2>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <UButton
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button
             v-for="action in quickActions"
             :key="action.route"
-            :color="action.color"
-            variant="soft"
-            size="lg"
-            block
             @click="handleQuickAction(action.route)"
+            class="group relative overflow-hidden rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-6 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-ring)] focus-visible:ring-offset-2"
           >
-            <UIcon :name="`i-lucide-${action.icon}`" class="w-5 h-5 mr-2" />
-            {{ action.label }}
-          </UButton>
+            <!-- Gradient Background on Hover -->
+            <div
+              class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+              :class="action.gradient"
+            ></div>
+
+            <!-- Content -->
+            <div class="relative z-10">
+              <!-- Icon -->
+              <div
+                class="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 bg-gradient-to-br transition-transform duration-300 group-hover:scale-110"
+                :class="action.gradient"
+              >
+                <UIcon
+                  :name="`i-lucide-${action.icon}`"
+                  class="w-6 h-6 text-white"
+                />
+              </div>
+
+              <!-- Text -->
+              <h3
+                class="text-lg font-semibold text-[var(--ui-text-highlighted)] mb-1 transition-colors duration-300 group-hover:text-[var(--ui-primary)]"
+              >
+                {{ action.label }}
+              </h3>
+              <p class="text-sm text-[var(--ui-text-muted)]">
+                {{ action.description }}
+              </p>
+
+              <!-- Arrow Icon -->
+              <div
+                class="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
+              >
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="w-5 h-5 text-[var(--ui-primary)]"
+                />
+              </div>
+            </div>
+          </button>
         </div>
-      </UCard>
+      </div>
     </div>
   </div>
 </template>

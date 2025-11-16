@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <LayoutPageHeader
       title="Locations"
-      icon="i-lucide-map-pin"
+      icon="i-lucide-store"
       :show-location="true"
       :show-period="true"
       location-scope="all"
@@ -74,11 +74,7 @@
       description="No locations match your search criteria. Try adjusting your filters or create a new location."
     >
       <template v-if="canManageLocations" #actions>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          @click="navigateTo('/locations/create')"
-        >
+        <UButton color="primary" icon="i-lucide-plus" @click="navigateTo('/locations/create')">
           Create Location
         </UButton>
       </template>
@@ -194,8 +190,7 @@ const fetchLocations = async () => {
     locations.value = response.locations || [];
   } catch (err) {
     console.error("Error fetching locations:", err);
-    const errorMessage =
-      err instanceof Error ? err.message : "Failed to fetch locations";
+    const errorMessage = err instanceof Error ? err.message : "Failed to fetch locations";
     error.value = errorMessage;
     toast.error("Error", { description: errorMessage });
   } finally {
