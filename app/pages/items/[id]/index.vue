@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-default">
+  <div class="space-y-6">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />
@@ -31,56 +31,25 @@
 
     <!-- Item Details -->
     <div v-else-if="item" class="space-y-6">
-      <!-- Page Header with Breadcrumb -->
-      <div>
-        <nav class="flex mb-4" aria-label="Breadcrumb">
-          <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-              <button
-                class="inline-flex items-center text-sm text-muted hover:text-default"
-                @click="navigateTo('/items')"
-              >
-                <UIcon name="i-heroicons-cube" class="w-4 h-4 mr-2" />
-                Items
-              </button>
-            </li>
-            <li aria-current="page">
-              <div class="flex items-center">
-                <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-muted" />
-                <span class="ml-1 text-sm font-medium text-default md:ml-2">
-                  {{ item.code }}
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav>
-
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-3">
-              <h1 class="text-heading md:text-display font-bold">
-                {{ item.name }}
-              </h1>
-              <UBadge v-if="!item.is_active" color="neutral" variant="subtle" size="md">
-                Inactive
-              </UBadge>
-            </div>
-            <p class="mt-1 text-caption">Item Code: {{ item.code }}</p>
-          </div>
-
-          <!-- Action Buttons -->
-          <div v-if="canEditItems()" class="flex gap-2">
-            <UButton
-              color="primary"
-              variant="outline"
-              icon="i-heroicons-pencil-square"
-              @click="navigateTo(`/items/${item.id}/edit`)"
-            >
-              Edit Item
-            </UButton>
-          </div>
-        </div>
-      </div>
+      <!-- Page Header -->
+      <LayoutPageHeader
+        :title="item.name"
+        icon="i-lucide-package-2"
+        :show-location="true"
+        :show-period="true"
+        location-scope="all"
+      >
+        <template #actions>
+          <UButton
+            v-if="canEditItems()"
+            color="primary"
+            icon="i-heroicons-pencil-square"
+            @click="navigateTo(`/items/${item.id}/edit`)"
+          >
+            Edit Item
+          </UButton>
+        </template>
+      </LayoutPageHeader>
 
       <!-- Item Information Card -->
       <UCard>

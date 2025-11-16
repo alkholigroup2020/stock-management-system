@@ -1,15 +1,13 @@
 <template>
-  <div class="container mx-auto">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <PageHeader title="Set Item Prices" icon="i-lucide-tag">
-      <template #breadcrumbs>
-        <nav class="flex items-center gap-2 text-caption">
-          <NuxtLink to="/">Dashboard</NuxtLink>
-          <span>/</span>
-          <span>Set Prices</span>
-        </nav>
-      </template>
-
+    <LayoutPageHeader
+      title="Set Item Prices"
+      icon="i-lucide-tag"
+      :show-location="true"
+      :show-period="false"
+      location-scope="all"
+    >
       <template #actions>
         <UButton
           v-if="hasChanges"
@@ -22,10 +20,10 @@
           Save All Prices
         </UButton>
       </template>
-    </PageHeader>
+    </LayoutPageHeader>
 
     <!-- Period Info -->
-    <div v-if="periodData" class="mb-6">
+    <div v-if="periodData">
       <UCard>
         <div class="flex items-center justify-between">
           <div>

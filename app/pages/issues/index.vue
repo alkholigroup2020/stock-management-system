@@ -218,25 +218,28 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-default">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <div class="mb-6">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 class="text-heading font-bold">Issues</h1>
-          <p class="mt-1 text-caption">
-            View and manage stock issues for
-            {{ locationStore.activeLocation?.name }}
-          </p>
-        </div>
-        <div v-if="canPostIssues()" class="flex gap-2">
-          <UButton color="primary" icon="i-lucide-plus" label="New Issue" @click="goToNewIssue" />
-        </div>
-      </div>
-    </div>
+    <LayoutPageHeader
+      title="Issues"
+      icon="i-lucide-arrow-up-from-line"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    >
+      <template #actions>
+        <UButton
+          v-if="canPostIssues()"
+          color="primary"
+          icon="i-lucide-plus"
+          label="New Issue"
+          @click="goToNewIssue"
+        />
+      </template>
+    </LayoutPageHeader>
 
     <!-- Filters -->
-    <div class="mb-6 rounded-lg border border-default bg-elevated p-4">
+    <div class="card-elevated p-4">
       <h2 class="mb-4 text-label font-semibold">Filters</h2>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

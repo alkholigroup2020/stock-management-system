@@ -24,22 +24,26 @@
     </div>
 
     <!-- Edit Form -->
-    <div v-else>
+    <div v-else class="space-y-6">
       <!-- Page Header -->
-      <div class="mb-6">
-        <div class="flex items-center gap-3 mb-2">
+      <LayoutPageHeader
+        title="Edit Item"
+        icon="i-lucide-package-2"
+        :show-location="true"
+        :show-period="true"
+        location-scope="all"
+      >
+        <template #actions>
           <UButton
             color="neutral"
-            variant="ghost"
+            variant="outline"
             icon="i-heroicons-arrow-left"
             @click="handleCancel"
           >
             Back
           </UButton>
-        </div>
-        <h1 class="text-heading md:text-display font-bold">Edit Item</h1>
-        <p class="mt-1 text-caption">Update item details</p>
-      </div>
+        </template>
+      </LayoutPageHeader>
 
       <!-- Form Card -->
       <UCard class="max-w-2xl">

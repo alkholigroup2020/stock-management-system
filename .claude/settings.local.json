@@ -51,7 +51,8 @@
       "Bash(rm:*)",
       "Bash(dir:*)",
       "Bash(rmdir:*)",
-      "Bash(timeout 5 bash:*)"
+      "Bash(timeout 5 bash:*)",
+      "Bash(timeout 15 pnpm dev:*)"
     ],
     "deny": [],
     "ask": []

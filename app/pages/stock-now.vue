@@ -431,66 +431,66 @@ watch(
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <div class="page-header-section">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <UIcon name="i-lucide-package" class="text-3xl text-primary" />
-          <div>
-            <h1 class="text-heading">Stock Now</h1>
-            <p class="text-caption">Real-time inventory levels</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <!-- View Mode Toggle (Supervisor/Admin only) -->
-          <UFieldGroup v-if="isAtLeastSupervisor" size="sm">
-            <UButton
-              :color="viewMode === 'single' ? 'primary' : 'neutral'"
-              :variant="viewMode === 'single' ? 'solid' : 'outline'"
-              @click="handleViewModeChange('single')"
-            >
-              Single Location
-            </UButton>
-            <UButton
-              :color="viewMode === 'consolidated' ? 'primary' : 'neutral'"
-              :variant="viewMode === 'consolidated' ? 'solid' : 'outline'"
-              @click="handleViewModeChange('consolidated')"
-            >
-              All Locations
-            </UButton>
-          </UFieldGroup>
-
-          <!-- Export Button -->
+    <LayoutPageHeader
+      title="Stock Now"
+      icon="i-lucide-package"
+      :show-location="true"
+      :show-period="true"
+      :location-scope="viewMode === 'consolidated' ? 'all' : 'current'"
+    >
+      <template #actions>
+        <!-- View Mode Toggle (Supervisor/Admin only) -->
+        <UFieldGroup v-if="isAtLeastSupervisor" size="sm">
           <UButton
-            icon="i-lucide-download"
-            color="neutral"
-            variant="outline"
-            @click="exportToCSV"
-            :disabled="loading || totalItems === 0"
+            :color="viewMode === 'single' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'single' ? 'solid' : 'outline'"
+            @click="handleViewModeChange('single')"
           >
-            Export CSV
+            Single Location
           </UButton>
-        </div>
-      </div>
+          <UButton
+            :color="viewMode === 'consolidated' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'consolidated' ? 'solid' : 'outline'"
+            @click="handleViewModeChange('consolidated')"
+          >
+            All Locations
+          </UButton>
+        </UFieldGroup>
 
-      <!-- Location Selector (when in single location mode and supervisor/admin) -->
-      <div v-if="isAtLeastSupervisor && viewMode === 'single'" class="mt-4">
-        <UFormField label="Select Location">
-          <USelectMenu
-            v-model="selectedLocationId"
-            :options="
-              locationStore.userLocations.map((loc) => ({
-                label: `${loc.name} (${loc.code})`,
-                value: loc.id,
-              }))
-            "
-            placeholder="Select a location"
-            value-attribute="value"
-            @update:model-value="handleLocationChange"
-          />
-        </UFormField>
-      </div>
+        <!-- Export Button -->
+        <UButton
+          icon="i-lucide-download"
+          color="neutral"
+          variant="outline"
+          @click="exportToCSV"
+          :disabled="loading || totalItems === 0"
+        >
+          Export CSV
+        </UButton>
+      </template>
+    </LayoutPageHeader>
+
+    <!-- Location Selector (when in single location mode and supervisor/admin) -->
+    <div
+      v-if="isAtLeastSupervisor && viewMode === 'single'"
+      class="card-elevated p-4"
+    >
+      <UFormField label="Select Location">
+        <USelectMenu
+          v-model="selectedLocationId"
+          :options="
+            locationStore.userLocations.map((loc) => ({
+              label: `${loc.name} (${loc.code})`,
+              value: loc.id,
+            }))
+          "
+          placeholder="Select a location"
+          value-attribute="value"
+          @update:model-value="handleLocationChange"
+        />
+      </UFormField>
     </div>
 
     <!-- Statistics Cards -->
@@ -792,11 +792,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style scoped>
-.page-header-section {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--ui-border);
-}
-</style>

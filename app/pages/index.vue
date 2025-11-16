@@ -200,19 +200,13 @@ const handleRetry = () => {
 <template>
   <div class="space-y-6">
     <!-- Page Header -->
-    <div>
-      <h1 class="text-display mb-2">Dashboard</h1>
-      <div
-        v-if="dashboardData?.location"
-        class="flex items-center gap-2 text-caption"
-      >
-        <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
-        <span>{{ dashboardData.location.name }}</span>
-        <span v-if="dashboardData.period" class="ml-2">
-          • Period: {{ dashboardData.period.name }}
-        </span>
-      </div>
-    </div>
+    <LayoutPageHeader
+      title="Dashboard"
+      icon="i-lucide-layout-dashboard"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    />
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">

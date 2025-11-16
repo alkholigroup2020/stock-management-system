@@ -1,18 +1,24 @@
 <template>
-  <div>
+  <div class="space-y-6">
     <!-- Page Header -->
-    <PageHeader title="Create Location" icon="i-lucide-plus">
+    <LayoutPageHeader
+      title="Create Location"
+      icon="i-lucide-map-pin"
+      :show-location="true"
+      :show-period="true"
+      location-scope="all"
+    >
       <template #actions>
         <UButton
           color="neutral"
-          variant="ghost"
+          variant="outline"
           icon="i-lucide-arrow-left"
           @click="navigateTo('/locations')"
         >
           Back to Locations
         </UButton>
       </template>
-    </PageHeader>
+    </LayoutPageHeader>
 
     <!-- Form Card -->
     <UCard class="max-w-3xl">

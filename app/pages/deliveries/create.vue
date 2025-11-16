@@ -246,22 +246,18 @@ watch(
 </script>
 
 <template>
-  <div class="bg-default">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <PageHeader title="New Delivery" icon="truck">
-      <template #breadcrumbs>
-        <nav class="flex items-center space-x-2 text-sm text-muted">
-          <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
-          <span>/</span>
-          <NuxtLink to="/deliveries" class="hover:text-primary">Deliveries</NuxtLink>
-          <span>/</span>
-          <span class="text-default">New</span>
-        </nav>
-      </template>
-    </PageHeader>
+    <LayoutPageHeader
+      title="New Delivery"
+      icon="i-lucide-truck"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    />
 
     <!-- Main Form -->
-    <div class="mt-6 space-y-6">
+    <div class="space-y-6">
       <!-- Delivery Header Card -->
       <UCard class="card-elevated">
         <template #header>

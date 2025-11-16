@@ -250,22 +250,18 @@ watch(
 </script>
 
 <template>
-  <div class="bg-default">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <PageHeader title="New Issue" icon="file-minus">
-      <template #breadcrumbs>
-        <nav class="flex items-center space-x-2 text-caption">
-          <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
-          <span>/</span>
-          <NuxtLink to="/issues" class="hover:text-primary">Issues</NuxtLink>
-          <span>/</span>
-          <span>New</span>
-        </nav>
-      </template>
-    </PageHeader>
+    <LayoutPageHeader
+      title="New Issue"
+      icon="i-lucide-arrow-up-from-line"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    />
 
     <!-- Main Form -->
-    <div class="mt-6 space-y-6">
+    <div class="space-y-6">
       <!-- Issue Header Card -->
       <UCard class="card-elevated">
         <template #header>

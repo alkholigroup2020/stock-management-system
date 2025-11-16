@@ -182,40 +182,34 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-default">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <div class="mb-6">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-2">
-            <UButton
-              icon="i-lucide-arrow-left"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click="goBack"
-            />
-            <h1 class="text-heading font-bold">Delivery Details</h1>
-          </div>
-          <nav class="flex items-center space-x-2 text-caption ml-10">
-            <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
-            <span>/</span>
-            <NuxtLink to="/deliveries" class="hover:text-primary">Deliveries</NuxtLink>
-            <span>/</span>
-            <span class="text-default">{{ delivery?.delivery_no || "Loading..." }}</span>
-          </nav>
-        </div>
-        <div class="flex gap-2">
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-printer"
-            label="Print"
-            @click="printDelivery"
-          />
-        </div>
-      </div>
-    </div>
+    <LayoutPageHeader
+      :title="`Delivery ${delivery?.delivery_no || ''}`"
+      icon="i-lucide-truck"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    >
+      <template #actions>
+        <UButton
+          icon="i-lucide-arrow-left"
+          color="neutral"
+          variant="outline"
+          @click="goBack"
+        >
+          Back
+        </UButton>
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-printer"
+          @click="printDelivery"
+        >
+          Print
+        </UButton>
+      </template>
+    </LayoutPageHeader>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-12">

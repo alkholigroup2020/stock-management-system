@@ -122,24 +122,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-default">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <PageHeader title="Issue Details" icon="file-minus">
-      <template #breadcrumbs>
-        <nav class="flex items-center space-x-2 text-caption">
-          <NuxtLink to="/" class="hover:text-primary">Home</NuxtLink>
-          <span>/</span>
-          <NuxtLink to="/issues" class="hover:text-primary">Issues</NuxtLink>
-          <span>/</span>
-          <span>{{ issue?.issue_no || "Loading..." }}</span>
-        </nav>
-      </template>
+    <LayoutPageHeader
+      :title="`Issue ${issue?.issue_no || ''}`"
+      icon="i-lucide-arrow-up-from-line"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    >
       <template #actions>
-        <UButton color="neutral" variant="soft" icon="i-lucide-arrow-left" @click="goBack">
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-arrow-left"
+          @click="goBack"
+        >
           Back to Issues
         </UButton>
       </template>
-    </PageHeader>
+    </LayoutPageHeader>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-12">
@@ -147,10 +149,10 @@ onMounted(() => {
     </div>
 
     <!-- Error State -->
-    <ErrorAlert v-else-if="error" :message="error" class="mt-6" @retry="fetchIssue" />
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchIssue" />
 
     <!-- Issue Details -->
-    <div v-else-if="issue" class="mt-6 space-y-6">
+    <div v-else-if="issue" class="space-y-6">
       <!-- Issue Header Card -->
       <UCard class="card-elevated">
         <template #header>

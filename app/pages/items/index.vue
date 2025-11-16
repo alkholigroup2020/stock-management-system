@@ -1,19 +1,27 @@
 <template>
-  <div>
-    <!-- Action Bar -->
-    <div v-if="canEditItems()" class="mb-6 flex justify-end">
-      <UButton
-        color="primary"
-        size="lg"
-        icon="i-heroicons-plus"
-        @click="navigateTo('/items/create')"
-      >
-        Create Item
-      </UButton>
-    </div>
+  <div class="space-y-6">
+    <!-- Page Header -->
+    <LayoutPageHeader
+      title="Items"
+      icon="i-lucide-package-2"
+      :show-location="true"
+      :show-period="true"
+      location-scope="all"
+    >
+      <template #actions>
+        <UButton
+          v-if="canEditItems()"
+          color="primary"
+          icon="i-heroicons-plus"
+          @click="navigateTo('/items/create')"
+        >
+          Create Item
+        </UButton>
+      </template>
+    </LayoutPageHeader>
 
     <!-- Filters Card -->
-    <UCard class="mb-6">
+    <UCard>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Search Input -->
         <div class="md:col-span-2">

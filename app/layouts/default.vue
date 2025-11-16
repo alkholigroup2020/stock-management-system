@@ -105,6 +105,7 @@ const pageTitle = computed(() => {
   // Format route name to title (e.g., "dashboard" -> "Dashboard")
   const name = route.name as string;
   if (!name) return "Dashboard";
+  if (name === "index") return "Dashboard";
   return name
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

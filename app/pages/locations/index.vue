@@ -1,7 +1,13 @@
 <template>
-  <div>
+  <div class="space-y-6">
     <!-- Page Header -->
-    <PageHeader title="Locations" icon="i-lucide-map-pin">
+    <LayoutPageHeader
+      title="Locations"
+      icon="i-lucide-map-pin"
+      :show-location="true"
+      :show-period="true"
+      location-scope="all"
+    >
       <template #actions>
         <UButton
           v-if="canManageLocations"
@@ -12,10 +18,10 @@
           Create Location
         </UButton>
       </template>
-    </PageHeader>
+    </LayoutPageHeader>
 
     <!-- Filters -->
-    <UCard class="mb-6">
+    <UCard>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Search -->
         <div>

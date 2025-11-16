@@ -153,6 +153,50 @@ sequenceDiagram
 - Prevent mistakes: block negative stock; confirm on close.
 - Keep forms short; remember last choices where helpful.
 
+### Page Header Structure (Unified Design)
+
+**All pages must follow this consistent header pattern:**
+
+**Section 1 - Page Header:**
+- **Left side:** Page title with icon, location indicator, and period
+  - Page title (e.g., "Dashboard", "Issues", "Items")
+  - Icon representing the page
+  - Location display: Current location name OR "All Locations" for global pages
+  - Period display: Current period name (e.g., "November 2025")
+- **Right side:** Action buttons (if applicable)
+  - Primary actions (e.g., "New Delivery", "New Issue", "Create Item")
+  - Secondary actions (e.g., "Export CSV", "Back", "Print")
+- **NO subtitle descriptions** - Keep headers clean and minimal
+
+**Section 2 - Filters/Search (if applicable):**
+- Always in a separate card below the header
+- Consistent spacing: `space-y-6` between sections
+- Filter controls in grid layout
+- Active filter badges when filters are applied
+
+**Implementation:**
+- Use the `LayoutPageHeader` component for all pages
+- Set `location-scope="current"` for location-specific pages (Dashboard, Stock Now, Deliveries, Issues)
+- Set `location-scope="all"` for global pages (Items, Locations)
+- NO subtitle prop - headers should be title and metadata only
+
+**Example:**
+```vue
+<LayoutPageHeader
+  title="Deliveries & Goods Receipts"
+  icon="i-lucide-truck"
+  :show-location="true"
+  :show-period="true"
+  location-scope="current"
+>
+  <template #actions>
+    <UButton color="primary" icon="i-lucide-plus">
+      New Delivery
+    </UButton>
+  </template>
+</LayoutPageHeader>
+```
+
 ### Color Usage
 
 **Brand Colors:**
