@@ -283,7 +283,7 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 
 ## Key Documentation Files
 
-See `/project-docs/` for: **PRD**, **MVP**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **DESIGN_SYSTEM**
+See `/project-docs/` for: **PRD**, **MVP**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **UI_DESIGN_GUIDE** (complete design system)
 
 See `project-docs/dev-phases/` for phased development plans.
 
@@ -300,7 +300,7 @@ See `project-docs/dev-phases/` for phased development plans.
 
 ## Theme Colors and Styling
 
-**Design System:** Navy Blue (#000046) = primary/brand, Emerald (#45cf7b) = success/secondary, Amber = warnings, Red = errors. All colors in `app/assets/css/main.css` using Tailwind v4 + CSS variables. See `/project-docs/DESIGN_SYSTEM.md` for full reference.
+**Design System:** Navy Blue (#000046) = primary/brand, Emerald (#45cf7b) = success/secondary, Amber = warnings, Red = errors. All colors in `app/assets/css/main.css` using Tailwind v4 + CSS variables. **See `/project-docs/UI_DESIGN_GUIDE.md` for complete design system reference.**
 
 **Color Palettes:** `navy`, `emerald`, `zinc`, `amber`, `red`, `blue` (shades 50-950)
 
