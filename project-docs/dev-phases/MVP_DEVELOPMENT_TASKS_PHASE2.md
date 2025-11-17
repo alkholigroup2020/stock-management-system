@@ -148,25 +148,25 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.2.1 NCR API Routes
 
-- [ ] Create `server/api/ncrs/index.get.ts`
-  - [ ] Fetch NCRs with filters
-  - [ ] Filter by location, type, status, date
-  - [ ] Return NCRs list
-- [ ] Create `server/api/ncrs/index.post.ts`
-  - [ ] Validate NCR data (Zod)
-  - [ ] Check user permissions
-  - [ ] Create manual NCR
-  - [ ] Link to delivery if provided
-  - [ ] Return created NCR
-- [ ] Create `server/api/ncrs/[id].get.ts`
-  - [ ] Fetch single NCR by ID
-  - [ ] Include related delivery/line info
-  - [ ] Return NCR details
-- [ ] Create `server/api/ncrs/[id].patch.ts`
-  - [ ] Update NCR status
-  - [ ] Add resolution notes
-  - [ ] Return updated NCR
-- [ ] Test NCR API routes
+- [x] Create `server/api/ncrs/index.get.ts`
+  - [x] Fetch NCRs with filters
+  - [x] Filter by location, type, status, date
+  - [x] Return NCRs list
+- [x] Create `server/api/ncrs/index.post.ts`
+  - [x] Validate NCR data (Zod)
+  - [x] Check user permissions
+  - [x] Create manual NCR
+  - [x] Link to delivery if provided
+  - [x] Return created NCR
+- [x] Create `server/api/ncrs/[id].get.ts`
+  - [x] Fetch single NCR by ID
+  - [x] Include related delivery/line info
+  - [x] Return NCR details
+- [x] Create `server/api/ncrs/[id].patch.ts`
+  - [x] Update NCR status
+  - [x] Add resolution notes
+  - [x] Return updated NCR
+- [x] Test NCR API routes
 
 ### 2.2.2 NCRs List Page
 
