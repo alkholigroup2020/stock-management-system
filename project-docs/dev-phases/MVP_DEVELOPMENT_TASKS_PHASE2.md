@@ -68,20 +68,20 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.1.2 Transfers List Page
 
-- [ ] Create `pages/transfers/index.vue`
-- [ ] Display transfers table
-  - [ ] Transfer No, Date, From Location, To Location, Status, Total Value
-- [ ] Implement filters
-  - [ ] Status dropdown
-  - [ ] Date range
-  - [ ] From/To location
-- [ ] Show status badges (use brand colors)
-  - [ ] Pending: navy
-  - [ ] Approved: emerald
-  - [ ] Rejected: red
-- [ ] Add "New Transfer" button
-- [ ] Add row click to view details
-- [ ] Test transfers list
+- [x] Create `pages/transfers/index.vue`
+- [x] Display transfers table
+  - [x] Transfer No, Date, From Location, To Location, Status, Total Value
+- [x] Implement filters
+  - [x] Status dropdown
+  - [x] Date range
+  - [x] From/To location
+- [x] Show status badges (use brand colors)
+  - [x] Pending: navy
+  - [x] Approved: emerald
+  - [x] Rejected: red
+- [x] Add "New Transfer" button
+- [x] Add row click to view details
+- [x] Test transfers list
 
 ### 2.1.3 Create Transfer UI
 
