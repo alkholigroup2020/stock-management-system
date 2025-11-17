@@ -170,18 +170,18 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.2.2 NCRs List Page
 
-- [ ] Create `pages/ncrs/index.vue`
-- [ ] Display NCRs table
-  - [ ] NCR No, Type, Date, Location, Reason, Value, Status
-- [ ] Implement filters
-  - [ ] Type (MANUAL/PRICE_VARIANCE)
-  - [ ] Status dropdown
-  - [ ] Location dropdown
-  - [ ] Auto-generated checkbox
-- [ ] Show status badges (brand colors)
-- [ ] Add "New NCR" button (manual)
-- [ ] Add row click to view details
-- [ ] Test NCRs list
+- [x] Create `pages/ncrs/index.vue`
+- [x] Display NCRs table
+  - [x] NCR No, Type, Date, Location, Reason, Value, Status
+- [x] Implement filters
+  - [x] Type (MANUAL/PRICE_VARIANCE)
+  - [x] Status dropdown
+  - [x] Location dropdown
+  - [x] Auto-generated checkbox
+- [x] Show status badges (brand colors)
+- [x] Add "New NCR" button (manual)
+- [x] Add row click to view details
+- [x] Test NCRs list
 
 ### 2.2.3 Create Manual NCR
 
