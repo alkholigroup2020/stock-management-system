@@ -110,27 +110,27 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.1.4 Transfer Detail & Approval
 
-- [ ] Create `pages/transfers/[id].vue`
-- [ ] Display transfer header
-  - [ ] Transfer No, Date, Status
-  - [ ] From/To locations
-  - [ ] Requested by
-- [ ] Display transfer lines table
-  - [ ] Item, Quantity, WAC, Value
-- [ ] Display total value
-- [ ] Show approval section (supervisor/admin only)
-  - [ ] Approve button (emerald)
-  - [ ] Reject button (red)
-  - [ ] Comments textarea
-- [ ] Implement approve handler
-  - [ ] Call approve API
-  - [ ] Show success message
-  - [ ] Refresh transfer data
-- [ ] Implement reject handler
-  - [ ] Call reject API
-  - [ ] Show success message
-  - [ ] Refresh transfer data
-- [ ] Test transfer approval flow
+- [x] Create `pages/transfers/[id].vue`
+- [x] Display transfer header
+  - [x] Transfer No, Date, Status
+  - [x] From/To locations
+  - [x] Requested by
+- [x] Display transfer lines table
+  - [x] Item, Quantity, WAC, Value
+- [x] Display total value
+- [x] Show approval section (supervisor/admin only)
+  - [x] Approve button (emerald)
+  - [x] Reject button (red)
+  - [x] Comments textarea
+- [x] Implement approve handler
+  - [x] Call approve API
+  - [x] Show success message
+  - [x] Refresh transfer data
+- [x] Implement reject handler
+  - [x] Call reject API
+  - [x] Show success message
+  - [x] Refresh transfer data
+- [x] Test transfer approval flow
 
 ### 2.1.5 Transfer Components
 
