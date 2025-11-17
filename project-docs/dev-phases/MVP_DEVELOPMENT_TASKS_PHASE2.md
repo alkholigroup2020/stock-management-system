@@ -134,13 +134,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.1.5 Transfer Components
 
-- [ ] Create `components/transfer/TransferForm.vue`
-  - [ ] Reusable transfer form
-- [ ] Create `components/transfer/TransferStatusBadge.vue`
-  - [ ] Status badge with appropriate colors
-- [ ] Create `components/transfer/ApprovalActions.vue`
-  - [ ] Approve/Reject buttons with modal confirmation
-- [ ] Test components
+- [x] Create `components/transfer/TransferForm.vue`
+  - [x] Reusable transfer form
+- [x] Create `components/transfer/TransferStatusBadge.vue`
+  - [x] Status badge with appropriate colors
+- [x] Create `components/transfer/ApprovalActions.vue`
+  - [x] Approve/Reject buttons with modal confirmation
+- [x] Test components
 
 ---
 
