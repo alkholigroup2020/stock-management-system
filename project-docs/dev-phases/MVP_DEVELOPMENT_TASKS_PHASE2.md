@@ -185,17 +185,17 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.2.3 Create Manual NCR
 
-- [ ] Create `pages/ncrs/create.vue`
-- [ ] Design NCR form
-  - [ ] Location dropdown
-  - [ ] Delivery selection (optional)
-  - [ ] Reason textarea
-  - [ ] Lines table
-    - [ ] Item selection
-    - [ ] Quantity
-    - [ ] Value
-- [ ] Implement submit handler
-- [ ] Test manual NCR creation
+- [x] Create `pages/ncrs/create.vue`
+- [x] Design NCR form
+  - [x] Location dropdown
+  - [x] Delivery selection (optional)
+  - [x] Reason textarea
+  - [x] Lines table
+    - [x] Item selection
+    - [x] Quantity
+    - [x] Value
+- [x] Implement submit handler
+- [x] Test manual NCR creation
 
 ### 2.2.4 NCR Detail Page
 
