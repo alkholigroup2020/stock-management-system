@@ -35,36 +35,36 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.1.1 Transfer API Routes
 
-- [ ] Create `server/api/transfers/index.get.ts`
-  - [ ] Fetch transfers with filters
-  - [ ] Filter by location (from/to), status, date
-  - [ ] Include transfer lines
-  - [ ] Return transfers list
-- [ ] Create `server/api/transfers/index.post.ts`
-  - [ ] Validate transfer data (Zod)
-  - [ ] Check user permissions
-  - [ ] Validate source location has sufficient stock
-  - [ ] Create transfer in PENDING_APPROVAL status
-  - [ ] Return created transfer
-- [ ] Create `server/api/transfers/[id].get.ts`
-  - [ ] Fetch single transfer by ID
-  - [ ] Include lines
-  - [ ] Return transfer details
-- [ ] Create `server/api/transfers/[id]/approve.patch.ts`
-  - [ ] Check user is supervisor or admin
-  - [ ] Start database transaction
-  - [ ] For each transfer line:
-    - [ ] Deduct from source location stock
-    - [ ] Add to destination location stock (at source WAC)
-  - [ ] Update transfer status to COMPLETED
-  - [ ] Commit transaction
-  - [ ] Return updated transfer
-- [ ] Create `server/api/transfers/[id]/reject.patch.ts`
-  - [ ] Check user is supervisor or admin
-  - [ ] Update transfer status to REJECTED
-  - [ ] Add rejection comment
-  - [ ] Return updated transfer
-- [ ] Test transfer API routes
+- [x] Create `server/api/transfers/index.get.ts`
+  - [x] Fetch transfers with filters
+  - [x] Filter by location (from/to), status, date
+  - [x] Include transfer lines
+  - [x] Return transfers list
+- [x] Create `server/api/transfers/index.post.ts`
+  - [x] Validate transfer data (Zod)
+  - [x] Check user permissions
+  - [x] Validate source location has sufficient stock
+  - [x] Create transfer in PENDING_APPROVAL status
+  - [x] Return created transfer
+- [x] Create `server/api/transfers/[id].get.ts`
+  - [x] Fetch single transfer by ID
+  - [x] Include lines
+  - [x] Return transfer details
+- [x] Create `server/api/transfers/[id]/approve.patch.ts`
+  - [x] Check user is supervisor or admin
+  - [x] Start database transaction
+  - [x] For each transfer line:
+    - [x] Deduct from source location stock
+    - [x] Add to destination location stock (at source WAC)
+  - [x] Update transfer status to COMPLETED
+  - [x] Commit transaction
+  - [x] Return updated transfer
+- [x] Create `server/api/transfers/[id]/reject.patch.ts`
+  - [x] Check user is supervisor or admin
+  - [x] Update transfer status to REJECTED
+  - [x] Add rejection comment
+  - [x] Return updated transfer
+- [x] Test transfer API routes
 
 ### 2.1.2 Transfers List Page
 
