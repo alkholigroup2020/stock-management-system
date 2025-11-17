@@ -217,16 +217,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.2.5 Auto-Generated Price Variance NCRs
 
-- [ ] Verify auto-NCR creation in delivery posting
-- [ ] Test price variance NCR flow end-to-end
-  - [ ] Post delivery with different price
-  - [ ] Verify NCR created automatically
-  - [ ] Check NCR appears in list
-  - [ ] Verify type = PRICE_VARIANCE
-  - [ ] Verify auto_generated = true
-- [ ] Test price variance NCR display in UI
-  - [ ] Show in delivery details
-  - [ ] Link to NCR detail page
+- [x] Verify auto-NCR creation in delivery posting
+- [x] Test price variance NCR flow end-to-end
+  - [x] Post delivery with different price
+  - [x] Verify NCR created automatically
+  - [x] Check NCR appears in list
+  - [x] Verify type = PRICE_VARIANCE
+  - [x] Verify auto_generated = true
+- [x] Test price variance NCR display in UI
+  - [x] Show in delivery details
+  - [x] Link to NCR detail page
 
 ---
 

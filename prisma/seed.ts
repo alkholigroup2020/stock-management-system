@@ -386,6 +386,36 @@ async function main() {
     `✓ Created stock for ${stockData.length} items in ${mainKitchen.name}\n`
   );
 
+  // ========================================
+  // 7. CREATE PERIOD PRICES
+  // ========================================
+  console.log("💰 Creating period prices...");
+
+  // Create period prices for all items
+  const priceData = allItems.map((item) => ({
+    period_id: testPeriod.id,
+    item_id: item.id,
+    price: 10.0, // Standard price for testing (will create variance when delivery uses different price)
+    set_by: adminUser.id,
+  }));
+
+  for (const price of priceData) {
+    await prisma.itemPrice.upsert({
+      where: {
+        item_id_period_id: {
+          item_id: price.item_id,
+          period_id: price.period_id,
+        },
+      },
+      update: {},
+      create: price,
+    });
+  }
+
+  console.log(
+    `✓ Created period prices for ${priceData.length} items in ${testPeriod.name}\n`
+  );
+
   console.log("\n✅ Database seed completed successfully!\n");
   console.log("📝 Summary:");
   console.log("─".repeat(50));
@@ -395,6 +425,7 @@ async function main() {
   console.log(`  • ${items.length} Items (across 4 categories)`);
   console.log(`  • 1 Period (${testPeriod.name} - OPEN)`);
   console.log(`  • ${stockData.length} Stock records (Main Kitchen)`);
+  console.log(`  • ${priceData.length} Period prices (SAR 10.00 each)`);
   console.log("─".repeat(50));
   console.log("\n🔐 Login Credentials:");
   console.log("  Email: admin@foodstock.local");
