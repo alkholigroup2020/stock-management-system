@@ -85,28 +85,28 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.1.3 Create Transfer UI
 
-- [ ] Create `pages/transfers/create.vue`
-- [ ] Design transfer form
-  - [ ] From location dropdown (user locations only)
-  - [ ] To location dropdown (exclude from location)
-  - [ ] Transfer date picker
-  - [ ] Notes textarea
-- [ ] Implement transfer lines table
-  - [ ] Item selection dropdown
-  - [ ] Show source location on-hand
-  - [ ] Quantity input with validation
-  - [ ] WAC display
-  - [ ] Line value (auto-calculated)
-  - [ ] Add/Remove line buttons
-- [ ] Show total value (auto-calculated)
-- [ ] Implement stock validation
-  - [ ] Check quantity <= source on-hand
-  - [ ] Show warnings
-- [ ] Implement submit handler
-  - [ ] Call API to create transfer
-  - [ ] Handle success (redirect to transfers list)
-  - [ ] Handle errors
-- [ ] Test transfer creation
+- [x] Create `pages/transfers/create.vue`
+- [x] Design transfer form
+  - [x] From location dropdown (user locations only)
+  - [x] To location dropdown (exclude from location)
+  - [x] Transfer date picker
+  - [x] Notes textarea
+- [x] Implement transfer lines table
+  - [x] Item selection dropdown
+  - [x] Show source location on-hand
+  - [x] Quantity input with validation
+  - [x] WAC display
+  - [x] Line value (auto-calculated)
+  - [x] Add/Remove line buttons
+- [x] Show total value (auto-calculated)
+- [x] Implement stock validation
+  - [x] Check quantity <= source on-hand
+  - [x] Show warnings
+- [x] Implement submit handler
+  - [x] Call API to create transfer
+  - [x] Handle success (redirect to transfers list)
+  - [x] Handle errors
+- [x] Test transfer creation
 
 ### 2.1.4 Transfer Detail & Approval
 
