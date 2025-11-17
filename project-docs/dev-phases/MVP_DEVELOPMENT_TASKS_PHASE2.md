@@ -199,21 +199,21 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.2.4 NCR Detail Page
 
-- [ ] Create `pages/ncrs/[id].vue`
-- [ ] Display NCR header
-  - [ ] NCR No, Type, Date, Location
-  - [ ] Status badge
-- [ ] Display NCR details
-  - [ ] Reason
-  - [ ] Related delivery (if auto-generated)
-  - [ ] Item lines
-  - [ ] Total value
-- [ ] Show status update section
-  - [ ] Status dropdown (OPEN → SENT → CREDITED/REJECTED)
-  - [ ] Resolution notes
-  - [ ] Update button
-- [ ] Implement status update handler
-- [ ] Test NCR details and updates
+- [x] Create `pages/ncrs/[id].vue`
+- [x] Display NCR header
+  - [x] NCR No, Type, Date, Location
+  - [x] Status badge
+- [x] Display NCR details
+  - [x] Reason
+  - [x] Related delivery (if auto-generated)
+  - [x] Item lines
+  - [x] Total value
+- [x] Show status update section
+  - [x] Status dropdown (OPEN → SENT → CREDITED/REJECTED)
+  - [x] Resolution notes
+  - [x] Update button
+- [x] Implement status update handler
+- [x] Test NCR details and updates
 
 ### 2.2.5 Auto-Generated Price Variance NCRs
 
