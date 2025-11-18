@@ -316,28 +316,28 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.4.3 Reconciliations Page
 
-- [ ] Create `pages/reconciliations.vue`
-- [ ] Display reconciliation for current location and period
-- [ ] Show calculated values (read-only)
-  - [ ] Opening Stock
-  - [ ] Receipts
-  - [ ] Transfers In
-  - [ ] Transfers Out
-  - [ ] Issues
-  - [ ] Closing Stock
-- [ ] Show editable adjustment fields
-  - [ ] Back-charges
-  - [ ] Credits Due
-  - [ ] Condemnations
-  - [ ] Others
-- [ ] Show calculated results
-  - [ ] Consumption
-  - [ ] Total Mandays (from POB)
-  - [ ] Manday Cost
-- [ ] Implement save handler
-- [ ] Show location selector (supervisor/admin)
-- [ ] Style with brand colors
-- [ ] Test reconciliations page
+- [x] Create `pages/reconciliations.vue`
+- [x] Display reconciliation for current location and period
+- [x] Show calculated values (read-only)
+  - [x] Opening Stock
+  - [x] Receipts
+  - [x] Transfers In
+  - [x] Transfers Out
+  - [x] Issues
+  - [x] Closing Stock
+- [x] Show editable adjustment fields
+  - [x] Back-charges
+  - [x] Credits Due
+  - [x] Condemnations
+  - [x] Others
+- [x] Show calculated results
+  - [x] Consumption
+  - [x] Total Mandays (from POB)
+  - [x] Manday Cost
+- [x] Implement save handler
+- [x] Show location selector (supervisor/admin)
+- [x] Style with brand colors
+- [x] Test reconciliations page
 
 ### 2.4.4 Consolidated Reconciliation View
 
