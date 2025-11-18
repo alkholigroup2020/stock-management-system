@@ -56,7 +56,8 @@
       "Bash(timeout /t 30)",
       "Bash(project-docs/TASK_COMPLETION_LOG.md)",
       "Bash(pnpm db:seed:*)",
-      "Bash(timeout /t 5)"
+      "Bash(timeout /t 5)",
+      "Bash(timeout 120 npx vue-tsc:*)"
     ],
     "deny": [],
     "ask": []

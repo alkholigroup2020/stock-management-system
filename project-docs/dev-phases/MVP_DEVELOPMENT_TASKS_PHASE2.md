@@ -234,17 +234,17 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.3.1 POB API Routes
 
-- [ ] Create `server/api/locations/[locationId]/pob.get.ts`
-  - [ ] Fetch POB entries for location and period
-  - [ ] Return daily entries
-- [ ] Create `server/api/locations/[locationId]/pob.post.ts`
-  - [ ] Validate POB data (Zod)
-  - [ ] Bulk create/update daily entries
-  - [ ] Return updated entries
-- [ ] Create `server/api/pob/[id].patch.ts`
-  - [ ] Update single POB entry
-  - [ ] Return updated entry
-- [ ] Test POB API routes
+- [x] Create `server/api/locations/[locationId]/pob.get.ts`
+  - [x] Fetch POB entries for location and period
+  - [x] Return daily entries
+- [x] Create `server/api/locations/[locationId]/pob.post.ts`
+  - [x] Validate POB data (Zod)
+  - [x] Bulk create/update daily entries
+  - [x] Return updated entries
+- [x] Create `server/api/pob/[id].patch.ts`
+  - [x] Update single POB entry
+  - [x] Return updated entry
+- [x] Test POB API routes
 
 ### 2.3.2 POB Page UI
 
