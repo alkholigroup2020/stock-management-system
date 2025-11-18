@@ -9,8 +9,8 @@ interface POBSummary {
 
 interface Period {
   name: string;
-  start_date: string;
-  end_date: string;
+  start_date: string | Date;
+  end_date: string | Date;
 }
 
 interface Props {

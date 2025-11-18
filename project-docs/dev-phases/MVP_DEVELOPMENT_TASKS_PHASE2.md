@@ -276,16 +276,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.4.1 Reconciliation Calculation Utility
 
-- [ ] Create `server/utils/reconciliation.ts`
-- [ ] Implement reconciliation calculation
+- [x] Create `server/utils/reconciliation.ts`
+- [x] Implement reconciliation calculation
   ```typescript
   calculateConsumption(opening, receipts, transfersIn, transfersOut, issues, closing, adjustments, ...): number
   ```
-- [ ] Implement manday cost calculation
+- [x] Implement manday cost calculation
   ```typescript
   calculateMandayCost(consumption, totalMandays): number
   ```
-- [ ] Test calculations
+- [x] Test calculations
 
 ### 2.4.2 Reconciliation API Routes
 

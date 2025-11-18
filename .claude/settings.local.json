@@ -60,7 +60,8 @@
       "Bash(timeout 120 npx vue-tsc:*)",
       "Bash(timeout:*)",
       "mcp__playwright__browser_type",
-      "Bash(npx prisma studio:*)"
+      "Bash(npx prisma studio:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": []
