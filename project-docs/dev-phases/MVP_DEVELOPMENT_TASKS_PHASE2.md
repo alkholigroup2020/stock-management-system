@@ -248,19 +248,19 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.3.2 POB Page UI
 
-- [ ] Create `pages/pob.vue`
-- [ ] Design POB entry interface
-  - [ ] Calendar view or date range selector
-  - [ ] Table with dates in current period
-  - [ ] Columns: Date, Crew Count, Extra Count, Total (calculated)
-  - [ ] Editable cells for crew and extra
-- [ ] Implement POB entry
-  - [ ] Inline editing
-  - [ ] Auto-save on blur (or Save button)
-  - [ ] Validation (non-negative integers)
-- [ ] Show period total mandays
-- [ ] Style with brand colors
-- [ ] Test POB entry
+- [x] Create `pages/pob.vue`
+- [x] Design POB entry interface
+  - [x] Calendar view or date range selector
+  - [x] Table with dates in current period
+  - [x] Columns: Date, Crew Count, Extra Count, Total (calculated)
+  - [x] Editable cells for crew and extra
+- [x] Implement POB entry
+  - [x] Inline editing
+  - [x] Auto-save on blur (or Save button)
+  - [x] Validation (non-negative integers)
+- [x] Show period total mandays
+- [x] Style with brand colors
+- [x] Test POB entry
 
 ### 2.3.3 POB Components
 
