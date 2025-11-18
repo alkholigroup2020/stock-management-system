@@ -341,12 +341,12 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.4.4 Consolidated Reconciliation View
 
-- [ ] Create `pages/reconciliations/consolidated.vue` (supervisor/admin only)
-- [ ] Display reconciliations for all locations
-- [ ] Show totals per location
-- [ ] Show grand totals
-- [ ] Implement export to CSV (optional)
-- [ ] Test consolidated view
+- [x] Create `pages/reconciliations/consolidated.vue` (supervisor/admin only)
+- [x] Display reconciliations for all locations
+- [x] Show totals per location
+- [x] Show grand totals
+- [x] Implement export to CSV (optional)
+- [x] Test consolidated view
 
 ### 2.4.5 Reconciliation Components
 
