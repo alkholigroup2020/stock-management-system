@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { formatDate } from "~/utils/format";
+// Explicit component imports
+import POBSummary from "~/components/pob/POBSummary.vue";
+import POBTable from "~/components/pob/POBTable.vue";
 
 // SEO
 useSeoMeta({
@@ -50,7 +52,6 @@ interface POBData {
 
 // State
 const loading = ref(false);
-const saving = ref(false);
 const error = ref<string | null>(null);
 const pobData = ref<POBData | null>(null);
 const editableEntries = ref<Map<string, POBEntry>>(new Map());
@@ -60,30 +61,6 @@ const savingDates = ref<Set<string>>(new Set());
 const activeLocationId = computed(() => locationStore.activeLocationId);
 const currentPeriod = computed(() => periodStore.currentPeriod);
 const isPeriodOpen = computed(() => periodStore.isPeriodOpen);
-
-// Table columns
-const columns = [
-  {
-    key: "date",
-    label: "Date",
-    class: "font-medium",
-  },
-  {
-    key: "crew_count",
-    label: "Crew Count",
-    class: "text-center",
-  },
-  {
-    key: "extra_count",
-    label: "Extra Count",
-    class: "text-center",
-  },
-  {
-    key: "total_count",
-    label: "Total",
-    class: "text-center font-semibold",
-  },
-];
 
 // Watch for location changes
 watch(activeLocationId, async (newLocationId) => {
@@ -258,29 +235,6 @@ function handleChange(dateStr: string) {
   updateTotal(dateStr);
 }
 
-/**
- * Check if date is being saved
- */
-function isSaving(dateStr: string): boolean {
-  return savingDates.value.has(dateStr);
-}
-
-/**
- * Format date for display
- */
-function formatDateDisplay(dateStr: string): string {
-  const date = new Date(dateStr);
-  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "short" });
-  const formatted = formatDate(dateStr);
-  return `${dayOfWeek}, ${formatted}`;
-}
-
-/**
- * Get sorted dates array
- */
-const sortedDates = computed(() => {
-  return Array.from(editableEntries.value.keys()).sort();
-});
 </script>
 
 <template>
@@ -293,35 +247,13 @@ const sortedDates = computed(() => {
       </p>
     </div>
 
-    <!-- Period Info -->
-    <div v-if="currentPeriod" class="mb-6">
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">
-              Current Period
-            </h3>
-            <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
-              {{ currentPeriod.name }}
-            </p>
-            <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-              {{ periodStore.periodDateRange }}
-            </p>
-          </div>
-          <div v-if="pobData?.summary" class="text-right">
-            <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">
-              Total Mandays
-            </h3>
-            <p class="text-3xl font-bold text-[var(--ui-primary)] mt-1">
-              {{ pobData.summary.total_mandays.toLocaleString() }}
-            </p>
-            <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-              {{ pobData.summary.total_crew_count.toLocaleString() }} crew +
-              {{ pobData.summary.total_extra_count.toLocaleString() }} extra
-            </p>
-          </div>
-        </div>
-      </UCard>
+    <!-- Period Info with Summary -->
+    <div v-if="currentPeriod && pobData?.summary" class="mb-6">
+      <POBSummary
+        :period="currentPeriod"
+        :summary="pobData.summary"
+        :period-date-range="periodStore.periodDateRange"
+      />
     </div>
 
     <!-- Loading State -->
@@ -361,82 +293,14 @@ const sortedDates = computed(() => {
     </div>
 
     <!-- POB Entry Table -->
-    <div v-else-if="pobData && sortedDates.length > 0">
-      <UCard>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-[var(--ui-border)]">
-            <thead>
-              <tr class="bg-[var(--ui-bg-elevated)]">
-                <th
-                  v-for="column in columns"
-                  :key="column.key"
-                  :class="[
-                    'px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider',
-                    column.class,
-                  ]"
-                >
-                  {{ column.label }}
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[var(--ui-border)]">
-              <tr
-                v-for="dateStr in sortedDates"
-                :key="dateStr"
-                :class="[
-                  'hover:bg-[var(--ui-bg-elevated)] transition-colors',
-                  isSaving(dateStr) ? 'opacity-50' : '',
-                ]"
-              >
-                <!-- Date -->
-                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-[var(--ui-text)]">
-                  {{ formatDateDisplay(dateStr) }}
-                </td>
-
-                <!-- Crew Count -->
-                <td class="px-4 py-3 whitespace-nowrap text-center">
-                  <UInput
-                    v-model.number="editableEntries.get(dateStr)!.crew_count"
-                    type="number"
-                    min="0"
-                    step="1"
-                    :disabled="!isPeriodOpen || isSaving(dateStr)"
-                    class="w-24 mx-auto"
-                    @blur="handleBlur(dateStr)"
-                    @input="handleChange(dateStr)"
-                  />
-                </td>
-
-                <!-- Extra Count -->
-                <td class="px-4 py-3 whitespace-nowrap text-center">
-                  <UInput
-                    v-model.number="editableEntries.get(dateStr)!.extra_count"
-                    type="number"
-                    min="0"
-                    step="1"
-                    :disabled="!isPeriodOpen || isSaving(dateStr)"
-                    class="w-24 mx-auto"
-                    @blur="handleBlur(dateStr)"
-                    @input="handleChange(dateStr)"
-                  />
-                </td>
-
-                <!-- Total -->
-                <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-semibold text-[var(--ui-text)]">
-                  <div class="flex items-center justify-center gap-2">
-                    <span>{{ editableEntries.get(dateStr)!.total_count }}</span>
-                    <UIcon
-                      v-if="isSaving(dateStr)"
-                      name="i-heroicons-arrow-path"
-                      class="w-4 h-4 animate-spin text-[var(--ui-primary)]"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </UCard>
+    <div v-else-if="pobData && editableEntries.size > 0">
+      <POBTable
+        :entries="editableEntries"
+        :disabled="!isPeriodOpen"
+        :saving-dates="savingDates"
+        @blur="handleBlur"
+        @change="handleChange"
+      />
 
       <!-- Instructions -->
       <div class="mt-4">

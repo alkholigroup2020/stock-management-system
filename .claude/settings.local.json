@@ -57,7 +57,10 @@
       "Bash(project-docs/TASK_COMPLETION_LOG.md)",
       "Bash(pnpm db:seed:*)",
       "Bash(timeout /t 5)",
-      "Bash(timeout 120 npx vue-tsc:*)"
+      "Bash(timeout 120 npx vue-tsc:*)",
+      "Bash(timeout:*)",
+      "mcp__playwright__browser_type",
+      "Bash(npx prisma studio:*)"
     ],
     "deny": [],
     "ask": []

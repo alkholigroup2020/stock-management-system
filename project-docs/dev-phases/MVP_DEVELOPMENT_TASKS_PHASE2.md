@@ -264,11 +264,11 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.3.3 POB Components
 
-- [ ] Create `components/pob/POBTable.vue`
-  - [ ] Editable POB table
-- [ ] Create `components/pob/POBSummary.vue`
-  - [ ] Display total mandays for period
-- [ ] Test components
+- [x] Create `components/pob/POBTable.vue`
+  - [x] Editable POB table
+- [x] Create `components/pob/POBSummary.vue`
+  - [x] Display total mandays for period
+- [x] Test components
 
 ---
 
