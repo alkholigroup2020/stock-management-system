@@ -61,7 +61,8 @@
       "Bash(timeout:*)",
       "mcp__playwright__browser_type",
       "Bash(npx prisma studio:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(node test-reconciliation.mjs:*)"
     ],
     "deny": [],
     "ask": []

@@ -289,30 +289,30 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.4.2 Reconciliation API Routes
 
-- [ ] Create `server/api/locations/[locationId]/reconciliations/[periodId].get.ts`
-  - [ ] Fetch reconciliation for location and period
-  - [ ] Auto-calculate if not exists:
-    - [ ] Opening stock (from previous period)
-    - [ ] Receipts (sum deliveries)
-    - [ ] Transfers in/out (sum transfers)
-    - [ ] Issues (sum issues)
-    - [ ] Closing stock (from Stock Now)
-  - [ ] Return reconciliation
-- [ ] Create `server/api/locations/[locationId]/reconciliations/[periodId].patch.ts`
-  - [ ] Validate reconciliation data (Zod)
-  - [ ] Check user is supervisor or admin
-  - [ ] Update adjustments:
-    - [ ] Back-charges
-    - [ ] Credits
-    - [ ] Condemnations
-    - [ ] Others
-  - [ ] Recalculate consumption and manday cost
-  - [ ] Return updated reconciliation
-- [ ] Create `server/api/reconciliations/consolidated.get.ts`
-  - [ ] Fetch reconciliations for all locations in period
-  - [ ] Aggregate totals
-  - [ ] Return consolidated view (supervisor/admin only)
-- [ ] Test reconciliation API routes
+- [x] Create `server/api/locations/[locationId]/reconciliations/[periodId].get.ts`
+  - [x] Fetch reconciliation for location and period
+  - [x] Auto-calculate if not exists:
+    - [x] Opening stock (from previous period)
+    - [x] Receipts (sum deliveries)
+    - [x] Transfers in/out (sum transfers)
+    - [x] Issues (sum issues)
+    - [x] Closing stock (from Stock Now)
+  - [x] Return reconciliation
+- [x] Create `server/api/locations/[locationId]/reconciliations/[periodId].patch.ts`
+  - [x] Validate reconciliation data (Zod)
+  - [x] Check user is supervisor or admin
+  - [x] Update adjustments:
+    - [x] Back-charges
+    - [x] Credits
+    - [x] Condemnations
+    - [x] Others
+  - [x] Recalculate consumption and manday cost
+  - [x] Return updated reconciliation
+- [x] Create `server/api/reconciliations/consolidated.get.ts`
+  - [x] Fetch reconciliations for all locations in period
+  - [x] Aggregate totals
+  - [x] Return consolidated view (supervisor/admin only)
+- [x] Test reconciliation API routes
 
 ### 2.4.3 Reconciliations Page
 
