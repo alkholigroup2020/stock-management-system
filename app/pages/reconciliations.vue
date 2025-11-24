@@ -164,12 +164,12 @@ async function fetchReconciliation() {
 
     reconciliationData.value = response;
 
-    // Initialize editable adjustments with fetched values
+    // Initialize editable adjustments with fetched values (default to 0 if undefined)
     adjustments.value = {
-      back_charges: response.reconciliation.back_charges,
-      credits: response.reconciliation.credits,
-      condemnations: response.reconciliation.condemnations,
-      adjustments: response.reconciliation.adjustments,
+      back_charges: response.reconciliation.back_charges || 0,
+      credits: response.reconciliation.credits || 0,
+      condemnations: response.reconciliation.condemnations || 0,
+      adjustments: response.reconciliation.adjustments || 0,
     };
   } catch (err: any) {
     console.error("Error fetching reconciliation:", err);

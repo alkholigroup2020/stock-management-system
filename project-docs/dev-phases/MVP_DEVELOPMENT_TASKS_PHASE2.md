@@ -362,17 +362,17 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 2.5.1 Integration Testing
 
-- [ ] Test complete transfer flow
-  - [ ] Create transfer
-  - [ ] Approve transfer
-  - [ ] Verify stock updates in both locations
-- [ ] Test complete NCR flow
-  - [ ] Manual NCR creation
-  - [ ] Auto-NCR from price variance
-  - [ ] Status updates
-- [ ] Test POB entry and usage in reconciliations
-- [ ] Test reconciliation calculations with real data
-- [ ] Test consolidated views
+- [x] Test complete transfer flow
+  - [x] Create transfer
+  - [x] Approve transfer
+  - [x] Verify stock updates in both locations
+- [x] Test complete NCR flow
+  - [x] Manual NCR creation
+  - [x] Auto-NCR from price variance
+  - [x] Status updates
+- [x] Test POB entry and usage in reconciliations
+- [x] Test reconciliation calculations with real data
+- [x] Test consolidated views
 
 ### 2.5.2 UI/UX Refinements
 

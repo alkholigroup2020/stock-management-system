@@ -126,7 +126,7 @@ const getItemById = (itemId: string) => {
 const fetchLocations = async () => {
   try {
     const data: any = await $fetch("/api/user/locations");
-    locations.value = data || [];
+    locations.value = data?.locations || [];
   } catch (error: any) {
     toast.error("Failed to fetch locations", error.message);
   }
@@ -139,8 +139,8 @@ const fetchItemsForLocation = async (locationId: string) => {
   try {
     const data: any = await $fetch("/api/items", {
       query: {
-        limit: 500, // Get more items for dropdown
-        is_active: true,
+        limit: 200, // Get items for dropdown (API max is 200)
+        is_active: "true",
         locationId: locationId, // Include stock data for source location
       },
     });
