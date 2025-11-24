@@ -86,6 +86,20 @@ const totalQuantity = computed(() => {
   return lines.value.reduce((sum, line) => sum + (parseFloat(line.quantity) || 0), 0);
 });
 
+// Delivery options for dropdown
+const deliveryOptions = computed(() => {
+  if (!deliveries.value || deliveries.value.length === 0) {
+    return [{ label: "No deliveries available", value: "" }];
+  }
+  return [
+    { label: "No delivery selected", value: "" },
+    ...deliveries.value.map((delivery: any) => ({
+      label: `${delivery.delivery_no} - ${delivery.supplier?.name || "Unknown"} (${formatCurrency(delivery.total_amount)})`,
+      value: delivery.id,
+    })),
+  ];
+});
+
 const isFormValid = computed(() => {
   // Check required fields
   if (!formData.value.location_id || !formData.value.reason) {
@@ -126,16 +140,12 @@ const buildDetailedReason = () => {
 // Submit handler
 const handleSubmit = async () => {
   if (!isFormValid.value) {
-    toast.warning("Form validation failed", {
-      description: "Please fill in all required fields",
-    });
+    toast.error("Please fill in all required fields");
     return;
   }
 
   if (!hasNCRPermission.value) {
-    toast.error("Permission Denied", {
-      description: "You do not have permission to create NCRs",
-    });
+    toast.error("You do not have permission to create NCRs");
     return;
   }
 
@@ -155,42 +165,13 @@ const handleSubmit = async () => {
       },
     });
 
-    toast.success("NCR Created", {
-      description: `NCR created successfully: ${response.ncr.ncr_no}`,
+    toast.success("NCR created successfully", {
+      description: `NCR ${response.ncr.ncr_no} has been created`,
     });
     router.push(`/ncrs/${response.ncr.id}`);
   } catch (error: any) {
-    console.error("Error creating NCR:", error);
-
-    // Handle specific error codes
-    const errorCode = error?.data?.data?.code;
-    if (errorCode === "LOCATION_NOT_FOUND") {
-      toast.error("Location Not Found", {
-        description: "The selected location was not found",
-      });
-    } else if (errorCode === "LOCATION_ACCESS_DENIED") {
-      toast.error("Access Denied", {
-        description: "You do not have access to this location",
-      });
-    } else if (errorCode === "INSUFFICIENT_PERMISSIONS") {
-      toast.error("Insufficient Permissions", {
-        description: "You do not have permission to create NCRs for this location",
-      });
-    } else if (errorCode === "DELIVERY_NOT_FOUND") {
-      toast.error("Delivery Not Found", {
-        description: "The selected delivery was not found",
-      });
-    } else if (errorCode === "VALIDATION_ERROR") {
-      const details = error?.data?.data?.details?.[0];
-      const fieldError = details ? `${details.path.join(".")}: ${details.message}` : "";
-      toast.error("Validation Error", {
-        description: fieldError || "Please check your input and try again",
-      });
-    } else {
-      toast.error("Error Creating NCR", {
-        description: error?.data?.message || "Failed to create NCR. Please try again.",
-      });
-    }
+    console.error("NCR submission error:", error);
+    toast.error("Failed to create NCR", error.data?.message || error.message);
   } finally {
     loading.value = false;
   }
@@ -280,207 +261,210 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
-    <div class="mx-auto max-w-4xl space-y-6">
-      <!-- Page Header -->
-      <LayoutPageHeader
-        title="New Non-Conformance Report"
-        icon="i-lucide-alert-circle"
-        :show-location="false"
-        :show-period="false"
-        location-scope="none"
-      >
-        <template #breadcrumbs>
-          <nav class="flex items-center space-x-2 text-sm">
-            <NuxtLink to="/ncrs" class="text-muted hover:text-default transition-colors">
-              NCRs
-            </NuxtLink>
-            <UIcon name="i-lucide-chevron-right" class="h-4 w-4 text-muted" />
-            <span class="text-default">New</span>
-          </nav>
+  <div class="space-y-6">
+    <!-- Page Header -->
+    <LayoutPageHeader
+      title="New Non-Conformance Report"
+      icon="i-lucide-alert-circle"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    />
+
+    <!-- Main Form -->
+    <div class="space-y-6">
+      <!-- NCR Information Card -->
+      <UCard class="card-elevated">
+        <template #header>
+          <h2 class="text-subheading font-semibold">NCR Information</h2>
         </template>
-      </LayoutPageHeader>
 
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- NCR Information -->
-        <div class="card-elevated p-6">
-          <h2 class="mb-4 text-h3 font-semibold">NCR Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Location -->
+          <div>
+            <label class="form-label">Location *</label>
+            <USelectMenu
+              v-model="formData.location_id"
+              :options="locations"
+              option-attribute="name"
+              value-attribute="id"
+              placeholder="Select location"
+              searchable
+            />
+          </div>
 
-          <div class="space-y-4">
-            <!-- Location -->
-            <div>
-              <label class="form-label">Location *</label>
-              <select v-model="formData.location_id" class="form-input w-full" required>
-                <option value="">Select location</option>
-                <option v-for="location in locations" :key="location.id" :value="location.id">
-                  {{ location.name }} ({{ location.code }})
-                </option>
-              </select>
-            </div>
+          <!-- Delivery (Optional) -->
+          <div>
+            <label class="form-label">Related Delivery (Optional)</label>
+            <USelectMenu
+              v-model="formData.delivery_id"
+              :options="deliveryOptions"
+              option-attribute="label"
+              value-attribute="value"
+              placeholder="No delivery selected"
+              searchable
+              :disabled="!formData.location_id || deliveries.length === 0"
+            />
+            <p class="mt-1 text-caption">
+              Link this NCR to a specific delivery if applicable
+            </p>
+          </div>
 
-            <!-- Delivery (Optional) -->
-            <div>
-              <label class="form-label">Related Delivery (Optional)</label>
-              <select v-model="formData.delivery_id" class="form-input w-full">
-                <option value="">No delivery selected</option>
-                <option v-for="delivery in deliveries" :key="delivery.id" :value="delivery.id">
-                  {{ delivery.delivery_no }} - {{ delivery.supplier.name }} ({{
-                    formatCurrency(delivery.total_amount)
-                  }})
-                </option>
-              </select>
-              <p class="mt-1 text-caption text-muted">
-                Link this NCR to a specific delivery if applicable
-              </p>
-            </div>
-
-            <!-- Reason -->
-            <div>
-              <label class="form-label">Reason *</label>
-              <textarea
-                v-model="formData.reason"
-                class="form-input w-full"
-                rows="3"
-                required
-                placeholder="Describe the non-conformance issue..."
-              ></textarea>
-              <p class="mt-1 text-caption text-muted">
-                Item details will be automatically appended to this reason
-              </p>
-            </div>
+          <!-- Reason -->
+          <div class="md:col-span-2">
+            <label class="form-label">Reason *</label>
+            <UTextarea
+              v-model="formData.reason"
+              placeholder="Describe the non-conformance issue..."
+              :rows="3"
+            />
+            <p class="mt-1 text-caption">
+              Item details will be automatically appended to this reason
+            </p>
           </div>
         </div>
+      </UCard>
 
-        <!-- NCR Items -->
-        <div class="card-elevated p-6">
-          <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-h3 font-semibold">NCR Items</h2>
+      <!-- NCR Items Card -->
+      <UCard class="card-elevated">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 class="text-subheading font-semibold">NCR Items</h2>
             <UButton
-              color="primary"
-              variant="outline"
               icon="i-lucide-plus"
-              label="Add Item"
+              color="primary"
+              variant="soft"
               size="sm"
               @click="addLine"
-            />
+            >
+              Add Item
+            </UButton>
           </div>
+        </template>
 
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="border-b border-default">
-                <tr>
-                  <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-muted">
-                    Item
-                  </th>
-                  <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-muted">
-                    Quantity
-                  </th>
-                  <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-muted">
-                    Unit Value
-                  </th>
-                  <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-muted">
-                    Line Value
-                  </th>
-                  <th class="px-3 py-2 text-center text-xs font-semibold uppercase text-muted">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="line in lines" :key="line.id" class="border-b border-default">
-                  <td class="px-3 py-2">
-                    <select
-                      v-model="line.item_id"
-                      class="form-input w-full min-w-[200px]"
-                      @change="updateLineValue(line)"
-                    >
-                      <option value="">Select item</option>
-                      <option v-for="item in items" :key="item.id" :value="item.id">
-                        {{ item.name }} ({{ item.code }}) - {{ item.unit }}
-                      </option>
-                    </select>
-                  </td>
-                  <td class="px-3 py-2">
-                    <input
-                      v-model="line.quantity"
-                      type="number"
-                      step="0.0001"
-                      min="0"
-                      class="form-input w-24"
-                      placeholder="0.00"
-                      @input="updateLineValue(line)"
-                    />
-                  </td>
-                  <td class="px-3 py-2">
-                    <input
-                      v-model="line.unit_value"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      class="form-input w-32"
-                      placeholder="0.00"
-                      @input="updateLineValue(line)"
-                    />
-                  </td>
-                  <td class="px-3 py-2 text-right font-medium">
+        <!-- Lines Table -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-default">
+            <thead>
+              <tr class="bg-default">
+                <th class="px-4 py-3 text-left text-label uppercase">Item</th>
+                <th class="px-4 py-3 text-left text-label uppercase">Quantity</th>
+                <th class="px-4 py-3 text-left text-label uppercase">Unit Value</th>
+                <th class="px-4 py-3 text-right text-label uppercase">Line Value</th>
+                <th class="px-4 py-3 text-center text-label uppercase">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-default">
+              <tr v-for="line in lines" :key="line.id">
+                <!-- Item Selection -->
+                <td class="px-4 py-3">
+                  <USelectMenu
+                    v-model="line.item_id"
+                    :options="items"
+                    option-attribute="name"
+                    value-attribute="id"
+                    placeholder="Select item"
+                    searchable
+                    class="min-w-[200px]"
+                    @update:model-value="updateLineValue(line)"
+                  />
+                </td>
+
+                <!-- Quantity -->
+                <td class="px-4 py-3">
+                  <UInput
+                    v-model="line.quantity"
+                    type="number"
+                    step="0.0001"
+                    min="0"
+                    placeholder="0.00"
+                    class="w-32"
+                    @input="updateLineValue(line)"
+                  />
+                </td>
+
+                <!-- Unit Value -->
+                <td class="px-4 py-3">
+                  <UInput
+                    v-model="line.unit_value"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    class="w-32"
+                    @input="updateLineValue(line)"
+                  />
+                </td>
+
+                <!-- Line Value -->
+                <td class="px-4 py-3 text-right">
+                  <span class="text-body font-medium">
                     {{ formatCurrency(line.line_value) }}
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <UButton
-                      color="error"
-                      variant="ghost"
-                      icon="i-lucide-trash-2"
-                      size="sm"
-                      :disabled="lines.length === 1"
-                      @click="removeLine(line.id)"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot class="border-t-2 border-default bg-zinc-50 dark:bg-zinc-900">
-                <tr>
-                  <td colspan="3" class="px-3 py-3 text-right font-semibold">Total NCR Value:</td>
-                  <td class="px-3 py-3 text-right text-lg font-bold text-primary">
-                    {{ formatCurrency(totalValue) }}
-                  </td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+                  </span>
+                </td>
 
-          <!-- Validation Warning -->
-          <div v-if="!isFormValid && lines.some((l) => l.item_id)" class="mt-4">
-            <UAlert
-              color="warning"
-              variant="soft"
-              icon="i-lucide-alert-triangle"
-              title="Please complete all item lines"
-              description="Each item must have a quantity and unit value greater than zero."
-            />
-          </div>
+                <!-- Action -->
+                <td class="px-4 py-3 text-center">
+                  <UButton
+                    icon="i-lucide-trash-2"
+                    color="error"
+                    variant="ghost"
+                    size="sm"
+                    :disabled="lines.length === 1"
+                    @click="removeLine(line.id)"
+                  />
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr v-if="lines.length === 0">
+                <td colspan="5" class="px-4 py-8 text-center text-caption">
+                  No items added yet. Click "Add Item" to start.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!-- Form Actions -->
-        <div class="flex justify-end gap-3">
-          <UButton
-            type="button"
-            color="neutral"
-            variant="outline"
-            label="Cancel"
-            @click="handleCancel"
+        <!-- Validation Warning -->
+        <div v-if="!isFormValid && lines.some((l) => l.item_id)" class="mt-4">
+          <UAlert
+            icon="i-lucide-alert-triangle"
+            color="warning"
+            variant="subtle"
+            title="Please complete all item lines"
+            description="Each item must have a quantity and unit value greater than zero."
           />
-          <UButton
-            type="submit"
-            color="primary"
-            :loading="loading"
-            :disabled="!isFormValid || loading"
-            icon="i-lucide-save"
-          >
-            Create NCR
-          </UButton>
         </div>
-      </form>
+
+        <!-- Summary -->
+        <div class="mt-4 pt-4 border-t border-default">
+          <div class="flex justify-between items-center">
+            <div class="text-caption">{{ lines.length }} item(s)</div>
+            <div class="text-right">
+              <div class="text-caption">Total NCR Value</div>
+              <div class="text-heading font-bold text-primary">
+                {{ formatCurrency(totalValue) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end space-x-3">
+        <UButton color="neutral" variant="soft" @click="handleCancel" :disabled="loading">
+          Cancel
+        </UButton>
+        <UButton
+          color="primary"
+          :loading="loading"
+          :disabled="!isFormValid || loading"
+          @click="handleSubmit"
+        >
+          Create NCR
+        </UButton>
+      </div>
     </div>
   </div>
 </template>
