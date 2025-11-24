@@ -36,6 +36,8 @@ const querySchema = z.object({
   endDate: z.string().optional(), // ISO date string
   hasVariance: z.enum(["true", "false"]).optional(),
   includeLines: z.enum(["true", "false"]).optional(),
+  page: z.coerce.number().default(1),
+  limit: z.coerce.number().max(200).default(50),
 });
 
 export default defineEventHandler(async (event) => {
@@ -84,7 +86,7 @@ export default defineEventHandler(async (event) => {
 
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { periodId, supplierId, startDate, endDate, hasVariance, includeLines } =
+    const { periodId, supplierId, startDate, endDate, hasVariance, includeLines, page, limit } =
       querySchema.parse(query);
 
     // Build where clause for deliveries
@@ -115,8 +117,13 @@ export default defineEventHandler(async (event) => {
       where.has_variance = hasVariance === "true";
     }
 
-    // Fetch deliveries
-    const deliveries = await prisma.delivery.findMany({
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // Fetch deliveries with pagination
+    const [deliveries, total] = await Promise.all([
+      prisma.delivery.findMany({
       where,
       include: {
         supplier: {
@@ -174,7 +181,16 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         delivery_date: "desc",
       },
-    });
+      skip,
+      take,
+    }),
+    prisma.delivery.count({ where }),
+  ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
 
     return {
       location: {
@@ -220,7 +236,14 @@ export default defineEventHandler(async (event) => {
               })
             : undefined,
       })),
-      count: deliveries.length,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage,
+        hasPrevPage,
+      },
     };
   } catch (error) {
     // Handle Zod validation errors

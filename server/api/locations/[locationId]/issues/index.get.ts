@@ -34,6 +34,8 @@ const querySchema = z.object({
   endDate: z.string().optional(), // ISO date string
   costCentre: z.enum(["FOOD", "CLEAN", "OTHER"]).optional(),
   includeLines: z.enum(["true", "false"]).optional(),
+  page: z.coerce.number().default(1),
+  limit: z.coerce.number().max(200).default(50),
 });
 
 export default defineEventHandler(async (event) => {
@@ -82,7 +84,8 @@ export default defineEventHandler(async (event) => {
 
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { periodId, startDate, endDate, costCentre, includeLines } = querySchema.parse(query);
+    const { periodId, startDate, endDate, costCentre, includeLines, page, limit } =
+      querySchema.parse(query);
 
     // Build where clause for issues
     const where: Record<string, unknown> = {
@@ -108,8 +111,13 @@ export default defineEventHandler(async (event) => {
       where.cost_centre = costCentre;
     }
 
-    // Fetch issues
-    const issues = await prisma.issue.findMany({
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // Fetch issues with pagination
+    const [issues, total] = await Promise.all([
+      prisma.issue.findMany({
       where,
       include: {
         period: {
@@ -145,7 +153,16 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         issue_date: "desc",
       },
-    });
+      skip,
+      take,
+    }),
+    prisma.issue.count({ where }),
+  ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
 
     return {
       location: {
@@ -182,7 +199,14 @@ export default defineEventHandler(async (event) => {
               })
             : undefined,
       })),
-      count: issues.length,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage,
+        hasPrevPage,
+      },
     };
   } catch (error) {
     // Handle Zod validation errors

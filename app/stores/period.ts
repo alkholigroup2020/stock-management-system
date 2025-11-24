@@ -5,6 +5,8 @@ export interface PeriodState {
   currentPeriod: Period | null;
   loading: boolean;
   error: string | null;
+  lastFetched: number | null;
+  cacheTimeout: number; // Cache duration in milliseconds (10 minutes)
 }
 
 export const usePeriodStore = defineStore("period", {
@@ -12,6 +14,8 @@ export const usePeriodStore = defineStore("period", {
     currentPeriod: null,
     loading: false,
     error: null,
+    lastFetched: null,
+    cacheTimeout: 10 * 60 * 1000, // 10 minutes
   }),
 
   getters: {
@@ -63,13 +67,26 @@ export const usePeriodStore = defineStore("period", {
 
       return diffDays > 0 ? diffDays : 0;
     },
+
+    // Check if cache is still valid
+    isCacheValid: (state: PeriodState): boolean => {
+      if (!state.lastFetched) return false;
+      const now = Date.now();
+      return now - state.lastFetched < state.cacheTimeout;
+    },
   },
 
   actions: {
     /**
-     * Fetch the current active period
+     * Fetch the current active period with caching
+     * @param forceRefresh - Skip cache and force a fresh fetch
      */
-    async fetchCurrentPeriod() {
+    async fetchCurrentPeriod(forceRefresh = false) {
+      // Return cached data if valid and not forcing refresh
+      if (!forceRefresh && this.isCacheValid && this.currentPeriod) {
+        return;
+      }
+
       this.loading = true;
       this.error = null;
 
@@ -82,6 +99,7 @@ export const usePeriodStore = defineStore("period", {
         );
 
         this.currentPeriod = response.period;
+        this.lastFetched = Date.now();
       } catch (err: any) {
         this.error = err?.data?.message || "Failed to fetch current period";
         console.error("Error fetching current period:", err);
@@ -92,10 +110,10 @@ export const usePeriodStore = defineStore("period", {
     },
 
     /**
-     * Refresh period data
+     * Refresh period data (force refresh)
      */
     async refresh() {
-      await this.fetchCurrentPeriod();
+      await this.fetchCurrentPeriod(true);
     },
 
     /**
@@ -112,6 +130,14 @@ export const usePeriodStore = defineStore("period", {
       this.currentPeriod = null;
       this.loading = false;
       this.error = null;
+      this.lastFetched = null;
+    },
+
+    /**
+     * Invalidate cache and force refetch on next access
+     */
+    invalidateCache() {
+      this.lastFetched = null;
     },
   },
 });

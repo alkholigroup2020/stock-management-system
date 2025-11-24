@@ -39,6 +39,8 @@ const querySchema = z.object({
   startDate: z.string().optional(), // ISO date string
   endDate: z.string().optional(), // ISO date string
   includeLines: z.enum(["true", "false"]).optional(),
+  page: z.coerce.number().default(1),
+  limit: z.coerce.number().max(200).default(50),
 });
 
 export default defineEventHandler(async (event) => {
@@ -58,7 +60,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { fromLocationId, toLocationId, status, startDate, endDate, includeLines } =
+    const { fromLocationId, toLocationId, status, startDate, endDate, includeLines, page, limit } =
       querySchema.parse(query);
 
     // Build where clause for transfers
@@ -113,8 +115,13 @@ export default defineEventHandler(async (event) => {
       where.request_date = requestDateFilter;
     }
 
-    // Fetch transfers
-    const transfers = await prisma.transfer.findMany({
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // Fetch transfers with pagination
+    const [transfers, total] = await Promise.all([
+      prisma.transfer.findMany({
       where,
       include: {
         from_location: {
@@ -168,7 +175,16 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         request_date: "desc",
       },
-    });
+      skip,
+      take,
+    }),
+    prisma.transfer.count({ where }),
+  ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
 
     return {
       transfers: transfers.map((transfer) => ({
@@ -206,7 +222,14 @@ export default defineEventHandler(async (event) => {
               })
             : undefined,
       })),
-      count: transfers.length,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage,
+        hasPrevPage,
+      },
     };
   } catch (error) {
     // Handle Zod validation errors

@@ -11,6 +11,8 @@ export interface LocationState {
   userLocations: LocationWithAccess[];
   loading: boolean;
   error: string | null;
+  lastFetched: number | null;
+  cacheTimeout: number; // Cache duration in milliseconds (5 minutes)
 }
 
 export const useLocationStore = defineStore("location", {
@@ -19,6 +21,8 @@ export const useLocationStore = defineStore("location", {
     userLocations: [],
     loading: false,
     error: null,
+    lastFetched: null,
+    cacheTimeout: 5 * 60 * 1000, // 5 minutes
   }),
 
   getters: {
@@ -42,13 +46,26 @@ export const useLocationStore = defineStore("location", {
         return state.userLocations.find((loc) => loc.id === locationId) || null;
       };
     },
+
+    // Check if cache is still valid
+    isCacheValid: (state: LocationState): boolean => {
+      if (!state.lastFetched) return false;
+      const now = Date.now();
+      return now - state.lastFetched < state.cacheTimeout;
+    },
   },
 
   actions: {
     /**
-     * Fetch user's accessible locations
+     * Fetch user's accessible locations with caching
+     * @param forceRefresh - Skip cache and force a fresh fetch
      */
-    async fetchUserLocations() {
+    async fetchUserLocations(forceRefresh = false) {
+      // Return cached data if valid and not forcing refresh
+      if (!forceRefresh && this.isCacheValid && this.userLocations.length > 0) {
+        return;
+      }
+
       this.loading = true;
       this.error = null;
 
@@ -61,6 +78,7 @@ export const useLocationStore = defineStore("location", {
         );
 
         this.userLocations = response.locations;
+        this.lastFetched = Date.now();
 
         // Set active location if not set
         if (!this.activeLocationId && this.userLocations.length > 0) {
@@ -124,6 +142,14 @@ export const useLocationStore = defineStore("location", {
       this.userLocations = [];
       this.loading = false;
       this.error = null;
+      this.lastFetched = null;
+    },
+
+    /**
+     * Invalidate cache and force refetch on next access
+     */
+    invalidateCache() {
+      this.lastFetched = null;
     },
   },
 });

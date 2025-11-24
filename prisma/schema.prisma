@@ -438,8 +438,10 @@ model Delivery {
   @@index([po_id])
   @@index([delivery_date])
   @@index([has_variance]) // For price variance queries
+  @@index([posted_at]) // For sorting by posted timestamp
   @@index([period_id, location_id]) // For location deliveries in period
   @@index([location_id, has_variance]) // For price variance filtering by location
+  @@index([location_id, delivery_date]) // For date-based queries per location
   @@map("deliveries")
 }
 
@@ -489,8 +491,10 @@ model Issue {
   @@index([location_id])
   @@index([issue_date])
   @@index([cost_centre])
+  @@index([posted_at]) // For sorting by posted timestamp
   @@index([period_id, location_id]) // For location issues in period
   @@index([location_id, cost_centre]) // For cost centre filtering by location
+  @@index([location_id, issue_date]) // For date-based queries per location
   @@map("issues")
 }
 
@@ -548,6 +552,7 @@ model Transfer {
   @@index([from_location_id, status]) // For outbound transfer queries by status
   @@index([to_location_id, status]) // For inbound transfer queries by status
   @@index([requested_by]) // For user's requested transfers
+  @@index([status, request_date]) // For filtering by status and sorting by date
   @@map("transfers")
 }
 
@@ -603,6 +608,7 @@ model NCR {
   @@index([delivery_id])
   @@index([delivery_line_id])
   @@index([auto_generated])
+  @@index([created_at]) // For sorting by created timestamp
   @@index([location_id, status]) // For location NCR queries by status
   @@index([location_id, type]) // For location NCR queries by type
   @@index([created_by]) // For user's created NCRs
