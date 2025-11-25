@@ -39,6 +39,21 @@ interface StockSnapshot {
   value: number;
 }
 
+interface ReconciliationSnapshot {
+  opening_stock: number;
+  receipts: number;
+  transfers_in: number;
+  transfers_out: number;
+  issues: number;
+  closing_stock: number;
+  adjustments: number;
+  back_charges: number;
+  credits: number;
+  condemnations: number;
+  calculated_closing: number;
+  variance: number;
+}
+
 interface LocationSnapshot {
   location_id: string;
   location_code: string;
@@ -46,6 +61,7 @@ interface LocationSnapshot {
   total_value: number;
   item_count: number;
   items: StockSnapshot[];
+  reconciliation: ReconciliationSnapshot | null;
   snapshot_timestamp: string;
 }
 
@@ -273,6 +289,59 @@ async function handlePeriodCloseApproval(
     },
   });
 
+  // Fetch all reconciliation data for all locations in this period
+  const allReconciliations = await prisma.reconciliation.findMany({
+    where: {
+      period_id: periodId,
+      location_id: { in: locationIds },
+    },
+  });
+
+  // Create a map of reconciliations by location ID for quick lookup
+  const reconciliationsByLocation = new Map<string, ReconciliationSnapshot>();
+  for (const recon of allReconciliations) {
+    const openingStock = Number(recon.opening_stock);
+    const receipts = Number(recon.receipts);
+    const transfersIn = Number(recon.transfers_in);
+    const transfersOut = Number(recon.transfers_out);
+    const issues = Number(recon.issues);
+    const closingStock = Number(recon.closing_stock);
+    const adjustments = Number(recon.adjustments);
+    const backCharges = Number(recon.back_charges);
+    const credits = Number(recon.credits);
+    const condemnations = Number(recon.condemnations);
+
+    // Calculate expected closing: opening + receipts + transfers_in - transfers_out - issues + adjustments - back_charges + credits - condemnations
+    const calculatedClosing =
+      openingStock +
+      receipts +
+      transfersIn -
+      transfersOut -
+      issues +
+      adjustments -
+      backCharges +
+      credits -
+      condemnations;
+
+    // Variance = actual closing - calculated closing
+    const variance = Math.round((closingStock - calculatedClosing) * 100) / 100;
+
+    reconciliationsByLocation.set(recon.location_id, {
+      opening_stock: openingStock,
+      receipts: receipts,
+      transfers_in: transfersIn,
+      transfers_out: transfersOut,
+      issues: issues,
+      closing_stock: closingStock,
+      adjustments: adjustments,
+      back_charges: backCharges,
+      credits: credits,
+      condemnations: condemnations,
+      calculated_closing: Math.round(calculatedClosing * 100) / 100,
+      variance: variance,
+    });
+  }
+
   // Group stock by location and calculate snapshots
   const snapshotsByLocation = new Map<string, LocationSnapshot>();
 
@@ -297,6 +366,9 @@ async function handlePeriodCloseApproval(
 
     const totalValue = items.reduce((sum, item) => sum + item.value, 0);
 
+    // Get reconciliation data for this location (if exists)
+    const reconciliation = reconciliationsByLocation.get(pl.location_id) || null;
+
     snapshotsByLocation.set(pl.location_id, {
       location_id: pl.location.id,
       location_code: pl.location.code,
@@ -304,6 +376,7 @@ async function handlePeriodCloseApproval(
       total_value: Math.round(totalValue * 100) / 100,
       item_count: items.length,
       items,
+      reconciliation,
       snapshot_timestamp: now.toISOString(),
     });
   }

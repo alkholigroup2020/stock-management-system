@@ -100,11 +100,11 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.2.3 Snapshot Creation
 
-- [ ] Implement snapshot logic
-  - [ ] Capture all location stock levels
-  - [ ] Save reconciliation final values
-  - [ ] Store as JSON in PeriodLocation
-- [ ] Test snapshot creation
+- [x] Implement snapshot logic
+  - [x] Capture all location stock levels
+  - [x] Save reconciliation final values
+  - [x] Store as JSON in PeriodLocation
+- [x] Test snapshot creation
 
 ### 3.2.4 Roll Forward to Next Period
 
