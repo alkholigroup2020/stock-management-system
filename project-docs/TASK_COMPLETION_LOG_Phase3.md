@@ -222,3 +222,31 @@ Created reusable approval components for displaying approval request details and
 
 **Testing:**
 Components compile successfully with no Vue errors in the browser console. Dev server builds without errors, confirming proper integration with Nuxt's auto-import system.
+
+---
+
+## Phase 3.4: Reporting & Exports
+
+### 3.4.1 Report API Routes
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Implemented four comprehensive report API endpoints that provide detailed data extraction for stock, reconciliation, deliveries, and issues. Each endpoint supports flexible filtering, location-based access control, and returns structured data with summaries and grand totals suitable for display and CSV export.
+
+**Implemented Routes:**
+1. **GET /api/reports/stock-now** - Current stock levels across locations with category filtering and low-stock indicators
+2. **GET /api/reports/reconciliation** - Period reconciliation data with consumption/manday cost calculations (requires periodId)
+3. **GET /api/reports/deliveries** - Delivery report with supplier/location summaries and price variance tracking
+4. **GET /api/reports/issues** - Issues report with cost centre breakdown and top items analysis
+
+**Key Features:**
+- Role-based filtering: Operators see assigned locations only; Supervisors/Admins see all locations
+- Comprehensive filtering options per report type (period, location, supplier, date ranges, cost centres)
+- Pre-calculated summaries by location, supplier, or cost centre
+- Grand totals with all relevant aggregations
+- Report metadata including generation timestamp and user info
+- Consistent error handling with Zod validation
+
+**Testing:**
+All four endpoints tested via browser with authenticated session. Stock-now returns 13 items across 3 locations with total value of SAR 13,000. Deliveries and issues return empty data sets (expected). Reconciliation returns location data with saved/auto-calculated indicators. TypeScript typecheck passed with zero errors.

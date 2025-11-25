@@ -158,23 +158,23 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.4.1 Report API Routes
 
-- [ ] Create `server/api/reports/stock-now.get.ts`
-  - [ ] Generate stock report
-  - [ ] Filter by location, category
-  - [ ] Return formatted data
-- [ ] Create `server/api/reports/reconciliation.get.ts`
-  - [ ] Generate reconciliation report
-  - [ ] Filter by period, location
-  - [ ] Return formatted data
-- [ ] Create `server/api/reports/deliveries.get.ts`
-  - [ ] Generate deliveries report
-  - [ ] Filter by period, location, supplier
-  - [ ] Return formatted data
-- [ ] Create `server/api/reports/issues.get.ts`
-  - [ ] Generate issues report
-  - [ ] Filter by period, location, cost centre
-  - [ ] Return formatted data
-- [ ] Test report API routes
+- [x] Create `server/api/reports/stock-now.get.ts`
+  - [x] Generate stock report
+  - [x] Filter by location, category
+  - [x] Return formatted data
+- [x] Create `server/api/reports/reconciliation.get.ts`
+  - [x] Generate reconciliation report
+  - [x] Filter by period, location
+  - [x] Return formatted data
+- [x] Create `server/api/reports/deliveries.get.ts`
+  - [x] Generate deliveries report
+  - [x] Filter by period, location, supplier
+  - [x] Return formatted data
+- [x] Create `server/api/reports/issues.get.ts`
+  - [x] Generate issues report
+  - [x] Filter by period, location, cost centre
+  - [x] Return formatted data
+- [x] Test report API routes
 
 ### 3.4.2 Report Pages
 
