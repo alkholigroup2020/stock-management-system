@@ -167,3 +167,34 @@ Implemented the roll forward functionality that enables admins to create a new a
 
 **Testing:**
 API endpoint tested via curl confirming proper authentication middleware (returns 401 for unauthenticated requests). TypeScript typecheck passed with zero errors.
+
+---
+
+## Phase 3.3: Period Close UI
+
+### 3.3.1 Period Close Page
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Implemented a comprehensive Period Close page that provides admins with a centralized interface to manage the period-end close process. The page displays the current period information, a pre-close checklist, location readiness status with interactive controls, and a guided workflow for closing the period with confirmation dialogs and success feedback.
+
+**Key Features:**
+1. **Admin-Only Access** - Page uses role middleware requiring ADMIN role to access
+2. **Current Period Display** - Shows period name, date range, location count, and status badge
+3. **Pre-Close Checklist** - Visual checklist with 5 items (deliveries, issues, transfers, reconciliations, locations ready) with completion indicators and count badges
+4. **Location Readiness Table** - Interactive table showing all locations with their status, ready date, and "Mark Ready" buttons for locations that aren't ready yet
+5. **Close Period Section** - Dynamic content based on readiness state: shows "Locations Not Ready" message when locations aren't ready, or "Ready to Close" with action button when all locations are ready
+6. **Confirmation Modal** - Detailed warning modal explaining the irreversible nature of period close and what actions will be taken
+7. **Success Modal** - Shows closing summary (total locations, total closing value) after successful period close
+8. **Full Approval Workflow** - Implements the complete flow: request close → approve → execute → show success
+
+**Technical Implementation:**
+- Vue 3 composition API with TypeScript for type safety
+- Uses existing API endpoints: `/api/periods/current`, `/api/periods/:id/locations/:locationId/ready`, `/api/periods/:id/close`, `/api/approvals/:id/approve`
+- Proper loading states, error handling, and toast notifications
+- Responsive design with consistent padding standards (p-4 md:p-6)
+- Brand-compliant styling using semantic color tokens
+
+**Testing:**
+Tested via Playwright browser automation confirming page renders correctly with all sections visible, navigation works from sidebar, and components display proper state based on period and location data. TypeScript typecheck passed with zero errors.

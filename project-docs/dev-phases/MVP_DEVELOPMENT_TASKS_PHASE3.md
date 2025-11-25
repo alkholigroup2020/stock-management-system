@@ -121,27 +121,27 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.3.1 Period Close Page
 
-- [ ] Create `pages/period-close.vue` (admin only)
-- [ ] Display current period info
-- [ ] Show checklist
-  - [ ] All deliveries posted
-  - [ ] All issues posted
-  - [ ] All transfers completed
-  - [ ] Reconciliations completed for all locations
-  - [ ] All locations marked ready
-- [ ] Show location readiness status
-  - [ ] Table with location, status, ready date
-  - [ ] "Mark Ready" button per location (if not ready)
-- [ ] Show "Close Period" button
-  - [ ] Enabled only if all locations ready
-  - [ ] Confirmation modal
-- [ ] Implement close handler
-  - [ ] Request approval
-  - [ ] Approve (admin)
-  - [ ] Execute close
-  - [ ] Show success message
-- [ ] Style with brand colors
-- [ ] Test period close UI
+- [x] Create `pages/period-close.vue` (admin only)
+- [x] Display current period info
+- [x] Show checklist
+  - [x] All deliveries posted
+  - [x] All issues posted
+  - [x] All transfers completed
+  - [x] Reconciliations completed for all locations
+  - [x] All locations marked ready
+- [x] Show location readiness status
+  - [x] Table with location, status, ready date
+  - [x] "Mark Ready" button per location (if not ready)
+- [x] Show "Close Period" button
+  - [x] Enabled only if all locations ready
+  - [x] Confirmation modal
+- [x] Implement close handler
+  - [x] Request approval
+  - [x] Approve (admin)
+  - [x] Execute close
+  - [x] Show success message
+- [x] Style with brand colors
+- [x] Test period close UI
 
 ### 3.3.2 Approval Components
 
