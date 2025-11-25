@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="p-4 md:p-6 space-y-6">
     <!-- Page Header -->
     <LayoutPageHeader
       title="Set Item Prices"
@@ -10,11 +10,23 @@
     >
       <template #actions>
         <UButton
+          v-if="!hasChanges && periodData?.status === 'DRAFT'"
+          color="secondary"
+          icon="i-lucide-copy"
+          :loading="copying"
+          :disabled="copying || !permissions.canSetItemPrices"
+          class="cursor-pointer"
+          @click="handleCopyPrices"
+        >
+          Copy from Previous Period
+        </UButton>
+        <UButton
           v-if="hasChanges"
           color="primary"
           icon="i-lucide-save"
           :loading="saving"
           :disabled="!canSave || saving"
+          class="cursor-pointer"
           @click="handleSaveAll"
         >
           Save All Prices
@@ -45,7 +57,15 @@
       </UCard>
     </div>
 
-    <!-- Period Closed Warning -->
+    <!-- Period Locked Warning -->
+    <UAlert
+      v-if="periodData?.status === 'OPEN'"
+      color="warning"
+      icon="i-lucide-lock"
+      title="Prices Locked"
+      description="This period is open. Prices are locked and cannot be modified."
+      class="mb-6"
+    />
     <UAlert
       v-if="periodData?.status === 'CLOSED'"
       color="warning"
@@ -234,7 +254,7 @@
                     min="0"
                     placeholder="0.00"
                     :disabled="
-                      periodData?.status === 'CLOSED' ||
+                      periodData?.status !== 'DRAFT' ||
                       !permissions.canSetItemPrices
                     "
                     class="w-32 ml-auto"
@@ -340,6 +360,7 @@ const locationStore = useLocationStore();
 // State
 const loading = ref(true);
 const saving = ref(false);
+const copying = ref(false);
 const error = ref<string | null>(null);
 const periodData = ref<any>(null);
 const pricesData = ref<any[]>([]);
@@ -483,7 +504,7 @@ const changesCount = computed(() => {
 const canSave = computed(() => {
   return (
     hasChanges.value &&
-    periodData.value?.status !== "CLOSED" &&
+    periodData.value?.status === "DRAFT" &&
     permissions.canSetItemPrices
   );
 });
@@ -492,6 +513,36 @@ const canSave = computed(() => {
 function clearFilters() {
   searchQuery.value = "";
   selectedCategory.value = "";
+}
+
+// Copy prices from previous period
+async function handleCopyPrices() {
+  if (periodData.value?.status === "CLOSED") return;
+
+  copying.value = true;
+
+  try {
+    const response = await $fetch<{
+      copied_count: number;
+      source_period: { name: string };
+    }>(`/api/periods/${periodId.value}/prices/copy`, {
+      method: "POST",
+    });
+
+    toast.success("Prices Copied", {
+      description: `Successfully copied ${response.copied_count} prices from ${response.source_period.name}`,
+    });
+
+    // Refresh data
+    await fetchPrices();
+  } catch (err: any) {
+    console.error("Error copying prices:", err);
+    toast.error("Copy Failed", {
+      description: err.data?.message || "Failed to copy prices from previous period",
+    });
+  } finally {
+    copying.value = false;
+  }
 }
 
 // Save all prices

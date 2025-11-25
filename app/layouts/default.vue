@@ -91,6 +91,14 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
 
   if (permissions.canClosePeriod()) {
     items.push({
+      label: "Periods",
+      icon: "i-heroicons-calendar-days",
+      to: "/periods",
+    });
+  }
+
+  if (permissions.canClosePeriod()) {
+    items.push({
       label: "Period Close",
       icon: "i-heroicons-lock-closed",
       to: "/period-close",

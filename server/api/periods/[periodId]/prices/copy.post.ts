@@ -1,34 +1,20 @@
 /**
- * POST /api/periods/:periodId/prices
+ * POST /api/periods/:periodId/prices/copy
  *
- * Bulk create or update item prices for a period
- *
- * Body:
- * - prices: Array of { item_id, price }
+ * Copy all item prices from the most recent previous period
  *
  * Permissions:
  * - ADMIN only
  *
  * Business Rules:
  * - Period must not be CLOSED
- * - Prices must be positive
- * - Creates new price records or updates existing ones
+ * - Finds the most recent closed period before the target period
+ * - Copies all item prices from that period
+ * - Overwrites existing prices if any
  */
 
-import prisma from "../../../utils/prisma";
-import { z } from "zod";
+import prisma from "../../../../utils/prisma";
 import { Decimal } from "@prisma/client/runtime/library";
-
-// Price item schema
-const priceItemSchema = z.object({
-  item_id: z.string().uuid(),
-  price: z.number().positive(),
-});
-
-// Request body schema
-const bulkPriceSchema = z.object({
-  prices: z.array(priceItemSchema).min(1),
-});
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -51,7 +37,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Forbidden",
       data: {
         code: "INSUFFICIENT_PERMISSIONS",
-        message: "Only admins can set item prices",
+        message: "Only admins can copy item prices",
       },
     });
   }
@@ -92,41 +78,80 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "PERIOD_LOCKED",
-          message: "Cannot set prices for a period that is not in DRAFT status. Prices are locked once a period is opened.",
+          message: "Cannot copy prices to a period that is not in DRAFT status",
         },
       });
     }
 
-    // Parse and validate request body
-    const body = await readBody(event);
-    const { prices } = bulkPriceSchema.parse(body);
-
-    // Verify all items exist
-    const itemIds = prices.map((p) => p.item_id);
-    const items = await prisma.item.findMany({
+    // Find the most recent closed period before this period
+    const previousPeriod = await prisma.period.findFirst({
       where: {
-        id: { in: itemIds },
-        is_active: true,
+        end_date: {
+          lt: period.start_date,
+        },
+        status: "CLOSED",
+      },
+      orderBy: {
+        end_date: "desc",
+      },
+      include: {
+        item_prices: {
+          include: {
+            item: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                unit: true,
+                is_active: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    if (items.length !== itemIds.length) {
-      const foundIds = items.map((item) => item.id);
-      const missingIds = itemIds.filter((id) => !foundIds.includes(id));
+    if (!previousPeriod) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Not Found",
+        data: {
+          code: "NO_PREVIOUS_PERIOD",
+          message: "No previous closed period found to copy prices from",
+        },
+      });
+    }
+
+    if (previousPeriod.item_prices.length === 0) {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",
         data: {
-          code: "INVALID_ITEMS",
-          message: "Some items do not exist or are inactive",
-          details: { missing_item_ids: missingIds },
+          code: "NO_PRICES_FOUND",
+          message: "Previous period has no item prices to copy",
         },
       });
     }
 
-    // Use transaction to create/update all prices
+    // Filter only active items
+    const activePrices = previousPeriod.item_prices.filter(
+      (price) => price.item.is_active
+    );
+
+    if (activePrices.length === 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "NO_ACTIVE_PRICES",
+          message: "No active item prices found in previous period",
+        },
+      });
+    }
+
+    // Use transaction to copy all prices
     const results = await prisma.$transaction(
-      prices.map((priceData) =>
+      activePrices.map((priceData) =>
         prisma.itemPrice.upsert({
           where: {
             item_id_period_id: {
@@ -135,15 +160,15 @@ export default defineEventHandler(async (event) => {
             },
           },
           update: {
-            price: new Decimal(priceData.price),
+            price: priceData.price,
             set_by: user.id,
             set_at: new Date(),
           },
           create: {
             item_id: priceData.item_id,
             period_id: periodId,
-            price: new Decimal(priceData.price),
-            currency: "SAR",
+            price: priceData.price,
+            currency: priceData.currency,
             set_by: user.id,
           },
           include: {
@@ -161,36 +186,29 @@ export default defineEventHandler(async (event) => {
     );
 
     return {
-      message: `Successfully updated ${results.length} item prices`,
-      updated_count: results.length,
+      message: `Successfully copied ${results.length} item prices from ${previousPeriod.name}`,
+      source_period: {
+        id: previousPeriod.id,
+        name: previousPeriod.name,
+        start_date: previousPeriod.start_date,
+        end_date: previousPeriod.end_date,
+      },
+      copied_count: results.length,
       prices: results,
     };
   } catch (error) {
-    // Handle Zod validation errors
-    if (error instanceof z.ZodError) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        data: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid price data",
-          details: error.issues,
-        },
-      });
-    }
-
     // Re-throw createError errors
     if (error && typeof error === "object" && "statusCode" in error) {
       throw error;
     }
 
-    console.error("Error updating period prices:", error);
+    console.error("Error copying period prices:", error);
     throw createError({
       statusCode: 500,
       statusMessage: "Internal Server Error",
       data: {
         code: "INTERNAL_ERROR",
-        message: "Failed to update period prices",
+        message: "Failed to copy period prices",
       },
     });
   }

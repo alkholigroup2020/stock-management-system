@@ -59,11 +59,11 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.1.3 Period Price Setting
 
-- [ ] Create workflow for setting period prices at start
-- [ ] Allow admin to bulk set prices from previous period
-- [ ] Allow admin to update prices before period starts
-- [ ] Lock prices once period opens
-- [ ] Test price locking
+- [x] Create workflow for setting period prices at start
+- [x] Allow admin to bulk set prices from previous period
+- [x] Allow admin to update prices before period starts
+- [x] Lock prices once period opens
+- [x] Test price locking
 
 ---
 

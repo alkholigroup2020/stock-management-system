@@ -51,3 +51,29 @@ Successfully implemented the period opening workflow that enables admins to crea
 
 **Testing:**
 Successfully tested period creation workflow via browser automation, confirming that new periods are created with correct date ranges, status, and automatic PeriodLocation entries for all active locations. All TypeScript checks passed with zero errors.
+
+---
+
+### 3.1.3 Period Price Setting
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Successfully implemented comprehensive period price setting functionality that enables admins to efficiently manage item prices for accounting periods with strict locking controls. The implementation includes intelligent price copying from previous periods, bulk price updates, and automatic price locking once periods transition from DRAFT to OPEN status. This ensures price integrity throughout the period lifecycle and prevents unauthorized price changes during active periods.
+
+**Key Features:**
+1. **Copy Prices from Previous Period** - New API endpoint (`POST /api/periods/:periodId/prices/copy`) automatically finds the most recent closed period and copies all active item prices to the target period
+2. **Enhanced Price Management UI** - Updated prices page with "Copy from Previous Period" button (visible only for DRAFT periods), status-based warnings, and disabled inputs for locked periods
+3. **Strict Price Locking** - Prices are locked when period status changes to OPEN (not just CLOSED), preventing any modifications during active periods
+4. **Status-Based Validation** - Both API and UI enforce DRAFT-only price modifications with clear error messages and visual indicators
+5. **Comprehensive Testing** - Browser automation confirmed proper price locking workflow, UI state management, and API validation
+
+**Technical Implementation:**
+- Created `/api/periods/:periodId/prices/copy` endpoint with intelligent previous period detection and bulk upsert operations
+- Enhanced UI with conditional rendering based on period status (DRAFT vs OPEN vs CLOSED)
+- Added warning alerts for OPEN periods: "Prices Locked - This period is open. Prices are locked and cannot be modified."
+- Updated validation logic in both copy and update API routes to check `status === "DRAFT"` instead of `status !== "CLOSED"`
+- Disabled price input fields and action buttons when period status is not DRAFT
+
+**Testing:**
+Successfully tested price locking workflow through browser automation, confirming that DRAFT periods allow price modifications while OPEN periods properly lock prices and display appropriate warnings. All TypeScript checks passed with zero errors.
