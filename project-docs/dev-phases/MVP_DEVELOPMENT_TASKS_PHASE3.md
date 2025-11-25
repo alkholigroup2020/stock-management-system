@@ -47,15 +47,15 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.1.2 Period Opening
 
-- [ ] Implement period opening logic
-  - [ ] Set start and end dates
-  - [ ] Create PeriodLocation entries
-  - [ ] Copy closing stock from previous period as opening stock
-  - [ ] Set status to OPEN
-- [ ] Create UI for period creation (admin only)
-  - [ ] Form with start/end dates
-  - [ ] Submit handler
-- [ ] Test period opening
+- [x] Implement period opening logic
+  - [x] Set start and end dates
+  - [x] Create PeriodLocation entries
+  - [x] Copy closing stock from previous period as opening stock
+  - [x] Set status to OPEN
+- [x] Create UI for period creation (admin only)
+  - [x] Form with start/end dates
+  - [x] Submit handler
+- [x] Test period opening
 
 ### 3.1.3 Period Price Setting
 

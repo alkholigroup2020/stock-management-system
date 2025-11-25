@@ -117,6 +117,35 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Find the most recent closed period to copy closing stock
+    const previousPeriod = await prisma.period.findFirst({
+      where: {
+        status: "CLOSED",
+        end_date: { lt: startDate },
+      },
+      orderBy: {
+        end_date: "desc",
+      },
+      include: {
+        period_locations: {
+          select: {
+            location_id: true,
+            closing_value: true,
+          },
+        },
+      },
+    });
+
+    // Create a map of previous period's closing values by location
+    const previousClosingValues = new Map<string, number>();
+    if (previousPeriod) {
+      previousPeriod.period_locations.forEach((pl) => {
+        if (pl.closing_value !== null) {
+          previousClosingValues.set(pl.location_id, Number(pl.closing_value));
+        }
+      });
+    }
+
     // Create the period with PeriodLocation entries
     const period = await prisma.period.create({
       data: {
@@ -128,6 +157,7 @@ export default defineEventHandler(async (event) => {
           create: activeLocations.map((location) => ({
             location_id: location.id,
             status: "OPEN",
+            opening_value: previousClosingValues.get(location.id) || null,
           })),
         },
       },
