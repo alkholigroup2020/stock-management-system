@@ -100,3 +100,29 @@ Implemented the location readiness API endpoint that allows supervisors and admi
 
 **Testing:**
 API tested via browser automation confirming both failure case (no reconciliation → 400 error) and success case (with reconciliation → 200 with updated status). TypeScript typecheck passed with zero errors.
+
+---
+
+### 3.2.2 Period Close API
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Implemented the complete Period Close API workflow with approval-based controls. The implementation includes endpoints for requesting period close, approving/rejecting requests, and fetching approval details. The close process creates stock snapshots for each location, updates closing values, and atomically transitions all PeriodLocation statuses to CLOSED within a database transaction.
+
+**Implemented Routes:**
+1. **POST /api/periods/:periodId/close** - Request period close (creates approval, updates period to PENDING_CLOSE)
+2. **PATCH /api/approvals/:id/approve** - Approve request and execute period close with snapshot creation
+3. **PATCH /api/approvals/:id/reject** - Reject request and revert period to OPEN status
+4. **GET /api/approvals/:id** - Fetch approval details with entity information
+
+**Key Features:**
+- Admin-only access control for all period close operations
+- Validates all locations are READY before allowing close request
+- Creates detailed stock snapshots (JSON) for each location at period close
+- Atomic transaction ensures all locations close together or none do
+- Calculates and stores closing_value for each PeriodLocation
+- Approval workflow supports approve/reject with comments
+
+**Testing:**
+Verified via browser automation: period close returns LOCATIONS_NOT_READY when locations aren't ready, returns PERIOD_NOT_FOUND for invalid periods, and approval endpoints return APPROVAL_NOT_FOUND for invalid IDs. TypeScript typecheck passed with zero errors.

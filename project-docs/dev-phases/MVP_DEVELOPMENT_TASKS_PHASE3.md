@@ -80,23 +80,23 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.2.2 Period Close API
 
-- [ ] Create `server/api/periods/[periodId]/close.post.ts`
-  - [ ] Check admin role
-  - [ ] Validate all locations are READY
-  - [ ] Create approval request
-  - [ ] Return approval ID
-- [ ] Create `server/api/approvals/[id]/approve.patch.ts`
-  - [ ] Check admin role
-  - [ ] Execute period close:
-    - [ ] Start database transaction
-    - [ ] For each location:
-      - [ ] Create snapshot of current stock
-      - [ ] Update PeriodLocation status to CLOSED
-      - [ ] Set closing_value
-    - [ ] Update Period status to CLOSED
-    - [ ] Commit transaction
-  - [ ] Return approval confirmation
-- [ ] Test period close API
+- [x] Create `server/api/periods/[periodId]/close.post.ts`
+  - [x] Check admin role
+  - [x] Validate all locations are READY
+  - [x] Create approval request
+  - [x] Return approval ID
+- [x] Create `server/api/approvals/[id]/approve.patch.ts`
+  - [x] Check admin role
+  - [x] Execute period close:
+    - [x] Start database transaction
+    - [x] For each location:
+      - [x] Create snapshot of current stock
+      - [x] Update PeriodLocation status to CLOSED
+      - [x] Set closing_value
+    - [x] Update Period status to CLOSED
+    - [x] Commit transaction
+  - [x] Return approval confirmation
+- [x] Test period close API
 
 ### 3.2.3 Snapshot Creation
 
