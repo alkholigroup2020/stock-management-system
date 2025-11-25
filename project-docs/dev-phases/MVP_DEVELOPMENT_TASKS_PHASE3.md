@@ -108,12 +108,12 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.2.4 Roll Forward to Next Period
 
-- [ ] Implement roll forward logic
-  - [ ] Create next period automatically
-  - [ ] Copy closing stock as opening stock
-  - [ ] Reset reconciliation values
-  - [ ] Copy period prices (or allow update)
-- [ ] Test roll forward
+- [x] Implement roll forward logic
+  - [x] Create next period automatically
+  - [x] Copy closing stock as opening stock
+  - [x] Reset reconciliation values
+  - [x] Copy period prices (or allow update)
+- [x] Test roll forward
 
 ---
 

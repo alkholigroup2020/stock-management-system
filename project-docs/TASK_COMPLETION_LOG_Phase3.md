@@ -144,3 +144,26 @@ Enhanced the period close snapshot logic to include comprehensive reconciliation
 
 **Testing:**
 Verified reconciliation data structure via API calls confirming the data is available for inclusion in snapshots. TypeScript typecheck passed with zero errors.
+
+---
+
+### 3.2.4 Roll Forward to Next Period
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Implemented the roll forward functionality that enables admins to create a new accounting period from a closed period, automatically carrying forward closing stock values as opening values and copying item prices. The new period is created in DRAFT status, allowing admins to review and adjust prices before opening the period for transactions.
+
+**Implemented Route:**
+- **POST /api/periods/:periodId/roll-forward** - Roll forward a closed period to create the next period
+
+**Key Features:**
+1. **Automatic Period Creation** - Calculates the next period's start date (day after closed period ends) and end date (last day of the month)
+2. **Stock Value Rollover** - Copies closing stock values from the source period as opening values for the new period
+3. **Price Copying** - Optionally copies all active item prices from the closed period (enabled by default)
+4. **DRAFT Status** - New period starts in DRAFT status so prices can be reviewed/adjusted before opening
+5. **Overlap Detection** - Validates that the new period doesn't overlap with existing periods
+6. **Customization Options** - Supports custom period name, end date, and price copying toggle
+
+**Testing:**
+API endpoint tested via curl confirming proper authentication middleware (returns 401 for unauthenticated requests). TypeScript typecheck passed with zero errors.
