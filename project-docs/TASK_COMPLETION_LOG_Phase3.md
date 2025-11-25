@@ -77,3 +77,26 @@ Successfully implemented comprehensive period price setting functionality that e
 
 **Testing:**
 Successfully tested price locking workflow through browser automation, confirming that DRAFT periods allow price modifications while OPEN periods properly lock prices and display appropriate warnings. All TypeScript checks passed with zero errors.
+
+---
+
+## Phase 3.2: Period Close Workflow
+
+### 3.2.1 Location Readiness Tracking
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Implemented the location readiness API endpoint that allows supervisors and admins to mark locations as ready for period close. The endpoint validates that a reconciliation has been completed for the specified period-location combination before allowing the status change, enforcing the business rule that all reconciliations must be finalized before a location can be marked ready for closing.
+
+**Implemented Route:**
+- **PATCH /api/periods/:periodId/locations/:locationId/ready** - Mark a location as ready for period close with comprehensive validation
+
+**Key Features:**
+1. **Role-Based Access Control** - Only SUPERVISOR and ADMIN roles can mark locations as ready
+2. **Reconciliation Validation** - Ensures a reconciliation record exists for the period-location before allowing status update
+3. **Status Tracking** - Updates PeriodLocation status to READY and records the ready_at timestamp
+4. **Comprehensive Error Handling** - Returns appropriate error codes (RECONCILIATION_NOT_COMPLETED, LOCATION_ALREADY_CLOSED, etc.)
+
+**Testing:**
+API tested via browser automation confirming both failure case (no reconciliation → 400 error) and success case (with reconciliation → 200 with updated status). TypeScript typecheck passed with zero errors.

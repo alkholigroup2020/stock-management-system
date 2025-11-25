@@ -71,12 +71,12 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.2.1 Location Readiness Tracking
 
-- [ ] Create `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts`
-  - [ ] Check user is supervisor or admin
-  - [ ] Check reconciliation completed
-  - [ ] Update PeriodLocation status to READY
-  - [ ] Return updated status
-- [ ] Test location readiness API
+- [x] Create `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts`
+  - [x] Check user is supervisor or admin
+  - [x] Check reconciliation completed
+  - [x] Update PeriodLocation status to READY
+  - [x] Return updated status
+- [x] Test location readiness API
 
 ### 3.2.2 Period Close API
 
