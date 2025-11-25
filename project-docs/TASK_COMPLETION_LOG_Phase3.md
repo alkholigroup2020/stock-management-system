@@ -250,3 +250,50 @@ Implemented four comprehensive report API endpoints that provide detailed data e
 
 **Testing:**
 All four endpoints tested via browser with authenticated session. Stock-now returns 13 items across 3 locations with total value of SAR 13,000. Deliveries and issues return empty data sets (expected). Reconciliation returns location data with saved/auto-calculated indicators. TypeScript typecheck passed with zero errors.
+
+---
+
+### 3.4.2 Report Pages
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Implemented four comprehensive report pages providing a centralized reporting hub with filtering capabilities and CSV export functionality. The reports index page serves as a dashboard linking to all available reports with feature descriptions. Each report page follows consistent patterns with filter panels, summary cards, detailed data tables, and export buttons.
+
+**Pages Implemented:**
+1. **pages/reports/index.vue** - Reports hub with cards for each report showing descriptions and feature badges
+2. **pages/reports/stock-now.vue** - Current inventory with location/category filters and low-stock indicators
+3. **pages/reports/reconciliation.vue** - Period reconciliation with location breakdown and consumption metrics
+4. **pages/reports/deliveries.vue** - Delivery history with supplier analysis and price variance tracking
+5. **pages/reports/issues.vue** - Stock consumption by location and cost centre with top items
+
+**Key Features:**
+- Consistent filter panels with location, period, category, and date range options
+- Summary cards displaying grand totals (locations, items, values)
+- Detailed data tables using UTable component with custom slot rendering
+- CSV export with proper formatting for numbers and currencies
+- Role-based filtering (supervisors see all locations, operators see assigned only)
+
+**Testing:**
+All pages render correctly with proper data loading, filtering, and CSV export functionality. TypeScript typecheck passed with zero errors.
+
+---
+
+### 3.4.3 CSV Export Utility
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Created a reusable CSV export utility that provides consistent CSV generation and browser download capabilities across all report pages. The utility handles proper escaping of special characters, supports both simple and complex data structures, and includes Excel-compatible UTF-8 BOM for proper encoding.
+
+**File:** `app/utils/csvExport.ts`
+
+**Key Functions:**
+- `generateCSV()` - Create CSV from array of objects with customizable headers
+- `generateSimpleCSV()` - Create CSV from headers array and rows matrix
+- `downloadCSV()` - Trigger browser download with proper filename and MIME type
+- `exportToCSV()` - Combined generate and download in one call
+- `formatNumberForCSV()` / `formatCurrencyForCSV()` - Format numbers for CSV output
+
+**Testing:**
+CSV exports tested on all report pages with proper file downloads and data formatting. TypeScript typecheck passed with zero errors.

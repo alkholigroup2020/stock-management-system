@@ -178,25 +178,25 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.4.2 Report Pages
 
-- [ ] Create `pages/reports/index.vue`
-  - [ ] List available reports
-  - [ ] Links to each report page
-- [ ] Create `pages/reports/stock-now.vue`
-  - [ ] Display stock report
-  - [ ] Implement filters
-  - [ ] Add export button (CSV)
-- [ ] Create `pages/reports/reconciliation.vue`
-  - [ ] Display reconciliation report
-  - [ ] Implement filters
-  - [ ] Add export button
-- [ ] Test report pages
+- [x] Create `pages/reports/index.vue`
+  - [x] List available reports
+  - [x] Links to each report page
+- [x] Create `pages/reports/stock-now.vue`
+  - [x] Display stock report
+  - [x] Implement filters
+  - [x] Add export button (CSV)
+- [x] Create `pages/reports/reconciliation.vue`
+  - [x] Display reconciliation report
+  - [x] Implement filters
+  - [x] Add export button
+- [x] Test report pages
 
 ### 3.4.3 CSV Export Utility
 
-- [ ] Create `utils/csvExport.ts`
-- [ ] Implement CSV generation function
-- [ ] Implement download trigger
-- [ ] Test CSV export
+- [x] Create `utils/csvExport.ts`
+- [x] Implement CSV generation function
+- [x] Implement download trigger
+- [x] Test CSV export
 
 ---
 

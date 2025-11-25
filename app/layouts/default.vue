@@ -89,6 +89,14 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
     });
   }
 
+  if (permissions.canViewStock()) {
+    items.push({
+      label: "Reports",
+      icon: "i-heroicons-document-chart-bar",
+      to: "/reports",
+    });
+  }
+
   if (permissions.canClosePeriod()) {
     items.push({
       label: "Periods",
