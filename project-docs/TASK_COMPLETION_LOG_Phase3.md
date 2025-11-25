@@ -198,3 +198,27 @@ Implemented a comprehensive Period Close page that provides admins with a centra
 
 **Testing:**
 Tested via Playwright browser automation confirming page renders correctly with all sections visible, navigation works from sidebar, and components display proper state based on period and location data. TypeScript typecheck passed with zero errors.
+
+---
+
+### 3.3.2 Approval Components
+
+**Completion Date:** 2025-11-25
+
+**Summary:**
+Created reusable approval components for displaying approval request details and status badges across the application. These components provide a consistent UI pattern for handling approval workflows including period close, transfers, PRF, and PO approvals.
+
+**Components Implemented:**
+1. **ApprovalStatus.vue** - A badge component that displays approval status (PENDING, APPROVED, REJECTED) with appropriate colors and icons
+2. **ApprovalRequest.vue** - A comprehensive card component displaying full approval request details including requester info, entity details (Period Close, Transfer, PRF, PO), reviewer info for processed requests, and approve/reject action buttons with confirmation modals
+
+**Key Features:**
+- Semantic color coding (primary for pending, success for approved, error for rejected)
+- Support for all entity types with type-specific detail displays
+- Integrated approve/reject workflow with confirmation modals
+- Rejection requires a comment explaining the reason
+- Toast notifications for success/error feedback
+- Proper TypeScript interfaces for type safety
+
+**Testing:**
+Components compile successfully with no Vue errors in the browser console. Dev server builds without errors, confirming proper integration with Nuxt's auto-import system.
