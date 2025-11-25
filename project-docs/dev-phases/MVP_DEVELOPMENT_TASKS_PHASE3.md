@@ -25,25 +25,25 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 3.1.1 Period API Routes
 
-- [ ] Create `server/api/periods/index.get.ts`
-  - [ ] Fetch all periods
-  - [ ] Filter by status, date range
-  - [ ] Return periods list
-- [ ] Create `server/api/periods/current.get.ts`
-  - [ ] Fetch current open period
-  - [ ] Include location readiness status
-  - [ ] Return current period
-- [ ] Create `server/api/periods/index.post.ts`
-  - [ ] Validate period data (Zod)
-  - [ ] Check admin role
-  - [ ] Create new period
-  - [ ] Create PeriodLocation entries for all locations
-  - [ ] Return created period
-- [ ] Create `server/api/periods/[id].get.ts`
-  - [ ] Fetch single period by ID
-  - [ ] Include location statuses
-  - [ ] Return period details
-- [ ] Test period API routes
+- [x] Create `server/api/periods/index.get.ts`
+  - [x] Fetch all periods
+  - [x] Filter by status, date range
+  - [x] Return periods list
+- [x] Create `server/api/periods/current.get.ts`
+  - [x] Fetch current open period
+  - [x] Include location readiness status
+  - [x] Return current period
+- [x] Create `server/api/periods/index.post.ts`
+  - [x] Validate period data (Zod)
+  - [x] Check admin role
+  - [x] Create new period
+  - [x] Create PeriodLocation entries for all locations
+  - [x] Return created period
+- [x] Create `server/api/periods/[id].get.ts`
+  - [x] Fetch single period by ID
+  - [x] Include location statuses
+  - [x] Return period details
+- [x] Test period API routes
 
 ### 3.1.2 Period Opening
 

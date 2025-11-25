@@ -63,7 +63,13 @@
       "Bash(npx prisma studio:*)",
       "Bash(npx tsx:*)",
       "Bash(node test-reconciliation.mjs:*)",
-      "Bash(pnpm db:push:*)"
+      "Bash(pnpm db:push:*)",
+      "Bash(npx:*)",
+      "Bash(nul)",
+      "Bash(claude mcp:*)",
+      "mcp__notion__notion-create-pages",
+      "mcp__notion__notion-update-page",
+      "mcp__notion__notion-search"
     ],
     "deny": [],
     "ask": []

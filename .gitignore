@@ -25,3 +25,5 @@ logs
 nul
 
 .playwright-mcp
+
+.mcp.json
