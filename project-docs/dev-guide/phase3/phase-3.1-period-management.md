@@ -15,6 +15,7 @@
 - [Phase 2.1: Transfer Management](../phase2/phase-2.1-transfers.md)
 - [Phase 3.1: Period Management](phase-3.1-period-management.md) ← You are here
 - [Phase 3.2: Period Close Workflow](phase-3.2-period-close-workflow.md)
+- [Phase 3.3: Period Close UI](phase-3.3-period-close-ui.md)
 
 ---
 
@@ -1421,7 +1422,7 @@ console.log("Stock items:", stock);
 
 After completing Period Management (Phase 3.1 and 3.2), the next phases are:
 
-**→ Phase 3.3: Period Close UI** (Days 27-28)
+**→ Phase 3.3: Period Close UI** ✅ Complete
 - Period close page with checklist
 - Visual location readiness tracking
 - Close confirmation modal
@@ -1469,4 +1470,4 @@ The period management system provides the foundation for proper financial tracki
 
 **Last Updated:** November 25, 2025
 **Phase:** 3.1 & 3.2 Period Management ✅ Complete
-**Next:** Phase 3.3 Period Close UI
+**Next:** [Phase 3.3 Period Close UI](phase-3.3-period-close-ui.md) ✅ Complete
