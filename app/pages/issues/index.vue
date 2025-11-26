@@ -321,9 +321,7 @@ onMounted(async () => {
     <ErrorAlert v-if="error" :message="error" @retry="fetchIssues" class="mb-6" />
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center py-12">
-      <LoadingSpinner size="lg" />
-    </div>
+    <CommonTableSkeleton v-if="loading" :columns="4" :rows="8" />
 
     <!-- Issues Table -->
     <div v-else-if="hasIssues" class="overflow-hidden rounded-lg border border-default bg-elevated">

@@ -354,6 +354,16 @@
       </UCard>
     </UModal>
 
+    <!-- Loading Overlay for Period Close -->
+    <CommonLoadingOverlay
+      v-if="closingPeriod && (currentStep > 0)"
+      title="Closing Period..."
+      message="Please wait while we process your request"
+      :current-step="currentStep"
+      :total-steps="2"
+      :step-description="currentStepDescription"
+    />
+
     <!-- Success Modal -->
     <UModal v-model="showSuccessModal" :closeable="false">
       <UCard>
@@ -416,6 +426,8 @@ const error = ref<string | null>(null);
 const currentPeriod = ref<any>(null);
 const markingReady = ref<string | null>(null);
 const closingPeriod = ref(false);
+const currentStep = ref(0);
+const currentStepDescription = ref("");
 const showConfirmModal = ref(false);
 const showSuccessModal = ref(false);
 const closeSummary = ref<{ totalLocations: number; totalClosingValue: number } | null>(null);
@@ -558,9 +570,12 @@ async function handleClosePeriod() {
   await guardAction(
     async () => {
       closingPeriod.value = true;
+      currentStep.value = 0;
 
       try {
         // Step 1: Request period close (creates approval)
+        currentStep.value = 1;
+        currentStepDescription.value = "Creating period close request...";
         const closeResponse = await $fetch<{ approval: { id: string } }>(
           `/api/periods/${currentPeriod.value!.id}/close`,
           {
@@ -569,6 +584,8 @@ async function handleClosePeriod() {
         );
 
         // Step 2: Approve and execute the close
+        currentStep.value = 2;
+        currentStepDescription.value = "Executing period close and creating snapshots...";
         const approvalResponse = await $fetch<{
           summary: { totalLocations: number; totalClosingValue: number };
         }>(`/api/approvals/${closeResponse.approval.id}/approve`, {
@@ -595,6 +612,8 @@ async function handleClosePeriod() {
         });
       } finally {
         closingPeriod.value = false;
+        currentStep.value = 0;
+        currentStepDescription.value = "";
       }
     },
     {

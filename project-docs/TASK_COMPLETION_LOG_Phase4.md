@@ -51,3 +51,11 @@ This document tracks the completion of tasks from Phase 4 of the MVP development
 **Summary:** Audited all pages for styling consistency and applied design system standards. Fixed pob.vue, reconciliations.vue, period-close.vue, and periods/index.vue by replacing manual padding with `space-y-6`, switching to `LayoutPageHeader` component, and replacing inline CSS variables with Tailwind utility classes (text-muted, bg-elevated, border-default, etc.). Updated typography to use design system classes (text-caption, text-subheading, text-body). Added `cursor-pointer` class to all interactive buttons across 10+ pages including deliveries/create.vue, issues/create.vue, issues/index.vue, transfers/create.vue, ncrs/create.vue, items/index.vue, items/[id]/edit.vue, and locations/index.vue. Replaced manual loading/error states with Common components (CommonLoadingSpinner, CommonErrorAlert). All pages now follow consistent spacing, typography, and button styling patterns.
 
 ---
+
+## 4.2.2 Loading States
+
+**Completed:** 2025-11-26
+
+**Summary:** Implemented comprehensive loading states across all async operations. Created three new reusable components: `CommonTableSkeleton` for table loading (with configurable column/row counts), `CommonCardSkeleton` for card content (with optional title/subtitle/actions), and `CommonLoadingOverlay` for multi-step processes (with progress bar and step descriptions). Updated all list pages (deliveries, issues, transfers, items, NCRs) to use TableSkeleton instead of basic spinners. Added progress indicators to the period-close workflow, displaying current step and description during the 2-step close process. All loading components use Nuxt UI's USkeleton for consistent animated shimmer effects. TypeScript types ensured with proper return value handling.
+
+---

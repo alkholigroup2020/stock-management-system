@@ -73,12 +73,7 @@
     </UCard>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center py-12">
-      <UIcon
-        name="i-heroicons-arrow-path"
-        class="w-8 h-8 animate-spin text-primary"
-      />
-    </div>
+    <CommonTableSkeleton v-if="loading" :columns="8" :rows="10" />
 
     <!-- Error State -->
     <UAlert
