@@ -92,32 +92,34 @@
     />
 
     <!-- Empty State -->
-    <UCard v-else-if="items.length === 0 && !loading">
-      <div class="text-center py-12">
-        <UIcon
-          name="i-heroicons-inbox"
-          class="w-16 h-16 mx-auto text-muted mb-4"
-        />
-        <h3 class="text-subheading font-semibold mb-2">No items found</h3>
-        <p class="text-caption mb-6">
-          {{
-            searchQuery || selectedCategory
-              ? "Try adjusting your filters"
-              : "Get started by creating your first item"
-          }}
-        </p>
+    <CommonEmptyState
+      v-else-if="items.length === 0 && !loading"
+      icon="i-lucide-package-2"
+      title="No Items Found"
+      :description="
+        searchQuery || selectedCategory
+          ? 'No items match your current filters. Try adjusting your search criteria.'
+          : 'No items have been created yet. Click the button above to create your first item.'
+      "
+    >
+      <template v-if="canEditItems() && !searchQuery && !selectedCategory" #action>
         <UButton
-          v-if="canEditItems() && !searchQuery && !selectedCategory"
           color="primary"
+          icon="i-lucide-plus"
+          label="Create First Item"
           @click="navigateTo('/items/create')"
-        >
-          Create First Item
-        </UButton>
-        <UButton v-else variant="soft" class="cursor-pointer" @click="clearFilters">
-          Clear Filters
-        </UButton>
-      </div>
-    </UCard>
+        />
+      </template>
+      <template v-else-if="searchQuery || selectedCategory" #action>
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-x"
+          label="Clear Filters"
+          @click="clearFilters"
+        />
+      </template>
+    </CommonEmptyState>
 
     <!-- Items Table -->
     <UCard v-else>

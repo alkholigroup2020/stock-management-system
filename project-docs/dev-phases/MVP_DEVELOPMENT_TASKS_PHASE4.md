@@ -107,14 +107,14 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.2.4 Empty States
 
-- [ ] Add empty states to all lists
-  - [ ] Deliveries list
-  - [ ] Issues list
-  - [ ] Transfers list
-  - [ ] NCRs list
-  - [ ] Items list
-- [ ] Include helpful text and action buttons
-- [ ] Test empty states
+- [x] Add empty states to all lists
+  - [x] Deliveries list
+  - [x] Issues list
+  - [x] Transfers list
+  - [x] NCRs list
+  - [x] Items list
+- [x] Include helpful text and action buttons
+- [x] Test empty states
 
 ### 4.2.5 Responsive Design
 

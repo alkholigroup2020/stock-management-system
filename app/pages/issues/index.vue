@@ -414,7 +414,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty State -->
-    <EmptyState
+    <CommonEmptyState
       v-else
       icon="i-lucide-file-minus"
       title="No Issues Found"
@@ -427,6 +427,6 @@ onMounted(async () => {
       <template v-if="canPostIssues()" #action>
         <UButton color="primary" icon="i-lucide-plus" label="New Issue" class="cursor-pointer" @click="goToNewIssue" />
       </template>
-    </EmptyState>
+    </CommonEmptyState>
   </div>
 </template>

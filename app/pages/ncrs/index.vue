@@ -437,7 +437,7 @@ onMounted(async () => {
       </div>
 
       <!-- Empty State -->
-      <EmptyState
+      <CommonEmptyState
         v-else
         icon="i-lucide-alert-circle"
         title="No NCRs Found"
@@ -455,7 +455,7 @@ onMounted(async () => {
             @click="goToNewNCR"
           />
         </template>
-      </EmptyState>
+      </CommonEmptyState>
     </div>
   </div>
 </template>

@@ -458,7 +458,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty State -->
-    <EmptyState
+    <CommonEmptyState
       v-else
       icon="i-lucide-package"
       title="No Deliveries Found"
@@ -476,6 +476,6 @@ onMounted(async () => {
           @click="goToNewDelivery"
         />
       </template>
-    </EmptyState>
+    </CommonEmptyState>
   </div>
 </template>

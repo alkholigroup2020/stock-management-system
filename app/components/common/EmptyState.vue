@@ -25,10 +25,10 @@
 
     <!-- Primary Action Button -->
     <div
-      v-if="showAction || $slots.actions"
+      v-if="showAction || $slots.action"
       class="flex flex-col sm:flex-row gap-3"
     >
-      <slot name="actions">
+      <slot name="action">
         <UButton
           v-if="showAction"
           :color="actionColor"

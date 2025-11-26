@@ -419,7 +419,7 @@ onMounted(async () => {
       </div>
 
       <!-- Empty State -->
-      <EmptyState
+      <CommonEmptyState
         v-else
         icon="i-lucide-arrow-left-right"
         title="No Transfers Found"
@@ -437,7 +437,7 @@ onMounted(async () => {
             @click="goToNewTransfer"
           />
         </template>
-      </EmptyState>
+      </CommonEmptyState>
     </div>
   </div>
 </template>
