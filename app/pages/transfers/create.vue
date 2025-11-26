@@ -16,6 +16,7 @@ const authStore = useAuthStore();
 const toast = useAppToast();
 const permissions = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
+const { handleError, handleSuccess } = useErrorHandler();
 
 // State
 const loading = ref(false);
@@ -129,7 +130,7 @@ const fetchLocations = async () => {
     const data: any = await $fetch("/api/user/locations");
     locations.value = data?.locations || [];
   } catch (error: any) {
-    toast.error("Failed to fetch locations", error.message);
+    handleError(error, { context: "fetching locations" });
   }
 };
 
@@ -162,19 +163,19 @@ const fetchItemsForLocation = async (locationId: string) => {
     // Update line calculations after fetching new stock data
     lines.value.forEach((line) => updateLineCalculations(line));
   } catch (error: any) {
-    toast.error("Failed to fetch items", error.message);
+    handleError(error, { context: "fetching items" });
   }
 };
 
 // Submit form
 const submitTransfer = async () => {
   if (!isFormValid.value) {
-    toast.error("Please fill in all required fields");
+    handleError("REQUIRED_FIELD");
     return;
   }
 
   if (!hasTransferPermission.value) {
-    toast.error("You do not have permission to create transfers");
+    handleError("PERMISSION_DENIED");
     return;
   }
 
@@ -204,36 +205,13 @@ const submitTransfer = async () => {
           },
         });
 
-        toast.success("Transfer created successfully", {
-          description: "Transfer is pending approval",
-        });
+        handleSuccess("Transfer Created Successfully", "The transfer request has been submitted and is pending supervisor approval.");
 
         // Redirect to transfer detail page
         router.push(`/transfers/${result.id}`);
       } catch (error: any) {
         console.error("Transfer submission error:", error);
-
-        // Check for insufficient stock error
-        if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
-          const items = error.data.details.insufficient_items;
-          const itemList = items
-            .map(
-              (item: any) =>
-                `${item.item_name}: requested ${item.requested}, available ${item.available}`
-            )
-            .join("; ");
-          toast.error("Insufficient Stock", {
-            description: `Cannot create transfer. ${itemList}`,
-          });
-        } else if (error.data?.code === "SAME_LOCATION") {
-          toast.error("Invalid Transfer", {
-            description: "From and To locations must be different",
-          });
-        } else {
-          toast.error("Failed to create transfer", {
-            description: error.data?.message || error.message,
-          });
-        }
+        handleError(error, { context: "creating transfer" });
       } finally {
         loading.value = false;
       }

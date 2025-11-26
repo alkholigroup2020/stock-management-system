@@ -8,6 +8,7 @@ const periodStore = usePeriodStore();
 const toast = useAppToast();
 const permissions = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
+const { handleError, handleSuccess, handleWarning } = useErrorHandler();
 
 // State
 const loading = ref(false);
@@ -112,7 +113,7 @@ const fetchSuppliers = async () => {
     const data: any = await $fetch("/api/suppliers");
     suppliers.value = data.suppliers || [];
   } catch (error: any) {
-    toast.error("Failed to fetch suppliers", error.message);
+    handleError(error, { context: "fetching suppliers" });
   }
 };
 
@@ -127,7 +128,7 @@ const fetchItems = async () => {
     });
     items.value = data.items || [];
   } catch (error: any) {
-    toast.error("Failed to fetch items", error.message);
+    handleError(error, { context: "fetching items" });
   }
 };
 
@@ -150,17 +151,19 @@ const fetchPeriodPrices = async () => {
 // Submit form
 const submitDelivery = async () => {
   if (!isFormValid.value) {
-    toast.error("Please fill in all required fields");
+    handleError("REQUIRED_FIELD");
     return;
   }
 
   if (!locationStore.activeLocation?.id) {
-    toast.error("No location selected");
+    handleError({
+      data: { message: "Please select a location before creating a delivery" },
+    });
     return;
   }
 
   if (!hasDeliveryPermission.value) {
-    toast.error("You do not have permission to post deliveries");
+    handleError("PERMISSION_DENIED");
     return;
   }
 
@@ -199,20 +202,18 @@ const submitDelivery = async () => {
         const ncrCount = result.ncrs?.length || 0;
 
         if (ncrCount > 0) {
-          toast.warning("Delivery created with price variances", {
-            description: `${ncrCount} NCR(s) automatically generated for price variances`,
+          handleWarning("Delivery Created with Price Variances", {
+            description: `${ncrCount} NCR(s) automatically generated for review. The delivery has been recorded successfully.`,
           });
         } else {
-          toast.success("Delivery created successfully", {
-            description: "Delivery record has been saved",
-          });
+          handleSuccess("Delivery Created Successfully", "The delivery has been recorded and stock levels have been updated.");
         }
 
         // Redirect to delivery detail page
         router.push(`/deliveries/${result.id}`);
       } catch (error: any) {
         console.error("Delivery submission error:", error);
-        toast.error("Failed to create delivery", error.data?.message || error.message);
+        handleError(error, { context: "creating delivery" });
       } finally {
         loading.value = false;
       }
@@ -233,7 +234,7 @@ const cancel = () => {
 onMounted(async () => {
   // Check permission
   if (!hasDeliveryPermission.value) {
-    toast.error("You do not have permission to post deliveries");
+    handleError("PERMISSION_DENIED");
     router.push("/deliveries");
     return;
   }

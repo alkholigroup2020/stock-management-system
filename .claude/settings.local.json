@@ -75,7 +75,8 @@
       "Bash(npm rebuild:*)",
       "Bash(cd:*)",
       "Bash(node scripts/generate-icons.mjs:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "mcp__playwright__browser_run_code"
     ],
     "deny": [],
     "ask": []

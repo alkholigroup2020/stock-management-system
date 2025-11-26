@@ -13,6 +13,7 @@ const router = useRouter();
 const locationStore = useLocationStore();
 const toast = useAppToast();
 const permissions = usePermissions();
+const { handleError, handleSuccess } = useErrorHandler();
 
 // State
 const loading = ref(false);
@@ -140,12 +141,12 @@ const buildDetailedReason = () => {
 // Submit handler
 const handleSubmit = async () => {
   if (!isFormValid.value) {
-    toast.error("Please fill in all required fields");
+    handleError("REQUIRED_FIELD");
     return;
   }
 
   if (!hasNCRPermission.value) {
-    toast.error("You do not have permission to create NCRs");
+    handleError("PERMISSION_DENIED");
     return;
   }
 
@@ -165,13 +166,11 @@ const handleSubmit = async () => {
       },
     });
 
-    toast.success("NCR created successfully", {
-      description: `NCR ${response.ncr.ncr_no} has been created`,
-    });
+    handleSuccess("NCR Created Successfully", `NCR ${response.ncr.ncr_no} has been created and is pending review.`);
     router.push(`/ncrs/${response.ncr.id}`);
   } catch (error: any) {
     console.error("NCR submission error:", error);
-    toast.error("Failed to create NCR", error.data?.message || error.message);
+    handleError(error, { context: "creating NCR" });
   } finally {
     loading.value = false;
   }
@@ -194,9 +193,7 @@ const fetchLocations = async () => {
     }
   } catch (error) {
     console.error("Error fetching locations:", error);
-    toast.error("Error", {
-      description: "Failed to load locations",
-    });
+    handleError(error, { context: "fetching locations" });
   }
 };
 
@@ -212,9 +209,7 @@ const fetchItems = async () => {
     items.value = response.items;
   } catch (error) {
     console.error("Error fetching items:", error);
-    toast.error("Error", {
-      description: "Failed to load items",
-    });
+    handleError(error, { context: "fetching items" });
   }
 };
 

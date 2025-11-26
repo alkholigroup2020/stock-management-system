@@ -15,6 +15,7 @@ const periodStore = usePeriodStore();
 const toast = useAppToast();
 const permissions = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
+const { handleError, handleSuccess } = useErrorHandler();
 
 // State
 const loading = ref(false);
@@ -113,7 +114,7 @@ const getItemById = (itemId: string) => {
 // Fetch items with stock levels
 const fetchItems = async () => {
   if (!locationStore.activeLocation?.id) {
-    toast.error("No active location selected");
+    handleError({ data: { message: "Please select a location first" } });
     return;
   }
 
@@ -139,24 +140,24 @@ const fetchItems = async () => {
       }
     });
   } catch (error: any) {
-    toast.error("Failed to fetch items", error.message);
+    handleError(error, { context: "fetching items" });
   }
 };
 
 // Submit form
 const submitIssue = async () => {
   if (!isFormValid.value) {
-    toast.error("Please fill in all required fields");
+    handleError("REQUIRED_FIELD");
     return;
   }
 
   if (!locationStore.activeLocation?.id) {
-    toast.error("No location selected");
+    handleError({ data: { message: "Please select a location before creating an issue" } });
     return;
   }
 
   if (!hasIssuePermission.value) {
-    toast.error("You do not have permission to post issues");
+    handleError("PERMISSION_DENIED");
     return;
   }
 
@@ -187,32 +188,13 @@ const submitIssue = async () => {
           }
         );
 
-        toast.success("Issue created successfully", {
-          description: "Issue record has been saved",
-        });
+        handleSuccess("Issue Created Successfully", "The issue has been recorded and stock levels have been updated.");
 
         // Redirect to issue detail page
         router.push(`/issues/${result.id}`);
       } catch (error: any) {
         console.error("Issue submission error:", error);
-
-        // Check for insufficient stock error
-        if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
-          const items = error.data.details.insufficient_items;
-          const itemList = items
-            .map(
-              (item: any) =>
-                `${item.item_name}: requested ${item.requested}, available ${item.available}`
-            )
-            .join("; ");
-          toast.error("Insufficient Stock", {
-            description: `Cannot post issue. ${itemList}`,
-          });
-        } else {
-          toast.error("Failed to create issue", {
-            description: error.data?.message || error.message,
-          });
-        }
+        handleError(error, { context: "creating issue" });
       } finally {
         loading.value = false;
       }
@@ -240,7 +222,7 @@ const costCentreOptions = [
 onMounted(async () => {
   // Check permission
   if (!hasIssuePermission.value) {
-    toast.error("You do not have permission to post issues");
+    handleError("PERMISSION_DENIED");
     router.push("/issues");
     return;
   }
