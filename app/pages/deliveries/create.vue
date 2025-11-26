@@ -7,6 +7,7 @@ const locationStore = useLocationStore();
 const periodStore = usePeriodStore();
 const toast = useAppToast();
 const permissions = usePermissions();
+const { isOnline, guardAction } = useOfflineGuard();
 
 // State
 const loading = ref(false);
@@ -163,55 +164,64 @@ const submitDelivery = async () => {
     return;
   }
 
-  loading.value = true;
+  // Guard against offline state
+  await guardAction(
+    async () => {
+      loading.value = true;
 
-  try {
-    // Prepare lines data
-    const linesData = lines.value.map((line) => ({
-      item_id: line.item_id,
-      quantity: parseFloat(line.quantity),
-      unit_price: parseFloat(line.unit_price),
-    }));
+      try {
+        // Prepare lines data
+        const linesData = lines.value.map((line) => ({
+          item_id: line.item_id,
+          quantity: parseFloat(line.quantity),
+          unit_price: parseFloat(line.unit_price),
+        }));
 
-    // Submit delivery
-    const result: any = await $fetch(
-      `/api/locations/${locationStore.activeLocation.id}/deliveries`,
-      {
-        method: "POST",
-        body: {
-          supplier_id: formData.value.supplier_id,
-          po_id: formData.value.po_id || null,
-          invoice_no: formData.value.invoice_no,
-          delivery_note: formData.value.delivery_note || null,
-          delivery_date: formData.value.delivery_date
-            ? new Date(formData.value.delivery_date).toISOString()
-            : new Date().toISOString(),
-          lines: linesData,
-        },
+        // Submit delivery
+        const result: any = await $fetch(
+          `/api/locations/${locationStore.activeLocation!.id}/deliveries`,
+          {
+            method: "POST",
+            body: {
+              supplier_id: formData.value.supplier_id,
+              po_id: formData.value.po_id || null,
+              invoice_no: formData.value.invoice_no,
+              delivery_note: formData.value.delivery_note || null,
+              delivery_date: formData.value.delivery_date
+                ? new Date(formData.value.delivery_date).toISOString()
+                : new Date().toISOString(),
+              lines: linesData,
+            },
+          }
+        );
+
+        // Check if NCRs were created
+        const ncrCount = result.ncrs?.length || 0;
+
+        if (ncrCount > 0) {
+          toast.warning("Delivery created with price variances", {
+            description: `${ncrCount} NCR(s) automatically generated for price variances`,
+          });
+        } else {
+          toast.success("Delivery created successfully", {
+            description: "Delivery record has been saved",
+          });
+        }
+
+        // Redirect to delivery detail page
+        router.push(`/deliveries/${result.id}`);
+      } catch (error: any) {
+        console.error("Delivery submission error:", error);
+        toast.error("Failed to create delivery", error.data?.message || error.message);
+      } finally {
+        loading.value = false;
       }
-    );
-
-    // Check if NCRs were created
-    const ncrCount = result.ncrs?.length || 0;
-
-    if (ncrCount > 0) {
-      toast.warning("Delivery created with price variances", {
-        description: `${ncrCount} NCR(s) automatically generated for price variances`,
-      });
-    } else {
-      toast.success("Delivery created successfully", {
-        description: "Delivery record has been saved",
-      });
+    },
+    {
+      offlineMessage: "Cannot create delivery",
+      offlineDescription: "You need an internet connection to post deliveries.",
     }
-
-    // Redirect to delivery detail page
-    router.push(`/deliveries/${result.id}`);
-  } catch (error: any) {
-    console.error("Delivery submission error:", error);
-    toast.error("Failed to create delivery", error.data?.message || error.message);
-  } finally {
-    loading.value = false;
-  }
+  );
 };
 
 // Cancel and go back
@@ -476,8 +486,9 @@ watch(
         <UButton color="neutral" variant="soft" @click="cancel" :disabled="loading">Cancel</UButton>
         <UButton
           color="primary"
+          class="cursor-pointer"
           :loading="loading"
-          :disabled="!isFormValid || loading"
+          :disabled="!isFormValid || loading || !isOnline"
           @click="submitDelivery"
         >
           Create Delivery

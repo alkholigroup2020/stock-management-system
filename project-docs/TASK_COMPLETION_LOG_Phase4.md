@@ -27,3 +27,11 @@ This document tracks the completion of tasks from Phase 4 of the MVP development
 **Summary:** Implemented offline detection for the PWA. Created `useOnlineStatus` composable that tracks browser online/offline state using the Navigator API and window events. Created `OfflineBanner` component that displays a red banner "You're offline. Some features are unavailable." when disconnected, and a green "Connection restored!" message when reconnecting. The banner uses smooth slide-down animations and the reconnection message auto-dismisses after 3 seconds. Integrated the OfflineBanner into the default layout. Tested offline detection using Playwright browser automation.
 
 ---
+
+## 4.1.4 Offline Guards
+
+**Completed:** 2025-11-26
+
+**Summary:** Implemented offline guards to prevent form submissions when the user is offline. Created `useOfflineGuard` composable that provides a `guardAction` wrapper function and `isOnline` reactive state. The guard shows a warning toast with a custom message when attempting actions while offline. Applied offline guards to all critical form submissions: deliveries/create.vue (submitDelivery), issues/create.vue (submitIssue), transfers/create.vue (submitTransfer), and period-close.vue (handleMarkReady, handleClosePeriod, handleApprovePeriodClose). Added `:disabled="!isOnline"` to all submit buttons to provide visual feedback when offline.
+
+---

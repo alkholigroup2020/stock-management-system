@@ -14,6 +14,7 @@ const locationStore = useLocationStore();
 const periodStore = usePeriodStore();
 const toast = useAppToast();
 const permissions = usePermissions();
+const { isOnline, guardAction } = useOfflineGuard();
 
 // State
 const loading = ref(false);
@@ -159,56 +160,68 @@ const submitIssue = async () => {
     return;
   }
 
-  loading.value = true;
+  // Guard against offline state
+  await guardAction(
+    async () => {
+      loading.value = true;
 
-  try {
-    // Prepare lines data
-    const linesData = lines.value.map((line) => ({
-      item_id: line.item_id,
-      quantity: parseFloat(line.quantity),
-    }));
+      try {
+        // Prepare lines data
+        const linesData = lines.value.map((line) => ({
+          item_id: line.item_id,
+          quantity: parseFloat(line.quantity),
+        }));
 
-    // Submit issue
-    const result: any = await $fetch(`/api/locations/${locationStore.activeLocation.id}/issues`, {
-      method: "POST",
-      body: {
-        issue_date: formData.value.issue_date
-          ? new Date(formData.value.issue_date).toISOString()
-          : new Date().toISOString(),
-        cost_centre: formData.value.cost_centre,
-        lines: linesData,
-      },
-    });
+        // Submit issue
+        const result: any = await $fetch(
+          `/api/locations/${locationStore.activeLocation!.id}/issues`,
+          {
+            method: "POST",
+            body: {
+              issue_date: formData.value.issue_date
+                ? new Date(formData.value.issue_date).toISOString()
+                : new Date().toISOString(),
+              cost_centre: formData.value.cost_centre,
+              lines: linesData,
+            },
+          }
+        );
 
-    toast.success("Issue created successfully", {
-      description: "Issue record has been saved",
-    });
+        toast.success("Issue created successfully", {
+          description: "Issue record has been saved",
+        });
 
-    // Redirect to issue detail page
-    router.push(`/issues/${result.id}`);
-  } catch (error: any) {
-    console.error("Issue submission error:", error);
+        // Redirect to issue detail page
+        router.push(`/issues/${result.id}`);
+      } catch (error: any) {
+        console.error("Issue submission error:", error);
 
-    // Check for insufficient stock error
-    if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
-      const items = error.data.details.insufficient_items;
-      const itemList = items
-        .map(
-          (item: any) =>
-            `${item.item_name}: requested ${item.requested}, available ${item.available}`
-        )
-        .join("; ");
-      toast.error("Insufficient Stock", {
-        description: `Cannot post issue. ${itemList}`,
-      });
-    } else {
-      toast.error("Failed to create issue", {
-        description: error.data?.message || error.message,
-      });
+        // Check for insufficient stock error
+        if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
+          const items = error.data.details.insufficient_items;
+          const itemList = items
+            .map(
+              (item: any) =>
+                `${item.item_name}: requested ${item.requested}, available ${item.available}`
+            )
+            .join("; ");
+          toast.error("Insufficient Stock", {
+            description: `Cannot post issue. ${itemList}`,
+          });
+        } else {
+          toast.error("Failed to create issue", {
+            description: error.data?.message || error.message,
+          });
+        }
+      } finally {
+        loading.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot create issue",
+      offlineDescription: "You need an internet connection to post issues.",
     }
-  } finally {
-    loading.value = false;
-  }
+  );
 };
 
 // Cancel and go back
@@ -443,8 +456,9 @@ watch(
         <UButton color="neutral" variant="soft" @click="cancel" :disabled="loading">Cancel</UButton>
         <UButton
           color="primary"
+          class="cursor-pointer"
           :loading="loading"
-          :disabled="!isFormValid || loading"
+          :disabled="!isFormValid || loading || !isOnline"
           @click="submitIssue"
         >
           Create Issue

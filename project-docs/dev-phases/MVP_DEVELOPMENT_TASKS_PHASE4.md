@@ -56,16 +56,16 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.1.4 Offline Guards
 
-- [ ] Create `composables/useOfflineGuard.ts`
-  - [ ] Guard action wrapper
-  - [ ] Show toast when offline
-- [ ] Apply offline guards to form submissions
-  - [ ] Delivery posting
-  - [ ] Issue posting
-  - [ ] Transfer creation
-  - [ ] Period close
-- [ ] Disable buttons when offline
-- [ ] Test offline guards
+- [x] Create `composables/useOfflineGuard.ts`
+  - [x] Guard action wrapper
+  - [x] Show toast when offline
+- [x] Apply offline guards to form submissions
+  - [x] Delivery posting
+  - [x] Issue posting
+  - [x] Transfer creation
+  - [x] Period close
+- [x] Disable buttons when offline
+- [x] Test offline guards
 
 ### 4.1.5 PWA Testing
 

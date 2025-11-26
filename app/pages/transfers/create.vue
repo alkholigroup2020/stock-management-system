@@ -15,6 +15,7 @@ const periodStore = usePeriodStore();
 const authStore = useAuthStore();
 const toast = useAppToast();
 const permissions = usePermissions();
+const { isOnline, guardAction } = useOfflineGuard();
 
 // State
 const loading = ref(false);
@@ -177,62 +178,71 @@ const submitTransfer = async () => {
     return;
   }
 
-  loading.value = true;
+  // Guard against offline state
+  await guardAction(
+    async () => {
+      loading.value = true;
 
-  try {
-    // Prepare lines data
-    const linesData = lines.value.map((line) => ({
-      item_id: line.item_id,
-      quantity: parseFloat(line.quantity),
-    }));
+      try {
+        // Prepare lines data
+        const linesData = lines.value.map((line) => ({
+          item_id: line.item_id,
+          quantity: parseFloat(line.quantity),
+        }));
 
-    // Submit transfer
-    const result: any = await $fetch("/api/transfers", {
-      method: "POST",
-      body: {
-        from_location_id: formData.value.from_location_id,
-        to_location_id: formData.value.to_location_id,
-        transfer_date: formData.value.transfer_date
-          ? new Date(formData.value.transfer_date).toISOString()
-          : new Date().toISOString(),
-        notes: formData.value.notes || null,
-        lines: linesData,
-      },
-    });
+        // Submit transfer
+        const result: any = await $fetch("/api/transfers", {
+          method: "POST",
+          body: {
+            from_location_id: formData.value.from_location_id,
+            to_location_id: formData.value.to_location_id,
+            transfer_date: formData.value.transfer_date
+              ? new Date(formData.value.transfer_date).toISOString()
+              : new Date().toISOString(),
+            notes: formData.value.notes || null,
+            lines: linesData,
+          },
+        });
 
-    toast.success("Transfer created successfully", {
-      description: "Transfer is pending approval",
-    });
+        toast.success("Transfer created successfully", {
+          description: "Transfer is pending approval",
+        });
 
-    // Redirect to transfer detail page
-    router.push(`/transfers/${result.id}`);
-  } catch (error: any) {
-    console.error("Transfer submission error:", error);
+        // Redirect to transfer detail page
+        router.push(`/transfers/${result.id}`);
+      } catch (error: any) {
+        console.error("Transfer submission error:", error);
 
-    // Check for insufficient stock error
-    if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
-      const items = error.data.details.insufficient_items;
-      const itemList = items
-        .map(
-          (item: any) =>
-            `${item.item_name}: requested ${item.requested}, available ${item.available}`
-        )
-        .join("; ");
-      toast.error("Insufficient Stock", {
-        description: `Cannot create transfer. ${itemList}`,
-      });
-    } else if (error.data?.code === "SAME_LOCATION") {
-      toast.error("Invalid Transfer", {
-        description: "From and To locations must be different",
-      });
-    } else {
-      toast.error("Failed to create transfer", {
-        description: error.data?.message || error.message,
-      });
+        // Check for insufficient stock error
+        if (error.data?.code === "INSUFFICIENT_STOCK" && error.data?.details?.insufficient_items) {
+          const items = error.data.details.insufficient_items;
+          const itemList = items
+            .map(
+              (item: any) =>
+                `${item.item_name}: requested ${item.requested}, available ${item.available}`
+            )
+            .join("; ");
+          toast.error("Insufficient Stock", {
+            description: `Cannot create transfer. ${itemList}`,
+          });
+        } else if (error.data?.code === "SAME_LOCATION") {
+          toast.error("Invalid Transfer", {
+            description: "From and To locations must be different",
+          });
+        } else {
+          toast.error("Failed to create transfer", {
+            description: error.data?.message || error.message,
+          });
+        }
+      } finally {
+        loading.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot create transfer",
+      offlineDescription: "You need an internet connection to create transfers.",
     }
-  } finally {
-    loading.value = false;
-  }
+  );
 };
 
 // Cancel and go back
@@ -513,8 +523,9 @@ watch(
         </UButton>
         <UButton
           color="primary"
+          class="cursor-pointer"
           :loading="loading"
-          :disabled="!isFormValid || loading"
+          :disabled="!isFormValid || loading || !isOnline"
           @click="submitTransfer"
         >
           Create Transfer

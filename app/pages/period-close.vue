@@ -187,7 +187,7 @@
                     size="sm"
                     icon="i-lucide-check"
                     :loading="markingReady === pl.location_id"
-                    :disabled="!!markingReady || currentPeriod.status !== 'OPEN'"
+                    :disabled="!!markingReady || currentPeriod.status !== 'OPEN' || !isOnline"
                     class="cursor-pointer"
                     @click="handleMarkReady(pl.location_id)"
                   >
@@ -240,6 +240,7 @@
             color="primary"
             icon="i-lucide-check-circle"
             :loading="closingPeriod"
+            :disabled="!isOnline"
             class="cursor-pointer"
             @click="handleApprovePeriodClose"
           >
@@ -269,7 +270,7 @@
               color="primary"
               icon="i-lucide-lock"
               size="lg"
-              :disabled="closingPeriod"
+              :disabled="closingPeriod || !isOnline"
               class="cursor-pointer"
               @click="showConfirmModal = true"
             >
@@ -344,6 +345,7 @@
               color="primary"
               icon="i-lucide-lock"
               :loading="closingPeriod"
+              :disabled="!isOnline"
               class="cursor-pointer"
               @click="handleClosePeriod"
             >
@@ -408,6 +410,7 @@ useSeoMeta({
 
 const router = useRouter();
 const toast = useToast();
+const { isOnline, guardAction } = useOfflineGuard();
 
 // State
 const loading = ref(true);
@@ -508,34 +511,43 @@ async function fetchCurrentPeriod() {
 async function handleMarkReady(locationId: string) {
   if (!currentPeriod.value) return;
 
-  markingReady.value = locationId;
+  // Guard against offline state
+  await guardAction(
+    async () => {
+      markingReady.value = locationId;
 
-  try {
-    await $fetch(`/api/periods/${currentPeriod.value.id}/locations/${locationId}/ready`, {
-      method: "PATCH",
-    });
+      try {
+        await $fetch(`/api/periods/${currentPeriod.value!.id}/locations/${locationId}/ready`, {
+          method: "PATCH",
+        });
 
-    toast.add({
-      title: "Success",
-      description: "Location marked as ready",
-      color: "success",
-      icon: "i-lucide-check",
-    });
+        toast.add({
+          title: "Success",
+          description: "Location marked as ready",
+          color: "success",
+          icon: "i-lucide-check",
+        });
 
-    // Refresh period data
-    await fetchCurrentPeriod();
-  } catch (err: any) {
-    console.error("Error marking location ready:", err);
+        // Refresh period data
+        await fetchCurrentPeriod();
+      } catch (err: any) {
+        console.error("Error marking location ready:", err);
 
-    toast.add({
-      title: "Error",
-      description: err?.data?.message || "Failed to mark location as ready",
-      color: "error",
-      icon: "i-lucide-alert-circle",
-    });
-  } finally {
-    markingReady.value = null;
-  }
+        toast.add({
+          title: "Error",
+          description: err?.data?.message || "Failed to mark location as ready",
+          color: "error",
+          icon: "i-lucide-alert-circle",
+        });
+      } finally {
+        markingReady.value = null;
+      }
+    },
+    {
+      offlineMessage: "Cannot mark location ready",
+      offlineDescription: "You need an internet connection to mark locations as ready.",
+    }
+  );
 }
 
 /**
@@ -544,42 +556,54 @@ async function handleMarkReady(locationId: string) {
 async function handleClosePeriod() {
   if (!currentPeriod.value) return;
 
-  closingPeriod.value = true;
+  // Guard against offline state
+  await guardAction(
+    async () => {
+      closingPeriod.value = true;
 
-  try {
-    // Step 1: Request period close (creates approval)
-    const closeResponse = await $fetch<{ approval: { id: string } }>(`/api/periods/${currentPeriod.value.id}/close`, {
-      method: "POST",
-    });
+      try {
+        // Step 1: Request period close (creates approval)
+        const closeResponse = await $fetch<{ approval: { id: string } }>(
+          `/api/periods/${currentPeriod.value!.id}/close`,
+          {
+            method: "POST",
+          }
+        );
 
-    // Step 2: Approve and execute the close
-    const approvalResponse = await $fetch<{
-      summary: { totalLocations: number; totalClosingValue: number };
-    }>(`/api/approvals/${closeResponse.approval.id}/approve`, {
-      method: "PATCH",
-    });
+        // Step 2: Approve and execute the close
+        const approvalResponse = await $fetch<{
+          summary: { totalLocations: number; totalClosingValue: number };
+        }>(`/api/approvals/${closeResponse.approval.id}/approve`, {
+          method: "PATCH",
+        });
 
-    // Store summary for success modal
-    closeSummary.value = approvalResponse.summary;
+        // Store summary for success modal
+        closeSummary.value = approvalResponse.summary;
 
-    // Hide confirm modal and show success modal
-    showConfirmModal.value = false;
-    showSuccessModal.value = true;
+        // Hide confirm modal and show success modal
+        showConfirmModal.value = false;
+        showSuccessModal.value = true;
 
-    // Refresh period data
-    await fetchCurrentPeriod();
-  } catch (err: any) {
-    console.error("Error closing period:", err);
+        // Refresh period data
+        await fetchCurrentPeriod();
+      } catch (err: any) {
+        console.error("Error closing period:", err);
 
-    toast.add({
-      title: "Error",
-      description: err?.data?.message || "Failed to close period",
-      color: "error",
-      icon: "i-lucide-alert-circle",
-    });
-  } finally {
-    closingPeriod.value = false;
-  }
+        toast.add({
+          title: "Error",
+          description: err?.data?.message || "Failed to close period",
+          color: "error",
+          icon: "i-lucide-alert-circle",
+        });
+      } finally {
+        closingPeriod.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot close period",
+      offlineDescription: "You need an internet connection to close periods.",
+    }
+  );
 }
 
 /**
@@ -596,31 +620,40 @@ async function handleApprovePeriodClose() {
     return;
   }
 
-  closingPeriod.value = true;
+  // Guard against offline state
+  await guardAction(
+    async () => {
+      closingPeriod.value = true;
 
-  try {
-    const approvalResponse = await $fetch<{
-      summary: { totalLocations: number; totalClosingValue: number };
-    }>(`/api/approvals/${currentPeriod.value.approval_id}/approve`, {
-      method: "PATCH",
-    });
+      try {
+        const approvalResponse = await $fetch<{
+          summary: { totalLocations: number; totalClosingValue: number };
+        }>(`/api/approvals/${currentPeriod.value!.approval_id}/approve`, {
+          method: "PATCH",
+        });
 
-    closeSummary.value = approvalResponse.summary;
-    showSuccessModal.value = true;
+        closeSummary.value = approvalResponse.summary;
+        showSuccessModal.value = true;
 
-    await fetchCurrentPeriod();
-  } catch (err: any) {
-    console.error("Error approving period close:", err);
+        await fetchCurrentPeriod();
+      } catch (err: any) {
+        console.error("Error approving period close:", err);
 
-    toast.add({
-      title: "Error",
-      description: err?.data?.message || "Failed to approve period close",
-      color: "error",
-      icon: "i-lucide-alert-circle",
-    });
-  } finally {
-    closingPeriod.value = false;
-  }
+        toast.add({
+          title: "Error",
+          description: err?.data?.message || "Failed to approve period close",
+          color: "error",
+          icon: "i-lucide-alert-circle",
+        });
+      } finally {
+        closingPeriod.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot approve period close",
+      offlineDescription: "You need an internet connection to approve period close.",
+    }
+  );
 }
 
 /**
