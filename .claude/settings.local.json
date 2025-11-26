@@ -70,7 +70,12 @@
       "mcp__notion__notion-create-pages",
       "mcp__notion__notion-update-page",
       "mcp__notion__notion-search",
-      "mcp__notion__notion-fetch"
+      "mcp__notion__notion-fetch",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(npm rebuild:*)",
+      "Bash(cd:*)",
+      "Bash(node scripts/generate-icons.mjs:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

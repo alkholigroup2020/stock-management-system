@@ -34,14 +34,14 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.1.2 App Icons
 
-- [ ] Design app icon (192x192 and 512x512)
-  - [ ] Use navy blue background (#000046)
-  - [ ] Use emerald green or white for icon/text
-  - [ ] Simple, recognizable design
-- [ ] Create `public/icon-192.png`
-- [ ] Create `public/icon-512.png`
-- [ ] Create `public/favicon.ico`
-- [ ] Test icons in manifest
+- [x] Design app icon (192x192 and 512x512)
+  - [x] Use navy blue background (#000046)
+  - [x] Use emerald green or white for icon/text
+  - [x] Simple, recognizable design
+- [x] Create `public/icon-192.png`
+- [x] Create `public/icon-512.png`
+- [x] Create `public/favicon.ico`
+- [x] Test icons in manifest
 
 ### 4.1.3 Offline Detection
 

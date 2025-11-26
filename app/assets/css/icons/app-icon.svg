@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Rounded corners clip path -->
+  <defs>
+    <clipPath id="rounded-corners">
+      <rect width="512" height="512" rx="102"/>
+    </clipPath>
+  </defs>
+  
+  <!-- No background - transparent -->
+  
+  <g clip-path="url(#rounded-corners)">
+    <!-- Stacked boxes pyramid with icons -->
+    
+    <!-- Bottom row - 3 emerald boxes with 2x2 grid icons -->
+    
+    <!-- Bottom left box with grid -->
+    <rect x="90" y="300" width="95" height="95" rx="14" fill="#45cf7b"/>
+    <g transform="translate(137.5, 347.5)">
+      <rect x="-22" y="-22" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="4" y="-22" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="-22" y="4" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="4" y="4" width="18" height="18" rx="4" fill="#ffffff"/>
+    </g>
+    
+    <!-- Bottom center box with grid -->
+    <rect x="208" y="300" width="95" height="95" rx="14" fill="#45cf7b"/>
+    <g transform="translate(255.5, 347.5)">
+      <rect x="-22" y="-22" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="4" y="-22" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="-22" y="4" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="4" y="4" width="18" height="18" rx="4" fill="#ffffff"/>
+    </g>
+    
+    <!-- Bottom right box with grid -->
+    <rect x="326" y="300" width="95" height="95" rx="14" fill="#45cf7b"/>
+    <g transform="translate(373.5, 347.5)">
+      <rect x="-22" y="-22" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="4" y="-22" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="-22" y="4" width="18" height="18" rx="4" fill="#ffffff"/>
+      <rect x="4" y="4" width="18" height="18" rx="4" fill="#ffffff"/>
+    </g>
+    
+    <!-- Middle row - 2 emerald boxes with white icons inside -->
+    
+    <!-- Left middle box - Checkmark -->
+    <rect x="149" y="190" width="95" height="95" rx="14" fill="#45cf7b"/>
+    <path d="M172 237 L190 255 L225 218" 
+          stroke="#ffffff" 
+          stroke-width="12" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+          fill="none"/>
+    
+    <!-- Right middle box - Bar chart -->
+    <rect x="267" y="190" width="95" height="95" rx="14" fill="#45cf7b"/>
+    <g transform="translate(283, 215)">
+      <rect x="0" y="35" width="16" height="25" rx="3" fill="#ffffff"/>
+      <rect x="24" y="20" width="16" height="40" rx="3" fill="#ffffff"/>
+      <rect x="48" y="5" width="16" height="55" rx="3" fill="#ffffff"/>
+    </g>
+    
+    <!-- Top box - emerald green with upward arrow -->
+    <rect x="208" y="80" width="95" height="95" rx="14" fill="#45cf7b"/>
+    <g transform="translate(255.5, 127.5)">
+      <path d="M0 -25 L18 0 L9 0 L9 25 L-9 25 L-9 0 L-18 0 Z" fill="#ffffff"/>
+    </g>
+  </g>
+</svg>

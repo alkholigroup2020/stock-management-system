@@ -149,11 +149,11 @@ const toggleTheme = () => {
             to="/"
             class="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
           >
-            <div
-              class="flex items-center justify-center w-10 h-10 rounded-lg bg-linear-to-br from-primary to-secondary"
-            >
-              <span class="text-white font-bold text-sm">SM</span>
-            </div>
+            <img
+              src="~/assets/css/icons/app-icon.svg"
+              alt="Stock Management System"
+              class="w-10 h-10 rounded-lg"
+            />
             <div v-if="!collapsed" class="flex flex-col min-w-0">
               <span class="text-label truncate">Stock</span>
               <span class="text-caption truncate">Management</span>

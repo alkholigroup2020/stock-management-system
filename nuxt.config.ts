@@ -144,7 +144,7 @@ export default defineNuxtConfig({
         { name: "description", content: "Multi-Location Inventory Management System" },
         // PWA meta tags
         { name: "theme-color", content: "#000046" },
-        { name: "apple-mobile-web-app-capable", content: "yes" },
+        { name: "mobile-web-app-capable", content: "yes" },
         { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
         { name: "apple-mobile-web-app-title", content: "FoodStock" },
       ],
