@@ -35,3 +35,11 @@ This document tracks the completion of tasks from Phase 4 of the MVP development
 **Summary:** Implemented offline guards to prevent form submissions when the user is offline. Created `useOfflineGuard` composable that provides a `guardAction` wrapper function and `isOnline` reactive state. The guard shows a warning toast with a custom message when attempting actions while offline. Applied offline guards to all critical form submissions: deliveries/create.vue (submitDelivery), issues/create.vue (submitIssue), transfers/create.vue (submitTransfer), and period-close.vue (handleMarkReady, handleClosePeriod, handleApprovePeriodClose). Added `:disabled="!isOnline"` to all submit buttons to provide visual feedback when offline.
 
 ---
+
+## 4.1.5 PWA Testing
+
+**Completed:** 2025-11-26
+
+**Summary:** Conducted comprehensive PWA testing using Playwright browser automation. Verified service worker registration (activated, scope: `/`), manifest configuration (name, icons, theme colors), and installability criteria (secure context, BeforeInstallPromptEvent supported). Tested mobile viewports for Android (375x812) and iOS (393x852), confirming responsive layouts and iOS-specific meta tags (apple-touch-icon, apple-mobile-web-app-status-bar-style, apple-mobile-web-app-title). Tested offline behavior by simulating offline/online events, verifying the OfflineBanner displays correctly. Moved OfflineBanner from default layout to app.vue for global coverage including login page. Verified Workbox caching with auto-update and cleanup strategies. All 28 test criteria passed. Full results documented in `project-docs/pwa-testing-results.md`.
+
+---
