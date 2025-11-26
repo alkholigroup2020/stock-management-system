@@ -118,11 +118,11 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.2.5 Responsive Design
 
-- [ ] Test all pages on mobile (320px - 768px)
-- [ ] Test all pages on tablet (768px - 1024px)
-- [ ] Test all pages on desktop (1024px+)
-- [ ] Fix any layout issues
-- [ ] Test navigation on mobile
+- [x] Test all pages on mobile (320px - 768px)
+- [x] Test all pages on tablet (768px - 1024px)
+- [x] Test all pages on desktop (1024px+)
+- [x] Fix any layout issues
+- [x] Test navigation on mobile
 
 ### 4.2.6 Accessibility
 

@@ -142,7 +142,11 @@ const toggleTheme = () => {
     <!-- Dashboard Layout using Nuxt UI Dashboard Components -->
     <UDashboardGroup storage="local" storage-key="stock-management-dashboard">
       <!-- SIDEBAR -->
-      <UDashboardSidebar collapsible resizable>
+      <UDashboardSidebar
+        collapsible
+        resizable
+        :toggle="{ color: 'neutral', variant: 'ghost', icon: 'i-heroicons-bars-3' }"
+      >
         <!-- Logo Header -->
         <template #header="{ collapsed }">
           <NuxtLink
@@ -218,9 +222,10 @@ const toggleTheme = () => {
           <div
             class="flex items-center justify-between w-full h-12 px-4 sm:px-6 border-b border-default bg-elevated"
           >
-            <!-- Left: Sidebar collapse and title -->
+            <!-- Left: Sidebar toggle (mobile) / collapse (desktop) and title -->
             <div class="flex items-center gap-4">
-              <UDashboardSidebarCollapse size="md" />
+              <UDashboardSidebarToggle class="lg:hidden" />
+              <UDashboardSidebarCollapse size="md" class="hidden lg:flex" />
               <h1 class="text-default">{{ pageTitle }}</h1>
             </div>
 
