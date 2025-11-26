@@ -45,14 +45,14 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.1.3 Offline Detection
 
-- [ ] Create `composables/useOnlineStatus.ts`
-  - [ ] Detect online/offline state
-  - [ ] Listen to connection events
-- [ ] Create `components/OfflineBanner.vue`
-  - [ ] Show banner when offline
-  - [ ] Show reconnect message
-- [ ] Add OfflineBanner to app layout
-- [ ] Test offline detection
+- [x] Create `composables/useOnlineStatus.ts`
+  - [x] Detect online/offline state
+  - [x] Listen to connection events
+- [x] Create `components/OfflineBanner.vue`
+  - [x] Show banner when offline
+  - [x] Show reconnect message
+- [x] Add OfflineBanner to app layout
+- [x] Test offline detection
 
 ### 4.1.4 Offline Guards
 

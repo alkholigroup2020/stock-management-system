@@ -139,6 +139,8 @@ const toggleTheme = () => {
 
 <template>
   <UApp>
+    <!-- Offline Detection Banner -->
+    <OfflineBanner />
     <!-- Dashboard Layout using Nuxt UI Dashboard Components -->
     <UDashboardGroup storage="local" storage-key="stock-management-dashboard">
       <!-- SIDEBAR -->
