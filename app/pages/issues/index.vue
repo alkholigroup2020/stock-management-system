@@ -427,7 +427,7 @@ onMounted(async () => {
       "
     >
       <template v-if="canPostIssues()" #action>
-        <UButton color="primary" icon="i-lucide-plus" label="New Issue" @click="goToNewIssue" />
+        <UButton color="primary" icon="i-lucide-plus" label="New Issue" class="cursor-pointer" @click="goToNewIssue" />
       </template>
     </EmptyState>
   </div>

@@ -238,17 +238,18 @@ function handleChange(dateStr: string) {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-[var(--ui-text)]">POB Entry</h1>
-      <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-        Personnel On Board - Daily headcount entry
-      </p>
-    </div>
+    <LayoutPageHeader
+      title="POB Entry"
+      icon="i-lucide-users"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    />
 
     <!-- Period Info with Summary -->
-    <div v-if="currentPeriod && pobData?.summary" class="mb-6">
+    <div v-if="currentPeriod && pobData?.summary">
       <POBSummary
         :period="currentPeriod"
         :summary="pobData.summary"
@@ -258,39 +259,29 @@ function handleChange(dateStr: string) {
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-[var(--ui-primary)]" />
-      <span class="ml-3 text-[var(--ui-text-muted)]">Loading POB data...</span>
+      <CommonLoadingSpinner size="lg" text="Loading POB data..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="mb-6">
-      <UAlert
-        color="error"
-        variant="soft"
-        :title="error"
-        :close-button="{ icon: 'i-heroicons-x-mark', color: 'error', variant: 'link' }"
-        @close="error = null"
-      />
-    </div>
+    <CommonErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
 
     <!-- No Period State -->
     <div v-else-if="!currentPeriod" class="text-center py-12">
-      <UIcon name="i-heroicons-calendar-days" class="w-16 h-16 mx-auto text-[var(--ui-text-muted)]" />
-      <h3 class="mt-4 text-lg font-medium text-[var(--ui-text)]">No Active Period</h3>
-      <p class="mt-2 text-sm text-[var(--ui-text-muted)]">
-        There is no active period to enter POB data.
-      </p>
+      <CommonEmptyState
+        icon="i-lucide-calendar-x"
+        title="No Active Period"
+        description="There is no active period to enter POB data."
+      />
     </div>
 
     <!-- Period Closed State -->
-    <div v-else-if="!isPeriodOpen" class="mb-6">
-      <UAlert
-        color="warning"
-        variant="soft"
-        title="Period is not open"
-        description="You cannot edit POB entries for a closed period."
-      />
-    </div>
+    <UAlert
+      v-else-if="!isPeriodOpen"
+      color="warning"
+      variant="soft"
+      title="Period is not open"
+      description="You cannot edit POB entries for a closed period."
+    />
 
     <!-- POB Entry Table -->
     <div v-else-if="pobData && editableEntries.size > 0">
@@ -303,14 +294,13 @@ function handleChange(dateStr: string) {
       />
 
       <!-- Instructions -->
-      <div class="mt-4">
-        <UAlert
-          color="primary"
-          variant="soft"
-          title="Auto-save enabled"
-          description="POB entries are automatically saved when you move to the next field. Ensure all counts are non-negative whole numbers."
-        />
-      </div>
+      <UAlert
+        class="mt-4"
+        color="primary"
+        variant="soft"
+        title="Auto-save enabled"
+        description="POB entries are automatically saved when you move to the next field. Ensure all counts are non-negative whole numbers."
+      />
     </div>
   </div>
 </template>

@@ -118,7 +118,7 @@
         >
           Create First Item
         </UButton>
-        <UButton v-else variant="soft" @click="clearFilters">
+        <UButton v-else variant="soft" class="cursor-pointer" @click="clearFilters">
           Clear Filters
         </UButton>
       </div>

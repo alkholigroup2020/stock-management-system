@@ -453,11 +453,12 @@ onMounted(async () => {
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton color="neutral" variant="soft" @click="handleCancel" :disabled="loading">
+        <UButton color="neutral" variant="soft" class="cursor-pointer" @click="handleCancel" :disabled="loading">
           Cancel
         </UButton>
         <UButton
           color="primary"
+          class="cursor-pointer"
           :loading="loading"
           :disabled="!isFormValid || loading"
           @click="handleSubmit"

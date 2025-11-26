@@ -518,7 +518,7 @@ watch(
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton color="neutral" variant="soft" @click="cancel" :disabled="loading">
+        <UButton color="neutral" variant="soft" class="cursor-pointer" @click="cancel" :disabled="loading">
           Cancel
         </UButton>
         <UButton

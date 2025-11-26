@@ -74,7 +74,7 @@
       description="No locations match your search criteria. Try adjusting your filters or create a new location."
     >
       <template v-if="canManageLocations" #actions>
-        <UButton color="primary" icon="i-lucide-plus" @click="navigateTo('/locations/create')">
+        <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer" @click="navigateTo('/locations/create')">
           Create Location
         </UButton>
       </template>

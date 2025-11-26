@@ -1,18 +1,16 @@
 <template>
-  <div class="p-4 md:p-6">
+  <div class="space-y-6">
     <!-- Page Header -->
     <LayoutPageHeader
       title="Period Close"
-      subtitle="Close the current accounting period and roll forward to the next"
       icon="i-lucide-lock"
       :show-location="false"
-      :show-period="false"
+      :show-period="true"
     />
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-16">
-      <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-primary" />
-      <span class="ml-3 text-muted">Loading period data...</span>
+      <CommonLoadingSpinner size="lg" text="Loading period data..." />
     </div>
 
     <!-- Error State -->
@@ -91,12 +89,12 @@
           <div
             v-for="item in checklistItems"
             :key="item.id"
-            class="flex items-center gap-3 p-3 rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-bg-elevated)] transition-colors"
+            class="flex items-center gap-3 p-3 rounded-lg border border-default hover:bg-elevated transition-colors"
           >
             <div
               :class="[
                 'flex items-center justify-center w-6 h-6 rounded-full',
-                item.completed ? 'bg-[var(--ui-success)] text-white' : 'bg-[var(--ui-bg-elevated)] text-muted'
+                item.completed ? 'bg-success text-white' : 'bg-elevated text-muted'
               ]"
             >
               <UIcon
@@ -105,7 +103,7 @@
               />
             </div>
             <div class="flex-1">
-              <p :class="['text-body', item.completed ? 'text-[var(--ui-text)]' : 'text-muted']">
+              <p :class="['text-body', item.completed ? '' : 'text-muted']">
                 {{ item.label }}
               </p>
             </div>
@@ -140,7 +138,7 @@
 
         <div class="overflow-x-auto">
           <table class="w-full">
-            <thead class="bg-[var(--ui-bg)] border-b border-[var(--ui-border)]">
+            <thead class="bg-default border-b border-default">
               <tr>
                 <th class="text-left py-3 px-4 text-label font-medium">Location</th>
                 <th class="text-left py-3 px-4 text-label font-medium">Type</th>
@@ -149,11 +147,11 @@
                 <th class="text-right py-3 px-4 text-label font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[var(--ui-border)]">
+            <tbody class="divide-y divide-default">
               <tr
                 v-for="pl in periodLocations"
                 :key="pl.location_id"
-                class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
+                class="hover:bg-elevated transition-colors"
               >
                 <td class="py-4 px-4">
                   <div class="font-medium">{{ pl.location.name }}</div>
@@ -366,7 +364,7 @@
             The period has been closed and a new period has been created.
           </p>
 
-          <div v-if="closeSummary" class="mb-6 p-4 bg-[var(--ui-bg-elevated)] rounded-lg text-left">
+          <div v-if="closeSummary" class="mb-6 p-4 bg-elevated rounded-lg text-left">
             <h4 class="text-label font-semibold mb-3">Summary</h4>
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">

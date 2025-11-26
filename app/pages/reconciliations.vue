@@ -258,55 +258,45 @@ const formattedDateRange = computed(() => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="space-y-6">
     <!-- Page Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-[var(--ui-text)]">Reconciliations</h1>
-      <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-        Period-end stock reconciliation and consumption analysis
-      </p>
-    </div>
+    <LayoutPageHeader
+      title="Reconciliations"
+      icon="i-lucide-calculator"
+      :show-location="true"
+      :show-period="true"
+      location-scope="current"
+    />
 
     <!-- Location Selector (Supervisor/Admin only) -->
-    <div v-if="isSupervisorOrAdmin && locations.length > 0" class="mb-6">
-      <UCard>
-        <div class="flex items-center gap-4">
-          <label class="text-sm font-medium text-[var(--ui-text)]">Location:</label>
-          <USelect
-            v-model="selectedLocationId"
-            :options="locations.map((loc) => ({ label: `${loc.code} - ${loc.name}`, value: loc.id }))"
-            placeholder="Select location"
-            :loading="loadingLocations"
-            class="w-64"
-          />
-        </div>
-      </UCard>
-    </div>
+    <UCard v-if="isSupervisorOrAdmin && locations.length > 0">
+      <div class="flex items-center gap-4">
+        <label class="form-label">Location:</label>
+        <USelectMenu
+          v-model="selectedLocationId"
+          :options="locations.map((loc) => ({ label: `${loc.code} - ${loc.name}`, value: loc.id }))"
+          value-attribute="value"
+          placeholder="Select location"
+          class="w-64"
+        />
+      </div>
+    </UCard>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-[var(--ui-primary)]" />
-      <span class="ml-3 text-[var(--ui-text-muted)]">Loading reconciliation...</span>
+      <CommonLoadingSpinner size="lg" text="Loading reconciliation..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="mb-6">
-      <UAlert
-        color="error"
-        variant="soft"
-        :title="error"
-        :close-button="{ icon: 'i-heroicons-x-mark', color: 'error', variant: 'link' }"
-        @close="error = null"
-      />
-    </div>
+    <CommonErrorAlert v-else-if="error" :message="error" :retry="fetchReconciliation" />
 
     <!-- No Period State -->
     <div v-else-if="!currentPeriod" class="text-center py-12">
-      <UIcon name="i-heroicons-calendar-days" class="w-16 h-16 mx-auto text-[var(--ui-text-muted)]" />
-      <h3 class="mt-4 text-lg font-medium text-[var(--ui-text)]">No Active Period</h3>
-      <p class="mt-2 text-sm text-[var(--ui-text-muted)]">
-        There is no active period to view reconciliation data.
-      </p>
+      <CommonEmptyState
+        icon="i-lucide-calendar-x"
+        title="No Active Period"
+        description="There is no active period to view reconciliation data."
+      />
     </div>
 
     <!-- Reconciliation Data -->
@@ -316,19 +306,19 @@ const formattedDateRange = computed(() => {
         <div class="flex items-center justify-between">
           <!-- Period Info -->
           <div>
-            <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Period</h3>
-            <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
+            <h3 class="text-caption text-muted">Period</h3>
+            <p class="text-subheading font-semibold mt-1">
               {{ reconciliationData.period.name }}
             </p>
-            <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+            <p class="text-caption mt-1">
               {{ formattedDateRange }}
             </p>
           </div>
 
           <!-- Location Info -->
           <div class="text-right">
-            <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Location</h3>
-            <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
+            <h3 class="text-caption text-muted">Location</h3>
+            <p class="text-subheading font-semibold mt-1">
               {{ reconciliationData.location.code }} - {{ reconciliationData.location.name }}
             </p>
           </div>
@@ -347,54 +337,54 @@ const formattedDateRange = computed(() => {
       <!-- Stock Movement Summary (Read-only) -->
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Stock Movement</h2>
+          <h2 class="text-subheading font-semibold">Stock Movement</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Opening Stock -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Opening Stock</h4>
-            <p class="text-xl font-semibold text-[var(--ui-text)] mt-1">
+            <h4 class="text-caption text-muted">Opening Stock</h4>
+            <p class="text-heading font-semibold mt-1">
               {{ formatCurrency(reconciliationData.reconciliation.opening_stock) }}
             </p>
           </div>
 
           <!-- Receipts -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Receipts</h4>
-            <p class="text-xl font-semibold text-[var(--ui-success)] mt-1">
+            <h4 class="text-caption text-muted">Receipts</h4>
+            <p class="text-heading font-semibold text-success mt-1">
               {{ formatCurrency(reconciliationData.reconciliation.receipts) }}
             </p>
           </div>
 
           <!-- Transfers In -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Transfers In</h4>
-            <p class="text-xl font-semibold text-[var(--ui-success)] mt-1">
+            <h4 class="text-caption text-muted">Transfers In</h4>
+            <p class="text-heading font-semibold text-success mt-1">
               {{ formatCurrency(reconciliationData.reconciliation.transfers_in) }}
             </p>
           </div>
 
           <!-- Transfers Out -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Transfers Out</h4>
-            <p class="text-xl font-semibold text-[var(--ui-error)] mt-1">
+            <h4 class="text-caption text-muted">Transfers Out</h4>
+            <p class="text-heading font-semibold text-error mt-1">
               {{ formatCurrency(reconciliationData.reconciliation.transfers_out) }}
             </p>
           </div>
 
           <!-- Issues -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Issues</h4>
-            <p class="text-xl font-semibold text-[var(--ui-error)] mt-1">
+            <h4 class="text-caption text-muted">Issues</h4>
+            <p class="text-heading font-semibold text-error mt-1">
               {{ formatCurrency(reconciliationData.reconciliation.issues) }}
             </p>
           </div>
 
           <!-- Closing Stock -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Closing Stock</h4>
-            <p class="text-xl font-semibold text-[var(--ui-text)] mt-1">
+            <h4 class="text-caption text-muted">Closing Stock</h4>
+            <p class="text-heading font-semibold mt-1">
               {{ formatCurrency(reconciliationData.reconciliation.closing_stock) }}
             </p>
           </div>
@@ -405,7 +395,7 @@ const formattedDateRange = computed(() => {
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">Adjustments</h2>
+            <h2 class="text-subheading font-semibold">Adjustments</h2>
             <UBadge v-if="!isSupervisorOrAdmin" color="warning" variant="soft">
               Read-only
             </UBadge>
@@ -415,9 +405,7 @@ const formattedDateRange = computed(() => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Back-charges -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
-              Back-charges
-            </label>
+            <label class="form-label">Back-charges</label>
             <UInput
               v-model.number="adjustments.back_charges"
               type="number"
@@ -430,9 +418,7 @@ const formattedDateRange = computed(() => {
 
           <!-- Credits Due -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
-              Credits Due
-            </label>
+            <label class="form-label">Credits Due</label>
             <UInput
               v-model.number="adjustments.credits"
               type="number"
@@ -445,9 +431,7 @@ const formattedDateRange = computed(() => {
 
           <!-- Condemnations -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
-              Condemnations
-            </label>
+            <label class="form-label">Condemnations</label>
             <UInput
               v-model.number="adjustments.condemnations"
               type="number"
@@ -460,9 +444,7 @@ const formattedDateRange = computed(() => {
 
           <!-- Other Adjustments -->
           <div>
-            <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
-              Other Adjustments
-            </label>
+            <label class="form-label">Other Adjustments</label>
             <UInput
               v-model.number="adjustments.adjustments"
               type="number"
@@ -478,6 +460,7 @@ const formattedDateRange = computed(() => {
         <div v-if="isSupervisorOrAdmin" class="mt-6 flex justify-end">
           <UButton
             color="primary"
+            class="cursor-pointer"
             :loading="saving"
             :disabled="saving"
             @click="saveAdjustments"
@@ -490,30 +473,30 @@ const formattedDateRange = computed(() => {
       <!-- Consumption Analysis -->
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Consumption Analysis</h2>
+          <h2 class="text-subheading font-semibold">Consumption Analysis</h2>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Total Consumption -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Consumption</h4>
-            <p class="text-2xl font-bold text-[var(--ui-primary)] mt-1">
+            <h4 class="text-caption text-muted">Total Consumption</h4>
+            <p class="text-display font-bold text-primary mt-1">
               {{ formatCurrency(reconciliationData.calculations.consumption) }}
             </p>
           </div>
 
           <!-- Total Mandays -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Mandays</h4>
-            <p class="text-2xl font-bold text-[var(--ui-text)] mt-1">
+            <h4 class="text-caption text-muted">Total Mandays</h4>
+            <p class="text-display font-bold mt-1">
               {{ reconciliationData.calculations.total_mandays.toLocaleString() }}
             </p>
           </div>
 
           <!-- Manday Cost -->
           <div>
-            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Manday Cost</h4>
-            <p class="text-2xl font-bold text-[var(--ui-success)] mt-1">
+            <h4 class="text-caption text-muted">Manday Cost</h4>
+            <p class="text-display font-bold text-success mt-1">
               {{
                 reconciliationData.calculations.manday_cost
                   ? formatCurrency(reconciliationData.calculations.manday_cost)
@@ -522,7 +505,7 @@ const formattedDateRange = computed(() => {
             </p>
             <p
               v-if="reconciliationData.calculations.total_mandays === 0"
-              class="text-xs text-[var(--ui-text-muted)] mt-1"
+              class="text-caption mt-1"
             >
               No POB entries for this period
             </p>
@@ -530,38 +513,38 @@ const formattedDateRange = computed(() => {
         </div>
 
         <!-- Breakdown Details -->
-        <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-          <h3 class="text-sm font-medium text-[var(--ui-text-muted)] mb-4">
+        <div class="mt-6 pt-6 border-t border-default">
+          <h3 class="text-caption text-muted mb-4">
             Calculation Breakdown
           </h3>
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
-              <span class="text-[var(--ui-text-muted)]">Stock Change:</span>
-              <span class="font-medium text-[var(--ui-text)]">
+              <span class="text-muted">Stock Change:</span>
+              <span class="text-body font-medium">
                 {{ formatCurrency(reconciliationData.calculations.breakdown.stock_change) }}
               </span>
             </div>
             <div class="flex justify-between">
-              <span class="text-[var(--ui-text-muted)]">Receipts + Transfers In:</span>
-              <span class="font-medium text-[var(--ui-text)]">
+              <span class="text-muted">Receipts + Transfers In:</span>
+              <span class="text-body font-medium">
                 {{ formatCurrency(reconciliationData.calculations.breakdown.receipts_and_transfers) }}
               </span>
             </div>
             <div class="flex justify-between">
-              <span class="text-[var(--ui-text-muted)]">Issues + Stock Change:</span>
-              <span class="font-medium text-[var(--ui-text)]">
+              <span class="text-muted">Issues + Stock Change:</span>
+              <span class="text-body font-medium">
                 {{ formatCurrency(reconciliationData.calculations.breakdown.issues_and_stock_change) }}
               </span>
             </div>
             <div class="flex justify-between">
-              <span class="text-[var(--ui-text-muted)]">Total Adjustments:</span>
-              <span class="font-medium text-[var(--ui-text)]">
+              <span class="text-muted">Total Adjustments:</span>
+              <span class="text-body font-medium">
                 {{ formatCurrency(reconciliationData.calculations.total_adjustments) }}
               </span>
             </div>
             <div class="flex justify-between">
-              <span class="text-[var(--ui-text-muted)]">Variance Before Adjustments:</span>
-              <span class="font-medium text-[var(--ui-text)]">
+              <span class="text-muted">Variance Before Adjustments:</span>
+              <span class="text-body font-medium">
                 {{
                   formatCurrency(
                     reconciliationData.calculations.breakdown.variance_before_adjustments
@@ -574,7 +557,7 @@ const formattedDateRange = computed(() => {
       </UCard>
 
       <!-- Last Updated Info -->
-      <div v-if="reconciliationData.reconciliation.last_updated" class="text-center text-sm text-[var(--ui-text-muted)]">
+      <div v-if="reconciliationData.reconciliation.last_updated" class="text-center text-caption">
         Last updated: {{ new Date(reconciliationData.reconciliation.last_updated).toLocaleString() }}
       </div>
     </div>

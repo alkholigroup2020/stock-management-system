@@ -43,3 +43,11 @@ This document tracks the completion of tasks from Phase 4 of the MVP development
 **Summary:** Conducted comprehensive PWA testing using Playwright browser automation. Verified service worker registration (activated, scope: `/`), manifest configuration (name, icons, theme colors), and installability criteria (secure context, BeforeInstallPromptEvent supported). Tested mobile viewports for Android (375x812) and iOS (393x852), confirming responsive layouts and iOS-specific meta tags (apple-touch-icon, apple-mobile-web-app-status-bar-style, apple-mobile-web-app-title). Tested offline behavior by simulating offline/online events, verifying the OfflineBanner displays correctly. Moved OfflineBanner from default layout to app.vue for global coverage including login page. Verified Workbox caching with auto-update and cleanup strategies. All 28 test criteria passed. Full results documented in `project-docs/pwa-testing-results.md`.
 
 ---
+
+## 4.2.1 Consistent Styling
+
+**Completed:** 2025-11-26
+
+**Summary:** Audited all pages for styling consistency and applied design system standards. Fixed pob.vue, reconciliations.vue, period-close.vue, and periods/index.vue by replacing manual padding with `space-y-6`, switching to `LayoutPageHeader` component, and replacing inline CSS variables with Tailwind utility classes (text-muted, bg-elevated, border-default, etc.). Updated typography to use design system classes (text-caption, text-subheading, text-body). Added `cursor-pointer` class to all interactive buttons across 10+ pages including deliveries/create.vue, issues/create.vue, issues/index.vue, transfers/create.vue, ncrs/create.vue, items/index.vue, items/[id]/edit.vue, and locations/index.vue. Replaced manual loading/error states with Common components (CommonLoadingSpinner, CommonErrorAlert). All pages now follow consistent spacing, typography, and button styling patterns.
+
+---

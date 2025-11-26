@@ -1,9 +1,8 @@
 <template>
-  <div class="p-4 md:p-6">
+  <div class="space-y-6">
     <!-- Page Header -->
     <LayoutPageHeader
       title="Period Management"
-      description="Manage accounting periods for the stock management system"
       icon="i-lucide-calendar"
       :show-location="false"
       :show-period="false"
@@ -13,6 +12,7 @@
           v-if="isAdmin"
           color="primary"
           icon="i-lucide-plus"
+          class="cursor-pointer"
           @click="openCreateModal"
         >
           New Period
@@ -27,7 +27,6 @@
       icon="i-lucide-check-circle"
       title="Current Active Period"
       :description="`${currentPeriod.name} (${formatDateRange(currentPeriod.start_date, currentPeriod.end_date)})`"
-      class="mb-6"
     />
 
     <!-- Periods List -->
@@ -69,6 +68,7 @@
           v-if="isAdmin && !searchQuery"
           color="primary"
           icon="i-lucide-plus"
+          class="cursor-pointer"
           @click="openCreateModal"
         >
           Create First Period
@@ -78,7 +78,7 @@
       <!-- Periods Table -->
       <div v-else class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-[var(--ui-bg)] border-b border-[var(--ui-border)]">
+          <thead class="bg-default border-b border-default">
             <tr>
               <th class="text-left py-3 px-4 text-label font-medium">Period Name</th>
               <th class="text-left py-3 px-4 text-label font-medium">Date Range</th>
@@ -87,11 +87,11 @@
               <th class="text-right py-3 px-4 text-label font-medium">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--ui-border)]">
+          <tbody class="divide-y divide-default">
             <tr
               v-for="period in filteredPeriods"
               :key="period.id"
-              class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
+              class="hover:bg-elevated transition-colors"
             >
               <!-- Period Name -->
               <td class="py-4 px-4">
@@ -131,6 +131,7 @@
                     variant="ghost"
                     icon="i-lucide-tag"
                     size="sm"
+                    class="cursor-pointer"
                     @click="goToPrices(period.id)"
                   >
                     Prices
@@ -140,6 +141,7 @@
                     variant="ghost"
                     icon="i-lucide-eye"
                     size="sm"
+                    class="cursor-pointer"
                     @click="viewDetails(period.id)"
                   >
                     View
@@ -262,6 +264,7 @@
             <UButton
               color="neutral"
               variant="ghost"
+              class="cursor-pointer"
               @click="closeCreateModal"
               :disabled="isCreating"
             >
@@ -270,6 +273,7 @@
             <UButton
               color="primary"
               icon="i-lucide-plus"
+              class="cursor-pointer"
               :loading="isCreating"
               @click="handleCreatePeriod"
             >

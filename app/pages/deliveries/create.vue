@@ -323,7 +323,7 @@ watch(
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-subheading font-semibold">Delivery Items</h2>
-            <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" @click="addLine">
+            <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" class="cursor-pointer" @click="addLine">
               Add Item
             </UButton>
           </div>
@@ -483,7 +483,7 @@ watch(
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton color="neutral" variant="soft" @click="cancel" :disabled="loading">Cancel</UButton>
+        <UButton color="neutral" variant="soft" class="cursor-pointer" @click="cancel" :disabled="loading">Cancel</UButton>
         <UButton
           color="primary"
           class="cursor-pointer"

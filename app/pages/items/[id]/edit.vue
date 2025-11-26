@@ -18,7 +18,7 @@
           />
           <h2 class="text-xl font-semibold text-default mb-2">Error Loading Item</h2>
           <p class="text-sm text-muted mb-4">{{ loadError }}</p>
-          <UButton color="primary" @click="router.push('/items')">Back to Items</UButton>
+          <UButton color="primary" class="cursor-pointer" @click="router.push('/items')">Back to Items</UButton>
         </div>
       </UCard>
     </div>
