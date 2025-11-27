@@ -236,6 +236,7 @@ model Item {
 
   @@index([category])
   @@index([is_active])
+  @@index([is_active, category]) // For filtered active items by category
   @@map("items")
 }
 
@@ -611,6 +612,7 @@ model NCR {
   @@index([created_at]) // For sorting by created timestamp
   @@index([location_id, status]) // For location NCR queries by status
   @@index([location_id, type]) // For location NCR queries by type
+  @@index([location_id, created_at]) // For recent NCRs by location
   @@index([created_by]) // For user's created NCRs
   @@map("ncrs")
 }
