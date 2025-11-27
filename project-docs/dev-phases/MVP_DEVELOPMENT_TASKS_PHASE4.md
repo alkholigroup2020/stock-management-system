@@ -242,13 +242,13 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.5.3 Training Materials
 
-- [ ] Create training presentation
-  - [ ] System overview (15 min)
-  - [ ] Operator training (30 min)
-  - [ ] Supervisor training (45 min)
-  - [ ] Admin training (60 min)
+- [x] Create training presentation
+  - [x] System overview (15 min)
+  - [x] Operator training (30 min)
+  - [x] Supervisor training (45 min)
+  - [x] Admin training (60 min)
 - [ ] Record video walkthrough (optional)
-- [ ] Create practice scenarios
+- [x] Create practice scenarios
 
 ### 4.5.4 Operational Documentation
 
