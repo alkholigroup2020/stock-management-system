@@ -78,7 +78,10 @@
       "Bash(node:*)",
       "mcp__playwright__browser_run_code",
       "Bash(pnpm build:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(pnpm test:unit:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm vitest run:*)"
     ],
     "deny": [],
     "ask": []

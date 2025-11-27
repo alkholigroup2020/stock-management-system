@@ -172,12 +172,12 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.4.1 Unit Tests
 
-- [ ] Write tests for WAC calculation
-- [ ] Write tests for reconciliation calculation
-- [ ] Write tests for stock validation
-- [ ] Write tests for price variance detection
-- [ ] Run all unit tests
-- [ ] Aim for > 80% coverage on business logic
+- [x] Write tests for WAC calculation
+- [x] Write tests for reconciliation calculation
+- [x] Write tests for stock validation
+- [x] Write tests for price variance detection
+- [x] Run all unit tests
+- [x] Aim for > 80% coverage on business logic
 
 ### 4.4.2 API Tests
 
