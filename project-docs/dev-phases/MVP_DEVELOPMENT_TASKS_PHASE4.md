@@ -160,11 +160,11 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.3.4 Data Caching
 
-- [ ] Cache location list (client-side)
-- [ ] Cache item master (client-side)
-- [ ] Cache current period (client-side)
-- [ ] Implement cache invalidation
-- [ ] Test caching
+- [x] Cache location list (client-side)
+- [x] Cache item master (client-side)
+- [x] Cache current period (client-side)
+- [x] Implement cache invalidation
+- [x] Test caching
 
 ---
 
