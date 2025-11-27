@@ -2,6 +2,38 @@
 
 A multi-location inventory management system built with **Nuxt 4**. Replaces Excel-based workflows with a modern web application featuring real-time stock tracking, inter-location transfers, weighted average costing (WAC), and coordinated period-end close across multiple sites.
 
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Environment Setup](#environment-setup)
+- [Development](#development)
+- [Project Structure](#project-structure)
+- [Documentation](#documentation)
+- [Deployment](#deployment)
+- [Support](#support)
+
+## Project Overview
+
+This Stock Management System is a full-stack web application designed to manage inventory across multiple physical locations (Kitchen, Store, Central Warehouse). It provides real-time stock tracking, automated weighted average cost calculations, and comprehensive period-end reconciliation workflows.
+
+**Key Business Processes:**
+
+- **Stock Transactions**: Deliveries (goods receipts), Issues (stock consumption), and Transfers (inter-location movements)
+- **Cost Control**: Weighted Average Costing (WAC) automatically calculated per location on each delivery
+- **Period Management**: Monthly accounting periods with coordinated close across all locations
+- **Quality Control**: Automatic NCR (Non-Conformance Report) generation for price variances
+- **Approval Workflows**: Multi-level approval for transfers, purchase requests, and period close
+
+**Target Users:**
+
+- **Operators**: Post daily transactions (deliveries, issues), view stock levels
+- **Supervisors**: Approve transfers and PRF/PO, manage reconciliations
+- **Admins**: Manage items and prices, close periods, configure system settings
+
 ## Key Features
 
 - **Multi-Location Management** - Kitchen, Store, Central, and Warehouse locations with independent stock levels
@@ -28,6 +60,28 @@ Before you begin, ensure you have the following installed:
 - **Node.js** 18.x or higher
 - **pnpm** 8.x or higher (required, not npm or yarn)
 - **Git**
+
+## Quick Start
+
+Get the application running in 5 minutes:
+
+```bash
+# 1. Clone the repository
+git clone <repository-url>
+cd stock-management-system
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Set up environment variables
+cp .env.example .env
+# Edit .env with your Supabase credentials
+
+# 4. Start development server
+pnpm dev
+
+# 5. Open browser to http://localhost:3000
+```
 
 ## Environment Setup
 
@@ -123,17 +177,79 @@ pnpm dev
 
 The application will be available at [http://localhost:3000](http://localhost:3000)
 
-## Available Commands
+## Development
+
+### Development Workflow
+
+This project follows a feature-branch workflow with comprehensive type checking and testing:
+
+1. **Create Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Implement Changes**
+   - Schema changes: Edit `prisma/schema.prisma` → Run `pnpm db:push` (dev) or `pnpm db:migrate dev` (with history)
+   - API routes: Create in `server/api/` using `defineEventHandler`
+   - Composables: Create in `app/composables/` (auto-imported)
+   - Components: Create in `app/components/` (auto-imported with path-based naming)
+   - Pages: Create in `app/pages/` (auto-routed)
+
+3. **Type Checking** (Required before commit)
+   ```bash
+   pnpm typecheck
+   ```
+   Must show **zero errors**. All code must be properly typed with no `any` types.
+
+4. **Code Formatting** (Automatic with Prettier)
+   ```bash
+   pnpm format        # Format all files
+   pnpm format:check  # Check formatting (CI)
+   ```
+   Files are auto-formatted on save in VS Code. Follow these rules:
+   - Semicolons: Always use `;`
+   - Quotes: Always use double quotes `"`
+   - Indentation: 2 spaces
+   - Line width: 100 characters max
+
+5. **Testing** (When applicable)
+   ```bash
+   pnpm test:unit     # Unit tests (WAC, reconciliation, validation)
+   pnpm test:api      # API integration tests
+   pnpm test          # All tests
+   ```
+
+6. **Commit & Push**
+   ```bash
+   git add .
+   git commit -m "feat: your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+7. **Deploy Preview**
+   - Push to GitHub triggers automatic Vercel preview deployment
+   - Test on preview URL before merging
+
+8. **Merge to Main**
+   - Create pull request
+   - After approval, merge to `main`
+   - Auto-deploys to production
+
+### Available Commands
 
 ```bash
 # Install dependencies
 pnpm install
 
-# Development server
+# Development server (http://localhost:3000)
 pnpm dev
 
-# Type checking
+# Type checking (REQUIRED before commit)
 pnpm typecheck
+
+# Code formatting
+pnpm format        # Format all files
+pnpm format:check  # Check formatting
 
 # Build for production
 pnpm build
@@ -143,24 +259,39 @@ pnpm preview
 
 # Linting
 pnpm lint
+
+# Testing
+pnpm test:unit     # Unit tests
+pnpm test:api      # API tests
+pnpm test          # All tests
 ```
 
-## Database Setup
+### Database Commands
 
-**Note:** Database setup will be configured in the next phase (Task 1.2). For now, ensure your environment variables are set correctly.
-
-Once Prisma is configured, you'll use:
+The database uses PostgreSQL 15+ via Supabase, accessed through Prisma ORM.
 
 ```bash
-# Push schema changes (development)
+# Development: Push schema changes (no migration history)
 pnpm db:push
 
-# Create migrations (production)
-pnpm db:migrate
+# Development: Create migration with history
+pnpm db:migrate dev
 
-# Open Prisma Studio
+# Production: Deploy migrations
+pnpm db:migrate deploy
+
+# Open Prisma Studio (database GUI)
 pnpm db:studio
+
+# Generate Prisma Client (auto-runs after npm install)
+pnpm prisma generate
 ```
+
+**Important Notes:**
+
+- **Development**: Use `db:push` for rapid prototyping or `db:migrate dev` when you want migration history
+- **Production**: Always use `db:migrate deploy` - never use `db:push` in production
+- **After schema changes**: Run `pnpm typecheck` to ensure generated types are correct
 
 ## Project Structure
 
@@ -184,12 +315,28 @@ pnpm db:studio
 
 ## Documentation
 
-For comprehensive project documentation, see:
+### Developer Documentation
 
+- **[API_ENDPOINTS.md](project-docs/API_ENDPOINTS.md)** - Complete API reference with request/response examples
+- **[DATABASE_SCHEMA.md](project-docs/DATABASE_SCHEMA.md)** - Database schema documentation and ERD
+- **[ENVIRONMENT_VARIABLES.md](project-docs/ENVIRONMENT_VARIABLES.md)** - Environment configuration guide
+- **[DEPLOYMENT.md](project-docs/DEPLOYMENT.md)** - Deployment guide for Vercel and Supabase
 - **[CLAUDE.md](CLAUDE.md)** - Development guidelines and best practices
-- **[project-docs/PRD.md](project-docs/PRD.md)** - Product requirements
-- **[project-docs/System_Design.md](project-docs/System_Design.md)** - System architecture
-- **[project-docs/MVP_DEVELOPMENT_TASKS.md](project-docs/MVP_DEVELOPMENT_TASKS.md)** - Development checklist
+
+### Product Documentation
+
+- **[PRD.md](project-docs/PRD.md)** - Product Requirements Document
+- **[MVP.md](project-docs/MVP.md)** - MVP scope and features
+- **[System_Design.md](project-docs/System_Design.md)** - System architecture and design
+- **[Workflow_Guide.md](project-docs/Workflow_Guide.md)** - Business workflows and processes
+- **[UI_DESIGN_GUIDE.md](project-docs/UI_DESIGN_GUIDE.md)** - Design system and UI guidelines
+- **[Roles_Permissions.md](project-docs/Roles_Permissions.md)** - User roles and permissions
+
+### Development Tracking
+
+- **[MVP_DEVELOPMENT_TASKS_PHASE4.md](project-docs/dev-phases/MVP_DEVELOPMENT_TASKS_PHASE4.md)** - Phase 4 task checklist
+- **[TASK_COMPLETION_LOG_Phase4.md](project-docs/TASK_COMPLETION_LOG_Phase4.md)** - Phase 4 completion log
+- **[pwa-implementation-guide.md](project-docs/pwa-implementation-guide.md)** - PWA setup guide
 
 ## Environment Variables Reference
 
@@ -211,12 +358,40 @@ The application is designed to be deployed on Vercel with Supabase as the databa
 
 ### Deploying to Vercel
 
-1. Push your code to GitHub/GitLab/Bitbucket
-2. Import the project in Vercel
-3. Set all required environment variables in Vercel dashboard
-4. Deploy
+1. **Prepare Repository**
+   ```bash
+   git push origin main
+   ```
 
-Vercel will automatically detect the Nuxt configuration and deploy accordingly.
+2. **Import Project to Vercel**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New Project"
+   - Import your Git repository
+   - Select the root directory
+
+3. **Configure Environment Variables**
+   - In Vercel project settings, add all required environment variables
+   - See [ENVIRONMENT_VARIABLES.md](project-docs/ENVIRONMENT_VARIABLES.md) for complete list
+   - Ensure `NUXT_PUBLIC_SITE_URL` is set to your production domain
+
+4. **Deploy**
+   - Vercel auto-detects Nuxt configuration
+   - Click "Deploy"
+   - Monitor deployment logs
+
+5. **Post-Deployment**
+   - Run database migrations: `pnpm db:migrate deploy`
+   - Seed initial data if needed
+   - Test all features on production URL
+   - Install PWA on mobile devices for testing
+
+### Continuous Deployment
+
+- **Main branch**: Auto-deploys to production on every push
+- **Feature branches**: Auto-creates preview deployments for testing
+- **Environment**: Preview deployments use preview environment variables
+
+For detailed deployment instructions, see [DEPLOYMENT.md](project-docs/DEPLOYMENT.md).
 
 ## Support
 
