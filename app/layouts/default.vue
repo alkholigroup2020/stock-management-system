@@ -139,6 +139,14 @@ const toggleTheme = () => {
 
 <template>
   <UApp>
+    <!-- Skip to main content link for keyboard users -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+    >
+      Skip to main content
+    </a>
+
     <!-- Dashboard Layout using Nuxt UI Dashboard Components -->
     <UDashboardGroup storage="local" storage-key="stock-management-dashboard">
       <!-- SIDEBAR -->
@@ -151,6 +159,7 @@ const toggleTheme = () => {
         <template #header="{ collapsed }">
           <NuxtLink
             to="/"
+            aria-label="Go to dashboard"
             class="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
           >
             <img
@@ -168,14 +177,14 @@ const toggleTheme = () => {
         <!-- Navigation Menu -->
         <template #default="{ collapsed }">
           <!-- Main Navigation Menu with increased padding -->
-          <div class="space-y-1">
+          <nav aria-label="Main navigation" class="space-y-1">
             <UNavigationMenu
               :collapsed="collapsed"
               :items="mainMenuItems"
               orientation="vertical"
               class="[&_a]:py-3"
             />
-          </div>
+          </nav>
         </template>
 
         <!-- User Profile Footer -->
@@ -206,6 +215,7 @@ const toggleTheme = () => {
             <UButton
               :avatar="{ alt: user.full_name || user.email }"
               :label="collapsed ? undefined : user.full_name || 'User'"
+              :aria-label="`User menu for ${user.full_name || user.email}`"
               color="neutral"
               variant="ghost"
               class="w-full"
@@ -219,7 +229,8 @@ const toggleTheme = () => {
       <UDashboardPanel>
         <!-- Header/Navbar -->
         <template #header>
-          <div
+          <header
+            aria-label="Page header"
             class="flex items-center justify-between w-full h-12 px-4 sm:px-6 border-b border-default bg-elevated"
           >
             <!-- Left: Sidebar toggle (mobile) / collapse (desktop) and title -->
@@ -260,19 +271,27 @@ const toggleTheme = () => {
                 @click="toggleTheme"
               />
             </div>
-          </div>
+          </header>
         </template>
 
         <!-- Body content -->
         <template #body>
-          <div class="py-2 px-4 sm:px-12 xl:py-4 xl:px-16">
+          <main
+            id="main-content"
+            aria-label="Main content"
+            class="py-2 px-4 sm:px-12 xl:py-4 xl:px-16"
+          >
             <slot />
-          </div>
+          </main>
         </template>
 
         <!-- Footer -->
         <template #footer>
-          <footer class="border-t border-default bg-elevated w-full h-fit-content">
+          <footer
+            role="contentinfo"
+            aria-label="Site footer"
+            class="border-t border-default bg-elevated w-full h-fit-content"
+          >
             <div class="px-4 sm:px-6 py-2">
               <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 <p class="text-caption">
