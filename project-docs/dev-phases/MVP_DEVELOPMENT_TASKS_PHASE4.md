@@ -181,15 +181,15 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ### 4.4.2 API Tests
 
-- [ ] Write tests for critical endpoints
-  - [ ] POST /api/locations/[id]/deliveries
-  - [ ] POST /api/locations/[id]/issues
-  - [ ] POST /api/transfers
-  - [ ] PATCH /api/transfers/[id]/approve
-  - [ ] POST /api/periods/[id]/close
-- [ ] Test error scenarios
-- [ ] Test validation errors
-- [ ] Run all API tests
+- [x] Write tests for critical endpoints
+  - [x] POST /api/locations/[id]/deliveries
+  - [x] POST /api/locations/[id]/issues
+  - [x] POST /api/transfers
+  - [x] PATCH /api/transfers/[id]/approve
+  - [x] POST /api/periods/[id]/close
+- [x] Test error scenarios
+- [x] Test validation errors
+- [x] Run all API tests
 
 ### 4.4.3 Integration Testing
 
