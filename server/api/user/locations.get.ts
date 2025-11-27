@@ -1,4 +1,5 @@
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 
 export default defineEventHandler(async (event) => {
   // Get user from session (auth middleware attaches it to event.context)
@@ -33,6 +34,12 @@ export default defineEventHandler(async (event) => {
         access_level: "MANAGE" as const,
       }));
 
+      // Set cache headers (5 minutes for user locations)
+      setCacheHeaders(event, {
+        maxAge: 300,
+        staleWhileRevalidate: 60,
+      });
+
       return {
         locations: locationsWithAccess,
       };
@@ -55,6 +62,12 @@ export default defineEventHandler(async (event) => {
         ...ul.location,
         access_level: ul.access_level,
       }));
+
+    // Set cache headers (5 minutes for user locations)
+    setCacheHeaders(event, {
+      maxAge: 300,
+      staleWhileRevalidate: 60,
+    });
 
     return {
       locations: locationsWithAccess,

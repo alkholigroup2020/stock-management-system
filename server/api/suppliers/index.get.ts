@@ -1,12 +1,13 @@
 import { defineEventHandler } from "h3";
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 
 /**
  * GET /api/suppliers
  * Fetch all suppliers with optional filtering
  * Returns list of active suppliers
  */
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   try {
     // Fetch all active suppliers
     const suppliers = await prisma.supplier.findMany({
@@ -24,6 +25,12 @@ export default defineEventHandler(async () => {
       orderBy: {
         name: "asc",
       },
+    });
+
+    // Set cache headers (5 minutes for suppliers list)
+    setCacheHeaders(event, {
+      maxAge: 300,
+      staleWhileRevalidate: 60,
     });
 
     return {

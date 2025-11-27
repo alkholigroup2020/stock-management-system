@@ -19,6 +19,7 @@
 import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import { setCacheHeaders } from "../../utils/performance";
 
 // User session type
 interface UserLocation {
@@ -144,6 +145,12 @@ export default defineEventHandler(async (event) => {
     const totalPages = Math.ceil(total / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
+
+    // Set cache headers (5 minutes for items list)
+    setCacheHeaders(event, {
+      maxAge: 300,
+      staleWhileRevalidate: 60,
+    });
 
     return {
       items,

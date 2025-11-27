@@ -1,4 +1,5 @@
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 
 export default defineEventHandler(async (event) => {
   // Get user from session (auth middleware attaches it to event.context)
@@ -56,6 +57,12 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         start_date: "desc",
       },
+    });
+
+    // Set cache headers (1 minute for current period)
+    setCacheHeaders(event, {
+      maxAge: 60,
+      staleWhileRevalidate: 30,
     });
 
     return {
