@@ -29,7 +29,8 @@ export async function getTestLocationIds(): Promise<{
   store: string;
   warehouse: string;
 }> {
-  const response = await fetch("http://localhost:3001/api/locations");
+  const baseUrl = process.env.TEST_BASE_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/locations`);
   const data = await response.json();
 
   const kitchen = data.locations?.find((l: { code: string }) => l.code === "MAIN-KIT");
@@ -51,7 +52,8 @@ export async function getTestItemIds(): Promise<{
   rice: string;
   oil: string;
 }> {
-  const response = await fetch("http://localhost:3001/api/items");
+  const baseUrl = process.env.TEST_BASE_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/items`);
   const data = await response.json();
 
   const chicken = data.items?.find((i: { code: string }) => i.code === "MEAT-001");
@@ -72,7 +74,8 @@ export async function getTestSupplierIds(): Promise<{
   supplierA: string;
   supplierB: string;
 }> {
-  const response = await fetch("http://localhost:3001/api/suppliers");
+  const baseUrl = process.env.TEST_BASE_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/suppliers`);
   const data = await response.json();
 
   const supplierA = data.suppliers?.[0];
@@ -88,7 +91,8 @@ export async function getTestSupplierIds(): Promise<{
  * Get current period ID
  */
 export async function getCurrentPeriodId(): Promise<string> {
-  const response = await fetch("http://localhost:3001/api/periods/current");
+  const baseUrl = process.env.TEST_BASE_URL || "http://localhost:3000";
+  const response = await fetch(`${baseUrl}/api/periods/current`);
   const data = await response.json();
 
   return data.period?.id || "";

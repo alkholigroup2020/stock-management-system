@@ -4,7 +4,7 @@
  * Provides utilities for making authenticated API requests during tests
  */
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 
 export interface TestUser {
   id: string;
@@ -26,7 +26,7 @@ export async function loginUser(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ email: username, password }),
   });
 
   if (!response.ok) {
