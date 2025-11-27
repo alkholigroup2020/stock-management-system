@@ -156,4 +156,52 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+  // Router configuration for performance
+  router: {
+    options: {
+      // Scroll behavior for better UX
+      scrollBehaviorType: "smooth",
+    },
+  },
+
+  // Experimental features for performance
+  experimental: {
+    // Enable component islands for better loading performance
+    componentIslands: true,
+    // Enable payload extraction for faster hydration
+    payloadExtraction: true,
+  },
+
+  // Vite configuration for bundle optimization
+  vite: {
+    build: {
+      // Optimize chunk size
+      chunkSizeWarningLimit: 500,
+      rollupOptions: {
+        output: {
+          // Manual chunk splitting for better caching
+          manualChunks(id) {
+            // Vendor chunks
+            if (id.includes("node_modules")) {
+              if (id.includes("@nuxt/ui")) {
+                return "vendor-ui";
+              }
+              if (id.includes("vue") || id.includes("@vue")) {
+                return "vendor-vue";
+              }
+              if (id.includes("pinia")) {
+                return "vendor-pinia";
+              }
+              return "vendor";
+            }
+          },
+        },
+      },
+    },
+    // Optimize dependencies
+    optimizeDeps: {
+      include: ["vue", "@nuxt/ui", "pinia"],
+    },
+  },
 });

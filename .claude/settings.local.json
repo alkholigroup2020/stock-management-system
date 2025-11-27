@@ -76,7 +76,9 @@
       "Bash(cd:*)",
       "Bash(node scripts/generate-icons.mjs:*)",
       "Bash(node:*)",
-      "mcp__playwright__browser_run_code"
+      "mcp__playwright__browser_run_code",
+      "Bash(pnpm build:*)",
+      "Bash(tee:*)"
     ],
     "deny": [],
     "ask": []
