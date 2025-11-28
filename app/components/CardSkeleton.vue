@@ -27,7 +27,7 @@
  * Displays a skeleton loading state for card content
  *
  * Usage:
- * <CommonCardSkeleton :lines="4" :show-title="true" :show-action="true" />
+ * <CardSkeleton :lines="4" :show-title="true" :show-action="true" />
  */
 
 interface Props {

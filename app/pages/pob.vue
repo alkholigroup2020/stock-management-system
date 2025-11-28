@@ -259,15 +259,15 @@ function handleChange(dateStr: string) {
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <CommonLoadingSpinner size="lg" text="Loading POB data..." />
+      <LoadingSpinner size="lg" text="Loading POB data..." />
     </div>
 
     <!-- Error State -->
-    <CommonErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
+    <ErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
 
     <!-- No Period State -->
     <div v-else-if="!currentPeriod" class="text-center py-12">
-      <CommonEmptyState
+      <EmptyState
         icon="i-lucide-calendar-x"
         title="No Active Period"
         description="There is no active period to enter POB data."

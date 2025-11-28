@@ -620,17 +620,17 @@ watch(
     <div class="card-elevated">
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-16">
-        <CommonLoadingSpinner size="lg" text="Loading stock data..." />
+        <LoadingSpinner size="lg" text="Loading stock data..." />
       </div>
 
       <!-- Error State -->
       <div v-else-if="error">
-        <CommonErrorAlert :message="error" :retry="fetchStockData" />
+        <ErrorAlert :message="error" :retry="fetchStockData" />
       </div>
 
       <!-- Empty State -->
       <div v-else-if="filteredStock.length === 0" class="py-16">
-        <CommonEmptyState
+        <EmptyState
           icon="i-lucide-package-x"
           title="No stock data"
           :description="

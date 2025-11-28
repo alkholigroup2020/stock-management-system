@@ -1,14 +1,14 @@
 <template>
   <div class="w-full">
     <!-- Loading State -->
-    <CommonLoadingSpinner
+    <LoadingSpinner
       v-if="loading"
       text="Loading data..."
       :size="loadingSize"
     />
 
     <!-- Error State -->
-    <CommonErrorAlert
+    <ErrorAlert
       v-else-if="error"
       type="error"
       :title="errorTitle"
@@ -18,7 +18,7 @@
     />
 
     <!-- Empty State -->
-    <CommonEmptyState
+    <EmptyState
       v-else-if="!data || data.length === 0"
       :icon="emptyIcon"
       :title="emptyTitle"
@@ -112,7 +112,7 @@ import { computed, ref } from "vue";
  * A reusable data table with loading, error, empty states, and pagination
  *
  * Usage:
- * <CommonDataTable
+ * <DataTable
  *   :data="items"
  *   :columns="[
  *     { key: 'code', label: 'Code' },
@@ -123,7 +123,7 @@ import { computed, ref } from "vue";
  *   <template #actions="{ row }">
  *     <UButton size="xs" @click="edit(row)">Edit</UButton>
  *   </template>
- * </CommonDataTable>
+ * </DataTable>
  */
 
 interface Column {

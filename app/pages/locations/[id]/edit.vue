@@ -27,36 +27,36 @@
       <UForm :schema="schema" :state="formData" @submit="onSubmit">
         <div class="space-y-6">
           <!-- Code (Read-only) -->
-          <UFormGroup
+          <UFormField
             label="Location Code"
             name="code"
             help="Code cannot be changed after creation"
           >
             <UInput v-model="formData.code" icon="i-lucide-hash" disabled />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Name -->
-          <UFormGroup label="Location Name" name="name" required>
+          <UFormField label="Location Name" name="name" required>
             <UInput
               v-model="formData.name"
               placeholder="Enter location name"
               icon="i-lucide-map-pin"
               :disabled="submitting"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Type -->
-          <UFormGroup label="Location Type" name="type" required>
+          <UFormField label="Location Type" name="type" required>
             <USelectMenu
               v-model="formData.type"
               :options="typeOptions"
               placeholder="Select location type"
               :disabled="submitting"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Address -->
-          <UFormGroup
+          <UFormField
             label="Address"
             name="address"
             help="Physical address of the location (optional)"
@@ -67,10 +67,10 @@
               :rows="3"
               :disabled="submitting"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Manager -->
-          <UFormGroup
+          <UFormField
             label="Manager"
             name="manager_id"
             help="Assign a manager to this location (optional)"
@@ -82,10 +82,10 @@
               :loading="loadingManagers"
               :disabled="submitting || loadingManagers"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Timezone -->
-          <UFormGroup
+          <UFormField
             label="Timezone"
             name="timezone"
             help="Timezone for this location"
@@ -96,10 +96,10 @@
               icon="i-lucide-clock"
               :disabled="submitting"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Active Status -->
-          <UFormGroup
+          <UFormField
             label="Status"
             name="is_active"
             help="Inactive locations are hidden from most views"
@@ -111,7 +111,7 @@
                 </span>
               </template>
             </UToggle>
-          </UFormGroup>
+          </UFormField>
 
           <!-- Submit Buttons -->
           <div

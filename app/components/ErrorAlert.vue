@@ -36,10 +36,10 @@ import { computed } from "vue";
  * Displays error, warning, info, or success messages using Nuxt UI Alert
  *
  * Usage:
- * <CommonErrorAlert title="Error" description="Something went wrong" />
- * <CommonErrorAlert type="warning" title="Warning" description="Please check your input" />
- * <CommonErrorAlert type="success" title="Success!" description="Data saved successfully" />
- * <CommonErrorAlert type="info" title="Info" description="This is informational" />
+ * <ErrorAlert title="Error" description="Something went wrong" />
+ * <ErrorAlert type="warning" title="Warning" description="Please check your input" />
+ * <ErrorAlert type="success" title="Success!" description="Data saved successfully" />
+ * <ErrorAlert type="info" title="Info" description="This is informational" />
  */
 
 interface Props {

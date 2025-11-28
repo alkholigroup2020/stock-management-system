@@ -284,15 +284,15 @@ const formattedDateRange = computed(() => {
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <CommonLoadingSpinner size="lg" text="Loading reconciliation..." />
+      <LoadingSpinner size="lg" text="Loading reconciliation..." />
     </div>
 
     <!-- Error State -->
-    <CommonErrorAlert v-else-if="error" :message="error" :retry="fetchReconciliation" />
+    <ErrorAlert v-else-if="error" :message="error" :retry="fetchReconciliation" />
 
     <!-- No Period State -->
     <div v-else-if="!currentPeriod" class="text-center py-12">
-      <CommonEmptyState
+      <EmptyState
         icon="i-lucide-calendar-x"
         title="No Active Period"
         description="There is no active period to view reconciliation data."

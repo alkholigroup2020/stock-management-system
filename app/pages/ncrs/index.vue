@@ -366,7 +366,7 @@ onMounted(async () => {
       <ErrorAlert v-if="error" :message="error" @retry="fetchNCRs" class="mb-6" />
 
       <!-- Loading State -->
-      <CommonTableSkeleton v-if="loading" :columns="7" :rows="8" />
+      <TableSkeleton v-if="loading" :columns="7" :rows="8" />
 
       <!-- NCRs Table -->
       <div
@@ -437,7 +437,7 @@ onMounted(async () => {
       </div>
 
       <!-- Empty State -->
-      <CommonEmptyState
+      <EmptyState
         v-else
         icon="i-lucide-alert-circle"
         title="No NCRs Found"
@@ -455,7 +455,7 @@ onMounted(async () => {
             @click="goToNewNCR"
           />
         </template>
-      </CommonEmptyState>
+      </EmptyState>
     </div>
   </div>
 </template>

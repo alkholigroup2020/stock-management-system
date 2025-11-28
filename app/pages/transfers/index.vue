@@ -359,7 +359,7 @@ onMounted(async () => {
       <ErrorAlert v-if="error" :message="error" @retry="fetchTransfers" class="mb-6" />
 
       <!-- Loading State -->
-      <CommonTableSkeleton v-if="loading" :columns="6" :rows="8" />
+      <TableSkeleton v-if="loading" :columns="6" :rows="8" />
 
       <!-- Transfers Table -->
       <div
@@ -419,7 +419,7 @@ onMounted(async () => {
       </div>
 
       <!-- Empty State -->
-      <CommonEmptyState
+      <EmptyState
         v-else
         icon="i-lucide-arrow-left-right"
         title="No Transfers Found"
@@ -437,7 +437,7 @@ onMounted(async () => {
             @click="goToNewTransfer"
           />
         </template>
-      </CommonEmptyState>
+      </EmptyState>
     </div>
   </div>
 </template>

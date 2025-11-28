@@ -33,7 +33,7 @@ const getLocationIconClass = (type: string): string => {
   return classes[type] || "text-zinc-600 dark:text-zinc-400";
 };
 
-// Compute dropdown items for UDropdown
+// Compute dropdown items for UDropdownMenu
 const locationItems = computed(() => {
   if (!locationStore.userLocations || locationStore.userLocations.length === 0) {
     return [
@@ -54,7 +54,7 @@ const locationItems = computed(() => {
       icon: getLocationIcon(location.type),
       iconClass: getLocationIconClass(location.type),
       active: location.id === locationStore.activeLocationId,
-      click: async () => {
+      onSelect: async () => {
         // Don't switch if already active
         if (location.id === locationStore.activeLocationId) {
           return;
@@ -109,10 +109,10 @@ const currentLocationIcon = computed(() => {
     </div>
 
     <!-- Location Dropdown -->
-    <UDropdown
+    <UDropdownMenu
       v-else-if="currentLocation"
       :items="locationItems"
-      :popper="{ placement: 'bottom-start' }"
+      :content="{ side: 'bottom', align: 'start' }"
     >
       <template #default>
         <!-- Desktop: Show full name -->
@@ -140,22 +140,29 @@ const currentLocationIcon = computed(() => {
 
       <template #item="{ item }">
         <div class="flex items-center gap-3 w-full">
-          <UIcon :name="item.icon" class="w-4 h-4" :class="item.iconClass" />
+          <UIcon
+            :name="item.icon"
+            class="w-4 h-4"
+            :class="(item as Record<string, unknown>).iconClass as string"
+          />
           <div class="flex-1 min-w-0">
             <p class="font-medium text-label truncate">{{ item.label }}</p>
-            <p v-if="item.description" class="text-caption truncate">
-              {{ item.description }}
+            <p
+              v-if="(item as Record<string, unknown>).description"
+              class="text-caption truncate"
+            >
+              {{ (item as Record<string, unknown>).description }}
             </p>
           </div>
           <UIcon
-            v-if="item.active"
+            v-if="(item as Record<string, unknown>).active"
             name="i-lucide-check"
             class="w-4 h-4 shrink-0"
             style="color: var(--ui-success)"
           />
         </div>
       </template>
-    </UDropdown>
+    </UDropdownMenu>
 
     <!-- No Location State -->
     <div v-else class="flex items-center gap-2 px-3 py-2">

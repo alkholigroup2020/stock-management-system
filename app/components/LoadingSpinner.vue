@@ -27,9 +27,9 @@ import { computed } from "vue";
  * Displays an animated loading spinner with optional text
  *
  * Usage:
- * <CommonLoadingSpinner />
- * <CommonLoadingSpinner text="Loading data..." />
- * <CommonLoadingSpinner size="lg" color="primary" fullScreen />
+ * <LoadingSpinner />
+ * <LoadingSpinner text="Loading data..." />
+ * <LoadingSpinner size="lg" color="primary" fullScreen />
  */
 
 interface Props {

@@ -321,7 +321,7 @@ onMounted(async () => {
     <ErrorAlert v-if="error" :message="error" @retry="fetchIssues" class="mb-6" />
 
     <!-- Loading State -->
-    <CommonTableSkeleton v-if="loading" :columns="4" :rows="8" />
+    <TableSkeleton v-if="loading" :columns="4" :rows="8" />
 
     <!-- Issues Table -->
     <div v-else-if="hasIssues" class="overflow-hidden rounded-lg border border-default bg-elevated">
@@ -414,7 +414,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty State -->
-    <CommonEmptyState
+    <EmptyState
       v-else
       icon="i-lucide-file-minus"
       title="No Issues Found"
@@ -427,6 +427,6 @@ onMounted(async () => {
       <template v-if="canPostIssues()" #action>
         <UButton color="primary" icon="i-lucide-plus" label="New Issue" class="cursor-pointer" @click="goToNewIssue" />
       </template>
-    </CommonEmptyState>
+    </EmptyState>
   </div>
 </template>

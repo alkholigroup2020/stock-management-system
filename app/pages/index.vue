@@ -218,11 +218,11 @@ const handleRetry = () => {
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">
-      <CommonLoadingSpinner size="lg" />
+      <LoadingSpinner size="lg" />
     </div>
 
     <!-- Error State -->
-    <CommonErrorAlert v-else-if="error" :title="error" @retry="handleRetry" />
+    <ErrorAlert v-else-if="error" :title="error" @retry="handleRetry" />
 
     <!-- No Active Period Warning -->
     <UAlert

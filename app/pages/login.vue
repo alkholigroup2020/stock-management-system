@@ -69,20 +69,35 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   errorMessage.value = "";
 
   try {
-    // Attempt login
-    await login(event.data.email, event.data.password);
+    // Attempt login - returns { success: boolean; message?: string }
+    const result = await login(event.data.email, event.data.password);
 
-    // If successful, show success toast
-    toast.add({
-      title: "Login successful",
-      description: "Welcome back!",
-      color: "primary",
-      icon: "i-heroicons-check-circle",
-    });
+    if (result.success) {
+      // If successful, show success toast
+      toast.add({
+        title: "Login successful",
+        description: "Welcome back!",
+        color: "primary",
+        icon: "i-heroicons-check-circle",
+      });
+      // Redirect to dashboard (handled by watch on isAuthenticated)
+    } else {
+      // Login failed - show error
+      const message =
+        result.message ||
+        authError.value ||
+        "Login failed. Please check your credentials.";
+      errorMessage.value = message;
 
-    // Redirect to dashboard (handled by watch on isAuthenticated)
+      toast.add({
+        title: "Login failed",
+        description: message,
+        color: "error",
+        icon: "i-heroicons-x-circle",
+      });
+    }
   } catch (err) {
-    // Handle login errors
+    // Handle unexpected errors
     const message =
       err instanceof Error
         ? err.message
@@ -158,7 +173,7 @@ watch([() => state.email, () => state.password], () => {
           />
 
           <!-- Email/Username Field -->
-          <UFormGroup label="Email or Username" name="email" required>
+          <UFormField label="Email or Username" name="email" required>
             <UInput
               v-model="state.email"
               type="text"
@@ -168,10 +183,10 @@ watch([() => state.email, () => state.password], () => {
               :disabled="loading"
               autocomplete="username"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Password Field -->
-          <UFormGroup label="Password" name="password" required>
+          <UFormField label="Password" name="password" required>
             <UInput
               v-model="state.password"
               type="password"
@@ -181,7 +196,7 @@ watch([() => state.email, () => state.password], () => {
               :disabled="loading"
               autocomplete="current-password"
             />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Remember Me feature removed - causes accessibility issues with hidden input -->
           <!-- Can be re-added in post-MVP with custom accessible checkbox implementation -->

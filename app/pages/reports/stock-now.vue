@@ -286,12 +286,12 @@ onMounted(async () => {
 
     <!-- Loading State -->
     <div v-if="loading" class="card-elevated p-12">
-      <CommonLoadingSpinner size="lg" text="Generating report..." />
+      <LoadingSpinner size="lg" text="Generating report..." />
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="card-elevated p-6">
-      <CommonErrorAlert :message="error" :retry="fetchReport" />
+      <ErrorAlert :message="error" :retry="fetchReport" />
     </div>
 
     <!-- Report Content -->
@@ -438,7 +438,7 @@ onMounted(async () => {
 
       <!-- Empty State -->
       <div v-else class="card-elevated p-12">
-        <CommonEmptyState
+        <EmptyState
           icon="i-lucide-package-x"
           title="No stock data"
           description="No stock data matches the selected filters."

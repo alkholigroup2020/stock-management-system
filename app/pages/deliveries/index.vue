@@ -346,7 +346,7 @@ onMounted(async () => {
     <ErrorAlert v-if="error" :message="error" @retry="fetchDeliveries" class="mb-6" />
 
     <!-- Loading State -->
-    <CommonTableSkeleton v-if="loading" :columns="6" :rows="8" />
+    <TableSkeleton v-if="loading" :columns="6" :rows="8" />
 
     <!-- Deliveries Table -->
     <div
@@ -458,7 +458,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty State -->
-    <CommonEmptyState
+    <EmptyState
       v-else
       icon="i-lucide-package"
       title="No Deliveries Found"
@@ -476,6 +476,6 @@ onMounted(async () => {
           @click="goToNewDelivery"
         />
       </template>
-    </CommonEmptyState>
+    </EmptyState>
   </div>
 </template>

@@ -73,7 +73,7 @@
     </UCard>
 
     <!-- Loading State -->
-    <CommonTableSkeleton v-if="loading" :columns="8" :rows="10" />
+    <TableSkeleton v-if="loading" :columns="8" :rows="10" />
 
     <!-- Error State -->
     <UAlert
@@ -92,7 +92,7 @@
     />
 
     <!-- Empty State -->
-    <CommonEmptyState
+    <EmptyState
       v-else-if="items.length === 0 && !loading"
       icon="i-lucide-package-2"
       title="No Items Found"
@@ -119,7 +119,7 @@
           @click="clearFilters"
         />
       </template>
-    </CommonEmptyState>
+    </EmptyState>
 
     <!-- Items Table -->
     <UCard v-else>

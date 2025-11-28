@@ -370,12 +370,12 @@ onMounted(async () => {
 
     <!-- Loading State -->
     <div v-if="loading" class="card-elevated p-12">
-      <CommonLoadingSpinner size="lg" text="Generating report..." />
+      <LoadingSpinner size="lg" text="Generating report..." />
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="card-elevated p-6">
-      <CommonErrorAlert :message="error" :retry="fetchReport" />
+      <ErrorAlert :message="error" :retry="fetchReport" />
     </div>
 
     <!-- Report Content -->
@@ -593,7 +593,7 @@ onMounted(async () => {
 
       <!-- Empty State -->
       <div v-else class="card-elevated p-12">
-        <CommonEmptyState
+        <EmptyState
           icon="i-lucide-calculator"
           title="No reconciliation data"
           description="No reconciliation data found for the selected period."
@@ -603,7 +603,7 @@ onMounted(async () => {
 
     <!-- No Period Selected -->
     <div v-else class="card-elevated p-12">
-      <CommonEmptyState
+      <EmptyState
         icon="i-lucide-calendar"
         title="Select a Period"
         description="Please select a period to generate the reconciliation report."

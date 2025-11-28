@@ -34,7 +34,7 @@
  * Displays a skeleton loading state for tables
  *
  * Usage:
- * <CommonTableSkeleton :columns="6" :rows="5" />
+ * <TableSkeleton :columns="6" :rows="5" />
  */
 
 interface Props {

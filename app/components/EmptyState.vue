@@ -56,7 +56,7 @@ import { computed } from "vue";
  * Displays a friendly empty state with icon, title, description, and optional action
  *
  * Usage:
- * <CommonEmptyState
+ * <EmptyState
  *   title="No items found"
  *   description="There are no items to display. Create your first item to get started."
  *   actionText="Create Item"

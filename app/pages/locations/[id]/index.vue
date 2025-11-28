@@ -181,7 +181,7 @@
         >
           <div class="space-y-4">
             <!-- User Selection -->
-            <UFormGroup label="User" name="user_id" required>
+            <UFormField label="User" name="user_id" required>
               <USelectMenu
                 v-model="assignFormData.user_id"
                 :options="availableUsers"
@@ -189,10 +189,10 @@
                 :loading="loadingAvailableUsers"
                 :disabled="submittingAssignment || loadingAvailableUsers"
               />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Access Level Selection -->
-            <UFormGroup
+            <UFormField
               label="Access Level"
               name="access_level"
               required
@@ -204,7 +204,7 @@
                 placeholder="Select access level"
                 :disabled="submittingAssignment"
               />
-            </UFormGroup>
+            </UFormField>
 
             <!-- Actions -->
             <div

@@ -43,11 +43,11 @@ export function usePermissions() {
   const canPostDeliveries = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
-
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
+
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
     // Operators need POST or MANAGE access level
     const accessLevel = user.value.locations.find(
@@ -73,11 +73,11 @@ export function usePermissions() {
   const canPostIssues = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
-
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
+
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
 
     // Operators need POST or MANAGE access level
     const accessLevel = user.value.locations.find(
@@ -250,6 +250,9 @@ export function usePermissions() {
   const canEnterPOB = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
+    // Admins and Supervisors have access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
     const targetLocationId = locationId || user.value.default_location_id;
     if (!targetLocationId) return false;
 
@@ -271,6 +274,9 @@ export function usePermissions() {
    */
   const canCreateNCR = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Admins and Supervisors have access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
 
     const targetLocationId = locationId || user.value.default_location_id;
     if (!targetLocationId) return false;
@@ -393,6 +399,9 @@ export function usePermissions() {
    */
   const canViewStock = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Admins and Supervisors have access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
 
     const targetLocationId = locationId || user.value.default_location_id;
     if (!targetLocationId) return false;

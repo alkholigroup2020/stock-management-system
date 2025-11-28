@@ -43,7 +43,7 @@
  * Displays a full-screen loading overlay with optional progress tracking
  *
  * Usage:
- * <CommonLoadingOverlay
+ * <LoadingOverlay
  *   title="Processing..."
  *   message="Please wait"
  *   :current-step="2"

@@ -114,7 +114,7 @@ import { useRouter } from "vue-router";
  * Displays a consistent page header with title, description, breadcrumbs, and actions
  *
  * Usage:
- * <CommonPageHeader
+ * <PageHeader
  *   title="Items & Prices"
  *   description="Manage inventory items and set period prices"
  *   icon="i-heroicons-cube"
@@ -122,7 +122,7 @@ import { useRouter } from "vue-router";
  *   <template #actions>
  *     <UButton color="primary">Create Item</UButton>
  *   </template>
- * </CommonPageHeader>
+ * </PageHeader>
  */
 
 interface Breadcrumb {

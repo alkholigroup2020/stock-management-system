@@ -81,7 +81,8 @@
       "Bash(tee:*)",
       "Bash(pnpm test:unit:*)",
       "Bash(pnpm test:*)",
-      "Bash(pnpm vitest run:*)"
+      "Bash(pnpm vitest run:*)",
+      "mcp__nuxt-ui-remote__search_components_by_category"
     ],
     "deny": [],
     "ask": []

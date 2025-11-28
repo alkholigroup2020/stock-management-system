@@ -10,7 +10,7 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-16">
-      <CommonLoadingSpinner size="lg" text="Loading period data..." />
+      <LoadingSpinner size="lg" text="Loading period data..." />
     </div>
 
     <!-- Error State -->
@@ -355,7 +355,7 @@
     </UModal>
 
     <!-- Loading Overlay for Period Close -->
-    <CommonLoadingOverlay
+    <LoadingOverlay
       v-if="closingPeriod && (currentStep > 0)"
       title="Closing Period..."
       message="Please wait while we process your request"

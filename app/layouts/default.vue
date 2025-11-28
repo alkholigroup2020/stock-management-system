@@ -135,6 +135,12 @@ const isDark = computed(() => colorMode.value === "dark");
 const toggleTheme = () => {
   colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
 };
+
+// Logout handler
+const handleLogout = async () => {
+  await useAuth().logout();
+  await navigateTo("/login");
+};
 </script>
 
 <template>
@@ -189,28 +195,25 @@ const toggleTheme = () => {
 
         <!-- User Profile Footer -->
         <template #footer="{ collapsed }">
-          <UDropdown
+          <UDropdownMenu
             v-if="isAuthenticated && user"
             :items="[
               [
                 {
                   label: 'Profile',
                   icon: 'i-heroicons-user',
-                  click: () => {},
+                  onSelect: () => {},
                 },
               ],
               [
                 {
                   label: 'Logout',
                   icon: 'i-heroicons-arrow-right-on-rectangle',
-                  click: async () => {
-                    await useAuth().logout();
-                    await navigateTo('/login');
-                  },
+                  onSelect: handleLogout,
                 },
               ],
             ]"
-            :popper="{ placement: 'top-start' }"
+            :content="{ side: 'top', align: 'start' }"
           >
             <UButton
               :avatar="{ alt: user.full_name || user.email }"
@@ -218,10 +221,10 @@ const toggleTheme = () => {
               :aria-label="`User menu for ${user.full_name || user.email}`"
               color="neutral"
               variant="ghost"
-              class="w-full"
+              class="w-full cursor-pointer"
               :block="collapsed"
             />
-          </UDropdown>
+          </UDropdownMenu>
         </template>
       </UDashboardSidebar>
 
@@ -260,6 +263,7 @@ const toggleTheme = () => {
                 color="neutral"
                 variant="ghost"
                 aria-label="Notifications"
+                class="cursor-pointer"
               />
 
               <!-- Theme Toggle -->
@@ -268,8 +272,44 @@ const toggleTheme = () => {
                 color="neutral"
                 variant="ghost"
                 aria-label="Toggle color mode"
+                class="cursor-pointer"
                 @click="toggleTheme"
               />
+
+              <!-- User Menu with Logout -->
+              <UDropdownMenu
+                v-if="isAuthenticated && user"
+                :items="[
+                  [
+                    {
+                      label: user.full_name || user.email,
+                      icon: 'i-heroicons-user-circle',
+                      type: 'label',
+                    },
+                    {
+                      label: user.role,
+                      icon: 'i-heroicons-shield-check',
+                      type: 'label',
+                    },
+                  ],
+                  [
+                    {
+                      label: 'Logout',
+                      icon: 'i-heroicons-arrow-right-on-rectangle',
+                      onSelect: handleLogout,
+                    },
+                  ],
+                ]"
+                :content="{ side: 'bottom', align: 'end' }"
+              >
+                <UButton
+                  icon="i-heroicons-user-circle"
+                  color="neutral"
+                  variant="ghost"
+                  aria-label="User menu"
+                  class="cursor-pointer"
+                />
+              </UDropdownMenu>
             </div>
           </header>
         </template>
