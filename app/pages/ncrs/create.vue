@@ -280,9 +280,9 @@ onMounted(async () => {
             <label class="form-label">Location *</label>
             <USelectMenu
               v-model="formData.location_id"
-              :options="locations"
-              option-attribute="name"
-              value-attribute="id"
+              :items="locations"
+              label-key="name"
+              value-key="id"
               placeholder="Select location"
               searchable
             />
@@ -293,9 +293,8 @@ onMounted(async () => {
             <label class="form-label">Related Delivery (Optional)</label>
             <USelectMenu
               v-model="formData.delivery_id"
-              :options="deliveryOptions"
-              option-attribute="label"
-              value-attribute="value"
+              :items="deliveryOptions"
+              value-key="value"
               placeholder="No delivery selected"
               searchable
               :disabled="!formData.location_id || deliveries.length === 0"
@@ -355,9 +354,9 @@ onMounted(async () => {
                 <td class="px-4 py-3">
                   <USelectMenu
                     v-model="line.item_id"
-                    :options="items"
-                    option-attribute="name"
-                    value-attribute="id"
+                    :items="items"
+                    label-key="name"
+                    value-key="id"
                     placeholder="Select item"
                     searchable
                     class="min-w-[200px]"

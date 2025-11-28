@@ -82,7 +82,8 @@
       "Bash(pnpm test:unit:*)",
       "Bash(pnpm test:*)",
       "Bash(pnpm vitest run:*)",
-      "mcp__nuxt-ui-remote__search_components_by_category"
+      "mcp__nuxt-ui-remote__search_components_by_category",
+      "mcp__playwright__browser_network_requests"
     ],
     "deny": [],
     "ask": []

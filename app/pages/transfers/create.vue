@@ -297,9 +297,9 @@ watch(
             <label class="form-label">From Location *</label>
             <USelectMenu
               v-model="formData.from_location_id"
-              :options="locations"
-              option-attribute="name"
-              value-attribute="id"
+              :items="locations"
+              label-key="name"
+              value-key="id"
               placeholder="Select source location"
               searchable
             />
@@ -310,9 +310,9 @@ watch(
             <label class="form-label">To Location *</label>
             <USelectMenu
               v-model="formData.to_location_id"
-              :options="availableToLocations"
-              option-attribute="name"
-              value-attribute="id"
+              :items="availableToLocations"
+              label-key="name"
+              value-key="id"
               placeholder="Select destination location"
               searchable
               :disabled="!formData.from_location_id"
@@ -405,9 +405,9 @@ watch(
                 <td class="px-4 py-3">
                   <USelectMenu
                     v-model="line.item_id"
-                    :options="items"
-                    option-attribute="name"
-                    value-attribute="id"
+                    :items="items"
+                    label-key="name"
+                    value-key="id"
                     placeholder="Select item"
                     searchable
                     class="min-w-[200px]"

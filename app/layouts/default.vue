@@ -113,6 +113,14 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
     });
   }
 
+  if (permissions.canManageUsers()) {
+    items.push({
+      label: "Users",
+      icon: "i-heroicons-user-group",
+      to: "/users",
+    });
+  }
+
   return items;
 });
 

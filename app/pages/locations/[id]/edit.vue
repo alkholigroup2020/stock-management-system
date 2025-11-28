@@ -49,7 +49,8 @@
           <UFormField label="Location Type" name="type" required>
             <USelectMenu
               v-model="formData.type"
-              :options="typeOptions"
+              :items="typeOptions"
+              value-key="value"
               placeholder="Select location type"
               :disabled="submitting"
             />
@@ -77,7 +78,8 @@
           >
             <USelectMenu
               v-model="formData.manager_id"
-              :options="managerOptions"
+              :items="managerOptions"
+              value-key="value"
               placeholder="Select manager"
               :loading="loadingManagers"
               :disabled="submitting || loadingManagers"
@@ -104,13 +106,13 @@
             name="is_active"
             help="Inactive locations are hidden from most views"
           >
-            <UToggle v-model="formData.is_active" :disabled="submitting">
+            <USwitch v-model="formData.is_active" :disabled="submitting">
               <template #label>
                 <span class="text-sm text-default">
                   {{ formData.is_active ? "Active" : "Inactive" }}
                 </span>
               </template>
-            </UToggle>
+            </USwitch>
           </UFormField>
 
           <!-- Submit Buttons -->

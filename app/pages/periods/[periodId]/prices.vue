@@ -109,10 +109,9 @@
             </label>
             <USelectMenu
               v-model="selectedCategory"
-              :options="categoryOptions"
+              :items="categoryOptions"
+              value-key="value"
               placeholder="All Categories"
-              value-attribute="value"
-              option-attribute="label"
             />
           </div>
 

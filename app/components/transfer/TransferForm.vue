@@ -98,9 +98,19 @@ const isFormValid = computed(() => {
   );
 });
 
+// Map locations for SelectMenu (rename 'type' to 'locationType' to avoid conflict with SelectMenuItem)
+const locationItems = computed(() => {
+  return props.locations.map((loc) => ({
+    id: loc.id,
+    code: loc.code,
+    name: loc.name,
+    locationType: loc.type,
+  }));
+});
+
 // Get available "to" locations (exclude from location)
 const availableToLocations = computed(() => {
-  return props.locations.filter((loc) => loc.id !== formData.value.from_location_id);
+  return locationItems.value.filter((loc) => loc.id !== formData.value.from_location_id);
 });
 
 // Methods
@@ -194,9 +204,9 @@ onMounted(() => {
           <label class="form-label">From Location *</label>
           <USelectMenu
             v-model="formData.from_location_id"
-            :options="locations"
-            option-attribute="name"
-            value-attribute="id"
+            :items="locationItems"
+            label-key="name"
+            value-key="id"
             placeholder="Select source location"
             searchable
           />
@@ -207,9 +217,9 @@ onMounted(() => {
           <label class="form-label">To Location *</label>
           <USelectMenu
             v-model="formData.to_location_id"
-            :options="availableToLocations"
-            option-attribute="name"
-            value-attribute="id"
+            :items="availableToLocations"
+            label-key="name"
+            value-key="id"
             placeholder="Select destination location"
             searchable
             :disabled="!formData.from_location_id"
@@ -302,9 +312,9 @@ onMounted(() => {
               <td class="px-4 py-3">
                 <USelectMenu
                   v-model="line.item_id"
-                  :options="items"
-                  option-attribute="name"
-                  value-attribute="id"
+                  :items="items"
+                  label-key="name"
+                  value-key="id"
                   placeholder="Select item"
                   searchable
                   class="min-w-[200px]"

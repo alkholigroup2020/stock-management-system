@@ -53,7 +53,8 @@
           <UFormField label="Location Type" name="type" required>
             <USelectMenu
               v-model="formData.type"
-              :options="typeOptions"
+              :items="typeOptions"
+              value-key="value"
               placeholder="Select location type"
               :disabled="submitting"
             />
@@ -81,7 +82,8 @@
           >
             <USelectMenu
               v-model="formData.manager_id"
-              :options="managerOptions"
+              :items="managerOptions"
+              value-key="value"
               placeholder="Select manager"
               :loading="loadingManagers"
               :disabled="submitting || loadingManagers"
@@ -94,9 +96,11 @@
             name="timezone"
             help="Timezone for this location"
           >
-            <UInput
+            <USelectMenu
               v-model="formData.timezone"
-              placeholder="Asia/Riyadh"
+              :items="timezoneOptions"
+              value-key="value"
+              placeholder="Select timezone"
               icon="i-lucide-clock"
               :disabled="submitting"
             />
@@ -180,6 +184,75 @@ const typeOptions = [
   { label: "Store", value: "STORE" },
   { label: "Central", value: "CENTRAL" },
   { label: "Warehouse", value: "WAREHOUSE" },
+];
+
+// Timezone options
+const timezoneOptions = [
+  // Middle East & Gulf
+  { label: "Asia/Riyadh (Saudi Arabia)", value: "Asia/Riyadh" },
+  { label: "Asia/Dubai (UAE)", value: "Asia/Dubai" },
+  { label: "Asia/Kuwait (Kuwait)", value: "Asia/Kuwait" },
+  { label: "Asia/Bahrain (Bahrain)", value: "Asia/Bahrain" },
+  { label: "Asia/Qatar (Qatar)", value: "Asia/Qatar" },
+  { label: "Asia/Muscat (Oman)", value: "Asia/Muscat" },
+  { label: "Asia/Baghdad (Iraq)", value: "Asia/Baghdad" },
+  { label: "Asia/Tehran (Iran)", value: "Asia/Tehran" },
+  { label: "Asia/Jerusalem (Israel)", value: "Asia/Jerusalem" },
+  { label: "Asia/Beirut (Lebanon)", value: "Asia/Beirut" },
+  { label: "Asia/Damascus (Syria)", value: "Asia/Damascus" },
+  { label: "Asia/Amman (Jordan)", value: "Asia/Amman" },
+
+  // Asia
+  { label: "Asia/Singapore (Singapore)", value: "Asia/Singapore" },
+  { label: "Asia/Hong_Kong (Hong Kong)", value: "Asia/Hong_Kong" },
+  { label: "Asia/Shanghai (China)", value: "Asia/Shanghai" },
+  { label: "Asia/Tokyo (Japan)", value: "Asia/Tokyo" },
+  { label: "Asia/Seoul (South Korea)", value: "Asia/Seoul" },
+  { label: "Asia/Bangkok (Thailand)", value: "Asia/Bangkok" },
+  { label: "Asia/Jakarta (Indonesia)", value: "Asia/Jakarta" },
+  { label: "Asia/Manila (Philippines)", value: "Asia/Manila" },
+  { label: "Asia/Kolkata (India)", value: "Asia/Kolkata" },
+  { label: "Asia/Karachi (Pakistan)", value: "Asia/Karachi" },
+
+  // Europe
+  { label: "Europe/London (UK)", value: "Europe/London" },
+  { label: "Europe/Paris (France)", value: "Europe/Paris" },
+  { label: "Europe/Berlin (Germany)", value: "Europe/Berlin" },
+  { label: "Europe/Rome (Italy)", value: "Europe/Rome" },
+  { label: "Europe/Madrid (Spain)", value: "Europe/Madrid" },
+  { label: "Europe/Amsterdam (Netherlands)", value: "Europe/Amsterdam" },
+  { label: "Europe/Brussels (Belgium)", value: "Europe/Brussels" },
+  { label: "Europe/Zurich (Switzerland)", value: "Europe/Zurich" },
+  { label: "Europe/Vienna (Austria)", value: "Europe/Vienna" },
+  { label: "Europe/Stockholm (Sweden)", value: "Europe/Stockholm" },
+  { label: "Europe/Moscow (Russia)", value: "Europe/Moscow" },
+  { label: "Europe/Istanbul (Turkey)", value: "Europe/Istanbul" },
+
+  // Americas
+  { label: "America/New_York (US Eastern)", value: "America/New_York" },
+  { label: "America/Chicago (US Central)", value: "America/Chicago" },
+  { label: "America/Denver (US Mountain)", value: "America/Denver" },
+  { label: "America/Los_Angeles (US Pacific)", value: "America/Los_Angeles" },
+  { label: "America/Toronto (Canada Eastern)", value: "America/Toronto" },
+  { label: "America/Vancouver (Canada Pacific)", value: "America/Vancouver" },
+  { label: "America/Mexico_City (Mexico)", value: "America/Mexico_City" },
+  { label: "America/Sao_Paulo (Brazil)", value: "America/Sao_Paulo" },
+  { label: "America/Buenos_Aires (Argentina)", value: "America/Buenos_Aires" },
+
+  // Africa
+  { label: "Africa/Cairo (Egypt)", value: "Africa/Cairo" },
+  { label: "Africa/Johannesburg (South Africa)", value: "Africa/Johannesburg" },
+  { label: "Africa/Lagos (Nigeria)", value: "Africa/Lagos" },
+  { label: "Africa/Nairobi (Kenya)", value: "Africa/Nairobi" },
+
+  // Pacific
+  { label: "Australia/Sydney (Australia Eastern)", value: "Australia/Sydney" },
+  { label: "Australia/Melbourne (Australia)", value: "Australia/Melbourne" },
+  { label: "Australia/Perth (Australia Western)", value: "Australia/Perth" },
+  { label: "Pacific/Auckland (New Zealand)", value: "Pacific/Auckland" },
+
+  // UTC
+  { label: "UTC (Coordinated Universal Time)", value: "UTC" },
 ];
 
 // Fetch managers (active users for dropdown)

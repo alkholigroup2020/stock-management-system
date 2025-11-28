@@ -275,9 +275,8 @@ watch(
             <label class="form-label">Cost Centre *</label>
             <USelectMenu
               v-model="formData.cost_centre"
-              :options="costCentreOptions"
-              option-attribute="label"
-              value-attribute="value"
+              :items="costCentreOptions"
+              value-key="value"
               placeholder="Select cost centre"
             />
           </div>
@@ -345,9 +344,9 @@ watch(
                 <td class="px-4 py-3">
                   <USelectMenu
                     v-model="line.item_id"
-                    :options="items"
-                    option-attribute="name"
-                    value-attribute="id"
+                    :items="items"
+                    label-key="name"
+                    value-key="id"
                     placeholder="Select item"
                     searchable
                     class="min-w-[200px]"

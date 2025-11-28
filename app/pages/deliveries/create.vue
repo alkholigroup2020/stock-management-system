@@ -281,9 +281,9 @@ watch(
             <label class="form-label">Supplier *</label>
             <USelectMenu
               v-model="formData.supplier_id"
-              :options="suppliers"
-              option-attribute="name"
-              value-attribute="id"
+              :items="suppliers"
+              label-key="name"
+              value-key="id"
               placeholder="Select supplier"
               searchable
             />
@@ -379,9 +379,9 @@ watch(
                 <td class="px-4 py-3">
                   <USelectMenu
                     v-model="line.item_id"
-                    :options="items"
-                    option-attribute="name"
-                    value-attribute="id"
+                    :items="items"
+                    label-key="name"
+                    value-key="id"
                     placeholder="Select item"
                     searchable
                     class="min-w-[200px]"
