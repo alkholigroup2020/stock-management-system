@@ -11,7 +11,6 @@
  * - name: Location name (required)
  * - type: Location type (KITCHEN, STORE, CENTRAL, WAREHOUSE) (required)
  * - address: Location address (optional)
- * - manager_id: Manager user ID (optional)
  * - timezone: Timezone (optional, defaults to Asia/Riyadh)
  */
 
@@ -34,7 +33,6 @@ const createLocationSchema = z.object({
   name: z.string().min(1).max(100),
   type: z.enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"]),
   address: z.string().optional(),
-  manager_id: z.string().uuid().optional(),
   timezone: z.string().max(50).optional().default("Asia/Riyadh"),
 });
 
@@ -69,36 +67,6 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const data = createLocationSchema.parse(body);
 
-    // Check if manager_id exists if provided
-    if (data.manager_id) {
-      const manager = await prisma.user.findUnique({
-        where: { id: data.manager_id },
-        select: { id: true, is_active: true },
-      });
-
-      if (!manager) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Not Found",
-          data: {
-            code: "MANAGER_NOT_FOUND",
-            message: "The specified manager user does not exist",
-          },
-        });
-      }
-
-      if (!manager.is_active) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Bad Request",
-          data: {
-            code: "MANAGER_INACTIVE",
-            message: "The specified manager is not an active user",
-          },
-        });
-      }
-    }
-
     // Create location in database
     const location = await prisma.location.create({
       data: {
@@ -106,18 +74,8 @@ export default defineEventHandler(async (event) => {
         name: data.name,
         type: data.type,
         address: data.address,
-        manager_id: data.manager_id,
         timezone: data.timezone,
         is_active: true,
-      },
-      include: {
-        manager: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-          },
-        },
       },
     });
 

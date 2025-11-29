@@ -80,12 +80,6 @@
             <label class="form-label">Address</label>
             <p class="text-body">{{ location.address }}</p>
           </div>
-          <div v-if="location.manager">
-            <label class="form-label">Manager</label>
-            <p class="text-body">
-              {{ location.manager.full_name || location.manager.username }}
-            </p>
-          </div>
         </div>
       </UCard>
 

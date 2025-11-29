@@ -141,7 +141,6 @@ model User {
 
   // Relations
   default_location    Location?       @relation("UserDefaultLocation", fields: [default_location_id], references: [id], onDelete: SetNull)
-  managed_locations   Location[]      @relation("LocationManager")
   user_locations      UserLocation[]
   assigned_users      UserLocation[]  @relation("AssignedBy")
   requested_prfs      PRF[]           @relation("PRFRequester")
@@ -168,14 +167,12 @@ model Location {
   name              String             @db.VarChar(100)
   type              LocationType
   address           String?            @db.Text
-  manager_id        String?            @db.Uuid
   timezone          String             @default("Asia/Riyadh") @db.VarChar(50)
   is_active         Boolean            @default(true)
   created_at        DateTime           @default(now()) @db.Timestamptz
   updated_at        DateTime           @updatedAt @db.Timestamptz
 
   // Relations
-  manager           User?              @relation("LocationManager", fields: [manager_id], references: [id], onDelete: SetNull)
   default_for_users User[]             @relation("UserDefaultLocation")
   user_locations    UserLocation[]
   period_locations  PeriodLocation[]
@@ -191,7 +188,6 @@ model Location {
 
   @@index([type]) // For location type filtering
   @@index([is_active]) // For active location queries
-  @@index([manager_id]) // For manager location queries
   @@map("locations")
 }
 

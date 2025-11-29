@@ -10,7 +10,6 @@
  * - name: Location name
  * - type: Location type (KITCHEN, STORE, CENTRAL, WAREHOUSE)
  * - address: Location address
- * - manager_id: Manager user ID
  * - timezone: Timezone
  * - is_active: Active status
  */
@@ -33,7 +32,6 @@ const updateLocationSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   type: z.enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"]).optional(),
   address: z.string().optional().nullable(),
-  manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().max(50).optional(),
   is_active: z.boolean().optional(),
 });
@@ -100,36 +98,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check if manager_id exists if provided
-    if (data.manager_id) {
-      const manager = await prisma.user.findUnique({
-        where: { id: data.manager_id },
-        select: { id: true, is_active: true },
-      });
-
-      if (!manager) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Not Found",
-          data: {
-            code: "MANAGER_NOT_FOUND",
-            message: "The specified manager user does not exist",
-          },
-        });
-      }
-
-      if (!manager.is_active) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Bad Request",
-          data: {
-            code: "MANAGER_INACTIVE",
-            message: "The specified manager is not an active user",
-          },
-        });
-      }
-    }
-
     // Update location in database
     const location = await prisma.location.update({
       where: { id: locationId },
@@ -137,18 +105,8 @@ export default defineEventHandler(async (event) => {
         ...(data.name && { name: data.name }),
         ...(data.type && { type: data.type }),
         ...(data.address !== undefined && { address: data.address }),
-        ...(data.manager_id !== undefined && { manager_id: data.manager_id }),
         ...(data.timezone && { timezone: data.timezone }),
         ...(data.is_active !== undefined && { is_active: data.is_active }),
-      },
-      include: {
-        manager: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-          },
-        },
       },
     });
 

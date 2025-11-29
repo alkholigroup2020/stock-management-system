@@ -47,15 +47,6 @@
         <span class="text-body">{{ location.address }}</span>
       </div>
 
-      <!-- Manager -->
-      <div v-if="location.manager" class="flex items-center gap-2">
-        <UIcon name="i-lucide-user" class="w-4 h-4 text-muted" />
-        <span class="text-caption">Manager:</span>
-        <span class="text-body">
-          {{ location.manager.full_name || location.manager.username }}
-        </span>
-      </div>
-
       <!-- Stats -->
       <div
         v-if="showStats"
@@ -111,11 +102,6 @@ interface Location {
   name: string;
   type: "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
   address?: string | null;
-  manager?: {
-    id: string;
-    username: string;
-    full_name?: string | null;
-  } | null;
   is_active: boolean;
   _count?: {
     user_locations?: number;

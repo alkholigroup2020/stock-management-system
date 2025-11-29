@@ -88,13 +88,6 @@ export default defineEventHandler(async (event) => {
       const locations = await prisma.location.findMany({
         where,
         include: {
-          manager: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-            },
-          },
           _count: {
             select: {
               user_locations: true,
@@ -135,13 +128,6 @@ export default defineEventHandler(async (event) => {
     const locations = await prisma.location.findMany({
       where,
       include: {
-        manager: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-          },
-        },
         _count: {
           select: {
             user_locations: true,

@@ -27,6 +27,14 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
     });
   }
 
+  if (permissions.canManageUsers()) {
+    items.push({
+      label: "Users",
+      icon: "i-heroicons-user-group",
+      to: "/users",
+    });
+  }
+
   if (permissions.canEnterPOB()) {
     items.push({
       label: "POB",
@@ -110,14 +118,6 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
       label: "Period Close",
       icon: "i-heroicons-lock-closed",
       to: "/period-close",
-    });
-  }
-
-  if (permissions.canManageUsers()) {
-    items.push({
-      label: "Users",
-      icon: "i-heroicons-user-group",
-      to: "/users",
     });
   }
 

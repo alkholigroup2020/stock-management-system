@@ -74,22 +74,6 @@
             />
           </UFormField>
 
-          <!-- Manager -->
-          <UFormField
-            label="Manager"
-            name="manager_id"
-            help="Assign a manager to this location (optional)"
-          >
-            <USelectMenu
-              v-model="formData.manager_id"
-              :items="managerOptions"
-              value-key="value"
-              placeholder="Select manager"
-              :loading="loadingManagers"
-              :disabled="submitting || loadingManagers"
-            />
-          </UFormField>
-
           <!-- Timezone -->
           <UFormField
             label="Timezone"
@@ -147,8 +131,6 @@ const toast = useAppToast();
 
 // State
 const submitting = ref(false);
-const loadingManagers = ref(false);
-const managerOptions = ref<any[]>([{ label: "No Manager", value: null }]);
 
 // Form data
 const formData = reactive({
@@ -156,7 +138,6 @@ const formData = reactive({
   name: "",
   type: undefined as string | undefined,
   address: "",
-  manager_id: undefined as string | undefined,
   timezone: "Asia/Riyadh",
 });
 
@@ -174,7 +155,6 @@ const schema = z.object({
     .enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"])
     .describe("Location type is required"),
   address: z.string().optional(),
-  manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().max(50).default("Asia/Riyadh"),
 });
 
@@ -255,31 +235,6 @@ const timezoneOptions = [
   { label: "UTC (Coordinated Universal Time)", value: "UTC" },
 ];
 
-// Fetch managers (active users for dropdown)
-const fetchManagers = async () => {
-  loadingManagers.value = true;
-
-  try {
-    const response = await $fetch<{ users: any[] }>("/api/users", {
-      query: { is_active: true },
-    });
-
-    const users = response.users || [];
-    managerOptions.value = [
-      { label: "No Manager", value: null },
-      ...users.map((user: any) => ({
-        label: user.full_name || user.username,
-        value: user.id,
-      })),
-    ];
-  } catch (err: any) {
-    console.error("Error fetching managers:", err);
-    toast.warning("Warning", { description: "Could not load manager list" });
-  } finally {
-    loadingManagers.value = false;
-  }
-};
-
 // Submit handler
 const onSubmit = async () => {
   submitting.value = true;
@@ -290,7 +245,6 @@ const onSubmit = async () => {
       name: formData.name,
       type: formData.type,
       address: formData.address || undefined,
-      manager_id: formData.manager_id || undefined,
       timezone: formData.timezone,
     };
 
@@ -309,11 +263,6 @@ const onSubmit = async () => {
     submitting.value = false;
   }
 };
-
-// Lifecycle
-onMounted(() => {
-  fetchManagers();
-});
 
 // Set page title
 useHead({

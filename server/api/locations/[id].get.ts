@@ -8,7 +8,7 @@
  * - OPERATOR: Can only view assigned locations
  *
  * Returns:
- * - Location details with manager info
+ * - Location details
  * - User assignments count
  * - Stock items count
  */
@@ -80,14 +80,6 @@ export default defineEventHandler(async (event) => {
     const location = await prisma.location.findUnique({
       where: { id: locationId },
       include: {
-        manager: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-            email: true,
-          },
-        },
         _count: {
           select: {
             user_locations: true,

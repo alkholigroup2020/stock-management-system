@@ -70,22 +70,6 @@
             />
           </UFormField>
 
-          <!-- Manager -->
-          <UFormField
-            label="Manager"
-            name="manager_id"
-            help="Assign a manager to this location (optional)"
-          >
-            <USelectMenu
-              v-model="formData.manager_id"
-              :items="managerOptions"
-              value-key="value"
-              placeholder="Select manager"
-              :loading="loadingManagers"
-              :disabled="submitting || loadingManagers"
-            />
-          </UFormField>
-
           <!-- Timezone -->
           <UFormField
             label="Timezone"
@@ -166,26 +150,16 @@ const schema = z.object({
     .enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"])
     .describe("Location type is required"),
   address: z.string().optional(),
-  manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().max(50),
   is_active: z.boolean(),
 });
 
 type FormData = z.infer<typeof schema>;
 
-interface ManagerOption {
-  label: string;
-  value: string | null;
-}
-
 // State
 const loading = ref(true);
 const error = ref<string | null>(null);
 const submitting = ref(false);
-const loadingManagers = ref(false);
-const managerOptions = ref<ManagerOption[]>([
-  { label: "No Manager", value: null },
-]);
 
 // Form data - properly typed
 const formData = reactive<{
@@ -193,7 +167,6 @@ const formData = reactive<{
   name: string;
   type: LocationType | undefined;
   address: string;
-  manager_id: string | undefined;
   timezone: string;
   is_active: boolean;
 }>({
@@ -201,7 +174,6 @@ const formData = reactive<{
   name: "",
   type: undefined,
   address: "",
-  manager_id: undefined,
   timezone: "Asia/Riyadh",
   is_active: true,
 });
@@ -228,7 +200,6 @@ const fetchLocation = async () => {
         name: string;
         type: LocationType | null;
         address: string | null;
-        manager_id: string | null;
         timezone: string | null;
         is_active: boolean;
       };
@@ -244,7 +215,6 @@ const fetchLocation = async () => {
     formData.name = location.name;
     formData.type = location.type ?? undefined;
     formData.address = location.address ?? "";
-    formData.manager_id = location.manager_id ?? undefined;
     formData.timezone = location.timezone ?? "Asia/Riyadh";
     formData.is_active = location.is_active;
   } catch (err) {
@@ -255,21 +225,6 @@ const fetchLocation = async () => {
     toast.error("Error", { description: errorMessage });
   } finally {
     loading.value = false;
-  }
-};
-
-// Fetch managers (active users for dropdown)
-const fetchManagers = async () => {
-  loadingManagers.value = true;
-
-  try {
-    // For now, just provide a no manager option
-    // In a real app, you would fetch users from /api/users
-    managerOptions.value = [{ label: "No Manager", value: null }];
-  } catch (err) {
-    console.error("Error fetching managers:", err);
-  } finally {
-    loadingManagers.value = false;
   }
 };
 
@@ -284,7 +239,6 @@ const onSubmit = async () => {
       name: formData.name,
       type: formData.type,
       address: formData.address || null,
-      manager_id: formData.manager_id || null,
       timezone: formData.timezone,
       is_active: formData.is_active,
     };
@@ -309,7 +263,6 @@ const onSubmit = async () => {
 // Lifecycle
 onMounted(() => {
   fetchLocation();
-  fetchManagers();
 });
 
 // Set page title
