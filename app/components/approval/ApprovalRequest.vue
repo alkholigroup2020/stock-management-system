@@ -497,8 +497,9 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
     </div>
 
     <!-- Approve Confirmation Modal -->
-    <UModal v-model="showApproveModal">
-      <UCard>
+    <UModal v-model:open="showApproveModal">
+      <template #content>
+        <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -570,12 +571,14 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
             </UButton>
           </div>
         </template>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
 
     <!-- Reject Confirmation Modal -->
-    <UModal v-model="showRejectModal">
-      <UCard>
+    <UModal v-model:open="showRejectModal">
+      <template #content>
+        <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -640,7 +643,8 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
             </UButton>
           </div>
         </template>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
   </UCard>
 </template>

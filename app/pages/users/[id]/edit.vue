@@ -149,10 +149,12 @@ const availableLocations = computed(() => {
 
 // Add location access
 const addLocationAccess = async () => {
-  if (!selectedLocationId.value || !user.value) return;
+  if (!selectedLocationId.value || !user.value) {
+    return;
+  }
 
   try {
-    await $fetch(`/api/locations/${selectedLocationId.value}/users`, {
+    const response = await $fetch(`/api/locations/${selectedLocationId.value}/users`, {
       method: "POST",
       body: {
         user_id: userId.value,
@@ -162,14 +164,11 @@ const addLocationAccess = async () => {
 
     toast.add({
       title: "Success",
-      description: "Location access added successfully",
+      description: response.message || "Location access added successfully",
       color: "success",
     });
 
-    // Refresh user data
     await fetchUser();
-
-    // Reset selection
     selectedLocationId.value = "";
     selectedAccessLevel.value = "VIEW";
   } catch (error: any) {
@@ -428,9 +427,14 @@ onMounted(() => {
                 value: l.id,
                 label: `${l.code} - ${l.name}`,
               }))"
+              value-key="value"
               placeholder="Select location"
             />
-            <USelect v-model="selectedAccessLevel" :items="accessLevelOptions" />
+            <USelect
+              v-model="selectedAccessLevel"
+              :items="accessLevelOptions"
+              value-key="value"
+            />
             <UButton
               label="Add Location"
               icon="i-heroicons-plus"

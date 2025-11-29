@@ -155,8 +155,9 @@
     </UCard>
 
     <!-- Create Period Modal -->
-    <UModal v-model="showCreateModal">
-      <UCard>
+    <UModal v-model:open="showCreateModal">
+      <template #content>
+        <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             <h3 class="text-heading3 font-semibold">Create New Period</h3>
@@ -281,7 +282,8 @@
             </UButton>
           </div>
         </template>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
   </div>
 </template>

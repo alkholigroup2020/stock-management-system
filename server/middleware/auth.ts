@@ -70,6 +70,7 @@ export default defineEventHandler(async (event) => {
   // Log authentication for debugging (optional, remove in production)
   if (process.env.NODE_ENV === "development") {
     const authUser = session.user as AuthUser;
-    console.log(`[Auth] User ${authUser.username} accessing ${path}`);
+    const method = event.node.req.method;
+    console.log(`[Auth] User ${authUser.username} ${method} ${path}`);
   }
 });

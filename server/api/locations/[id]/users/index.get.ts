@@ -1,19 +1,13 @@
 /**
  * GET /api/locations/:id/users
  *
- * Fetch all users assigned to a specific location
- *
- * Permissions:
- * - ADMIN/SUPERVISOR: Can view users for any location
- * - OPERATOR: Can only view users for assigned locations
- *
- * Returns:
- * - List of users with their access level for the location
- * - User details (id, username, full_name, email, role)
+ * Fetch all users assigned to a location
  */
 
-import prisma from "../../../utils/prisma";
+import prisma from "../../../../utils/prisma";
 import type { UserRole } from "@prisma/client";
+
+console.log("✓ GET [id]/users/index.get.ts HANDLER LOADED");
 
 // User session type
 interface UserLocation {
@@ -31,6 +25,9 @@ interface AuthUser {
 }
 
 export default defineEventHandler(async (event) => {
+  console.log("[GET /api/locations/:id/users] Handler called");
+  console.log("[GET] URL:", event.node.req.url);
+
   const user = event.context.user as AuthUser | undefined;
 
   if (!user) {
@@ -124,11 +121,14 @@ export default defineEventHandler(async (event) => {
     // Format response to include user details with access level
     const users = userLocations.map((ul) => ({
       user_id: ul.user.id,
-      username: ul.user.username,
-      full_name: ul.user.full_name,
-      email: ul.user.email,
-      role: ul.user.role,
-      is_active: ul.user.is_active,
+      user: {
+        id: ul.user.id,
+        username: ul.user.username,
+        full_name: ul.user.full_name,
+        email: ul.user.email,
+        role: ul.user.role,
+        is_active: ul.user.is_active,
+      },
       access_level: ul.access_level,
       assigned_at: ul.assigned_at,
       assigned_by: ul.assigner

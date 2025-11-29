@@ -152,7 +152,7 @@
               size="sm"
               :loading="removingUserId === assignment.user_id"
               @click="
-                removeUserAssignment(
+                openRemoveModal(
                   assignment.user_id,
                   assignment.user.full_name || assignment.user.username
                 )
@@ -166,45 +166,90 @@
     </div>
 
     <!-- Assign User Modal -->
-    <UModal v-model="isAssignModalOpen">
-      <UCard>
-        <template #header>
-          <h3 class="text-subheading font-semibold">
-            Assign User to {{ location?.name }}
-          </h3>
-        </template>
+    <UModal v-model:open="isAssignModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-subheading font-semibold">
+              Assign User to {{ location?.name }}
+            </h3>
+          </template>
 
-        <UForm
-          :schema="assignUserSchema"
-          :state="(assignFormData as any)"
-          @submit="submitUserAssignment"
-        >
+          <UForm
+            :schema="assignUserSchema"
+            :state="(assignFormData as any)"
+            @submit="submitUserAssignment"
+          >
+            <div class="space-y-4">
+              <!-- User Selection -->
+              <UFormField label="User" name="user_id" required>
+                <USelectMenu
+                  v-model="assignFormData.user_id"
+                  :items="availableUsers"
+                  value-key="value"
+                  placeholder="Select a user"
+                  :loading="loadingAvailableUsers"
+                  :disabled="submittingAssignment || loadingAvailableUsers"
+                />
+              </UFormField>
+
+              <!-- Access Level Selection -->
+              <UFormField
+                label="Access Level"
+                name="access_level"
+                required
+                help="VIEW: Read-only, POST: Can post transactions, MANAGE: Full access"
+              >
+                <USelectMenu
+                  v-model="assignFormData.access_level"
+                  :items="accessLevelOptions"
+                  value-key="value"
+                  placeholder="Select access level"
+                  :disabled="submittingAssignment"
+                />
+              </UFormField>
+
+              <!-- Actions -->
+              <div
+                class="flex items-center justify-end gap-3 pt-4 border-t border-default"
+              >
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  @click="isAssignModalOpen = false"
+                  :disabled="submittingAssignment"
+                >
+                  Cancel
+                </UButton>
+                <UButton
+                  type="submit"
+                  color="primary"
+                  icon="i-lucide-user-plus"
+                  :loading="submittingAssignment"
+                >
+                  Assign User
+                </UButton>
+              </div>
+            </div>
+          </UForm>
+        </UCard>
+      </template>
+    </UModal>
+
+    <!-- Remove User Confirmation Modal -->
+    <UModal v-model:open="isRemoveModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-subheading font-semibold">Confirm Removal</h3>
+          </template>
+
           <div class="space-y-4">
-            <!-- User Selection -->
-            <UFormField label="User" name="user_id" required>
-              <USelectMenu
-                v-model="assignFormData.user_id"
-                :options="availableUsers"
-                placeholder="Select a user"
-                :loading="loadingAvailableUsers"
-                :disabled="submittingAssignment || loadingAvailableUsers"
-              />
-            </UFormField>
-
-            <!-- Access Level Selection -->
-            <UFormField
-              label="Access Level"
-              name="access_level"
-              required
-              help="VIEW: Read-only, POST: Can post transactions, MANAGE: Full access"
-            >
-              <USelectMenu
-                v-model="assignFormData.access_level"
-                :options="accessLevelOptions"
-                placeholder="Select access level"
-                :disabled="submittingAssignment"
-              />
-            </UFormField>
+            <p>
+              Are you sure you want to remove
+              <strong>{{ userToRemove?.name }}</strong> from this location?
+            </p>
+            <p class="text-caption">This action cannot be undone.</p>
 
             <!-- Actions -->
             <div
@@ -213,23 +258,23 @@
               <UButton
                 color="neutral"
                 variant="ghost"
-                @click="isAssignModalOpen = false"
-                :disabled="submittingAssignment"
+                @click="isRemoveModalOpen = false"
+                :disabled="removingUserId !== null"
               >
                 Cancel
               </UButton>
               <UButton
-                type="submit"
-                color="primary"
-                icon="i-lucide-user-plus"
-                :loading="submittingAssignment"
+                color="error"
+                icon="i-lucide-trash-2"
+                :loading="removingUserId !== null"
+                @click="confirmRemoveUser"
               >
-                Assign User
+                Remove User
               </UButton>
             </div>
           </div>
-        </UForm>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
   </div>
 </template>
@@ -260,6 +305,9 @@ const availableUsers = ref<any[]>([]);
 const isAssignModalOpen = ref(false);
 const submittingAssignment = ref(false);
 const removingUserId = ref<string | null>(null);
+
+const isRemoveModalOpen = ref(false);
+const userToRemove = ref<{ id: string; name: string } | null>(null);
 
 // Assign form data
 const assignFormData = reactive({
@@ -469,27 +517,31 @@ const submitUserAssignment = async () => {
   }
 };
 
-// Remove user assignment
-const removeUserAssignment = async (userId: string, userName: string) => {
-  if (
-    !confirm(`Are you sure you want to remove ${userName} from this location?`)
-  ) {
-    return;
-  }
+// Open remove confirmation modal
+const openRemoveModal = (userId: string, userName: string) => {
+  userToRemove.value = { id: userId, name: userName };
+  isRemoveModalOpen.value = true;
+};
 
-  removingUserId.value = userId;
+// Confirm and remove user assignment
+const confirmRemoveUser = async () => {
+  if (!userToRemove.value) return;
+
+  removingUserId.value = userToRemove.value.id;
 
   try {
     const locationId = route.params.id as string;
 
     const response = await $fetch<{ message: string }>(
-      `/api/locations/${locationId}/users/${userId}`,
+      `/api/locations/${locationId}/users/${userToRemove.value.id}`,
       {
         method: "DELETE",
       }
     );
 
     toast.success("Success", { description: response.message });
+    isRemoveModalOpen.value = false;
+    userToRemove.value = null;
 
     // Refresh assigned users list
     await fetchAssignedUsers();

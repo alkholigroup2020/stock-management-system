@@ -289,8 +289,9 @@
     </div>
 
     <!-- Confirmation Modal -->
-    <UModal v-model="showConfirmModal">
-      <UCard>
+    <UModal v-model:open="showConfirmModal">
+      <template #content>
+        <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -351,7 +352,8 @@
             </UButton>
           </div>
         </template>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
 
     <!-- Loading Overlay for Period Close -->
@@ -365,8 +367,9 @@
     />
 
     <!-- Success Modal -->
-    <UModal v-model="showSuccessModal" :closeable="false">
-      <UCard>
+    <UModal v-model:open="showSuccessModal" :closeable="false">
+      <template #content>
+        <UCard>
         <div class="text-center py-6">
           <UIcon name="i-lucide-check-circle" class="w-16 h-16 mx-auto text-success mb-4" />
           <h3 class="text-heading3 font-semibold mb-2">Period Closed Successfully</h3>
@@ -399,7 +402,8 @@
             Go to Period Management
           </UButton>
         </div>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
   </div>
 </template>

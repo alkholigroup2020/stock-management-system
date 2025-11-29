@@ -83,7 +83,14 @@
       "Bash(pnpm test:*)",
       "Bash(pnpm vitest run:*)",
       "mcp__nuxt-ui-remote__search_components_by_category",
-      "mcp__playwright__browser_network_requests"
+      "mcp__playwright__browser_network_requests",
+      "Bash(netstat:*)",
+      "mcp__playwright__browser_install",
+      "Bash(serverapilocations[id]users.post.ts)",
+      "Bash(move users.ts usersindex.ts)",
+      "Bash(del users.ts)",
+      "Bash(pkill:*)",
+      "WebFetch(domain:ui.nuxt.com)"
     ],
     "deny": [],
     "ask": []

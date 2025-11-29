@@ -65,6 +65,8 @@ export default defineNuxtConfig({
     },
     workbox: {
       navigateFallback: "/",
+      // Exclude API routes from navigation fallback to prevent service worker from intercepting
+      navigateFallbackDenylist: [/^\/api\/.*/],
       globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}"],
       cleanupOutdatedCaches: true,
       runtimeCaching: [
@@ -102,7 +104,7 @@ export default defineNuxtConfig({
       installPrompt: true,
     },
     devOptions: {
-      enabled: true,
+      enabled: false,
       type: "module",
     },
   },

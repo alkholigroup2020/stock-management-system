@@ -6,52 +6,59 @@
  * Admin only
  */
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../../utils/prisma";
 import type { UserRole } from "@prisma/client";
 
-const prisma = new PrismaClient();
+console.log("✓ DELETE [id]/users/[userId].delete.ts HANDLER LOADED");
 
 // User session type
-interface UserSession {
+interface UserLocation {
+  location_id: string;
+  access_level: string;
+}
+
+interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
+  locations?: UserLocation[];
 }
 
 export default defineEventHandler(async (event) => {
+  console.log("[DELETE /api/locations/:id/users/:userId] Handler called");
+  console.log("[DELETE] URL:", event.node.req.url);
+
+  const user = event.context.user as AuthUser | undefined;
+
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      data: {
+        code: "NOT_AUTHENTICATED",
+        message: "You must be logged in to access this resource",
+      },
+    });
+  }
+
+  // Only admins can remove user assignments
+  if (user.role !== "ADMIN") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
+      data: {
+        code: "INSUFFICIENT_PERMISSIONS",
+        message: "Only administrators can remove user location assignments",
+      },
+    });
+  }
+
   try {
-    // Get authenticated user from session
-    const session = await getUserSession(event);
-    const authUser = session?.user as UserSession | undefined;
-
-    if (!authUser?.id) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-        data: {
-          code: "UNAUTHORIZED",
-          message: "You must be logged in to perform this action",
-        },
-      });
-    }
-
-    // Only admins can remove user assignments
-    if (authUser.role !== "ADMIN") {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-        data: {
-          code: "INSUFFICIENT_PERMISSIONS",
-          message: "Only administrators can remove user location assignments",
-        },
-      });
-    }
-
     // Get location ID and user ID from route params
-    const locationId = event.context.params?.id;
-    const userId = event.context.params?.userId;
+    const locationId = getRouterParam(event, "id");
+    const userId = getRouterParam(event, "userId");
 
     if (!locationId) {
       throw createError({
@@ -114,12 +121,12 @@ export default defineEventHandler(async (event) => {
 
     // Prevent removing the last admin's access to prevent lockout
     // Check if user is an admin
-    const user = await prisma.user.findUnique({
+    const targetUser = await prisma.user.findUnique({
       where: { id: userId },
       select: { role: true },
     });
 
-    if (user?.role === "ADMIN") {
+    if (targetUser?.role === "ADMIN") {
       // Count how many locations this admin has access to
       const adminLocationCount = await prisma.userLocation.count({
         where: { user_id: userId },
@@ -155,26 +162,24 @@ export default defineEventHandler(async (event) => {
       removed_assignment: {
         user_id: userId,
         location_id: locationId,
-        user_name: existingAssignment.user.full_name || existingAssignment.user.username,
+        user_name:
+          existingAssignment.user.full_name || existingAssignment.user.username,
         location_name: existingAssignment.location.name,
       },
     };
   } catch (error) {
-    // Re-throw H3 errors
+    // Re-throw if already a createError
     if (error && typeof error === "object" && "statusCode" in error) {
       throw error;
     }
 
-    // Log unexpected errors
     console.error("Error removing user from location:", error);
-
-    // Generic error response
     throw createError({
       statusCode: 500,
       statusMessage: "Internal Server Error",
       data: {
         code: "INTERNAL_ERROR",
-        message: "An unexpected error occurred while removing user from location",
+        message: "Failed to remove user from location",
       },
     });
   }
