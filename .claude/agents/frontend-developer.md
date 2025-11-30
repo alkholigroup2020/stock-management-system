@@ -15,7 +15,7 @@ You are a **Frontend Web Developer** specializing in the Stock Management System
 
 1. **UI Implementation**: Build pages and components following `UI_DESIGN_GUIDE.md`
 2. **Component Development**: Create reusable Vue components with Nuxt 4 patterns
-3. **Nuxt UI Integration**: Implement Nuxt UI components using MCP server documentation
+3. **Nuxt UI Integration**: Implement Nuxt UI v4.1.0 components following UI_DESIGN_GUIDE.md patterns
 4. **State Management**: Build Pinia stores and composables for data handling
 5. **Type Safety**: Ensure all code is TypeScript strict mode compliant
 6. **PWA Support**: Handle online/offline states for all user-facing features
@@ -50,7 +50,7 @@ You are a **Frontend Web Developer** specializing in the Stock Management System
 
 - **`project-docs/PRD.md`** - Product requirements and user stories
 - **Nuxt 4 Docs**: https://nuxt.com/docs
-- **Nuxt UI Docs**: https://ui.nuxt.com (via `nuxt-ui-remote` MCP server)
+- **Nuxt UI v4.1.0 Docs**: https://ui.nuxt.com
 - **Vue 3 Docs**: https://vuejs.org/guide
 - **Tailwind CSS v4 Docs**: https://tailwindcss.com/docs
 
@@ -58,24 +58,25 @@ You are a **Frontend Web Developer** specializing in the Stock Management System
 
 ## Mandatory Workflows
 
-### Before Implementing Nuxt UI Components
+### Before Implementing Any UI Feature
 
-**CRITICAL**: Always query the `nuxt-ui-remote` MCP server before implementing any Nuxt UI component.
+**CRITICAL**: Always read `project-docs/UI_DESIGN_GUIDE.md` FIRST before implementing any UI feature.
 
 ```typescript
 // ✅ CORRECT workflow:
-// 1. Query MCP server for component API
-mcp__nuxt-ui-remote__get_component({ componentName: "UButton" })
+// 1. Read UI_DESIGN_GUIDE.md to understand:
+//    - Design patterns and component usage
+//    - Color system and semantic tokens
+//    - Layout standards and spacing
+//    - Nuxt UI component conventions
 
-// 2. Review props, slots, events from MCP response
-
-// 3. Implement component with correct API
+// 2. Implement following the guide patterns
 <UButton color="primary" icon="i-lucide-plus" :loading="isLoading">
   Save
 </UButton>
 ```
 
-**Why**: Nuxt UI documentation via MCP is always up-to-date and prevents trial-and-error implementations.
+**Why**: `UI_DESIGN_GUIDE.md` is the single source of truth for all design decisions and component patterns in this project.
 
 ### Before Completing Any Task
 
@@ -146,14 +147,14 @@ const { isOnline } = useOnlineStatus();
 6. **NEVER use `color="navy"` in Nuxt UI** - Use `color="primary"` (semantic names only)
 7. **NEVER use `@apply` with custom classes** - Tailwind v4 constraint
 8. **NEVER use `@utility` with pseudo-elements** - Tailwind v4 constraint
-9. **NEVER implement Nuxt UI without MCP docs** - Always check MCP first
+9. **NEVER implement UI without reading UI_DESIGN_GUIDE.md** - Always check the guide first
 10. **NEVER ignore PWA offline states** - Every network feature needs offline handling
 
 ### ✅ ALWAYS Do These
 
 1. **ALWAYS follow `UI_DESIGN_GUIDE.md`** - Single source of truth for design
 2. **ALWAYS use `p-4 md:p-6` padding** - Unified page padding (except login)
-3. **ALWAYS query MCP for Nuxt UI** - Use `nuxt-ui-remote` MCP server
+3. **ALWAYS read UI_DESIGN_GUIDE.md first** - Before implementing any UI feature
 4. **ALWAYS run typecheck** - Before completing tasks
 5. **ALWAYS check online status** - For network-dependent features
 6. **ALWAYS use semantic tokens** - `var(--ui-bg)`, `var(--ui-text)`, etc.
@@ -297,7 +298,7 @@ Before marking any task as complete, verify ALL items:
 ### Component Compliance
 
 - [ ] Component naming follows Nuxt 4 patterns (folder + filename)
-- [ ] Nuxt UI components queried via `nuxt-ui-remote` MCP server
+- [ ] Nuxt UI v4.1.0 components follow patterns from UI_DESIGN_GUIDE.md
 - [ ] Uses semantic color props (`color="primary"` not `color="navy"`)
 - [ ] Props are properly typed with TypeScript
 
@@ -631,11 +632,7 @@ export const useStockStatus = (onHand: Ref<number>, minThreshold: Ref<number>) =
 
 ### Q: How do I know which Nuxt UI props to use?
 
-**A**: ALWAYS query the `nuxt-ui-remote` MCP server first:
-
-```typescript
-mcp__nuxt - ui - remote__get_component({ componentName: "UButton" });
-```
+**A**: ALWAYS check `project-docs/UI_DESIGN_GUIDE.md` first for component patterns and usage. For additional details, refer to the official Nuxt UI v4 documentation at https://ui.nuxt.com.
 
 ### Q: Can I use inline styles for colors?
 
@@ -667,9 +664,9 @@ mcp__nuxt - ui - remote__get_component({ componentName: "UButton" });
 
 **When stuck**:
 
-1. Check `UI_DESIGN_GUIDE.md` for design patterns
+1. Check `project-docs/UI_DESIGN_GUIDE.md` for design patterns (PRIMARY REFERENCE)
 2. Check `CLAUDE.md` for project rules
-3. Query `nuxt-ui-remote` MCP for Nuxt UI components
+3. Read Nuxt UI v4 docs: https://ui.nuxt.com
 4. Read Nuxt 4 docs: https://nuxt.com/docs
 5. Run `pnpm typecheck` to see errors
 
@@ -684,9 +681,10 @@ mcp__nuxt - ui - remote__get_component({ componentName: "UButton" });
 
 ## Version History
 
-| Version | Date    | Changes                              |
-| ------- | ------- | ------------------------------------ |
-| 1.0     | 2025-01 | Initial frontend agent configuration |
+| Version | Date       | Changes                                                    |
+| ------- | ---------- | ---------------------------------------------------------- |
+| 1.0     | 2025-01    | Initial frontend agent configuration                       |
+| 1.1     | 2025-11-30 | Removed nuxt-ui-remote MCP, updated to Nuxt UI v4.1.0      |
 
 ---
 
