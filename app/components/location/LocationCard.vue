@@ -69,27 +69,45 @@
 
     <!-- Card Footer -->
     <template #footer>
-      <div class="flex items-center justify-end gap-2">
+      <div class="flex items-center justify-between gap-2">
+        <!-- Left: Delete (destructive) -->
         <UButton
-          v-if="showViewDetails"
-          color="neutral"
+          v-if="showDelete && canDelete"
+          color="error"
           variant="ghost"
           size="sm"
-          icon="i-lucide-eye"
-          @click="$emit('view-details', location)"
+          icon="i-lucide-trash-2"
+          class="cursor-pointer"
+          @click="$emit('delete', location)"
         >
-          View Details
+          Delete
         </UButton>
-        <UButton
-          v-if="showEdit && canEdit"
-          color="primary"
-          variant="ghost"
-          size="sm"
-          icon="i-lucide-edit"
-          @click="$emit('edit', location)"
-        >
-          Edit
-        </UButton>
+
+        <!-- Right: View & Edit -->
+        <div class="flex items-center gap-2 ml-auto">
+          <UButton
+            v-if="showViewDetails"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            icon="i-lucide-eye"
+            class="cursor-pointer"
+            @click="$emit('view-details', location)"
+          >
+            View Details
+          </UButton>
+          <UButton
+            v-if="showEdit && canEdit"
+            color="primary"
+            variant="ghost"
+            size="sm"
+            icon="i-lucide-edit"
+            class="cursor-pointer"
+            @click="$emit('edit', location)"
+          >
+            Edit
+          </UButton>
+        </div>
       </div>
     </template>
   </UCard>
@@ -113,20 +131,25 @@ interface Props {
   location: Location;
   showViewDetails?: boolean;
   showEdit?: boolean;
+  showDelete?: boolean;
   showStats?: boolean;
   canEdit?: boolean;
+  canDelete?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showViewDetails: true,
   showEdit: true,
+  showDelete: true,
   showStats: true,
   canEdit: true,
+  canDelete: true,
 });
 
 defineEmits<{
   "view-details": [location: Location];
   edit: [location: Location];
+  delete: [location: Location];
 }>();
 
 // Computed properties for location type styling

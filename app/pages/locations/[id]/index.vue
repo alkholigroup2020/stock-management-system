@@ -10,6 +10,7 @@
           color="neutral"
           variant="ghost"
           icon="i-lucide-arrow-left"
+          class="cursor-pointer"
           @click="navigateTo('/locations')"
         >
           Back to Locations
@@ -18,9 +19,20 @@
           v-if="canManageLocations()"
           color="primary"
           icon="i-lucide-edit"
+          class="cursor-pointer"
           @click="navigateTo(`/locations/${route.params.id}/edit`)"
         >
           Edit Location
+        </UButton>
+        <UButton
+          v-if="canManageLocations()"
+          color="error"
+          variant="outline"
+          icon="i-lucide-trash-2"
+          class="cursor-pointer"
+          @click="openDeleteModal"
+        >
+          Delete Location
         </UButton>
       </template>
     </PageHeader>
@@ -270,11 +282,67 @@
         </UCard>
       </template>
     </UModal>
+
+    <!-- Delete Confirmation Modal -->
+    <UModal v-model:open="isDeleteModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-subheading font-semibold">Confirm Location Deletion</h3>
+          </template>
+
+          <div class="space-y-4">
+            <div
+              v-if="location"
+              class="p-4 rounded-lg border-2 border-warning bg-warning/10"
+            >
+              <p class="font-semibold text-warning">
+                {{ location.name }}
+              </p>
+              <p class="text-caption mt-1">{{ location.code }}</p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="font-medium">Are you sure you want to delete this location?</p>
+              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+                <li>If the location has transaction history, it will be deactivated</li>
+                <li>If the location is empty, it will be permanently deleted</li>
+                <li>Users assigned to this location will remain assigned</li>
+                <li>Users with this as default location will have it cleared</li>
+              </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="isDeleteModalOpen = false"
+                :disabled="deletingLocation"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                icon="i-lucide-trash-2"
+                class="cursor-pointer"
+                :loading="deletingLocation"
+                @click="confirmDeleteLocation"
+              >
+                Delete Location
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { z } from "zod";
+import type { LocationDeleteResponse } from "../../../../shared/types/api";
 
 definePageMeta({
   layout: "default",
@@ -302,6 +370,10 @@ const removingUserId = ref<string | null>(null);
 
 const isRemoveModalOpen = ref(false);
 const userToRemove = ref<{ id: string; name: string } | null>(null);
+
+// Delete modal state
+const isDeleteModalOpen = ref(false);
+const deletingLocation = ref(false);
 
 // Assign form data
 const assignFormData = reactive({
@@ -545,6 +617,51 @@ const confirmRemoveUser = async () => {
     toast.error("Error", { description: message });
   } finally {
     removingUserId.value = null;
+  }
+};
+
+// Delete handlers
+const openDeleteModal = () => {
+  isDeleteModalOpen.value = true;
+};
+
+const confirmDeleteLocation = async () => {
+  if (!location.value) return;
+
+  deletingLocation.value = true;
+
+  try {
+    const response = await $fetch<LocationDeleteResponse>(
+      `/api/locations/${location.value.id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    // Show appropriate success message based on delete type
+    if (response.deactivated) {
+      toast.warning("Location Deactivated", {
+        description: response.message,
+      });
+    } else {
+      toast.success("Location Deleted", {
+        description: response.message,
+      });
+    }
+
+    isDeleteModalOpen.value = false;
+
+    // Navigate back to locations list
+    navigateTo("/locations");
+  } catch (err: unknown) {
+    console.error("Error deleting location:", err);
+    const message =
+      err && typeof err === "object" && "data" in err && err.data && typeof err.data === "object" && "message" in err.data
+        ? String(err.data.message)
+        : "Failed to delete location";
+    toast.error("Error", { description: message });
+  } finally {
+    deletingLocation.value = false;
   }
 };
 
