@@ -41,10 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
 const colorClasses = computed(() => {
   const classes = {
     primary: "bg-navy-50 dark:bg-navy-900/20 text-navy-600 dark:text-navy-400",
-    secondary:
-      "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
-    success:
-      "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
+    secondary: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
+    success: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
     error: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
     neutral: "bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400",
   };
@@ -68,10 +66,7 @@ const trendIcon = computed(() => {
   <UCard class="card-elevated">
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center h-32">
-      <UIcon
-        name="i-lucide-loader-circle"
-        class="w-8 h-8 animate-spin text-muted"
-      />
+      <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-muted" />
     </div>
 
     <!-- Content -->
@@ -91,11 +86,7 @@ const trendIcon = computed(() => {
         </p>
 
         <!-- Trend Indicator -->
-        <div
-          v-if="trend"
-          class="flex items-center gap-1 text-body"
-          :class="trendColorClass"
-        >
+        <div v-if="trend" class="flex items-center gap-1 text-body" :class="trendColorClass">
           <UIcon :name="`i-lucide-${trendIcon}`" class="w-4 h-4" />
           <span>{{ Math.abs(trend.value) }}%</span>
         </div>

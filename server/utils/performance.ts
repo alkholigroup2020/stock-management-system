@@ -19,11 +19,7 @@ const MAX_METRICS = 100;
 /**
  * Record API response time
  */
-export function recordPerformance(
-  event: H3Event,
-  startTime: number,
-  statusCode: number
-): void {
+export function recordPerformance(event: H3Event, startTime: number, statusCode: number): void {
   const duration = Date.now() - startTime;
   const endpoint = event.path || "unknown";
   const method = event.method || "unknown";
@@ -45,13 +41,9 @@ export function recordPerformance(
 
   // Log slow requests (> 1000ms)
   if (duration > 1000) {
-    console.warn(
-      `[SLOW API] ${method} ${endpoint} took ${duration}ms (status: ${statusCode})`
-    );
+    console.warn(`[SLOW API] ${method} ${endpoint} took ${duration}ms (status: ${statusCode})`);
   } else if (duration > 500) {
-    console.log(
-      `[API] ${method} ${endpoint} took ${duration}ms (status: ${statusCode})`
-    );
+    console.log(`[API] ${method} ${endpoint} took ${duration}ms (status: ${statusCode})`);
   }
 }
 

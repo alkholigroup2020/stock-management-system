@@ -23,6 +23,7 @@
 The Stock Management System is a modern web application designed to replace Excel-based inventory workflows with real-time stock tracking across multiple locations.
 
 **Key Benefits:**
+
 - ✅ Real-time stock visibility across all locations
 - ✅ Automatic calculations (no manual spreadsheets)
 - ✅ Built-in approval workflows
@@ -35,12 +36,12 @@ The Stock Management System is a modern web application designed to replace Exce
 
 The system manages inventory across **four distinct locations**:
 
-| Location | Purpose | Typical Users |
-|----------|---------|---------------|
-| **Kitchen** | Food preparation, daily consumption | Kitchen Operators, Chef |
-| **Store** | Dry goods storage, supplies | Store Operators, Supervisor |
-| **Central** | Central warehouse, bulk storage | Warehouse Operators, Manager |
-| **Warehouse** | Main distribution center | Warehouse Staff, Supervisor |
+| Location      | Purpose                             | Typical Users                |
+| ------------- | ----------------------------------- | ---------------------------- |
+| **Kitchen**   | Food preparation, daily consumption | Kitchen Operators, Chef      |
+| **Store**     | Dry goods storage, supplies         | Store Operators, Supervisor  |
+| **Central**   | Central warehouse, bulk storage     | Warehouse Operators, Manager |
+| **Warehouse** | Main distribution center            | Warehouse Staff, Supervisor  |
 
 **Important:** Each location has its own stock levels and operates independently. Stock moves between locations via **Transfers**.
 
@@ -52,11 +53,13 @@ The system manages inventory across **four distinct locations**:
 WAC is the average cost of inventory items, recalculated each time we receive new stock.
 
 **Why WAC?**
+
 - Provides accurate inventory valuation
 - Smooths out price fluctuations
 - Required for financial reporting
 
 **Example:**
+
 ```
 Current stock: 10 kg @ SAR 5.00/kg = SAR 50.00
 New delivery: 20 kg @ SAR 6.00/kg = SAR 120.00
@@ -72,6 +75,7 @@ New WAC = (50 + 120) / (10 + 20) = SAR 5.67/kg
 A period is a monthly accounting cycle that locks prices and controls when transactions can be posted.
 
 **Period Lifecycle:**
+
 ```
 OPEN → READY_TO_CLOSE → CLOSED
   ↓         ↓              ↓
@@ -80,6 +84,7 @@ transactions              allowed
 ```
 
 **Important Rules:**
+
 - Transactions can only be posted in **OPEN** periods
 - Prices are locked when period is marked **READY_TO_CLOSE**
 - Once **CLOSED**, no changes are allowed
@@ -90,6 +95,7 @@ transactions              allowed
 When a delivery price differs from the locked period price, the system automatically creates a **Non-Conformance Report (NCR)**.
 
 **Example:**
+
 ```
 Locked price for Rice: SAR 10.00/kg
 Delivery price: SAR 12.00/kg
@@ -106,41 +112,47 @@ To ensure all price changes are documented and reviewed before accepting new cos
 **Dashboard** - Overview of stock levels and recent activity
 
 **Transactions:**
+
 - Deliveries - Record goods received
 - Issues - Record goods consumed/used
 - Transfers - Move stock between locations
 
 **Management:**
+
 - Items - Product master list
 - NCRs - Non-conformance reports
 - Reconciliations - Month-end stock counts
 
 **Admin:**
+
 - Periods - Period management and close
 - Locations - Location settings (Admin only)
 
 ### User Roles & Permissions
 
-| Role | What You Can Do |
-|------|-----------------|
-| **Operator** | Post deliveries and issues, view stock (assigned locations only) |
-| **Supervisor** | Everything Operators can do, plus: approve transfers, manage reconciliations (all locations) |
-| **Admin** | Everything Supervisors can do, plus: manage items/prices, close periods, system configuration |
+| Role           | What You Can Do                                                                               |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| **Operator**   | Post deliveries and issues, view stock (assigned locations only)                              |
+| **Supervisor** | Everything Operators can do, plus: approve transfers, manage reconciliations (all locations)  |
+| **Admin**      | Everything Supervisors can do, plus: manage items/prices, close periods, system configuration |
 
 ### Accessing the System
 
 **Desktop:**
+
 1. Open your web browser (Chrome, Edge, Safari)
 2. Navigate to: `https://[your-domain].vercel.app`
 3. Login with your credentials
 
 **Mobile:**
+
 1. Visit the URL on your mobile browser
 2. Tap the browser menu → "Add to Home Screen"
 3. System will install as an app icon
 4. Launch like any other app
 
 **Offline Mode:**
+
 - The system will warn you if you go offline
 - You can still view data, but cannot submit transactions
 - All changes sync when you reconnect
@@ -152,12 +164,14 @@ To ensure all price changes are documented and reviewed before accepting new cos
 ## Your Role as an Operator
 
 As an Operator, you are responsible for:
+
 - Recording daily deliveries (goods received)
 - Recording daily issues (goods consumed/used)
 - Viewing current stock levels
 - Ensuring accurate data entry
 
 **What you CANNOT do:**
+
 - Approve transfers
 - Edit items or prices
 - Close periods
@@ -174,10 +188,12 @@ A **Delivery** is when goods are received from a supplier. This increases your l
 ### Step-by-Step: Create a Delivery
 
 **1. Navigate to Deliveries**
+
 - Click **"Deliveries"** in the main menu
 - Click **"New Delivery"** button (top-right)
 
 **2. Fill in Header Information**
+
 ```
 Location: [Your assigned location - auto-selected]
 Supplier: [Select from dropdown]
@@ -189,6 +205,7 @@ Notes: [Optional - any special information]
 **3. Add Delivery Lines**
 
 Click **"Add Item"** for each product received:
+
 ```
 Item: [Select from dropdown]
 Quantity: [Amount received]
@@ -196,16 +213,19 @@ Unit Price: [Price per unit from invoice]
 ```
 
 **Example:**
+
 ```
 Rice, Basmati 5kg - Qty: 10, Price: SAR 25.00
 Oil, Vegetable 1L - Qty: 20, Price: SAR 8.50
 ```
 
 **4. Review Total**
+
 - System calculates total automatically
 - Verify against your invoice
 
 **5. Submit**
+
 - Click **"Submit Delivery"**
 - System will:
   - Add stock to your location
@@ -217,6 +237,7 @@ Oil, Vegetable 1L - Qty: 20, Price: SAR 8.50
 **What happens if the price is different?**
 
 If the delivery price differs from the locked period price:
+
 1. System shows a **yellow warning banner**
 2. Delivery is still recorded
 3. **NCR is automatically created**
@@ -242,10 +263,12 @@ An **Issue** is when goods are consumed, used, or removed from stock. This decre
 ### Step-by-Step: Create an Issue
 
 **1. Navigate to Issues**
+
 - Click **"Issues"** in the main menu
 - Click **"New Issue"** button (top-right)
 
 **2. Fill in Header Information**
+
 ```
 Location: [Your assigned location - auto-selected]
 Issue Type: [Select: CONSUMPTION, TRANSFER_OUT, WASTE, SALE]
@@ -257,6 +280,7 @@ Notes: [Optional - purpose or reason]
 **3. Add Issue Lines**
 
 Click **"Add Item"** for each product issued:
+
 ```
 Item: [Select from dropdown]
 Quantity: [Amount to issue]
@@ -265,6 +289,7 @@ Quantity: [Amount to issue]
 **CRITICAL:** System will show current stock level. You **cannot** issue more than what's available.
 
 **Example:**
+
 ```
 Current Stock: 15.5 kg
 You can issue: Up to 15.5 kg
@@ -272,29 +297,32 @@ If you try 20 kg: ❌ Error - Insufficient stock
 ```
 
 **4. Review and Submit**
+
 - Verify quantities
 - Click **"Submit Issue"**
 - Stock is immediately reduced
 
 ### Issue Types Explained
 
-| Type | When to Use | Example |
-|------|-------------|---------|
-| **CONSUMPTION** | Items used in production/cooking | Rice used in meal preparation |
-| **TRANSFER_OUT** | Moving to another location (formal) | Sending flour to Kitchen |
-| **WASTE** | Spoiled or damaged goods | Expired vegetables |
-| **SALE** | Items sold to customers | Retail sales |
+| Type             | When to Use                         | Example                       |
+| ---------------- | ----------------------------------- | ----------------------------- |
+| **CONSUMPTION**  | Items used in production/cooking    | Rice used in meal preparation |
+| **TRANSFER_OUT** | Moving to another location (formal) | Sending flour to Kitchen      |
+| **WASTE**        | Spoiled or damaged goods            | Expired vegetables            |
+| **SALE**         | Items sold to customers             | Retail sales                  |
 
 **Note:** For informal transfers between locations, use the **Transfers** module instead of TRANSFER_OUT issues.
 
 ### Stock Validation
 
 **Real-time Stock Check:**
+
 - System always shows current stock
 - You cannot issue more than available
 - If stock is insufficient → Contact supervisor
 
 **What if stock shows wrong amount?**
+
 1. Don't guess or force the issue
 2. Check recent deliveries/issues
 3. Report to supervisor for reconciliation
@@ -306,6 +334,7 @@ If you try 20 kg: ❌ Error - Insufficient stock
 ### Dashboard Overview
 
 Your dashboard shows:
+
 - **Stock by Location** - Current levels at your location(s)
 - **Recent Activity** - Last 10 transactions
 - **Alerts** - Low stock warnings, NCRs, pending approvals
@@ -313,6 +342,7 @@ Your dashboard shows:
 ### Reading the Dashboard
 
 **Stock Cards:**
+
 ```
 Rice, Basmati 5kg
 Current: 45.5 kg
@@ -322,23 +352,27 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 ```
 
 **Status Indicators:**
+
 - **Green (Healthy):** Stock above reorder level
 - **Yellow (Low):** Below reorder point
 - **Red (Critical):** Near stockout
 
 **Recent Activity:**
+
 - Shows last 10 deliveries/issues
 - Click any item to view details
 
 ### Searching & Filtering
 
 **Stock List:**
+
 1. Click **"Items"** menu
 2. Use search box to find items
 3. Filter by category, status, location
 4. View item details and history
 
 **Transaction History:**
+
 1. Click **"Deliveries"** or **"Issues"**
 2. Filter by date range
 3. Filter by item, supplier, or status
@@ -347,18 +381,21 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 ### Mobile App Usage
 
 **Installing on Mobile:**
+
 1. Visit site on mobile browser
 2. Tap browser menu
 3. Select "Add to Home Screen"
 4. App icon appears on home screen
 
 **Mobile Features:**
+
 - Same functionality as desktop
 - Optimized for smaller screens
 - Offline detection
 - Touch-friendly buttons
 
 **Tips for Mobile:**
+
 - Use landscape mode for tables
 - Swipe to see more columns
 - Tap to expand details
@@ -370,16 +407,19 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 ### Daily Routine
 
 **Morning:**
+
 1. Check dashboard for alerts
 2. Review pending deliveries
 3. Verify stock levels for the day
 
 **During the Day:**
+
 - Record deliveries as they arrive
 - Record issues as they occur
 - Don't batch at end of day (real-time entry)
 
 **End of Day:**
+
 - Verify all transactions recorded
 - Check for any errors or missing entries
 - Review tomorrow's schedule
@@ -387,6 +427,7 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 ### Data Entry Tips
 
 ✅ **DO:**
+
 - Enter transactions immediately
 - Double-check quantities and prices
 - Use correct units (KG, EA, LTR)
@@ -394,6 +435,7 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 - Verify totals against invoices
 
 ❌ **DON'T:**
+
 - Batch entries at end of week
 - Guess quantities or prices
 - Override system warnings without checking
@@ -404,15 +446,16 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 
 **Common Issues:**
 
-| Problem | Solution |
-|---------|----------|
-| Can't find an item | Search by name or code; check spelling |
-| Price seems wrong | Verify invoice; proceed (NCR will be created) |
-| Insufficient stock | Check recent issues; contact supervisor |
-| System says period closed | Contact admin to open new period |
-| Offline warning | Check internet; wait to reconnect |
+| Problem                   | Solution                                      |
+| ------------------------- | --------------------------------------------- |
+| Can't find an item        | Search by name or code; check spelling        |
+| Price seems wrong         | Verify invoice; proceed (NCR will be created) |
+| Insufficient stock        | Check recent issues; contact supervisor       |
+| System says period closed | Contact admin to open new period              |
+| Offline warning           | Check internet; wait to reconnect             |
 
 **Who to Contact:**
+
 - **Technical issues:** IT Support
 - **Stock discrepancies:** Your supervisor
 - **Missing items:** Admin or supervisor
@@ -425,6 +468,7 @@ Status: ● Healthy (green) / ⚠ Low (yellow) / ❌ Critical (red)
 ## Your Role as a Supervisor
 
 As a Supervisor, you have all Operator permissions, plus:
+
 - **Approve transfers** between locations
 - **Manage reconciliations** at month-end
 - **View all locations** (not just assigned)
@@ -432,6 +476,7 @@ As a Supervisor, you have all Operator permissions, plus:
 - **Monitor team performance**
 
 **What you CANNOT do:**
+
 - Edit items or prices (Admin only)
 - Close periods (Admin only)
 - Change system settings
@@ -456,10 +501,12 @@ by user   supervisor     execute     moved
 ### Reviewing Transfer Requests
 
 **1. Navigate to Transfers**
+
 - Click **"Transfers"** in main menu
 - Filter: **"Pending Approval"**
 
 **2. Review Transfer Details**
+
 ```
 Transfer #: TR-2024-11-001
 From: Central → To: Kitchen
@@ -484,11 +531,13 @@ Before approving, verify:
 **4. Approve or Reject**
 
 **To Approve:**
+
 - Click **"Approve Transfer"**
 - System immediately moves stock
 - WAC recalculated at destination
 
 **To Reject:**
+
 - Click **"Reject"** (if available)
 - Add comment explaining why
 - Requester is notified
@@ -498,6 +547,7 @@ Before approving, verify:
 **What happens when you approve a transfer?**
 
 **At Source Location (Central):**
+
 ```
 Before: 100 kg @ SAR 5.00/kg
 Transfer out: 10 kg @ SAR 5.00/kg
@@ -505,6 +555,7 @@ After: 90 kg @ SAR 5.00/kg (WAC unchanged)
 ```
 
 **At Destination Location (Kitchen):**
+
 ```
 Before: 20 kg @ SAR 6.00/kg = SAR 120.00
 Received: 10 kg @ SAR 5.00/kg = SAR 50.00
@@ -518,10 +569,12 @@ After: 30 kg @ SAR 5.67/kg = SAR 170.00 (WAC recalculated)
 **When you need to move stock:**
 
 **1. Create New Transfer**
+
 - Navigate to **"Transfers"**
 - Click **"New Transfer"**
 
 **2. Fill Transfer Form**
+
 ```
 From Location: [Source]
 To Location: [Destination]
@@ -531,12 +584,14 @@ Reason: [Why stock is moving]
 ```
 
 **3. Add Items**
+
 ```
 Item: [Select]
 Quantity: [Amount to transfer]
 ```
 
 **4. Submit**
+
 - Click **"Submit Transfer"**
 - Status: **PENDING_APPROVAL**
 - Another supervisor must approve
@@ -550,6 +605,7 @@ Quantity: [Amount to transfer]
 ### What are NCRs?
 
 **Non-Conformance Reports (NCRs)** document issues requiring attention:
+
 - Price variances
 - Quality issues
 - Damaged goods
@@ -558,6 +614,7 @@ Quantity: [Amount to transfer]
 ### Types of NCRs
 
 **1. Auto-Generated (Price Variance)**
+
 ```
 System creates when:
 - Delivery price ≠ Period price
@@ -566,6 +623,7 @@ System creates when:
 ```
 
 **2. Manual (Quality/Operational)**
+
 ```
 Created by staff for:
 - Damaged goods
@@ -576,12 +634,14 @@ Created by staff for:
 ### Reviewing NCRs
 
 **1. Navigate to NCRs**
+
 - Click **"NCRs"** menu
 - Filter: **"Pending Review"**
 
 **2. Review NCR Details**
 
 **Example: Price Variance NCR**
+
 ```
 NCR #: NCR-2024-11-015
 Type: PRICE_VARIANCE (Auto-generated)
@@ -600,6 +660,7 @@ Total variance: SAR 100.00
 **3. Investigation**
 
 **Questions to ask:**
+
 - Is the new price from supplier invoice?
 - Was there a price increase communicated?
 - Is this a temporary or permanent change?
@@ -609,13 +670,14 @@ Total variance: SAR 100.00
 
 Choose appropriate action:
 
-| Disposition | When to Use | Next Steps |
-|-------------|-------------|------------|
-| **ACCEPT** | Price increase is valid | Update master price list (Admin) |
-| **REJECT** | Price error, negotiate with supplier | Return goods or get credit |
-| **INVESTIGATE** | Need more information | Contact supplier, gather data |
+| Disposition     | When to Use                          | Next Steps                       |
+| --------------- | ------------------------------------ | -------------------------------- |
+| **ACCEPT**      | Price increase is valid              | Update master price list (Admin) |
+| **REJECT**      | Price error, negotiate with supplier | Return goods or get credit       |
+| **INVESTIGATE** | Need more information                | Contact supplier, gather data    |
 
 **5. Complete NCR**
+
 - Select disposition
 - Add detailed comments
 - Click **"Update NCR"**
@@ -623,12 +685,14 @@ Choose appropriate action:
 ### NCR Best Practices
 
 ✅ **DO:**
+
 - Review NCRs within 24 hours
 - Document your investigation
 - Provide clear disposition reasoning
 - Communicate with Admin for price updates
 
 ❌ **DON'T:**
+
 - Auto-accept all variances
 - Skip investigation
 - Leave NCRs pending indefinitely
@@ -651,10 +715,12 @@ Choose appropriate action:
 ### Reconciliation Workflow
 
 **1. Navigate to Reconciliations**
+
 - Click **"Reconciliations"** menu
 - Click **"New Reconciliation"**
 
 **2. Start Reconciliation**
+
 ```
 Location: [Select location to count]
 Period: [Current period - auto-selected]
@@ -664,6 +730,7 @@ Count Date: [Date of physical count]
 **3. System Pre-Fills Book Stock**
 
 The system loads all items with current stock:
+
 ```
 Item               | Book Stock | Counted | Variance
 -------------------|------------|---------|----------
@@ -674,6 +741,7 @@ Oil, Vegetable 1L | 20.00 LTR  | _____   | _____
 **4. Physical Count**
 
 **Conduct physical inventory:**
+
 - Count all items in location
 - Use tally sheets or mobile device
 - Double-check counts
@@ -682,6 +750,7 @@ Oil, Vegetable 1L | 20.00 LTR  | _____   | _____
 **5. Enter Counted Quantities**
 
 For each item:
+
 ```
 Book Stock: 45.50 kg
 Counted: 44.00 kg
@@ -691,6 +760,7 @@ Variance: -1.50 kg (shortage)
 **6. System Calculates Variance**
 
 **Variance Types:**
+
 - **Positive variance:** Counted > Book (surplus)
 - **Negative variance:** Counted < Book (shortage)
 - **Zero variance:** Perfect match (ideal)
@@ -698,12 +768,14 @@ Variance: -1.50 kg (shortage)
 **7. Add Variance Notes**
 
 For each variance, document the reason:
+
 ```
 Variance: -1.50 kg
 Reason: "Spillage during transfer to kitchen containers"
 ```
 
 **8. Review & Submit**
+
 - Check all variances
 - Verify notes are clear
 - Click **"Submit Reconciliation"**
@@ -712,14 +784,15 @@ Reason: "Spillage during transfer to kitchen containers"
 
 **General Guidelines:**
 
-| Item Type | Acceptable Variance |
-|-----------|---------------------|
-| Dry goods (rice, flour) | ±2% |
-| Liquids (oil, milk) | ±3% |
-| High-value items | ±1% |
-| Perishables | ±5% |
+| Item Type               | Acceptable Variance |
+| ----------------------- | ------------------- |
+| Dry goods (rice, flour) | ±2%                 |
+| Liquids (oil, milk)     | ±3%                 |
+| High-value items        | ±1%                 |
+| Perishables             | ±5%                 |
 
 **Example:**
+
 ```
 Rice: 100 kg book stock
 Acceptable range: 98-102 kg (±2%)
@@ -731,20 +804,24 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 **When variance exceeds threshold:**
 
 **1. Recount the Item**
+
 - Physical count errors are common
 - Double-check measurement units
 
 **2. Review Recent Transactions**
+
 - Check deliveries in last 7 days
 - Check issues in last 7 days
 - Look for data entry errors
 
 **3. Check for Unreported Issues**
+
 - Waste not recorded
 - Spillage not documented
 - Samples given out
 
 **4. Document Findings**
+
 - Update variance notes
 - Create NCR if needed
 - Recommend corrective action
@@ -754,14 +831,17 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 **After reconciliation is submitted:**
 
 **1. System Updates Book Stock**
+
 - Book stock adjusted to match counted stock
 - Variance recorded for audit trail
 
 **2. Financial Impact**
+
 - Positive variance → Asset increase
 - Negative variance → Asset decrease (write-off)
 
 **3. Reporting**
+
 - Variances included in month-end reports
 - Admin reviews for patterns
 - Used for inventory accuracy KPIs
@@ -769,6 +849,7 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 ### Reconciliation Best Practices
 
 ✅ **DO:**
+
 - Schedule counts during low activity times
 - Use two people for high-value items
 - Count systematically (shelf by shelf)
@@ -776,6 +857,7 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 - Investigate variances immediately
 
 ❌ **DON'T:**
+
 - Rush the count
 - Adjust book stock without counting
 - Ignore small variances (they add up)
@@ -789,21 +871,25 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 ### Key Reports for Supervisors
 
 **1. Stock Levels by Location**
+
 - Current stock across all locations
 - WAC values
 - Low stock alerts
 
 **2. Transaction History**
+
 - All deliveries, issues, transfers
 - Filter by date, location, user
 - Identify data entry errors
 
 **3. Pending Approvals**
+
 - Transfers awaiting approval
 - NCRs pending disposition
 - Reconciliations pending review
 
 **4. Variance Reports**
+
 - Price variances
 - Reconciliation variances
 - Trend analysis
@@ -811,11 +897,13 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 ### Monitoring Team Performance
 
 **Operator Activity:**
+
 - Number of transactions per user
 - Error rates (corrections needed)
 - Timeliness of data entry
 
 **Quality Metrics:**
+
 - Reconciliation accuracy
 - NCR resolution time
 - Transfer approval time
@@ -823,21 +911,25 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 ### Supervisor Daily Checklist
 
 **Morning:**
+
 - ☐ Review pending approvals
 - ☐ Check NCRs for review
 - ☐ Verify stock alerts
 
 **During Day:**
+
 - ☐ Approve/reject transfers promptly
 - ☐ Monitor operator transactions
 - ☐ Respond to stock queries
 
 **End of Day:**
+
 - ☐ Clear pending approvals
 - ☐ Review day's variances
 - ☐ Plan next day reconciliations
 
 **End of Month:**
+
 - ☐ Complete all reconciliations
 - ☐ Resolve all NCRs
 - ☐ Prepare for period close
@@ -849,6 +941,7 @@ Counted: 97 kg → Variance: -3% (INVESTIGATE)
 ## Your Role as an Admin
 
 As an Admin, you have full system access:
+
 - Everything Supervisors can do
 - **Manage Items & Prices** - Master data control
 - **Manage Periods** - Open/close accounting periods
@@ -867,6 +960,7 @@ As an Admin, you have full system access:
 The **Item Master** is the central database of all products tracked in the system.
 
 **Each item includes:**
+
 - Item code (unique identifier)
 - Name and description
 - Category (e.g., Grains, Oils, Dairy)
@@ -878,12 +972,14 @@ The **Item Master** is the central database of all products tracked in the syste
 ### Creating New Items
 
 **1. Navigate to Items**
+
 - Click **"Items"** menu
 - Click **"New Item"** button
 
 **2. Fill Item Details**
 
 **Basic Information:**
+
 ```
 Item Code: [Unique code, e.g., RICE-001]
 Name: [Display name, e.g., "Rice, Basmati 5kg"]
@@ -893,12 +989,14 @@ Unit: [Select: KG, LTR, EA, BOX, etc.]
 ```
 
 **Stock Control:**
+
 ```
 Reorder Point: [Min stock before alert, e.g., 20]
 Maximum Stock: [Max stock level, e.g., 100]
 ```
 
 **Supplier Information:**
+
 ```
 Default Supplier: [Select primary supplier]
 Supplier Item Code: [Supplier's SKU, if any]
@@ -907,6 +1005,7 @@ Supplier Item Code: [Supplier's SKU, if any]
 **3. Set Initial Prices**
 
 **Price by Location:**
+
 ```
 Kitchen: SAR 25.00
 Store: SAR 25.00
@@ -917,12 +1016,14 @@ Warehouse: SAR 24.00
 **Important:** These prices become the **period prices** for current period.
 
 **4. Activate Item**
+
 - Toggle **"Is Active"** to enabled
 - Click **"Save Item"**
 
 ### Editing Items
 
 **When to Edit Items:**
+
 - Correct spelling errors
 - Update descriptions
 - Change reorder levels
@@ -930,6 +1031,7 @@ Warehouse: SAR 24.00
 - **NOT for price changes** (see Price Management)
 
 **To Edit:**
+
 1. Find item in list
 2. Click item name to open
 3. Click **"Edit"** button
@@ -945,15 +1047,18 @@ Warehouse: SAR 24.00
 **Price Change Workflow:**
 
 **1. Wait for Period Lock**
+
 - Current period must be READY_TO_CLOSE
 - All locations confirmed ready
 
 **2. Navigate to Item**
+
 - Click **"Items"** menu
 - Find item to update
 - Click to open details
 
 **3. Edit Prices**
+
 ```
 Current price: SAR 25.00
 New price: SAR 27.00
@@ -961,11 +1066,13 @@ Effective date: [Next period start date]
 ```
 
 **4. Save Changes**
+
 - System validates period status
 - Prices locked for current period
 - New prices apply to next period
 
 **Price History:**
+
 - System tracks all price changes
 - Audit trail shows who/when/why
 - Historical reports use correct prices
@@ -973,16 +1080,19 @@ Effective date: [Next period start date]
 ### Deactivating Items
 
 **When to Deactivate:**
+
 - Item discontinued by supplier
 - No longer stocking item
 - Seasonal item out of season
 
 **How to Deactivate:**
+
 1. Open item details
 2. Toggle **"Is Active"** to disabled
 3. Save changes
 
 **Effect:**
+
 - Item hidden from new transactions
 - Existing stock still visible
 - Historical data preserved
@@ -996,6 +1106,7 @@ Effective date: [Next period start date]
 ### Understanding Periods
 
 **Periods** are monthly accounting cycles that control:
+
 - When transactions can be posted
 - When prices are locked
 - Month-end closing procedures
@@ -1012,6 +1123,7 @@ period    locked       period
 ### Opening a New Period
 
 **When to Open:**
+
 - First day of each month
 - Previous period is closed
 - New fiscal period starts
@@ -1019,10 +1131,12 @@ period    locked       period
 **Steps:**
 
 **1. Navigate to Periods**
+
 - Click **"Periods"** menu
 - Click **"New Period"** button
 
 **2. Define Period**
+
 ```
 Period Name: November 2024
 Start Date: 01/11/2024
@@ -1034,11 +1148,13 @@ Status: OPEN (auto-set)
 **3. Lock Prices**
 
 System automatically:
+
 - Copies current item prices
 - Creates **period price snapshot**
 - Locks prices for this period
 
 **Example:**
+
 ```
 Item: Rice, Basmati 5kg
 Current price: SAR 25.00
@@ -1047,6 +1163,7 @@ Current price: SAR 25.00
 ```
 
 **4. Activate Period**
+
 - Click **"Create Period"**
 - System sets as current period
 - Users can now post transactions
@@ -1058,6 +1175,7 @@ Current price: SAR 25.00
 Period close is a **multi-step coordinated process** across all locations.
 
 **Phase 1: Preparation (Days 1-25)**
+
 - Normal operations
 - Users post deliveries, issues, transfers
 - Period status: **OPEN**
@@ -1065,6 +1183,7 @@ Period close is a **multi-step coordinated process** across all locations.
 **Phase 2: Lock Transactions (Day 26-28)**
 
 **1. Communicate Cutoff**
+
 - Notify all users of cutoff date/time
 - Ensure all transactions are posted
 - Verify all transfers approved
@@ -1072,17 +1191,20 @@ Period close is a **multi-step coordinated process** across all locations.
 **2. Location Readiness**
 
 Each location Supervisor must:
+
 - Complete physical reconciliation
 - Resolve all variances
 - Submit reconciliation
 - Mark location as **"Ready to Close"**
 
 **To Mark Ready:**
+
 1. Navigate to **"Period Close"** page
 2. Find your location
 3. Click **"Mark as Ready"**
 
 **System validates:**
+
 - ✅ Reconciliation completed
 - ✅ All variances documented
 - ✅ No pending transfers involving this location
@@ -1090,6 +1212,7 @@ Each location Supervisor must:
 **3. Monitor Readiness**
 
 As Admin, monitor **"Period Close"** dashboard:
+
 ```
 Location  | Status         | Reconciled | Actions
 ----------|----------------|------------|----------
@@ -1102,6 +1225,7 @@ Warehouse | ✅ Ready       | Yes        | -
 **Phase 3: Admin Period Close (Day 29-30)**
 
 **1. Verify All Locations Ready**
+
 ```
 ✅ Kitchen - Ready
 ✅ Store - Ready
@@ -1110,6 +1234,7 @@ Warehouse | ✅ Ready       | Yes        | -
 ```
 
 **2. Review NCRs**
+
 - All price variance NCRs resolved
 - Dispositions recorded
 - Item prices updated if needed
@@ -1117,10 +1242,12 @@ Warehouse | ✅ Ready       | Yes        | -
 **3. Execute Period Close**
 
 **Navigate to Period Close:**
+
 - Click **"Periods"** menu
 - Click **"Close Period"** button
 
 **System performs:**
+
 - Validates all locations ready
 - Validates all NCRs closed
 - Creates stock snapshots (all locations)
@@ -1130,6 +1257,7 @@ Warehouse | ✅ Ready       | Yes        | -
 **4. Verification**
 
 **Check snapshots:**
+
 ```
 Location: Kitchen
 Period: November 2024
@@ -1144,6 +1272,7 @@ Total Value: SAR 45,250.00
 ```
 
 **5. Open Next Period**
+
 - Immediately create next month's period
 - Follow "Opening a New Period" steps
 - Operations resume
@@ -1153,11 +1282,13 @@ Total Value: SAR 45,250.00
 **Problem: Location won't mark as ready**
 
 **Possible causes:**
+
 - Reconciliation not submitted
 - Variances exceed thresholds
 - Pending transfers involving location
 
 **Solution:**
+
 1. Check reconciliation status
 2. Review variances with supervisor
 3. Approve/reject pending transfers
@@ -1166,11 +1297,13 @@ Total Value: SAR 45,250.00
 **Problem: Period close fails**
 
 **Possible causes:**
+
 - Not all locations ready
 - Open NCRs exist
 - Pending transactions
 
 **Solution:**
+
 1. Review period close checklist
 2. Verify all NCRs dispositioned
 3. Clear pending approvals
@@ -1181,17 +1314,20 @@ Total Value: SAR 45,250.00
 **After period close, generate reports:**
 
 **1. Period Summary Report**
+
 - Total deliveries value
 - Total issues value
 - Net stock movement
 - Ending stock value
 
 **2. Variance Analysis**
+
 - Price variances by item
 - Reconciliation variances by location
 - Year-over-year comparison
 
 **3. Financial Reports**
+
 - Cost of goods received
 - Cost of goods issued
 - Inventory valuation (ending)
@@ -1203,6 +1339,7 @@ Total Value: SAR 45,250.00
 ### Location Configuration
 
 **Each location has:**
+
 - Location code (unique)
 - Name and description
 - Address
@@ -1212,6 +1349,7 @@ Total Value: SAR 45,250.00
 ### Creating a New Location
 
 **Rare but necessary when:**
+
 - Opening new facility
 - Restructuring operations
 - Pilot expansion
@@ -1219,10 +1357,12 @@ Total Value: SAR 45,250.00
 **Steps:**
 
 **1. Navigate to Locations (Admin Only)**
+
 - Click **"Admin"** menu
 - Click **"Locations"**
 
 **2. Create Location**
+
 ```
 Location Code: [Unique, e.g., BRANCH-01]
 Name: [Display name, e.g., "Branch Store #1"]
@@ -1232,6 +1372,7 @@ Is Active: ☑ Enabled
 ```
 
 **3. Assign Users**
+
 ```
 Operators:
 - John Smith (Operator)
@@ -1244,6 +1385,7 @@ Supervisors:
 **4. Initialize Stock**
 
 **For new locations:**
+
 - Import opening stock (if available)
 - Or start with zero stock
 - Record initial deliveries
@@ -1253,15 +1395,18 @@ Supervisors:
 **To change user assignments:**
 
 **1. Edit Location**
+
 - Open location details
 - Click **"Manage Users"**
 
 **2. Add/Remove Users**
+
 - Select users from dropdown
 - Assign role (Operator, Supervisor)
 - Save changes
 
 **Effect:**
+
 - Users immediately see location in their filters
 - Access controlled by middleware
 
@@ -1276,6 +1421,7 @@ Supervisors:
 ### Creating Users
 
 **1. Gather User Information**
+
 ```
 Full Name: John Smith
 Email: john.smith@company.com
@@ -1286,6 +1432,7 @@ Locations: [Kitchen, Store] (Operators/Supervisors only)
 **2. Create User Account**
 
 **Via Admin Panel:**
+
 - Navigate to **"Users"** (if available)
 - Click **"New User"**
 - Fill user details
@@ -1293,11 +1440,13 @@ Locations: [Kitchen, Store] (Operators/Supervisors only)
 - Generate password
 
 **Via Database (if no UI):**
+
 - Work with IT to create user
 - Use secure password policy
 - Send credentials via secure channel
 
 **3. First Login**
+
 - User receives welcome email
 - Logs in with temp password
 - Required to change password
@@ -1306,6 +1455,7 @@ Locations: [Kitchen, Store] (Operators/Supervisors only)
 ### User Roles & Permissions
 
 **OPERATOR:**
+
 ```
 Can:
 - Post deliveries and issues
@@ -1320,6 +1470,7 @@ Cannot:
 ```
 
 **SUPERVISOR:**
+
 ```
 Can:
 - Everything Operators can
@@ -1335,6 +1486,7 @@ Cannot:
 ```
 
 **ADMIN:**
+
 ```
 Can:
 - Everything (full access)
@@ -1351,11 +1503,13 @@ Can:
 **When user leaves or role changes:**
 
 **1. Deactivate Account**
+
 - Edit user profile
 - Toggle **"Is Active"** to disabled
 - Save changes
 
 **Effect:**
+
 - User cannot log in
 - Historical data preserved
 - Audit trail intact
@@ -1369,16 +1523,19 @@ Can:
 ### Daily Admin Tasks
 
 **Morning:**
+
 - ☐ Check system alerts
 - ☐ Review overnight transactions
 - ☐ Verify no errors in logs
 
 **During Day:**
+
 - ☐ Monitor NCR queue
 - ☐ Respond to user questions
 - ☐ Review price variance trends
 
 **End of Day:**
+
 - ☐ Review transaction volume
 - ☐ Check reconciliation progress (month-end)
 - ☐ Plan next day tasks
@@ -1386,12 +1543,14 @@ Can:
 ### Weekly Admin Tasks
 
 **Every Monday:**
+
 - ☐ Review last week's metrics
 - ☐ Analyze price variance trends
 - ☐ Check user activity logs
 - ☐ Update item prices (if needed)
 
 **Every Friday:**
+
 - ☐ Review pending NCRs
 - ☐ Clear stale data
 - ☐ Backup check (automated)
@@ -1400,11 +1559,13 @@ Can:
 ### Monthly Admin Tasks
 
 **Week 1-3:**
+
 - Normal operations monitoring
 - Item master maintenance
 - User feedback review
 
 **Week 4 (Month-End):**
+
 - ☐ Coordinate reconciliation
 - ☐ Monitor location readiness
 - ☐ Resolve blocking NCRs
@@ -1415,6 +1576,7 @@ Can:
 ### Audit & Compliance
 
 **Audit Trail:**
+
 - All transactions logged with:
   - User who performed action
   - Timestamp
@@ -1422,12 +1584,14 @@ Can:
   - IP address (if needed)
 
 **Compliance Reports:**
+
 - Monthly reconciliation summary
 - Price change log
 - User activity report
 - NCR disposition summary
 
 **Data Retention:**
+
 - Transactional data: Indefinite
 - Period snapshots: Indefinite
 - Audit logs: Minimum 7 years
@@ -1438,21 +1602,25 @@ Can:
 **Key Metrics:**
 
 **Performance:**
+
 - API response times (target: <1s)
 - Page load times (target: <3s)
 - Database query performance
 
 **Usage:**
+
 - Active users per day
 - Transactions per hour
 - Peak usage times
 
 **Quality:**
+
 - Error rate (target: <1%)
 - NCR volume and trends
 - Reconciliation variance trends
 
 **Alerts:**
+
 - System errors
 - Slow queries
 - Failed logins
@@ -1465,6 +1633,7 @@ Can:
 ### Critical Do's and Don'ts
 
 ✅ **DO:**
+
 - Verify all price changes before saving
 - Communicate period close dates early
 - Review all NCRs before period close
@@ -1475,6 +1644,7 @@ Can:
 - Keep backup/restore tested
 
 ❌ **DON'T:**
+
 - Delete data (deactivate instead)
 - Change prices during open period
 - Close period without all locations ready
@@ -1486,17 +1656,20 @@ Can:
 ### Security & Access Control
 
 **Password Policy:**
+
 - Minimum 12 characters
 - Mix of letters, numbers, symbols
 - Changed every 90 days
 - No password reuse
 
 **Session Management:**
+
 - Automatic timeout after 30 minutes
 - Re-authentication for sensitive actions
 - Single sign-on (if available)
 
 **Principle of Least Privilege:**
+
 - Users get minimum access needed
 - Regular access reviews
 - Remove access promptly when role changes
@@ -1504,12 +1677,14 @@ Can:
 ### Disaster Recovery
 
 **Backup Strategy:**
+
 - Automated daily backups
 - Retention: 30 days
 - Offsite storage
 - Regular restore tests
 
 **Business Continuity:**
+
 - Document manual processes (if system down)
 - Emergency contact list
 - Escalation procedures
@@ -1522,18 +1697,21 @@ Can:
 ### Key Takeaways by Role
 
 **Operators:**
+
 - Record deliveries and issues accurately
 - Check stock before issuing
 - Report discrepancies immediately
 - Don't guess - ask if unsure
 
 **Supervisors:**
+
 - Approve transfers promptly
 - Complete reconciliations on time
 - Investigate variances thoroughly
 - Monitor team performance
 
 **Admins:**
+
 - Maintain master data integrity
 - Coordinate period close process
 - Monitor system health
@@ -1542,18 +1720,21 @@ Can:
 ### Support & Resources
 
 **Documentation:**
+
 - User Manual: `/project-docs/user-docs/USER_MANUAL.md`
 - Quick Reference: `/project-docs/user-docs/QUICK_REFERENCE_CARD.md`
 - FAQ: `/project-docs/user-docs/FAQ.md`
 - Workflow Guide: `/project-docs/Workflow_Guide.md`
 
 **Getting Help:**
+
 - Technical Issues: IT Support
 - Process Questions: Your Supervisor
 - System Changes: Admin
 - Training: Request refresher session
 
 **Feedback:**
+
 - Report bugs or issues
 - Suggest improvements
 - Request new features
@@ -1563,4 +1744,4 @@ Can:
 
 **End of Training Presentation**
 
-*Thank you for your attention. Questions?*
+_Thank you for your attention. Questions?_

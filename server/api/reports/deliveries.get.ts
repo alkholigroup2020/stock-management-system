@@ -242,7 +242,9 @@ export default defineEventHandler(async (event) => {
     for (const delivery of deliveries) {
       // Calculate total variance for this delivery
       const totalVariance = delivery.delivery_lines.reduce((sum, line) => {
-        return sum + parseFloat(line.price_variance.toString()) * parseFloat(line.quantity.toString());
+        return (
+          sum + parseFloat(line.price_variance.toString()) * parseFloat(line.quantity.toString())
+        );
       }, 0);
 
       // Process lines
@@ -335,13 +337,12 @@ export default defineEventHandler(async (event) => {
     // Calculate grand totals
     const grandTotals = {
       total_deliveries: deliveryReports.length,
-      total_value: Math.round(
-        deliveryReports.reduce((sum, d) => sum + d.total_amount, 0) * 100
-      ) / 100,
+      total_value:
+        Math.round(deliveryReports.reduce((sum, d) => sum + d.total_amount, 0) * 100) / 100,
       deliveries_with_variance: deliveryReports.filter((d) => d.has_variance).length,
-      total_variance: Math.round(
-        deliveryReports.reduce((sum, d) => sum + Math.abs(d.total_variance), 0) * 100
-      ) / 100,
+      total_variance:
+        Math.round(deliveryReports.reduce((sum, d) => sum + Math.abs(d.total_variance), 0) * 100) /
+        100,
       total_ncrs: deliveryReports.reduce((sum, d) => sum + d.ncr_count, 0),
       total_line_items: deliveryReports.reduce((sum, d) => sum + d.lines.length, 0),
     };

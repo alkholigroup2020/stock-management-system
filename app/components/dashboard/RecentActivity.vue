@@ -28,13 +28,7 @@ interface ActivityItem {
   /** Optional badge label */
   badge?: string;
   /** Optional badge color */
-  badgeColor?:
-    | "primary"
-    | "secondary"
-    | "success"
-    | "error"
-    | "warning"
-    | "neutral";
+  badgeColor?: "primary" | "secondary" | "success" | "error" | "warning" | "neutral";
   /** Optional icon */
   icon?: string;
 }
@@ -81,23 +75,10 @@ const handleViewAll = () => {
 // Map badge colors to Nuxt UI colors
 const getBadgeColor = (
   color?: string
-):
-  | "primary"
-  | "secondary"
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "neutral" => {
+): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" => {
   const colorMap: Record<
     string,
-    | "primary"
-    | "secondary"
-    | "success"
-    | "error"
-    | "warning"
-    | "info"
-    | "neutral"
+    "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral"
   > = {
     primary: "primary",
     secondary: "secondary",
@@ -116,11 +97,7 @@ const getBadgeColor = (
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <UIcon
-            v-if="icon"
-            :name="`i-lucide-${icon}`"
-            class="w-5 h-5 text-muted"
-          />
+          <UIcon v-if="icon" :name="`i-lucide-${icon}`" class="w-5 h-5 text-muted" />
           <h2 class="text-subheading">{{ title }}</h2>
         </div>
         <UButton
@@ -138,10 +115,7 @@ const getBadgeColor = (
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-8">
-      <UIcon
-        name="i-lucide-loader-circle"
-        class="w-8 h-8 animate-spin text-muted"
-      />
+      <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-muted" />
     </div>
 
     <!-- Empty State -->
@@ -164,10 +138,7 @@ const getBadgeColor = (
             <!-- Icon -->
             <div v-if="item.icon" class="shrink-0 mt-0.5">
               <div class="p-2 rounded-lg bg-default">
-                <UIcon
-                  :name="`i-lucide-${item.icon}`"
-                  class="w-4 h-4 text-muted"
-                />
+                <UIcon :name="`i-lucide-${item.icon}`" class="w-4 h-4 text-muted" />
               </div>
             </div>
 

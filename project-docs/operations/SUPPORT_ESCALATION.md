@@ -34,12 +34,12 @@ This document defines the support escalation process for the Stock Management Sy
 
 ### Support Channels
 
-| Channel | Use For | Response Time |
-|---------|---------|---------------|
-| **Email** (support@company.com) | General questions, how-to, minor issues | 4 business hours |
-| **Phone** ([TO BE FILLED]) | Urgent issues, system down | 1 hour (business hours) |
-| **In-Person** (Supervisor/Admin) | Training, complex workflows | Scheduled |
-| **Self-Service** (Documentation) | Common questions, reference | Immediate |
+| Channel                          | Use For                                 | Response Time           |
+| -------------------------------- | --------------------------------------- | ----------------------- |
+| **Email** (support@company.com)  | General questions, how-to, minor issues | 4 business hours        |
+| **Phone** ([TO BE FILLED])       | Urgent issues, system down              | 1 hour (business hours) |
+| **In-Person** (Supervisor/Admin) | Training, complex workflows             | Scheduled               |
+| **Self-Service** (Documentation) | Common questions, reference             | Immediate               |
 
 ---
 
@@ -50,18 +50,21 @@ This document defines the support escalation process for the Stock Management Sy
 **Who:** End users
 
 **Resources:**
+
 - User Manual (`USER_MANUAL.md`)
 - Quick Reference Card (`QUICK_REFERENCE_CARD.md`)
 - FAQ (`FAQ.md`)
 - In-app help text and tooltips
 
 **Handles:**
+
 - How-to questions
 - Common workflows
 - Feature explanations
 - Password resets (via forgot password link)
 
 **Example Questions:**
+
 - "How do I create a delivery?"
 - "What does WAC mean?"
 - "How do I switch locations?"
@@ -72,12 +75,14 @@ This document defines the support escalation process for the Stock Management Sy
 **Who:** Supervisors, Power Users
 
 **Skills Required:**
+
 - Deep knowledge of system workflows
 - Familiar with common issues
 - Can troubleshoot basic problems
 - Can guide users through processes
 
 **Handles:**
+
 - User training and onboarding
 - Workflow guidance
 - Basic troubleshooting
@@ -85,6 +90,7 @@ This document defines the support escalation process for the Stock Management Sy
 - Access requests
 
 **Escalates to Tier 3:**
+
 - System errors or bugs
 - Performance issues
 - Data corruption
@@ -92,6 +98,7 @@ This document defines the support escalation process for the Stock Management Sy
 - Feature requests
 
 **Example Issues:**
+
 - "I can't find an item in the list"
 - "How do I approve a transfer?"
 - "The reconciliation numbers don't match"
@@ -102,12 +109,14 @@ This document defines the support escalation process for the Stock Management Sy
 **Who:** System Administrator, Development Team
 
 **Skills Required:**
+
 - System administration
 - Database access
 - Code understanding
 - Third-party service knowledge (Vercel, Supabase)
 
 **Handles:**
+
 - System errors and bugs
 - Performance issues
 - Database queries and reports
@@ -116,12 +125,14 @@ This document defines the support escalation process for the Stock Management Sy
 - Integration issues
 
 **Escalates to Tier 4:**
+
 - Critical outages
 - Data loss
 - Security breaches
 - Infrastructure failures
 
 **Example Issues:**
+
 - "Users are getting 500 errors"
 - "API responses are very slow"
 - "Database query is timing out"
@@ -132,12 +143,14 @@ This document defines the support escalation process for the Stock Management Sy
 **Who:** Vercel Support, Supabase Support, External Consultants
 
 **When to Escalate:**
+
 - Platform outages (Vercel, Supabase)
 - Infrastructure failures
 - Critical security incidents
 - Data recovery beyond internal capabilities
 
 **Contact:**
+
 - Vercel Support: support@vercel.com, https://vercel.com/support
 - Supabase Support: support@supabase.com, https://app.supabase.com/support
 
@@ -147,16 +160,17 @@ This document defines the support escalation process for the Stock Management Sy
 
 ### Priority Levels
 
-| Priority | Impact | Response Time | Examples |
-|----------|--------|---------------|----------|
-| **P1 - Critical** | System down, blocking all users | 1 hour | Application unavailable, database down, data loss |
-| **P2 - High** | Major feature broken, blocking some users | 4 hours | Login fails, period close fails, transfers not approving |
-| **P3 - Medium** | Feature degraded, workaround available | 1 business day | Slow performance, minor UI bugs, incorrect calculations |
-| **P4 - Low** | Minor issue, cosmetic, enhancement request | 1 week | Typos, UI improvements, feature requests |
+| Priority          | Impact                                     | Response Time  | Examples                                                 |
+| ----------------- | ------------------------------------------ | -------------- | -------------------------------------------------------- |
+| **P1 - Critical** | System down, blocking all users            | 1 hour         | Application unavailable, database down, data loss        |
+| **P2 - High**     | Major feature broken, blocking some users  | 4 hours        | Login fails, period close fails, transfers not approving |
+| **P3 - Medium**   | Feature degraded, workaround available     | 1 business day | Slow performance, minor UI bugs, incorrect calculations  |
+| **P4 - Low**      | Minor issue, cosmetic, enhancement request | 1 week         | Typos, UI improvements, feature requests                 |
 
 ### Issue Categories
 
 **1. How-To / Training**
+
 - User doesn't know how to perform a task
 - Needs guidance on workflow
 - Wants to learn a feature
@@ -164,6 +178,7 @@ This document defines the support escalation process for the Stock Management Sy
 **Resolution:** Tier 1 or 2 (Self-service or Supervisor)
 
 **2. Data Issue**
+
 - Incorrect data entered
 - Need to correct a transaction
 - Data doesn't match expectations
@@ -171,6 +186,7 @@ This document defines the support escalation process for the Stock Management Sy
 **Resolution:** Tier 2 or 3 (Supervisor or Admin)
 
 **3. Access Issue**
+
 - Cannot log in
 - Permission denied
 - Cannot access a location
@@ -178,6 +194,7 @@ This document defines the support escalation process for the Stock Management Sy
 **Resolution:** Tier 2 or 3 (Supervisor or Admin)
 
 **4. System Error**
+
 - Error message displayed
 - Feature not working as expected
 - Unexpected behavior
@@ -185,6 +202,7 @@ This document defines the support escalation process for the Stock Management Sy
 **Resolution:** Tier 3 (Technical Support)
 
 **5. Performance Issue**
+
 - Slow page loads
 - Timeouts
 - Unresponsive UI
@@ -192,6 +210,7 @@ This document defines the support escalation process for the Stock Management Sy
 **Resolution:** Tier 3 (Technical Support)
 
 **6. Feature Request**
+
 - Want new functionality
 - Suggest improvement
 - Report usability issue
@@ -247,11 +266,13 @@ User Issue
 ### Escalation Triggers
 
 **Escalate from Tier 1 to Tier 2 when:**
+
 - User cannot find answer in documentation
 - Question requires system knowledge beyond docs
 - User needs hands-on guidance
 
 **Escalate from Tier 2 to Tier 3 when:**
+
 - System error or bug suspected
 - Database access required
 - Permission changes needed
@@ -259,6 +280,7 @@ User Issue
 - Issue affects multiple users
 
 **Escalate from Tier 3 to Tier 4 when:**
+
 - Vercel or Supabase platform issue confirmed
 - Infrastructure failure beyond internal control
 - Data recovery requires vendor assistance
@@ -273,6 +295,7 @@ User Issue
 **Methods:**
 
 **Email (Preferred):**
+
 ```
 TO: support@company.com
 SUBJECT: [Location] Brief description of issue
@@ -292,11 +315,13 @@ Contact:
 ```
 
 **Phone:**
+
 - Call support line (business hours only)
 - Provide: Name, location, issue description
 - Support staff creates ticket on behalf of user
 
 **In-Person:**
+
 - Speak to supervisor or admin
 - They create ticket or resolve immediately
 
@@ -305,6 +330,7 @@ Contact:
 **Support staff (Tier 2 or 3):**
 
 1. **Acknowledge receipt** (within 1 hour):
+
    ```
    Thank you for contacting support. We've received your request
    and assigned ticket #XXX. We will respond within [X hours/days]
@@ -368,6 +394,7 @@ Contact:
 **When escalating from Tier 2 to Tier 3:**
 
 **Email template:**
+
 ```
 TO: admin@company.com
 SUBJECT: [ESCALATION] Ticket #XXX - Brief description
@@ -402,10 +429,12 @@ USER IMPACT:
 **Contact vendor support:**
 
 For Vercel:
+
 - https://vercel.com/support
 - Provide: Project name, deployment URL, error logs
 
 For Supabase:
+
 - https://app.supabase.com/support
 - Provide: Project ID, affected tables/queries, error logs
 
@@ -426,14 +455,15 @@ Before escalating, ensure you have:
 
 ### Service Level Agreements
 
-| Priority | First Response | Progress Update | Resolution Target |
-|----------|----------------|-----------------|-------------------|
-| **P1 - Critical** | 1 hour | Every 2 hours | 4 hours |
-| **P2 - High** | 4 hours | Daily | 1 business day |
-| **P3 - Medium** | 1 business day | Every 2 days | 1 week |
-| **P4 - Low** | 1 week | Weekly | 1 month |
+| Priority          | First Response | Progress Update | Resolution Target |
+| ----------------- | -------------- | --------------- | ----------------- |
+| **P1 - Critical** | 1 hour         | Every 2 hours   | 4 hours           |
+| **P2 - High**     | 4 hours        | Daily           | 1 business day    |
+| **P3 - Medium**   | 1 business day | Every 2 days    | 1 week            |
+| **P4 - Low**      | 1 week         | Weekly          | 1 month           |
 
 **Notes:**
+
 - SLAs apply during business hours (8 AM - 5 PM, Mon-Fri)
 - P1 incidents may require after-hours support
 - Resolution target is for initial resolution (may require follow-up)
@@ -457,6 +487,7 @@ Before escalating, ensure you have:
 ### Issue 1: Cannot Log In
 
 **Symptoms:**
+
 - "Invalid credentials" error
 - "Email not found" error
 
@@ -471,12 +502,14 @@ Before escalating, ensure you have:
    - Or ask admin to reset password manually
 
 **Escalate to Tier 3 if:**
+
 - Account exists but password reset doesn't work
 - User reports they never received onboarding email
 
 ### Issue 2: Permission Denied
 
 **Symptoms:**
+
 - "You don't have permission" error
 - Cannot access a page or feature
 - Cannot see a location
@@ -489,12 +522,14 @@ Before escalating, ensure you have:
    - Is supervisor assigned to all locations?
 
 **Escalate to Tier 3 if:**
+
 - User role or location access needs to be changed
 - Permission error appears to be a bug
 
 ### Issue 3: Incorrect Stock Quantity
 
 **Symptoms:**
+
 - Stock quantity doesn't match physical count
 - Stock quantity is negative
 - Recent transaction didn't update stock
@@ -506,6 +541,7 @@ Before escalating, ensure you have:
 3. **Guide user through reconciliation** to correct discrepancies
 
 **Escalate to Tier 3 if:**
+
 - Stock calculation appears incorrect (WAC bug suspected)
 - Data corruption suspected
 - Need to manually adjust stock (requires admin)
@@ -513,6 +549,7 @@ Before escalating, ensure you have:
 ### Issue 4: Slow Performance
 
 **Symptoms:**
+
 - Pages load slowly
 - API requests timeout
 - UI is unresponsive
@@ -524,6 +561,7 @@ Before escalating, ensure you have:
 3. **Check if issue is isolated** (one user or all users?)
 
 **Escalate to Tier 3 if:**
+
 - Performance issue affects multiple users
 - Issue persists after basic troubleshooting
 - Appears to be server-side issue
@@ -531,6 +569,7 @@ Before escalating, ensure you have:
 ### Issue 5: Transfer Not Approving
 
 **Symptoms:**
+
 - Transfer stuck in "Pending Approval" status
 - Approval button doesn't work
 - Error when approving
@@ -545,6 +584,7 @@ Before escalating, ensure you have:
 3. **Try refreshing the page**
 
 **Escalate to Tier 3 if:**
+
 - Approval button still doesn't work
 - Error message appears
 - Stock availability check failing incorrectly
@@ -558,12 +598,14 @@ Before escalating, ensure you have:
 **Tier 2: First-Line Support (Supervisors)**
 
 Kitchen Supervisor:
+
 - Name: [TO BE FILLED]
 - Email: [TO BE FILLED]
 - Phone: [TO BE FILLED]
 - Hours: 8 AM - 5 PM
 
 Store Supervisor:
+
 - Name: [TO BE FILLED]
 - Email: [TO BE FILLED]
 - Phone: [TO BE FILLED]
@@ -572,12 +614,14 @@ Store Supervisor:
 **Tier 3: Technical Support**
 
 System Administrator:
+
 - Name: [TO BE FILLED]
 - Email: admin@company.com
 - Phone: [TO BE FILLED]
 - Hours: 8 AM - 6 PM (M-F), On-call for P1
 
 Development Team Lead:
+
 - Name: [TO BE FILLED]
 - Email: dev-lead@company.com
 - Phone: [TO BE FILLED]
@@ -588,12 +632,14 @@ Development Team Lead:
 **Tier 4: Vendor Support**
 
 Vercel Support:
+
 - Email: support@vercel.com
 - Dashboard: https://vercel.com/support
 - Status: https://www.vercel-status.com
 - Response: 24-48 hours
 
 Supabase Support:
+
 - Email: support@supabase.com
 - Dashboard: https://app.supabase.com/support
 - Status: https://status.supabase.com
@@ -607,10 +653,10 @@ Supabase Support:
 
 Use this format to track support tickets:
 
-| Ticket ID | Date | User | Location | Priority | Category | Issue Summary | Assigned To | Status | Resolved Date |
-|-----------|------|------|----------|----------|----------|---------------|-------------|--------|---------------|
-| 001 | 2025-11-27 | John | Kitchen | P2 | Access | Cannot access Store location | Admin | Resolved | 2025-11-27 |
-| 002 | 2025-11-28 | Jane | Store | P3 | How-to | How to approve transfer? | Supervisor | Resolved | 2025-11-28 |
+| Ticket ID | Date       | User | Location | Priority | Category | Issue Summary                | Assigned To | Status   | Resolved Date |
+| --------- | ---------- | ---- | -------- | -------- | -------- | ---------------------------- | ----------- | -------- | ------------- |
+| 001       | 2025-11-27 | John | Kitchen  | P2       | Access   | Cannot access Store location | Admin       | Resolved | 2025-11-27    |
+| 002       | 2025-11-28 | Jane | Store    | P3       | How-to   | How to approve transfer?     | Supervisor  | Resolved | 2025-11-28    |
 
 ### Ticket Detail Template
 
@@ -642,6 +688,7 @@ Use this format to track support tickets:
 [Detailed description of what user was trying to do and what happened]
 
 **Steps to Reproduce:**
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
@@ -673,6 +720,7 @@ Use this format to track support tickets:
 **Tier:** 1 / 2 / 3 / 4
 
 **Troubleshooting Steps:**
+
 - [YYYY-MM-DD HH:MM] Checked user account - active
 - [YYYY-MM-DD HH:MM] Verified location access - missing Store location
 - [YYYY-MM-DD HH:MM] Added Store location to user permissions
@@ -755,9 +803,9 @@ Use this format to track support tickets:
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-27 | System Administrator | Initial documentation |
+| Version | Date       | Author               | Changes               |
+| ------- | ---------- | -------------------- | --------------------- |
+| 1.0     | 2025-11-27 | System Administrator | Initial documentation |
 
 ---
 

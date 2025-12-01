@@ -188,7 +188,10 @@ const submitIssue = async () => {
           }
         );
 
-        handleSuccess("Issue Created Successfully", "The issue has been recorded and stock levels have been updated.");
+        handleSuccess(
+          "Issue Created Successfully",
+          "The issue has been recorded and stock levels have been updated."
+        );
 
         // Redirect to issue detail page
         router.push(`/issues/${result.id}`);
@@ -294,7 +297,14 @@ watch(
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-subheading font-semibold">Issue Items</h2>
-            <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" class="cursor-pointer" @click="addLine">
+            <UButton
+              icon="i-lucide-plus"
+              color="primary"
+              variant="soft"
+              size="sm"
+              class="cursor-pointer"
+              @click="addLine"
+            >
               Add Item
             </UButton>
           </div>
@@ -317,19 +327,11 @@ watch(
             <thead>
               <tr class="bg-default">
                 <th class="px-4 py-3 text-left text-label uppercase">Item</th>
-                <th class="px-4 py-3 text-left text-label uppercase">
-                  On Hand
-                </th>
-                <th class="px-4 py-3 text-left text-label uppercase">
-                  Quantity
-                </th>
+                <th class="px-4 py-3 text-left text-label uppercase">On Hand</th>
+                <th class="px-4 py-3 text-left text-label uppercase">Quantity</th>
                 <th class="px-4 py-3 text-left text-label uppercase">WAC</th>
-                <th class="px-4 py-3 text-right text-label uppercase">
-                  Line Value
-                </th>
-                <th class="px-4 py-3 text-center text-label uppercase">
-                  Action
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase">Line Value</th>
+                <th class="px-4 py-3 text-center text-label uppercase">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-default">
@@ -434,7 +436,15 @@ watch(
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton color="neutral" variant="soft" class="cursor-pointer" @click="cancel" :disabled="loading">Cancel</UButton>
+        <UButton
+          color="neutral"
+          variant="soft"
+          class="cursor-pointer"
+          @click="cancel"
+          :disabled="loading"
+        >
+          Cancel
+        </UButton>
         <UButton
           color="primary"
           class="cursor-pointer"

@@ -1,4 +1,5 @@
 # Phase 3.3: Period Close UI
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -32,6 +33,7 @@ In Phase 3.1 and 3.2, we built all the **backend API routes** for period managem
 - See the result of the close operation
 
 **Without a UI:**
+
 - ❌ Users would need to call APIs manually (technical knowledge required)
 - ❌ No visual feedback about what's happening
 - ❌ Easy to make mistakes (closing wrong period)
@@ -40,6 +42,7 @@ In Phase 3.1 and 3.2, we built all the **backend API routes** for period managem
 ### Our Solution
 
 We built a **Period Close UI** that:
+
 - ✅ Shows current period information at a glance
 - ✅ Displays a pre-close checklist (what needs to be done)
 - ✅ Shows location readiness status with "Mark Ready" buttons
@@ -87,6 +90,7 @@ In this phase, we created the **complete Period Close user interface** including
 ### Tasks Completed
 
 **Phase 3.3: Period Close UI**
+
 - ✅ 3.3.1: Period Close Page
 - ✅ 3.3.2: Approval Components
 
@@ -105,6 +109,7 @@ We created a **single page** where admins can manage the entire period close pro
 This page is **admin-only**. Regular users (Operators, Supervisors) cannot access it.
 
 **How we do this:**
+
 ```typescript
 definePageMeta({
   middleware: "role",
@@ -113,6 +118,7 @@ definePageMeta({
 ```
 
 **What this does:**
+
 - When someone tries to visit `/period-close`, the `role` middleware runs
 - It checks if the user's role is `ADMIN`
 - If not an admin, they get redirected to an error page or login
@@ -164,6 +170,7 @@ Uses the reusable `LayoutPageHeader` component:
 ```
 
 **What the props mean:**
+
 - `title`: The main heading text
 - `subtitle`: A short description below the title
 - `icon`: Lucide icon name (lock icon represents "closing/locking")
@@ -212,6 +219,7 @@ Shows the active period's basic information:
 ```
 
 **Display example:**
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ 📅 Current Period                              [OPEN]      │
@@ -269,15 +277,16 @@ Shows a list of things that need to be done before closing:
 
 **The checklist items:**
 
-| Item | What It Checks |
-|------|----------------|
-| All deliveries posted | Are there any pending deliveries? |
-| All issues posted | Are there any pending issues? |
-| All transfers completed | Are all transfers finalized? |
-| Reconciliations completed | Is there a reconciliation for each location? |
+| Item                       | What It Checks                                  |
+| -------------------------- | ----------------------------------------------- |
+| All deliveries posted      | Are there any pending deliveries?               |
+| All issues posted          | Are there any pending issues?                   |
+| All transfers completed    | Are all transfers finalized?                    |
+| Reconciliations completed  | Is there a reconciliation for each location?    |
 | All locations marked ready | Have supervisors marked each location as ready? |
 
 **Display example:**
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ ✓ All deliveries have been posted                    [15]  │
@@ -335,6 +344,7 @@ const checklistItems = computed(() => {
 **Key concept: Computed Properties**
 
 A `computed` property automatically recalculates when its dependencies change. Here:
+
 - If `currentPeriod` changes → checklist updates
 - If `readyLocationsCount` changes → checklist updates
 
@@ -397,6 +407,7 @@ Shows all locations with their readiness status:
 ```
 
 **Display example:**
+
 ```
 ┌──────────────────┬──────────┬─────────┬──────────────────┬─────────────┐
 │ Location         │ Type     │ Status  │ Ready Date       │ Actions     │
@@ -415,11 +426,11 @@ Shows all locations with their readiness status:
 function getLocationStatusColor(status: string) {
   switch (status) {
     case "READY":
-      return "success";   // Green - ready to close
+      return "success"; // Green - ready to close
     case "OPEN":
-      return "warning";   // Amber - not ready yet
+      return "warning"; // Amber - not ready yet
     case "CLOSED":
-      return "neutral";   // Gray - already closed
+      return "neutral"; // Gray - already closed
     default:
       return "warning";
   }
@@ -433,6 +444,7 @@ function getLocationStatusColor(status: string) {
 This section changes based on the current state:
 
 **State 1: Locations Not Ready**
+
 ```vue
 <div v-if="!allLocationsReady" class="text-center py-6">
   <UIcon name="i-lucide-alert-circle" class="w-12 h-12 mx-auto text-warning mb-4" />
@@ -447,6 +459,7 @@ This section changes based on the current state:
 ```
 
 **State 2: Ready to Close**
+
 ```vue
 <div v-else class="text-center py-6">
   <UIcon name="i-lucide-check-circle" class="w-12 h-12 mx-auto text-success mb-4" />
@@ -466,6 +479,7 @@ This section changes based on the current state:
 ```
 
 **State 3: Pending Close (approval requested)**
+
 ```vue
 <div v-if="currentPeriod.status === 'PENDING_CLOSE'" class="text-center py-6">
   <UIcon name="i-lucide-clock" class="w-12 h-12 mx-auto text-primary mb-4" />
@@ -533,6 +547,7 @@ Before closing, we show a warning modal:
 ```
 
 **Why confirmation is important:**
+
 - Period close is **irreversible** (cannot undo)
 - Creates permanent snapshots
 - Locks all previous transactions
@@ -634,10 +649,7 @@ async function handleClosePeriod() {
     // Step 2: Approve and execute the close
     const approvalResponse = await $fetch<{
       summary: { totalLocations: number; totalClosingValue: number };
-    }>(
-      `/api/approvals/${closeResponse.approval.id}/approve`,
-      { method: "PATCH" }
-    );
+    }>(`/api/approvals/${closeResponse.approval.id}/approve`, { method: "PATCH" });
 
     // Store summary for success modal
     closeSummary.value = approvalResponse.summary;
@@ -664,6 +676,7 @@ async function handleClosePeriod() {
 ```
 
 **Why two API calls?**
+
 1. `POST /periods/:id/close` - Creates an approval request
 2. `PATCH /approvals/:id/approve` - Approves and executes the close
 
@@ -683,10 +696,9 @@ async function handleMarkReady(locationId: string) {
   markingReady.value = locationId;
 
   try {
-    await $fetch(
-      `/api/periods/${currentPeriod.value.id}/locations/${locationId}/ready`,
-      { method: "PATCH" }
-    );
+    await $fetch(`/api/periods/${currentPeriod.value.id}/locations/${locationId}/ready`, {
+      method: "PATCH",
+    });
 
     toast.add({
       title: "Success",
@@ -733,9 +745,9 @@ We need to show a loading spinner on the specific button that was clicked:
 
 ### Files Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/period-close.vue` | ~680 | Complete period close page |
+| File                         | Lines | Purpose                    |
+| ---------------------------- | ----- | -------------------------- |
+| `app/pages/period-close.vue` | ~680  | Complete period close page |
 
 ---
 
@@ -744,6 +756,7 @@ We need to show a loading spinner on the specific button that was clicked:
 ### Simple Explanation
 
 Approval workflows are used in many places:
+
 - Period Close needs approval
 - Transfers need approval
 - PRF (Purchase Request Forms) need approval
@@ -762,10 +775,10 @@ A simple badge component that shows the approval status with correct colors and 
 
 ```typescript
 interface ApprovalStatusProps {
-  status: "PENDING" | "APPROVED" | "REJECTED";  // Required
-  size?: "sm" | "md" | "lg";                     // Optional, default "md"
-  variant?: "solid" | "soft" | "outline" | "subtle";  // Optional, default "soft"
-  showIcon?: boolean;                            // Optional, default true
+  status: "PENDING" | "APPROVED" | "REJECTED"; // Required
+  size?: "sm" | "md" | "lg"; // Optional, default "md"
+  variant?: "solid" | "soft" | "outline" | "subtle"; // Optional, default "soft"
+  showIcon?: boolean; // Optional, default true
 }
 ```
 
@@ -774,9 +787,9 @@ interface ApprovalStatusProps {
 ```typescript
 const statusColor = computed(() => {
   const colorMap = {
-    PENDING: "primary" as const,   // Navy Blue - waiting
-    APPROVED: "success" as const,  // Green - approved
-    REJECTED: "error" as const,    // Red - rejected
+    PENDING: "primary" as const, // Navy Blue - waiting
+    APPROVED: "success" as const, // Green - approved
+    REJECTED: "error" as const, // Red - rejected
   };
   return colorMap[props.status] || "neutral";
 });
@@ -787,9 +800,9 @@ const statusColor = computed(() => {
 ```typescript
 const statusIcon = computed(() => {
   const iconMap = {
-    PENDING: "i-lucide-clock",         // Clock - waiting
+    PENDING: "i-lucide-clock", // Clock - waiting
     APPROVED: "i-lucide-check-circle", // Check - approved
-    REJECTED: "i-lucide-x-circle",     // X - rejected
+    REJECTED: "i-lucide-x-circle", // X - rejected
   };
   return iconMap[props.status];
 });
@@ -802,21 +815,16 @@ const statusIcon = computed(() => {
 <ApprovalApprovalStatus status="PENDING" />
 
 <!-- With custom options -->
-<ApprovalApprovalStatus
-  status="APPROVED"
-  size="lg"
-  variant="solid"
-  :showIcon="false"
-/>
+<ApprovalApprovalStatus status="APPROVED" size="lg" variant="solid" :showIcon="false" />
 ```
 
 **Visual output:**
 
-| Status | Display |
-|--------|---------|
-| PENDING | 🕐 Pending (navy blue badge) |
-| APPROVED | ✓ Approved (green badge) |
-| REJECTED | ✗ Rejected (red badge) |
+| Status   | Display                      |
+| -------- | ---------------------------- |
+| PENDING  | 🕐 Pending (navy blue badge) |
+| APPROVED | ✓ Approved (green badge)     |
+| REJECTED | ✗ Rejected (red badge)       |
 
 ---
 
@@ -828,11 +836,11 @@ A larger component that shows full approval details and allows approve/reject ac
 
 ```typescript
 interface ApprovalRequestProps {
-  approval: Approval;           // Required - the approval data
-  entity?: Entity;              // Optional - related entity details
-  canApprove?: boolean;         // Optional, default false - show action buttons?
-  showEntityDetails?: boolean;  // Optional, default true - show entity info?
-  loading?: boolean;            // Optional, default false - loading state
+  approval: Approval; // Required - the approval data
+  entity?: Entity; // Optional - related entity details
+  canApprove?: boolean; // Optional, default false - show action buttons?
+  showEntityDetails?: boolean; // Optional, default true - show entity info?
+  loading?: boolean; // Optional, default false - loading state
 }
 ```
 
@@ -875,6 +883,7 @@ graph TB
 The component shows different details based on the entity type:
 
 **Period Close:**
+
 ```
 Period Name: January 2025
 Date Range: 01 Jan 2025 - 31 Jan 2025
@@ -888,6 +897,7 @@ Location Status:
 ```
 
 **Transfer:**
+
 ```
 Transfer Number: TRF-2025-001
 Total Value: SAR 5,000.00
@@ -896,6 +906,7 @@ To Location: Central Store (CENT-STORE)
 ```
 
 **PRF (Purchase Request Form):**
+
 ```
 PRF Number: PRF-2025-001
 Request Date: 25 Jan 2025
@@ -903,6 +914,7 @@ Location: Main Kitchen (MAIN-KIT)
 ```
 
 **PO (Purchase Order):**
+
 ```
 PO Number: PO-2025-001
 Total Amount: SAR 10,000.00
@@ -924,6 +936,7 @@ const isTransferEntity = (entity: Entity): entity is TransferEntity => {
 ```
 
 **Usage in template:**
+
 ```vue
 <template v-if="isPeriodEntity(entity)">
   <!-- Show period-specific details -->
@@ -1023,7 +1036,7 @@ const confirmReject = async () => {
     emit("reject", props.approval.id, rejectComment.value);
     emit("success");
     showRejectModal.value = false;
-    rejectComment.value = "";  // Clear for next time
+    rejectComment.value = ""; // Clear for next time
   } catch (err: unknown) {
     // ... error handling
   } finally {
@@ -1033,6 +1046,7 @@ const confirmReject = async () => {
 ```
 
 **Why require a comment for rejection?**
+
 - Provides feedback to the requester
 - Creates an audit trail
 - Prevents accidental rejections
@@ -1051,6 +1065,7 @@ const emit = defineEmits<{
 ```
 
 **Parent component can listen:**
+
 ```vue
 <ApprovalApprovalRequest
   :approval="approval"
@@ -1068,11 +1083,13 @@ const emit = defineEmits<{
 #### Usage Examples
 
 **Basic usage:**
+
 ```vue
 <ApprovalApprovalRequest :approval="approval" />
 ```
 
 **With entity details and approval actions:**
+
 ```vue
 <ApprovalApprovalRequest
   :approval="periodApproval"
@@ -1084,21 +1101,19 @@ const emit = defineEmits<{
 ```
 
 **Read-only (no action buttons):**
+
 ```vue
-<ApprovalApprovalRequest
-  :approval="approval"
-  :can-approve="false"
-/>
+<ApprovalApprovalRequest :approval="approval" :can-approve="false" />
 ```
 
 ---
 
 ### Files Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/components/approval/ApprovalStatus.vue` | ~62 | Status badge component |
-| `app/components/approval/ApprovalRequest.vue` | ~647 | Full approval request component |
+| File                                          | Lines | Purpose                         |
+| --------------------------------------------- | ----- | ------------------------------- |
+| `app/components/approval/ApprovalStatus.vue`  | ~62   | Status badge component          |
+| `app/components/approval/ApprovalRequest.vue` | ~647  | Full approval request component |
 
 ---
 
@@ -1106,11 +1121,11 @@ const emit = defineEmits<{
 
 ### Frontend Components
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/period-close.vue` | ~680 | Period close management page |
-| `app/components/approval/ApprovalStatus.vue` | ~62 | Approval status badge |
-| `app/components/approval/ApprovalRequest.vue` | ~647 | Approval request card with actions |
+| File                                          | Lines | Purpose                            |
+| --------------------------------------------- | ----- | ---------------------------------- |
+| `app/pages/period-close.vue`                  | ~680  | Period close management page       |
+| `app/components/approval/ApprovalStatus.vue`  | ~62   | Approval status badge              |
+| `app/components/approval/ApprovalRequest.vue` | ~647  | Approval request card with actions |
 
 **Total:** ~1,389 lines of code
 
@@ -1145,11 +1160,9 @@ app/components/approval/ApprovalRequest.vue →  <ApprovalApprovalRequest />
 - User closing the modal sets `showConfirmModal = false`
 
 **Under the hood:**
+
 ```vue
-<UModal
-  :model-value="showConfirmModal"
-  @update:model-value="showConfirmModal = $event"
->
+<UModal :model-value="showConfirmModal" @update:model-value="showConfirmModal = $event"></UModal>
 ```
 
 ---
@@ -1169,6 +1182,7 @@ We show different content based on conditions:
 ```
 
 **v-if vs v-show:**
+
 - `v-if` removes/adds elements from DOM (use for rarely changing conditions)
 - `v-show` just hides with CSS (use for frequently changing conditions)
 
@@ -1179,31 +1193,28 @@ We show different content based on conditions:
 Good UX requires showing loading states:
 
 ```vue
-<UButton
-  :loading="closingPeriod"
-  :disabled="closingPeriod"
-  @click="handleClose"
->
+<UButton :loading="closingPeriod" :disabled="closingPeriod" @click="handleClose">
   Close Period
 </UButton>
 ```
 
 **Pattern:**
+
 1. Set `loading = true` before API call
 2. Call API
 3. Set `loading = false` in `finally` block
 
 ```typescript
 async function handleClose() {
-  closingPeriod.value = true;  // Start loading
+  closingPeriod.value = true; // Start loading
 
   try {
-    await $fetch('/api/...');
+    await $fetch("/api/...");
     // Handle success
   } catch (err) {
     // Handle error
   } finally {
-    closingPeriod.value = false;  // Stop loading (always runs)
+    closingPeriod.value = false; // Stop loading (always runs)
   }
 }
 ```
@@ -1223,8 +1234,8 @@ const isPeriodEntity = (entity: Entity): entity is PeriodEntity => {
 // Usage
 if (isPeriodEntity(entity)) {
   // TypeScript knows entity is PeriodEntity here
-  console.log(entity.name);  // OK
-  console.log(entity.period_locations);  // OK
+  console.log(entity.name); // OK
+  console.log(entity.period_locations); // OK
 }
 ```
 
@@ -1268,16 +1279,16 @@ function handleError(message: string) {
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Modal** | A popup dialog that appears on top of the page |
-| **Toast** | A small notification that appears briefly (like phone notifications) |
-| **v-model** | Two-way data binding between component and variable |
-| **computed** | A value that automatically updates when its dependencies change |
-| **emit** | How a child component sends events to its parent |
-| **Type Guard** | A function that tells TypeScript what type something is |
-| **Loading State** | Showing a spinner while waiting for something |
-| **Confirmation Modal** | A dialog asking "Are you sure?" before an action |
+| Term                   | Simple Explanation                                                   |
+| ---------------------- | -------------------------------------------------------------------- |
+| **Modal**              | A popup dialog that appears on top of the page                       |
+| **Toast**              | A small notification that appears briefly (like phone notifications) |
+| **v-model**            | Two-way data binding between component and variable                  |
+| **computed**           | A value that automatically updates when its dependencies change      |
+| **emit**               | How a child component sends events to its parent                     |
+| **Type Guard**         | A function that tells TypeScript what type something is              |
+| **Loading State**      | Showing a spinner while waiting for something                        |
+| **Confirmation Modal** | A dialog asking "Are you sure?" before an action                     |
 
 ---
 
@@ -1286,15 +1297,17 @@ function handleError(message: string) {
 ### Issue 1: "Mark Ready" Button Not Working
 
 **Symptoms:**
+
 - Button shows loading but nothing happens
 - Error in console about "reconciliation not completed"
 
 **Cause:** Reconciliation must exist before marking location as ready
 
 **Solution:**
+
 ```typescript
 // Check the API response
-const response = await $fetch('/api/periods/:id/locations/:locationId/ready');
+const response = await $fetch("/api/periods/:id/locations/:locationId/ready");
 console.log(response);
 
 // The API requires reconciliation first
@@ -1306,12 +1319,14 @@ console.log(response);
 ### Issue 2: Close Button Stays Disabled
 
 **Symptoms:**
+
 - "Close Period" button never enables
 - Shows "Locations Not Ready" even after marking all ready
 
 **Cause:** The computed property isn't updating properly
 
 **Solution:**
+
 ```typescript
 // Make sure to refresh data after marking ready
 async function handleMarkReady(locationId: string) {
@@ -1327,12 +1342,14 @@ async function handleMarkReady(locationId: string) {
 ### Issue 3: Modal Doesn't Close After Action
 
 **Symptoms:**
+
 - Modal stays open after clicking Approve/Reject
 - Loading spinner keeps spinning
 
 **Cause:** Error in the API call not being handled
 
 **Solution:**
+
 ```typescript
 async function confirmApprove() {
   actionLoading.value = true;
@@ -1355,21 +1372,23 @@ async function confirmApprove() {
 ### Issue 4: TypeScript Errors with Entity
 
 **Symptoms:**
+
 - "Property 'name' does not exist on type 'Entity'"
 - Red squiggly lines in editor
 
 **Cause:** TypeScript doesn't know which entity type you have
 
 **Solution:** Use type guards:
+
 ```typescript
 // Wrong
 if (entity) {
-  console.log(entity.name);  // Error: 'name' might not exist
+  console.log(entity.name); // Error: 'name' might not exist
 }
 
 // Correct
 if (isPeriodEntity(entity)) {
-  console.log(entity.name);  // OK: TypeScript knows it's PeriodEntity
+  console.log(entity.name); // OK: TypeScript knows it's PeriodEntity
 }
 ```
 
@@ -1378,12 +1397,14 @@ if (isPeriodEntity(entity)) {
 ### Issue 5: Component Not Found Error
 
 **Symptoms:**
+
 - "Failed to resolve component: ApprovalStatus"
 - Component renders as empty or shows error
 
 **Cause:** Wrong component name
 
 **Solution:**
+
 ```vue
 <!-- Wrong -->
 <ApprovalStatus />
@@ -1399,24 +1420,28 @@ if (isPeriodEntity(entity)) {
 ### Manual Testing Steps
 
 **1. Page Access**
+
 - [ ] Admin can access /period-close
 - [ ] Non-admin gets redirected (403 error or redirect)
 - [ ] Page shows loading state initially
 - [ ] Page shows current period info after loading
 
 **2. Pre-Close Checklist**
+
 - [ ] Checklist items display correctly
 - [ ] Completed items show green checkmark
 - [ ] Incomplete items show gray circle
 - [ ] Count badges show correct numbers
 
 **3. Location Readiness Table**
+
 - [ ] All locations appear in table
 - [ ] Status badges show correct colors
 - [ ] Ready date shows for ready locations
 - [ ] "Mark Ready" button appears for non-ready locations
 
 **4. Mark Ready Flow**
+
 - [ ] Button shows loading spinner when clicked
 - [ ] Other buttons are disabled during loading
 - [ ] Success toast appears after completion
@@ -1424,6 +1449,7 @@ if (isPeriodEntity(entity)) {
 - [ ] Checklist updates automatically
 
 **5. Close Period Flow**
+
 - [ ] Button disabled when not all locations ready
 - [ ] Button enabled when all locations ready
 - [ ] Confirmation modal shows on click
@@ -1434,6 +1460,7 @@ if (isPeriodEntity(entity)) {
 - [ ] "Go to Period Management" navigates correctly
 
 **6. Approval Components**
+
 - [ ] ApprovalStatus shows correct color per status
 - [ ] ApprovalStatus shows correct icon per status
 - [ ] ApprovalRequest shows requester info
@@ -1444,6 +1471,7 @@ if (isPeriodEntity(entity)) {
 - [ ] Success/error toasts appear appropriately
 
 **7. Error Scenarios**
+
 - [ ] Error message shows if API fails
 - [ ] Loading state clears after error
 - [ ] User can retry after error
@@ -1455,6 +1483,7 @@ if (isPeriodEntity(entity)) {
 After completing Period Close UI (Phase 3.3), the next phase is:
 
 **→ Phase 3.4: Reporting & Exports** (Days 28-30)
+
 - Stock report API and page
 - Reconciliation report API and page
 - Deliveries and Issues reports

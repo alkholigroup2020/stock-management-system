@@ -19,43 +19,43 @@
 
 ### Business Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **WAC** | Weighted Average Cost - The average price of an item | 100 kg @ SAR 5 + 200 kg @ SAR 6 = 300 kg @ SAR 5.67 |
-| **Period** | Monthly accounting period | January 2025, February 2025 |
-| **NCR** | Non-Conformance Report - Alert for problems | Delivery price different from expected |
-| **POB** | People on Board - Daily headcount | 50 crew + 10 extra = 60 total people |
-| **Location** | Physical place where stock is kept | Main Kitchen, Warehouse |
-| **Delivery** | When goods arrive | Received 100 kg flour from supplier |
-| **Issue** | When goods are used | Used 50 kg flour for kitchen |
-| **Transfer** | Moving stock between locations | Move 30 kg from Warehouse to Kitchen |
-| **On-Hand** | Current quantity available | We have 100 kg in stock |
+| Term         | Simple Explanation                                   | Example                                             |
+| ------------ | ---------------------------------------------------- | --------------------------------------------------- |
+| **WAC**      | Weighted Average Cost - The average price of an item | 100 kg @ SAR 5 + 200 kg @ SAR 6 = 300 kg @ SAR 5.67 |
+| **Period**   | Monthly accounting period                            | January 2025, February 2025                         |
+| **NCR**      | Non-Conformance Report - Alert for problems          | Delivery price different from expected              |
+| **POB**      | People on Board - Daily headcount                    | 50 crew + 10 extra = 60 total people                |
+| **Location** | Physical place where stock is kept                   | Main Kitchen, Warehouse                             |
+| **Delivery** | When goods arrive                                    | Received 100 kg flour from supplier                 |
+| **Issue**    | When goods are used                                  | Used 50 kg flour for kitchen                        |
+| **Transfer** | Moving stock between locations                       | Move 30 kg from Warehouse to Kitchen                |
+| **On-Hand**  | Current quantity available                           | We have 100 kg in stock                             |
 
 ### Technical Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **API** | Application Programming Interface - How frontend talks to backend | GET /api/items |
-| **Component** | Reusable UI piece | Button, Table, Form |
-| **Composable** | Reusable logic function | useAuth(), usePermissions() |
-| **Store** | Shared data storage | authStore, locationStore |
-| **Middleware** | Security check before accessing page/API | Check if user is logged in |
-| **Migration** | Database change record | Add new table, add new column |
-| **Seed** | Test data for development | Create sample items, users |
-| **JWT** | JSON Web Token - Encrypted session data | Stored in httpOnly cookie |
-| **Zod** | Data validation library | Check email format, required fields |
-| **Prisma** | Database access tool | Query items, create delivery |
+| Term           | Simple Explanation                                                | Example                             |
+| -------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| **API**        | Application Programming Interface - How frontend talks to backend | GET /api/items                      |
+| **Component**  | Reusable UI piece                                                 | Button, Table, Form                 |
+| **Composable** | Reusable logic function                                           | useAuth(), usePermissions()         |
+| **Store**      | Shared data storage                                               | authStore, locationStore            |
+| **Middleware** | Security check before accessing page/API                          | Check if user is logged in          |
+| **Migration**  | Database change record                                            | Add new table, add new column       |
+| **Seed**       | Test data for development                                         | Create sample items, users          |
+| **JWT**        | JSON Web Token - Encrypted session data                           | Stored in httpOnly cookie           |
+| **Zod**        | Data validation library                                           | Check email format, required fields |
+| **Prisma**     | Database access tool                                              | Query items, create delivery        |
 
 ### File Extensions
 
-| Extension | What It Is | Example |
-|-----------|------------|---------|
-| `.vue` | Vue component file | AppNavbar.vue |
-| `.ts` | TypeScript file | auth.ts |
-| `.prisma` | Prisma database schema | schema.prisma |
-| `.md` | Markdown documentation | README.md |
-| `.mjs` | JavaScript module (ES6) | test-api.mjs |
-| `.json` | JSON configuration | package.json |
+| Extension | What It Is              | Example       |
+| --------- | ----------------------- | ------------- |
+| `.vue`    | Vue component file      | AppNavbar.vue |
+| `.ts`     | TypeScript file         | auth.ts       |
+| `.prisma` | Prisma database schema  | schema.prisma |
+| `.md`     | Markdown documentation  | README.md     |
+| `.mjs`    | JavaScript module (ES6) | test-api.mjs  |
+| `.json`   | JSON configuration      | package.json  |
 
 ---
 
@@ -227,16 +227,16 @@ Project Root
 
 ### Where to Find Things
 
-| I want to... | Look in... |
-|--------------|------------|
-| Create a new page | `/app/pages/` |
-| Create a reusable component | `/app/components/` |
-| Add API endpoint | `/server/api/` |
-| Add permission check | `/app/composables/usePermissions.ts` |
-| Modify database | `/prisma/schema.prisma` |
-| Add helper function | `/server/utils/` (server) or `/app/utils/` (client) |
-| Change app layout | `/app/layouts/default.vue` |
-| Modify navigation menu | `/app/components/layout/AppSidebar.vue` |
+| I want to...                | Look in...                                          |
+| --------------------------- | --------------------------------------------------- |
+| Create a new page           | `/app/pages/`                                       |
+| Create a reusable component | `/app/components/`                                  |
+| Add API endpoint            | `/server/api/`                                      |
+| Add permission check        | `/app/composables/usePermissions.ts`                |
+| Modify database             | `/prisma/schema.prisma`                             |
+| Add helper function         | `/server/utils/` (server) or `/app/utils/` (client) |
+| Change app layout           | `/app/layouts/default.vue`                          |
+| Modify navigation menu      | `/app/components/layout/AppSidebar.vue`             |
 
 ---
 
@@ -409,11 +409,7 @@ GET    /api/locations/:locationId/dashboard      Get dashboard data
 />
 
 <!-- Page Header -->
-<PageHeader
-  title="Items"
-  icon="i-lucide-package"
-  :breadcrumbs="breadcrumbs"
->
+<PageHeader title="Items" icon="i-lucide-package" :breadcrumbs="breadcrumbs">
   <template #actions>
     <UButton>Action Button</UButton>
   </template>
@@ -438,15 +434,15 @@ GET    /api/locations/:locationId/dashboard      Get dashboard data
 <!-- Use default layout (navbar + sidebar) -->
 <script setup>
 definePageMeta({
-  layout: 'default'
-})
+  layout: "default",
+});
 </script>
 
 <!-- Use blank layout (login page) -->
 <script setup>
 definePageMeta({
-  layout: false
-})
+  layout: false,
+});
 </script>
 ```
 
@@ -459,19 +455,10 @@ definePageMeta({
 </UButton>
 
 <!-- Input -->
-<UInput
-  v-model="value"
-  type="text"
-  placeholder="Enter value"
-  icon="i-lucide-search"
-/>
+<UInput v-model="value" type="text" placeholder="Enter value" icon="i-lucide-search" />
 
 <!-- Select -->
-<USelectMenu
-  v-model="selected"
-  :options="options"
-  placeholder="Select option"
-/>
+<USelectMenu v-model="selected" :options="options" placeholder="Select option" />
 
 <!-- Card -->
 <UCard>
@@ -494,24 +481,18 @@ definePageMeta({
 ```vue
 <template>
   <!-- Show only if user can post deliveries -->
-  <UButton v-if="permissions.canPostDeliveries()">
-    New Delivery
-  </UButton>
+  <UButton v-if="permissions.canPostDeliveries()">New Delivery</UButton>
 
   <!-- Show only for admins -->
-  <UButton v-if="auth.isAdmin">
-    Admin Action
-  </UButton>
+  <UButton v-if="auth.isAdmin">Admin Action</UButton>
 
   <!-- Show for supervisor or higher -->
-  <UButton v-if="auth.isAtLeastSupervisor">
-    Approve
-  </UButton>
+  <UButton v-if="auth.isAtLeastSupervisor">Approve</UButton>
 </template>
 
 <script setup>
-const auth = useAuth()
-const permissions = usePermissions()
+const auth = useAuth();
+const permissions = usePermissions();
 </script>
 ```
 
@@ -522,28 +503,26 @@ const permissions = usePermissions()
 if (!event.context.user) {
   throw createError({
     statusCode: 401,
-    message: 'Unauthorized'
-  })
+    message: "Unauthorized",
+  });
 }
 
 // Check if user is admin
-if (event.context.user.role !== 'ADMIN') {
+if (event.context.user.role !== "ADMIN") {
   throw createError({
     statusCode: 403,
-    message: 'Admin access required'
-  })
+    message: "Admin access required",
+  });
 }
 
 // Check location access
-if (user.role === 'OPERATOR') {
-  const hasAccess = user.locations.some(
-    loc => loc.location_id === locationId
-  )
+if (user.role === "OPERATOR") {
+  const hasAccess = user.locations.some((loc) => loc.location_id === locationId);
   if (!hasAccess) {
     throw createError({
       statusCode: 403,
-      message: 'No access to this location'
-    })
+      message: "No access to this location",
+    });
   }
 }
 ```
@@ -555,28 +534,28 @@ if (user.role === 'OPERATOR') {
 ### Currency Formatting
 
 ```typescript
-import { formatCurrency } from '~/utils/format'
+import { formatCurrency } from "~/utils/format";
 
-formatCurrency(1234.56)  // "SAR 1,234.56"
-formatCurrency(1000)     // "SAR 1,000.00"
+formatCurrency(1234.56); // "SAR 1,234.56"
+formatCurrency(1000); // "SAR 1,000.00"
 ```
 
 ### Date Formatting
 
 ```typescript
-import { formatDate, formatDateTime } from '~/utils/format'
+import { formatDate, formatDateTime } from "~/utils/format";
 
-formatDate('2025-01-15')              // "15/01/2025"
-formatDateTime('2025-01-15T14:30:00') // "15/01/2025 14:30"
+formatDate("2025-01-15"); // "15/01/2025"
+formatDateTime("2025-01-15T14:30:00"); // "15/01/2025 14:30"
 ```
 
 ### Number Formatting
 
 ```typescript
-import { formatNumber, formatQuantity } from '~/utils/format'
+import { formatNumber, formatQuantity } from "~/utils/format";
 
-formatNumber(1234.5678)      // "1,234.57" (2 decimals)
-formatQuantity(123.4567)     // "123.4567" (4 decimals)
+formatNumber(1234.5678); // "1,234.57" (2 decimals)
+formatQuantity(123.4567); // "123.4567" (4 decimals)
 ```
 
 ---
@@ -586,32 +565,32 @@ formatQuantity(123.4567)     // "123.4567" (4 decimals)
 ### Fetching Data in Page
 
 ```typescript
-const { data: items, pending, error, refresh } = await useFetch('/api/items')
+const { data: items, pending, error, refresh } = await useFetch("/api/items");
 ```
 
 ### Submitting Form
 
 ```typescript
-const loading = ref(false)
-const error = ref<string | null>(null)
+const loading = ref(false);
+const error = ref<string | null>(null);
 
 async function handleSubmit() {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    await $fetch('/api/items', {
-      method: 'POST',
-      body: formData
-    })
+    await $fetch("/api/items", {
+      method: "POST",
+      body: formData,
+    });
 
-    toast.success('Item created successfully')
-    navigateTo('/items')
+    toast.success("Item created successfully");
+    navigateTo("/items");
   } catch (err) {
-    error.value = err.message
-    toast.error('Failed to create item')
+    error.value = err.message;
+    toast.error("Failed to create item");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 ```
@@ -619,15 +598,15 @@ async function handleSubmit() {
 ### Watch Store Changes
 
 ```typescript
-const locationStore = useLocationStore()
+const locationStore = useLocationStore();
 
 watch(
   () => locationStore.activeLocationId,
   () => {
     // Refresh data when location changes
-    refresh()
+    refresh();
   }
-)
+);
 ```
 
 ---
@@ -636,42 +615,42 @@ watch(
 
 ### Common Issues
 
-| Problem | Likely Cause | Solution |
-|---------|--------------|----------|
-| Page shows login instead of content | Not authenticated | Check if session is valid |
-| API returns 403 Forbidden | No permission | Check user role and location access |
-| Items don't show stock | Missing locationId | Pass locationId in query |
-| WAC not updating | Issue instead of delivery | WAC only changes on deliveries |
-| Form validation fails | Missing required field | Check Zod schema requirements |
-| Database error | Migration not run | Run `pnpm db:migrate dev` |
-| TypeScript errors | Missing type | Run `pnpm db:generate` for Prisma types |
+| Problem                             | Likely Cause              | Solution                                |
+| ----------------------------------- | ------------------------- | --------------------------------------- |
+| Page shows login instead of content | Not authenticated         | Check if session is valid               |
+| API returns 403 Forbidden           | No permission             | Check user role and location access     |
+| Items don't show stock              | Missing locationId        | Pass locationId in query                |
+| WAC not updating                    | Issue instead of delivery | WAC only changes on deliveries          |
+| Form validation fails               | Missing required field    | Check Zod schema requirements           |
+| Database error                      | Migration not run         | Run `pnpm db:migrate dev`               |
+| TypeScript errors                   | Missing type              | Run `pnpm db:generate` for Prisma types |
 
 ### Error Codes Reference
 
-| Code | Meaning | Common Cause |
-|------|---------|--------------|
-| 400 | Bad Request | Validation failed |
-| 401 | Unauthorized | Not logged in |
-| 403 | Forbidden | No permission |
-| 404 | Not Found | Resource doesn't exist |
-| 409 | Conflict | Duplicate value (e.g., item code) |
-| 500 | Internal Error | Server bug |
+| Code | Meaning        | Common Cause                      |
+| ---- | -------------- | --------------------------------- |
+| 400  | Bad Request    | Validation failed                 |
+| 401  | Unauthorized   | Not logged in                     |
+| 403  | Forbidden      | No permission                     |
+| 404  | Not Found      | Resource doesn't exist            |
+| 409  | Conflict       | Duplicate value (e.g., item code) |
+| 500  | Internal Error | Server bug                        |
 
 ---
 
 ## Keyboard Shortcuts (Development)
 
-| Action | Shortcut |
-|--------|----------|
-| Save file | Ctrl + S |
+| Action               | Shortcut         |
+| -------------------- | ---------------- |
+| Save file            | Ctrl + S         |
 | Open command palette | Ctrl + Shift + P |
-| Search files | Ctrl + P |
-| Find in file | Ctrl + F |
-| Find in all files | Ctrl + Shift + F |
-| Go to definition | F12 |
-| Show all references | Shift + F12 |
-| Rename symbol | F2 |
-| Format document | Shift + Alt + F |
+| Search files         | Ctrl + P         |
+| Find in file         | Ctrl + F         |
+| Find in all files    | Ctrl + Shift + F |
+| Go to definition     | F12              |
+| Show all references  | Shift + F12      |
+| Rename symbol        | F2               |
+| Format document      | Shift + Alt + F  |
 
 ---
 

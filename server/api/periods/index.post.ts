@@ -75,22 +75,13 @@ export default defineEventHandler(async (event) => {
       where: {
         OR: [
           {
-            AND: [
-              { start_date: { lte: startDate } },
-              { end_date: { gte: startDate } },
-            ],
+            AND: [{ start_date: { lte: startDate } }, { end_date: { gte: startDate } }],
           },
           {
-            AND: [
-              { start_date: { lte: endDate } },
-              { end_date: { gte: endDate } },
-            ],
+            AND: [{ start_date: { lte: endDate } }, { end_date: { gte: endDate } }],
           },
           {
-            AND: [
-              { start_date: { gte: startDate } },
-              { end_date: { lte: endDate } },
-            ],
+            AND: [{ start_date: { gte: startDate } }, { end_date: { lte: endDate } }],
           },
         ],
       },

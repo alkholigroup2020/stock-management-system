@@ -5,6 +5,7 @@
 **NCR = Non-Conformance Report**
 
 Think of an NCR like a **formal complaint form** for business. When something goes wrong with a delivery or stock quality, we create an NCR to:
+
 - Document the problem
 - Track resolution
 - Request credit from supplier
@@ -13,18 +14,21 @@ Think of an NCR like a **formal complaint form** for business. When something go
 ## Real-World Examples
 
 ### Example 1: Damaged Goods
+
 - You order 100 KG tomatoes
 - 20 KG arrive rotten
 - Create NCR for damaged goods
 - Supplier gives credit for 20 KG
 
 ### Example 2: Wrong Quantity
+
 - You order 50 boxes of oil
 - Only 45 boxes delivered
 - Create NCR for short delivery
 - Supplier sends missing 5 boxes
 
 ### Example 3: Price Difference
+
 - Contract price: SAR 10.00/KG
 - Invoice price: SAR 12.00/KG
 - System auto-creates NCR
@@ -33,14 +37,18 @@ Think of an NCR like a **formal complaint form** for business. When something go
 ## Two Types of NCRs
 
 ### 1. Manual NCR
+
 Created by **humans** when they notice problems:
+
 - Physical damage
 - Wrong items
 - Quality issues
 - Missing quantities
 
 ### 2. Automatic NCR (Price Variance)
+
 Created by **system** when prices don't match:
+
 - Delivery price ≠ Period price
 - No human intervention needed
 - Instant detection
@@ -87,6 +95,7 @@ flowchart TD
 ### Why This Matters
 
 **Business Impact:**
+
 1. **Prevents unauthorized price increases**
    - Suppliers can't change prices without approval
    - System catches every variance
@@ -130,13 +139,13 @@ stateDiagram-v2
 
 ### What Each Status Means
 
-| Status | Meaning | Next Actions | Who Can Update |
-|--------|---------|--------------|----------------|
-| OPEN | Just created, not yet sent | Prepare documentation, Send to supplier | Any user with location access |
-| SENT | Sent to supplier, awaiting response | Follow up, Wait for response | Supervisor/Admin |
-| CREDITED | Supplier agreed to give credit | Process credit note, Update accounting | Supervisor/Admin |
-| REJECTED | Supplier refused the claim | Escalate or Accept | Supervisor/Admin |
-| RESOLVED | Resolved through other means | Document resolution | Supervisor/Admin |
+| Status   | Meaning                             | Next Actions                            | Who Can Update                |
+| -------- | ----------------------------------- | --------------------------------------- | ----------------------------- |
+| OPEN     | Just created, not yet sent          | Prepare documentation, Send to supplier | Any user with location access |
+| SENT     | Sent to supplier, awaiting response | Follow up, Wait for response            | Supervisor/Admin              |
+| CREDITED | Supplier agreed to give credit      | Process credit note, Update accounting  | Supervisor/Admin              |
+| REJECTED | Supplier refused the claim          | Escalate or Accept                      | Supervisor/Admin              |
+| RESOLVED | Resolved through other means        | Document resolution                     | Supervisor/Admin              |
 
 ## Database Design
 
@@ -197,19 +206,23 @@ erDiagram
 ### Key Fields Explained
 
 **ncr_no**: Sequential number format NCR-YYYY-NNN
+
 - NCR-2025-001 (first NCR of 2025)
 - NCR-2025-002 (second NCR of 2025)
 - Resets each year
 
 **type**: Two possible values
+
 - MANUAL = Created by user
 - PRICE_VARIANCE = Created by system
 
 **auto_generated**: Boolean flag
+
 - true = System created
 - false = User created
 
 **value**: Total value of the non-conformance
+
 - For price variance: (actual_price - expected_price) × quantity
 - For manual: User-entered value
 
@@ -234,6 +247,7 @@ erDiagram
 ```
 
 **Key Function:** `detectAndCreateNCR()`
+
 ```
 Purpose: Create NCR for price variance
 Input:
@@ -255,6 +269,7 @@ Process:
 ### 2. Manual NCR Creation (POST /api/ncrs)
 
 **What Users Provide:**
+
 ```json
 {
   "location_id": "uuid",
@@ -264,13 +279,14 @@ Process:
     {
       "item_id": "uuid",
       "quantity": 20,
-      "unit_value": 5.00
+      "unit_value": 5.0
     }
   ]
 }
 ```
 
 **What System Does:**
+
 1. Validate user has location access
 2. Generate NCR number
 3. Calculate total value from items
@@ -281,12 +297,14 @@ Process:
 ### 3. NCR Status Update (PATCH /api/ncrs/:id)
 
 **Status Transition Rules:**
+
 - OPEN → SENT (when sent to supplier)
 - SENT → CREDITED (supplier agrees)
 - SENT → REJECTED (supplier refuses)
 - SENT → RESOLVED (other resolution)
 
 **Automatic Updates:**
+
 - When status becomes CREDITED/REJECTED/RESOLVED:
   - Set resolved_at = current timestamp
   - Save resolution_notes
@@ -298,6 +316,7 @@ Process:
 **Key Features:**
 
 1. **Table Columns**
+
    ```
    | NCR No | Type | Date | Location | Reason | Value | Status |
    |--------|------|------|----------|--------|-------|--------|
@@ -322,6 +341,7 @@ Process:
 **Comprehensive Display:**
 
 1. **Header Section**
+
    ```
    NCR-2025-001                    [PRICE VARIANCE] [Auto]
    Status: [OPEN]
@@ -332,6 +352,7 @@ Process:
    ```
 
 2. **For Price Variance NCRs - Special Section**
+
    ```
    Related Delivery: DLV-2025-456
    Date: 15/11/2025
@@ -366,6 +387,7 @@ Process:
    - Helps link NCR to specific delivery
 
 3. **Dynamic Item Lines**
+
    ```
    | Item | Quantity | Unit Value | Line Total |
    |------|----------|------------|------------|
@@ -377,6 +399,7 @@ Process:
 4. **Automatic Reason Building**
    User enters: "Damaged items found"
    System appends:
+
    ```
    Damaged items found
 
@@ -391,6 +414,7 @@ Process:
 ### Scenario 1: Price Increase Detection
 
 **What Happens:**
+
 1. Period starts with Chicken at SAR 15.00/KG
 2. Supplier delivers at SAR 17.00/KG
 3. System creates NCR automatically
@@ -403,6 +427,7 @@ Process:
 ### Scenario 2: Damaged Goods
 
 **What Happens:**
+
 1. Operator receives vegetables
 2. Notices 30% are damaged
 3. Creates manual NCR
@@ -415,6 +440,7 @@ Process:
 ### Scenario 3: Short Delivery
 
 **What Happens:**
+
 1. Ordered 100 boxes
 2. Received only 90 boxes
 3. Create manual NCR for 10 boxes
@@ -441,6 +467,7 @@ Process:
 ## Performance Optimizations
 
 ### Database Indexes
+
 - `ncr.status` + `ncr.created_at`
 - `ncr.location_id`
 - `ncr.type`
@@ -449,6 +476,7 @@ Process:
 **Result:** List queries 75% faster
 
 ### Caching Strategy
+
 - NCR list not cached (needs real-time)
 - Delivery data cached for dropdown
 - Location data cached 5 minutes
@@ -478,27 +506,35 @@ Process:
 ## Best Practices
 
 ### 1. Always Document
+
 Every NCR needs clear documentation:
+
 - What went wrong
 - When it happened
 - What's the impact
 - What's the resolution
 
 ### 2. Quick Response
+
 NCRs should be sent to suppliers quickly:
+
 - Fresh evidence
 - Better recall
 - Faster resolution
 
 ### 3. Complete Information
+
 Include all relevant details:
+
 - Item codes and names
 - Quantities and values
 - Delivery references
 - Photos if applicable
 
 ### 4. Follow Up
+
 Don't let NCRs sit in SENT status:
+
 - Regular follow-ups
 - Escalate if needed
 - Close when resolved
@@ -506,16 +542,19 @@ Don't let NCRs sit in SENT status:
 ## Business Benefits
 
 ### Financial Impact
+
 - **Recover money** from suppliers
 - **Prevent losses** from price increases
 - **Document costs** of quality issues
 
 ### Operational Impact
+
 - **Improve supplier quality** through feedback
 - **Reduce waste** from damaged goods
 - **Ensure compliance** with contracts
 
 ### Strategic Impact
+
 - **Supplier evaluation** data
 - **Negotiation leverage**
 - **Quality trends** analysis
@@ -523,12 +562,14 @@ Don't let NCRs sit in SENT status:
 ## Future Enhancements
 
 ### Phase 3 Ideas
+
 - NCR dashboard with metrics
 - Supplier scorecards
 - Automatic follow-up reminders
 - Email notifications
 
 ### Post-MVP Ideas
+
 - Photo attachments
 - PDF export
 - Supplier portal access
@@ -537,6 +578,7 @@ Don't let NCRs sit in SENT status:
 ## Summary
 
 The NCR System is a **critical quality control tool** that:
+
 - Automatically detects price problems
 - Tracks quality issues
 - Manages supplier complaints
@@ -547,4 +589,4 @@ Every variance is caught, every issue documented, every resolution tracked.
 
 ---
 
-*Remember: Good NCR management saves money, improves quality, and strengthens supplier relationships.*
+_Remember: Good NCR management saves money, improves quality, and strengthens supplier relationships._

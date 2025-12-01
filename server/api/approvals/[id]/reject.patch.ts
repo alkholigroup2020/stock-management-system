@@ -242,14 +242,12 @@ async function handlePeriodCloseRejection(
       id: result.period.id,
       name: result.period.name,
       status: result.period.status,
-      locations: result.period.period_locations.map(
-        (pl: PeriodLocationWithLocation) => ({
-          locationId: pl.location_id,
-          locationCode: pl.location.code,
-          locationName: pl.location.name,
-          status: pl.status,
-        })
-      ),
+      locations: result.period.period_locations.map((pl: PeriodLocationWithLocation) => ({
+        locationId: pl.location_id,
+        locationCode: pl.location.code,
+        locationName: pl.location.name,
+        status: pl.status,
+      })),
     },
     message: "Period close request rejected - period reverted to OPEN status",
   };

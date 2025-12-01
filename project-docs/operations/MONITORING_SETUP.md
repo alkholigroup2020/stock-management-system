@@ -35,13 +35,13 @@ This document outlines the monitoring setup for the Stock Management System. The
 
 ### Monitoring Stack
 
-| Component | Tool | Purpose |
-|-----------|------|---------|
-| Application Hosting | Vercel Analytics | Page views, performance, Web Vitals |
-| Database | Supabase Dashboard | Query performance, connections, storage |
-| Uptime | UptimeRobot (or Vercel Monitoring) | HTTP endpoint checks |
-| Error Tracking | Built-in logging (optional: Sentry) | JavaScript errors, API errors |
-| Performance | Built-in middleware | API response times, slow queries |
+| Component           | Tool                                | Purpose                                 |
+| ------------------- | ----------------------------------- | --------------------------------------- |
+| Application Hosting | Vercel Analytics                    | Page views, performance, Web Vitals     |
+| Database            | Supabase Dashboard                  | Query performance, connections, storage |
+| Uptime              | UptimeRobot (or Vercel Monitoring)  | HTTP endpoint checks                    |
+| Error Tracking      | Built-in logging (optional: Sentry) | JavaScript errors, API errors           |
+| Performance         | Built-in middleware                 | API response times, slow queries        |
 
 ---
 
@@ -89,19 +89,20 @@ Vercel Analytics is already enabled for the project and provides:
 
 #### Key Metrics to Monitor
 
-| Metric | Target | Description |
-|--------|--------|-------------|
-| **CLS** (Cumulative Layout Shift) | < 0.1 | Visual stability |
-| **FID** (First Input Delay) | < 100ms | Interactivity |
-| **LCP** (Largest Contentful Paint) | < 2.5s | Load performance |
-| **FCP** (First Contentful Paint) | < 1.8s | Perceived load speed |
-| **TTFB** (Time to First Byte) | < 600ms | Server response time |
+| Metric                             | Target  | Description          |
+| ---------------------------------- | ------- | -------------------- |
+| **CLS** (Cumulative Layout Shift)  | < 0.1   | Visual stability     |
+| **FID** (First Input Delay)        | < 100ms | Interactivity        |
+| **LCP** (Largest Contentful Paint) | < 2.5s  | Load performance     |
+| **FCP** (First Contentful Paint)   | < 1.8s  | Perceived load speed |
+| **TTFB** (Time to First Byte)      | < 600ms | Server response time |
 
 #### Weekly Analytics Review
 
 **Schedule:** Every Monday 10:00 AM
 
 **Checklist:**
+
 - [ ] Review Web Vitals scores (all should be "Good")
 - [ ] Check for any performance regressions (compare to previous week)
 - [ ] Identify slowest pages (LCP > 3s)
@@ -142,19 +143,20 @@ Supabase provides built-in monitoring for the PostgreSQL database:
 
 #### Key Database Metrics
 
-| Metric | Target | Alert Threshold |
-|--------|--------|-----------------|
-| **Active Connections** | < 20 | > 50 (warning), > 80 (critical) |
-| **Database Size** | Monitor growth | > 8GB (Free tier limit) |
-| **Query Performance** | < 100ms avg | > 500ms (warning), > 1s (critical) |
-| **Connection Pool** | < 80% usage | > 90% (warning) |
-| **Disk I/O** | Monitor trends | Sudden spikes |
+| Metric                 | Target         | Alert Threshold                    |
+| ---------------------- | -------------- | ---------------------------------- |
+| **Active Connections** | < 20           | > 50 (warning), > 80 (critical)    |
+| **Database Size**      | Monitor growth | > 8GB (Free tier limit)            |
+| **Query Performance**  | < 100ms avg    | > 500ms (warning), > 1s (critical) |
+| **Connection Pool**    | < 80% usage    | > 90% (warning)                    |
+| **Disk I/O**           | Monitor trends | Sudden spikes                      |
 
 #### Weekly Database Review
 
 **Schedule:** Every Monday 10:30 AM
 
 **Checklist:**
+
 - [ ] Check database size and growth rate
 - [ ] Review slow queries (> 500ms)
 - [ ] Check connection pool usage
@@ -199,6 +201,7 @@ The application includes custom performance monitoring middleware at `server/mid
 **Authentication:** Admin role required
 
 **Response:**
+
 ```json
 {
   "summary": {
@@ -237,6 +240,7 @@ curl https://stock-management.vercel.app/api/metrics/performance \
 Configure alerts for performance degradation:
 
 **Alert Rules:**
+
 1. **Slow API Requests:** > 10 slow requests per hour
 2. **Average Response Time:** > 500ms over 5-minute window
 3. **Error Rate:** > 5% of requests failing
@@ -261,25 +265,27 @@ Monitor database query performance using Supabase dashboard:
 
 Monitor these common operations:
 
-| Query Type | Expected Time | Alert Threshold |
-|------------|---------------|-----------------|
-| Single location stock query | < 50ms | > 200ms |
-| Delivery posting (5 lines) | < 200ms | > 1s |
-| Transfer approval | < 150ms | > 500ms |
-| Period close (all locations) | < 5s | > 10s |
-| Dashboard data fetch | < 300ms | > 1s |
+| Query Type                   | Expected Time | Alert Threshold |
+| ---------------------------- | ------------- | --------------- |
+| Single location stock query  | < 50ms        | > 200ms         |
+| Delivery posting (5 lines)   | < 200ms       | > 1s            |
+| Transfer approval            | < 150ms       | > 500ms         |
+| Period close (all locations) | < 5s          | > 10s           |
+| Dashboard data fetch         | < 300ms       | > 1s            |
 
 ### Database Connection Monitoring
 
 Monitor connection pool health:
 
 **Indicators of Connection Issues:**
+
 - High number of idle connections (> 20)
 - Connection pool exhaustion errors
 - "Too many connections" errors
 - Long-running transactions (> 30s)
 
 **Resolution:**
+
 - Review Prisma client connection settings
 - Check for connection leaks in code
 - Upgrade to Supabase Pro for more connections
@@ -372,29 +378,33 @@ Configure multi-channel alerts:
 
 ### Alert Priority Levels
 
-| Priority | Response Time | Escalation |
-|----------|---------------|------------|
-| **Critical** | 15 minutes | Page on-call admin immediately |
-| **High** | 1 hour | Email + SMS to admin |
-| **Medium** | 4 hours | Email to admin |
-| **Low** | Next business day | Email to dev team |
+| Priority     | Response Time     | Escalation                     |
+| ------------ | ----------------- | ------------------------------ |
+| **Critical** | 15 minutes        | Page on-call admin immediately |
+| **High**     | 1 hour            | Email + SMS to admin           |
+| **Medium**   | 4 hours           | Email to admin                 |
+| **Low**      | Next business day | Email to dev team              |
 
 **Critical Alerts:**
+
 - Application down (uptime check fails)
 - Database unavailable
 - Data loss detected
 
 **High Alerts:**
+
 - Slow API responses (> 2s)
 - High error rate (> 5%)
 - Backup failure
 
 **Medium Alerts:**
+
 - Degraded performance (> 1s response time)
 - Storage usage > 80%
 - Slow queries detected
 
 **Low Alerts:**
+
 - Code quality issues
 - Minor performance regression
 - Non-critical warnings
@@ -433,9 +443,7 @@ Build a custom monitoring dashboard page in the application:
       <!-- Uptime Status -->
       <UCard>
         <div class="text-center">
-          <div class="text-3xl font-bold" :class="uptimeColor">
-            {{ uptime }}%
-          </div>
+          <div class="text-3xl font-bold" :class="uptimeColor">{{ uptime }}%</div>
           <div class="text-sm text-muted mt-1">Uptime (30 days)</div>
         </div>
       </UCard>
@@ -474,30 +482,30 @@ Build a custom monitoring dashboard page in the application:
 
 ### Application Metrics
 
-| Metric | Source | Target | How to Access |
-|--------|--------|--------|---------------|
-| Page Load Time | Vercel Analytics | < 3s | Vercel Dashboard → Analytics |
-| API Response Time | Performance Middleware | < 1s | `/api/metrics/performance` |
-| Error Rate | Vercel Functions | < 0.1% | Vercel Dashboard → Functions |
-| Uptime | UptimeRobot | > 99.5% | UptimeRobot Dashboard |
+| Metric            | Source                 | Target  | How to Access                |
+| ----------------- | ---------------------- | ------- | ---------------------------- |
+| Page Load Time    | Vercel Analytics       | < 3s    | Vercel Dashboard → Analytics |
+| API Response Time | Performance Middleware | < 1s    | `/api/metrics/performance`   |
+| Error Rate        | Vercel Functions       | < 0.1%  | Vercel Dashboard → Functions |
+| Uptime            | UptimeRobot            | > 99.5% | UptimeRobot Dashboard        |
 
 ### Database Metrics
 
-| Metric | Source | Target | How to Access |
-|--------|--------|--------|---------------|
-| Query Performance | Supabase | < 100ms avg | Supabase Dashboard → Database |
-| Active Connections | Supabase | < 20 | Supabase Dashboard → Database |
-| Database Size | Supabase | Monitor | Supabase Dashboard → Database |
-| Backup Status | Supabase | Daily | Supabase Dashboard → Backups |
+| Metric             | Source   | Target      | How to Access                 |
+| ------------------ | -------- | ----------- | ----------------------------- |
+| Query Performance  | Supabase | < 100ms avg | Supabase Dashboard → Database |
+| Active Connections | Supabase | < 20        | Supabase Dashboard → Database |
+| Database Size      | Supabase | Monitor     | Supabase Dashboard → Database |
+| Backup Status      | Supabase | Daily       | Supabase Dashboard → Backups  |
 
 ### Infrastructure Metrics
 
-| Metric | Source | Target | How to Access |
-|--------|--------|--------|---------------|
-| Build Time | Vercel | < 2 min | Vercel Dashboard → Deployments |
-| Function Errors | Vercel | < 10/hour | Vercel Dashboard → Functions |
-| Bandwidth Usage | Vercel | Monitor | Vercel Dashboard → Usage |
-| Storage Usage | Supabase | < 8 GB | Supabase Dashboard → Settings |
+| Metric          | Source   | Target    | How to Access                  |
+| --------------- | -------- | --------- | ------------------------------ |
+| Build Time      | Vercel   | < 2 min   | Vercel Dashboard → Deployments |
+| Function Errors | Vercel   | < 10/hour | Vercel Dashboard → Functions   |
+| Bandwidth Usage | Vercel   | Monitor   | Vercel Dashboard → Usage       |
+| Storage Usage   | Supabase | < 8 GB    | Supabase Dashboard → Settings  |
 
 ---
 
@@ -539,16 +547,19 @@ Build a custom monitoring dashboard page in the application:
 ### High Response Times
 
 **Symptoms:**
+
 - API requests > 1s
 - Performance metrics show degradation
 - Users report slow page loads
 
 **Diagnosis:**
+
 1. Check `/api/metrics/performance` for slow endpoints
 2. Review Supabase query performance
 3. Check Vercel function logs for errors
 
 **Resolution:**
+
 - Optimize slow database queries
 - Add database indexes if needed
 - Enable caching for frequently accessed data
@@ -557,16 +568,19 @@ Build a custom monitoring dashboard page in the application:
 ### Database Connection Errors
 
 **Symptoms:**
+
 - "Too many connections" errors
 - High active connection count
 - Connection pool exhausted
 
 **Diagnosis:**
+
 1. Check Supabase Dashboard → Database → Connections
 2. Review Prisma connection pool settings
 3. Check for connection leaks in code
 
 **Resolution:**
+
 - Close unused connections
 - Review Prisma client instantiation
 - Upgrade to Supabase Pro for more connections
@@ -575,16 +589,19 @@ Build a custom monitoring dashboard page in the application:
 ### Application Downtime
 
 **Symptoms:**
+
 - Uptime check fails
 - Users cannot access application
 - 500 errors on all pages
 
 **Diagnosis:**
+
 1. Check Vercel deployment status
 2. Check Supabase database status
 3. Review Vercel function logs
 
 **Resolution:**
+
 - Rollback to last known good deployment
 - Check environment variables
 - Restart database (Supabase support)
@@ -611,9 +628,9 @@ Dashboard: https://app.supabase.com/support
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-27 | System Administrator | Initial documentation |
+| Version | Date       | Author               | Changes               |
+| ------- | ---------- | -------------------- | --------------------- |
+| 1.0     | 2025-11-27 | System Administrator | Initial documentation |
 
 ---
 

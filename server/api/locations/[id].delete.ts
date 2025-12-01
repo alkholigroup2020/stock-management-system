@@ -153,8 +153,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "DELETE_FAILED",
-          message:
-            "Cannot delete location due to existing references or constraints",
+          message: "Cannot delete location due to existing references or constraints",
         },
       });
     }

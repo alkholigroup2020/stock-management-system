@@ -11,10 +11,7 @@
  * - After any transaction: invalidateAll() (nuclear option)
  */
 
-import {
-  invalidateLocationsCache,
-  invalidateLocationCache,
-} from "./useLocations";
+import { invalidateLocationsCache, invalidateLocationCache } from "./useLocations";
 import { invalidateItemsCache, invalidateItemCache } from "./useItems";
 import { invalidateCurrentPeriodCache } from "./useCurrentPeriod";
 
@@ -159,15 +156,14 @@ export function useCache() {
 
     const stats = {
       total: keys.length,
-      locations: keys.filter((k) => k.startsWith("locations:") || k.startsWith("location:"))
-        .length,
+      locations: keys.filter((k) => k.startsWith("locations:") || k.startsWith("location:")).length,
       items: keys.filter((k) => k.startsWith("items:") || k.startsWith("item:")).length,
-      periods: keys.filter((k) => k.startsWith("periods:") || k.startsWith("period:") || k === "currentPeriod")
-        .length,
+      periods: keys.filter(
+        (k) => k.startsWith("periods:") || k.startsWith("period:") || k === "currentPeriod"
+      ).length,
       stock: keys.filter((k) => k.startsWith("stock:")).length,
       transactions: keys.filter(
-        (k) =>
-          k.startsWith("deliveries:") || k.startsWith("issues:") || k.startsWith("transfers:")
+        (k) => k.startsWith("deliveries:") || k.startsWith("issues:") || k.startsWith("transfers:")
       ).length,
       dashboard: keys.filter((k) => k.startsWith("dashboard:")).length,
       other: keys.filter(

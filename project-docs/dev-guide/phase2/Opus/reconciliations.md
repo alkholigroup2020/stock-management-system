@@ -5,6 +5,7 @@
 **Reconciliation** is the process of calculating **how much was consumed** during a period (usually a month).
 
 Think of it like balancing your checkbook:
+
 - What you had at the start
 - What came in
 - What went out
@@ -23,17 +24,17 @@ Let's break it down with a real example:
 
 ### Kitchen Example for November 2025
 
-| Component | Amount (SAR) | Explanation |
-|-----------|--------------|-------------|
-| Opening Stock | 125,000 | What we had on November 1st |
-| + Receipts | 45,000 | Deliveries received in November |
-| + Transfers In | 8,000 | Stock received from other locations |
-| - Transfers Out | 3,500 | Stock sent to other locations |
-| - Issues | 135,000 | Stock used for cooking |
-| - Closing Stock | 5,000 | What we have on November 30th |
-| **= Base Consumption** | **34,500** | Stock consumed before adjustments |
-| + Adjustments | 600 | Various adjustments (see below) |
-| **= Final Consumption** | **35,100** | Total consumption for November |
+| Component               | Amount (SAR) | Explanation                         |
+| ----------------------- | ------------ | ----------------------------------- |
+| Opening Stock           | 125,000      | What we had on November 1st         |
+| + Receipts              | 45,000       | Deliveries received in November     |
+| + Transfers In          | 8,000        | Stock received from other locations |
+| - Transfers Out         | 3,500        | Stock sent to other locations       |
+| - Issues                | 135,000      | Stock used for cooking              |
+| - Closing Stock         | 5,000        | What we have on November 30th       |
+| **= Base Consumption**  | **34,500**   | Stock consumed before adjustments   |
+| + Adjustments           | 600          | Various adjustments (see below)     |
+| **= Final Consumption** | **35,100**   | Total consumption for November      |
 
 ## Why Reconciliation Matters
 
@@ -60,36 +61,42 @@ Let's break it down with a real example:
 ## Understanding Each Component
 
 ### Opening Stock
+
 - **What:** Value of stock at period start
 - **Source:** Previous period's closing stock
 - **First period:** Zero (no previous period)
 - **Formula:** Quantity × WAC for each item
 
 ### Receipts
+
 - **What:** All deliveries received
 - **Source:** Sum of all posted deliveries
 - **Includes:** All delivery line values
 - **Formula:** Sum(quantity × unit_price) for all deliveries
 
 ### Transfers In/Out
+
 - **What:** Stock moved between locations
 - **Source:** Approved and completed transfers
 - **In:** Stock received from other locations
 - **Out:** Stock sent to other locations
 
 ### Issues
+
 - **What:** Stock used/consumed
 - **Source:** All posted issues
 - **Purpose:** Actual usage for operations
 - **Formula:** Sum(quantity × WAC) for all issues
 
 ### Closing Stock
+
 - **What:** Value of stock at period end
 - **Source:** Current LocationStock
 - **Timing:** Snapshot at period close
 - **Formula:** Current quantity × current WAC
 
 ### Adjustments
+
 Four types of adjustments supervisors can add:
 
 1. **Back-charges:** Additional costs charged to location
@@ -138,12 +145,14 @@ flowchart TD
 ### Why Auto-Calculate?
 
 **Benefits:**
+
 - No manual data entry
 - Always current
 - Reduces errors
 - Available anytime
 
 **Process:**
+
 1. System queries all transactions
 2. Applies the formula
 3. Shows result instantly
@@ -196,11 +205,13 @@ erDiagram
 ### Key Design Decisions
 
 **Why store calculated values?**
+
 - Performance (no need to recalculate)
 - Historical accuracy (transactions might change)
 - Audit trail (who approved these numbers)
 
 **Why allow adjustments?**
+
 - Real-world complexity
 - Things happen outside the system
 - Supervisor knowledge
@@ -212,6 +223,7 @@ erDiagram
 **Endpoint:** `GET /api/locations/:locationId/reconciliations/:periodId`
 
 **Logic Flow:**
+
 ```
 1. Check if saved reconciliation exists
 2. If YES:
@@ -235,6 +247,7 @@ erDiagram
 **Endpoint:** `PATCH /api/locations/:locationId/reconciliations/:periodId`
 
 **Process:**
+
 ```
 1. Validate user is Supervisor/Admin
 2. If no record exists:
@@ -256,12 +269,14 @@ erDiagram
 **Endpoint:** `GET /api/reconciliations/consolidated`
 
 **What it does:**
+
 - Gets reconciliations for ALL locations
 - Aggregates totals
 - Calculates averages
 - Supervisor/Admin only
 
 **Response Structure:**
+
 ```json
 {
   "period": "November 2025",
@@ -331,12 +346,14 @@ graph TD
 ### Visual Design
 
 **Color Coding:**
+
 - Green (emerald): Additions (receipts, transfers in)
 - Red: Deductions (transfers out, issues)
 - Primary (navy): Key values (consumption)
 - Warning (amber): Auto-calculated indicator
 
 **Card Layout:**
+
 - Stock Movement: Read-only, auto-calculated
 - Adjustments: Editable for supervisors
 - Analysis: Prominent display of results
@@ -380,6 +397,7 @@ Cost per Manday:         SAR 21.27
 |----------|---------|----------|-----------|---------|---------|-------------|-------------|---------|----------|--------|
 
 **Features:**
+
 - Sort by any column
 - Color-coded values
 - Status indicators (Saved/Auto)
@@ -389,6 +407,7 @@ Cost per Manday:         SAR 21.27
 ### CSV Export
 
 **Generated File Includes:**
+
 ```
 Stock Management System - Consolidated Reconciliation
 Period: November 2025
@@ -407,6 +426,7 @@ TOTAL,220000,83000,11500,11500,233000,35000,600,35600,2850,12.49
 
 **User:** Opens reconciliation for first time
 **System:**
+
 - No saved record exists
 - Auto-calculates everything
 - Shows with yellow "Auto-calculated" banner
@@ -417,12 +437,14 @@ TOTAL,220000,83000,11500,11500,233000,35000,600,35600,2850,12.49
 
 **User:** Supervisor reviews auto-calculated
 **Actions:**
+
 1. Reviews auto-calculated values
 2. Adds back-charges: SAR 500 (borrowed staff meals)
 3. Adds credits: -SAR 200 (supplier refund)
 4. Adds condemnations: SAR 300 (spoiled vegetables)
 5. Clicks "Save Adjustments"
-**System:**
+   **System:**
+
 - Creates permanent record
 - Recalculates consumption
 - Removes "Auto-calculated" banner
@@ -432,6 +454,7 @@ TOTAL,220000,83000,11500,11500,233000,35000,600,35600,2850,12.49
 
 **User:** Admin preparing to close period
 **Checks:**
+
 1. Opens consolidated view
 2. Sees 3 of 4 locations saved
 3. One still auto-calculated
@@ -463,6 +486,7 @@ TOTAL,220000,83000,11500,11500,233000,35000,600,35600,2850,12.49
 
 **Challenge:** Calculating for many transactions
 **Solution:**
+
 - Aggregate queries at database level
 - Single query per component
 - Parallel execution where possible
@@ -521,6 +545,7 @@ graph LR
 ### What Affects Reconciliation
 
 Any change to:
+
 - Deliveries → Changes receipts
 - Issues → Changes issues total
 - Transfers → Changes transfer totals
@@ -594,6 +619,7 @@ Any change to:
 ## Summary
 
 Reconciliation is the **financial heart** of the system:
+
 - Calculates true consumption
 - Enables cost per person analysis
 - Provides management visibility
@@ -603,4 +629,4 @@ Without reconciliation, you're flying blind!
 
 ---
 
-*Remember: Accurate reconciliation drives better business decisions and cost control.*
+_Remember: Accurate reconciliation drives better business decisions and cost control._

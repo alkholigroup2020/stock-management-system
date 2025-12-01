@@ -34,10 +34,7 @@ export function formatCurrency(
  * @param endDate - End date
  * @returns Formatted date range (e.g., "01/11/2025 - 30/11/2025")
  */
-export function formatDateRange(
-  startDate: Date | string,
-  endDate: Date | string
-): string {
+export function formatDateRange(startDate: Date | string, endDate: Date | string): string {
   const start = typeof startDate === "string" ? new Date(startDate) : startDate;
   const end = typeof endDate === "string" ? new Date(endDate) : endDate;
 

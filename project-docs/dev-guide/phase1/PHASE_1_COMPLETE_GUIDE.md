@@ -37,6 +37,7 @@ We built a **web application** for managing inventory (stock) across multiple lo
 ### Why We Built This
 
 Previously, everything was done in Excel spreadsheets. This caused problems:
+
 - Hard to track items across multiple locations
 - Easy to make mistakes
 - No automatic calculations
@@ -90,6 +91,7 @@ graph TB
 ### Multi-Location System
 
 **Simple Explanation:** Imagine you have 4 different storage rooms (locations):
+
 - Main Kitchen
 - Central Store
 - Main Warehouse
@@ -117,6 +119,7 @@ graph LR
 **Simple Explanation:** This is how we calculate the average price of items when we buy them at different prices.
 
 **Example:**
+
 - You have 100 kg of flour bought at SAR 5.00/kg (Total value: SAR 500)
 - You receive 200 kg more at SAR 6.00/kg (Total value: SAR 1,200)
 - New average price = (SAR 500 + SAR 1,200) ÷ (100 + 200) = SAR 5.67/kg
@@ -134,6 +137,7 @@ graph LR
 **Simple Explanation:** Each month is a "period" (like January 2025, February 2025). At the start of each period, an admin sets the expected price for each item. This "locked price" is used to detect price changes.
 
 **Example:**
+
 - Period: January 2025
 - Flour locked price: SAR 5.00/kg
 - When delivery arrives at SAR 6.00/kg, the system creates an automatic alert (NCR) because the price is different
@@ -287,35 +291,43 @@ graph TB
 ### Key Tables Explained
 
 #### Users Table
+
 Stores information about people who use the system.
 
 **Important Fields:**
+
 - username, email, password_hash (login info)
 - role (ADMIN, SUPERVISOR, OPERATOR)
 - default_location_id (which location they usually work at)
 
 #### Locations Table
+
 Represents physical places like kitchens or warehouses.
 
 **Important Fields:**
+
 - code (unique identifier like "MAIN-KIT")
 - name (like "Main Kitchen")
 - type (KITCHEN, STORE, CENTRAL, WAREHOUSE)
 - manager_id (who manages this location)
 
 #### Items Table
+
 The master list of all products we track.
 
 **Important Fields:**
+
 - code (unique identifier like "FLR-001")
 - name (like "All Purpose Flour")
 - unit (KG, LTR, EA, etc.)
 - category (like "Dry Goods")
 
 #### LocationStock Table
+
 This is the MOST IMPORTANT table for inventory. It tracks how much of each item is at each location.
 
 **Important Fields:**
+
 - location_id + item_id (combination is unique)
 - on_hand (current quantity available)
 - wac (Weighted Average Cost - the average price)
@@ -414,6 +426,7 @@ sequenceDiagram
 After login, the system remembers who you are using a "session":
 
 **How Sessions Work:**
+
 1. You login successfully
 2. Server creates a special encrypted token (JWT)
 3. Token is stored in a secure cookie (httpOnly)
@@ -602,6 +615,7 @@ graph TB
 **What It Does:** Shows important information when you first login.
 
 **Key Features:**
+
 - Total receipts this period (how much received)
 - Total issues this period (how much used)
 - Total mandays (people working)
@@ -658,6 +672,7 @@ sequenceDiagram
 **What It Does:** Lets admins create and manage inventory items.
 
 **Key Features:**
+
 - View all items with stock levels
 - Create new items
 - Edit existing items
@@ -881,10 +896,10 @@ graph TB
 
 Shows the same item across all locations:
 
-| Item | Kitchen | Store | Warehouse | Total |
-|------|---------|-------|-----------|-------|
-| Flour | 100 kg | 50 kg | 500 kg | 650 kg |
-| Sugar | 80 kg | 30 kg | 200 kg | 310 kg |
+| Item  | Kitchen | Store | Warehouse | Total  |
+| ----- | ------- | ----- | --------- | ------ |
+| Flour | 100 kg  | 50 kg | 500 kg    | 650 kg |
+| Sugar | 80 kg   | 30 kg | 200 kg    | 310 kg |
 
 ### 7.7 Location Management
 
@@ -938,6 +953,7 @@ graph LR
 **Rule:** You can NEVER have less than zero items.
 
 **How We Enforce:**
+
 - Before creating an issue, system checks available stock
 - If requested quantity > available quantity, request is rejected
 - Database constraint prevents negative values
@@ -1221,6 +1237,7 @@ We added indexes on columns we search frequently:
 Instead of storing status as plain text ("OPEN", "CLOSED"), we use database enums.
 
 **Benefits:**
+
 - Prevents typos ("OPNE" would be rejected)
 - Database enforces valid values
 - Better performance than text comparison
@@ -1270,6 +1287,7 @@ Instead of copying code between components, we created composables:
 - `useAppToast()` - Toast notifications
 
 **Benefits:**
+
 - Write once, use everywhere
 - Fix bug in one place
 - Consistent behavior
@@ -1312,6 +1330,7 @@ stateDiagram-v2
 ```
 
 Users need to know:
+
 - Data is loading (spinner)
 - Data loaded successfully (show content)
 - Error occurred (error message + retry button)
@@ -1351,6 +1370,7 @@ All errors return the same structure:
 When returning data, include related data the frontend will need:
 
 Example: When getting a delivery, also include:
+
 - Supplier info (so we can display supplier name)
 - Item details (so we can display item names)
 - Period info (so we can display period name)
@@ -1364,6 +1384,7 @@ This reduces the number of API calls needed.
 We created separate utility files for complex logic (WAC calculation, price variance detection) and tested them independently.
 
 **Benefits:**
+
 - Easier to test
 - Can test without database
 - Faster tests
@@ -1417,23 +1438,27 @@ computed: {
 ### What We Accomplished in Phase 1
 
 ✅ **Project Setup**
+
 - Nuxt 4 application with Tailwind CSS
 - Complete design system with brand colors
 - Development environment ready
 
 ✅ **Database Layer**
+
 - 22 database tables
 - All relationships defined
 - Indexes for performance
 - Seed data for testing
 
 ✅ **Authentication System**
+
 - Secure login/logout
 - Role-based permissions
 - Session management
 - Route protection
 
 ✅ **Core Features**
+
 - Dashboard with key metrics
 - Items management
 - Price management per period
@@ -1443,6 +1468,7 @@ computed: {
 - Location management
 
 ✅ **Business Rules Implemented**
+
 - No negative stock
 - WAC calculation
 - Period-based pricing
@@ -1493,6 +1519,7 @@ After Phase 1, the next features to build:
 **Ask Questions:**
 
 If you don't understand something:
+
 1. Check the documentation first
 2. Look at similar code in the project
 3. Ask your senior developer

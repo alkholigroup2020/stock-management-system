@@ -134,9 +134,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Filter only active items
-    const activePrices = previousPeriod.item_prices.filter(
-      (price) => price.item.is_active
-    );
+    const activePrices = previousPeriod.item_prices.filter((price) => price.item.is_active);
 
     if (activePrices.length === 0) {
       throw createError({

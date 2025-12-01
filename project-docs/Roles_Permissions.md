@@ -6,31 +6,30 @@
 
 ## Roles (MVP)
 
-| **Role** | **Main actions** | **Cannot do** |
-| --- | --- | --- |
-| Operator | Post Deliveries and Issues; view Stock Now; view **Dashboard** | Edit Items & Prices; Close Period; change Reconciliations |
-| Supervisor | Everything Operator can do plus: edit Reconciliations (Back‑charges, Credits, Others, Condemnations); print/ export | Change Items & Prices; Close Period (unless granted) |
-| Admin | Everything Supervisor can do plus: manage Items & Prices (create/edit), manage users/roles, **Close Period** |  |
+| **Role**   | **Main actions**                                                                                                    | **Cannot do**                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Operator   | Post Deliveries and Issues; view Stock Now; view **Dashboard**                                                      | Edit Items & Prices; Close Period; change Reconciliations |
+| Supervisor | Everything Operator can do plus: edit Reconciliations (Back‑charges, Credits, Others, Condemnations); print/ export | Change Items & Prices; Close Period (unless granted)      |
+| Admin      | Everything Supervisor can do plus: manage Items & Prices (create/edit), manage users/roles, **Close Period**        |                                                           |
 
 > Tip: Keep roles few and clear. If approvals are not needed, keep it simple: everyone can post, only Admin can Close.
-> 
 
 ---
 
 ## Permissions matrix (detailed)
 
-| **Feature** | **Operator** | **Supervisor** | **Admin** |
-| --- | --- | --- | --- |
-| Dashboard (view) | ✔️ | ✔️ | ✔️ |
-| POB (enter/edit) | ✔️ | ✔️ | ✔️ |
-| Items & Prices (create/edit) | — | — | ✔️ |
-| Deliveries (post) | ✔️ | ✔️ | ✔️ |
-| Issues (post) | ✔️ | ✔️ | ✔️ |
-| NCR (create/update) | ✔️ | ✔️ | ✔️ |
-| Stock Now (view) | ✔️ | ✔️ | ✔️ |
-| Reconciliations (edit) | — | ✔️ | ✔️ |
-| Period Close | — | — | ✔️ |
-| User & Role management | — | — | ✔️ |
+| **Feature**                  | **Operator** | **Supervisor** | **Admin** |
+| ---------------------------- | ------------ | -------------- | --------- |
+| Dashboard (view)             | ✔️           | ✔️             | ✔️        |
+| POB (enter/edit)             | ✔️           | ✔️             | ✔️        |
+| Items & Prices (create/edit) | —            | —              | ✔️        |
+| Deliveries (post)            | ✔️           | ✔️             | ✔️        |
+| Issues (post)                | ✔️           | ✔️             | ✔️        |
+| NCR (create/update)          | ✔️           | ✔️             | ✔️        |
+| Stock Now (view)             | ✔️           | ✔️             | ✔️        |
+| Reconciliations (edit)       | —            | ✔️             | ✔️        |
+| Period Close                 | —            | —              | ✔️        |
+| User & Role management       | —            | —              | ✔️        |
 
 ---
 

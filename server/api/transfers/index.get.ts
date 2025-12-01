@@ -33,9 +33,7 @@ interface AuthUser {
 const querySchema = z.object({
   fromLocationId: z.string().uuid().optional(),
   toLocationId: z.string().uuid().optional(),
-  status: z
-    .enum(["DRAFT", "PENDING_APPROVAL", "APPROVED", "REJECTED", "COMPLETED"])
-    .optional(),
+  status: z.enum(["DRAFT", "PENDING_APPROVAL", "APPROVED", "REJECTED", "COMPLETED"]).optional(),
   startDate: z.string().optional(), // ISO date string
   endDate: z.string().optional(), // ISO date string
   includeLines: z.enum(["true", "false"]).optional(),
@@ -122,64 +120,64 @@ export default defineEventHandler(async (event) => {
     // Fetch transfers with pagination
     const [transfers, total] = await Promise.all([
       prisma.transfer.findMany({
-      where,
-      include: {
-        from_location: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            type: true,
+        where,
+        include: {
+          from_location: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              type: true,
+            },
           },
-        },
-        to_location: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            type: true,
+          to_location: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              type: true,
+            },
           },
-        },
-        requester: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-            role: true,
+          requester: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              role: true,
+            },
           },
-        },
-        approver: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-            role: true,
+          approver: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              role: true,
+            },
           },
-        },
-        transfer_lines:
-          includeLines === "true"
-            ? {
-                include: {
-                  item: {
-                    select: {
-                      id: true,
-                      code: true,
-                      name: true,
-                      unit: true,
+          transfer_lines:
+            includeLines === "true"
+              ? {
+                  include: {
+                    item: {
+                      select: {
+                        id: true,
+                        code: true,
+                        name: true,
+                        unit: true,
+                      },
                     },
                   },
-                },
-              }
-            : false,
-      },
-      orderBy: {
-        request_date: "desc",
-      },
-      skip,
-      take,
-    }),
-    prisma.transfer.count({ where }),
-  ]);
+                }
+              : false,
+        },
+        orderBy: {
+          request_date: "desc",
+        },
+        skip,
+        take,
+      }),
+      prisma.transfer.count({ where }),
+    ]);
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(total / limit);

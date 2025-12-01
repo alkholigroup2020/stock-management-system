@@ -31,6 +31,7 @@ pnpm add -D @vite-pwa/nuxt
 ```
 
 **Expected Output:**
+
 ```
 âœ“ @vite-pwa/nuxt added to devDependencies
 ```
@@ -45,72 +46,72 @@ Update your `nuxt.config.ts` file:
 // nuxt.config.ts
 export default defineNuxtConfig({
   ssr: false, // SPA mode
-  
+
   modules: [
-    '@nuxt/ui',
-    '@pinia/nuxt',
-    '@nuxtjs/tailwindcss',
-    '@vite-pwa/nuxt', // Add PWA module
+    "@nuxt/ui",
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss",
+    "@vite-pwa/nuxt", // Add PWA module
   ],
-  
+
   // PWA Configuration
   pwa: {
-    registerType: 'autoUpdate',
+    registerType: "autoUpdate",
     manifest: {
-      name: 'Stock Management System',
-      short_name: 'FoodStock',
-      description: 'Stock control and inventory management',
-      theme_color: '#000046', // Navy blue - primary brand color
-      background_color: '#000046', // Navy blue - matches brand
-      display: 'standalone',
-      orientation: 'portrait',
+      name: "Stock Management System",
+      short_name: "FoodStock",
+      description: "Stock control and inventory management",
+      theme_color: "#000046", // Navy blue - primary brand color
+      background_color: "#000046", // Navy blue - matches brand
+      display: "standalone",
+      orientation: "portrait",
       icons: [
         {
-          src: '/icon-192.png',
-          sizes: '192x192',
-          type: 'image/png',
-          purpose: 'any maskable'
+          src: "/icon-192.png",
+          sizes: "192x192",
+          type: "image/png",
+          purpose: "any maskable",
         },
         {
-          src: '/icon-512.png',
-          sizes: '512x512',
-          type: 'image/png',
-          purpose: 'any maskable'
-        }
-      ]
+          src: "/icon-512.png",
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "any maskable",
+        },
+      ],
     },
     workbox: {
-      navigateFallback: '/',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      navigateFallback: "/",
+      globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
       cleanupOutdatedCaches: true,
       runtimeCaching: [
         {
           urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-          handler: 'CacheFirst',
+          handler: "CacheFirst",
           options: {
-            cacheName: 'google-fonts-cache',
+            cacheName: "google-fonts-cache",
             expiration: {
               maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
             },
             cacheableResponse: {
-              statuses: [0, 200]
-            }
-          }
-        }
-      ]
+              statuses: [0, 200],
+            },
+          },
+        },
+      ],
     },
     client: {
       installPrompt: true,
     },
     devOptions: {
       enabled: true,
-      type: 'module'
-    }
+      type: "module",
+    },
   },
-  
+
   // ... rest of your config
-})
+});
 ```
 
 ---
@@ -118,11 +119,13 @@ export default defineNuxtConfig({
 ## Step 3: Create App Icons
 
 ### Required Icon Sizes:
+
 - **192x192 pixels** - Standard icon
 - **512x512 pixels** - High-resolution icon
 - **favicon.ico** - Browser favicon (32x32)
 
 ### Icon Design Guidelines:
+
 1. **Simple and recognizable** - Clear at small sizes
 2. **No text** - Icons should be visual only (or minimal text like "FS")
 3. **Solid background** - Avoid transparency for maskable icons
@@ -133,11 +136,13 @@ export default defineNuxtConfig({
    - **Text (if any):** White for contrast
 
 ### Recommended Tools:
+
 - **Figma** - Design icons
 - **Canva** - Quick icon creation
 - **RealFaviconGenerator** (https://realfavicongenerator.net/) - Generate all sizes
 
 ### File Locations:
+
 ```
 public/
 â”œâ”€â”€ icon-192.png    # 192x192 PNG
@@ -168,6 +173,7 @@ convert -size 512x512 xc:#000046 -font Arial -pointsize 128 \
 ```
 
 **Recommended:** Use an online tool like **Canva** or **Figma** to design proper icons that incorporate:
+
 - Navy blue background (#000046)
 - Emerald green accent elements (#45cf7b)
 - Simple food/inventory icon symbol
@@ -183,37 +189,37 @@ Create a composable to detect online/offline status:
 // composables/useOnlineStatus.ts
 
 export const useOnlineStatus = () => {
-  const isOnline = ref(true)
+  const isOnline = ref(true);
 
   // Initialize with current status
   if (process.client) {
-    isOnline.value = navigator.onLine
+    isOnline.value = navigator.onLine;
   }
 
   const handleOnline = () => {
-    isOnline.value = true
-    console.log('ðŸŸ¢ Connection restored')
-  }
+    isOnline.value = true;
+    console.log("ðŸŸ¢ Connection restored");
+  };
 
   const handleOffline = () => {
-    isOnline.value = false
-    console.log('ðŸ”´ Connection lost')
-  }
+    isOnline.value = false;
+    console.log("ðŸ”´ Connection lost");
+  };
 
   onMounted(() => {
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-  })
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+  });
 
   onUnmounted(() => {
-    window.removeEventListener('online', handleOnline)
-    window.removeEventListener('offline', handleOffline)
-  })
+    window.removeEventListener("online", handleOnline);
+    window.removeEventListener("offline", handleOffline);
+  });
 
   return {
-    isOnline: readonly(isOnline)
-  }
-}
+    isOnline: readonly(isOnline),
+  };
+};
 ```
 
 ---
@@ -231,12 +237,17 @@ Create a component to show offline status:
   >
     <span class="inline-flex items-center gap-2">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"
+        />
       </svg>
       You're offline. Some features are unavailable.
     </span>
   </div>
-  
+
   <Transition name="slide-down">
     <div
       v-if="wasOffline && isOnline"
@@ -244,7 +255,12 @@ Create a component to show offline status:
     >
       <span class="inline-flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
         </svg>
         Connection restored!
       </span>
@@ -253,26 +269,26 @@ Create a component to show offline status:
 </template>
 
 <script setup lang="ts">
-const { isOnline } = useOnlineStatus()
-const wasOffline = ref(false)
-const reconnectTimer = ref<NodeJS.Timeout>()
+const { isOnline } = useOnlineStatus();
+const wasOffline = ref(false);
+const reconnectTimer = ref<NodeJS.Timeout>();
 
 watch(isOnline, (online) => {
   if (!online) {
-    wasOffline.value = true
+    wasOffline.value = true;
   } else if (wasOffline.value) {
     // Show "reconnected" message for 3 seconds
     reconnectTimer.value = setTimeout(() => {
-      wasOffline.value = false
-    }, 3000)
+      wasOffline.value = false;
+    }, 3000);
   }
-})
+});
 
 onUnmounted(() => {
   if (reconnectTimer.value) {
-    clearTimeout(reconnectTimer.value)
+    clearTimeout(reconnectTimer.value);
   }
-})
+});
 </script>
 
 <style scoped>
@@ -302,7 +318,7 @@ Add the offline banner to your main layout:
 <template>
   <div>
     <OfflineBanner />
-    
+
     <!-- Your existing layout -->
     <NuxtLayout>
       <NuxtPage />
@@ -321,52 +337,49 @@ Create a wrapper for action buttons:
 // composables/useOfflineGuard.ts
 
 export const useOfflineGuard = () => {
-  const { isOnline } = useOnlineStatus()
-  const toast = useToast()
+  const { isOnline } = useOnlineStatus();
+  const toast = useToast();
 
   const guardAction = async (action: () => Promise<void>, actionName: string) => {
     if (!isOnline.value) {
       toast.add({
-        title: 'No Connection',
+        title: "No Connection",
         description: `Cannot ${actionName} while offline. Please check your connection.`,
-        color: 'red',
-        icon: 'i-heroicons-wifi-slash'
-      })
-      return
+        color: "red",
+        icon: "i-heroicons-wifi-slash",
+      });
+      return;
     }
 
-    await action()
-  }
+    await action();
+  };
 
   return {
     isOnline,
-    guardAction
-  }
-}
+    guardAction,
+  };
+};
 ```
 
 Usage in components:
 
 ```vue
 <script setup lang="ts">
-const { isOnline, guardAction } = useOfflineGuard()
+const { isOnline, guardAction } = useOfflineGuard();
 
 async function handleSubmit() {
   await guardAction(async () => {
     // Your actual submit logic
-    await $fetch('/api/deliveries/post', {
-      method: 'POST',
-      body: deliveryData
-    })
-  }, 'post delivery')
+    await $fetch("/api/deliveries/post", {
+      method: "POST",
+      body: deliveryData,
+    });
+  }, "post delivery");
 }
 </script>
 
 <template>
-  <UButton
-    :disabled="!isOnline"
-    @click="handleSubmit"
-  >
+  <UButton :disabled="!isOnline" @click="handleSubmit">
     Post Delivery
     <template #trailing v-if="!isOnline">
       <UIcon name="i-heroicons-wifi-slash" />
@@ -382,6 +395,7 @@ async function handleSubmit() {
 ### Testing in Development:
 
 1. **Start dev server:**
+
    ```bash
    pnpm dev
    ```
@@ -408,18 +422,21 @@ async function handleSubmit() {
 ### Testing Installation:
 
 **Desktop (Chrome):**
+
 1. Visit your app URL
 2. Look for install icon in address bar (âŠ• or ðŸ”½)
 3. Click to install
 4. App opens in standalone window
 
 **Mobile (Android):**
+
 1. Open in Chrome
 2. Menu â†’ "Install app" or "Add to Home Screen"
 3. App icon appears on home screen
 4. Opens full-screen without browser UI
 
 **Mobile (iOS):**
+
 1. Open in Safari
 2. Share button â†’ "Add to Home Screen"
 3. Icon appears on home screen
@@ -452,6 +469,7 @@ pnpm preview
 ### Vercel Configuration:
 
 Vercel automatically handles PWA requirements:
+
 - âœ… HTTPS (required for PWA)
 - âœ… Service worker caching
 - âœ… Manifest serving
@@ -468,19 +486,19 @@ No additional Vercel config needed!
 ```typescript
 // Track PWA installation
 if (process.client) {
-  window.addEventListener('appinstalled', () => {
-    console.log('âœ… PWA installed')
+  window.addEventListener("appinstalled", () => {
+    console.log("âœ… PWA installed");
     // Optional: Send to analytics
     // gtag('event', 'pwa_install')
-  })
+  });
 }
 
 // Track service worker updates
-if (process.client && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('ðŸ”„ Service Worker updated')
+if (process.client && "serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    console.log("ðŸ”„ Service Worker updated");
     // Optional: Show update notification
-  })
+  });
 }
 ```
 
@@ -498,6 +516,7 @@ if (process.client && 'serviceWorker' in navigator) {
 ### Issue: Service Worker Not Registering
 
 **Solution:**
+
 - Check HTTPS is enabled (required for SW)
 - Clear browser cache
 - Check console for errors
@@ -506,6 +525,7 @@ if (process.client && 'serviceWorker' in navigator) {
 ### Issue: Icons Not Showing
 
 **Solution:**
+
 - Verify icon files exist in `/public/`
 - Check file names match manifest
 - Clear browser cache
@@ -514,6 +534,7 @@ if (process.client && 'serviceWorker' in navigator) {
 ### Issue: App Not Installable
 
 **Solution:**
+
 - Manifest must be valid JSON
 - Need at least 192px and 512px icons
 - HTTPS required
@@ -522,6 +543,7 @@ if (process.client && 'serviceWorker' in navigator) {
 ### Issue: Offline Mode Not Working
 
 **Solution:**
+
 - Check service worker is active
 - Verify caching strategy in workbox config
 - Test with `navigator.onLine` API
@@ -552,12 +574,14 @@ Before marking PWA implementation complete:
 ## Next Steps (Post-MVP)
 
 ### Level 2 PWA Features:
+
 - [ ] Background sync for failed requests
 - [ ] Push notifications for period reminders
 - [ ] Offline queue for deliveries/issues
 - [ ] IndexedDB for local data caching
 
 ### Level 3 PWA Features:
+
 - [ ] Full offline mode
 - [ ] Sync engine (bidirectional)
 - [ ] Conflict resolution
@@ -583,7 +607,7 @@ This guide covered:
 âœ… Detecting online/offline status  
 âœ… Building offline-aware UI  
 âœ… Testing PWA functionality  
-âœ… Deploying to production  
+âœ… Deploying to production
 
 **Estimated time:** 2-3 hours for basic implementation
 

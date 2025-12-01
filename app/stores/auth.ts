@@ -54,9 +54,7 @@ export const useAuthStore = defineStore("auth", {
     /**
      * Get the user's accessible locations
      */
-    locations: (
-      state: AuthState
-    ): Array<{ location_id: string; access_level: string }> => {
+    locations: (state: AuthState): Array<{ location_id: string; access_level: string }> => {
       return state.user?.locations || [];
     },
 
@@ -104,10 +102,7 @@ export const useAuthStore = defineStore("auth", {
      * @param password - Password
      * @returns Promise with success status
      */
-    async login(
-      email: string,
-      password: string
-    ): Promise<{ success: boolean; message?: string }> {
+    async login(email: string, password: string): Promise<{ success: boolean; message?: string }> {
       this.loading = true;
       this.error = null;
 
@@ -125,8 +120,7 @@ export const useAuthStore = defineStore("auth", {
         this.error = response.message || "Login failed";
         return { success: false, message: this.error };
       } catch (error: any) {
-        const errorMessage =
-          error?.data?.message || error?.message || "Login failed";
+        const errorMessage = error?.data?.message || error?.message || "Login failed";
         this.error = errorMessage;
         return { success: false, message: errorMessage };
       } finally {
@@ -155,8 +149,7 @@ export const useAuthStore = defineStore("auth", {
         this.error = response.message || "Logout failed";
         return { success: false, message: this.error };
       } catch (error: any) {
-        const errorMessage =
-          error?.data?.message || error?.message || "Logout failed";
+        const errorMessage = error?.data?.message || error?.message || "Logout failed";
         this.error = errorMessage;
         return { success: false, message: errorMessage };
       } finally {
@@ -188,8 +181,7 @@ export const useAuthStore = defineStore("auth", {
         this.error = "Failed to fetch session";
         return { success: false, authenticated: false };
       } catch (error: any) {
-        const errorMessage =
-          error?.data?.message || error?.message || "Failed to fetch session";
+        const errorMessage = error?.data?.message || error?.message || "Failed to fetch session";
         this.error = errorMessage;
         this.user = null;
         return { success: false, authenticated: false };
@@ -213,8 +205,7 @@ export const useAuthStore = defineStore("auth", {
 
       // Operators only have access to assigned locations
       return this.user.locations.some(
-        (loc: { location_id: string; access_level: string }) =>
-          loc.location_id === locationId
+        (loc: { location_id: string; access_level: string }) => loc.location_id === locationId
       );
     },
 
@@ -223,9 +214,7 @@ export const useAuthStore = defineStore("auth", {
      * @param locationId - Location ID to check
      * @returns Access level or null
      */
-    getLocationAccessLevel(
-      locationId: string
-    ): "VIEW" | "POST" | "MANAGE" | null {
+    getLocationAccessLevel(locationId: string): "VIEW" | "POST" | "MANAGE" | null {
       if (!this.user) return null;
 
       // Admins and Supervisors have MANAGE access to all locations
@@ -235,12 +224,9 @@ export const useAuthStore = defineStore("auth", {
 
       // Find the location in user's assigned locations
       const userLocation = this.user.locations.find(
-        (loc: { location_id: string; access_level: string }) =>
-          loc.location_id === locationId
+        (loc: { location_id: string; access_level: string }) => loc.location_id === locationId
       );
-      return userLocation
-        ? (userLocation.access_level as "VIEW" | "POST" | "MANAGE")
-        : null;
+      return userLocation ? (userLocation.access_level as "VIEW" | "POST" | "MANAGE") : null;
     },
 
     /**

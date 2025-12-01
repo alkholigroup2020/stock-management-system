@@ -296,9 +296,7 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
           </div>
           <div>
             <h2 class="text-subheading font-semibold">{{ entityTypeLabel }} Approval</h2>
-            <p class="text-caption text-muted">
-              Requested {{ formatDate(approval.requestedAt) }}
-            </p>
+            <p class="text-caption text-muted">Requested {{ formatDate(approval.requestedAt) }}</p>
           </div>
         </div>
         <ApprovalApprovalStatus :status="approval.status" />
@@ -354,7 +352,13 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
                   <p class="text-caption text-muted">{{ pl.location.code }}</p>
                 </div>
                 <UBadge
-                  :color="pl.status === 'READY' ? 'success' : pl.status === 'CLOSED' ? 'neutral' : 'warning'"
+                  :color="
+                    pl.status === 'READY'
+                      ? 'success'
+                      : pl.status === 'CLOSED'
+                        ? 'neutral'
+                        : 'warning'
+                  "
                   variant="soft"
                   size="sm"
                 >
@@ -440,7 +444,7 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
         <div
           :class="[
             'flex items-center justify-center w-10 h-10 rounded-full',
-            approval.status === 'APPROVED' ? 'bg-[var(--ui-success)]' : 'bg-[var(--ui-error)]'
+            approval.status === 'APPROVED' ? 'bg-[var(--ui-success)]' : 'bg-[var(--ui-error)]',
           ]"
         >
           <UIcon
@@ -450,7 +454,7 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
         </div>
         <div class="flex-1">
           <p class="text-label font-medium">
-            {{ approval.status === 'APPROVED' ? 'Approved' : 'Rejected' }} by
+            {{ approval.status === "APPROVED" ? "Approved" : "Rejected" }} by
           </p>
           <p class="text-body font-semibold">
             {{ approval.reviewer.full_name || approval.reviewer.username }}
@@ -500,77 +504,77 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
     <UModal v-model:open="showApproveModal">
       <template #content>
         <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-success" />
-              <h3 class="text-subheading font-semibold">Approve {{ entityTypeLabel }}</h3>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-success" />
+                <h3 class="text-subheading font-semibold">Approve {{ entityTypeLabel }}</h3>
+              </div>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                class="cursor-pointer"
+                @click="closeApproveModal"
+                :disabled="actionLoading"
+              />
             </div>
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-x"
-              size="sm"
-              class="cursor-pointer"
-              @click="closeApproveModal"
-              :disabled="actionLoading"
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-body">
+              Are you sure you want to approve this {{ entityTypeLabel.toLowerCase() }} request?
+            </p>
+
+            <UAlert
+              v-if="approval.entityType === 'PERIOD_CLOSE'"
+              icon="i-lucide-alert-triangle"
+              color="warning"
+              variant="subtle"
+              title="Important"
+              description="This action will close the period, create snapshots of all stock levels, and lock all transactions. This cannot be undone."
+            />
+
+            <UAlert
+              v-else-if="approval.entityType === 'TRANSFER'"
+              icon="i-lucide-info"
+              color="primary"
+              variant="subtle"
+              description="Stock will be immediately moved from the source to the destination location."
+            />
+
+            <UAlert
+              v-else
+              icon="i-lucide-info"
+              color="primary"
+              variant="subtle"
+              :description="`The ${entityTypeLabel.toLowerCase()} will be marked as approved and can proceed to the next stage.`"
             />
           </div>
-        </template>
 
-        <div class="space-y-4">
-          <p class="text-body">
-            Are you sure you want to approve this {{ entityTypeLabel.toLowerCase() }} request?
-          </p>
-
-          <UAlert
-            v-if="approval.entityType === 'PERIOD_CLOSE'"
-            icon="i-lucide-alert-triangle"
-            color="warning"
-            variant="subtle"
-            title="Important"
-            description="This action will close the period, create snapshots of all stock levels, and lock all transactions. This cannot be undone."
-          />
-
-          <UAlert
-            v-else-if="approval.entityType === 'TRANSFER'"
-            icon="i-lucide-info"
-            color="primary"
-            variant="subtle"
-            description="Stock will be immediately moved from the source to the destination location."
-          />
-
-          <UAlert
-            v-else
-            icon="i-lucide-info"
-            color="primary"
-            variant="subtle"
-            :description="`The ${entityTypeLabel.toLowerCase()} will be marked as approved and can proceed to the next stage.`"
-          />
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              class="cursor-pointer"
-              @click="closeApproveModal"
-              :disabled="actionLoading"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              color="success"
-              icon="i-lucide-check"
-              class="cursor-pointer"
-              @click="confirmApprove"
-              :loading="actionLoading"
-            >
-              Confirm Approval
-            </UButton>
-          </div>
-        </template>
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                class="cursor-pointer"
+                @click="closeApproveModal"
+                :disabled="actionLoading"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="success"
+                icon="i-lucide-check"
+                class="cursor-pointer"
+                @click="confirmApprove"
+                :loading="actionLoading"
+              >
+                Confirm Approval
+              </UButton>
+            </div>
+          </template>
         </UCard>
       </template>
     </UModal>
@@ -579,70 +583,71 @@ const isPOEntity = (entity: Entity): entity is POEntity => {
     <UModal v-model:open="showRejectModal">
       <template #content>
         <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-x-circle" class="h-5 w-5 text-error" />
-              <h3 class="text-subheading font-semibold">Reject {{ entityTypeLabel }}</h3>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-lucide-x-circle" class="h-5 w-5 text-error" />
+                <h3 class="text-subheading font-semibold">Reject {{ entityTypeLabel }}</h3>
+              </div>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                class="cursor-pointer"
+                @click="closeRejectModal"
+                :disabled="actionLoading"
+              />
             </div>
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-x"
-              size="sm"
-              class="cursor-pointer"
-              @click="closeRejectModal"
-              :disabled="actionLoading"
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-body">
+              Please provide a reason for rejecting this
+              {{ entityTypeLabel.toLowerCase() }} request.
+            </p>
+
+            <div>
+              <label class="form-label">Reason for Rejection *</label>
+              <UTextarea
+                v-model="rejectComment"
+                placeholder="Enter the reason for rejecting this request"
+                :rows="4"
+                autofocus
+              />
+            </div>
+
+            <UAlert
+              icon="i-lucide-info"
+              color="primary"
+              variant="subtle"
+              :description="`The request will be marked as rejected. ${approval.entityType === 'PERIOD_CLOSE' ? 'The period will be reverted to OPEN status.' : 'No changes will be made.'}`"
             />
           </div>
-        </template>
 
-        <div class="space-y-4">
-          <p class="text-body">
-            Please provide a reason for rejecting this {{ entityTypeLabel.toLowerCase() }} request.
-          </p>
-
-          <div>
-            <label class="form-label">Reason for Rejection *</label>
-            <UTextarea
-              v-model="rejectComment"
-              placeholder="Enter the reason for rejecting this request"
-              :rows="4"
-              autofocus
-            />
-          </div>
-
-          <UAlert
-            icon="i-lucide-info"
-            color="primary"
-            variant="subtle"
-            :description="`The request will be marked as rejected. ${approval.entityType === 'PERIOD_CLOSE' ? 'The period will be reverted to OPEN status.' : 'No changes will be made.'}`"
-          />
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              class="cursor-pointer"
-              @click="closeRejectModal"
-              :disabled="actionLoading"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              color="error"
-              icon="i-lucide-x"
-              class="cursor-pointer"
-              @click="confirmReject"
-              :loading="actionLoading"
-              :disabled="!rejectComment.trim()"
-            >
-              Confirm Rejection
-            </UButton>
-          </div>
-        </template>
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                class="cursor-pointer"
+                @click="closeRejectModal"
+                :disabled="actionLoading"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                icon="i-lucide-x"
+                class="cursor-pointer"
+                @click="confirmReject"
+                :loading="actionLoading"
+                :disabled="!rejectComment.trim()"
+              >
+                Confirm Rejection
+              </UButton>
+            </div>
+          </template>
         </UCard>
       </template>
     </UModal>

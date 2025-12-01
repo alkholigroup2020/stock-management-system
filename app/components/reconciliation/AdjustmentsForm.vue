@@ -32,12 +32,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Emits
 const emit = defineEmits<{
-  save: [values: {
-    back_charges: number;
-    credits: number;
-    condemnations: number;
-    adjustments: number;
-  }];
+  save: [
+    values: {
+      back_charges: number;
+      credits: number;
+      condemnations: number;
+      adjustments: number;
+    },
+  ];
 }>();
 
 // Local state for form values
@@ -116,7 +118,7 @@ function formatCurrency(value: number): string {
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold text-[var(--ui-text)]">Adjustments</h3>
-        <UBadge v-if="readOnly" color="warning" variant="soft"> Read-only </UBadge>
+        <UBadge v-if="readOnly" color="warning" variant="soft">Read-only</UBadge>
       </div>
     </template>
 
@@ -135,9 +137,7 @@ function formatCurrency(value: number): string {
           placeholder="0.00"
           :disabled="readOnly || loading"
         />
-        <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-          Amounts charged back to suppliers
-        </p>
+        <p class="text-xs text-[var(--ui-text-muted)] mt-1">Amounts charged back to suppliers</p>
       </div>
 
       <!-- Credits Due -->
@@ -154,9 +154,7 @@ function formatCurrency(value: number): string {
           placeholder="0.00"
           :disabled="readOnly || loading"
         />
-        <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-          Credits expected from suppliers
-        </p>
+        <p class="text-xs text-[var(--ui-text-muted)] mt-1">Credits expected from suppliers</p>
       </div>
 
       <!-- Condemnations -->
@@ -173,9 +171,7 @@ function formatCurrency(value: number): string {
           placeholder="0.00"
           :disabled="readOnly || loading"
         />
-        <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-          Value of condemned/discarded stock
-        </p>
+        <p class="text-xs text-[var(--ui-text-muted)] mt-1">Value of condemned/discarded stock</p>
       </div>
 
       <!-- Other Adjustments -->
@@ -192,9 +188,7 @@ function formatCurrency(value: number): string {
           placeholder="0.00"
           :disabled="readOnly || loading"
         />
-        <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-          Miscellaneous adjustments
-        </p>
+        <p class="text-xs text-[var(--ui-text-muted)] mt-1">Miscellaneous adjustments</p>
       </div>
     </div>
 

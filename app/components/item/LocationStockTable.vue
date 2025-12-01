@@ -2,9 +2,7 @@
   <div class="space-y-4">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h3 class="text-subheading">
-        Stock Levels by Location
-      </h3>
+      <h3 class="text-subheading">Stock Levels by Location</h3>
       <UBadge v-if="totalLocations > 0" color="primary" variant="subtle">
         {{ totalLocations }}
         {{ totalLocations === 1 ? "Location" : "Locations" }}
@@ -12,10 +10,7 @@
     </div>
 
     <!-- Table -->
-    <div
-      v-if="locationStock && locationStock.length > 0"
-      class="overflow-x-auto"
-    >
+    <div v-if="locationStock && locationStock.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-default">
         <thead class="bg-elevated">
           <tr>
@@ -68,11 +63,7 @@
               </div>
             </td>
             <td class="px-4 py-3 whitespace-nowrap">
-              <UBadge
-                :color="getLocationTypeColor(stock.location.type)"
-                variant="subtle"
-                size="xs"
-              >
+              <UBadge :color="getLocationTypeColor(stock.location.type)" variant="subtle" size="xs">
                 {{ stock.location.type }}
               </UBadge>
             </td>
@@ -88,24 +79,15 @@
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-right">
               <span class="text-body font-medium">
-                {{
-                  formatCurrency(calculateTotalValue(stock.on_hand, stock.wac))
-                }}
+                {{ formatCurrency(calculateTotalValue(stock.on_hand, stock.wac)) }}
               </span>
             </td>
           </tr>
         </tbody>
         <tfoot v-if="showTotals" class="bg-elevated border-t-2 border-default">
           <tr>
-            <td
-              colspan="4"
-              class="px-4 py-3 text-right text-body font-semibold"
-            >
-              Grand Total:
-            </td>
-            <td
-              class="px-4 py-3 whitespace-nowrap text-right text-body font-bold"
-            >
+            <td colspan="4" class="px-4 py-3 text-right text-body font-semibold">Grand Total:</td>
+            <td class="px-4 py-3 whitespace-nowrap text-right text-body font-bold">
               {{ formatCurrency(grandTotal) }}
             </td>
           </tr>
@@ -114,19 +96,11 @@
     </div>
 
     <!-- Empty State -->
-    <div
-      v-else
-      class="text-center py-12 bg-elevated rounded-lg border border-default"
-    >
+    <div v-else class="text-center py-12 bg-elevated rounded-lg border border-default">
       <div class="text-muted">
-        <Icon
-          name="i-heroicons-inbox"
-          class="w-12 h-12 mx-auto mb-3 opacity-50"
-        />
+        <Icon name="i-heroicons-inbox" class="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p class="text-body font-medium">No stock data available</p>
-        <p class="text-caption mt-1">
-          This item has no stock recorded in any location.
-        </p>
+        <p class="text-caption mt-1">This item has no stock recorded in any location.</p>
       </div>
     </div>
   </div>
@@ -190,10 +164,7 @@ function formatCurrency(value: number | string): string {
     .replace("SAR", "SAR ");
 }
 
-function calculateTotalValue(
-  onHand: number | string,
-  wac: number | string
-): number {
+function calculateTotalValue(onHand: number | string, wac: number | string): number {
   const quantity = typeof onHand === "string" ? parseFloat(onHand) : onHand;
   const cost = typeof wac === "string" ? parseFloat(wac) : wac;
   return quantity * cost;
@@ -201,23 +172,10 @@ function calculateTotalValue(
 
 function getLocationTypeColor(
   type: string
-):
-  | "primary"
-  | "secondary"
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "neutral" {
+): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
   const colorMap: Record<
     string,
-    | "primary"
-    | "secondary"
-    | "success"
-    | "error"
-    | "warning"
-    | "info"
-    | "neutral"
+    "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral"
   > = {
     KITCHEN: "warning",
     STORE: "info",

@@ -298,10 +298,7 @@ const handleRetry = () => {
                 class="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 bg-gradient-to-br transition-transform duration-300 group-hover:scale-110"
                 :class="action.gradient"
               >
-                <UIcon
-                  :name="`i-lucide-${action.icon}`"
-                  class="w-6 h-6 text-white"
-                />
+                <UIcon :name="`i-lucide-${action.icon}`" class="w-6 h-6 text-white" />
               </div>
 
               <!-- Text -->
@@ -318,10 +315,7 @@ const handleRetry = () => {
               <div
                 class="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
               >
-                <UIcon
-                  name="i-lucide-arrow-right"
-                  class="w-5 h-5 text-[var(--ui-primary)]"
-                />
+                <UIcon name="i-lucide-arrow-right" class="w-5 h-5 text-[var(--ui-primary)]" />
               </div>
             </div>
           </button>

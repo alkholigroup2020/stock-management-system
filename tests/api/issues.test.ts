@@ -10,17 +10,8 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  apiFetch,
-  type TestUser,
-} from "./helpers/test-server";
-import {
-  testUsers,
-  getTestLocationIds,
-  getTestItemIds,
-} from "./helpers/test-data";
+import { loginUser, authenticatedFetch, apiFetch, type TestUser } from "./helpers/test-server";
+import { testUsers, getTestLocationIds, getTestItemIds } from "./helpers/test-data";
 
 describe("POST /api/locations/:locationId/issues", () => {
   let adminUser: TestUser;
@@ -51,17 +42,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(issueData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(200);
       expect(result.data).toBeDefined();
@@ -106,17 +94,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(issueData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(200);
 
@@ -169,10 +154,7 @@ describe("POST /api/locations/:locationId/issues", () => {
       expect(line!.line_value).toBeCloseTo(expectedLineValue, 2);
 
       // Verify total value matches sum of line values
-      const expectedTotal = result.data?.issue.lines.reduce(
-        (sum, l) => sum + l.line_value,
-        0
-      );
+      const expectedTotal = result.data?.issue.lines.reduce((sum, l) => sum + l.line_value, 0);
       expect(result.data?.issue.total_value).toBeCloseTo(expectedTotal!, 2);
     }, 10000);
   });
@@ -190,17 +172,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(issueData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 
@@ -238,17 +217,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.warehouse}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(issueData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.warehouse}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 
@@ -297,17 +273,14 @@ describe("POST /api/locations/:locationId/issues", () => {
       };
 
       // Try to create issue at a location the operator doesn't have access to
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.warehouse}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(issueData),
-          user: operatorUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.warehouse}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(issueData),
+        user: operatorUser,
+      });
 
       // Should be either 403 (forbidden) or succeed if operator has access
       if (result.status === 403) {
@@ -330,17 +303,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(invalidData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(invalidData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 
@@ -355,17 +325,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         lines: [], // Empty lines not allowed
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(invalidData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(invalidData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 
@@ -385,17 +352,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(invalidData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(invalidData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 
@@ -415,17 +379,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(invalidData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(invalidData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 
@@ -445,17 +406,14 @@ describe("POST /api/locations/:locationId/issues", () => {
         ],
       };
 
-      const result = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(invalidData),
-          user: adminUser,
-        }
-      );
+      const result = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(invalidData),
+        user: adminUser,
+      });
 
       expect(result.status).toBe(400);
 

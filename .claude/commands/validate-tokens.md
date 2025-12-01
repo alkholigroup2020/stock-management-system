@@ -17,26 +17,34 @@ Scan the codebase for design token violations and provide fixes.
 ### Violation Patterns to Detect
 
 #### 1. Inline Hex Colors (CRITICAL)
+
 ```regex
 style="[^"]*(?:color|background|border-color):\s*#[0-9a-fA-F]{3,6}
 ```
+
 **Fix:** Replace with Tailwind class or CSS variable
 
 #### 2. Wrong Nuxt UI Color Props (CRITICAL)
+
 ```regex
 color="(?:navy|emerald|zinc|amber|red|blue)"
 ```
+
 **Correct values:** `primary`, `secondary`, `success`, `warning`, `error`, `info`, `neutral`
 
 #### 3. Non-Standard Spacing Values
+
 ```regex
 (?:p|m|gap|space-[xy])-(?:1|3|5|7|9|10|11)(?:\s|")
 ```
+
 **Standard spacing:** `2`, `4`, `6`, `8`, `12`, `16`, `20`, `24`
 **Exception:** `gap-2`, `gap-3` are allowed for tight inline spacing
 
 #### 4. Direct Palette Colors (instead of semantic)
+
 Look for direct palette usage where semantic tokens should be used:
+
 - `text-navy-*` → should use `text-[var(--ui-text)]` or `text-[var(--ui-primary)]`
 - `bg-navy-*` → should use `bg-[var(--ui-bg)]` or semantic class
 - `border-navy-*` → should use `border-[var(--ui-border)]`
@@ -44,13 +52,17 @@ Look for direct palette usage where semantic tokens should be used:
 **Note:** Some direct palette usage is acceptable for decorative elements
 
 #### 5. Hardcoded Pixel Values
+
 ```regex
 style="[^"]*(?:width|height|padding|margin|font-size):\s*\d+px
 ```
+
 **Fix:** Use Tailwind utilities or CSS variables
 
 #### 6. Missing Dark Mode Variants
+
 Check for theme-sensitive classes without `dark:` counterpart:
+
 - `bg-white` without `dark:bg-zinc-900`
 - `text-zinc-900` without `dark:text-zinc-100`
 - `border-zinc-200` without `dark:border-zinc-800`

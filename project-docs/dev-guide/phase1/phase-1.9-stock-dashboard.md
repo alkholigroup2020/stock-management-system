@@ -1,4 +1,5 @@
 # Phase 1.9: Stock Now & Dashboard
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -35,12 +36,14 @@ These pages give users quick insights into their business operations at a glance
 ### What Problems Does This Solve?
 
 Before this phase:
+
 - ❌ Users had no way to see current stock levels
 - ❌ No overview of daily operations
 - ❌ Had to navigate multiple pages to find information
 - ❌ No quick access to important metrics
 
 After this phase:
+
 - ✅ Real-time stock visibility
 - ✅ Dashboard with key performance indicators (KPIs)
 - ✅ Recent activity at a glance
@@ -102,6 +105,7 @@ graph LR
 ```
 
 **Key Features:**
+
 - Fetches current stock with item details
 - Calculates total value (quantity × WAC)
 - Supports filters (category, low stock)
@@ -200,16 +204,10 @@ graph TB
 <template>
   <!-- Toggle between Single Location and All Locations -->
   <UButtonGroup>
-    <UButton
-      :variant="viewMode === 'single' ? 'solid' : 'ghost'"
-      @click="viewMode = 'single'"
-    >
+    <UButton :variant="viewMode === 'single' ? 'solid' : 'ghost'" @click="viewMode = 'single'">
       Single Location
     </UButton>
-    <UButton
-      :variant="viewMode === 'all' ? 'solid' : 'ghost'"
-      @click="viewMode = 'all'"
-    >
+    <UButton :variant="viewMode === 'all' ? 'solid' : 'ghost'" @click="viewMode = 'all'">
       All Locations
     </UButton>
   </UButtonGroup>
@@ -227,32 +225,27 @@ The page has three types of filters:
 ```typescript
 // How filters work together
 const filteredStock = computed(() => {
-  let items = stock.value
+  let items = stock.value;
 
   // Apply search filter
   if (searchQuery.value) {
-    items = items.filter(item =>
-      item.name.includes(searchQuery) ||
-      item.code.includes(searchQuery)
-    )
+    items = items.filter(
+      (item) => item.name.includes(searchQuery) || item.code.includes(searchQuery)
+    );
   }
 
   // Apply category filter
   if (selectedCategory.value) {
-    items = items.filter(item =>
-      item.category === selectedCategory.value
-    )
+    items = items.filter((item) => item.category === selectedCategory.value);
   }
 
   // Apply low stock filter
   if (showLowStock.value) {
-    items = items.filter(item =>
-      item.on_hand < item.min_stock
-    )
+    items = items.filter((item) => item.on_hand < item.min_stock);
   }
 
-  return items
-})
+  return items;
+});
 ```
 
 #### 3. Export to CSV
@@ -262,26 +255,24 @@ Users can download stock data as a CSV file:
 ```typescript
 function exportToCSV() {
   // Create CSV header
-  const headers = ['Code', 'Name', 'Unit', 'Category', 'On Hand', 'WAC', 'Total Value']
+  const headers = ["Code", "Name", "Unit", "Category", "On Hand", "WAC", "Total Value"];
 
   // Convert data to CSV format
-  const rows = filteredStock.value.map(item => [
+  const rows = filteredStock.value.map((item) => [
     item.item_code,
     item.item_name,
     item.unit,
     item.category,
     item.on_hand,
     item.wac,
-    item.total_value
-  ])
+    item.total_value,
+  ]);
 
   // Create downloadable file
-  const csvContent = [headers, ...rows]
-    .map(row => row.join(','))
-    .join('\n')
+  const csvContent = [headers, ...rows].map((row) => row.join(",")).join("\n");
 
   // Trigger download
-  downloadFile(csvContent, 'stock-now.csv')
+  downloadFile(csvContent, "stock-now.csv");
 }
 ```
 
@@ -403,21 +394,21 @@ graph LR
 
 ```typescript
 function calculateDaysLeft(endDate: Date): number {
-  const today = new Date()
-  const end = new Date(endDate)
+  const today = new Date();
+  const end = new Date(endDate);
 
   // Set time to midnight for accurate day calculation
-  today.setHours(0, 0, 0, 0)
-  end.setHours(23, 59, 59, 999)
+  today.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
 
   // Calculate difference in milliseconds
-  const diff = end.getTime() - today.getTime()
+  const diff = end.getTime() - today.getTime();
 
   // Convert to days and round up
-  const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24))
+  const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
   // Return 0 if period has ended
-  return Math.max(0, daysLeft)
+  return Math.max(0, daysLeft);
 }
 ```
 
@@ -428,17 +419,16 @@ function calculateDaysLeft(endDate: Date): number {
 const totalMandays = await prisma.pOB.aggregate({
   where: {
     location_id: locationId,
-    period_id: currentPeriod.id
+    period_id: currentPeriod.id,
   },
   _sum: {
     crew_count: true,
-    extra_count: true
-  }
-})
+    extra_count: true,
+  },
+});
 
 // Total = crew + extra personnel
-const mandays = (totalMandays._sum.crew_count || 0) +
-                (totalMandays._sum.extra_count || 0)
+const mandays = (totalMandays._sum.crew_count || 0) + (totalMandays._sum.extra_count || 0);
 ```
 
 ---
@@ -507,39 +497,37 @@ A reusable card component for displaying key metrics:
 
 <script setup lang="ts">
 interface Props {
-  label: string
-  value: number | string
-  icon: string
-  color?: 'primary' | 'secondary' | 'success' | 'error' | 'neutral'
-  format?: 'currency' | 'number' | 'text'
-  trend?: number
-  loading?: boolean
+  label: string;
+  value: number | string;
+  icon: string;
+  color?: "primary" | "secondary" | "success" | "error" | "neutral";
+  format?: "currency" | "number" | "text";
+  trend?: number;
+  loading?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  color: 'neutral',
-  format: 'number',
-  loading: false
-})
+  color: "neutral",
+  format: "number",
+  loading: false,
+});
 
 // Format value based on type
 const formattedValue = computed(() => {
-  if (props.format === 'currency') {
-    return formatCurrency(props.value as number)
+  if (props.format === "currency") {
+    return formatCurrency(props.value as number);
   }
-  if (props.format === 'number') {
-    return props.value.toLocaleString()
+  if (props.format === "number") {
+    return props.value.toLocaleString();
   }
-  return props.value
-})
+  return props.value;
+});
 
 // Determine trend icon
 const trendIcon = computed(() => {
-  if (!props.trend) return ''
-  return props.trend > 0
-    ? 'i-heroicons-arrow-trending-up'
-    : 'i-heroicons-arrow-trending-down'
-})
+  if (!props.trend) return "";
+  return props.trend > 0 ? "i-heroicons-arrow-trending-up" : "i-heroicons-arrow-trending-down";
+});
 </script>
 ```
 
@@ -555,14 +543,7 @@ Displays a list of recent transactions:
     <!-- Header -->
     <div class="recent-activity__header">
       <h3>{{ title }}</h3>
-      <UButton
-        v-if="viewAllLink"
-        variant="link"
-        size="sm"
-        :to="viewAllLink"
-      >
-        View All →
-      </UButton>
+      <UButton v-if="viewAllLink" variant="link" size="sm" :to="viewAllLink">View All →</UButton>
     </div>
 
     <!-- Items List -->
@@ -596,7 +577,7 @@ Displays a list of recent transactions:
       <template v-else>
         <div class="empty-state">
           <UIcon name="i-heroicons-inbox" class="text-4xl" />
-          <p>{{ emptyMessage || 'No recent activity' }}</p>
+          <p>{{ emptyMessage || "No recent activity" }}</p>
         </div>
       </template>
     </div>
@@ -691,16 +672,16 @@ Both pages use Pinia stores for state management:
 
 ```typescript
 // Location Store - Tracks current location
-const locationStore = useLocationStore()
-locationStore.currentLocationId // Currently selected location
+const locationStore = useLocationStore();
+locationStore.currentLocationId; // Currently selected location
 
 // Period Store - Tracks current period
-const periodStore = usePeriodStore()
-periodStore.currentPeriod // Active period information
+const periodStore = usePeriodStore();
+periodStore.currentPeriod; // Active period information
 
 // User Store - Tracks user permissions
-const userStore = useUserStore()
-userStore.hasRole(['supervisor', 'admin']) // Check permissions
+const userStore = useUserStore();
+userStore.hasRole(["supervisor", "admin"]); // Check permissions
 ```
 
 ---
@@ -715,18 +696,21 @@ Created test scripts to validate all endpoints:
 
 ```javascript
 // Test location-specific stock
-const locationStock = await fetch('/api/locations/loc1/stock')
-assert(locationStock.stock.length > 0, 'Should return stock items')
-assert(locationStock.stats.total_value > 0, 'Should calculate total value')
+const locationStock = await fetch("/api/locations/loc1/stock");
+assert(locationStock.stock.length > 0, "Should return stock items");
+assert(locationStock.stats.total_value > 0, "Should calculate total value");
 
 // Test consolidated stock (admin only)
-const consolidated = await fetch('/api/stock/consolidated')
-assert(consolidated.items.length > 0, 'Should return consolidated items')
-assert(consolidated.summary.total_locations > 0, 'Should count locations')
+const consolidated = await fetch("/api/stock/consolidated");
+assert(consolidated.items.length > 0, "Should return consolidated items");
+assert(consolidated.summary.total_locations > 0, "Should count locations");
 
 // Test filters
-const filtered = await fetch('/api/locations/loc1/stock?category=Rice')
-assert(filtered.stock.every(i => i.category === 'Rice'), 'Should filter by category')
+const filtered = await fetch("/api/locations/loc1/stock?category=Rice");
+assert(
+  filtered.stock.every((i) => i.category === "Rice"),
+  "Should filter by category"
+);
 ```
 
 ### UI Testing with Playwright
@@ -735,18 +719,18 @@ Automated browser testing for user interactions:
 
 ```javascript
 // Test dashboard loading
-await page.goto('http://localhost:3000')
-await expect(page.locator('.metric-card')).toHaveCount(4)
-await expect(page.getByText('Total Receipts')).toBeVisible()
+await page.goto("http://localhost:3000");
+await expect(page.locator(".metric-card")).toHaveCount(4);
+await expect(page.getByText("Total Receipts")).toBeVisible();
 
 // Test navigation to Stock Now
-await page.click('text=View Stock')
-await expect(page).toHaveURL('/stock-now')
-await expect(page.locator('.stock-table')).toBeVisible()
+await page.click("text=View Stock");
+await expect(page).toHaveURL("/stock-now");
+await expect(page.locator(".stock-table")).toBeVisible();
 
 // Test filtering
-await page.fill('input[placeholder="Search items..."]', 'Rice')
-await expect(page.locator('.stock-row')).toContainText('Rice')
+await page.fill('input[placeholder="Search items..."]', "Rice");
+await expect(page.locator(".stock-row")).toContainText("Rice");
 ```
 
 ---
@@ -808,20 +792,20 @@ onUnmounted(() => {
 ```typescript
 // Export in chunks
 async function exportLargeCSV() {
-  const chunks = []
-  let page = 1
-  let hasMore = true
+  const chunks = [];
+  let page = 1;
+  let hasMore = true;
 
   while (hasMore) {
-    const data = await fetchStockPage(page)
-    chunks.push(data.items)
-    hasMore = data.hasNextPage
-    page++
+    const data = await fetchStockPage(page);
+    chunks.push(data.items);
+    hasMore = data.hasNextPage;
+    page++;
   }
 
   // Combine and download
-  const allData = chunks.flat()
-  downloadCSV(allData)
+  const allData = chunks.flat();
+  downloadCSV(allData);
 }
 ```
 
@@ -866,6 +850,7 @@ After Phase 1.9, the application has:
 ✅ Role-based access control
 
 **Next phases will add:**
+
 - Transfer management between locations
 - Period closing and reconciliation
 - Advanced reporting and analytics

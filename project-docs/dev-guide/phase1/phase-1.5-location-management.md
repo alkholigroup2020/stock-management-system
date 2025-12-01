@@ -1,4 +1,5 @@
 # Phase 1.5: Location Management
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -22,11 +23,13 @@
 In this phase, we built the **Location Management System** - the feature that allows admins to manage multiple business locations (kitchens, stores, warehouses) and assign users to them.
 
 Think of locations as **different branches** of your business. For example:
+
 - **Main Kitchen** - Where food is prepared
 - **Central Store** - Where items are stored
 - **Warehouse 1** - Where raw materials are kept
 
 This phase created the tools to:
+
 - ✅ **Add new locations** (create kitchen, store, warehouse)
 - ✅ **Edit location details** (change name, address, manager)
 - ✅ **View all locations** (see list of all branches)
@@ -36,6 +39,7 @@ This phase created the tools to:
 ### Why Locations Are Important
 
 In a multi-location business:
+
 - **Different places** have different stock
 - **Different users** work at different places
 - **Each location** tracks its own inventory separately
@@ -107,10 +111,12 @@ server/api/locations/
 ##### 1. GET /api/locations (Get All Locations)
 
 This endpoint returns a list of locations based on who is asking:
+
 - **Admins/Supervisors**: See ALL locations
 - **Operators**: See only locations they are assigned to
 
 You can also filter locations:
+
 - **By type**: `?type=KITCHEN` (only kitchens)
 - **By status**: `?is_active=true` (only active ones)
 - **By search**: `?search=Main` (search by name or code)
@@ -121,27 +127,27 @@ You can also filter locations:
 // server/api/locations/index.get.ts
 export default defineEventHandler(async (event) => {
   // Get the logged-in user
-  const session = await getUserSession(event)
+  const session = await getUserSession(event);
 
   // Get filter parameters from URL
-  const { type, is_active, search } = getQuery(event)
+  const { type, is_active, search } = getQuery(event);
 
   // Build database query
-  const where = {}
+  const where = {};
 
-  if (type) where.type = type
-  if (is_active !== undefined) where.is_active = is_active
+  if (type) where.type = type;
+  if (is_active !== undefined) where.is_active = is_active;
   if (search) {
     where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { code: { contains: search, mode: 'insensitive' } }
-    ]
+      { name: { contains: search, mode: "insensitive" } },
+      { code: { contains: search, mode: "insensitive" } },
+    ];
   }
 
   // If user is Operator, show only their locations
-  if (session.user.role === 'OPERATOR') {
-    const userLocationIds = await getUserLocationIds(session.user.id)
-    where.id = { in: userLocationIds }
+  if (session.user.role === "OPERATOR") {
+    const userLocationIds = await getUserLocationIds(session.user.id);
+    where.id = { in: userLocationIds };
   }
 
   // Fetch locations from database
@@ -152,18 +158,19 @@ export default defineEventHandler(async (event) => {
       _count: {
         select: {
           user_locations: true,
-          location_stock: true
-        }
-      }
+          location_stock: true,
+        },
+      },
     },
-    orderBy: { name: 'asc' }
-  })
+    orderBy: { name: "asc" },
+  });
 
-  return { locations }
-})
+  return { locations };
+});
 ```
 
 **What This Does:**
+
 1. Gets the current user from session
 2. Gets filter parameters from URL query
 3. Builds a database search based on filters
@@ -176,11 +183,13 @@ export default defineEventHandler(async (event) => {
 This endpoint creates a new location. **Only admins** can do this.
 
 **Required Fields:**
+
 - `code` - Unique code (e.g., "MAIN-KIT")
 - `name` - Location name (e.g., "Main Kitchen")
 - `type` - KITCHEN, STORE, CENTRAL, or WAREHOUSE
 
 **Optional Fields:**
+
 - `address` - Physical address
 - `manager_id` - User ID of the manager
 - `timezone` - Defaults to "Asia/Riyadh"
@@ -192,27 +201,27 @@ This endpoint creates a new location. **Only admins** can do this.
 const createLocationSchema = z.object({
   code: z.string().min(1).max(10),
   name: z.string().min(1).max(100),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE']),
+  type: z.enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"]),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional(),
-  timezone: z.string().default('Asia/Riyadh')
-})
+  timezone: z.string().default("Asia/Riyadh"),
+});
 
 export default defineEventHandler(async (event) => {
   // Check if user is admin
-  if (session.user.role !== 'ADMIN') {
+  if (session.user.role !== "ADMIN") {
     throw createError({
       statusCode: 403,
-      message: 'Only admins can create locations'
-    })
+      message: "Only admins can create locations",
+    });
   }
 
   // Get and validate data from request
-  const body = await readBody(event)
-  const data = createLocationSchema.parse(body)
+  const body = await readBody(event);
+  const data = createLocationSchema.parse(body);
 
   // Make code uppercase
-  data.code = data.code.toUpperCase()
+  data.code = data.code.toUpperCase();
 
   // Create location in database
   const location = await prisma.location.create({
@@ -223,18 +232,19 @@ export default defineEventHandler(async (event) => {
       address: data.address,
       manager_id: data.manager_id,
       timezone: data.timezone,
-      is_active: true
-    }
-  })
+      is_active: true,
+    },
+  });
 
-  return { location }
-})
+  return { location };
+});
 ```
 
 **Validation with Zod:**
 Zod is a library that checks if the data is correct. It's like a **security guard** that checks if the data coming in is valid before saving it.
 
 For example:
+
 - `z.string().min(1)` - Must be a text with at least 1 character
 - `z.enum([...])` - Must be one of the specific values listed
 - `.optional()` - This field is not required
@@ -244,6 +254,7 @@ For example:
 This endpoint gets detailed information about a single location.
 
 It returns:
+
 - Basic location info (code, name, type, address)
 - Manager information
 - Count of users assigned
@@ -266,12 +277,12 @@ It returns:
       "email": "ahmad@example.com"
     },
     "_count": {
-      "user_locations": 5,      // 5 users assigned
-      "location_stock": 120,    // 120 items in stock
-      "deliveries": 45,         // 45 deliveries received
-      "issues": 30,             // 30 issues created
-      "transfers_from": 10,     // 10 transfers sent
-      "transfers_to": 8         // 8 transfers received
+      "user_locations": 5, // 5 users assigned
+      "location_stock": 120, // 120 items in stock
+      "deliveries": 45, // 45 deliveries received
+      "issues": 30, // 30 issues created
+      "transfers_from": 10, // 10 transfers sent
+      "transfers_to": 8 // 8 transfers received
     }
   }
 }
@@ -284,6 +295,7 @@ This endpoint updates an existing location. **Only admins** can do this.
 **Important:** The `code` field CANNOT be changed after creation (it's like a serial number).
 
 You can update:
+
 - Name
 - Type
 - Address
@@ -297,32 +309,33 @@ You can update:
 // server/api/locations/[id].patch.ts
 const updateLocationSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE']).optional(),
+  type: z.enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"]).optional(),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional().nullable(),
   timezone: z.string().optional(),
-  is_active: z.boolean().optional()
-})
+  is_active: z.boolean().optional(),
+});
 
 export default defineEventHandler(async (event) => {
-  const locationId = event.context.params.id
-  const body = await readBody(event)
-  const data = updateLocationSchema.parse(body)
+  const locationId = event.context.params.id;
+  const body = await readBody(event);
+  const data = updateLocationSchema.parse(body);
 
   // Update in database
   const location = await prisma.location.update({
     where: { id: locationId },
-    data: data
-  })
+    data: data,
+  });
 
-  return { location }
-})
+  return { location };
+});
 ```
 
 **Partial Updates:**
 Notice how all fields are `.optional()` in the schema? This means you can update just ONE field without sending all fields. This is called a **partial update**.
 
 Example: To change just the name:
+
 ```json
 {
   "name": "New Kitchen Name"
@@ -334,6 +347,7 @@ Example: To change just the name:
 This endpoint returns all users assigned to a specific location.
 
 For each user, it shows:
+
 - User details (name, email, role)
 - Access level (VIEW, POST, or MANAGE)
 - When they were assigned
@@ -366,14 +380,14 @@ For each user, it shows:
 
 All API routes handle errors properly:
 
-| Error Code | Meaning | Example |
-|------------|---------|---------|
-| **400** | Bad Request | Missing required field |
-| **401** | Unauthorized | User not logged in |
-| **403** | Forbidden | User doesn't have permission |
-| **404** | Not Found | Location doesn't exist |
-| **409** | Conflict | Location code already exists |
-| **500** | Server Error | Database error |
+| Error Code | Meaning      | Example                      |
+| ---------- | ------------ | ---------------------------- |
+| **400**    | Bad Request  | Missing required field       |
+| **401**    | Unauthorized | User not logged in           |
+| **403**    | Forbidden    | User doesn't have permission |
+| **404**    | Not Found    | Location doesn't exist       |
+| **409**    | Conflict     | Location code already exists |
+| **500**    | Server Error | Database error               |
 
 **Example Error Response:**
 
@@ -397,6 +411,7 @@ All API routes handle errors properly:
 We created the **user interface** (screens) that allow users to see and manage locations.
 
 Think of this as the **control panel** where admins can:
+
 - See all locations in a nice grid
 - Search for specific locations
 - Filter by type or status
@@ -426,6 +441,7 @@ app/components/location/
 This is the main page that shows all locations in a grid.
 
 **Features:**
+
 1. **Search Bar** - Search by name or code
 2. **Type Filter** - Show only Kitchens, Stores, etc.
 3. **Status Filter** - Show only Active or Inactive
@@ -487,35 +503,36 @@ graph TB
 
 <script setup>
 const filters = reactive({
-  search: '',
+  search: "",
   type: null,
-  is_active: null
-})
+  is_active: null,
+});
 
 // Debounce means "wait a bit before searching"
 // If user types fast, don't search after every letter
 // Wait until they stop typing for 500ms
 const debouncedFetch = useDebounceFn(() => {
-  fetchLocations()
-}, 500)
+  fetchLocations();
+}, 500);
 
 const fetchLocations = async () => {
-  const query = {}
+  const query = {};
 
-  if (filters.search) query.search = filters.search
-  if (filters.type) query.type = filters.type
-  if (filters.is_active !== null) query.is_active = filters.is_active
+  if (filters.search) query.search = filters.search;
+  if (filters.type) query.type = filters.type;
+  if (filters.is_active !== null) query.is_active = filters.is_active;
 
-  const response = await $fetch('/api/locations', { query })
-  locations.value = response.locations
-}
+  const response = await $fetch("/api/locations", { query });
+  locations.value = response.locations;
+};
 </script>
 ```
 
 **What is Debouncing?**
 
 Imagine typing "Main Kitchen" in the search box:
-- Without debounce: Searches after M, Ma, Mai, Main, Main_, ... (11 searches!)
+
+- Without debounce: Searches after M, Ma, Mai, Main, Main\_, ... (11 searches!)
 - With debounce: Waits until you stop typing, then searches ONCE
 
 This saves server resources and makes the app faster.
@@ -525,6 +542,7 @@ This saves server resources and makes the app faster.
 This is a **reusable card** that displays one location's information.
 
 **Features:**
+
 - Type-specific icon (chef hat for kitchen, store icon for store)
 - Color coding by type
 - Status badge (Active/Inactive)
@@ -539,27 +557,28 @@ This is a **reusable card** that displays one location's information.
 <script setup>
 const locationIcon = computed(() => {
   const icons = {
-    KITCHEN: 'i-lucide-chef-hat',      // Chef hat icon
-    STORE: 'i-lucide-store',           // Store icon
-    CENTRAL: 'i-lucide-warehouse',     // Warehouse icon
-    WAREHOUSE: 'i-lucide-package-2'    // Package icon
-  }
-  return icons[props.location.type]
-})
+    KITCHEN: "i-lucide-chef-hat", // Chef hat icon
+    STORE: "i-lucide-store", // Store icon
+    CENTRAL: "i-lucide-warehouse", // Warehouse icon
+    WAREHOUSE: "i-lucide-package-2", // Package icon
+  };
+  return icons[props.location.type];
+});
 
 const locationTypeClass = computed(() => {
   const classes = {
-    KITCHEN: 'bg-amber-100 text-amber-700',     // Amber for kitchen
-    STORE: 'bg-emerald-100 text-emerald-700',   // Emerald for store
-    CENTRAL: 'bg-navy-100 text-navy-700',       // Navy for central
-    WAREHOUSE: 'bg-zinc-100 text-zinc-700'      // Zinc for warehouse
-  }
-  return classes[props.location.type]
-})
+    KITCHEN: "bg-amber-100 text-amber-700", // Amber for kitchen
+    STORE: "bg-emerald-100 text-emerald-700", // Emerald for store
+    CENTRAL: "bg-navy-100 text-navy-700", // Navy for central
+    WAREHOUSE: "bg-zinc-100 text-zinc-700", // Zinc for warehouse
+  };
+  return classes[props.location.type];
+});
 </script>
 ```
 
 **Color Coding:**
+
 - **Kitchen**: Amber (orange-yellow) - represents cooking fire
 - **Store**: Emerald (green) - represents sales/money
 - **Central**: Navy (blue) - represents headquarters
@@ -570,6 +589,7 @@ const locationTypeClass = computed(() => {
 This page has a form to create a new location.
 
 **Form Fields:**
+
 1. **Code** (required) - Unique identifier, auto-uppercase
 2. **Name** (required) - Location name
 3. **Type** (required) - Dropdown: Kitchen, Store, Central, Warehouse
@@ -582,19 +602,15 @@ This page has a form to create a new location.
 ```typescript
 // Validation rules
 const schema = z.object({
-  code: z.string()
-    .min(1, 'Code is required')
-    .max(10, 'Code must be 10 characters or less'),
-  name: z.string()
-    .min(1, 'Name is required')
-    .max(100, 'Name must be 100 characters or less'),
-  type: z.enum(['KITCHEN', 'STORE', 'CENTRAL', 'WAREHOUSE'], {
-    required_error: 'Please select a location type'
+  code: z.string().min(1, "Code is required").max(10, "Code must be 10 characters or less"),
+  name: z.string().min(1, "Name is required").max(100, "Name must be 100 characters or less"),
+  type: z.enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"], {
+    required_error: "Please select a location type",
   }),
   address: z.string().optional(),
   manager_id: z.string().uuid().optional(),
-  timezone: z.string().default('Asia/Riyadh')
-})
+  timezone: z.string().default("Asia/Riyadh"),
+});
 ```
 
 **Submit Flow:**
@@ -628,38 +644,38 @@ sequenceDiagram
 ```vue
 <script setup>
 const formData = reactive({
-  code: '',
-  name: '',
+  code: "",
+  name: "",
   type: null,
-  address: '',
+  address: "",
   manager_id: null,
-  timezone: 'Asia/Riyadh'
-})
+  timezone: "Asia/Riyadh",
+});
 
 const onSubmit = async () => {
   try {
     // Make code uppercase before sending
     const payload = {
       ...formData,
-      code: formData.code.toUpperCase()
-    }
+      code: formData.code.toUpperCase(),
+    };
 
     // Send to API
-    await $fetch('/api/locations', {
-      method: 'POST',
-      body: payload
-    })
+    await $fetch("/api/locations", {
+      method: "POST",
+      body: payload,
+    });
 
     // Show success message
-    toast.success('Success', 'Location created successfully')
+    toast.success("Success", "Location created successfully");
 
     // Go back to locations list
-    navigateTo('/locations')
+    navigateTo("/locations");
   } catch (error) {
     // Show error message
-    toast.error('Error', error.data?.message || 'Failed to create location')
+    toast.error("Error", error.data?.message || "Failed to create location");
   }
-}
+};
 </script>
 ```
 
@@ -668,6 +684,7 @@ const onSubmit = async () => {
 This page allows editing an existing location.
 
 **Key Differences from Create Page:**
+
 1. **Pre-filled data** - Form shows current values
 2. **Code is read-only** - Cannot change code after creation
 3. **Active status toggle** - Can activate/deactivate location
@@ -676,25 +693,25 @@ This page allows editing an existing location.
 
 ```vue
 <script setup>
-const route = useRoute()
+const route = useRoute();
 
 onMounted(async () => {
   // Get location ID from URL
-  const locationId = route.params.id
+  const locationId = route.params.id;
 
   // Fetch location data
-  const response = await $fetch(`/api/locations/${locationId}`)
-  const location = response.location
+  const response = await $fetch(`/api/locations/${locationId}`);
+  const location = response.location;
 
   // Pre-fill form
-  formData.code = location.code
-  formData.name = location.name
-  formData.type = location.type
-  formData.address = location.address || ''
-  formData.manager_id = location.manager_id || null
-  formData.timezone = location.timezone || 'Asia/Riyadh'
-  formData.is_active = location.is_active
-})
+  formData.code = location.code;
+  formData.name = location.name;
+  formData.type = location.type;
+  formData.address = location.address || "";
+  formData.manager_id = location.manager_id || null;
+  formData.timezone = location.timezone || "Asia/Riyadh";
+  formData.is_active = location.is_active;
+});
 </script>
 ```
 
@@ -702,7 +719,7 @@ onMounted(async () => {
 
 ```typescript
 const onSubmit = async () => {
-  const locationId = route.params.id
+  const locationId = route.params.id;
 
   const payload = {
     name: formData.name,
@@ -710,17 +727,18 @@ const onSubmit = async () => {
     address: formData.address || null,
     manager_id: formData.manager_id || null,
     timezone: formData.timezone,
-    is_active: formData.is_active
-  }
+    is_active: formData.is_active,
+  };
 
   await $fetch(`/api/locations/${locationId}`, {
-    method: 'PATCH',
-    body: payload
-  })
-}
+    method: "PATCH",
+    body: payload,
+  });
+};
 ```
 
 **Why PATCH instead of PUT?**
+
 - **PUT** - Replace entire object (must send ALL fields)
 - **PATCH** - Update specific fields (send only changed fields)
 
@@ -734,6 +752,7 @@ We use PATCH because it's more flexible - you can update just the name without s
 We created a system that allows admins to **assign users to locations** and control what they can do at each location.
 
 Think of this like **giving employees badges** to enter different buildings:
+
 - **VIEW badge** - Can see what's inside but can't touch
 - **POST badge** - Can use equipment and record work
 - **MANAGE badge** - Has full control and keys to everything
@@ -749,11 +768,11 @@ Think of this like **giving employees badges** to enter different buildings:
 
 Each user can be assigned to a location with one of three access levels:
 
-| Access Level | What They Can Do | Example |
-|--------------|------------------|---------|
-| **VIEW** | Only see information | Auditor who checks records |
-| **POST** | Create transactions | Warehouse worker who receives deliveries |
-| **MANAGE** | Full control | Location manager |
+| Access Level | What They Can Do     | Example                                  |
+| ------------ | -------------------- | ---------------------------------------- |
+| **VIEW**     | Only see information | Auditor who checks records               |
+| **POST**     | Create transactions  | Warehouse worker who receives deliveries |
+| **MANAGE**   | Full control         | Location manager                         |
 
 **Access Level Hierarchy:**
 
@@ -795,6 +814,7 @@ This endpoint assigns a user to a location with a specific access level.
 ```
 
 **What Happens:**
+
 1. Checks if location exists
 2. Checks if user exists and is active
 3. Checks if user is already assigned
@@ -807,18 +827,18 @@ This endpoint assigns a user to a location with a specific access level.
 ```typescript
 // server/api/locations/[id]/users.post.ts
 export default defineEventHandler(async (event) => {
-  const locationId = event.context.params.id
-  const { user_id, access_level } = await readBody(event)
+  const locationId = event.context.params.id;
+  const { user_id, access_level } = await readBody(event);
 
   // Check if user already assigned
   const existingAssignment = await prisma.userLocation.findUnique({
     where: {
       user_id_location_id: {
         user_id: user_id,
-        location_id: locationId
-      }
-    }
-  })
+        location_id: locationId,
+      },
+    },
+  });
 
   if (existingAssignment) {
     // Update existing assignment
@@ -826,17 +846,17 @@ export default defineEventHandler(async (event) => {
       where: {
         user_id_location_id: {
           user_id: user_id,
-          location_id: locationId
-        }
+          location_id: locationId,
+        },
       },
       data: {
         access_level: access_level,
         assigned_by: session.user.id,
-        assigned_at: new Date()
-      }
-    })
+        assigned_at: new Date(),
+      },
+    });
 
-    return { assignment: updated, updated: true }
+    return { assignment: updated, updated: true };
   } else {
     // Create new assignment
     const assignment = await prisma.userLocation.create({
@@ -844,13 +864,13 @@ export default defineEventHandler(async (event) => {
         user_id: user_id,
         location_id: locationId,
         access_level: access_level,
-        assigned_by: session.user.id
-      }
-    })
+        assigned_by: session.user.id,
+      },
+    });
 
-    return { assignment, updated: false }
+    return { assignment, updated: false };
   }
-})
+});
 ```
 
 **2. DELETE /api/locations/:id/users/:userId** - Remove User
@@ -868,26 +888,26 @@ Imagine the last admin removes themselves from all locations - they would be loc
 ```typescript
 // server/api/locations/[id]/users/[userId].delete.ts
 export default defineEventHandler(async (event) => {
-  const locationId = event.context.params.id
-  const userId = event.context.params.userId
+  const locationId = event.context.params.id;
+  const userId = event.context.params.userId;
 
   // Check if user is admin
   const user = await prisma.user.findUnique({
-    where: { id: userId }
-  })
+    where: { id: userId },
+  });
 
-  if (user.role === 'ADMIN') {
+  if (user.role === "ADMIN") {
     // Count how many locations this admin has
     const locationCount = await prisma.userLocation.count({
-      where: { user_id: userId }
-    })
+      where: { user_id: userId },
+    });
 
     // If this is their last location, prevent removal
     if (locationCount === 1) {
       throw createError({
         statusCode: 400,
-        message: 'Cannot remove last location from admin. Admins must have at least one location.'
-      })
+        message: "Cannot remove last location from admin. Admins must have at least one location.",
+      });
     }
   }
 
@@ -896,13 +916,13 @@ export default defineEventHandler(async (event) => {
     where: {
       user_id_location_id: {
         user_id: userId,
-        location_id: locationId
-      }
-    }
-  })
+        location_id: locationId,
+      },
+    },
+  });
 
-  return { success: true }
-})
+  return { success: true };
+});
 ```
 
 #### User Assignment UI
@@ -910,6 +930,7 @@ export default defineEventHandler(async (event) => {
 We added a **User Assignments section** to the location detail page.
 
 **Features:**
+
 1. **List of assigned users** - Shows all users with their access levels
 2. **Assign User button** - Opens a modal to add new users
 3. **Remove button** - Remove user from location (with confirmation)
@@ -976,9 +997,7 @@ graph TB
       <!-- Actions -->
       <div class="flex gap-3">
         <UButton @click="isOpen = false">Cancel</UButton>
-        <UButton color="primary" @click="submitAssignment">
-          Assign User
-        </UButton>
+        <UButton color="primary" @click="submitAssignment">Assign User</UButton>
       </div>
     </UCard>
   </UModal>
@@ -987,37 +1006,37 @@ graph TB
 <script setup>
 const accessLevelOptions = [
   {
-    label: 'View Only',
-    value: 'VIEW',
-    description: 'Can only view information'
+    label: "View Only",
+    value: "VIEW",
+    description: "Can only view information",
   },
   {
-    label: 'Post Transactions',
-    value: 'POST',
-    description: 'Can create deliveries and issues'
+    label: "Post Transactions",
+    value: "POST",
+    description: "Can create deliveries and issues",
   },
   {
-    label: 'Full Management',
-    value: 'MANAGE',
-    description: 'Has complete control'
-  }
-]
+    label: "Full Management",
+    value: "MANAGE",
+    description: "Has complete control",
+  },
+];
 
 const submitAssignment = async () => {
   await $fetch(`/api/locations/${locationId}/users`, {
-    method: 'POST',
+    method: "POST",
     body: {
       user_id: formData.user_id,
-      access_level: formData.access_level
-    }
-  })
+      access_level: formData.access_level,
+    },
+  });
 
-  toast.success('Success', 'User assigned to location')
-  isOpen.value = false
+  toast.success("Success", "User assigned to location");
+  isOpen.value = false;
 
   // Refresh the list
-  await fetchAssignedUsers()
-}
+  await fetchAssignedUsers();
+};
 </script>
 ```
 
@@ -1043,12 +1062,7 @@ const submitAssignment = async () => {
     </div>
 
     <!-- Remove Button -->
-    <UButton
-      color="error"
-      @click="removeUser(assignment.user_id)"
-    >
-      Remove
-    </UButton>
+    <UButton color="error" @click="removeUser(assignment.user_id)">Remove</UButton>
   </div>
 </template>
 ```
@@ -1065,6 +1079,7 @@ Think of it like **changing channels on TV** - you click the dropdown and select
 **Why Is This Important?**
 
 Users who work at multiple locations need to switch between them easily. For example:
+
 - A supervisor manages both Main Kitchen and Central Store
 - They need to check stock at Main Kitchen
 - Then switch to Central Store to approve a transfer
@@ -1099,13 +1114,13 @@ Each location type has its own icon for easy recognition:
 ```typescript
 const getLocationIcon = (type: string) => {
   const icons = {
-    KITCHEN: 'i-lucide-chef-hat',      // Chef hat for kitchen
-    STORE: 'i-lucide-store',           // Store icon for retail
-    CENTRAL: 'i-lucide-warehouse',     // Warehouse for central
-    WAREHOUSE: 'i-lucide-package-2'    // Package for warehouse
-  }
-  return icons[type] || 'i-lucide-map-pin'
-}
+    KITCHEN: "i-lucide-chef-hat", // Chef hat for kitchen
+    STORE: "i-lucide-store", // Store icon for retail
+    CENTRAL: "i-lucide-warehouse", // Warehouse for central
+    WAREHOUSE: "i-lucide-package-2", // Package for warehouse
+  };
+  return icons[type] || "i-lucide-map-pin";
+};
 ```
 
 **2. Color Coding**
@@ -1115,13 +1130,13 @@ Each location type has specific colors:
 ```typescript
 const getLocationIconClass = (type: string) => {
   const classes = {
-    KITCHEN: 'text-amber-600',      // Amber/orange
-    STORE: 'text-emerald-600',      // Emerald/green
-    CENTRAL: 'text-navy-600',       // Navy/blue
-    WAREHOUSE: 'text-zinc-600'      // Zinc/gray
-  }
-  return classes[type]
-}
+    KITCHEN: "text-amber-600", // Amber/orange
+    STORE: "text-emerald-600", // Emerald/green
+    CENTRAL: "text-navy-600", // Navy/blue
+    WAREHOUSE: "text-zinc-600", // Zinc/gray
+  };
+  return classes[type];
+};
 ```
 
 **Visual Example:**
@@ -1152,52 +1167,54 @@ const getLocationIconClass = (type: string) => {
 
 ```vue
 <script setup>
-import { useLocationStore } from '~/stores/location'
+import { useLocationStore } from "~/stores/location";
 
-const locationStore = useLocationStore()
-const toast = useAppToast()
+const locationStore = useLocationStore();
+const toast = useAppToast();
 
 // Build dropdown menu items
 const locationItems = computed(() => {
-  return [locationStore.userLocations.map(location => ({
-    label: location.name,
-    description: location.code,
-    icon: getLocationIcon(location.type),
-    iconClass: getLocationIconClass(location.type),
-    active: location.id === locationStore.activeLocationId,
-    click: () => handleLocationSwitch(location)
-  }))]
-})
+  return [
+    locationStore.userLocations.map((location) => ({
+      label: location.name,
+      description: location.code,
+      icon: getLocationIcon(location.type),
+      iconClass: getLocationIconClass(location.type),
+      active: location.id === locationStore.activeLocationId,
+      click: () => handleLocationSwitch(location),
+    })),
+  ];
+});
 
 // Handle switching to different location
 const handleLocationSwitch = async (location) => {
   // Don't switch if already active
   if (location.id === locationStore.activeLocationId) {
-    return
+    return;
   }
 
   try {
     // Update active location in store
-    const success = await locationStore.switchLocation(location.id)
+    const success = await locationStore.switchLocation(location.id);
 
     if (success) {
       // Show success message
-      toast.success('Location Changed', `Switched to ${location.name}`)
+      toast.success("Location Changed", `Switched to ${location.name}`);
 
       // Refresh all page data
-      await refreshNuxtData()
+      await refreshNuxtData();
     }
   } catch (error) {
-    toast.error('Error', 'Failed to switch location')
+    toast.error("Error", "Failed to switch location");
   }
-}
+};
 
 // Load user's locations when component mounts
 onMounted(async () => {
   if (!locationStore.userLocations.length) {
-    await locationStore.fetchUserLocations()
+    await locationStore.fetchUserLocations();
   }
-})
+});
 </script>
 ```
 
@@ -1210,6 +1227,7 @@ Think of it like **refreshing your web browser** but without actually reloading 
 **Why Do We Need It?**
 
 When you switch from Kitchen to Store:
+
 - The **stock levels are different**
 - The **transactions are different**
 - The **reports are different**
@@ -1217,6 +1235,7 @@ When you switch from Kitchen to Store:
 So all components need to fetch new data for the new location.
 
 **Example:**
+
 ```typescript
 // Before switch: Main Kitchen
 - Stock: 50 items
@@ -1235,64 +1254,63 @@ The location switcher uses a Pinia store to manage location state globally.
 
 ```typescript
 // stores/location.ts
-export const useLocationStore = defineStore('location', {
+export const useLocationStore = defineStore("location", {
   state: () => ({
-    activeLocationId: null,        // Currently selected location
-    userLocations: [],             // All locations user can access
-    loading: false,                // Loading state
-    error: null                    // Error message
+    activeLocationId: null, // Currently selected location
+    userLocations: [], // All locations user can access
+    loading: false, // Loading state
+    error: null, // Error message
   }),
 
   getters: {
     // Get the active location object
     activeLocation(state) {
-      return state.userLocations.find(
-        loc => loc.id === state.activeLocationId
-      )
+      return state.userLocations.find((loc) => loc.id === state.activeLocationId);
     },
 
     // Check if user has any locations
     hasLocations(state) {
-      return state.userLocations.length > 0
-    }
+      return state.userLocations.length > 0;
+    },
   },
 
   actions: {
     // Fetch user's accessible locations
     async fetchUserLocations() {
-      this.loading = true
+      this.loading = true;
 
-      const response = await $fetch('/api/user/locations')
-      this.userLocations = response.locations
+      const response = await $fetch("/api/user/locations");
+      this.userLocations = response.locations;
 
       // Set first location as active if none selected
       if (!this.activeLocationId && this.userLocations.length > 0) {
-        this.activeLocationId = this.userLocations[0].id
+        this.activeLocationId = this.userLocations[0].id;
       }
 
-      this.loading = false
+      this.loading = false;
     },
 
     // Switch to different location
     async switchLocation(locationId) {
-      const location = this.userLocations.find(loc => loc.id === locationId)
+      const location = this.userLocations.find((loc) => loc.id === locationId);
 
       if (!location) {
-        this.error = 'Location not found'
-        return false
+        this.error = "Location not found";
+        return false;
       }
 
-      this.activeLocationId = locationId
-      this.error = null
-      return true
-    }
-  }
-})
+      this.activeLocationId = locationId;
+      this.error = null;
+      return true;
+    },
+  },
+});
 ```
 
 **Why Use a Store?**
 
 The active location needs to be accessible from **many components**:
+
 - Navigation bar (to show current location)
 - Pages (to fetch data for current location)
 - Forms (to save transactions to current location)
@@ -1304,6 +1322,7 @@ A store provides a **single source of truth** - everyone gets the same location 
 The location switcher adapts to different screen sizes:
 
 **Desktop:**
+
 ```
 ┌────────────────────────────┐
 │ 🍳 Main Kitchen        ▼   │  ← Full name shown
@@ -1311,6 +1330,7 @@ The location switcher adapts to different screen sizes:
 ```
 
 **Mobile:**
+
 ```
 ┌─────┐
 │ 🍳  │  ← Just icon shown
@@ -1337,6 +1357,7 @@ The location switcher adapts to different screen sizes:
 ```
 
 **Tailwind Classes Explained:**
+
 - `hidden sm:flex` - Hide on mobile, show as flex on small screens and up
 - `sm:hidden` - Show on mobile, hide on small screens and up
 
@@ -1403,13 +1424,13 @@ graph TB
 
 REST is a way of organizing API endpoints. We follow these patterns:
 
-| Action | HTTP Method | URL | Example |
-|--------|-------------|-----|---------|
-| Get all | GET | /api/locations | List all locations |
-| Get one | GET | /api/locations/:id | Get location ABC |
-| Create | POST | /api/locations | Create new location |
-| Update | PATCH | /api/locations/:id | Update location ABC |
-| Delete | DELETE | /api/locations/:id | Delete location ABC |
+| Action  | HTTP Method | URL                | Example             |
+| ------- | ----------- | ------------------ | ------------------- |
+| Get all | GET         | /api/locations     | List all locations  |
+| Get one | GET         | /api/locations/:id | Get location ABC    |
+| Create  | POST        | /api/locations     | Create new location |
+| Update  | PATCH       | /api/locations/:id | Update location ABC |
+| Delete  | DELETE      | /api/locations/:id | Delete location ABC |
 
 ### 2. **Role-Based Access Control (RBAC)**
 
@@ -1444,13 +1465,13 @@ Zod checks if data is correct before saving:
 ```typescript
 // Define rules
 const schema = z.object({
-  code: z.string().min(1).max(10),  // Must be 1-10 characters
-  name: z.string().min(1),           // Required
-  type: z.enum(['KITCHEN', 'STORE']) // Must be one of these
-})
+  code: z.string().min(1).max(10), // Must be 1-10 characters
+  name: z.string().min(1), // Required
+  type: z.enum(["KITCHEN", "STORE"]), // Must be one of these
+});
 
 // Check data
-const result = schema.parse(data)  // Throws error if invalid
+const result = schema.parse(data); // Throws error if invalid
 ```
 
 ### 4. **Reactive State Management**
@@ -1459,11 +1480,11 @@ Vue's `reactive()` creates reactive data - when it changes, the UI updates autom
 
 ```typescript
 const filters = reactive({
-  search: ''
-})
+  search: "",
+});
 
 // When this changes ↓
-filters.search = 'kitchen'
+filters.search = "kitchen";
 
 // UI updates automatically! ✨
 ```
@@ -1477,8 +1498,8 @@ Debouncing delays function execution until user stops doing something:
 // With debounce: Runs 1 time after user stops typing
 
 const debouncedFetch = useDebounceFn(() => {
-  fetchLocations()
-}, 500)  // Wait 500ms after last keystroke
+  fetchLocations();
+}, 500); // Wait 500ms after last keystroke
 ```
 
 ---
@@ -1488,6 +1509,7 @@ const debouncedFetch = useDebounceFn(() => {
 When testing the Location Management system, check:
 
 ### API Routes
+
 - [ ] Can fetch all locations
 - [ ] Can create new location
 - [ ] Cannot create duplicate location code
@@ -1502,6 +1524,7 @@ When testing the Location Management system, check:
 - [ ] Cannot remove admin's last location
 
 ### UI Pages
+
 - [ ] Locations list shows all locations
 - [ ] Search works correctly
 - [ ] Filters work correctly
@@ -1515,6 +1538,7 @@ When testing the Location Management system, check:
 - [ ] Colors match location types
 
 ### Location Switcher
+
 - [ ] Shows user's assigned locations
 - [ ] Shows current location correctly
 - [ ] Can switch to different location
@@ -1531,6 +1555,7 @@ When testing the Location Management system, check:
 ### Q1: Why can't we change the location code after creation?
 
 **Answer:** The code is like a **serial number** - it's used in many places:
+
 - Transaction records
 - Reports
 - Historical data
@@ -1542,10 +1567,12 @@ If we change it, all these references would break. It's safer to keep it permane
 ### Q2: What's the difference between PUT and PATCH?
 
 **Answer:**
+
 - **PUT** = Replace the entire object (must send ALL fields)
 - **PATCH** = Update specific fields (send only what changed)
 
 Example:
+
 ```typescript
 // PUT - Must send everything
 PUT /api/locations/123
@@ -1572,6 +1599,7 @@ PATCH /api/locations/123
 **Answer:** Stores provide **global state** that multiple components can access.
 
 Without store:
+
 ```
 Component A has location X
 Component B has location Y
@@ -1580,6 +1608,7 @@ Component C has location Z
 ```
 
 With store:
+
 ```
 Store has location X
 Component A gets from Store → X
@@ -1595,6 +1624,7 @@ Component C gets from Store → X
 **Answer:** It tells all components on the page to **reload their data**.
 
 Think of it like hitting the browser refresh button, but:
+
 - Doesn't reload the entire page
 - Doesn't lose user's scroll position
 - Doesn't reset form inputs
@@ -1607,6 +1637,7 @@ Think of it like hitting the browser refresh button, but:
 **Answer:** To avoid too many server requests.
 
 Without debounce:
+
 ```
 User types: M → API call
 User types: a → API call
@@ -1616,6 +1647,7 @@ Result: 4 API calls! 🚫
 ```
 
 With debounce (500ms):
+
 ```
 User types: M (wait)
 User types: a (wait)
@@ -1661,6 +1693,7 @@ Now that you understand Location Management, you can:
 **🎉 Congratulations!** You now understand how the Location Management system works. This is a critical part of the application that enables multi-location inventory tracking.
 
 **Remember:**
+
 - Locations are like **branches** of the business
 - Users are **assigned** to locations with different **access levels**
 - The **Location Switcher** lets users change between their locations easily

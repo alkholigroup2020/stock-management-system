@@ -32,12 +32,12 @@ A web application managing stock across **multiple locations**. Core operations 
 
 ## 2) Actors & Roles
 
-| Role | Main Actions | Location Scope |
-| --- | --- | --- |
-| **Operator** | Post Deliveries & Issues; view Stock Now | Assigned locations only |
-| **Supervisor** | Approve PRFs & Transfers; manage Reconciliations | All locations |
-| **Admin** | Manage Items & Prices; Approve Period Close; configure system | All locations |
-| **System** | Auto-generate price variance NCRs; enforce rules | All locations |
+| Role           | Main Actions                                                  | Location Scope          |
+| -------------- | ------------------------------------------------------------- | ----------------------- |
+| **Operator**   | Post Deliveries & Issues; view Stock Now                      | Assigned locations only |
+| **Supervisor** | Approve PRFs & Transfers; manage Reconciliations              | All locations           |
+| **Admin**      | Manage Items & Prices; Approve Period Close; configure system | All locations           |
+| **System**     | Auto-generate price variance NCRs; enforce rules              | All locations           |
 
 ## 3) System Context - Multi-Location Architecture
 
@@ -416,6 +416,7 @@ PATCH  /api/items/{id}/period-price
 ```
 
 **Implementation Notes:**
+
 - All routes in `/server/api/` directory
 - Use Nuxt's `defineEventHandler` for route handlers
 - Prisma for all database operations
@@ -454,12 +455,12 @@ flowchart TB
         subgraph "Edge Network"
             CDN[CDN - Static Assets]
         end
-        
+
         subgraph "Serverless Functions"
             NUXT[Nuxt 3 App]
             API[Server Routes]
         end
-        
+
         CDN --> NUXT
         NUXT --> API
     end
@@ -485,6 +486,7 @@ flowchart TB
 ### Technology Stack (Finalized)
 
 **Frontend:**
+
 - Nuxt 3 (SPA mode, `ssr: false`)
 - Nuxt UI (component library)
 - Tailwind CSS (styling)
@@ -493,21 +495,25 @@ flowchart TB
 - Zod (validation)
 
 **Backend:**
+
 - Nuxt Server Routes (Nitro/H3)
 - Prisma ORM
 - PostgreSQL 15+ (Supabase)
 
 **PWA:**
+
 - @vite-pwa/nuxt
 - Service Worker (auto-generated)
 - Offline-aware UI
 
 **Hosting:**
+
 - Vercel (free tier)
 - Supabase (free tier)
 - Single monolithic deployment
 
 **Authentication:**
+
 - nuxt-auth-utils
 - JWT in httpOnly cookies
 - Nuxt middleware for route protection
@@ -614,31 +620,31 @@ pnpm db:push  # Development
 ```typescript
 // server/middleware/auth.ts
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  
+  const session = await getUserSession(event);
+
   if (!session.user) {
     throw createError({
       statusCode: 401,
-      message: 'Unauthorized'
-    })
+      message: "Unauthorized",
+    });
   }
-  
+
   // Attach user to event context
-  event.context.user = session.user
-})
+  event.context.user = session.user;
+});
 
 // server/middleware/location-access.ts
 export default defineEventHandler(async (event) => {
-  const locationId = getRouterParam(event, 'locationId')
-  const user = event.context.user
-  
+  const locationId = getRouterParam(event, "locationId");
+  const user = event.context.user;
+
   if (!hasLocationAccess(user, locationId)) {
     throw createError({
       statusCode: 403,
-      message: 'Location access denied'
-    })
+      message: "Location access denied",
+    });
   }
-})
+});
 ```
 
 ### Transfer Approval
@@ -706,18 +712,21 @@ export default defineEventHandler(async (event) => {
 ## 16) Future Enhancements (Post-MVP)
 
 ### PWA Level 2 Features
+
 - Background sync for queued offline requests
 - Push notifications for period reminders
 - Web Share API for report exports
 - Install prompts optimization
 
 ### PWA Level 3 Features
+
 - Full offline mode with IndexedDB
 - Conflict resolution for offline edits
 - Local-first architecture
 - Bidirectional sync engine
 
 ### Additional Features
+
 - Advanced reporting with charts
 - Predictive stock requirements
 - Automated transfer suggestions

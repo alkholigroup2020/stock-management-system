@@ -10,16 +10,8 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  apiFetch,
-  type TestUser,
-} from "./helpers/test-server";
-import {
-  testUsers,
-  getCurrentPeriodId,
-} from "./helpers/test-data";
+import { loginUser, authenticatedFetch, apiFetch, type TestUser } from "./helpers/test-server";
+import { testUsers, getCurrentPeriodId } from "./helpers/test-data";
 
 describe("POST /api/periods/:periodId/close", () => {
   let adminUser: TestUser;
@@ -30,10 +22,7 @@ describe("POST /api/periods/:periodId/close", () => {
   beforeAll(async () => {
     // Login users
     adminUser = await loginUser(testUsers.admin.username, testUsers.admin.password);
-    supervisorUser = await loginUser(
-      testUsers.supervisor.username,
-      testUsers.supervisor.password
-    );
+    supervisorUser = await loginUser(testUsers.supervisor.username, testUsers.supervisor.password);
     operatorUser = await loginUser(testUsers.operator.username, testUsers.operator.password);
 
     // Get current period ID
@@ -62,17 +51,14 @@ describe("POST /api/periods/:periodId/close", () => {
 
       for (const pl of periodLocations) {
         if (pl.status !== "READY") {
-          await authenticatedFetch(
-            `/api/periods/${periodId}/locations/${pl.location_id}/ready`,
-            {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ ready: true }),
-              user: adminUser,
-            }
-          );
+          await authenticatedFetch(`/api/periods/${periodId}/locations/${pl.location_id}/ready`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ready: true }),
+            user: adminUser,
+          });
         }
       }
 
@@ -168,9 +154,7 @@ describe("POST /api/periods/:periodId/close", () => {
         user: adminUser,
       });
 
-      const closedPeriod = periodsResult.data?.periods?.find(
-        (p) => p.status === "CLOSED"
-      );
+      const closedPeriod = periodsResult.data?.periods?.find((p) => p.status === "CLOSED");
 
       if (!closedPeriod) {
         console.warn("No closed periods found, skipping test");

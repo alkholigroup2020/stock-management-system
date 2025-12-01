@@ -48,9 +48,7 @@ const formattedDateRange = computed(() => {
     <div class="flex items-center justify-between">
       <!-- Period Info -->
       <div>
-        <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">
-          Current Period
-        </h3>
+        <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Current Period</h3>
         <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
           {{ period.name }}
         </p>
@@ -61,9 +59,7 @@ const formattedDateRange = computed(() => {
 
       <!-- Total Mandays Summary -->
       <div class="text-right">
-        <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">
-          Total Mandays
-        </h3>
+        <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Mandays</h3>
         <p class="text-3xl font-bold text-[var(--ui-primary)] mt-1">
           {{ summary.total_mandays.toLocaleString() }}
         </p>

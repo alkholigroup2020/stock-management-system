@@ -81,9 +81,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
           <!-- Search -->
           <div class="flex-1">
-            <label class="block text-label mb-2">
-              Search Items
-            </label>
+            <label class="block text-label mb-2">Search Items</label>
             <UInput
               v-model="searchQuery"
               icon="i-lucide-search"
@@ -104,9 +102,7 @@
 
           <!-- Category Filter -->
           <div class="sm:w-64">
-            <label class="block text-label mb-2">
-              Category
-            </label>
+            <label class="block text-label mb-2">Category</label>
             <USelectMenu
               v-model="selectedCategory"
               :items="categoryOptions"
@@ -130,12 +126,7 @@
     </div>
 
     <!-- Loading State -->
-    <LoadingSpinner
-      v-if="loading"
-      size="lg"
-      text="Loading prices..."
-      class="my-12"
-    />
+    <LoadingSpinner v-if="loading" size="lg" text="Loading prices..." class="my-12" />
 
     <!-- Error State -->
     <ErrorAlert v-else-if="error" :error="error" :retry="fetchPrices" />
@@ -147,27 +138,19 @@
         <div class="mb-4 flex flex-wrap gap-4 text-caption">
           <div>
             <span>Total Items:</span>
-            <span class="ml-2 font-semibold">{{
-              pricesData.length
-            }}</span>
+            <span class="ml-2 font-semibold">{{ pricesData.length }}</span>
           </div>
           <div>
             <span>Prices Set:</span>
-            <span class="ml-2 font-semibold">{{
-              pricesSetCount
-            }}</span>
+            <span class="ml-2 font-semibold">{{ pricesSetCount }}</span>
           </div>
           <div>
             <span>Prices Missing:</span>
-            <span class="ml-2 font-semibold">{{
-              pricesMissingCount
-            }}</span>
+            <span class="ml-2 font-semibold">{{ pricesMissingCount }}</span>
           </div>
           <div v-if="hasChanges" class="ml-auto">
             <span>Unsaved Changes:</span>
-            <span class="ml-2 font-semibold text-amber-600">{{
-              changesCount
-            }}</span>
+            <span class="ml-2 font-semibold text-amber-600">{{ changesCount }}</span>
           </div>
         </div>
 
@@ -176,41 +159,13 @@
           <table class="w-full">
             <thead>
               <tr class="border-b border-default">
-                <th
-                  class="px-4 py-3 text-left text-label"
-                >
-                  Code
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-label"
-                >
-                  Item Name
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-label"
-                >
-                  Unit
-                </th>
-                <th
-                  class="px-4 py-3 text-left text-label"
-                >
-                  Category
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-label"
-                >
-                  Current WAC
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-label"
-                >
-                  Period Price
-                </th>
-                <th
-                  class="px-4 py-3 text-center text-label"
-                >
-                  Status
-                </th>
+                <th class="px-4 py-3 text-left text-label">Code</th>
+                <th class="px-4 py-3 text-left text-label">Item Name</th>
+                <th class="px-4 py-3 text-left text-label">Unit</th>
+                <th class="px-4 py-3 text-left text-label">Category</th>
+                <th class="px-4 py-3 text-right text-label">Current WAC</th>
+                <th class="px-4 py-3 text-right text-label">Period Price</th>
+                <th class="px-4 py-3 text-center text-label">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -252,10 +207,7 @@
                     step="0.01"
                     min="0"
                     placeholder="0.00"
-                    :disabled="
-                      periodData?.status !== 'DRAFT' ||
-                      !permissions.canSetItemPrices
-                    "
+                    :disabled="periodData?.status !== 'DRAFT' || !permissions.canSetItemPrices"
                     class="w-32 ml-auto"
                     @input="handlePriceChange(item)"
                   />
@@ -265,12 +217,7 @@
                 <td class="px-4 py-3 text-center">
                   <div class="flex items-center justify-center gap-2">
                     <!-- Modified Indicator -->
-                    <UBadge
-                      v-if="item.isModified"
-                      color="warning"
-                      variant="subtle"
-                      size="xs"
-                    >
+                    <UBadge v-if="item.isModified" color="warning" variant="subtle" size="xs">
                       Modified
                     </UBadge>
 
@@ -279,10 +226,7 @@
                       v-if="item.hasPriceVariance"
                       text="Price differs significantly from current WAC"
                     >
-                      <UIcon
-                        name="i-lucide-alert-triangle"
-                        class="h-5 w-5 text-amber-600"
-                      />
+                      <UIcon name="i-lucide-alert-triangle" class="h-5 w-5 text-amber-600" />
                     </UTooltip>
 
                     <!-- Price Set Indicator -->
@@ -316,16 +260,13 @@
     </div>
 
     <!-- Footer Actions -->
-    <div
-      v-if="pricesData && pricesData.length > 0"
-      class="mt-6 flex items-center justify-between"
-    >
+    <div v-if="pricesData && pricesData.length > 0" class="mt-6 flex items-center justify-between">
       <div class="text-caption">
         <span v-if="hasChanges">
           <UIcon name="i-lucide-alert-circle" class="inline h-4 w-4" />
           You have unsaved changes. Click "Save All Prices" to apply them.
         </span>
-        <span v-else> All prices are saved. </span>
+        <span v-else>All prices are saved.</span>
       </div>
 
       <UButton
@@ -389,9 +330,7 @@ async function fetchPrices() {
     // Fetch location stock for current location to get WAC values
     const activeLocationId = locationStore.activeLocation?.id;
     if (activeLocationId) {
-      const stockResponse = await $fetch(
-        `/api/locations/${activeLocationId}/stock`
-      );
+      const stockResponse = await $fetch(`/api/locations/${activeLocationId}/stock`);
       if (stockResponse.stock) {
         stockResponse.stock.forEach((s: any) => {
           locationStock.value.set(s.item_id, parseFloat(s.wac) || 0);
@@ -402,9 +341,7 @@ async function fetchPrices() {
     // Process prices data
     pricesData.value = response.prices.map((item: any) => {
       const wac = locationStock.value.get(item.item_id) || null;
-      const currentPrice = item.price
-        ? parseFloat(item.price.toString())
-        : null;
+      const currentPrice = item.price ? parseFloat(item.price.toString()) : null;
 
       return {
         ...item,
@@ -469,16 +406,13 @@ const filteredPrices = computed(() => {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(
       (item) =>
-        item.item_name.toLowerCase().includes(query) ||
-        item.item_code.toLowerCase().includes(query)
+        item.item_name.toLowerCase().includes(query) || item.item_code.toLowerCase().includes(query)
     );
   }
 
   // Filter by category
   if (selectedCategory.value) {
-    filtered = filtered.filter(
-      (item) => item.item_category === selectedCategory.value
-    );
+    filtered = filtered.filter((item) => item.item_category === selectedCategory.value);
   }
 
   return filtered;
@@ -501,11 +435,7 @@ const changesCount = computed(() => {
 });
 
 const canSave = computed(() => {
-  return (
-    hasChanges.value &&
-    periodData.value?.status === "DRAFT" &&
-    permissions.canSetItemPrices
-  );
+  return hasChanges.value && periodData.value?.status === "DRAFT" && permissions.canSetItemPrices;
 });
 
 // Clear filters

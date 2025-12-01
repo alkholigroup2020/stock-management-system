@@ -1,4 +1,5 @@
 # Phase 4.5: Documentation
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -28,6 +29,7 @@
 **Documentation** is like an instruction manual for your application. Just like you need a manual to learn how to use a new phone, developers and users need documentation to understand how to work with the Stock Management System.
 
 Think of it like this:
+
 - A recipe tells you how to cook food
 - A map tells you how to reach a place
 - **Documentation** tells you how to use, maintain, or develop software
@@ -35,6 +37,7 @@ Think of it like this:
 ### Why We Need Documentation
 
 **Problems without documentation:**
+
 - ❌ New developers don't know how to set up the project
 - ❌ Users don't know how to use the system
 - ❌ Nobody knows what to do when something breaks
@@ -42,6 +45,7 @@ Think of it like this:
 - ❌ Knowledge is lost when people leave
 
 **Benefits of good documentation:**
+
 - ✅ New developers can start working quickly
 - ✅ Users can learn the system themselves
 - ✅ Clear procedures for handling problems
@@ -52,12 +56,12 @@ Think of it like this:
 
 Our documentation covers four main audiences:
 
-| Type | For Whom | Purpose |
-|------|----------|---------|
-| **Developer Docs** | Programmers | How to build and maintain the code |
-| **User Docs** | End users (Operators, Supervisors, Admins) | How to use the system daily |
-| **Training Materials** | New users being trained | How to learn the system step-by-step |
-| **Operational Docs** | IT staff, system admins | How to run and support the system |
+| Type                   | For Whom                                   | Purpose                              |
+| ---------------------- | ------------------------------------------ | ------------------------------------ |
+| **Developer Docs**     | Programmers                                | How to build and maintain the code   |
+| **User Docs**          | End users (Operators, Supervisors, Admins) | How to use the system daily          |
+| **Training Materials** | New users being trained                    | How to learn the system step-by-step |
+| **Operational Docs**   | IT staff, system admins                    | How to run and support the system    |
 
 ---
 
@@ -91,6 +95,7 @@ We created five main developer documents:
 **Purpose:** The first document developers see when they open the project.
 
 **What it contains:**
+
 - **Project overview:** What the system does and why
 - **Quick start:** Get running in 5 minutes
 - **Development workflow:** 8 steps from code to production
@@ -98,6 +103,7 @@ We created five main developer documents:
 - **Tech stack:** Technologies we use
 
 **Example section:**
+
 ```markdown
 ## Quick Start
 
@@ -109,6 +115,7 @@ We created five main developer documents:
 ```
 
 **Why it's important:**
+
 - First impression for new developers
 - Saves hours of setup time
 - Answers "how do I start?" question
@@ -120,6 +127,7 @@ We created five main developer documents:
 **Purpose:** Explains all the settings needed to run the application.
 
 **What it contains:**
+
 - **Complete variable list:** All 7 required environment variables
 - **Setup instructions:** How to get values from Supabase and generate secrets
 - **Security best practices:** Never commit .env files, use strong secrets
@@ -127,6 +135,7 @@ We created five main developer documents:
 - **Environment-specific configs:** Different settings for dev/staging/production
 
 **Example:**
+
 ```markdown
 ## DATABASE_URL
 
@@ -135,6 +144,7 @@ We created five main developer documents:
 **Example:** postgresql://postgres.abc123:SecretPass@aws...pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
 
 **How to get it:**
+
 1. Open your Supabase project
 2. Go to Settings → Database
 3. Copy "Connection String" from Transaction mode section
@@ -142,6 +152,7 @@ We created five main developer documents:
 ```
 
 **Why it's important:**
+
 - Environment setup is the #1 blocker for new developers
 - Prevents security mistakes
 - Saves debugging time
@@ -153,6 +164,7 @@ We created five main developer documents:
 **Purpose:** Complete reference for the database structure.
 
 **What it contains:**
+
 - **All 16 models:** User, Location, Item, Supplier, LocationStock, Delivery, Issue, Transfer, etc.
 - **All relationships:** How tables connect to each other
 - **All enums:** Status values, roles, units, etc.
@@ -161,23 +173,27 @@ We created five main developer documents:
 - **Formulas:** WAC calculation, reconciliation math
 
 **Example section:**
+
 ```markdown
 ### LocationStock Model
 
 **Purpose:** Tracks inventory quantity and cost per location
 
 **Fields:**
+
 - `location_id`: Which location owns this stock
 - `item_id`: Which item is being tracked
 - `on_hand`: Current quantity available
 - `unit_cost`: Weighted Average Cost (WAC) per unit
 
 **Key Business Rule:**
+
 - `on_hand` cannot be negative (CHECK constraint)
 - WAC updates only on deliveries, not issues
 ```
 
 **Why it's important:**
+
 - Database is the heart of the application
 - Helps understand data relationships
 - Reference for writing queries
@@ -189,6 +205,7 @@ We created five main developer documents:
 **Purpose:** Complete guide to all backend endpoints.
 
 **What it contains:**
+
 - **40+ endpoints** organized by feature
 - **Request examples:** What to send
 - **Response examples:** What you get back
@@ -197,7 +214,8 @@ We created five main developer documents:
 - **Business rules:** What each endpoint validates
 
 **Example:**
-```markdown
+
+````markdown
 ### POST /api/locations/:locationId/deliveries
 
 **Description:** Record a new delivery at a location
@@ -205,6 +223,7 @@ We created five main developer documents:
 **Authentication:** Required (Operator, Supervisor, or Admin)
 
 **Request Body:**
+
 ```json
 {
   "supplier_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -214,13 +233,15 @@ We created five main developer documents:
     {
       "item_id": "123e4567-e89b-12d3-a456-426614174001",
       "quantity": 100,
-      "unit_price": 25.50
+      "unit_price": 25.5
     }
   ]
 }
 ```
+````
 
 **Success Response (200):**
+
 ```json
 {
   "id": "delivery-id",
@@ -231,11 +252,13 @@ We created five main developer documents:
 ```
 
 **Errors:**
+
 - 401: Not authenticated
 - 403: User doesn't have access to this location
 - 400: Validation error (missing fields, invalid data)
 - 409: Period is closed
-```
+
+````
 
 **Why it's important:**
 - Frontend developers know exactly what to call
@@ -265,14 +288,16 @@ We created five main developer documents:
 1. Install Prisma CLI:
    ```bash
    pnpm install -D prisma
-   ```
+````
 
 2. Generate Prisma Client:
+
    ```bash
    pnpm prisma generate
    ```
 
 3. Push schema to production:
+
    ```bash
    DATABASE_URL="your-production-url" pnpm prisma db push
    ```
@@ -281,6 +306,7 @@ We created five main developer documents:
    - Open Supabase Dashboard → Table Editor
    - Confirm all 16 tables exist
    - Check indexes are created
+
 ```
 
 **Why it's important:**
@@ -293,13 +319,15 @@ We created five main developer documents:
 ### Documentation Organization
 
 ```
+
 project-docs/
-├── README.md                    # Main entry point
-├── ENVIRONMENT_VARIABLES.md     # Config reference
-├── DATABASE_SCHEMA.md           # Database reference
-├── API_ENDPOINTS.md             # API reference
-└── DEPLOYMENT.md                # Deployment guide
-```
+├── README.md # Main entry point
+├── ENVIRONMENT_VARIABLES.md # Config reference
+├── DATABASE_SCHEMA.md # Database reference
+├── API_ENDPOINTS.md # API reference
+└── DEPLOYMENT.md # Deployment guide
+
+````
 
 ### Files Created
 
@@ -356,32 +384,37 @@ graph TD
     F --> F8[Items]
     F --> F9[Periods]
     F --> F10[Period Close]
-```
+````
 
 **What it contains:**
 
 **Section 1: Introduction**
+
 - What is the Stock Management System?
 - Who uses it and why?
 - Key benefits
 
 **Section 2: Getting Started**
+
 - How to log in
 - Understanding your role
 - Navigating the interface
 - Changing your location
 
 **Section 3: Role Descriptions**
+
 ```markdown
 ### Operator Role
 
 **What you can do:**
+
 - Record deliveries received
 - Post issues (stock used)
 - View stock levels
 - Check dashboard
 
 **What you CANNOT do:**
+
 - Approve transfers
 - Close periods
 - Change item prices
@@ -391,6 +424,7 @@ graph TD
 **Section 4-10:** Step-by-step instructions for each feature
 
 **Example from Deliveries section:**
+
 ```markdown
 ## How to Record a Delivery
 
@@ -416,6 +450,7 @@ graph TD
 6. Click **"Submit Delivery"** (green button at bottom)
 
 **What happens next:**
+
 - Stock quantity increases immediately
 - Unit cost (WAC) recalculates automatically
 - If price is different from expected → NCR created automatically
@@ -423,6 +458,7 @@ graph TD
 ```
 
 **Why it's important:**
+
 - Users can learn without asking IT
 - Reduces training time
 - Reference for forgotten procedures
@@ -445,12 +481,14 @@ graph TD
 | Resolve price difference | NCRs | Disposition |
 
 **Important Business Rules:**
+
 - Cannot issue more stock than available
 - Cannot transfer to same location
 - Cannot post to closed periods
 - Price changes create automatic NCRs
 
 **Document Status Workflows:**
+
 ```
 Transfer: DRAFT → PENDING → APPROVED → COMPLETED
 NCR: OPEN → IN_REVIEW → CLOSED
@@ -466,6 +504,7 @@ Period: OPEN → READY → CLOSED
 | Close Period | ❌ | ❌ | ✅ |
 
 **Month-End Checklist:**
+
 - [ ] Post all deliveries and issues
 - [ ] Complete all reconciliations
 - [ ] Close all NCRs
@@ -473,11 +512,13 @@ Period: OPEN → READY → CLOSED
 - [ ] Wait for admin to close period
 
 **Common Error Messages:**
+
 - "Insufficient stock" → Check stock view for current quantity
 - "Period is closed" → Contact admin to open new period
 - "Price variance detected" → Normal - NCR created automatically
 
 **Why it's important:**
+
 - Fast answers during busy work
 - Printable reference for desk
 - Reduces support calls
@@ -512,10 +553,12 @@ A: You can only see locations you have access to. Your access is set up when you
 **Q: What's the difference between a Delivery and an Issue?**
 
 A:
+
 - **Delivery** = Stock coming IN (you receive from supplier)
 - **Issue** = Stock going OUT (you use it or transfer it)
 
 Think of it like:
+
 - Delivery: Your salary (money coming in)
 - Issue: Buying groceries (money going out)
 
@@ -524,6 +567,7 @@ Think of it like:
 **Q: Can I edit a delivery after I submit it?**
 
 A: No, you cannot edit posted deliveries. This protects the audit trail and ensures accurate stock tracking. If you made a mistake:
+
 1. Contact your supervisor
 2. They may create a correcting NCR
 3. Or post a reverse entry
@@ -537,6 +581,7 @@ A: No, you cannot edit posted deliveries. This protects the audit trail and ensu
 A: Not necessarily. An NCR is created when the price you enter is different from the expected price locked at period start. This is normal and helps track price changes. Your supervisor will review and close the NCR.
 
 **Example:**
+
 - Expected price: 25.00 SAR (locked in period)
 - You entered: 27.50 SAR (actual invoice price)
 - Difference: +2.50 SAR → NCR created
@@ -550,6 +595,7 @@ A: The system automatically compares your entered price with the locked period p
 ```
 
 **Why it's important:**
+
 - Reduces repetitive questions
 - Self-service support
 - Builds user confidence
@@ -558,11 +604,11 @@ A: The system automatically compares your entered price with the locked period p
 
 ### Files Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `project-docs/user-docs/USER_MANUAL.md` | ~800 | Complete user guide for all roles |
-| `project-docs/user-docs/QUICK_REFERENCE_CARD.md` | ~200 | One-page cheat sheet |
-| `project-docs/user-docs/FAQ.md` | ~600 | 55+ common questions answered |
+| File                                             | Lines | Purpose                           |
+| ------------------------------------------------ | ----- | --------------------------------- |
+| `project-docs/user-docs/USER_MANUAL.md`          | ~800  | Complete user guide for all roles |
+| `project-docs/user-docs/QUICK_REFERENCE_CARD.md` | ~200  | One-page cheat sheet              |
+| `project-docs/user-docs/FAQ.md`                  | ~600  | 55+ common questions answered     |
 
 ---
 
@@ -599,6 +645,7 @@ graph LR
 **For:** Everyone
 
 **Topics covered:**
+
 - What is stock management?
 - Why we need this system (replace Excel)
 - Key concepts:
@@ -610,12 +657,14 @@ graph LR
 - User roles overview
 
 **Example content:**
+
 ```markdown
 ### What is Weighted Average Cost (WAC)?
 
 **Simple explanation:**
 
 Imagine you buy eggs at different prices:
+
 - Week 1: Buy 10 eggs at 1 SAR each = 10 SAR total
 - Week 2: Buy 20 eggs at 2 SAR each = 40 SAR total
 
@@ -626,6 +675,7 @@ Imagine you buy eggs at different prices:
 This is your average cost. When you use eggs, you deduct them at 1.67 SAR each, not at the price you originally paid.
 
 **Why use WAC?**
+
 - Smooths out price fluctuations
 - Fair cost allocation
 - Easier than tracking each batch separately (FIFO)
@@ -638,6 +688,7 @@ This is your average cost. When you use eggs, you deduct them at 1.67 SAR each, 
 **For:** Operators (frontline staff)
 
 **Topics covered:**
+
 1. **Logging in and navigation** (5 min)
 2. **Recording deliveries** (10 min)
    - Step-by-step walkthrough
@@ -651,11 +702,13 @@ This is your average cost. When you use eggs, you deduct them at 1.67 SAR each, 
    - Stock alerts
 
 **Hands-on exercise:**
+
 ```markdown
 ### Exercise: Record Your First Delivery
 
 **Scenario:**
 You received a delivery from ABC Suppliers:
+
 - Invoice: INV-2025-100
 - Date: Today
 - Items:
@@ -663,6 +716,7 @@ You received a delivery from ABC Suppliers:
   - Olive Oil 1L: 20 bottles @ 45.00 SAR
 
 **Tasks:**
+
 1. Navigate to Deliveries page
 2. Click "New Delivery"
 3. Enter all details
@@ -670,6 +724,7 @@ You received a delivery from ABC Suppliers:
 5. Verify stock increased
 
 **Expected result:**
+
 - Success message appears
 - Dashboard shows updated quantities
 - Total value: 1,525 SAR
@@ -682,6 +737,7 @@ You received a delivery from ABC Suppliers:
 **For:** Supervisors
 
 **Topics covered:**
+
 1. **Everything Operators do** (quick review - 5 min)
 2. **Approving transfers** (15 min)
    - Review transfer requests
@@ -697,6 +753,7 @@ You received a delivery from ABC Suppliers:
    - Investigating differences
 
 **Example scenario:**
+
 ```markdown
 ### Scenario: Approve a Transfer
 
@@ -704,6 +761,7 @@ You received a delivery from ABC Suppliers:
 The Store location requested a transfer of 30 units of Tomato Sauce to the Kitchen.
 
 **Your tasks:**
+
 1. Open the Transfer from "Pending Approval" list
 2. Check:
    - Does Store have 30 units available? → Yes, 50 units on hand
@@ -717,6 +775,7 @@ The Store location requested a transfer of 30 units of Tomato Sauce to the Kitch
    - Stock added to Kitchen
 
 **What if stock was insufficient?**
+
 - You would see error: "Only 15 units available"
 - Reject transfer with note: "Insufficient stock - reduce quantity"
 - Requester can create new transfer with lower quantity
@@ -729,6 +788,7 @@ The Store location requested a transfer of 30 units of Tomato Sauce to the Kitch
 **For:** System administrators
 
 **Topics covered:**
+
 1. **Everything Supervisors do** (quick review - 5 min)
 2. **Managing item master** (15 min)
    - Creating new items
@@ -748,12 +808,14 @@ The Store location requested a transfer of 30 units of Tomato Sauce to the Kitch
    - Error tracking
 
 **Detailed walkthrough:**
+
 ```markdown
 ### Period Close Process (Step-by-Step)
 
 **Phase 1: Month-End (Last day of month)**
 
 **Everyone's role:**
+
 1. **Operators:** Post all pending deliveries and issues
 2. **Supervisors:**
    - Approve all transfers
@@ -764,18 +826,21 @@ The Store location requested a transfer of 30 units of Tomato Sauce to the Kitch
 **Phase 2: Admin Coordination**
 
 **Your role as Admin:**
+
 1. Monitor Period Close page
 2. Wait until ALL locations show "READY" status:
-   ```
-   ✅ Kitchen: READY
-   ✅ Store: READY
-   ✅ Central: READY
-   ✅ Warehouse: READY
-   ```
+```
+
+✅ Kitchen: READY
+✅ Store: READY
+✅ Central: READY
+✅ Warehouse: READY
+
+```
 3. Review summary:
-   - Total transactions
-   - Open NCRs (should be 0)
-   - Reconciliation status (all complete)
+- Total transactions
+- Open NCRs (should be 0)
+- Reconciliation status (all complete)
 4. If all good → Click "Close Period"
 5. Enter reason: "November 2025 period close"
 6. Confirm in popup
@@ -824,6 +889,7 @@ After period closes:
 You work at the Kitchen location. A delivery arrived from Fresh Foods Supplier today.
 
 **Details:**
+
 - Supplier: Fresh Foods Ltd
 - Invoice Number: FF-2025-045
 - Delivery Date: 2025-11-28
@@ -832,6 +898,7 @@ You work at the Kitchen location. A delivery arrived from Fresh Foods Supplier t
   - Onions 1kg: 15 kg @ 5.00 SAR/kg
 
 **Tasks:**
+
 1. Log in as Operator
 2. Navigate to Deliveries page
 3. Create new delivery with above details
@@ -839,6 +906,7 @@ You work at the Kitchen location. A delivery arrived from Fresh Foods Supplier t
 5. Verify stock increased
 
 **Expected Results:**
+
 - ✅ Delivery posted successfully
 - ✅ Fresh Tomatoes stock increased by 25 kg
 - ✅ Onions stock increased by 15 kg
@@ -846,6 +914,7 @@ You work at the Kitchen location. A delivery arrived from Fresh Foods Supplier t
 - ✅ Total delivery value: 287.50 SAR
 
 **Self-Check Questions:**
+
 - [ ] Did you select the correct supplier?
 - [ ] Did you enter quantities correctly?
 - [ ] Did you verify the success message?
@@ -861,6 +930,7 @@ You work at the Kitchen location. A delivery arrived from Fresh Foods Supplier t
 The Store is running low on cooking oil and needs stock from the Warehouse.
 
 **Part A - As Operator:**
+
 1. Log in as Store Operator
 2. Create transfer request:
    - From: Warehouse
@@ -872,6 +942,7 @@ The Store is running low on cooking oil and needs stock from the Warehouse.
 4. Verify status: "PENDING_APPROVAL"
 
 **Part B - As Supervisor:**
+
 1. Log in as Supervisor
 2. Navigate to Transfers → Pending Approval
 3. Open the transfer
@@ -882,11 +953,13 @@ The Store is running low on cooking oil and needs stock from the Warehouse.
 6. Verify status changes to "APPROVED" → "COMPLETED"
 
 **Part C - Verification:**
+
 1. Check Warehouse stock decreased by 30
 2. Check Store stock increased by 30
 3. Check WAC updated at Store location
 
 **Expected Results:**
+
 - ✅ Transfer created by Operator
 - ✅ Supervisor sees pending transfer
 - ✅ Approval successful
@@ -894,6 +967,7 @@ The Store is running low on cooking oil and needs stock from the Warehouse.
 - ✅ WAC recalculated at destination
 
 **Self-Check Questions:**
+
 - [ ] Why do transfers need approval but deliveries don't?
 - [ ] What happens if Warehouse only has 20 bottles?
 - [ ] Who can see this transfer in the system?
@@ -908,11 +982,13 @@ The Store is running low on cooking oil and needs stock from the Warehouse.
 Walk through a complete month's operations at the Kitchen location.
 
 **Day 1 (Period Start):**
+
 - Admin opens December 2025 period
 - All item prices locked
 - Starting stock: Tomato Sauce = 100 bottles @ 12.00 SAR
 
 **Day 5 (Delivery):**
+
 - Receive delivery:
   - Item: Tomato Sauce
   - Quantity: 200 bottles
@@ -923,6 +999,7 @@ Walk through a complete month's operations at the Kitchen location.
   - NCR created for price variance (+1.00 SAR)
 
 **Day 10 (Issue):**
+
 - Post issue:
   - Item: Tomato Sauce
   - Quantity: 150 bottles
@@ -933,6 +1010,7 @@ Walk through a complete month's operations at the Kitchen location.
   - Value decreased by: 150 × 12.67 = 1,900.50 SAR
 
 **Day 15 (Transfer Out):**
+
 - Store requests transfer:
   - Item: Tomato Sauce
   - Quantity: 50 bottles
@@ -943,6 +1021,7 @@ Walk through a complete month's operations at the Kitchen location.
   - Store WAC recalculates
 
 **Day 30 (Month-End):**
+
 - Physical count: 102 bottles (found 2 extra)
 - Reconciliation variance: +2 bottles
 - Supervisor investigates: "Found in back storage"
@@ -950,6 +1029,7 @@ Walk through a complete month's operations at the Kitchen location.
 - Admin closes period
 
 **Tasks:**
+
 1. Complete all operations above
 2. At each step, verify:
    - Stock quantities correct
@@ -958,6 +1038,7 @@ Walk through a complete month's operations at the Kitchen location.
    - Audit trail complete
 
 **Self-Check Questions:**
+
 - [ ] Can you explain why WAC changed after delivery but not after issue?
 - [ ] Why was NCR created automatically?
 - [ ] What would happen if you tried to issue 200 bottles on Day 10?
@@ -965,6 +1046,7 @@ Walk through a complete month's operations at the Kitchen location.
 ```
 
 **Why practice scenarios are important:**
+
 - Learning by doing is more effective
 - Builds confidence before using real data
 - Covers edge cases and errors
@@ -974,10 +1056,10 @@ Walk through a complete month's operations at the Kitchen location.
 
 ### Files Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `project-docs/training/TRAINING_PRESENTATION.md` | ~900 | Structured training modules for all roles |
-| `project-docs/training/PRACTICE_SCENARIOS.md` | ~700 | 10 hands-on practice exercises |
+| File                                             | Lines | Purpose                                   |
+| ------------------------------------------------ | ----- | ----------------------------------------- |
+| `project-docs/training/TRAINING_PRESENTATION.md` | ~900  | Structured training modules for all roles |
+| `project-docs/training/PRACTICE_SCENARIOS.md`    | ~700  | 10 hands-on practice exercises            |
 
 ---
 
@@ -988,6 +1070,7 @@ Walk through a complete month's operations at the Kitchen location.
 Operational documentation helps IT staff and system administrators keep the system running smoothly and handle problems when they occur.
 
 Think of it like:
+
 - **User docs:** How to drive a car
 - **Operational docs:** How to maintain the car, change oil, fix problems
 
@@ -1002,6 +1085,7 @@ We created five operational procedure documents:
 **Key concepts:**
 
 **The 3-2-1 Backup Rule:**
+
 ```
 3 copies of data:
   1. Production database (live)
@@ -1025,7 +1109,8 @@ We created five operational procedure documents:
 | Code | Every commit | Forever | GitHub |
 
 **Restoration Process:**
-```markdown
+
+````markdown
 ## How to Restore from Backup
 
 **Scenario:** Database corruption detected
@@ -1049,6 +1134,7 @@ We created five operational procedure documents:
    supabase db reset
    psql $DATABASE_URL < backup.sql
    ```
+````
 
 4. **Verify restore**
    - Check table counts match
@@ -1062,13 +1148,16 @@ We created five operational procedure documents:
    - Monitor for issues
 
 **Recovery Time Objective (RTO):**
+
 - Critical: Restore within 4 hours
 - Important: Restore within 24 hours
 - Archive: Restore within 1 week
 
 **Recovery Point Objective (RPO):**
+
 - Maximum acceptable data loss: 24 hours (one day)
-```
+
+````
 
 **Why backup procedures are critical:**
 - Prevents permanent data loss
@@ -1103,28 +1192,32 @@ graph TD
 
     style A fill:#e3f2fd
     style J fill:#ffcccc
-```
+````
 
 **What we monitor:**
 
 **1. Application Performance (Vercel)**
+
 - Page load times (target: < 3s)
 - Core Web Vitals (LCP, FID, CLS)
 - API response times (target: < 1s)
 - Error rate (target: < 0.1%)
 
 **2. Database Health (Supabase)**
+
 - Connection pool usage (alert if > 80%)
 - Query performance (alert if > 5s)
 - Storage usage (alert if > 80%)
 - Backup status (alert if failed)
 
 **3. Uptime (UptimeRobot)**
+
 - Check every 5 minutes
 - Alert if down for > 2 minutes
 - Check from multiple regions
 
 **4. Custom Performance Tracking**
+
 ```typescript
 // Built-in middleware tracks:
 {
@@ -1138,14 +1231,15 @@ graph TD
 
 **Alert Configuration:**
 
-| Severity | Example | Response Time | Notification |
-|----------|---------|---------------|--------------|
-| P1 Critical | Site down | Immediate | Email + SMS |
-| P2 High | Database at 90% capacity | 15 minutes | Email |
-| P3 Medium | Slow API (> 2s) | 1 hour | Email |
-| P4 Low | Warning logs | Daily digest | Email |
+| Severity    | Example                  | Response Time | Notification |
+| ----------- | ------------------------ | ------------- | ------------ |
+| P1 Critical | Site down                | Immediate     | Email + SMS  |
+| P2 High     | Database at 90% capacity | 15 minutes    | Email        |
+| P3 Medium   | Slow API (> 2s)          | 1 hour        | Email        |
+| P4 Low      | Warning logs             | Daily digest  | Email        |
 
 **Daily Monitoring Checklist:**
+
 ```markdown
 ## Morning Health Check (10 minutes)
 
@@ -1168,12 +1262,12 @@ graph TD
 
 **Incident Severity Levels:**
 
-| Level | Description | Example | Response |
-|-------|-------------|---------|----------|
-| **P1 Critical** | System down, major data loss | Database crashed | Immediate, 24/7 |
-| **P2 High** | Core feature broken | Cannot post deliveries | < 1 hour |
-| **P3 Medium** | Minor feature broken | Report not loading | < 4 hours |
-| **P4 Low** | Cosmetic issue | Button color wrong | Next business day |
+| Level           | Description                  | Example                | Response          |
+| --------------- | ---------------------------- | ---------------------- | ----------------- |
+| **P1 Critical** | System down, major data loss | Database crashed       | Immediate, 24/7   |
+| **P2 High**     | Core feature broken          | Cannot post deliveries | < 1 hour          |
+| **P3 Medium**   | Minor feature broken         | Report not loading     | < 4 hours         |
+| **P4 Low**      | Cosmetic issue               | Button color wrong     | Next business day |
 
 **Incident Response Process:**
 
@@ -1193,13 +1287,16 @@ stateDiagram-v2
 **Detailed Process:**
 
 **Phase 1: Detection** (0-5 minutes)
+
 ```markdown
 How incidents are detected:
+
 - ✅ Automatic alert (monitoring system)
 - ✅ User report (phone, email, chat)
 - ✅ Developer notice (error tracking)
 
 First actions:
+
 1. Log the incident (create ticket)
 2. Note time detected
 3. Identify severity level
@@ -1207,14 +1304,17 @@ First actions:
 ```
 
 **Phase 2: Assessment** (5-15 minutes)
+
 ```markdown
 Questions to answer:
+
 - What is broken?
 - How many users affected?
 - Is data at risk?
 - What is the root cause?
 
 Severity decision tree:
+
 - System completely down? → P1
 - Critical feature broken? → P2
 - Minor feature broken? → P3
@@ -1222,10 +1322,12 @@ Severity decision tree:
 ```
 
 **Phase 3: Response** (Varies by severity)
+
 ```markdown
 ## P1 Critical Response
 
 **Immediate actions (first 15 minutes):**
+
 1. Activate incident commander
 2. Notify all stakeholders:
    - Management: "System is down, investigating"
@@ -1239,6 +1341,7 @@ Severity decision tree:
    - Documentation: Records timeline
 
 **Troubleshooting steps:**
+
 1. Check recent deployments (rollback if needed)
 2. Check database status (connection, queries)
 3. Check error logs (find root cause)
@@ -1251,6 +1354,7 @@ Severity decision tree:
 
 **Communication template:**
 ```
+
 Subject: [P1 INCIDENT] Stock Management System Down
 
 Status: Investigating / Fixing / Resolved
@@ -1262,12 +1366,16 @@ ETA: [Investigating / 30 minutes]
 Next Update: In 15 minutes
 
 - Incident Commander
+
 ```
+
 ```
 
 **Phase 4: Resolution** (Varies)
+
 ```markdown
 Resolution checklist:
+
 - [ ] Root cause identified
 - [ ] Fix implemented and tested
 - [ ] System fully operational
@@ -1276,6 +1384,7 @@ Resolution checklist:
 - [ ] Monitoring confirms stability
 
 **Verification steps:**
+
 1. Test all critical features
 2. Check data integrity
 3. Review error logs (should be clear)
@@ -1284,18 +1393,21 @@ Resolution checklist:
 ```
 
 **Phase 5: Post-Incident Review** (Within 48 hours)
+
 ```markdown
 ## Post-Incident Review Meeting
 
 **Attendees:** Response team + management
 
 **Agenda:**
+
 1. **Timeline review** (what happened when)
 2. **Root cause analysis** (why did it happen)
 3. **Response evaluation** (what went well, what didn't)
 4. **Action items** (how to prevent recurrence)
 
 **Example findings:**
+
 - **Root cause:** Database connection pool exhausted
 - **Why:** Slow queries not optimized
 - **Action items:**
@@ -1333,8 +1445,10 @@ graph LR
 **Step-by-Step Process:**
 
 **Step 1: Pre-Onboarding Preparation**
+
 ```markdown
 Before creating account:
+
 - [ ] User onboarding request received (from HR or manager)
 - [ ] Role determined (Operator/Supervisor/Admin)
 - [ ] Location access approved (which locations)
@@ -1344,6 +1458,7 @@ Before creating account:
 ```
 
 **Step 2: Account Creation**
+
 ```markdown
 ## Create User in Supabase
 
@@ -1358,10 +1473,12 @@ Before creating account:
 ```
 
 **Step 3: Role and Location Assignment**
-```markdown
+
+````markdown
 ## Assign Role and Locations
 
 **Via Admin UI (when built):**
+
 1. Navigate to Admin → Users
 2. Find new user
 3. Select role from dropdown
@@ -1369,6 +1486,7 @@ Before creating account:
 5. Save changes
 
 **Via Database (current method):**
+
 ```sql
 -- Create user record
 INSERT INTO "User" (id, email, name, role, is_active)
@@ -1386,7 +1504,9 @@ VALUES
   ('user-id', 'kitchen-location-id'),
   ('user-id', 'store-location-id');
 ```
-```
+````
+
+````
 
 **Step 4: Training Path by Role**
 
@@ -1429,7 +1549,7 @@ Admin (in addition to Supervisor):
 **Signed off by:**
 Trainer: _________________ Date: _________
 User: ___________________ Date: _________
-```
+````
 
 ---
 
@@ -1460,6 +1580,7 @@ graph TD
 **Tier Descriptions:**
 
 **Tier 1: Self-Service** (Target: Immediate)
+
 - **Resources:** FAQ, User Manual, Quick Reference
 - **Example issues:**
   - "How do I post a delivery?"
@@ -1468,6 +1589,7 @@ graph TD
 - **Resolution:** User finds answer in documentation
 
 **Tier 2: Location Supervisor** (Target: < 1 hour)
+
 - **Resources:** Supervisor has admin access, can check data
 - **Example issues:**
   - "I can't see Kitchen location"
@@ -1476,6 +1598,7 @@ graph TD
 - **Resolution:** Supervisor fixes permissions, data, or approvals
 
 **Tier 3: IT Support** (Target: < 4 hours)
+
 - **Resources:** Database access, system logs, can restart services
 - **Example issues:**
   - "System very slow"
@@ -1484,6 +1607,7 @@ graph TD
 - **Resolution:** IT investigates logs, optimizes queries, fixes configuration
 
 **Tier 4: Vendor/Developer** (Target: < 1 business day)
+
 - **Resources:** Source code access, can deploy fixes
 - **Example issues:**
   - "Found a bug in WAC calculation"
@@ -1493,14 +1617,15 @@ graph TD
 
 **Issue Priority Matrix:**
 
-| Priority | Description | Response Time | Examples |
-|----------|-------------|---------------|----------|
-| **P1** | Cannot work | 15 minutes | System down, cannot log in |
-| **P2** | Major impact | 1 hour | Cannot post deliveries, data incorrect |
-| **P3** | Minor impact | 4 hours | Report not loading, formatting issue |
-| **P4** | Enhancement | Next sprint | New feature request, UI improvement |
+| Priority | Description  | Response Time | Examples                               |
+| -------- | ------------ | ------------- | -------------------------------------- |
+| **P1**   | Cannot work  | 15 minutes    | System down, cannot log in             |
+| **P2**   | Major impact | 1 hour        | Cannot post deliveries, data incorrect |
+| **P3**   | Minor impact | 4 hours       | Report not loading, formatting issue   |
+| **P4**   | Enhancement  | Next sprint   | New feature request, UI improvement    |
 
 **Support Request Template:**
+
 ```markdown
 ## Support Ticket #12345
 
@@ -1514,6 +1639,7 @@ graph TD
 Cannot post delivery - getting error "Period is closed"
 
 **Steps to reproduce:**
+
 1. Navigate to Deliveries page
 2. Click "New Delivery"
 3. Fill in all fields
@@ -1526,6 +1652,7 @@ Cannot post delivery - getting error "Period is closed"
 **Screenshots:** [attached]
 
 **Troubleshooting attempted:**
+
 - Refreshed page (didn't help)
 - Logged out and back in (didn't help)
 - Tried different browser (same error)
@@ -1539,25 +1666,25 @@ Cannot post delivery - getting error "Period is closed"
 
 **Common Issues Quick Reference:**
 
-| Issue | Tier | Resolution |
-|-------|------|------------|
-| Forgot password | T1 | User clicks "Forgot Password" |
-| Can't see location | T2 | Supervisor checks UserLocation table |
-| Period closed error | T2 | Supervisor checks current period status |
-| System slow | T3 | IT checks database connections |
-| WAC calculation wrong | T4 | Developer investigates formula |
+| Issue                 | Tier | Resolution                              |
+| --------------------- | ---- | --------------------------------------- |
+| Forgot password       | T1   | User clicks "Forgot Password"           |
+| Can't see location    | T2   | Supervisor checks UserLocation table    |
+| Period closed error   | T2   | Supervisor checks current period status |
+| System slow           | T3   | IT checks database connections          |
+| WAC calculation wrong | T4   | Developer investigates formula          |
 
 ---
 
 ### Files Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `project-docs/operations/BACKUP_PROCEDURES.md` | ~400 | Complete backup and restore procedures |
-| `project-docs/operations/MONITORING_SETUP.md` | ~500 | System monitoring and alerting guide |
-| `project-docs/operations/INCIDENT_RESPONSE_PLAN.md` | ~600 | Emergency response procedures |
-| `project-docs/operations/USER_ONBOARDING_PROCESS.md` | ~400 | New user setup procedures |
-| `project-docs/operations/SUPPORT_ESCALATION.md` | ~350 | Support tiers and escalation paths |
+| File                                                 | Lines | Purpose                                |
+| ---------------------------------------------------- | ----- | -------------------------------------- |
+| `project-docs/operations/BACKUP_PROCEDURES.md`       | ~400  | Complete backup and restore procedures |
+| `project-docs/operations/MONITORING_SETUP.md`        | ~500  | System monitoring and alerting guide   |
+| `project-docs/operations/INCIDENT_RESPONSE_PLAN.md`  | ~600  | Emergency response procedures          |
+| `project-docs/operations/USER_ONBOARDING_PROCESS.md` | ~400  | New user setup procedures              |
+| `project-docs/operations/SUPPORT_ESCALATION.md`      | ~350  | Support tiers and escalation paths     |
 
 ---
 
@@ -1565,38 +1692,38 @@ Cannot post delivery - getting error "Period is closed"
 
 ### Developer Documentation
 
-| File | Purpose | Audience |
-|------|---------|----------|
-| `README.md` | Project overview and quick start | New developers |
-| `ENVIRONMENT_VARIABLES.md` | Configuration reference | DevOps, developers |
-| `DATABASE_SCHEMA.md` | Database structure | Backend developers |
-| `API_ENDPOINTS.md` | API reference | Frontend/backend developers |
-| `DEPLOYMENT.md` | Deployment guide | DevOps engineers |
+| File                       | Purpose                          | Audience                    |
+| -------------------------- | -------------------------------- | --------------------------- |
+| `README.md`                | Project overview and quick start | New developers              |
+| `ENVIRONMENT_VARIABLES.md` | Configuration reference          | DevOps, developers          |
+| `DATABASE_SCHEMA.md`       | Database structure               | Backend developers          |
+| `API_ENDPOINTS.md`         | API reference                    | Frontend/backend developers |
+| `DEPLOYMENT.md`            | Deployment guide                 | DevOps engineers            |
 
 ### User Documentation
 
-| File | Purpose | Audience |
-|------|---------|----------|
-| `user-docs/USER_MANUAL.md` | Complete user guide | All end users |
+| File                                | Purpose              | Audience                |
+| ----------------------------------- | -------------------- | ----------------------- |
+| `user-docs/USER_MANUAL.md`          | Complete user guide  | All end users           |
 | `user-docs/QUICK_REFERENCE_CARD.md` | One-page cheat sheet | Daily users (printable) |
-| `user-docs/FAQ.md` | Common questions | Self-service support |
+| `user-docs/FAQ.md`                  | Common questions     | Self-service support    |
 
 ### Training Materials
 
-| File | Purpose | Audience |
-|------|---------|----------|
-| `training/TRAINING_PRESENTATION.md` | Structured training modules | Trainers, new users |
-| `training/PRACTICE_SCENARIOS.md` | Hands-on exercises | Training participants |
+| File                                | Purpose                     | Audience              |
+| ----------------------------------- | --------------------------- | --------------------- |
+| `training/TRAINING_PRESENTATION.md` | Structured training modules | Trainers, new users   |
+| `training/PRACTICE_SCENARIOS.md`    | Hands-on exercises          | Training participants |
 
 ### Operational Documentation
 
-| File | Purpose | Audience |
-|------|---------|----------|
-| `operations/BACKUP_PROCEDURES.md` | Backup and recovery | IT administrators |
-| `operations/MONITORING_SETUP.md` | System monitoring | IT operations |
-| `operations/INCIDENT_RESPONSE_PLAN.md` | Emergency procedures | IT support team |
-| `operations/USER_ONBOARDING_PROCESS.md` | New user setup | HR, IT administrators |
-| `operations/SUPPORT_ESCALATION.md` | Support procedures | Help desk, supervisors |
+| File                                    | Purpose              | Audience               |
+| --------------------------------------- | -------------------- | ---------------------- |
+| `operations/BACKUP_PROCEDURES.md`       | Backup and recovery  | IT administrators      |
+| `operations/MONITORING_SETUP.md`        | System monitoring    | IT operations          |
+| `operations/INCIDENT_RESPONSE_PLAN.md`  | Emergency procedures | IT support team        |
+| `operations/USER_ONBOARDING_PROCESS.md` | New user setup       | HR, IT administrators  |
+| `operations/SUPPORT_ESCALATION.md`      | Support procedures   | Help desk, supervisors |
 
 ---
 
@@ -1622,32 +1749,36 @@ Users start at Level 1 and go deeper as needed.
 
 Every software project needs all four:
 
-| Type | Question Answered | Example |
-|------|------------------|---------|
-| **Tutorial** | How do I learn this? | Training presentation |
-| **How-To Guide** | How do I do X? | User manual |
-| **Reference** | What are the details? | API endpoints |
-| **Explanation** | Why does it work this way? | Database schema concepts |
+| Type             | Question Answered          | Example                  |
+| ---------------- | -------------------------- | ------------------------ |
+| **Tutorial**     | How do I learn this?       | Training presentation    |
+| **How-To Guide** | How do I do X?             | User manual              |
+| **Reference**    | What are the details?      | API endpoints            |
+| **Explanation**  | Why does it work this way? | Database schema concepts |
 
 ### 3. Writing for Your Audience
 
 Different audiences need different language:
 
 **For end users:**
+
 - ✅ "Click the green Submit button"
 - ❌ "Invoke the POST endpoint"
 
 **For developers:**
+
 - ✅ "Call POST /api/deliveries with JSON body"
 - ❌ "Press the green button"
 
 **For operations:**
+
 - ✅ "Run `psql $DATABASE_URL < backup.sql`"
 - ❌ "Restore the database somehow"
 
 ### 4. The 5 W's of Good Documentation
 
 Every procedure should answer:
+
 - **Who:** Who performs this action?
 - **What:** What exactly needs to be done?
 - **When:** When should this be done?
@@ -1655,6 +1786,7 @@ Every procedure should answer:
 - **Why:** Why is this important?
 
 **Example:**
+
 ```markdown
 ## Period Close (Complete 5 W's)
 
@@ -1668,6 +1800,7 @@ Every procedure should answer:
 ### 5. Documentation Maintenance
 
 Documentation needs updates when:
+
 - ✅ Features change
 - ✅ New features added
 - ✅ Users ask same question repeatedly (update FAQ)
@@ -1675,6 +1808,7 @@ Documentation needs updates when:
 - ✅ Better ways to explain concepts discovered
 
 **Set a schedule:**
+
 - Review user docs: Every 3 months
 - Review developer docs: With each major release
 - Review operational docs: Every 6 months
@@ -1684,23 +1818,23 @@ Documentation needs updates when:
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Documentation** | Written instructions and reference materials |
-| **End User** | Person who uses the software (not developer) |
-| **Technical Documentation** | Docs for developers and IT staff |
-| **User Manual** | Complete guide for using the system |
-| **Quick Reference** | Short cheat sheet for common tasks |
-| **FAQ** | Frequently Asked Questions (and answers) |
-| **Training Materials** | Structured learning content |
-| **Operational Docs** | Procedures for running and maintaining system |
-| **Runbook** | Step-by-step procedures for specific tasks |
-| **Knowledge Base** | Collection of all documentation |
-| **SOP** | Standard Operating Procedure (formal process) |
-| **Onboarding** | Process of adding new users/staff |
-| **Escalation** | Moving a problem to higher support tier |
-| **Incident** | Something went wrong and needs fixing |
-| **Post-Mortem** | Review after incident to learn and improve |
+| Term                        | Simple Explanation                            |
+| --------------------------- | --------------------------------------------- |
+| **Documentation**           | Written instructions and reference materials  |
+| **End User**                | Person who uses the software (not developer)  |
+| **Technical Documentation** | Docs for developers and IT staff              |
+| **User Manual**             | Complete guide for using the system           |
+| **Quick Reference**         | Short cheat sheet for common tasks            |
+| **FAQ**                     | Frequently Asked Questions (and answers)      |
+| **Training Materials**      | Structured learning content                   |
+| **Operational Docs**        | Procedures for running and maintaining system |
+| **Runbook**                 | Step-by-step procedures for specific tasks    |
+| **Knowledge Base**          | Collection of all documentation               |
+| **SOP**                     | Standard Operating Procedure (formal process) |
+| **Onboarding**              | Process of adding new users/staff             |
+| **Escalation**              | Moving a problem to higher support tier       |
+| **Incident**                | Something went wrong and needs fixing         |
+| **Post-Mortem**             | Review after incident to learn and improve    |
 
 ---
 
@@ -1709,6 +1843,7 @@ Documentation needs updates when:
 ### Issue 1: Documentation Out of Date
 
 **Symptoms:**
+
 - Users report "this doesn't work as described"
 - Screenshots don't match current UI
 - Steps reference features that don't exist
@@ -1716,6 +1851,7 @@ Documentation needs updates when:
 **Cause:** System changed but docs not updated
 
 **Solution:**
+
 ```markdown
 ## Documentation Update Process
 
@@ -1734,6 +1870,7 @@ Documentation needs updates when:
 ### Issue 2: Users Can't Find Information
 
 **Symptoms:**
+
 - Same questions asked repeatedly
 - Users say "I looked but couldn't find it"
 - Support tickets for documented features
@@ -1741,6 +1878,7 @@ Documentation needs updates when:
 **Cause:** Poor organization or discoverability
 
 **Solution:**
+
 ```markdown
 ## Improve Discoverability
 
@@ -1757,6 +1895,7 @@ If UI says "Deliveries" don't call it "Receipts" in docs
 ### Issue 3: Documentation Too Technical
 
 **Symptoms:**
+
 - Users say "I don't understand this"
 - Support requests even with docs available
 - Docs only make sense to developers
@@ -1764,10 +1903,12 @@ If UI says "Deliveries" don't call it "Receipts" in docs
 **Cause:** Wrong language for audience
 
 **Solution:**
+
 ```markdown
 ## Simplification Checklist
 
 Before publishing user docs:
+
 - [ ] Remove technical jargon
 - [ ] Use plain language
 - [ ] Include screenshots
@@ -1781,6 +1922,7 @@ Before publishing user docs:
 ### Issue 4: Training Takes Too Long
 
 **Symptoms:**
+
 - New users need weeks to be productive
 - Trainers spend hours with each person
 - Users forget training after few days
@@ -1788,6 +1930,7 @@ Before publishing user docs:
 **Cause:** Poor training structure or materials
 
 **Solution:**
+
 ```markdown
 ## Effective Training Structure
 
@@ -1816,6 +1959,7 @@ Before publishing user docs:
 ### Issue 5: No One Reads the Docs
 
 **Symptoms:**
+
 - Documentation exists but unused
 - Users prefer asking questions
 - Docs have low view counts
@@ -1823,6 +1967,7 @@ Before publishing user docs:
 **Cause:** Docs hard to find or perceived as unhelpful
 
 **Solution:**
+
 ```markdown
 ## Make Docs Accessible
 
@@ -1853,6 +1998,7 @@ Before publishing user docs:
 **Before Publishing:**
 
 **1. Accuracy**
+
 - [ ] All information is correct
 - [ ] Screenshots match current system
 - [ ] Code examples are tested and work
@@ -1860,6 +2006,7 @@ Before publishing user docs:
 - [ ] Version numbers are current
 
 **2. Completeness**
+
 - [ ] All features are documented
 - [ ] All error messages explained
 - [ ] All user roles covered
@@ -1867,6 +2014,7 @@ Before publishing user docs:
 - [ ] No "TODO" placeholders
 
 **3. Clarity**
+
 - [ ] Language appropriate for audience
 - [ ] No unexplained jargon
 - [ ] Clear step-by-step instructions
@@ -1874,6 +2022,7 @@ Before publishing user docs:
 - [ ] Screenshots help understanding
 
 **4. Organization**
+
 - [ ] Table of contents included
 - [ ] Logical structure (simple → complex)
 - [ ] Easy to navigate
@@ -1881,6 +2030,7 @@ Before publishing user docs:
 - [ ] Related topics cross-referenced
 
 **5. Usefulness**
+
 - [ ] Answers real user questions
 - [ ] Practical, not theoretical
 - [ ] Searchable (good keywords)
@@ -1892,6 +2042,7 @@ Before publishing user docs:
 **Test with Real Users:**
 
 **Scenario 1: New Developer Setup**
+
 - Give docs to developer unfamiliar with project
 - Ask them to set up development environment
 - Time how long it takes
@@ -1899,6 +2050,7 @@ Before publishing user docs:
 - **Target:** Setup in < 30 minutes
 
 **Scenario 2: New User Training**
+
 - Give user manual to new Operator
 - Ask them to complete common tasks
 - Observe: Do they read docs or ask questions?
@@ -1906,6 +2058,7 @@ Before publishing user docs:
 - **Target:** Productive within 2 hours
 
 **Scenario 3: Incident Response**
+
 - Give incident response plan to IT team member
 - Simulate P1 incident (in test environment)
 - Follow documented procedures
@@ -1919,6 +2072,7 @@ Before publishing user docs:
 After completing Documentation (Phase 4.5), the final phase is:
 
 **→ Phase 4.6: Pre-Launch Preparation** (Pending)
+
 - Deployment setup (Vercel + Supabase production)
 - Production testing
 - Data seeding (pilot locations, items, users)
@@ -1941,6 +2095,7 @@ In Phase 4.5, we created comprehensive documentation covering all aspects of the
 ✅ **Operational Documentation** - Backup procedures, monitoring setup, incident response, user onboarding, support escalation
 
 ### Total Documentation Created:
+
 - **15 major documents**
 - **~6,000 lines** of detailed content
 - **4 audiences** served (developers, users, trainers, operations)
@@ -1949,6 +2104,7 @@ In Phase 4.5, we created comprehensive documentation covering all aspects of the
 - **55+ FAQs** answered
 
 ### Documentation Benefits:
+
 - ✅ New developers can set up in 30 minutes (was: hours of trial-and-error)
 - ✅ Users can self-serve answers (reduces support tickets)
 - ✅ Training time reduced by 50% (structured modules vs ad-hoc)

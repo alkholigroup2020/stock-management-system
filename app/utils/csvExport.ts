@@ -87,7 +87,10 @@ export function generateCSV<T extends Record<string, unknown>>(
  * @param rows - Array of row arrays
  * @returns CSV string content
  */
-export function generateSimpleCSV(headers: string[], rows: (string | number | null | undefined)[][]): string {
+export function generateSimpleCSV(
+  headers: string[],
+  rows: (string | number | null | undefined)[][]
+): string {
   const headerRow = headers.map((h) => escapeCSVValue(h)).join(",");
 
   const dataRows = rows.map((row) => {

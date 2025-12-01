@@ -136,9 +136,7 @@ export default defineEventHandler(async (event) => {
 
       // Set resolved_at timestamp when status changes to a final state
       if (
-        (data.status === "CREDITED" ||
-          data.status === "REJECTED" ||
-          data.status === "RESOLVED") &&
+        (data.status === "CREDITED" || data.status === "REJECTED" || data.status === "RESOLVED") &&
         !ncr.resolved_at
       ) {
         updateData.resolved_at = new Date();

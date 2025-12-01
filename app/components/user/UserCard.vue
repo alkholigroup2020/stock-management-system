@@ -15,9 +15,7 @@
             {{ user.full_name }}
           </h3>
           <div class="flex items-center gap-2 mb-2">
-            <span class="text-sm font-mono text-[var(--ui-text-muted)]">
-              @{{ user.username }}
-            </span>
+            <span class="text-sm font-mono text-[var(--ui-text-muted)]">@{{ user.username }}</span>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <UBadge :color="roleBadgeColor" variant="subtle" size="sm">
@@ -69,10 +67,7 @@
           <div
             class="w-10 h-10 rounded-lg bg-[var(--ui-bg-elevated)] flex items-center justify-center"
           >
-            <UIcon
-              name="i-lucide-map-pin-house"
-              class="w-5 h-5 text-blue-500 dark:text-blue-400"
-            />
+            <UIcon name="i-lucide-map-pin-house" class="w-5 h-5 text-blue-500 dark:text-blue-400" />
           </div>
           <div>
             <p class="text-xs text-[var(--ui-text-muted)] mb-0.5">Assigned Locations</p>
@@ -207,23 +202,10 @@ const handleCardClick = () => {
 
 // Badge color for role
 const roleBadgeColor = computed(
-  ():
-    | "primary"
-    | "secondary"
-    | "success"
-    | "error"
-    | "warning"
-    | "info"
-    | "neutral" => {
+  (): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" => {
     const colors: Record<
       UserRole,
-      | "primary"
-      | "secondary"
-      | "success"
-      | "error"
-      | "warning"
-      | "info"
-      | "neutral"
+      "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral"
     > = {
       ADMIN: "error",
       SUPERVISOR: "warning",

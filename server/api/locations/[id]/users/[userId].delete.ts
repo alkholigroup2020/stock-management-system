@@ -162,8 +162,7 @@ export default defineEventHandler(async (event) => {
       removed_assignment: {
         user_id: userId,
         location_id: locationId,
-        user_name:
-          existingAssignment.user.full_name || existingAssignment.user.username,
+        user_name: existingAssignment.user.full_name || existingAssignment.user.username,
         location_name: existingAssignment.location.name,
       },
     };

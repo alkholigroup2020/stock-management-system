@@ -193,11 +193,7 @@ export default defineEventHandler(async (event) => {
 /**
  * Handle Period Close approval - executes the close in a transaction
  */
-async function handlePeriodCloseApproval(
-  approvalId: string,
-  periodId: string,
-  reviewerId: string
-) {
+async function handlePeriodCloseApproval(approvalId: string, periodId: string, reviewerId: string) {
   // Fetch the period with all location data
   const period = await prisma.period.findUnique({
     where: { id: periodId },
@@ -252,9 +248,7 @@ async function handlePeriodCloseApproval(
       data: {
         code: "LOCATIONS_NOT_READY",
         message: "Some locations are no longer ready",
-        locations: notReadyLocations.map(
-          (pl: PeriodLocationWithLocation) => pl.location.name
-        ),
+        locations: notReadyLocations.map((pl: PeriodLocationWithLocation) => pl.location.name),
       },
     });
   }
@@ -471,16 +465,14 @@ async function handlePeriodCloseApproval(
       name: result.period.name,
       status: result.period.status,
       closedAt: result.period.closed_at,
-      locations: result.period.period_locations.map(
-        (pl: PeriodLocationWithLocation) => ({
-          locationId: pl.location_id,
-          locationCode: pl.location.code,
-          locationName: pl.location.name,
-          status: pl.status,
-          closingValue: Number(pl.closing_value),
-          closedAt: pl.closed_at,
-        })
-      ),
+      locations: result.period.period_locations.map((pl: PeriodLocationWithLocation) => ({
+        locationId: pl.location_id,
+        locationCode: pl.location.code,
+        locationName: pl.location.name,
+        status: pl.status,
+        closingValue: Number(pl.closing_value),
+        closedAt: pl.closed_at,
+      })),
     },
     summary: {
       totalLocations: locationSummaries.length,

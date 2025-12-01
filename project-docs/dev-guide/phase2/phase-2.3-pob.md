@@ -1,4 +1,5 @@
 # Phase 2.3: POB Entry (Personnel On Board)
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -23,11 +24,13 @@
 ### The Problem
 
 In catering operations (especially in marine vessels, camps, or large facilities), you need to track:
+
 - How many people you feed each day
 - How much food you consume in a period
 - **Cost per person per day** (called "manday cost")
 
 **Example Scenario:**
+
 - Location: Main Kitchen
 - Period: January 2025
 - Food consumed: SAR 150,000
@@ -37,6 +40,7 @@ In catering operations (especially in marine vessels, camps, or large facilities
   - **Manday cost** = 150,000 / 1,650 = **SAR 90.91 per person per day**
 
 **Problems without POB tracking:**
+
 - ❌ Can't calculate accurate cost per person
 - ❌ No visibility into headcount trends
 - ❌ Can't compare efficiency between locations
@@ -46,6 +50,7 @@ In catering operations (especially in marine vessels, camps, or large facilities
 ### Our Solution
 
 We built a **POB Entry System** that:
+
 - ✅ Tracks daily headcount (crew + extra)
 - ✅ Auto-generates entries for all dates in period
 - ✅ Auto-saves on blur (no save button needed)
@@ -111,9 +116,11 @@ We created **3 API endpoints** that handle all POB operations on the server - ge
 ### What Was Done
 
 #### Endpoint 1: GET /api/locations/:locationId/pob
+
 **Purpose:** Get all POB entries for a location and period
 
 **What it does:**
+
 - Returns POB entries for specified location and period
 - If no period specified, uses current OPEN period
 - Can filter by date range (startDate, endDate)
@@ -121,11 +128,13 @@ We created **3 API endpoints** that handle all POB operations on the server - ge
 - Checks user has access to the location
 
 **Example Request:**
+
 ```http
 GET /api/locations/abc123/pob?periodId=xyz789
 ```
 
 **Response:**
+
 ```json
 {
   "location": {
@@ -164,6 +173,7 @@ GET /api/locations/abc123/pob?periodId=xyz789
 ```
 
 **Key Features:**
+
 - **Period Detection:** Automatically uses current OPEN period if not specified
 - **Access Control:** Validates user has access to location
 - **Summary Calculation:** Auto-calculates total mandays across all entries
@@ -172,9 +182,11 @@ GET /api/locations/abc123/pob?periodId=xyz789
 ---
 
 #### Endpoint 2: POST /api/locations/:locationId/pob
+
 **Purpose:** Create or update multiple POB entries at once (bulk operation)
 
 **What it does:**
+
 1. Validates all input data (Zod schema)
 2. Checks user has POST or MANAGE access to location
 3. Verifies period is OPEN for this location
@@ -185,6 +197,7 @@ GET /api/locations/abc123/pob?periodId=xyz789
 8. Returns all saved entries with new summary
 
 **Example Request:**
+
 ```json
 {
   "period_id": "xyz789",
@@ -206,6 +219,7 @@ GET /api/locations/abc123/pob?periodId=xyz789
 **Important Concepts:**
 
 **1. Upsert Operation**
+
 ```typescript
 // Upsert = Update if exists, Insert if new
 await prisma.pOB.upsert({
@@ -213,21 +227,21 @@ await prisma.pOB.upsert({
     period_id_location_id_date: {
       period_id: periodId,
       location_id: locationId,
-      date: new Date(entryData.date)
-    }
+      date: new Date(entryData.date),
+    },
   },
   create: {
     // Create new entry
     crew_count: entryData.crew_count,
     extra_count: entryData.extra_count,
-    entered_by: user.id
+    entered_by: user.id,
   },
   update: {
     // Update existing entry
     crew_count: entryData.crew_count,
     extra_count: entryData.extra_count,
-    entered_by: user.id
-  }
+    entered_by: user.id,
+  },
 });
 ```
 
@@ -241,9 +255,11 @@ This prevents duplicate entries and ensures data integrity.
 ---
 
 #### Endpoint 3: PATCH /api/pob/:id
+
 **Purpose:** Update a single existing POB entry
 
 **What it does:**
+
 - Fetches existing POB entry by ID
 - Checks user has access to the location
 - Verifies period is still OPEN
@@ -252,6 +268,7 @@ This prevents duplicate entries and ensures data integrity.
 - Returns updated entry
 
 **Example Request:**
+
 ```json
 {
   "crew_count": 52,
@@ -260,6 +277,7 @@ This prevents duplicate entries and ensures data integrity.
 ```
 
 **When to use:**
+
 - Updating a single entry directly by ID
 - Mobile apps or APIs that work with specific entry IDs
 
@@ -279,15 +297,15 @@ const periodLocation = await prisma.periodLocation.findUnique({
   where: {
     period_id_location_id: {
       period_id: targetPeriod.id,
-      location_id: locationId
-    }
-  }
+      location_id: locationId,
+    },
+  },
 });
 
 if (!periodLocation || periodLocation.status !== "OPEN") {
   throw createError({
     statusCode: 400,
-    message: "Period is not open for this location"
+    message: "Period is not open for this location",
   });
 }
 ```
@@ -310,13 +328,14 @@ for (const entry of data.entries) {
   if (entryDate < periodStart || entryDate > periodEnd) {
     throw createError({
       statusCode: 400,
-      message: `Date ${entry.date} is outside period range`
+      message: `Date ${entry.date} is outside period range`,
     });
   }
 }
 ```
 
 **Example:**
+
 - Period: January 2025 (01/01/2025 - 31/01/2025)
 - Valid date: 15/01/2025 ✅
 - Invalid date: 05/02/2025 ❌ (February - outside range)
@@ -328,6 +347,7 @@ for (const entry of data.entries) {
 **Mandays** = Total number of people × total number of days
 
 **For single day:**
+
 ```
 Date: 01/01/2025
 Crew: 50
@@ -336,6 +356,7 @@ Mandays for this day = 50 + 5 = 55
 ```
 
 **For entire period:**
+
 ```
 Period: January 2025 (31 days)
 
@@ -349,21 +370,17 @@ Total Mandays = Sum of all daily totals = 1,705 mandays
 ```
 
 **Calculation in API:**
-```typescript
-const totalCrewCount = pobEntries.reduce(
-  (sum, entry) => sum + entry.crew_count,
-  0
-);
 
-const totalExtraCount = pobEntries.reduce(
-  (sum, entry) => sum + entry.extra_count,
-  0
-);
+```typescript
+const totalCrewCount = pobEntries.reduce((sum, entry) => sum + entry.crew_count, 0);
+
+const totalExtraCount = pobEntries.reduce((sum, entry) => sum + entry.extra_count, 0);
 
 const totalMandays = totalCrewCount + totalExtraCount;
 ```
 
 **Why it matters:**
+
 - Used to calculate **manday cost** in reconciliations
 - Manday Cost = Total Consumption Value / Total Mandays
 - Example: SAR 150,000 / 1,705 = **SAR 87.98 per person per day**
@@ -373,6 +390,7 @@ const totalMandays = totalCrewCount + totalExtraCount;
 #### 4. Audit Trail
 
 Every POB entry tracks:
+
 - **Who entered it:** `entered_by` (user ID)
 - **When first entered:** `entered_at` (timestamp)
 - **When last updated:** `updated_at` (timestamp)
@@ -389,6 +407,7 @@ Every POB entry tracks:
 ```
 
 **Why?** If there's a discrepancy, you can trace:
+
 - Who entered the data
 - When it was entered
 - If it was changed later
@@ -397,11 +416,11 @@ Every POB entry tracks:
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/locations/[locationId]/pob.get.ts` | Get POB entries for location and period |
-| `server/api/locations/[locationId]/pob.post.ts` | Bulk create/update POB entries |
-| `server/api/pob/[id].patch.ts` | Update single POB entry by ID |
+| File                                            | What It Does                            |
+| ----------------------------------------------- | --------------------------------------- |
+| `server/api/locations/[locationId]/pob.get.ts`  | Get POB entries for location and period |
+| `server/api/locations/[locationId]/pob.post.ts` | Bulk create/update POB entries          |
+| `server/api/pob/[id].patch.ts`                  | Update single POB entry by ID           |
 
 ---
 
@@ -417,6 +436,7 @@ We created a **web page** where operators can see all dates in the current perio
 
 **1. Period Information Card**
 Shows:
+
 - Current period name (January 2025)
 - Period date range (01/01/2025 - 31/01/2025)
 - **Total mandays** (large, prominent number)
@@ -438,13 +458,14 @@ graph LR
 
 Auto-generates rows for **all dates** in period:
 
-| Date | Crew Count | Extra Count | Total |
-|------|------------|-------------|-------|
-| Wed, 01/01/2025 | [50] | [5] | 55 |
-| Thu, 02/01/2025 | [48] | [7] | 55 |
-| Fri, 03/01/2025 | [52] | [3] | 55 |
+| Date            | Crew Count | Extra Count | Total |
+| --------------- | ---------- | ----------- | ----- |
+| Wed, 01/01/2025 | [50]       | [5]         | 55    |
+| Thu, 02/01/2025 | [48]       | [7]         | 55    |
+| Fri, 03/01/2025 | [52]       | [3]         | 55    |
 
 **Features:**
+
 - Shows **weekday** + formatted date
 - Crew and Extra are **editable number inputs**
 - Total is **auto-calculated** (read-only)
@@ -457,6 +478,7 @@ Auto-generates rows for **all dates** in period:
 **What is "blur"?** When you click or tab away from an input field, it loses focus - this is called "blur".
 
 **Our behavior:**
+
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -476,6 +498,7 @@ sequenceDiagram
 ```
 
 **Benefits:**
+
 - No "Save" button needed
 - Data saved immediately
 - Can't forget to save
@@ -486,6 +509,7 @@ sequenceDiagram
 **4. Real-Time Validation**
 
 Before saving, we check:
+
 - ✅ Must be non-negative (can't have -5 people!)
 - ✅ Must be whole number (can't have 5.5 people!)
 
@@ -496,8 +520,7 @@ if (entry.crew_count < 0 || entry.extra_count < 0) {
   return;
 }
 
-if (!Number.isInteger(entry.crew_count) ||
-    !Number.isInteger(entry.extra_count)) {
+if (!Number.isInteger(entry.crew_count) || !Number.isInteger(entry.extra_count)) {
   toast.error("Crew and extra counts must be whole numbers");
   return;
 }
@@ -508,14 +531,11 @@ if (!Number.isInteger(entry.crew_count) ||
 **5. Period-Based Access Control**
 
 ```vue
-<UInput
-  v-model.number="entry.crew_count"
-  type="number"
-  :disabled="!isPeriodOpen"
-/>
+<UInput v-model.number="entry.crew_count" type="number" :disabled="!isPeriodOpen" />
 ```
 
 If period is closed:
+
 - Inputs are **disabled** (grayed out)
 - Warning message shown: "Period is not open"
 - Can still **view** data, but cannot edit
@@ -525,6 +545,7 @@ If period is closed:
 **6. Loading and Error States**
 
 **Loading State:**
+
 ```vue
 <div v-if="loading">
   <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
@@ -533,6 +554,7 @@ If period is closed:
 ```
 
 **No Period State:**
+
 ```vue
 <div v-else-if="!currentPeriod">
   <UIcon name="i-heroicons-calendar-days" />
@@ -542,6 +564,7 @@ If period is closed:
 ```
 
 **Period Closed State:**
+
 ```vue
 <UAlert
   color="warning"
@@ -609,7 +632,7 @@ function initializeEditableEntries(data: POBData) {
     const dateStr = currentDate.toISOString().split("T")[0];
 
     // Check if we have existing entry from API
-    const existingEntry = data.entries.find(e => {
+    const existingEntry = data.entries.find((e) => {
       const entryDate = new Date(e.date).toISOString().split("T")[0];
       return entryDate === dateStr;
     });
@@ -623,7 +646,7 @@ function initializeEditableEntries(data: POBData) {
         date: dateStr,
         crew_count: 0,
         extra_count: 0,
-        total_count: 0
+        total_count: 0,
       });
     }
 
@@ -636,6 +659,7 @@ function initializeEditableEntries(data: POBData) {
 ```
 
 **Example:**
+
 - Period: January 2025 (31 days)
 - API returned data for 5 days (user has entered 5 so far)
 - We generate 31 rows:
@@ -664,19 +688,18 @@ async function saveEntry(dateStr: string) {
 
   try {
     // Call API
-    const response = await $fetch(
-      `/api/locations/${locationId}/pob`,
-      {
-        method: "POST",
-        body: {
-          entries: [{
+    const response = await $fetch(`/api/locations/${locationId}/pob`, {
+      method: "POST",
+      body: {
+        entries: [
+          {
             date: entry.date,
             crew_count: entry.crew_count,
-            extra_count: entry.extra_count
-          }]
-        }
-      }
-    );
+            extra_count: entry.extra_count,
+          },
+        ],
+      },
+    });
 
     // Update summary with new totals
     pobData.value.summary = response.summary;
@@ -709,8 +732,8 @@ watch(activeLocationId, async (newLocationId) => {
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                | What It Does                             |
+| ------------------- | ---------------------------------------- |
 | `app/pages/pob.vue` | POB entry page with auto-generated table |
 
 ---
@@ -735,23 +758,26 @@ We created **2 components:**
 **Purpose:** Display editable POB entries table with auto-save capability.
 
 **Props (Inputs):**
+
 ```typescript
 interface Props {
-  entries: Map<string, POBEntry>;  // All entries (key = date string)
-  disabled?: boolean;              // Disable editing (period closed)
-  savingDates?: Set<string>;       // Dates currently being saved
+  entries: Map<string, POBEntry>; // All entries (key = date string)
+  disabled?: boolean; // Disable editing (period closed)
+  savingDates?: Set<string>; // Dates currently being saved
 }
 ```
 
 **Events (Outputs):**
+
 ```typescript
 const emit = defineEmits<{
-  blur: [dateStr: string];    // When input loses focus
-  change: [dateStr: string];  // When input value changes
+  blur: [dateStr: string]; // When input loses focus
+  change: [dateStr: string]; // When input value changes
 }>();
 ```
 
 **Features:**
+
 - **Auto-sorted dates** - Oldest to newest
 - **Formatted date display** - "Wed, 01/01/2025"
 - **Number inputs** - With min="0" and step="1"
@@ -760,6 +786,7 @@ const emit = defineEmits<{
 - **Auto-calculated total** - Read-only column
 
 **Usage Example:**
+
 ```vue
 <template>
   <POBTable
@@ -836,11 +863,7 @@ const handleChange = (dateStr: string) => {
           <!-- Total (Read-Only) -->
           <td>
             {{ entries.get(dateStr).total_count }}
-            <UIcon
-              v-if="isSaving(dateStr)"
-              name="i-heroicons-arrow-path"
-              class="animate-spin"
-            />
+            <UIcon v-if="isSaving(dateStr)" name="i-heroicons-arrow-path" class="animate-spin" />
           </td>
         </tr>
       </tbody>
@@ -856,21 +879,24 @@ const handleChange = (dateStr: string) => {
 **Purpose:** Display period information and total mandays summary.
 
 **Props:**
+
 ```typescript
 interface Props {
-  period: Period;           // Period info (name, dates)
-  summary: POBSummary;      // Summary stats (totals)
+  period: Period; // Period info (name, dates)
+  summary: POBSummary; // Summary stats (totals)
   periodDateRange?: string; // Optional formatted date range
 }
 ```
 
 **Features:**
+
 - **Dual-section layout** - Period info on left, totals on right
 - **Large mandays display** - Prominent total in primary color
 - **Breakdown** - Shows crew + extra counts
 - **Auto-formatting** - Formats dates if periodDateRange not provided
 
 **Usage Example:**
+
 ```vue
 <template>
   <POBSummary
@@ -879,7 +905,7 @@ interface Props {
       total_crew_count: 1500,
       total_extra_count: 150,
       total_mandays: 1650,
-      entries_count: 30
+      entries_count: 30,
     }"
     period-date-range="01/01/2025 - 31/01/2025"
   />
@@ -979,17 +1005,17 @@ These components can be used in multiple places:
 #### 2. Props vs Emits
 
 **Props flow DOWN** (parent → child):
+
 ```vue
 <POBTable :entries="myEntries" :disabled="true" />
-                     ↓              ↓
-              Component receives these values
+↓ ↓ Component receives these values
 ```
 
 **Emits flow UP** (child → parent):
+
 ```vue
 <POBTable @blur="handleBlur" />
-              ↑
-    Component sends events up
+↑ Component sends events up
 ```
 
 **Analogy:** Props are like **parameters** to a function, Emits are like **return values**.
@@ -1012,6 +1038,7 @@ const entry = entries.get("2025-01-15"); // O(1) - instant!
 ```
 
 **Benefits:**
+
 - **Fast lookup** - No searching needed
 - **Easy update** - Just `entries.set(date, newValue)`
 - **Natural key** - Date string is the key
@@ -1020,9 +1047,9 @@ const entry = entries.get("2025-01-15"); // O(1) - instant!
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `app/components/pob/POBTable.vue` | Editable POB table component |
+| File                                | What It Does                 |
+| ----------------------------------- | ---------------------------- |
+| `app/components/pob/POBTable.vue`   | Editable POB table component |
 | `app/components/pob/POBSummary.vue` | Period info and summary card |
 
 ---
@@ -1031,24 +1058,24 @@ const entry = entries.get("2025-01-15"); // O(1) - instant!
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/locations/[locationId]/pob.get.ts` | ~250 | Get POB entries for location/period |
-| `server/api/locations/[locationId]/pob.post.ts` | ~310 | Bulk create/update POB entries |
-| `server/api/pob/[id].patch.ts` | ~260 | Update single POB entry |
+| File                                            | Lines | Purpose                             |
+| ----------------------------------------------- | ----- | ----------------------------------- |
+| `server/api/locations/[locationId]/pob.get.ts`  | ~250  | Get POB entries for location/period |
+| `server/api/locations/[locationId]/pob.post.ts` | ~310  | Bulk create/update POB entries      |
+| `server/api/pob/[id].patch.ts`                  | ~260  | Update single POB entry             |
 
 ### Frontend Pages
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/pob.vue` | ~320 | POB entry page with auto-save |
+| File                | Lines | Purpose                       |
+| ------------------- | ----- | ----------------------------- |
+| `app/pages/pob.vue` | ~320  | POB entry page with auto-save |
 
 ### Components
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/components/pob/POBTable.vue` | ~175 | Editable POB table |
-| `app/components/pob/POBSummary.vue` | ~80 | Period summary card |
+| File                                | Lines | Purpose             |
+| ----------------------------------- | ----- | ------------------- |
+| `app/components/pob/POBTable.vue`   | ~175  | Editable POB table  |
+| `app/components/pob/POBSummary.vue` | ~80   | Period summary card |
 
 **Total:** ~1,395 lines of code
 
@@ -1061,6 +1088,7 @@ const entry = entries.get("2025-01-15"); // O(1) - instant!
 **Simple Explanation:** "Update if exists, Insert if new"
 
 **Why it's useful:**
+
 ```typescript
 // Without upsert (BAD):
 const existing = await findEntry();
@@ -1075,12 +1103,13 @@ if (existing) {
 await upsert({
   where: { id },
   create: { data },
-  update: { data }
+  update: { data },
 });
 // 1 database call, atomic operation!
 ```
 
 **Real scenario:**
+
 - Operator fills Day 1 data → Creates new entry
 - Operator realizes mistake, changes Day 1 → Updates existing entry
 - Same code handles both cases!
@@ -1090,24 +1119,28 @@ await upsert({
 ### 2. Auto-Save UX Pattern
 
 **Traditional approach:**
+
 ```
 [Input Field] [Save Button]
 User has to remember to click Save!
 ```
 
 **Auto-save approach:**
+
 ```
 [Input Field] (auto-saves on blur)
 Just enter data and move on!
 ```
 
 **Benefits:**
+
 - ✅ Can't forget to save
 - ✅ Less clicks
 - ✅ More intuitive
 - ✅ Mobile-friendly
 
 **Implementation:**
+
 ```vue
 <UInput
   v-model="value"
@@ -1165,11 +1198,13 @@ entry.crew_count = 55;
 ```
 
 **When to use Map:**
+
 - Need fast lookup by key
 - Frequently update items
 - Key is a string or number
 
 **When to use Array:**
+
 - Need to sort
 - Need to filter
 - Need numeric index
@@ -1198,18 +1233,18 @@ In our implementation, we use `ref(new Map())` which Vue 3 tracks deeply.
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **POB** | Personnel On Board - daily headcount tracking |
-| **Crew Count** | Regular staff/employees working that day |
-| **Extra Count** | Guests, visitors, or temporary staff |
-| **Mandays** | Total people × days (used for cost calculation) |
-| **Manday Cost** | Cost per person per day (consumption / mandays) |
-| **Upsert** | Update if exists, insert if new (one operation) |
-| **Blur Event** | When input field loses focus (click/tab away) |
-| **Auto-Save** | Saving data automatically without save button |
-| **Period-Based** | Data tied to specific accounting period |
-| **Map** | Key-value data structure with fast lookup |
+| Term             | Simple Explanation                              |
+| ---------------- | ----------------------------------------------- |
+| **POB**          | Personnel On Board - daily headcount tracking   |
+| **Crew Count**   | Regular staff/employees working that day        |
+| **Extra Count**  | Guests, visitors, or temporary staff            |
+| **Mandays**      | Total people × days (used for cost calculation) |
+| **Manday Cost**  | Cost per person per day (consumption / mandays) |
+| **Upsert**       | Update if exists, insert if new (one operation) |
+| **Blur Event**   | When input field loses focus (click/tab away)   |
+| **Auto-Save**    | Saving data automatically without save button   |
+| **Period-Based** | Data tied to specific accounting period         |
+| **Map**          | Key-value data structure with fast lookup       |
 
 ---
 
@@ -1218,16 +1253,19 @@ In our implementation, we use `ref(new Map())` which Vue 3 tracks deeply.
 ### Issue 1: Data Not Saving on Blur
 
 **Symptoms:**
+
 - User enters data and moves to next field
 - No saving indicator appears
 - Data not persisted to database
 
 **Causes:**
+
 1. Blur event not firing
 2. Validation failing silently
 3. Period is closed
 
 **Solutions:**
+
 ```typescript
 // 1. Check blur event is connected
 <UInput @blur="handleBlur(dateStr)" />
@@ -1251,26 +1289,20 @@ if (!isPeriodOpen.value) {
 ### Issue 2: Decimal Values Entered (5.5 people)
 
 **Symptoms:**
+
 - User enters 5.5 in crew count
 - Validation error appears
 
 **Cause:** HTML number input allows decimals by default
 
 **Solution:**
+
 ```vue
 <!-- Use step="1" to force integers -->
-<UInput
-  v-model.number="crew_count"
-  type="number"
-  step="1"
-  min="0"
-/>
+<UInput v-model.number="crew_count" type="number" step="1" min="0" />
 
 <!-- Also validate in code -->
-if (!Number.isInteger(crew_count)) {
-  toast.error("Must be whole number");
-  return;
-}
+if (!Number.isInteger(crew_count)) { toast.error("Must be whole number"); return; }
 ```
 
 ---
@@ -1278,15 +1310,18 @@ if (!Number.isInteger(crew_count)) {
 ### Issue 3: Dates Not Auto-Generating
 
 **Symptoms:**
+
 - Table is empty even though period has dates
 - No rows displayed
 
 **Causes:**
+
 1. Period data not loaded
 2. Date loop logic error
 3. Wrong date format
 
 **Solution:**
+
 ```typescript
 // Ensure period loaded first
 if (!currentPeriod.value) {
@@ -1313,6 +1348,7 @@ function initializeEditableEntries(data: POBData) {
 ### Issue 4: Summary Not Updating After Save
 
 **Symptoms:**
+
 - Single entry saves successfully
 - Total mandays doesn't update
 - Summary still shows old values
@@ -1320,6 +1356,7 @@ function initializeEditableEntries(data: POBData) {
 **Cause:** Not updating pobData.summary after save
 
 **Solution:**
+
 ```typescript
 async function saveEntry(dateStr: string) {
   const response = await $fetch('/api/locations/.../pob', {
@@ -1339,12 +1376,14 @@ async function saveEntry(dateStr: string) {
 ### Issue 5: Can Edit Closed Period
 
 **Symptoms:**
+
 - Period shows as CLOSED
 - But inputs are still enabled
 
 **Cause:** isPeriodOpen check not working
 
 **Solution:**
+
 ```typescript
 // Check period status from store
 const isPeriodOpen = computed(() => periodStore.isPeriodOpen);
@@ -1367,6 +1406,7 @@ console.log("Is open:", isPeriodOpen.value);
 ### Manual Testing Steps
 
 **1. Load POB Page**
+
 - [ ] Page loads without errors
 - [ ] Current period name displays correctly
 - [ ] Date range shows correctly formatted
@@ -1375,6 +1415,7 @@ console.log("Is open:", isPeriodOpen.value);
 - [ ] Each date shows weekday (Wed, Thu, etc.)
 
 **2. Enter POB Data**
+
 - [ ] Can enter crew count
 - [ ] Can enter extra count
 - [ ] Total calculates automatically (crew + extra)
@@ -1384,35 +1425,41 @@ console.log("Is open:", isPeriodOpen.value);
 - [ ] Summary updates with new totals
 
 **3. Data Validation**
+
 - [ ] Cannot enter negative numbers
 - [ ] Cannot enter decimal values (e.g., 5.5)
 - [ ] Error toast shows for invalid values
 - [ ] No save happens if validation fails
 
 **4. Period Closed Behavior**
+
 - [ ] Warning alert appears when period closed
 - [ ] All input fields disabled
 - [ ] Can still view existing data
 - [ ] Auto-save doesn't trigger
 
 **5. Location Switching**
+
 - [ ] Switching location reloads POB data
 - [ ] Correct location's data displays
 - [ ] Summary shows correct totals for location
 
 **6. Existing Data Loading**
+
 - [ ] Previously saved entries load correctly
 - [ ] Existing crew counts display
 - [ ] Existing extra counts display
 - [ ] Dates without data show 0
 
 **7. Edge Cases**
+
 - [ ] Period with no entries shows empty table with dates
 - [ ] Period with partial entries shows mix of filled/empty
 - [ ] Same date edited twice updates (not duplicates)
 - [ ] Rapid changes (typing fast) don't cause multiple saves
 
 **8. Error Scenarios**
+
 - [ ] Network error shows error toast
 - [ ] Period not found shows appropriate message
 - [ ] No location selected shows helpful message
@@ -1425,6 +1472,7 @@ console.log("Is open:", isPeriodOpen.value);
 After completing POB Entry (Phase 2.3), the next phase is:
 
 **→ Phase 2.4: Reconciliations** (Days 18-20)
+
 - Reconciliation calculation utility
 - Reconciliation API routes
 - Reconciliations page (single location)
@@ -1450,6 +1498,7 @@ graph LR
 ```
 
 **Formula:**
+
 ```
 Manday Cost = Total Consumption Value / Total Mandays
 

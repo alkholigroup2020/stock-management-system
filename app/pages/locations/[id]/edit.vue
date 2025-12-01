@@ -2,27 +2,27 @@
   <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
-        <!-- Title with icon matching the index page style -->
-        <div class="flex items-center gap-2 sm:gap-4">
-          <UIcon name="i-lucide-map-pin" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
-          <div>
-            <h1 class="text-xl sm:text-3xl font-bold text-primary">Edit Location</h1>
-            <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
-              Update location information and settings
-            </p>
-          </div>
+      <!-- Title with icon matching the index page style -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-map-pin" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Edit Location</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Update location information and settings
+          </p>
         </div>
-        <!-- Back button -->
-        <UButton
-          color="neutral"
-          variant="soft"
-          icon="i-lucide-arrow-left"
-          size="lg"
-          class="cursor-pointer rounded-full px-3 sm:px-6"
-          @click="handleCancel"
-        >
-          <span class="hidden sm:inline">Back</span>
-        </UButton>
+      </div>
+      <!-- Back button -->
+      <UButton
+        color="neutral"
+        variant="soft"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="handleCancel"
+      >
+        <span class="hidden sm:inline">Back</span>
+      </UButton>
     </div>
 
     <!-- Loading State -->

@@ -241,7 +241,12 @@ useHead({
             </UFormField>
 
             <!-- Password -->
-            <UFormField label="Password" name="password" required help="Must meet requirements below">
+            <UFormField
+              label="Password"
+              name="password"
+              required
+              help="Must meet requirements below"
+            >
               <UInput
                 v-model="formData.password"
                 type="password"

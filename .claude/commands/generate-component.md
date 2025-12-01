@@ -13,6 +13,7 @@ Generate boilerplate code following project standards from `UI_DESIGN_GUIDE.md`.
 **Arguments:** $ARGUMENTS
 
 Parse the arguments to determine:
+
 1. **type** - First word (page, feature, form, store, composable)
 2. **name** - Second word (PascalCase for components, camelCase for stores/composables)
 
@@ -74,12 +75,7 @@ onMounted(() => {
       location-scope="current"
     >
       <template #actions>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          :disabled="!isOnline"
-          class="cursor-pointer"
-        >
+        <UButton color="primary" icon="i-lucide-plus" :disabled="!isOnline" class="cursor-pointer">
           Action
         </UButton>
       </template>
@@ -155,10 +151,7 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <div
-    class="card-elevated p-4"
-    :class="{ 'opacity-50': disabled }"
-  >
+  <div class="card-elevated p-4" :class="{ 'opacity-50': disabled }">
     <div class="flex items-start justify-between">
       <div>
         <h4 class="text-[var(--ui-text-highlighted)] font-semibold">
@@ -297,20 +290,10 @@ const handleCancel = () => {
 
     <!-- Actions -->
     <div class="flex justify-end gap-3 pt-4">
-      <UButton
-        type="button"
-        variant="outline"
-        class="cursor-pointer"
-        @click="handleCancel"
-      >
+      <UButton type="button" variant="outline" class="cursor-pointer" @click="handleCancel">
         Cancel
       </UButton>
-      <UButton
-        type="submit"
-        color="primary"
-        :loading="loading"
-        class="cursor-pointer"
-      >
+      <UButton type="submit" color="primary" :loading="loading" class="cursor-pointer">
         Submit
       </UButton>
     </div>

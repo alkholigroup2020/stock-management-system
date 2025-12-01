@@ -26,6 +26,7 @@
 Phase 3 is about **closing the books** at the end of each accounting period (usually each month). Think of it like closing your checkbook at month-end to see exactly how much money you spent and how much you have left.
 
 In Phase 1 and Phase 2, we built the system to:
+
 - Track stock movements (deliveries, issues, transfers)
 - Manage quality problems (NCRs)
 - Count people daily (POB)
@@ -64,6 +65,7 @@ graph TD
 ### Why is This Important?
 
 Imagine running a restaurant for a month:
+
 - You receive food deliveries every week
 - You use ingredients daily
 - You transfer items between kitchen and store
@@ -85,6 +87,7 @@ This is exactly what Phase 3 does - it creates a **coordinated month-end close**
 An **Accounting Period** is a time range (usually one month) during which we track all stock movements and costs. Think of it as a "chapter" in a book - each chapter (period) tells the story of one month.
 
 **Example:**
+
 - Period: January 2025
 - Start date: 2025-01-01
 - End date: 2025-01-31
@@ -105,23 +108,27 @@ stateDiagram-v2
 ```
 
 **1. DRAFT**
+
 - Period just created
 - **Admins can still change prices**
 - No transactions allowed yet
 - Like a blank notebook before school starts
 
 **2. OPEN**
+
 - Period is active
 - **Operators can post deliveries and issues**
 - **Prices are locked** (cannot be changed)
 - Like school days when you're taking notes
 
 **3. PENDING_CLOSE**
+
 - Admin requested to close the period
 - Waiting for final approval
 - Like the last day of school before summer break
 
 **4. CLOSED**
+
 - Period is locked forever
 - **Nobody can change anything**
 - Stock values are saved in snapshots
@@ -131,11 +138,13 @@ stateDiagram-v2
 
 **Problem without locking:**
 Imagine if someone could change January prices in February:
+
 - Your January reports would be wrong
 - You can't trust historical data
 - Financial audits would fail
 
 **Solution with locking:**
+
 - Prices are set at period start
 - When period opens, prices lock
 - If delivery price differs, system creates automatic alert (NCR)
@@ -188,6 +197,7 @@ graph TB
 ```
 
 Each location has:
+
 - **Opening Value** - Stock value at period start
 - **Closing Value** - Stock value at period end
 - **Status** - OPEN, READY, or CLOSED
@@ -226,6 +236,7 @@ graph LR
 Purpose: See all periods in the system
 
 What it returns:
+
 - All periods sorted by date
 - Each period shows: name, dates, status
 - Location readiness for each period
@@ -238,6 +249,7 @@ Example use: Show admin a table of all periods (Jan 2025, Feb 2025, etc.)
 Purpose: Find which period is currently active
 
 What it returns:
+
 - The one period with status = OPEN
 - Location readiness status for that period
 - Used everywhere: deliveries, issues, transfers all need to know the current period
@@ -251,6 +263,7 @@ Purpose: Create a new accounting period
 Who can use: **Admin only** (very important!)
 
 What it does:
+
 - Creates new period record
 - Automatically creates **PeriodLocation** entries for ALL locations
 - Copies closing values from previous period as opening values (smart!)
@@ -263,6 +276,7 @@ Example: Admin creates "February 2025" period on Jan 31st
 Purpose: See complete information about one period
 
 What it returns:
+
 - Period basic info (name, dates, status)
 - All location statuses and values
 - Transaction counts (deliveries, issues, reconciliations)
@@ -279,6 +293,7 @@ Period Opening is the process of **starting a new accounting month**. It's like 
 **The Challenge:**
 
 When February starts, we need to know:
+
 - What stock did we have at the **end of January**? (closing stock)
 - This becomes the **start of February** (opening stock)
 
@@ -332,6 +347,7 @@ sequenceDiagram
 Opening stock values MUST match the previous period's closing values. Why?
 
 **Example:**
+
 - January ends with Kitchen stock = SAR 12,000
 - February MUST start with Kitchen stock = SAR 12,000
 - If numbers don't match, financial reports will be wrong!
@@ -343,6 +359,7 @@ This automatic copying prevents human errors.
 **What is Period Price Setting?**
 
 At the start of each period, the admin must set the **expected price** for each item. These prices:
+
 - Are used to detect price changes during the month
 - Must be set BEFORE the period opens
 - Cannot be changed once period is OPEN
@@ -351,6 +368,7 @@ At the start of each period, the admin must set the **expected price** for each 
 **Why Do We Need Period Prices?**
 
 Imagine you're a restaurant owner:
+
 - In January, you bought flour at SAR 5.00/kg
 - In February, you expect the same price
 - But supplier charges SAR 6.00/kg
@@ -443,25 +461,30 @@ stateDiagram-v2
 **Example Scenario:**
 
 **Step 1: Admin creates February period (DRAFT)**
+
 - Status: DRAFT
 - All prices blank
 
 **Step 2: Admin clicks "Copy from Previous Period"**
+
 - System finds January 2025 (CLOSED)
 - Copies all 150 item prices from January
 - February now has same prices as January
 
 **Step 3: Admin adjusts a few prices**
+
 - Flour: Change from SAR 5.00 to SAR 5.20 (expected increase)
 - Sugar: Keep at SAR 3.50
 - Oil: Change from SAR 12.00 to SAR 11.50 (bulk discount negotiated)
 
 **Step 4: Admin opens period**
+
 - Status changes: DRAFT → OPEN
 - All prices LOCK automatically
 - Cannot change anymore
 
 **Step 5: Delivery arrives with different price**
+
 - Expected (period price): Flour SAR 5.20
 - Actual (delivery price): Flour SAR 5.80
 - Variance: SAR 0.60
@@ -476,6 +499,7 @@ This workflow ensures price integrity and automatic variance detection.
 ### What is Period Close?
 
 Period Close is the process of **ending an accounting period** and **locking all data**. Think of it like:
+
 - Closing a cash register at end of day
 - Submitting your final exam (can't change answers after!)
 - Locking a diary so nobody can change old entries
@@ -507,6 +531,7 @@ graph TB
 ```
 
 **The Problem:**
+
 - Kitchen finishes reconciliation at 2pm
 - Store finishes at 4pm
 - Warehouse finishes at 6pm
@@ -560,11 +585,13 @@ sequenceDiagram
 **What is Location Readiness?**
 
 A location is "ready" when:
+
 1. Reconciliation is completed
 2. Supervisor verifies all data
 3. Supervisor marks location as READY
 
 Think of it like a checklist before a flight:
+
 - ✓ Fuel checked
 - ✓ Passengers boarded
 - ✓ Doors closed
@@ -575,10 +602,12 @@ Think of it like a checklist before a flight:
 **API Endpoint: PATCH /api/periods/:periodId/locations/:locationId/ready**
 
 Who can use:
+
 - SUPERVISOR (for their assigned locations)
 - ADMIN (for all locations)
 
 What it does:
+
 1. Checks reconciliation exists for this period + location
 2. If no reconciliation → Error: "RECONCILIATION_NOT_COMPLETED"
 3. If reconciliation exists → Update PeriodLocation:
@@ -608,6 +637,7 @@ flowchart TD
 A location **CANNOT** be marked ready without a completed reconciliation. Why?
 
 Reconciliation ensures:
+
 - All stock is counted
 - Variances are explained
 - Financial values are accurate
@@ -640,6 +670,7 @@ graph LR
 Who can use: **ADMIN only**
 
 What it does:
+
 - Validates ALL locations are READY
 - If any location not ready → Error: "LOCATIONS_NOT_READY"
 - Creates an Approval record (type: PERIOD_CLOSE)
@@ -647,6 +678,7 @@ What it does:
 - Returns approval ID
 
 Why separate request from execution?
+
 - Gives admin time to review
 - Prevents accidental close
 - Follows approval workflow pattern
@@ -656,6 +688,7 @@ Why separate request from execution?
 Who can use: **ADMIN only**
 
 What it does:
+
 - Starts database **transaction** (all-or-nothing)
 - For each location:
   - Fetches all stock items
@@ -694,6 +727,7 @@ sequenceDiagram
 ```
 
 Why use transactions?
+
 - **Atomic**: All locations close together or none do
 - **Consistent**: Data always in valid state
 - **Isolated**: No other operations interfere
@@ -704,12 +738,14 @@ Why use transactions?
 Who can use: **ADMIN only**
 
 What it does:
+
 - Updates approval: status = REJECTED
 - Adds rejection comment
 - Reverts period: PENDING_CLOSE → OPEN
 - Locations return to READY status (stay ready)
 
 When to use?
+
 - Found an error in reconciliation
 - Need to post additional transactions
 - Data not ready yet
@@ -719,6 +755,7 @@ When to use?
 **What is a Snapshot?**
 
 A snapshot is a **complete picture** of stock at a specific moment in time. Think of it like:
+
 - A photograph of all your items
 - A backup of all data
 - A time capsule that preserves the moment
@@ -726,6 +763,7 @@ A snapshot is a **complete picture** of stock at a specific moment in time. Thin
 **Why Do We Need Snapshots?**
 
 After period closes, data keeps changing:
+
 - New deliveries arrive
 - Items are used
 - Stock levels change
@@ -767,12 +805,14 @@ graph TB
 For Kitchen on January 31, 2025:
 
 **Stock Items:**
+
 - Flour: 100 KG @ SAR 5.00/KG = SAR 500
 - Sugar: 50 KG @ SAR 3.50/KG = SAR 175
 - Oil: 20 LTR @ SAR 12.00/LTR = SAR 240
 - **Total: SAR 915**
 
 **Reconciliation Summary:**
+
 - Opening Stock: SAR 10,000
 - Receipts: SAR 5,000
 - Transfers In: SAR 500
@@ -789,6 +829,7 @@ For Kitchen on January 31, 2025:
 This snapshot is saved as JSON in the database:
 
 **Where is it stored?**
+
 - Table: PeriodLocation
 - Column: snapshot (JSONB type)
 - Indexed for fast queries
@@ -820,6 +861,7 @@ sequenceDiagram
 **Important Technical Detail:**
 
 We fetch all reconciliations in ONE query (not one-by-one):
+
 - More efficient (fewer database calls)
 - Faster period close
 - Uses Map for O(1) lookup by location ID
@@ -827,6 +869,7 @@ We fetch all reconciliations in ONE query (not one-by-one):
 **Graceful Handling:**
 
 What if a location has no reconciliation?
+
 - Instead of error, we save `reconciliation: null`
 - Snapshot still contains stock items
 - Admin can see which locations missed reconciliation
@@ -836,6 +879,7 @@ What if a location has no reconciliation?
 **What is Roll Forward?**
 
 Roll Forward is creating the **next period automatically** from a closed period. It's like:
+
 - Starting a new semester (carries forward your student info)
 - New financial year (carries forward balances)
 - Next month's budget (based on last month's closing)
@@ -847,6 +891,7 @@ Roll Forward is creating the **next period automatically** from a closed period.
 Who can use: **ADMIN only**
 
 What it does:
+
 1. Validates source period is CLOSED
 2. Calculates next period dates:
    - Start date = day after source period ends
@@ -898,6 +943,7 @@ The admin can customize:
 **Why Start in DRAFT?**
 
 New period starts in DRAFT status so admin can:
+
 - Review copied prices
 - Adjust for known price changes
 - Add new items
@@ -909,12 +955,14 @@ New period starts in DRAFT status so admin can:
 January 31, 2025 - End of month:
 
 **Step 1: Close January**
+
 - All locations reconciled and READY
 - Admin approves period close
 - January status: CLOSED
 - Snapshots created for all locations
 
 **Step 2: Roll Forward**
+
 - Admin clicks "Roll Forward" on January
 - System calculates: February 1 - February 28
 - System copies:
@@ -925,12 +973,14 @@ January 31, 2025 - End of month:
 - Creates February period in DRAFT
 
 **Step 3: Review and Adjust**
+
 - Admin opens February period page
 - Reviews prices
 - Adjusts 5 items with known price increases
 - Adds 2 new items
 
 **Step 4: Open February**
+
 - Admin clicks "Open Period"
 - February status: DRAFT → OPEN
 - Prices lock automatically
@@ -945,11 +995,13 @@ This workflow ensures smooth month-to-month transitions with accurate opening va
 ### What is Period Close UI?
 
 The Period Close UI is the **admin's command center** for managing the month-end close process. Think of it like:
+
 - An airplane cockpit (pilot sees all instruments)
 - A control room (engineer monitors all systems)
 - A dashboard (driver sees speed, fuel, warnings)
 
 The admin needs to see:
+
 - Which locations are ready?
 - What's the checklist status?
 - Can we close the period?
@@ -960,6 +1012,7 @@ The admin needs to see:
 **What is the Period Close Page?**
 
 A dedicated page (`/period-close`) where admins:
+
 - Monitor period close progress
 - See location readiness status
 - Mark locations as ready
@@ -999,6 +1052,7 @@ graph TB
 **Section 1: Current Period Info**
 
 Shows at the top:
+
 - Period name: "January 2025"
 - Date range: "01/01/2025 - 31/01/2025"
 - Status badge: OPEN (green) or PENDING_CLOSE (yellow) or CLOSED (gray)
@@ -1026,6 +1080,7 @@ graph LR
 ```
 
 Each item shows:
+
 - Checkmark if complete
 - Count badge (e.g., "4/4 locations ready")
 - Warning icon if incomplete
@@ -1036,14 +1091,15 @@ Purpose: Admin sees what's done and what's missing
 
 Interactive table showing each location:
 
-| Location | Status | Ready Date | Action |
-|----------|--------|------------|--------|
-| Kitchen | READY | 31/01/2025 14:30 | ✓ Ready |
-| Store | READY | 31/01/2025 16:15 | ✓ Ready |
-| Warehouse | OPEN | - | [Mark Ready] |
-| Central | READY | 31/01/2025 18:00 | ✓ Ready |
+| Location  | Status | Ready Date       | Action       |
+| --------- | ------ | ---------------- | ------------ |
+| Kitchen   | READY  | 31/01/2025 14:30 | ✓ Ready      |
+| Store     | READY  | 31/01/2025 16:15 | ✓ Ready      |
+| Warehouse | OPEN   | -                | [Mark Ready] |
+| Central   | READY  | 31/01/2025 18:00 | ✓ Ready      |
 
 Features:
+
 - Status badge (OPEN = yellow, READY = green, CLOSED = gray)
 - Ready date shows when marked ready
 - "Mark Ready" button for locations not ready yet
@@ -1056,6 +1112,7 @@ Purpose: Admin sees which locations are ready and can mark remaining ones
 Shows different content based on readiness:
 
 **If locations NOT all ready:**
+
 ```
 ⚠️ Locations Not Ready
 
@@ -1066,6 +1123,7 @@ Locations pending: Warehouse (1/4)
 ```
 
 **If all locations READY:**
+
 ```
 ✓ Ready to Close Period
 
@@ -1192,6 +1250,7 @@ sequenceDiagram
 **Why Do We Need Approval Components?**
 
 Approvals are used in multiple places:
+
 - Period close (admin approval)
 - Transfers (supervisor approval)
 - PRF/PO (supervisor approval - future feature)
@@ -1220,6 +1279,7 @@ Two components that work together:
 ```
 
 **Props it accepts:**
+
 - `status` - The approval status (PENDING, APPROVED, REJECTED)
 
 **How it works:**
@@ -1311,6 +1371,7 @@ graph TB
 **Interactive Features:**
 
 **If status is PENDING:**
+
 - Shows two buttons: [Reject] [Approve]
 - Clicking Approve → Shows confirmation → Calls API → Shows success
 - Clicking Reject → Shows rejection form → Requires comment → Calls API
@@ -1334,11 +1395,13 @@ graph TB
 ```
 
 **If status is APPROVED:**
+
 - Shows reviewer name and date
 - No action buttons
 - Read-only display
 
 **If status is REJECTED:**
+
 - Shows rejection reason
 - Shows who rejected and when
 - No action buttons
@@ -1346,6 +1409,7 @@ graph TB
 **Component Props:**
 
 The component accepts:
+
 - `approval` - The full approval object with all details
 - Entity details are nested inside approval object
 
@@ -1381,11 +1445,13 @@ graph TB
 ### What is Reporting?
 
 Reporting is the process of **extracting data** from the system and **presenting it** in a useful format for decision-making. Think of it like:
+
 - A school report card (shows your grades)
 - A bank statement (shows your transactions)
 - A health checkup report (shows test results)
 
 Management needs reports to answer questions like:
+
 - What items do we have in stock right now?
 - How much did we spend on food this month?
 - Which suppliers did we buy from?
@@ -1422,12 +1488,14 @@ graph TB
 ```
 
 Without reports:
+
 - Management can't make decisions
 - Can't track spending
 - Can't identify problems
 - Can't plan for the future
 
 With reports:
+
 - Clear visibility into operations
 - Data-driven decisions
 - Early problem detection
@@ -1442,11 +1510,13 @@ We built **4 comprehensive report endpoints**, each designed for a specific busi
 **Purpose:** Show current stock levels across all locations
 
 **Who uses it:**
+
 - Admin: See stock across all locations
 - Supervisor: See stock across all locations
 - Operator: See stock for their assigned locations only
 
 **Filters available:**
+
 - Location: Show one or multiple locations
 - Category: Filter by item category (Dry Goods, Fresh Produce, etc.)
 
@@ -1481,16 +1551,19 @@ graph TB
 **Example data structure:**
 
 Summary by location:
+
 - Kitchen: 45 items, SAR 12,000
 - Store: 87 items, SAR 28,000
 - Warehouse: 120 items, SAR 55,000
 
 Item details:
+
 - FLOUR-001 | Flour All Purpose | Dry Goods | Kitchen | 100 KG | SAR 5.00 | SAR 500
 - SUGAR-001 | Sugar White | Dry Goods | Kitchen | 50 KG | SAR 3.50 | SAR 175
 - OIL-001 | Vegetable Oil | Dry Goods | Store | 20 LTR | SAR 12.00 | SAR 240
 
 Low stock indicators:
+
 - Shows ⚠️ if stock below reorder level
 - Helps identify items to reorder
 
@@ -1501,6 +1574,7 @@ Low stock indicators:
 **Who uses it:** Admin, Supervisor
 
 **Filters available:**
+
 - Period: Which month to show (REQUIRED)
 - Location: Which location (optional)
 
@@ -1540,13 +1614,16 @@ graph TB
 **Key Calculations:**
 
 **Consumption** = Issues + Adjustments + Condemnations - Credits
+
 - Represents actual food cost for the period
 
 **Cost per Manday** = Consumption ÷ Total Mandays
+
 - Shows how much we spent per person per day
 - Critical metric for food cost control
 
 **Example:**
+
 - Kitchen consumption: SAR 14,000
 - Total mandays: 600 people × days
 - Cost per manday: SAR 14,000 ÷ 600 = SAR 23.33 per person per day
@@ -1558,6 +1635,7 @@ graph TB
 **Who uses it:** Admin, Supervisor, Operator (limited)
 
 **Filters available:**
+
 - Period: Which month
 - Location: Which location received deliveries
 - Supplier: Filter by specific supplier
@@ -1592,12 +1670,14 @@ graph TB
 **Price Variance Tracking:**
 
 Each delivery line shows:
+
 - Actual unit price (what we paid)
 - Period price (what we expected)
 - Variance amount (difference)
 - Variance flag (⚠️ if prices differ)
 
 **Example:**
+
 - Item: Flour
 - Expected (period price): SAR 5.00/KG
 - Actual (delivery price): SAR 5.80/KG
@@ -1605,6 +1685,7 @@ Each delivery line shows:
 - Flag: ⚠️ Price increased
 
 Helps management identify:
+
 - Which suppliers raised prices
 - Which items became more expensive
 - Budget impact of price changes
@@ -1616,6 +1697,7 @@ Helps management identify:
 **Who uses it:** Admin, Supervisor
 
 **Filters available:**
+
 - Period: Which month
 - Location: Which location issued stock
 - Cost Centre: Department filter (Kitchen, Catering, Room Service)
@@ -1656,11 +1738,13 @@ graph TB
 **Cost Centre Analysis:**
 
 Breaks down consumption by department:
+
 - Which department used the most?
 - What's the cost distribution?
 - Are there any unusual patterns?
 
 **Example:**
+
 - Kitchen: SAR 8,000 (57%)
 - Catering: SAR 3,500 (25%)
 - Room Service: SAR 2,500 (18%)
@@ -1668,11 +1752,13 @@ Breaks down consumption by department:
 **Top Items Analysis:**
 
 Shows top 10 items by total value:
+
 1. Flour: SAR 2,000 (250 KG × SAR 8.00)
 2. Oil: SAR 1,500 (125 LTR × SAR 12.00)
 3. Sugar: SAR 1,200 (340 KG × SAR 3.53)
 
 Helps identify:
+
 - Most expensive items
 - High-usage items
 - Opportunities for bulk purchasing
@@ -1788,11 +1874,11 @@ graph TB
 
 **Data Table:**
 
-| Code | Item Name | Category | Location | Qty | Unit | WAC | Value | Status |
-|------|-----------|----------|----------|-----|------|-----|-------|--------|
-| FLOUR-001 | Flour All Purpose | Dry Goods | Kitchen | 100 | KG | SAR 5.00 | SAR 500.00 | ✓ |
-| SUGAR-001 | Sugar White | Dry Goods | Kitchen | 50 | KG | SAR 3.50 | SAR 175.00 | ⚠️ Low |
-| OIL-001 | Vegetable Oil | Dry Goods | Store | 20 | LTR | SAR 12.00 | SAR 240.00 | ✓ |
+| Code      | Item Name         | Category  | Location | Qty | Unit | WAC       | Value      | Status |
+| --------- | ----------------- | --------- | -------- | --- | ---- | --------- | ---------- | ------ |
+| FLOUR-001 | Flour All Purpose | Dry Goods | Kitchen  | 100 | KG   | SAR 5.00  | SAR 500.00 | ✓      |
+| SUGAR-001 | Sugar White       | Dry Goods | Kitchen  | 50  | KG   | SAR 3.50  | SAR 175.00 | ⚠️ Low |
+| OIL-001   | Vegetable Oil     | Dry Goods | Store    | 20  | LTR  | SAR 12.00 | SAR 240.00 | ✓      |
 
 **Export Button:**
 
@@ -1830,12 +1916,13 @@ Note: Period is REQUIRED - can't generate reconciliation without selecting a per
 
 **Data Table:**
 
-| Location | Opening | Receipts | Issues | Calculated Closing | Actual Closing | Variance | Status |
-|----------|---------|----------|--------|-------------------|----------------|----------|--------|
-| Kitchen | SAR 10,000 | SAR 5,000 | SAR 14,000 | SAR 915 | SAR 915 | SAR 0 | ✓ Match |
-| Store | SAR 25,000 | SAR 8,000 | SAR 5,000 | SAR 28,000 | SAR 28,100 | SAR 100 | ⚠️ Variance |
+| Location | Opening    | Receipts  | Issues     | Calculated Closing | Actual Closing | Variance | Status      |
+| -------- | ---------- | --------- | ---------- | ------------------ | -------------- | -------- | ----------- |
+| Kitchen  | SAR 10,000 | SAR 5,000 | SAR 14,000 | SAR 915            | SAR 915        | SAR 0    | ✓ Match     |
+| Store    | SAR 25,000 | SAR 8,000 | SAR 5,000  | SAR 28,000         | SAR 28,100     | SAR 100  | ⚠️ Variance |
 
 Status badge:
+
 - ✓ Green if variance = 0 (perfect match)
 - ⚠️ Yellow if variance exists (needs investigation)
 
@@ -1844,6 +1931,7 @@ Status badge:
 **What is CSV Export?**
 
 CSV (Comma-Separated Values) is a universal file format that:
+
 - Opens in Excel, Google Sheets, Numbers
 - Easy to share via email
 - Can be imported into other systems
@@ -1852,6 +1940,7 @@ CSV (Comma-Separated Values) is a universal file format that:
 **Why Do We Need CSV Export?**
 
 Management often needs to:
+
 - Open reports in Excel for further analysis
 - Share reports with external auditors
 - Create charts and pivot tables
@@ -1889,10 +1978,12 @@ graph TB
 **Example:**
 
 Input (JavaScript array):
+
 - `{ code: "FLOUR-001", name: "Flour", qty: 100, wac: 5.00 }`
 - `{ code: "SUGAR-001", name: "Sugar", qty: 50, wac: 3.50 }`
 
 Output (CSV string):
+
 ```
 Code,Name,Quantity,WAC
 FLOUR-001,Flour,100,5.00
@@ -1906,6 +1997,7 @@ SUGAR-001,Sugar,50,3.50
 **Example:**
 
 Input:
+
 - Headers: `["Code", "Name", "Quantity"]`
 - Rows: `[["FLOUR-001", "Flour", "100"], ["SUGAR-001", "Sugar", "50"]]`
 
@@ -1937,6 +2029,7 @@ sequenceDiagram
 ```
 
 **Important:** Adds UTF-8 BOM (Byte Order Mark)
+
 - Ensures Excel displays Arabic characters correctly (if we add Arabic support later)
 - Prevents encoding issues
 
@@ -1947,6 +2040,7 @@ sequenceDiagram
 **Usage:**
 
 From report page:
+
 - Prepare data array
 - Call `exportToCSV(data, filename)`
 - File downloads automatically
@@ -1956,11 +2050,13 @@ From report page:
 **Purpose:** Format numbers consistently for CSV
 
 **Number formatting:**
+
 - 1234.5678 → "1234.57" (2 decimals)
 - 1000000 → "1000000.00"
 - null → "0.00"
 
 **Currency formatting:**
+
 - 1234.5678 → "SAR 1,234.57"
 - 1000000 → "SAR 1,000,000.00"
 - Includes thousands separators for readability
@@ -2234,6 +2330,7 @@ flowchart TD
 **1. Period Locking is Critical**
 
 Why we lock periods:
+
 - Prevents changing historical data
 - Ensures audit compliance
 - Maintains financial integrity
@@ -2242,6 +2339,7 @@ Why we lock periods:
 **2. Price Locking Detects Problems**
 
 By locking period prices:
+
 - Automatic detection of supplier price changes
 - Early warning of budget impacts
 - Helps negotiate better prices
@@ -2250,6 +2348,7 @@ By locking period prices:
 **3. Coordinated Close Prevents Errors**
 
 Closing all locations together:
+
 - Ensures consistent cutoff date
 - Prevents partial closures
 - Uses database transactions for safety
@@ -2258,6 +2357,7 @@ Closing all locations together:
 **4. Snapshots Preserve History**
 
 Period close snapshots:
+
 - Create permanent record of month-end stock
 - Include both stock items and reconciliation data
 - Enable historical reporting
@@ -2266,6 +2366,7 @@ Period close snapshots:
 **5. Roll Forward Ensures Continuity**
 
 Automatic roll forward:
+
 - Closing values = Next period's opening values
 - Prevents manual entry errors
 - Ensures financial accuracy
@@ -2281,6 +2382,7 @@ Automatic roll forward:
 
 **Example:**
 Closing 4 locations - if location 3 fails:
+
 - Without transaction: Locations 1 and 2 are closed, 3 and 4 are open (BAD!)
 - With transaction: All 4 remain open, try again after fixing error (GOOD!)
 
@@ -2291,6 +2393,7 @@ Closing 4 locations - if location 3 fails:
 **Why:** Snapshots contain varying amounts of data
 
 **Example:**
+
 ```
 snapshot: {
   stockItems: [100 items],
@@ -2306,6 +2409,7 @@ snapshot: {
 **Why:** Write once, use many times
 
 **Example:**
+
 - ApprovalStatus used in: Period close, Transfers, NCRs
 - Benefits: Consistency, less code, easier updates
 
@@ -2317,6 +2421,7 @@ snapshot: {
 
 **Example:**
 Stock Report:
+
 - Operator sees: Only their assigned locations
 - Supervisor/Admin sees: All locations
 
@@ -2335,11 +2440,13 @@ With BOM: Arabic text displays correctly
 **1. Validate at Multiple Levels**
 
 **Client-side (UI):**
+
 - Immediate feedback
 - Better user experience
 - Prevents unnecessary API calls
 
 **Server-side (API):**
+
 - Cannot be bypassed
 - Ensures data integrity
 - Security enforcement
@@ -2353,6 +2460,7 @@ Good error: "Cannot mark location ready: reconciliation not completed. Please co
 **3. Provide Loading States**
 
 Always show:
+
 - Spinner when loading data
 - Progress when processing
 - Disable buttons during operations
@@ -2361,12 +2469,14 @@ Always show:
 **4. Use Consistent Patterns**
 
 **All report pages follow same structure:**
+
 - Filter panel at top
 - Summary cards in row
 - Data table below
 - Export button at top-right
 
 Benefits:
+
 - Users know what to expect
 - Faster development
 - Easier to maintain
@@ -2377,10 +2487,12 @@ Benefits:
 **Bad:** Fetch reconciliations one-by-one in a loop
 
 For 4 locations:
+
 - Good: 1 database query
 - Bad: 4 database queries
 
 For 100 locations (future):
+
 - Good: 1 database query
 - Bad: 100 database queries (VERY SLOW!)
 
@@ -2391,6 +2503,7 @@ For 100 locations (future):
 **Problem:** If someone changes January data in March, reports are wrong
 
 **Solution:** Check period status before all operations:
+
 ```
 if (period.status === "CLOSED") {
   throw error("Period is closed - no changes allowed")
@@ -2414,6 +2527,7 @@ if (period.status === "CLOSED") {
 **Problem:** Report shows data but nobody knows when it was generated or what filters were applied
 
 **Solution:** Always include:
+
 - Generation timestamp
 - User who generated
 - Filters applied
@@ -2424,6 +2538,7 @@ if (period.status === "CLOSED") {
 **Problem:** System crashes if reconciliation doesn't exist
 
 **Solution:** Use null checks and show appropriate messages:
+
 ```
 if (reconciliation exists) {
   Show reconciliation data
@@ -2435,25 +2550,30 @@ if (reconciliation exists) {
 ### What We Accomplished in Phase 3
 
 **APIs Built:**
+
 - 4 Period management endpoints
 - 4 Report endpoints
 - Period close workflow (3 endpoints)
 - Roll forward endpoint
 
 **UI Pages Built:**
+
 - Period management page
 - Period close page
 - Reports hub page
 - 4 individual report pages
 
 **Components Built:**
+
 - ApprovalStatus component
 - ApprovalRequest component
 
 **Utilities Built:**
+
 - CSV export utility (5 functions)
 
 **Business Rules Implemented:**
+
 - Price locking when period opens
 - Location readiness validation
 - Coordinated period close
@@ -2463,6 +2583,7 @@ if (reconciliation exists) {
 - Role-based report filtering
 
 **Technical Features:**
+
 - Database transactions for period close
 - JSON snapshots for flexible data storage
 - Efficient batch queries
@@ -2473,6 +2594,7 @@ if (reconciliation exists) {
 ### Next Steps (Post-Phase 3)
 
 **Phase 4 Would Include:**
+
 - Polish and performance optimization
 - Additional validations
 - Enhanced error handling
@@ -2480,6 +2602,7 @@ if (reconciliation exists) {
 - Comprehensive testing
 
 **Post-MVP Enhancements:**
+
 - Email notifications for period close
 - Automated period rollover
 - Advanced report filters
@@ -2505,6 +2628,7 @@ Phase 3 completed the **Period Management** and **Reporting** system, enabling t
 ✅ **Export data to CSV**
 
 The system now provides **complete month-end close functionality** with:
+
 - Financial integrity through locked periods
 - Audit trail through snapshots
 - Price variance detection

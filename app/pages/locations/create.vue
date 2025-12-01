@@ -230,17 +230,9 @@ const formData = reactive({
 
 // Validation schema
 const schema = z.object({
-  code: z
-    .string()
-    .min(1, "Code is required")
-    .max(10, "Code must be at most 10 characters"),
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(100, "Name must be at most 100 characters"),
-  type: z
-    .enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"])
-    .describe("Location type is required"),
+  code: z.string().min(1, "Code is required").max(10, "Code must be at most 10 characters"),
+  name: z.string().min(1, "Name is required").max(100, "Name must be at most 100 characters"),
+  type: z.enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"]).describe("Location type is required"),
   description: z.string().max(500, "Description must be at most 500 characters").optional(),
   address: z.string().max(500, "Address must be at most 500 characters").optional(),
   timezone: z.string().max(50).default("Asia/Riyadh"),

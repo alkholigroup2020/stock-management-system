@@ -126,7 +126,7 @@ const columns = [
 
 // Status badge helper
 function getStatusColor(
-  status: NCR["status"],
+  status: NCR["status"]
 ): "success" | "warning" | "error" | "neutral" | "primary" {
   const statusColors = {
     OPEN: "primary" as const,
@@ -369,10 +369,7 @@ onMounted(async () => {
       <TableSkeleton v-if="loading" :columns="7" :rows="8" />
 
       <!-- NCRs Table -->
-      <div
-        v-else-if="hasNCRs"
-        class="overflow-hidden rounded-lg border border-default bg-elevated"
-      >
+      <div v-else-if="hasNCRs" class="overflow-hidden rounded-lg border border-default bg-elevated">
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
@@ -448,12 +445,7 @@ onMounted(async () => {
         "
       >
         <template v-if="canCreateNCR()" #action>
-          <UButton
-            color="primary"
-            icon="i-lucide-plus"
-            label="New NCR"
-            @click="goToNewNCR"
-          />
+          <UButton color="primary" icon="i-lucide-plus" label="New NCR" @click="goToNewNCR" />
         </template>
       </EmptyState>
     </div>

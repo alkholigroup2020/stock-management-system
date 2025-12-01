@@ -29,22 +29,22 @@ You are a **Frontend Web Developer** specializing in the Stock Management System
 
 ### Current Stack (from package.json)
 
-| Package | Version | Documentation |
-|---------|---------|---------------|
-| **nuxt** | ^4.2.0 | https://nuxt.com/docs |
-| **@nuxt/ui** | ^4.1.0 | https://ui.nuxt.com |
-| **@nuxt/image** | ^1.11.0 | https://image.nuxt.com |
-| **vue** | ^3.5.22 | https://vuejs.org/guide |
-| **pinia** | ^3.0.4 | https://pinia.vuejs.org |
-| **zod** | ^4.1.12 | Validation library |
-| **dayjs** | ^1.11.19 | Date handling |
+| Package         | Version  | Documentation           |
+| --------------- | -------- | ----------------------- |
+| **nuxt**        | ^4.2.0   | https://nuxt.com/docs   |
+| **@nuxt/ui**    | ^4.1.0   | https://ui.nuxt.com     |
+| **@nuxt/image** | ^1.11.0  | https://image.nuxt.com  |
+| **vue**         | ^3.5.22  | https://vuejs.org/guide |
+| **pinia**       | ^3.0.4   | https://pinia.vuejs.org |
+| **zod**         | ^4.1.12  | Validation library      |
+| **dayjs**       | ^1.11.19 | Date handling           |
 
 ### MCP Tools Available
 
-| Tool | Purpose |
-|------|---------|
+| Tool               | Purpose                                                           |
+| ------------------ | ----------------------------------------------------------------- |
 | **nuxt-ui-remote** | Nuxt UI component documentation lookup at https://ui.nuxt.com/mcp |
-| **playwright** | Browser automation for responsive testing across all screen sizes |
+| **playwright**     | Browser automation for responsive testing across all screen sizes |
 
 **Usage**: When implementing UI features, use the `nuxt-ui-remote` MCP to look up component APIs, props, slots, and examples. Use Playwright MCP to verify responsive behavior.
 
@@ -160,11 +160,11 @@ You are a **Frontend Web Developer** specializing in the Stock Management System
 
 ### Screen Size Breakpoints
 
-| Device | Width | Height | Tailwind Prefix |
-|--------|-------|--------|-----------------|
-| Mobile | 375px | 667px | Default (no prefix) |
-| Tablet | 768px | 1024px | `sm:`, `md:` |
-| Desktop | 1280px | 800px | `lg:`, `xl:` |
+| Device  | Width  | Height | Tailwind Prefix     |
+| ------- | ------ | ------ | ------------------- |
+| Mobile  | 375px  | 667px  | Default (no prefix) |
+| Tablet  | 768px  | 1024px | `sm:`, `md:`        |
+| Desktop | 1280px | 800px  | `lg:`, `xl:`        |
 
 ### What to Check
 
@@ -336,6 +336,7 @@ app/components/Footer.vue               → <Footer />
 ```
 
 **Rules**:
+
 - Horizontal padding: `px-3` (mobile), `md:px-4` (desktop)
 - Vertical padding: `py-0` (mobile), `md:py-1` (desktop)
 - Section spacing: `space-y-3`
@@ -457,25 +458,25 @@ const getButtonClass = (value: string | null) => {
 
 ### Page Layout Rules
 
-| Element | Value |
-|---------|-------|
-| **Page Container** | `px-3 py-0 md:px-4 md:py-1 space-y-3` |
+| Element                | Value                                                             |
+| ---------------------- | ----------------------------------------------------------------- |
+| **Page Container**     | `px-3 py-0 md:px-4 md:py-1 space-y-3`                             |
 | **Page Content Width** | Full width by default (no max-width), sections as direct children |
-| **Section Spacing** | `space-y-3` (automatic via container) |
-| **Card Padding** | `:ui="{ body: 'p-3 sm:p-4' }"` |
-| **Header Icon** | `w-8 h-8 sm:w-12 sm:h-12 text-primary` (NO background) |
-| **Header Title** | `text-xl sm:text-3xl font-bold text-primary` |
-| **Buttons - Primary** | `color="primary"`, always `cursor-pointer`, use `rounded-full` |
-| **Buttons - Cancel** | `color="error" variant="soft"`, always `cursor-pointer` |
+| **Section Spacing**    | `space-y-3` (automatic via container)                             |
+| **Card Padding**       | `:ui="{ body: 'p-3 sm:p-4' }"`                                    |
+| **Header Icon**        | `w-8 h-8 sm:w-12 sm:h-12 text-primary` (NO background)            |
+| **Header Title**       | `text-xl sm:text-3xl font-bold text-primary`                      |
+| **Buttons - Primary**  | `color="primary"`, always `cursor-pointer`, use `rounded-full`    |
+| **Buttons - Cancel**   | `color="error" variant="soft"`, always `cursor-pointer`           |
 
 ### Form Layout Rules
 
-| Element | Value |
-|---------|-------|
-| **Form Grid** | `grid grid-cols-1 lg:grid-cols-2 gap-6` |
-| **Input Width** | Always `class="w-full"` |
-| **Full-Width Fields** | Add `lg:col-span-2` (textareas, descriptions) |
-| **Single Column Settings** | `space-y-6` with `w-full lg:w-1/2` per field |
+| Element                    | Value                                         |
+| -------------------------- | --------------------------------------------- |
+| **Form Grid**              | `grid grid-cols-1 lg:grid-cols-2 gap-6`       |
+| **Input Width**            | Always `class="w-full"`                       |
+| **Full-Width Fields**      | Add `lg:col-span-2` (textareas, descriptions) |
+| **Single Column Settings** | `space-y-6` with `w-full lg:w-1/2` per field  |
 
 ### Colors (Tailwind Tokens)
 
@@ -807,10 +808,10 @@ const statusIcon = computed(() => {
 
 ## Version History
 
-| Version | Date       | Changes                                                    |
-| ------- | ---------- | ---------------------------------------------------------- |
-| 1.0     | 2025-01    | Initial frontend agent configuration                       |
-| 1.1     | 2025-11-30 | Removed nuxt-ui-remote MCP, updated to Nuxt UI v4.1.0      |
+| Version | Date       | Changes                                                                                                     |
+| ------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2025-01    | Initial frontend agent configuration                                                                        |
+| 1.1     | 2025-11-30 | Removed nuxt-ui-remote MCP, updated to Nuxt UI v4.1.0                                                       |
 | 2.0     | 2025-12-01 | Updated to follow UI_DESIGN_SYSTEM.md, added Playwright testing, package.json awareness, modern UI/UX focus |
 
 ---

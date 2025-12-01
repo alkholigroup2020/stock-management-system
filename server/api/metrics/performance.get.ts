@@ -41,9 +41,7 @@ export default defineEventHandler(async (event) => {
   const slowRequests = allMetrics.filter((m) => m.duration > 1000).length;
   const avgDuration =
     totalRequests > 0
-      ? Math.round(
-          allMetrics.reduce((sum, m) => sum + m.duration, 0) / totalRequests
-        )
+      ? Math.round(allMetrics.reduce((sum, m) => sum + m.duration, 0) / totalRequests)
       : 0;
 
   return {

@@ -25,10 +25,10 @@ The Stock Management System uses environment variables to configure database con
 
 ### Public vs Private Variables
 
-| Type | Prefix | Exposure | Use Case | Example |
-|------|--------|----------|----------|---------|
-| Private | None | Server only | Database URLs, API keys, secrets | `DATABASE_URL` |
-| Public | `NUXT_PUBLIC_` | Client & server | Site URL, currency, feature flags | `NUXT_PUBLIC_CURRENCY` |
+| Type    | Prefix         | Exposure        | Use Case                          | Example                |
+| ------- | -------------- | --------------- | --------------------------------- | ---------------------- |
+| Private | None           | Server only     | Database URLs, API keys, secrets  | `DATABASE_URL`         |
+| Public  | `NUXT_PUBLIC_` | Client & server | Site URL, currency, feature flags | `NUXT_PUBLIC_CURRENCY` |
 
 **Important:** Never put sensitive data in `NUXT_PUBLIC_*` variables as they are bundled in the client-side JavaScript.
 

@@ -136,9 +136,7 @@ async function fetchTransfer() {
   error.value = null;
 
   try {
-    const response = await $fetch<{ transfer: Transfer }>(
-      `/api/transfers/${transferId.value}`
-    );
+    const response = await $fetch<{ transfer: Transfer }>(`/api/transfers/${transferId.value}`);
 
     transfer.value = response.transfer;
   } catch (err: any) {
@@ -423,7 +421,7 @@ onMounted(async () => {
                     <div class="font-medium">{{ line.item.name }}</div>
                     <div v-if="line.item.category" class="text-caption">
                       {{ line.item.category }}
-                      <span v-if="line.item.sub_category"> / {{ line.item.sub_category }}</span>
+                      <span v-if="line.item.sub_category">/ {{ line.item.sub_category }}</span>
                     </div>
                   </td>
 

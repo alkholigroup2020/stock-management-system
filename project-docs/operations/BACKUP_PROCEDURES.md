@@ -34,13 +34,13 @@ This document outlines the backup and recovery procedures for the Stock Manageme
 
 ### Backup Frequency
 
-| Data Type | Frequency | Retention Period |
-|-----------|-----------|------------------|
-| Database (Automatic) | Daily | 7 days (Free tier) |
-| Database (Manual) | Weekly | 30 days |
-| Database (Monthly) | Monthly | 12 months |
-| Code Repository | On every commit | Unlimited |
-| Environment Variables | On every change | Manual versioning |
+| Data Type             | Frequency       | Retention Period   |
+| --------------------- | --------------- | ------------------ |
+| Database (Automatic)  | Daily           | 7 days (Free tier) |
+| Database (Manual)     | Weekly          | 30 days            |
+| Database (Monthly)    | Monthly         | 12 months          |
+| Code Repository       | On every commit | Unlimited          |
+| Environment Variables | On every change | Manual versioning  |
 
 ---
 
@@ -87,6 +87,7 @@ Perform manual backups weekly as an additional safeguard.
    - Select the production project
 
 2. **Create Manual Backup:**
+
    ```bash
    # Option 1: Use Supabase CLI (recommended)
    supabase db dump --project-ref YOUR_PROJECT_REF > backup-$(date +%Y%m%d).sql
@@ -98,6 +99,7 @@ Perform manual backups weekly as an additional safeguard.
    ```
 
 3. **Verify Backup:**
+
    ```bash
    # Check file size (should be > 100 KB for production database)
    ls -lh backup-$(date +%Y%m%d).sql
@@ -149,6 +151,7 @@ Vercel maintains deployment history:
 #### Monthly Environment Variables Backup (First Monday of each month)
 
 1. **Export from Vercel:**
+
    ```bash
    # Using Vercel CLI
    vercel env pull .env.production.backup
@@ -240,12 +243,14 @@ Perform these checks on the first Monday of each month:
 #### Restore from Manual Backup
 
 1. **Prepare restore:**
+
    ```bash
    # Download backup file from cloud storage
    # Decrypt if encrypted
    ```
 
 2. **Restore database:**
+
    ```bash
    # Using psql
    psql "postgresql://postgres.[PROJECT]:[PASSWORD]@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres" \
@@ -270,6 +275,7 @@ Perform these checks on the first Monday of each month:
    - Click "..." menu → "Promote to Production"
 
 2. **Via Vercel CLI:**
+
    ```bash
    # List recent deployments
    vercel ls
@@ -292,11 +298,13 @@ git push --force
 ### Environment Variables Restoration
 
 1. **Decrypt backup file:**
+
    ```bash
    # Using 7-Zip or GPG
    ```
 
 2. **Import to Vercel:**
+
    ```bash
    # Using Vercel CLI
    vercel env add VARIABLE_NAME production < value.txt
@@ -310,15 +318,16 @@ git push --force
 
 ## Recovery Time Objectives
 
-| Recovery Scenario | RTO (Recovery Time Objective) | RPO (Recovery Point Objective) |
-|-------------------|------------------------------|-------------------------------|
-| Database restore (automatic backup) | 30 minutes | 24 hours |
-| Database restore (manual backup) | 1 hour | 7 days |
-| Code rollback | 10 minutes | Last deployment (minutes) |
-| Full system recovery | 2 hours | 24 hours |
-| Environment variable recovery | 30 minutes | 30 days |
+| Recovery Scenario                   | RTO (Recovery Time Objective) | RPO (Recovery Point Objective) |
+| ----------------------------------- | ----------------------------- | ------------------------------ |
+| Database restore (automatic backup) | 30 minutes                    | 24 hours                       |
+| Database restore (manual backup)    | 1 hour                        | 7 days                         |
+| Code rollback                       | 10 minutes                    | Last deployment (minutes)      |
+| Full system recovery                | 2 hours                       | 24 hours                       |
+| Environment variable recovery       | 30 minutes                    | 30 days                        |
 
 **Definitions:**
+
 - **RTO:** Maximum acceptable time to restore service
 - **RPO:** Maximum acceptable data loss (how old can the backup be)
 
@@ -483,9 +492,9 @@ echo "Environment variables backed up and encrypted: $BACKUP_FILE.7z"
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-27 | System Administrator | Initial documentation |
+| Version | Date       | Author               | Changes               |
+| ------- | ---------- | -------------------- | --------------------- |
+| 1.0     | 2025-11-27 | System Administrator | Initial documentation |
 
 ---
 

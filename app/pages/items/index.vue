@@ -47,10 +47,7 @@
       </div>
 
       <!-- Active Filter Chips -->
-      <div
-        v-if="searchQuery || selectedCategory"
-        class="mt-4 flex flex-wrap gap-2"
-      >
+      <div v-if="searchQuery || selectedCategory" class="mt-4 flex flex-wrap gap-2">
         <UBadge v-if="searchQuery" color="primary" variant="subtle" size="md">
           Search: {{ searchQuery }}
           <button class="ml-1 hover:text-error" @click="clearSearch">
@@ -58,12 +55,7 @@
           </button>
         </UBadge>
 
-        <UBadge
-          v-if="selectedCategory"
-          color="primary"
-          variant="subtle"
-          size="md"
-        >
+        <UBadge v-if="selectedCategory" color="primary" variant="subtle" size="md">
           Category: {{ selectedCategory }}
           <button class="ml-1 hover:text-error" @click="clearCategory">
             <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
@@ -127,41 +119,13 @@
         <table class="min-w-full divide-y divide-default">
           <thead>
             <tr class="bg-elevated">
-              <th
-                class="px-4 py-3 text-left text-label uppercase tracking-wider"
-              >
-                Code
-              </th>
-              <th
-                class="px-4 py-3 text-left text-label uppercase tracking-wider"
-              >
-                Name
-              </th>
-              <th
-                class="px-4 py-3 text-left text-label uppercase tracking-wider"
-              >
-                Unit
-              </th>
-              <th
-                class="px-4 py-3 text-left text-label uppercase tracking-wider"
-              >
-                Category
-              </th>
-              <th
-                class="px-4 py-3 text-right text-label uppercase tracking-wider"
-              >
-                On-Hand
-              </th>
-              <th
-                class="px-4 py-3 text-right text-label uppercase tracking-wider"
-              >
-                WAC
-              </th>
-              <th
-                class="px-4 py-3 text-right text-label uppercase tracking-wider"
-              >
-                Value
-              </th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Code</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Name</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Category</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">On-Hand</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">WAC</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Value</th>
               <th
                 v-if="canEditItems()"
                 class="px-4 py-3 text-right text-label uppercase tracking-wider"
@@ -177,20 +141,13 @@
               class="hover:bg-elevated transition-colors cursor-pointer"
               @click="navigateTo(`/items/${item.id}`)"
             >
-              <td
-                class="px-4 py-4 whitespace-nowrap text-body font-medium"
-              >
+              <td class="px-4 py-4 whitespace-nowrap text-body font-medium">
                 {{ item.code }}
               </td>
               <td class="px-4 py-4 text-body">
                 <div class="flex items-center gap-2">
                   {{ item.name }}
-                  <UBadge
-                    v-if="!item.is_active"
-                    color="neutral"
-                    variant="subtle"
-                    size="xs"
-                  >
+                  <UBadge v-if="!item.is_active" color="neutral" variant="subtle" size="xs">
                     Inactive
                   </UBadge>
                 </div>
@@ -201,25 +158,16 @@
               <td class="px-4 py-4 whitespace-nowrap text-caption">
                 {{ item.category || "-" }}
               </td>
-              <td
-                class="px-4 py-4 whitespace-nowrap text-body text-right"
-              >
+              <td class="px-4 py-4 whitespace-nowrap text-body text-right">
                 {{ formatQuantity(getStockData(item).onHand) }}
               </td>
-              <td
-                class="px-4 py-4 whitespace-nowrap text-body text-right"
-              >
+              <td class="px-4 py-4 whitespace-nowrap text-body text-right">
                 {{ formatCurrency(getStockData(item).wac) }}
               </td>
-              <td
-                class="px-4 py-4 whitespace-nowrap text-body text-right font-medium"
-              >
+              <td class="px-4 py-4 whitespace-nowrap text-body text-right font-medium">
                 {{ formatCurrency(getStockData(item).value) }}
               </td>
-              <td
-                v-if="canEditItems()"
-                class="px-4 py-4 whitespace-nowrap text-sm text-right"
-              >
+              <td v-if="canEditItems()" class="px-4 py-4 whitespace-nowrap text-sm text-right">
                 <UButton
                   color="primary"
                   variant="ghost"
@@ -236,13 +184,8 @@
       </div>
 
       <!-- Pagination -->
-      <div
-        v-if="pagination.totalPages > 1"
-        class="mt-6 border-t border-default pt-4"
-      >
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
+      <div v-if="pagination.totalPages > 1" class="mt-6 border-t border-default pt-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <!-- Pagination Info -->
           <div class="text-caption">
             Showing
@@ -251,9 +194,7 @@
             </span>
             to
             <span class="font-medium">
-              {{
-                Math.min(pagination.page * pagination.limit, pagination.total)
-              }}
+              {{ Math.min(pagination.page * pagination.limit, pagination.total) }}
             </span>
             of
             <span class="font-medium">
@@ -502,11 +443,7 @@ const visiblePages = computed(() => {
     }
 
     // Show pages around current page
-    for (
-      let i = Math.max(2, current - 1);
-      i <= Math.min(total - 1, current + 1);
-      i++
-    ) {
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
       pages.push(i);
     }
 

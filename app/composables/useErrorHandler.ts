@@ -234,10 +234,7 @@ export const useErrorHandler = () => {
       let description = errorMsg.description;
 
       // Special handling for insufficient stock
-      if (
-        parsed.code === "INSUFFICIENT_STOCK" &&
-        parsed.details?.insufficient_items?.length > 0
-      ) {
+      if (parsed.code === "INSUFFICIENT_STOCK" && parsed.details?.insufficient_items?.length > 0) {
         const items = parsed.details.insufficient_items;
         const itemList = items
           .map(
@@ -332,11 +329,7 @@ export const useErrorHandler = () => {
   /**
    * Handle success with toast notification
    */
-  const handleSuccess = (
-    title: string,
-    description?: string,
-    options?: { duration?: number }
-  ) => {
+  const handleSuccess = (title: string, description?: string, options?: { duration?: number }) => {
     const toastOptions: any = {};
     if (description) toastOptions.description = description;
     if (options?.duration) toastOptions.duration = options.duration;
@@ -347,10 +340,7 @@ export const useErrorHandler = () => {
   /**
    * Handle warning with toast notification
    */
-  const handleWarning = (
-    title: string,
-    options?: { description?: string; duration?: number }
-  ) => {
+  const handleWarning = (title: string, options?: { description?: string; duration?: number }) => {
     const toastOptions: any = {};
     if (options?.description) toastOptions.description = options.description;
     if (options?.duration) toastOptions.duration = options.duration;

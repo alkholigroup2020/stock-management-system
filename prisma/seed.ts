@@ -314,9 +314,7 @@ async function main() {
     });
     console.log(`✓ Period created: ${testPeriod.name} (${testPeriod.status})`);
   } else {
-    console.log(
-      `✓ Period already exists: ${testPeriod.name} (${testPeriod.status})`
-    );
+    console.log(`✓ Period already exists: ${testPeriod.name} (${testPeriod.status})`);
   }
 
   console.log(`  Start: ${testPeriod.start_date.toLocaleDateString()}`);
@@ -382,9 +380,7 @@ async function main() {
     });
   }
 
-  console.log(
-    `✓ Created stock for ${stockData.length} items in ${mainKitchen.name}\n`
-  );
+  console.log(`✓ Created stock for ${stockData.length} items in ${mainKitchen.name}\n`);
 
   // ========================================
   // 7. CREATE PERIOD PRICES
@@ -412,9 +408,7 @@ async function main() {
     });
   }
 
-  console.log(
-    `✓ Created period prices for ${priceData.length} items in ${testPeriod.name}\n`
-  );
+  console.log(`✓ Created period prices for ${priceData.length} items in ${testPeriod.name}\n`);
 
   console.log("\n✅ Database seed completed successfully!\n");
   console.log("📝 Summary:");

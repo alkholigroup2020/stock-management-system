@@ -20,6 +20,7 @@ This document provides comprehensive instructions for deploying the Stock Manage
 The Stock Management System uses a modern serverless architecture:
 
 **Architecture:**
+
 - **Frontend & API**: Vercel (Nuxt 4 SPA + serverless functions)
 - **Database**: Supabase (PostgreSQL 15+)
 - **Auth**: JWT tokens in httpOnly cookies
@@ -75,6 +76,7 @@ Before deploying, ensure you have:
    - **service_role key** (click "Reveal") → `SUPABASE_SERVICE_KEY`
 
 **⚠️ Security Warning:**
+
 - Keep `SUPABASE_SERVICE_KEY` secret (never commit to Git)
 - Store securely in password manager
 - Only use in server-side code
@@ -97,6 +99,7 @@ pnpm prisma db pull
 ```
 
 **Expected output:**
+
 ```
 ✓ Migrations applied successfully
 ✓ Prisma schema is in sync with database
@@ -115,6 +118,7 @@ pnpm db:studio
 ```
 
 **Initial Seed Data:**
+
 - Admin user (email: `admin@example.com`, password: change on first login)
 - Default locations (Kitchen, Store, Central, Warehouse)
 - Sample items and suppliers
@@ -142,17 +146,18 @@ pnpm db:studio
 1. In Vercel project settings, navigate to **Settings → Environment Variables**
 2. Add all required variables for **Production** environment:
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `DATABASE_URL` | `postgresql://...` (from Supabase) | Production |
-| `SUPABASE_URL` | `https://[PROJECT].supabase.co` | Production |
-| `SUPABASE_ANON_KEY` | `eyJ...` | Production |
-| `SUPABASE_SERVICE_KEY` | `eyJ...` | Production |
-| `AUTH_SECRET` | Strong random string (min 32 bytes) | Production |
-| `NUXT_PUBLIC_SITE_URL` | `https://your-domain.vercel.app` | Production |
-| `NUXT_PUBLIC_CURRENCY` | `SAR` | Production |
+| Variable               | Value                               | Environment |
+| ---------------------- | ----------------------------------- | ----------- |
+| `DATABASE_URL`         | `postgresql://...` (from Supabase)  | Production  |
+| `SUPABASE_URL`         | `https://[PROJECT].supabase.co`     | Production  |
+| `SUPABASE_ANON_KEY`    | `eyJ...`                            | Production  |
+| `SUPABASE_SERVICE_KEY` | `eyJ...`                            | Production  |
+| `AUTH_SECRET`          | Strong random string (min 32 bytes) | Production  |
+| `NUXT_PUBLIC_SITE_URL` | `https://your-domain.vercel.app`    | Production  |
+| `NUXT_PUBLIC_CURRENCY` | `SAR`                               | Production  |
 
 **Generate AUTH_SECRET:**
+
 ```bash
 # On your local machine
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
@@ -160,6 +165,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 **Important:**
+
 - Use **different** `AUTH_SECRET` for production vs development
 - Ensure `NUXT_PUBLIC_SITE_URL` matches your actual domain
 - Click **"Save"** after adding each variable
@@ -176,6 +182,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 4. Deployment typically takes 2-5 minutes
 
 **Expected output:**
+
 ```
 ✓ Deployment successful
 ✓ Production: https://stock-management-system.vercel.app
@@ -200,9 +207,11 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 **Test critical functionality:**
 
 1. **Health Check**
+
    ```bash
    curl https://your-domain.vercel.app/api/health
    ```
+
    Expected: `{"status":"ok","database":"connected"}`
 
 2. **Database Connection**
@@ -305,6 +314,7 @@ pnpm db:seed
 **Purpose:** Local development and testing
 
 **Configuration:**
+
 ```bash
 # .env (local)
 DATABASE_URL="postgresql://postgres.dev:devpass@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
@@ -322,6 +332,7 @@ NUXT_PUBLIC_SITE_URL="http://localhost:3000"
 **Purpose:** Pre-production testing with production-like data
 
 **Configuration:**
+
 ```bash
 # Vercel staging environment variables
 DATABASE_URL="postgresql://postgres.staging:stagingpass@..."
@@ -337,6 +348,7 @@ NUXT_PUBLIC_SITE_URL="https://staging-stock.vercel.app"
 **Purpose:** Live application for end users
 
 **Configuration:**
+
 ```bash
 # Vercel production environment variables
 DATABASE_URL="postgresql://postgres.prod:strongpass@..."
@@ -454,10 +466,12 @@ Before running production migrations:
 - [New Relic](https://newrelic.com) - APM with Vercel integration
 
 **Monitor endpoints:**
+
 - `GET /api/health` - Health check (every 5 minutes)
 - `GET /` - Homepage availability
 
 **Alert thresholds:**
+
 - Response time > 3s
 - Downtime > 2 minutes
 - Error rate > 5%
@@ -495,6 +509,7 @@ psql $DATABASE_URL < backup-20250115.sql
 **Issue:** Vercel deployment fails during build
 
 **Diagnosis:**
+
 ```bash
 # Check Vercel deployment logs
 # Common issues:
@@ -506,6 +521,7 @@ psql $DATABASE_URL < backup-20250115.sql
 **Solutions:**
 
 1. **TypeScript errors:**
+
    ```bash
    # Run locally
    pnpm typecheck
@@ -527,6 +543,7 @@ psql $DATABASE_URL < backup-20250115.sql
 **Issue:** "Can't reach database server"
 
 **Diagnosis:**
+
 ```bash
 # Test connection
 pnpm prisma db pull
@@ -551,6 +568,7 @@ pnpm prisma db pull
 **Issue:** 500 Internal Server Error
 
 **Diagnosis:**
+
 1. Check Vercel function logs
 2. Look for stack traces
 3. Identify error source (API route, database query)

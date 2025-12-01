@@ -1,4 +1,5 @@
 # Phase 4.3: Performance Optimization
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -26,12 +27,14 @@
 ### Simple Explanation
 
 **Performance Optimization** means making your application **faster** and **more efficient**. It is like making a car run faster by:
+
 - Using better fuel (optimized database)
 - Reducing weight (smaller files)
 - Improving the engine (better code)
 - Adding a turbo (caching)
 
 When we optimize performance, we make:
+
 - Pages load faster
 - API calls respond quicker
 - Less waiting for users
@@ -40,6 +43,7 @@ When we optimize performance, we make:
 ### Why Performance Matters
 
 **Problems with slow applications:**
+
 - ❌ Users get frustrated waiting
 - ❌ Data takes too long to load
 - ❌ Forms feel unresponsive
@@ -47,6 +51,7 @@ When we optimize performance, we make:
 - ❌ Higher server costs
 
 **Benefits of good performance:**
+
 - ✅ Pages load in under 1 second
 - ✅ Smooth, fast interactions
 - ✅ Happy users
@@ -57,12 +62,12 @@ When we optimize performance, we make:
 
 Our Stock Management System has specific performance targets:
 
-| Operation Type | Target Response Time | Example |
-|---------------|---------------------|---------|
-| Single location operations | < 1 second | Post a delivery, create issue |
-| Cross-location operations | < 2 seconds | Create transfer between locations |
-| Reports and dashboards | < 5 seconds | View dashboard with charts |
-| Page loads | < 3 seconds | First load of any page |
+| Operation Type             | Target Response Time | Example                           |
+| -------------------------- | -------------------- | --------------------------------- |
+| Single location operations | < 1 second           | Post a delivery, create issue     |
+| Cross-location operations  | < 2 seconds          | Create transfer between locations |
+| Reports and dashboards     | < 5 seconds          | View dashboard with charts        |
+| Page loads                 | < 3 seconds          | First load of any page            |
 
 ---
 
@@ -100,6 +105,7 @@ We reviewed all our database queries (requests for data) to find slow ones. We l
 Imagine you want to get a list of 10 deliveries with their items:
 
 **Bad way (N+1):**
+
 ```typescript
 // First query: Get 10 deliveries
 const deliveries = await db.delivery.findMany({ take: 10 });
@@ -107,19 +113,20 @@ const deliveries = await db.delivery.findMany({ take: 10 });
 // Then for EACH delivery, get its items (10 more queries!)
 for (const delivery of deliveries) {
   const items = await db.deliveryLine.findMany({
-    where: { delivery_id: delivery.id }
+    where: { delivery_id: delivery.id },
   });
 }
 // Total: 1 + 10 = 11 queries! ❌
 ```
 
 **Good way (optimized):**
+
 ```typescript
 // Single query: Get deliveries WITH their items
 const deliveries = await db.delivery.findMany({
   take: 10,
   include: {
-    delivery_lines: true,  // Get items in the same query
+    delivery_lines: true, // Get items in the same query
   },
 });
 // Total: 1 query! ✅
@@ -134,6 +141,7 @@ const deliveries = await db.delivery.findMany({
 An **index** is like a phone book. Instead of searching page by page, you can jump directly to the right section.
 
 **Example without index:**
+
 ```
 Finding all items in "Vegetables" category:
 Check item 1... not vegetables
@@ -144,6 +152,7 @@ Check item 4... not vegetables
 ```
 
 **Example with index:**
+
 ```
 Finding all items in "Vegetables" category:
 Look up "Vegetables" in the index
@@ -154,6 +163,7 @@ Done! (much faster)
 We added two new compound indexes:
 
 **1. Items by Category Index**
+
 ```prisma
 // In schema.prisma
 model Item {
@@ -166,11 +176,13 @@ model Item {
 ```
 
 **Why this index helps:**
+
 - Fast filtering of active items by category
 - Used on the items list page when filtering
 - Example: "Show me all active Vegetables"
 
 **2. NCRs by Location and Date Index**
+
 ```prisma
 // In schema.prisma
 model NCR {
@@ -183,6 +195,7 @@ model NCR {
 ```
 
 **Why this index helps:**
+
 - Fast retrieval of NCRs for a specific location
 - Sorted by creation date (newest first)
 - Used on the NCRs list page
@@ -193,14 +206,14 @@ model NCR {
 
 Our database schema already had excellent indexes on high-traffic tables:
 
-| Table | Index | Why It Matters |
-|-------|-------|----------------|
-| Delivery | `[location_id, created_at]` | Fast location-specific delivery lists |
-| Issue | `[location_id, created_at]` | Fast location-specific issue lists |
-| Transfer | `[from_location_id, status]` | Fast transfer filtering by status |
-| Transfer | `[to_location_id, status]` | Fast incoming transfer lists |
-| LocationStock | `[location_id, item_id]` | Unique constraint + fast lookups |
-| UserLocation | `[user_id]` | Fast user permission checks |
+| Table         | Index                        | Why It Matters                        |
+| ------------- | ---------------------------- | ------------------------------------- |
+| Delivery      | `[location_id, created_at]`  | Fast location-specific delivery lists |
+| Issue         | `[location_id, created_at]`  | Fast location-specific issue lists    |
+| Transfer      | `[from_location_id, status]` | Fast transfer filtering by status     |
+| Transfer      | `[to_location_id, status]`   | Fast incoming transfer lists          |
+| LocationStock | `[location_id, item_id]`     | Unique constraint + fast lookups      |
+| UserLocation  | `[user_id]`                  | Fast user permission checks           |
 
 ---
 
@@ -267,15 +280,15 @@ graph TD
 
 ### Files Modified
 
-| File | Changes |
-|------|---------|
-| `prisma/schema.prisma` | Added 2 compound indexes |
+| File                                            | Changes                   |
+| ----------------------------------------------- | ------------------------- |
+| `prisma/schema.prisma`                          | Added 2 compound indexes  |
 | `project-docs/database-optimization-summary.md` | Documentation of findings |
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                 | Purpose                    |
+| ------------------------------------ | -------------------------- |
 | `scripts/test-query-performance.mjs` | Performance testing script |
 
 ---
@@ -348,6 +361,7 @@ sequenceDiagram
 ```
 
 **What gets recorded:**
+
 - HTTP method (GET, POST, PATCH, DELETE)
 - Request path (/api/deliveries)
 - Response time in milliseconds
@@ -387,6 +401,7 @@ We created an admin-only API endpoint to view performance statistics:
 ```
 
 **How to use it:**
+
 1. Only admins can access this endpoint
 2. Open in browser: `http://localhost:3000/api/metrics/performance`
 3. View statistics to identify slow endpoints
@@ -399,6 +414,7 @@ We created an admin-only API endpoint to view performance statistics:
 **What is HTTP caching?**
 
 Imagine you ask your friend "What time is it?" every 10 seconds. Your friend would get annoyed! Instead, you could:
+
 1. Ask once
 2. Remember the answer
 3. Only ask again after 1 minute
@@ -406,6 +422,7 @@ Imagine you ask your friend "What time is it?" every 10 seconds. Your friend wou
 HTTP caching works the same way:
 
 **Without cache:**
+
 ```typescript
 // Every time user visits dashboard, fetch locations
 GET /api/locations  → Database query → 45ms
@@ -415,6 +432,7 @@ GET /api/locations  → Database query → 45ms
 ```
 
 **With cache:**
+
 ```typescript
 // First request: Database query
 GET /api/locations  → Database query → 45ms (store in cache)
@@ -427,15 +445,16 @@ GET /api/locations  → From cache → 2ms
 
 We added HTTP caching to **master data** endpoints (data that doesn't change often):
 
-| Endpoint | Cache Duration | Reasoning |
-|----------|---------------|-----------|
-| `/api/locations` | 5 minutes | Locations rarely change |
-| `/api/items` | 5 minutes | Items updated infrequently |
-| `/api/suppliers` | 5 minutes | Suppliers rarely added |
-| `/api/periods/current` | 1 minute | Current period changes monthly |
-| `/api/users/me/locations` | 5 minutes | User locations rarely change |
+| Endpoint                  | Cache Duration | Reasoning                      |
+| ------------------------- | -------------- | ------------------------------ |
+| `/api/locations`          | 5 minutes      | Locations rarely change        |
+| `/api/items`              | 5 minutes      | Items updated infrequently     |
+| `/api/suppliers`          | 5 minutes      | Suppliers rarely added         |
+| `/api/periods/current`    | 1 minute       | Current period changes monthly |
+| `/api/users/me/locations` | 5 minutes      | User locations rarely change   |
 
 **Implementation:**
+
 ```typescript
 // server/api/locations/index.get.ts
 export default defineEventHandler(async (event) => {
@@ -454,12 +473,12 @@ export default defineEventHandler(async (event) => {
 
 **Cache Headers Explained:**
 
-| Header | Meaning |
-|--------|---------|
-| `max-age=300` | Browser caches for 5 minutes (300 seconds) |
-| `s-maxage=300` | CDN/proxy caches for 5 minutes |
+| Header                      | Meaning                                                                      |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| `max-age=300`               | Browser caches for 5 minutes (300 seconds)                                   |
+| `s-maxage=300`              | CDN/proxy caches for 5 minutes                                               |
 | `stale-while-revalidate=60` | Can serve cached version for 60 extra seconds while refreshing in background |
-| `public` | Can be cached by browsers and proxies |
+| `public`                    | Can be cached by browsers and proxies                                        |
 
 ---
 
@@ -497,22 +516,22 @@ sequenceDiagram
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
-| `server/middleware/performance.ts` | Automatic performance tracking |
-| `server/utils/performance.ts` | Performance utilities and metrics storage |
-| `server/api/metrics/performance.get.ts` | Admin endpoint for viewing metrics |
-| `scripts/test-api-performance.mjs` | Automated performance testing |
-| `project-docs/PERFORMANCE_OPTIMIZATIONS.md` | Complete documentation |
+| File                                        | Purpose                                   |
+| ------------------------------------------- | ----------------------------------------- |
+| `server/middleware/performance.ts`          | Automatic performance tracking            |
+| `server/utils/performance.ts`               | Performance utilities and metrics storage |
+| `server/api/metrics/performance.get.ts`     | Admin endpoint for viewing metrics        |
+| `scripts/test-api-performance.mjs`          | Automated performance testing             |
+| `project-docs/PERFORMANCE_OPTIMIZATIONS.md` | Complete documentation                    |
 
 ### Files Modified
 
-| File | Changes |
-|------|---------|
-| `server/api/locations/index.get.ts` | Added HTTP caching |
-| `server/api/items/index.get.ts` | Added HTTP caching |
-| `server/api/suppliers/index.get.ts` | Added HTTP caching |
-| `server/api/periods/current.get.ts` | Added HTTP caching |
+| File                                   | Changes            |
+| -------------------------------------- | ------------------ |
+| `server/api/locations/index.get.ts`    | Added HTTP caching |
+| `server/api/items/index.get.ts`        | Added HTTP caching |
+| `server/api/suppliers/index.get.ts`    | Added HTTP caching |
+| `server/api/periods/current.get.ts`    | Added HTTP caching |
 | `server/api/users/me/locations.get.ts` | Added HTTP caching |
 
 ---
@@ -522,6 +541,7 @@ sequenceDiagram
 ### Simple Explanation
 
 When you visit a website, your browser downloads files (JavaScript, CSS, images). Larger files take longer to download. We optimized the frontend by:
+
 - **Splitting code** into smaller pieces
 - **Compressing images** to smaller sizes
 - **Lazy loading** pages (only load when needed)
@@ -535,6 +555,7 @@ When you visit a website, your browser downloads files (JavaScript, CSS, images)
 Imagine you have a 1000-page book. You don't want to carry the entire book if you only need chapter 5!
 
 **Without code splitting:**
+
 ```
 User visits Dashboard page
 → Downloads ENTIRE app (500 KB)
@@ -545,6 +566,7 @@ User visits Dashboard page
 ```
 
 **With code splitting:**
+
 ```
 User visits Dashboard page
 → Downloads only Dashboard code (50 KB)
@@ -611,13 +633,14 @@ Total: 100 KB (saves 350 KB!)
 
 We verified all PWA icons are optimized:
 
-| File | Original Size | Optimized Size | Savings |
-|------|--------------|----------------|---------|
-| `icon-192.png` | 3.2 KB | 3.2 KB | Already optimized ✅ |
-| `icon-512.png` | 7.2 KB | 7.2 KB | Already optimized ✅ |
-| `favicon.ico` | 763 bytes | 763 bytes | Already optimized ✅ |
+| File           | Original Size | Optimized Size | Savings              |
+| -------------- | ------------- | -------------- | -------------------- |
+| `icon-192.png` | 3.2 KB        | 3.2 KB         | Already optimized ✅ |
+| `icon-512.png` | 7.2 KB        | 7.2 KB         | Already optimized ✅ |
+| `favicon.ico`  | 763 bytes     | 763 bytes      | Already optimized ✅ |
 
 **How we optimized:**
+
 - Used SVG source for sharp edges
 - PNG compression with `sharp` library
 - No unnecessary metadata
@@ -633,6 +656,7 @@ pnpm build
 ```
 
 **Build output:**
+
 ```
 Entry                                        Size        Gzip
 ├── app/entry.css                           180 KB       24 KB
@@ -647,6 +671,7 @@ Entry                                        Size        Gzip
 ```
 
 **Key observations:**
+
 - CSS is well optimized (180 KB → 24 KB gzipped)
 - Largest vendor chunk is 383 KB (115 KB gzipped) - acceptable
 - Individual page chunks are 8-16 KB - excellent!
@@ -674,6 +699,7 @@ export default defineNuxtConfig({
 Vite combines small modules into larger bundles during development. This reduces the number of HTTP requests.
 
 **Without pre-bundling:**
+
 ```
 import Button from "@nuxt/ui/components/Button"
 import Card from "@nuxt/ui/components/Card"
@@ -682,6 +708,7 @@ import Input from "@nuxt/ui/components/Input"
 ```
 
 **With pre-bundling:**
+
 ```
 import { Button, Card, Input } from "@nuxt/ui"
 → 1 HTTP request (all bundled together)
@@ -695,13 +722,7 @@ We created a script to measure page load times:
 
 ```javascript
 // scripts/test-page-load-times.mjs
-const pages = [
-  "/dashboard",
-  "/deliveries",
-  "/issues",
-  "/transfers",
-  "/stock",
-];
+const pages = ["/dashboard", "/deliveries", "/issues", "/transfers", "/stock"];
 
 for (const page of pages) {
   const metrics = await page.evaluate(() => {
@@ -757,14 +778,14 @@ graph TD
 
 ### Files Modified
 
-| File | Changes |
-|------|---------|
+| File             | Changes                                           |
+| ---------------- | ------------------------------------------------- |
 | `nuxt.config.ts` | Added Vite build configuration for code splitting |
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
+| File                               | Purpose                     |
+| ---------------------------------- | --------------------------- |
 | `scripts/test-page-load-times.mjs` | Automated page load testing |
 
 ---
@@ -778,6 +799,7 @@ Imagine you work in a library. Every time someone asks "Where is the history sec
 **Solution:** Write it down on a sticky note! Now you can answer instantly without walking.
 
 Data caching works the same way:
+
 - First request: Fetch from database (slow)
 - Store in memory (the "sticky note")
 - Next requests: Return from memory (fast!)
@@ -789,6 +811,7 @@ Data caching works the same way:
 Nuxt provides a built-in composable called `useAsyncData` that automatically caches data on the client side.
 
 **Without caching:**
+
 ```vue
 <script setup>
 // Every time component mounts, fetch locations
@@ -800,12 +823,11 @@ const { data: locations } = await $fetch("/api/locations");
 ```
 
 **With caching:**
+
 ```vue
 <script setup>
 // First mount: Fetch locations
-const { data: locations } = await useAsyncData("locations", () =>
-  $fetch("/api/locations")
-);
+const { data: locations } = await useAsyncData("locations", () => $fetch("/api/locations"));
 // Component unmounts and remounts → use cached data
 // Component unmounts and remounts → use cached data
 // Only 1 API call!
@@ -813,6 +835,7 @@ const { data: locations } = await useAsyncData("locations", () =>
 ```
 
 **How it works:**
+
 1. `useAsyncData` takes a **unique key** (`"locations"`)
 2. First call: Fetches data and stores it with that key
 3. Subsequent calls: Returns cached data instantly
@@ -825,20 +848,25 @@ const { data: locations } = await useAsyncData("locations", () =>
 We created three main caching composables for frequently accessed data:
 
 **1. useLocations**
+
 ```typescript
 // app/composables/useLocations.ts
 export const useLocations = (options?: { includeInactive?: boolean }) => {
-  const key = computed(() =>
-    `locations:${options?.includeInactive ? "all" : "active"}`
-  );
+  const key = computed(() => `locations:${options?.includeInactive ? "all" : "active"}`);
 
-  const { data: locations, refresh, pending, error } = useAsyncData(
+  const {
+    data: locations,
+    refresh,
+    pending,
+    error,
+  } = useAsyncData(
     key.value,
-    () => $fetch("/api/locations", {
-      query: { includeInactive: options?.includeInactive },
-    }),
+    () =>
+      $fetch("/api/locations", {
+        query: { includeInactive: options?.includeInactive },
+      }),
     {
-      ttl: 5 * 60 * 1000,  // Cache for 5 minutes
+      ttl: 5 * 60 * 1000, // Cache for 5 minutes
     }
   );
 
@@ -847,6 +875,7 @@ export const useLocations = (options?: { includeInactive?: boolean }) => {
 ```
 
 **How to use:**
+
 ```vue
 <script setup>
 const { locations, pending, refresh } = useLocations();
@@ -866,26 +895,28 @@ const { locations, pending, refresh } = useLocations();
 ```
 
 **2. useItems**
+
 ```typescript
 // app/composables/useItems.ts
-export const useItems = (options?: {
-  category?: string;
-  searchQuery?: string;
-}) => {
-  const key = computed(() =>
-    `items:${options?.category || "all"}:${options?.searchQuery || ""}`
-  );
+export const useItems = (options?: { category?: string; searchQuery?: string }) => {
+  const key = computed(() => `items:${options?.category || "all"}:${options?.searchQuery || ""}`);
 
-  const { data: items, refresh, pending, error } = useAsyncData(
+  const {
+    data: items,
+    refresh,
+    pending,
+    error,
+  } = useAsyncData(
     key.value,
-    () => $fetch("/api/items", {
-      query: {
-        category: options?.category,
-        search: options?.searchQuery,
-      },
-    }),
+    () =>
+      $fetch("/api/items", {
+        query: {
+          category: options?.category,
+          search: options?.searchQuery,
+        },
+      }),
     {
-      ttl: 5 * 60 * 1000,  // Cache for 5 minutes
+      ttl: 5 * 60 * 1000, // Cache for 5 minutes
     }
   );
 
@@ -894,16 +925,18 @@ export const useItems = (options?: {
 ```
 
 **3. useCurrentPeriod**
+
 ```typescript
 // app/composables/useCurrentPeriod.ts
 export const useCurrentPeriod = (options?: { autoRefresh?: boolean }) => {
-  const { data: period, refresh, pending, error } = useAsyncData(
-    "current-period",
-    () => $fetch("/api/periods/current"),
-    {
-      ttl: 1 * 60 * 1000,  // Cache for 1 minute (shorter than others)
-    }
-  );
+  const {
+    data: period,
+    refresh,
+    pending,
+    error,
+  } = useAsyncData("current-period", () => $fetch("/api/periods/current"), {
+    ttl: 1 * 60 * 1000, // Cache for 1 minute (shorter than others)
+  });
 
   // Auto-refresh every minute if enabled
   if (options?.autoRefresh) {
@@ -923,6 +956,7 @@ export const useCurrentPeriod = (options?: { autoRefresh?: boolean }) => {
 When data changes, we need to clear the old cached data so users see the fresh data.
 
 **Example:**
+
 ```typescript
 // User creates a new delivery
 await $fetch("/api/locations/1/deliveries", {
@@ -971,7 +1005,7 @@ export const useCache = () => {
   };
 
   const invalidateAll = () => {
-    clearNuxtData();  // Clear everything
+    clearNuxtData(); // Clear everything
   };
 
   return {
@@ -986,6 +1020,7 @@ export const useCache = () => {
 ```
 
 **How to use:**
+
 ```typescript
 // After creating a delivery
 const { invalidateTransactions, invalidateStock } = useCache();
@@ -1013,24 +1048,24 @@ export const useSmartCacheInvalidation = () => {
 
   const afterDelivery = (locationId: number) => {
     invalidateTransactions("delivery", locationId);
-    invalidateStock(locationId);  // Stock changed
+    invalidateStock(locationId); // Stock changed
     // Period NOT invalidated (only changes monthly)
   };
 
   const afterIssue = (locationId: number) => {
     invalidateTransactions("issue", locationId);
-    invalidateStock(locationId);  // Stock changed
+    invalidateStock(locationId); // Stock changed
   };
 
   const afterTransfer = (fromLocationId: number, toLocationId: number) => {
     invalidateTransactions("transfer");
-    invalidateStock(fromLocationId);   // Stock changed
-    invalidateStock(toLocationId);     // Stock changed
+    invalidateStock(fromLocationId); // Stock changed
+    invalidateStock(toLocationId); // Stock changed
   };
 
   const afterPeriodClose = () => {
-    invalidatePeriod();        // Period changed
-    invalidateStock();         // All stock snapshots
+    invalidatePeriod(); // Period changed
+    invalidateStock(); // All stock snapshots
     invalidateTransactions("delivery");
     invalidateTransactions("issue");
   };
@@ -1045,6 +1080,7 @@ export const useSmartCacheInvalidation = () => {
 ```
 
 **How to use:**
+
 ```typescript
 // In deliveries/create.vue
 const { afterDelivery } = useSmartCacheInvalidation();
@@ -1104,28 +1140,28 @@ sequenceDiagram
 
 ### Cache Strategy Summary
 
-| Data Type | Cache Duration | Invalidate When |
-|-----------|---------------|-----------------|
-| Locations | 5 minutes | Location created/updated |
-| Items | 5 minutes | Item created/updated |
-| Current Period | 1 minute | Period closed |
-| Stock | 5 minutes | Delivery/Issue/Transfer posted |
-| Deliveries | 5 minutes | New delivery created |
-| Issues | 5 minutes | New issue created |
-| Transfers | 5 minutes | Transfer created/approved |
+| Data Type      | Cache Duration | Invalidate When                |
+| -------------- | -------------- | ------------------------------ |
+| Locations      | 5 minutes      | Location created/updated       |
+| Items          | 5 minutes      | Item created/updated           |
+| Current Period | 1 minute       | Period closed                  |
+| Stock          | 5 minutes      | Delivery/Issue/Transfer posted |
+| Deliveries     | 5 minutes      | New delivery created           |
+| Issues         | 5 minutes      | New issue created              |
+| Transfers      | 5 minutes      | Transfer created/approved      |
 
 ---
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
-| `app/composables/useLocations.ts` | Location caching composable |
-| `app/composables/useItems.ts` | Item caching composable |
-| `app/composables/useCurrentPeriod.ts` | Period caching composable |
-| `app/composables/useCache.ts` | Centralized cache invalidation |
+| File                                           | Purpose                                |
+| ---------------------------------------------- | -------------------------------------- |
+| `app/composables/useLocations.ts`              | Location caching composable            |
+| `app/composables/useItems.ts`                  | Item caching composable                |
+| `app/composables/useCurrentPeriod.ts`          | Period caching composable              |
+| `app/composables/useCache.ts`                  | Centralized cache invalidation         |
 | `app/composables/useSmartCacheInvalidation.ts` | Smart invalidation based on operations |
-| `app/composables/README.md` | Complete documentation with examples |
+| `app/composables/README.md`                    | Complete documentation with examples   |
 
 ---
 
@@ -1135,33 +1171,37 @@ sequenceDiagram
 
 After completing all four tasks, our application performance is excellent:
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| API Response Time | 45-58ms | 45-58ms | Already optimal ✅ |
-| Page Load Time | ~2000ms | 892-1234ms | 38-56% faster ✅ |
-| Repeated API Calls | Every time | Cached 1-5min | 70-90% reduction ✅ |
-| Database Queries | Good | Excellent | Indexed + optimized ✅ |
-| Bundle Size (gzipped) | ~180 KB | ~24 KB CSS + split JS | Code splitting ✅ |
+| Metric                | Before     | After                 | Improvement            |
+| --------------------- | ---------- | --------------------- | ---------------------- |
+| API Response Time     | 45-58ms    | 45-58ms               | Already optimal ✅     |
+| Page Load Time        | ~2000ms    | 892-1234ms            | 38-56% faster ✅       |
+| Repeated API Calls    | Every time | Cached 1-5min         | 70-90% reduction ✅    |
+| Database Queries      | Good       | Excellent             | Indexed + optimized ✅ |
+| Bundle Size (gzipped) | ~180 KB    | ~24 KB CSS + split JS | Code splitting ✅      |
 
 ### Performance Test Results
 
 **Database Queries:**
+
 - All queries respond in < 60ms
 - Zero N+1 query issues
 - Proper indexes on all high-traffic tables
 
 **API Response Times:**
+
 - Single-location operations: 33-58ms (target: < 1s) ✅
 - Cross-location operations: Not tested yet (target: < 2s)
 - Master data cached for 1-5 minutes
 
 **Frontend Performance:**
+
 - Page loads: 892-1234ms (target: < 3s) ✅
 - First paint: 367-456ms ✅
 - Code split by route automatically
 - Vendor libraries cached separately
 
 **Client-Side Caching:**
+
 - Locations cached for 5 minutes
 - Items cached for 5 minutes
 - Period cached for 1 minute
@@ -1173,35 +1213,35 @@ After completing all four tasks, our application performance is excellent:
 
 ### Server-Side Performance
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/middleware/performance.ts` | ~60 | Automatic request tracking |
-| `server/utils/performance.ts` | ~80 | Metrics storage and utilities |
-| `server/api/metrics/performance.get.ts` | ~40 | Admin metrics endpoint |
+| File                                    | Lines | Purpose                       |
+| --------------------------------------- | ----- | ----------------------------- |
+| `server/middleware/performance.ts`      | ~60   | Automatic request tracking    |
+| `server/utils/performance.ts`           | ~80   | Metrics storage and utilities |
+| `server/api/metrics/performance.get.ts` | ~40   | Admin metrics endpoint        |
 
 ### Client-Side Caching
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/composables/useLocations.ts` | ~50 | Location caching |
-| `app/composables/useItems.ts` | ~60 | Item caching |
-| `app/composables/useCurrentPeriod.ts` | ~40 | Period caching |
-| `app/composables/useCache.ts` | ~80 | Cache invalidation |
-| `app/composables/useSmartCacheInvalidation.ts` | ~60 | Smart invalidation |
+| File                                           | Lines | Purpose            |
+| ---------------------------------------------- | ----- | ------------------ |
+| `app/composables/useLocations.ts`              | ~50   | Location caching   |
+| `app/composables/useItems.ts`                  | ~60   | Item caching       |
+| `app/composables/useCurrentPeriod.ts`          | ~40   | Period caching     |
+| `app/composables/useCache.ts`                  | ~80   | Cache invalidation |
+| `app/composables/useSmartCacheInvalidation.ts` | ~60   | Smart invalidation |
 
 ### Database
 
-| File | Changes | Purpose |
-|------|---------|---------|
+| File                   | Changes    | Purpose                          |
+| ---------------------- | ---------- | -------------------------------- |
 | `prisma/schema.prisma` | +2 indexes | Compound indexes for performance |
 
 ### Testing Scripts
 
-| File | Purpose |
-|------|---------|
-| `scripts/test-query-performance.mjs` | Test database query speed |
-| `scripts/test-api-performance.mjs` | Test API endpoint response times |
-| `scripts/test-page-load-times.mjs` | Test frontend page load speed |
+| File                                 | Purpose                          |
+| ------------------------------------ | -------------------------------- |
+| `scripts/test-query-performance.mjs` | Test database query speed        |
+| `scripts/test-api-performance.mjs`   | Test API endpoint response times |
+| `scripts/test-page-load-times.mjs`   | Test frontend page load speed    |
 
 ---
 
@@ -1233,6 +1273,7 @@ graph TD
 ```
 
 **Levels:**
+
 1. **Browser cache** (fastest, 5-60 minutes)
 2. **Nuxt cache** (client-side, 1-5 minutes)
 3. **HTTP/CDN cache** (server-side, 1-5 minutes)
@@ -1240,11 +1281,11 @@ graph TD
 
 ### 2. Database Index Types
 
-| Index Type | Example | Good For |
-|-----------|---------|----------|
-| Single column | `@@index([location_id])` | Simple lookups |
-| Compound (2-3 columns) | `@@index([location_id, created_at])` | Filtering + sorting |
-| Unique | `@@unique([location_id, item_id])` | Preventing duplicates + fast lookups |
+| Index Type             | Example                              | Good For                             |
+| ---------------------- | ------------------------------------ | ------------------------------------ |
+| Single column          | `@@index([location_id])`             | Simple lookups                       |
+| Compound (2-3 columns) | `@@index([location_id, created_at])` | Filtering + sorting                  |
+| Unique                 | `@@unique([location_id, item_id])`   | Preventing duplicates + fast lookups |
 
 **Rule of thumb:** First column in compound index should be the one you filter on most.
 
@@ -1252,49 +1293,52 @@ graph TD
 
 TTL is how long cached data stays fresh:
 
-| Data Type | TTL | Reasoning |
-|-----------|-----|-----------|
-| Master data (locations, items) | 5 minutes | Changes rarely |
-| Current period | 1 minute | May change monthly |
-| Stock levels | 5 minutes | Changes frequently but can tolerate slight delay |
-| Transaction lists | 5 minutes | Historical data, changes when new items added |
+| Data Type                      | TTL       | Reasoning                                        |
+| ------------------------------ | --------- | ------------------------------------------------ |
+| Master data (locations, items) | 5 minutes | Changes rarely                                   |
+| Current period                 | 1 minute  | May change monthly                               |
+| Stock levels                   | 5 minutes | Changes frequently but can tolerate slight delay |
+| Transaction lists              | 5 minutes | Historical data, changes when new items added    |
 
 **Shorter TTL** = More fresh data but more API calls
 **Longer TTL** = Fewer API calls but data may be stale
 
 ### 4. Code Splitting Strategies
 
-| Strategy | What Gets Split | Example |
-|----------|----------------|---------|
-| Route-based | Each page in separate file | `/dashboard.js`, `/deliveries.js` |
-| Vendor splitting | Third-party libraries separate | `vue.js`, `nuxt-ui.js` |
-| Component lazy loading | Large components load on demand | `<LazyChartComponent>` |
+| Strategy               | What Gets Split                 | Example                           |
+| ---------------------- | ------------------------------- | --------------------------------- |
+| Route-based            | Each page in separate file      | `/dashboard.js`, `/deliveries.js` |
+| Vendor splitting       | Third-party libraries separate  | `vue.js`, `nuxt-ui.js`            |
+| Component lazy loading | Large components load on demand | `<LazyChartComponent>`            |
 
 We use **route-based** + **vendor splitting** for optimal balance.
 
 ### 5. Cache Invalidation Patterns
 
 **Pattern 1: Immediate invalidation**
+
 ```typescript
 // After mutation, clear cache immediately
 await createDelivery();
-invalidateStock();  // Clear now
+invalidateStock(); // Clear now
 ```
 
 **Pattern 2: Time-based invalidation**
+
 ```typescript
 // Cache expires after TTL
 useAsyncData("locations", fetchLocations, {
-  ttl: 5 * 60 * 1000,  // Expires after 5 minutes
+  ttl: 5 * 60 * 1000, // Expires after 5 minutes
 });
 ```
 
 **Pattern 3: Event-based invalidation**
+
 ```typescript
 // Clear cache when specific event happens
 watch(currentPeriod, (newPeriod, oldPeriod) => {
   if (newPeriod.id !== oldPeriod.id) {
-    invalidateAll();  // New period, clear everything
+    invalidateAll(); // New period, clear everything
   }
 });
 ```
@@ -1303,21 +1347,21 @@ watch(currentPeriod, (newPeriod, oldPeriod) => {
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Performance** | How fast the application responds |
-| **Optimization** | Making something faster or more efficient |
-| **Index** | A lookup table for faster database searches |
-| **N+1 Query** | A performance problem where 1 query becomes N queries |
-| **Cache** | Stored data that can be reused without re-fetching |
-| **TTL** | Time-To-Live - how long cached data is valid |
-| **Invalidation** | Clearing cached data so fresh data is fetched |
-| **Code Splitting** | Dividing code into smaller chunks for faster loading |
-| **Lazy Loading** | Loading code only when it's actually needed |
-| **Bundle Size** | Total size of all JavaScript/CSS files |
-| **Gzip** | Compression that makes files smaller for faster downloads |
-| **Middleware** | Code that runs before/after API requests |
-| **Compound Index** | Database index on multiple columns together |
+| Term               | Simple Explanation                                        |
+| ------------------ | --------------------------------------------------------- |
+| **Performance**    | How fast the application responds                         |
+| **Optimization**   | Making something faster or more efficient                 |
+| **Index**          | A lookup table for faster database searches               |
+| **N+1 Query**      | A performance problem where 1 query becomes N queries     |
+| **Cache**          | Stored data that can be reused without re-fetching        |
+| **TTL**            | Time-To-Live - how long cached data is valid              |
+| **Invalidation**   | Clearing cached data so fresh data is fetched             |
+| **Code Splitting** | Dividing code into smaller chunks for faster loading      |
+| **Lazy Loading**   | Loading code only when it's actually needed               |
+| **Bundle Size**    | Total size of all JavaScript/CSS files                    |
+| **Gzip**           | Compression that makes files smaller for faster downloads |
+| **Middleware**     | Code that runs before/after API requests                  |
+| **Compound Index** | Database index on multiple columns together               |
 
 ---
 
@@ -1326,12 +1370,14 @@ watch(currentPeriod, (newPeriod, oldPeriod) => {
 ### Issue 1: Cached Data Not Updating
 
 **Symptoms:**
+
 - User creates delivery but list doesn't show it
 - Stock levels don't update after issue
 
 **Cause:** Cache not invalidated after mutation
 
 **Solution:**
+
 ```typescript
 // Always invalidate cache after mutations
 const submitDelivery = async () => {
@@ -1347,12 +1393,14 @@ const submitDelivery = async () => {
 ### Issue 2: Slow API Responses
 
 **Symptoms:**
+
 - Requests take > 1 second
 - Database queries are slow
 
 **Cause:** Missing database index
 
 **Solution:**
+
 ```prisma
 // Add index to frequently queried columns
 model Delivery {
@@ -1366,12 +1414,14 @@ model Delivery {
 ### Issue 3: Large Bundle Size
 
 **Symptoms:**
+
 - Initial page load is slow
 - Large JavaScript files
 
 **Cause:** Not using code splitting or importing too much
 
 **Solution:**
+
 ```typescript
 // Bad - imports entire library
 import _ from "lodash";
@@ -1380,18 +1430,22 @@ import _ from "lodash";
 import { debounce } from "lodash-es";
 
 // Better - use native JavaScript when possible
-const debounce = (fn, delay) => { /* ... */ };
+const debounce = (fn, delay) => {
+  /* ... */
+};
 ```
 
 ### Issue 4: Cache Key Conflicts
 
 **Symptoms:**
+
 - Wrong data returned from cache
 - Data meant for one page shows on another
 
 **Cause:** Duplicate cache keys
 
 **Solution:**
+
 ```typescript
 // Bad - same key for different filters
 useAsyncData("items", () => fetchItems({ category: "Vegetables" }));
@@ -1407,12 +1461,14 @@ useAsyncData("items:Fruits", () => fetchItems({ category: "Fruits" }));
 ### Issue 5: Stale Cache After Deploy
 
 **Symptoms:**
+
 - Users see old version after deployment
 - Changes not visible until hard refresh
 
 **Cause:** Browser cache not cleared
 
 **Solution:**
+
 ```typescript
 // In nuxt.config.ts
 export default defineNuxtConfig({
@@ -1477,18 +1533,21 @@ export default defineNuxtConfig({
 After completing Performance Optimization (Phase 4.3), the next phases are:
 
 **→ Phase 4.4: Testing** (Pending)
+
 - Unit tests for business logic
 - API endpoint tests
 - Integration tests
 - Manual testing completion
 
 **→ Phase 4.5: Documentation & Training** (Pending)
+
 - Developer documentation
 - User manual
 - Training materials
 - Operational procedures
 
 **→ Phase 4.6: Pre-Launch Preparation** (Pending)
+
 - Production deployment
 - Data seeding
 - User setup

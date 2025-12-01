@@ -7,6 +7,7 @@ Perform a comprehensive WCAG 2.1 AA accessibility audit using Playwright browser
 **Target:** $ARGUMENTS (if empty, audit main application routes)
 
 Parse arguments:
+
 - If a route is provided (e.g., `/deliveries`), audit that specific page
 - If empty, audit the following main routes:
   - `/` (Dashboard)
@@ -42,43 +43,52 @@ mcp__playwright__browser_snapshot()
 For each page, perform these checks:
 
 #### Color Contrast (WCAG 2.1 AA)
+
 - **Normal text:** Minimum 4.5:1 contrast ratio
 - **Large text (18px+ or 14px+ bold):** Minimum 3:1 contrast ratio
 - **UI components:** Minimum 3:1 contrast ratio
 
 Use browser evaluate to check contrast:
+
 ```javascript
 // Check if any elements have insufficient contrast
 // Focus on text-[var(--ui-text-muted)] on backgrounds
 ```
 
 #### Interactive Elements
+
 - [ ] All buttons have accessible names (text content or aria-label)
 - [ ] All links have descriptive text (not just "click here")
 - [ ] All form inputs have associated labels
 - [ ] Focus states are visible on all interactive elements
 
 #### Keyboard Navigation
+
 Test by pressing Tab through the page:
+
 ```
 mcp__playwright__browser_press_key({ key: "Tab" })
 ```
+
 - [ ] Focus order is logical (left-to-right, top-to-bottom)
 - [ ] No keyboard traps (can Tab out of all elements)
 - [ ] Skip links available for main content
 
 #### Form Accessibility
+
 - [ ] All inputs have visible labels (not just placeholders)
 - [ ] Required fields are indicated
 - [ ] Error messages are associated with inputs
 - [ ] Form validation errors are announced
 
 #### Images and Icons
+
 - [ ] Decorative images have `alt=""`
 - [ ] Informative images have descriptive alt text
 - [ ] Icon-only buttons have aria-label
 
 #### ARIA Usage
+
 - [ ] ARIA roles are used correctly
 - [ ] ARIA states (expanded, selected, etc.) are accurate
 - [ ] Live regions announce dynamic content
@@ -86,11 +96,13 @@ mcp__playwright__browser_press_key({ key: "Tab" })
 ### 4. Visual Checks
 
 Take screenshots for manual review if needed:
+
 ```
 mcp__playwright__browser_take_screenshot({ filename: "a11y-[route].png" })
 ```
 
 Check:
+
 - [ ] Text is readable at 200% zoom
 - [ ] Content reflows properly on narrow viewports
 - [ ] No horizontal scrolling at 320px width
@@ -98,6 +110,7 @@ Check:
 ### 5. Dark Mode Testing
 
 Switch to dark mode and repeat contrast checks:
+
 - Navigate to the page
 - Toggle dark mode (if available)
 - Re-run contrast checks
@@ -152,6 +165,7 @@ Switch to dark mode and repeat contrast checks:
 ## WCAG 2.1 AA Quick Reference
 
 ### Level A (Must Have)
+
 - 1.1.1 Non-text Content (alt text)
 - 1.3.1 Info and Relationships (semantic HTML)
 - 2.1.1 Keyboard (all functionality via keyboard)
@@ -160,6 +174,7 @@ Switch to dark mode and repeat contrast checks:
 - 4.1.2 Name, Role, Value (accessible names)
 
 ### Level AA (Should Have)
+
 - 1.4.3 Contrast (Minimum) - 4.5:1 / 3:1
 - 1.4.4 Resize Text (200% zoom)
 - 1.4.10 Reflow (320px width)

@@ -429,7 +429,7 @@ onMounted(async () => {
         <!-- Actions -->
         <UFormField label="Actions">
           <div class="flex gap-2">
-            <UButton color="primary" class="cursor-pointer" @click="fetchReport"> Generate </UButton>
+            <UButton color="primary" class="cursor-pointer" @click="fetchReport">Generate</UButton>
             <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
               Clear
             </UButton>

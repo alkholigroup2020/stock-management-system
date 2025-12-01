@@ -63,6 +63,7 @@ graph TD
 A **Transfer** is when we move stock from **one location to another location**.
 
 **Real-world example:**
+
 - The **Kitchen** needs 50 KG of rice
 - The **Store** has 200 KG of rice
 - An operator creates a **transfer request** to move 50 KG from Store to Kitchen
@@ -75,6 +76,7 @@ A **Transfer** is when we move stock from **one location to another location**.
 ### Why Do We Need Approval?
 
 Transfers need approval because:
+
 - **Prevents mistakes**: What if someone requests too much?
 - **Prevents theft**: Someone can't just move stock without permission
 - **Keeps records**: We know who requested and who approved every transfer
@@ -126,16 +128,19 @@ stateDiagram-v2
 ### Important Business Rules
 
 **Stock Validation:**
+
 - Always check source location has enough stock
 - Check again when approving (stock might have been used by someone else)
 - If insufficient, show clear error message
 
 **WAC Transfer:**
+
 - Destination location receives stock at source location's WAC
 - Example: Store's rice costs SAR 5.00/KG, Kitchen receives it at SAR 5.00/KG
 - This ensures accurate cost tracking per location
 
 **Atomic Operations:**
+
 - Use database transactions
 - If anything fails, rollback everything
 - Prevents data corruption (no partial transfers)
@@ -143,6 +148,7 @@ stateDiagram-v2
 ### What We Built
 
 **5 API Endpoints:**
+
 1. **GET /api/transfers** - List all transfers with filters
 2. **POST /api/transfers** - Create new transfer request
 3. **GET /api/transfers/:id** - Get single transfer details
@@ -150,11 +156,13 @@ stateDiagram-v2
 5. **PATCH /api/transfers/:id/reject** - Reject transfer request
 
 **3 Pages:**
+
 1. **Transfers List** - View all transfers with filtering
 2. **Create Transfer** - Form to request new transfer
 3. **Transfer Detail** - View details and approve/reject
 
 **3 Components:**
+
 1. **TransferForm** - Reusable form with item lines and validation
 2. **TransferStatusBadge** - Colored badges for each status
 3. **ApprovalActions** - Approve/Reject buttons with confirmation modals
@@ -170,6 +178,7 @@ stateDiagram-v2
 It's a quality control document that records **when something goes wrong** with deliveries or stock. Think of it as a complaint form.
 
 **Real-world examples:**
+
 - Supplier sent **damaged tomatoes**
 - We ordered 100 items but received only **90 items**
 - Supplier charged **SAR 12.00** but the agreed price was **SAR 10.00**
@@ -177,11 +186,13 @@ It's a quality control document that records **when something goes wrong** with 
 ### Two Types of NCRs
 
 **1. Manual NCR**
+
 - Created by operators manually
 - Used for physical quality issues (damaged, expired, wrong items)
 - Operator fills a form describing the problem
 
 **2. Auto-Generated NCR (Price Variance)**
+
 - Created automatically by the system
 - Happens when delivery price differs from expected price
 - No human needs to create it - system detects it automatically
@@ -205,12 +216,14 @@ graph LR
 ```
 
 **Why is this important?**
+
 - At the start of each period, we **lock prices** for all items
 - If supplier charges a different price, we need to know why
 - This prevents **unauthorized price changes** during the month
 - Helps management track and negotiate with suppliers
 
 **Example:**
+
 - Period price for Chicken: SAR 15.00/KG
 - Delivery comes with price: SAR 17.00/KG
 - System automatically:
@@ -245,17 +258,20 @@ stateDiagram-v2
 ### What We Built
 
 **4 API Endpoints:**
+
 1. **GET /api/ncrs** - List all NCRs with filters
 2. **POST /api/ncrs** - Create manual NCR
 3. **GET /api/ncrs/:id** - Get single NCR details
 4. **PATCH /api/ncrs/:id** - Update NCR status
 
 **3 Pages:**
+
 1. **NCRs List** - View all NCRs with filtering (type, status, location)
 2. **Create Manual NCR** - Form to report quality issues
 3. **NCR Detail** - View details and update status
 
 **Key Features:**
+
 - Auto-generation of price variance NCRs during delivery posting
 - Detailed breakdown showing expected vs actual prices
 - Link between NCR and delivery for traceability
@@ -278,6 +294,7 @@ This is essential because we need to calculate: **How much does it cost to feed 
 **Real-world scenario:**
 
 Your kitchen feeds people every day. Some days you have:
+
 - Monday: 50 crew + 5 visitors = 55 people
 - Tuesday: 50 crew + 10 visitors = 60 people
 - Wednesday: 48 crew + 0 visitors = 48 people (2 crew on leave)
@@ -285,12 +302,14 @@ Your kitchen feeds people every day. Some days you have:
 At month-end, you spent **SAR 50,000** on food. How much did it cost per person per day?
 
 **Formula:**
+
 ```
 Total Mandays = Sum of (Crew + Extra) for all days in month
 Manday Cost = Total Consumption ÷ Total Mandays
 ```
 
 **Example:**
+
 - Total consumption: SAR 50,000
 - Total mandays: 1,650 (average 55 people × 30 days)
 - Manday cost: SAR 50,000 ÷ 1,650 = **SAR 30.30 per person per day**
@@ -335,16 +354,19 @@ graph TD
 ### Important Features
 
 **Date Handling:**
+
 - Shows dates in friendly format: "Monday, 01/11/2025"
 - Automatically sorted oldest to newest
 - Only shows dates within current period
 
 **Validation:**
+
 - Must be non-negative integers (no decimals, no negative numbers)
 - Cannot edit if period is closed
 - Shows clear disabled state when period closed
 
 **User Experience:**
+
 - Inline editing (edit directly in table cells)
 - Individual row saving (can edit multiple rows, each saves independently)
 - Loading indicators per row
@@ -353,14 +375,17 @@ graph TD
 ### What We Built
 
 **3 API Endpoints:**
+
 1. **GET /api/locations/:locationId/pob** - Fetch POB entries for period
 2. **POST /api/locations/:locationId/pob** - Bulk create/update entries
 3. **PATCH /api/pob/:id** - Update single entry
 
 **1 Page:**
+
 - **POB Page** - Calendar-like table for daily headcount entry
 
 **2 Components:**
+
 1. **POBTable** - Editable table with auto-save functionality
 2. **POBSummary** - Display period info and total mandays
 
@@ -371,6 +396,7 @@ graph TD
 ### What is a Reconciliation?
 
 **Reconciliation** is a **month-end calculation** that answers:
+
 1. How much food did we consume this month?
 2. How much did it cost per person per day?
 
@@ -388,24 +414,24 @@ Let's break it down with an **example:**
 
 **Al Sanafer Kitchen - November 2025:**
 
-| Item | Amount (SAR) | Explanation |
-|------|--------------|-------------|
-| Opening Stock | 125,000 | What we had at start of month |
-| + Receipts | 45,000 | New deliveries received |
-| + Transfers In | 8,000 | Stock received from other locations |
-| - Transfers Out | 3,500 | Stock sent to other locations |
-| - Closing Stock | 140,000 | What we have at end of month |
-| **= Consumption** | **34,500** | What we actually used this month |
+| Item              | Amount (SAR) | Explanation                         |
+| ----------------- | ------------ | ----------------------------------- |
+| Opening Stock     | 125,000      | What we had at start of month       |
+| + Receipts        | 45,000       | New deliveries received             |
+| + Transfers In    | 8,000        | Stock received from other locations |
+| - Transfers Out   | 3,500        | Stock sent to other locations       |
+| - Closing Stock   | 140,000      | What we have at end of month        |
+| **= Consumption** | **34,500**   | What we actually used this month    |
 
 Now with adjustments:
 
-| Adjustment | Amount (SAR) | Explanation |
-|------------|--------------|-------------|
-| + Back-charges | 500 | Additional costs charged back to us |
-| + Credits | -200 | Supplier gave us credit (negative) |
-| + Condemnations | 300 | Food we had to throw away (spoiled) |
-| + Other Adjustments | 0 | Other miscellaneous adjustments |
-| **= Adjusted Consumption** | **35,100** | Final consumption after adjustments |
+| Adjustment                 | Amount (SAR) | Explanation                         |
+| -------------------------- | ------------ | ----------------------------------- |
+| + Back-charges             | 500          | Additional costs charged back to us |
+| + Credits                  | -200         | Supplier gave us credit (negative)  |
+| + Condemnations            | 300          | Food we had to throw away (spoiled) |
+| + Other Adjustments        | 0            | Other miscellaneous adjustments     |
+| **= Adjusted Consumption** | **35,100**   | Final consumption after adjustments |
 
 Finally, calculate cost per person:
 
@@ -419,19 +445,23 @@ Manday Cost = 35,100 ÷ 2,100 = SAR 16.71 per person per day
 Real-world scenarios require adjustments:
 
 **Back-charges:**
+
 - Location borrowed staff from another location
 - Must pay for their meals
 
 **Credits:**
+
 - Supplier gave us a discount or refund
 - NCR was resolved with credit note
 
 **Condemnations:**
+
 - Food spoiled before use
 - Items damaged in storage
 - Still consumed (lost value) but not served
 
 **Other Adjustments:**
+
 - Unusual situations
 - Manual corrections approved by management
 
@@ -456,11 +486,13 @@ graph TD
 ```
 
 **Why auto-calculate?**
+
 - Operators can view reconciliation anytime during period
 - No need to wait for supervisor to enter data
 - Always shows current state
 
 **Why save reconciliation?**
+
 - Supervisor reviews and confirms numbers are correct
 - Adds adjustments that only supervisor knows about
 - Creates official record for management reporting
@@ -506,6 +538,7 @@ sequenceDiagram
 For **Supervisors and Admins** only, we provide a **Consolidated Reconciliation View**.
 
 **What it shows:**
+
 - All locations in one table
 - Compare performance across locations
 - See which locations have saved reconciliations
@@ -513,6 +546,7 @@ For **Supervisors and Admins** only, we provide a **Consolidated Reconciliation 
 - Average manday cost across the company
 
 **Why it's important:**
+
 - Management needs to compare locations
 - Identify locations with high costs (investigate why)
 - Generate company-wide reports
@@ -534,18 +568,22 @@ graph LR
 ### What We Built
 
 **Utility Function:**
+
 - **reconciliation.ts** - Business logic for consumption and manday cost calculations
 
 **3 API Endpoints:**
+
 1. **GET /api/locations/:locationId/reconciliations/:periodId** - Get/calculate reconciliation
 2. **PATCH /api/locations/:locationId/reconciliations/:periodId** - Save adjustments
 3. **GET /api/reconciliations/consolidated** - Get all locations (supervisor/admin)
 
 **2 Pages:**
+
 1. **Reconciliations Page** - Single location view with adjustments form
 2. **Consolidated Reconciliation Page** - All locations table with CSV export
 
 **2 Components:**
+
 1. **ReconciliationSummary** - Display stock movement and consumption analysis
 2. **AdjustmentsForm** - Editable form for supervisor adjustments
 
@@ -601,61 +639,43 @@ graph TD
 **Scenario: Complete month cycle for Al Sanafer Kitchen**
 
 **Week 1:**
+
 1. Receive delivery of Rice (20 bags) at SAR 50.00/bag
 2. Period price was SAR 48.00/bag
 3. System auto-creates Price Variance NCR
 4. Operator enters POB daily (50 crew, 5 extra)
 
-**Week 2:**
-5. Issue 5 bags of Rice for cooking
-6. Store transfers 10 bags of Flour to Kitchen (approved by supervisor)
-7. Operator enters POB daily (48 crew, 8 extra)
+**Week 2:** 5. Issue 5 bags of Rice for cooking 6. Store transfers 10 bags of Flour to Kitchen (approved by supervisor) 7. Operator enters POB daily (48 crew, 8 extra)
 
-**Week 3:**
-8. Receive another delivery of Chicken at correct price (no NCR)
-9. Issue 8 bags of Chicken for cooking
-10. Operator enters POB daily (50 crew, 10 extra)
-11. Supervisor updates Price Variance NCR status to "SENT" (sent complaint to supplier)
+**Week 3:** 8. Receive another delivery of Chicken at correct price (no NCR) 9. Issue 8 bags of Chicken for cooking 10. Operator enters POB daily (50 crew, 10 extra) 11. Supervisor updates Price Variance NCR status to "SENT" (sent complaint to supplier)
 
-**Week 4:**
-12. Issue more stock for daily cooking
-13. Operator enters POB daily
-14. Supervisor marks NCR as "CREDITED" (supplier agreed to refund)
+**Week 4:** 12. Issue more stock for daily cooking 13. Operator enters POB daily 14. Supervisor marks NCR as "CREDITED" (supplier agreed to refund)
 
-**Month-End (Day 30):**
-15. Operator views reconciliation - sees auto-calculated consumption
-16. Supervisor opens same reconciliation
-17. Adds adjustments:
-    - Credits: -SAR 100 (from supplier credit note)
-    - Condemnations: SAR 50 (some vegetables spoiled)
-18. Supervisor saves adjustments
-19. Reconciliation now shows final consumption and manday cost
-20. Admin views Consolidated Report showing all locations
-21. Admin exports to CSV for management meeting
+**Month-End (Day 30):** 15. Operator views reconciliation - sees auto-calculated consumption 16. Supervisor opens same reconciliation 17. Adds adjustments: - Credits: -SAR 100 (from supplier credit note) - Condemnations: SAR 50 (some vegetables spoiled) 18. Supervisor saves adjustments 19. Reconciliation now shows final consumption and manday cost 20. Admin views Consolidated Report showing all locations 21. Admin exports to CSV for management meeting
 
 ### Integration Points
 
 **Phase 1 ↔ Phase 2 Integration:**
 
-| Phase 1 Feature | Used By Phase 2 | How |
-|-----------------|-----------------|-----|
-| Deliveries | NCR Management | Price variance detection |
-| Deliveries | Reconciliations | Receipts value |
-| Issues | Reconciliations | Issues value |
-| LocationStock | Transfers | Stock validation |
-| LocationStock | Reconciliations | Opening/Closing stock |
-| Period Management | All Phase 2 | Period context for all operations |
-| Authentication | All Phase 2 | Permission checks |
-| Location Access | All Phase 2 | User can only access assigned locations |
+| Phase 1 Feature   | Used By Phase 2 | How                                     |
+| ----------------- | --------------- | --------------------------------------- |
+| Deliveries        | NCR Management  | Price variance detection                |
+| Deliveries        | Reconciliations | Receipts value                          |
+| Issues            | Reconciliations | Issues value                            |
+| LocationStock     | Transfers       | Stock validation                        |
+| LocationStock     | Reconciliations | Opening/Closing stock                   |
+| Period Management | All Phase 2     | Period context for all operations       |
+| Authentication    | All Phase 2     | Permission checks                       |
+| Location Access   | All Phase 2     | User can only access assigned locations |
 
 **Phase 2 → Future Phase 3:**
 
-| Phase 2 Feature | Used By Phase 3 | How |
-|-----------------|------------------|-----|
-| Reconciliations | Period Close | Validate all reconciliations saved before closing |
-| POB Entries | Period Close | Ensure all days have POB entries |
-| Transfers | Period Close | Ensure no pending transfers remain |
-| NCR Status | Period Close | Warning for unresolved NCRs |
+| Phase 2 Feature | Used By Phase 3 | How                                               |
+| --------------- | --------------- | ------------------------------------------------- |
+| Reconciliations | Period Close    | Validate all reconciliations saved before closing |
+| POB Entries     | Period Close    | Ensure all days have POB entries                  |
+| Transfers       | Period Close    | Ensure no pending transfers remain                |
+| NCR Status      | Period Close    | Warning for unresolved NCRs                       |
 
 ---
 
@@ -665,12 +685,12 @@ graph TD
 
 **Total Endpoints Created: 19**
 
-| Feature | Endpoints | Key Achievement |
-|---------|-----------|-----------------|
-| Transfers | 5 | Atomic transactions for stock movement |
-| NCRs | 4 | Auto-generation logic for price variance |
-| POB | 3 | Bulk upsert for efficient daily entry |
-| Reconciliations | 3 | Auto-calculation when records don't exist |
+| Feature         | Endpoints | Key Achievement                           |
+| --------------- | --------- | ----------------------------------------- |
+| Transfers       | 5         | Atomic transactions for stock movement    |
+| NCRs            | 4         | Auto-generation logic for price variance  |
+| POB             | 3         | Bulk upsert for efficient daily entry     |
+| Reconciliations | 3         | Auto-calculation when records don't exist |
 
 **Key Technical Patterns:**
 
@@ -733,12 +753,14 @@ graph TD
 **Reusable Components Created: 11**
 
 All components follow Vue 3 Composition API with:
+
 - TypeScript interfaces for props and emits
 - Proper type safety
 - Emit declarations for parent communication
 - Semantic design tokens for styling
 
 **Benefits:**
+
 - Code reusability across pages
 - Easier testing
 - Consistent UI/UX
@@ -747,11 +769,13 @@ All components follow Vue 3 Composition API with:
 ### Testing Quality
 
 **Integration Testing:**
+
 - Tested complete workflows end-to-end
 - Identified and fixed 8 critical bugs before production
 - All edge cases validated
 
 **Performance Testing:**
+
 - Measured page load times with Playwright
 - All pages load under 200ms (well within 1-2s SLA)
 - Validated responsive design on mobile viewports
@@ -767,11 +791,13 @@ All components follow Vue 3 Composition API with:
 **1. Business Logic Before Code**
 
 Always understand **why** before coding **how**:
+
 - Why do we need supervisor approval for transfers?
 - Why auto-generate NCRs for price variance?
 - Why calculate manday cost?
 
 Understanding the business purpose helps you:
+
 - Write better validation rules
 - Handle edge cases correctly
 - Communicate with stakeholders
@@ -779,6 +805,7 @@ Understanding the business purpose helps you:
 **2. Data Integrity is Critical**
 
 In financial systems like ours:
+
 - Never allow negative stock
 - Always use transactions for multi-step operations
 - Validate before and after operations
@@ -787,6 +814,7 @@ In financial systems like ours:
 **3. User Experience Matters**
 
 Technical correctness is not enough:
+
 - Show loading states (users need feedback)
 - Display clear error messages (help users fix problems)
 - Use auto-save (reduce friction)
@@ -795,6 +823,7 @@ Technical correctness is not enough:
 **4. Think About Scale**
 
 Design for growth:
+
 - Add pagination early (before you have millions of records)
 - Use indexes on commonly queried fields
 - Cache frequently accessed data
@@ -803,6 +832,7 @@ Design for growth:
 **5. Component Thinking**
 
 Break UI into reusable pieces:
+
 - Forms should be separate components
 - Status badges should be reusable
 - Tables should accept props
@@ -813,11 +843,13 @@ Break UI into reusable pieces:
 **1. Forgetting Stock Validation**
 
 ❌ **Wrong Approach:**
+
 ```
 Create transfer → Approve → Update stock → Error: Negative stock!
 ```
 
 ✅ **Correct Approach:**
+
 ```
 Create transfer → Validate stock → Only allow creation if sufficient
 Approve transfer → Re-validate stock → Only execute if still sufficient
@@ -826,12 +858,14 @@ Approve transfer → Re-validate stock → Only execute if still sufficient
 **2. Not Using Transactions**
 
 ❌ **Wrong Approach:**
+
 ```
 Deduct from source → Server crashes → Destination never gets stock
 Result: Stock disappeared!
 ```
 
 ✅ **Correct Approach:**
+
 ```
 Start transaction → Deduct from source → Add to destination → Commit
 If any step fails → Rollback everything
@@ -840,12 +874,14 @@ If any step fails → Rollback everything
 **3. Poor Error Messages**
 
 ❌ **Wrong Approach:**
+
 ```
 "Error: Validation failed"
 User thinks: What validation? What failed? How do I fix it?
 ```
 
 ✅ **Correct Approach:**
+
 ```
 "Insufficient stock: Item 'Rice' needs 50 KG but only 30 KG available"
 User knows exactly what's wrong and how to fix it
@@ -854,12 +890,14 @@ User knows exactly what's wrong and how to fix it
 **4. Forgetting Permissions**
 
 ❌ **Wrong Approach:**
+
 ```
 Any user can approve transfers
 Result: Operators approving their own requests!
 ```
 
 ✅ **Correct Approach:**
+
 ```
 Check if user.role === 'SUPERVISOR' or 'ADMIN'
 Only then allow approval
@@ -869,12 +907,14 @@ Result: Proper approval workflow enforced
 **5. Not Planning for Scale**
 
 ❌ **Wrong Approach:**
+
 ```
 Fetch all 50,000 transfers from database
 Page load takes 30 seconds
 ```
 
 ✅ **Correct Approach:**
+
 ```
 Fetch only 50 transfers per page
 Use pagination with skip/take
@@ -886,6 +926,7 @@ Page loads in 0.05 seconds
 **1. Read Before Write**
 
 Before writing any API endpoint:
+
 - Read the database schema
 - Understand related tables
 - Check existing utilities (don't reinvent the wheel)
@@ -893,6 +934,7 @@ Before writing any API endpoint:
 **2. Test As You Go**
 
 Don't wait until the end:
+
 - Test each endpoint immediately after creation
 - Use Playwright to test UI as you build it
 - Fix bugs when fresh in your mind
@@ -900,6 +942,7 @@ Don't wait until the end:
 **3. Type Safety Saves Time**
 
 TypeScript may seem like extra work, but:
+
 - Catches errors at compile time (not runtime)
 - Provides autocomplete (faster coding)
 - Makes refactoring safer
@@ -908,6 +951,7 @@ TypeScript may seem like extra work, but:
 **4. Follow Patterns**
 
 Once a pattern is established:
+
 - Follow it consistently (DRY principle)
 - Don't create new patterns unless necessary
 - Makes code easier to understand
@@ -936,12 +980,14 @@ All features are **production-ready** - they handle real-world scenarios, edge c
 Phase 2 transformed our Stock Management System from a **basic inventory tracker** into a **complete operational control system**.
 
 We now have:
+
 - **Stock movement** between locations with proper approval
 - **Quality control** with automatic issue detection
 - **Daily headcount** tracking for cost analysis
 - **Period-end calculations** for management reporting
 
 Every feature was built with:
+
 - **Business understanding** first
 - **Data integrity** as priority
 - **User experience** as focus
@@ -955,6 +1001,7 @@ These principles will guide us in Phase 3 as we build the final piece: **Period 
 **Next Steps:**
 
 After reading this guide, you should:
+
 1. Review the actual implementation in the codebase
 2. Try running the application locally
 3. Test each feature to see how it works

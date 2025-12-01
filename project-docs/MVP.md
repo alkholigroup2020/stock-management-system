@@ -127,6 +127,7 @@ flowchart LR
 ### Slice 1: Foundation & Locations (12 days)
 
 **Goal:** Multi-location infrastructure and base operations
+
 - Location management and user assignment
 - Items & Prices with period price setting
 - Deliveries with automatic price variance NCR
@@ -137,6 +138,7 @@ flowchart LR
 ### Slice 2: Transfers & Controls (10 days)
 
 **Goal:** Inter-location operations and controls
+
 - Transfer creation and approval workflow
 - NCR management (manual + auto)
 - POB entry per location
@@ -146,6 +148,7 @@ flowchart LR
 ### Slice 3: Period Management (8 days)
 
 **Goal:** Complete period lifecycle
+
 - Period close approval workflow
 - Location readiness tracking
 - Simultaneous close execution
@@ -155,6 +158,7 @@ flowchart LR
 ### Slice 4: Polish & Performance (5 days)
 
 **Goal:** Production readiness
+
 - UI/UX refinements
 - Performance optimization
 - Error handling
@@ -250,21 +254,21 @@ gantt
 
 ### Technical Risks
 
-| Risk | Impact | Mitigation |
-| --- | --- | --- |
-| Multi-location complexity | High | Start with 2-3 pilots |
-| Data migration errors | High | No migration, fresh start |
-| Performance at scale | Medium | Load testing, caching |
-| Network issues | Medium | Retry logic, queuing |
+| Risk                      | Impact | Mitigation                |
+| ------------------------- | ------ | ------------------------- |
+| Multi-location complexity | High   | Start with 2-3 pilots     |
+| Data migration errors     | High   | No migration, fresh start |
+| Performance at scale      | Medium | Load testing, caching     |
+| Network issues            | Medium | Retry logic, queuing      |
 
 ### Business Risks
 
-| Risk | Impact | Mitigation |
-| --- | --- | --- |
-| User resistance | High | Training, parallel run |
-| Price variance overload | Medium | Bulk resolution tools |
-| Transfer errors | Medium | Approval workflow |
-| Period close delays | Low | Clear checklist, alerts |
+| Risk                    | Impact | Mitigation              |
+| ----------------------- | ------ | ----------------------- |
+| User resistance         | High   | Training, parallel run  |
+| Price variance overload | Medium | Bulk resolution tools   |
+| Transfer errors         | Medium | Approval workflow       |
+| Period close delays     | Low    | Clear checklist, alerts |
 
 ## 11) Pilot Locations Selection
 
@@ -304,27 +308,27 @@ gantt
 
 ### Technical Readiness
 
-- [ ]  All slices deployed
-- [ ]  Performance SLAs met
-- [ ]  Security scan passed
-- [ ]  Backup/restore tested
-- [ ]  Monitoring configured
+- [ ] All slices deployed
+- [ ] Performance SLAs met
+- [ ] Security scan passed
+- [ ] Backup/restore tested
+- [ ] Monitoring configured
 
 ### Business Readiness
 
-- [ ]  Pilot locations selected
-- [ ]  Users trained
-- [ ]  Period prices set
-- [ ]  Item master loaded
-- [ ]  Support team ready
+- [ ] Pilot locations selected
+- [ ] Users trained
+- [ ] Period prices set
+- [ ] Item master loaded
+- [ ] Support team ready
 
 ### Operational Readiness
 
-- [ ]  Runbooks documented
-- [ ]  Escalation process defined
-- [ ]  Rollback plan ready
-- [ ]  Communication sent
-- [ ]  Executive sign-off
+- [ ] Runbooks documented
+- [ ] Escalation process defined
+- [ ] Rollback plan ready
+- [ ] Communication sent
+- [ ] Executive sign-off
 
 ## 14) Post-MVP Roadmap
 

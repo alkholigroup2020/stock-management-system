@@ -17,10 +17,7 @@ export interface TestUser {
 /**
  * Login and get authentication cookie
  */
-export async function loginUser(
-  username: string,
-  password: string
-): Promise<TestUser> {
+export async function loginUser(username: string, password: string): Promise<TestUser> {
   const response = await fetch(`${BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: {

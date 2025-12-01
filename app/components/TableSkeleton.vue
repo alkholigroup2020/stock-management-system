@@ -5,11 +5,7 @@
         <!-- Header Skeleton -->
         <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
           <tr>
-            <th
-              v-for="col in columns"
-              :key="col"
-              class="px-4 py-3 text-left"
-            >
+            <th v-for="col in columns" :key="col" class="px-4 py-3 text-left">
               <USkeleton class="h-4 w-24" />
             </th>
           </tr>

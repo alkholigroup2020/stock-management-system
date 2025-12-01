@@ -205,7 +205,10 @@ const submitTransfer = async () => {
           },
         });
 
-        handleSuccess("Transfer Created Successfully", "The transfer request has been submitted and is pending supervisor approval.");
+        handleSuccess(
+          "Transfer Created Successfully",
+          "The transfer request has been submitted and is pending supervisor approval."
+        );
 
         // Redirect to transfer detail page
         router.push(`/transfers/${result.id}`);
@@ -496,7 +499,13 @@ watch(
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton color="neutral" variant="soft" class="cursor-pointer" @click="cancel" :disabled="loading">
+        <UButton
+          color="neutral"
+          variant="soft"
+          class="cursor-pointer"
+          @click="cancel"
+          :disabled="loading"
+        >
           Cancel
         </UButton>
         <UButton

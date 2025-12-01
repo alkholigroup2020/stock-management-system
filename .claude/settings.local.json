@@ -92,7 +92,8 @@
       "Bash(pkill:*)",
       "WebFetch(domain:ui.nuxt.com)",
       "Bash(jq:*)",
-      "Bash(pnpm format:check:*)"
+      "Bash(pnpm format:check:*)",
+      "Bash(pnpm format:*)"
     ],
     "deny": [],
     "ask": []

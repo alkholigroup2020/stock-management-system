@@ -390,6 +390,7 @@ ALTER TABLE ItemPrice
 ## 8) Audit Requirements
 
 All transaction tables include:
+
 - Who: User reference
 - When: Timestamp
 - What: Complete record of changes

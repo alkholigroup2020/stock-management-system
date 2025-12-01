@@ -91,12 +91,9 @@ export const usePeriodStore = defineStore("period", {
       this.error = null;
 
       try {
-        const response = await $fetch<{ period: Period | null }>(
-          "/api/periods/current",
-          {
-            method: "GET",
-          }
-        );
+        const response = await $fetch<{ period: Period | null }>("/api/periods/current", {
+          method: "GET",
+        });
 
         this.currentPeriod = response.period;
         this.lastFetched = Date.now();

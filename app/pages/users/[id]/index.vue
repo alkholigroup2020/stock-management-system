@@ -63,23 +63,10 @@ const fetchUser = async () => {
 // Role badge color
 const getRoleBadgeColor = (
   role: UserRole
-):
-  | "error"
-  | "info"
-  | "primary"
-  | "secondary"
-  | "success"
-  | "warning"
-  | "neutral" => {
+): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
   const colors: Record<
     UserRole,
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "neutral"
+    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
   > = {
     ADMIN: "error",
     SUPERVISOR: "warning",
@@ -91,23 +78,10 @@ const getRoleBadgeColor = (
 // Access level badge color
 const getAccessLevelColor = (
   level: string
-):
-  | "error"
-  | "info"
-  | "primary"
-  | "secondary"
-  | "success"
-  | "warning"
-  | "neutral" => {
+): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
   const colors: Record<
     string,
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "neutral"
+    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
   > = {
     MANAGE: "success",
     POST: "primary",
@@ -195,11 +169,7 @@ useHead({
             <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
               Basic Information
             </h2>
-            <UBadge
-              :color="user.is_active ? 'success' : 'neutral'"
-              variant="subtle"
-              size="lg"
-            >
+            <UBadge :color="user.is_active ? 'success' : 'neutral'" variant="subtle" size="lg">
               {{ user.is_active ? "Active" : "Inactive" }}
             </UBadge>
           </div>
@@ -264,9 +234,7 @@ useHead({
       <!-- Location Access Card -->
       <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
         <template #header>
-          <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
-            Location Access
-          </h2>
+          <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Location Access</h2>
         </template>
 
         <!-- No Locations Assigned -->
@@ -285,10 +253,7 @@ useHead({
             class="flex items-center justify-between p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] smooth-transition"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
-              <UIcon
-                name="i-lucide-map-pin"
-                class="w-5 h-5 text-primary flex-shrink-0"
-              />
+              <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary flex-shrink-0" />
               <div class="flex-1 min-w-0">
                 <p class="font-semibold text-[var(--ui-text)]">
                   {{ loc.location.name }}
@@ -323,15 +288,11 @@ useHead({
           <div
             class="flex items-start gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
           >
-            <UIcon
-              name="i-lucide-shield-check"
-              class="w-5 h-5 text-error flex-shrink-0 mt-0.5"
-            />
+            <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
             <div>
               <p class="text-[var(--ui-text)] font-medium">Full System Access</p>
               <p class="text-caption text-[var(--ui-text-muted)] mt-1">
-                Can manage all aspects of the system including users, locations, items, and
-                settings
+                Can manage all aspects of the system including users, locations, items, and settings
               </p>
             </div>
           </div>
@@ -342,10 +303,7 @@ useHead({
           <div
             class="flex items-start gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
           >
-            <UIcon
-              name="i-lucide-shield"
-              class="w-5 h-5 text-warning flex-shrink-0 mt-0.5"
-            />
+            <UIcon name="i-lucide-shield" class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
             <div>
               <p class="text-[var(--ui-text)] font-medium">Supervisor Access</p>
               <p class="text-caption text-[var(--ui-text-muted)] mt-1">
@@ -360,10 +318,7 @@ useHead({
           <div
             class="flex items-start gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
           >
-            <UIcon
-              name="i-lucide-user"
-              class="w-5 h-5 text-success flex-shrink-0 mt-0.5"
-            />
+            <UIcon name="i-lucide-user" class="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
             <div>
               <p class="text-[var(--ui-text)] font-medium">Operator Access</p>
               <p class="text-caption text-[var(--ui-text-muted)] mt-1">

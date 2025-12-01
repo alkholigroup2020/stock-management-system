@@ -107,12 +107,8 @@ export const useAuth = () => {
      * @param roles - Array of roles to check
      * @returns boolean
      */
-    hasAnyRole: (
-      roles: Array<"ADMIN" | "SUPERVISOR" | "OPERATOR">
-    ): boolean => {
-      return roles.includes(
-        authStore.role as "ADMIN" | "SUPERVISOR" | "OPERATOR"
-      );
+    hasAnyRole: (roles: Array<"ADMIN" | "SUPERVISOR" | "OPERATOR">): boolean => {
+      return roles.includes(authStore.role as "ADMIN" | "SUPERVISOR" | "OPERATOR");
     },
 
     /**
@@ -141,9 +137,7 @@ export const useAuth = () => {
      * @param locationId - Location ID to check
      * @returns Access level ('VIEW', 'POST', 'MANAGE') or null
      */
-    getLocationAccessLevel: (
-      locationId: string
-    ): "VIEW" | "POST" | "MANAGE" | null => {
+    getLocationAccessLevel: (locationId: string): "VIEW" | "POST" | "MANAGE" | null => {
       return authStore.getLocationAccessLevel(locationId);
     },
 

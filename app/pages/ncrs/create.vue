@@ -166,7 +166,10 @@ const handleSubmit = async () => {
       },
     });
 
-    handleSuccess("NCR Created Successfully", `NCR ${response.ncr.ncr_no} has been created and is pending review.`);
+    handleSuccess(
+      "NCR Created Successfully",
+      `NCR ${response.ncr.ncr_no} has been created and is pending review.`
+    );
     router.push(`/ncrs/${response.ncr.id}`);
   } catch (error: any) {
     console.error("NCR submission error:", error);
@@ -227,7 +230,7 @@ const fetchDeliveries = async () => {
         params: {
           includeLines: false,
         },
-      },
+      }
     );
     deliveries.value = response.deliveries;
   } catch (error) {
@@ -242,7 +245,7 @@ watch(
     fetchDeliveries();
     // Reset delivery selection when location changes
     formData.value.delivery_id = "";
-  },
+  }
 );
 
 // Initial load
@@ -299,9 +302,7 @@ onMounted(async () => {
               searchable
               :disabled="!formData.location_id || deliveries.length === 0"
             />
-            <p class="mt-1 text-caption">
-              Link this NCR to a specific delivery if applicable
-            </p>
+            <p class="mt-1 text-caption">Link this NCR to a specific delivery if applicable</p>
           </div>
 
           <!-- Reason -->
@@ -324,13 +325,7 @@ onMounted(async () => {
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-subheading font-semibold">NCR Items</h2>
-            <UButton
-              icon="i-lucide-plus"
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="addLine"
-            >
+            <UButton icon="i-lucide-plus" color="primary" variant="soft" size="sm" @click="addLine">
               Add Item
             </UButton>
           </div>
@@ -447,7 +442,13 @@ onMounted(async () => {
 
       <!-- Form Actions -->
       <div class="flex justify-end space-x-3">
-        <UButton color="neutral" variant="soft" class="cursor-pointer" @click="handleCancel" :disabled="loading">
+        <UButton
+          color="neutral"
+          variant="soft"
+          class="cursor-pointer"
+          @click="handleCancel"
+          :disabled="loading"
+        >
           Cancel
         </UButton>
         <UButton

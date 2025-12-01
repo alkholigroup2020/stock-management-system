@@ -1,4 +1,5 @@
 # Phase 2.2: NCR Management
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -22,12 +23,14 @@
 ### The Problem
 
 In a food service business, suppliers sometimes deliver items that don't match what was ordered:
+
 - Supplier charges **SAR 15.00** per KG but the agreed price was **SAR 12.00**
 - Items delivered are damaged or wrong quantity
 - Quality issues (expired, spoiled, wrong specifications)
 - Wrong items delivered
 
 **Problems with manual tracking:**
+
 - ❌ No record of supplier mistakes (memory-based)
 - ❌ Lost money (overcharges not noticed or forgotten)
 - ❌ No follow-up process (issues not resolved)
@@ -37,6 +40,7 @@ In a food service business, suppliers sometimes deliver items that don't match w
 ### Our Solution
 
 We built an **NCR (Non-Conformance Report) System** that:
+
 - ✅ Automatically detects price differences when deliveries are posted
 - ✅ Creates NCR records with complete details
 - ✅ Allows manual NCR creation for other issues (damage, quality, etc.)
@@ -109,20 +113,24 @@ We created **4 API endpoints** that handle all NCR operations on the server side
 ### What Was Done
 
 #### Endpoint 1: GET /api/ncrs
+
 **Purpose:** Get list of all NCRs with filters
 
 **What it does:**
+
 - Returns all NCRs (or filtered subset)
 - Operators see only NCRs for their assigned locations
 - Admins/supervisors see all NCRs
 - Can filter by: location, type, status, date range, auto-generated flag
 
 **Example Request:**
+
 ```http
 GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
 ```
 
 **Response:**
+
 ```json
 {
   "ncrs": [
@@ -133,7 +141,7 @@ GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
       "auto_generated": true,
       "location": { "name": "Main Kitchen", "code": "MAIN-KIT" },
       "status": "OPEN",
-      "ncr_value": 150.00,
+      "ncr_value": 150.0,
       "ncr_date": "2025-11-17",
       "reason": "Price variance detected on delivery DEL-2025-045..."
     }
@@ -142,10 +150,12 @@ GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
 ```
 
 **NCR Types:**
+
 - **MANUAL**: Created by users for quality issues, damage, wrong items
 - **PRICE_VARIANCE**: Auto-created when delivery price ≠ period price
 
 **NCR Statuses:**
+
 - **OPEN**: NCR created, not yet sent to supplier
 - **SENT**: Sent to supplier, waiting for response
 - **CREDITED**: Supplier accepted, credit received
@@ -155,9 +165,11 @@ GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
 ---
 
 #### Endpoint 2: POST /api/ncrs
+
 **Purpose:** Create a new manual NCR
 
 **What it does:**
+
 1. Validates all input data (location, reason, items, values)
 2. Checks user has access to the location
 3. Generates unique NCR number (NCR-2025-001)
@@ -166,6 +178,7 @@ GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
 6. Calculates total value from all line items
 
 **Example Request:**
+
 ```json
 {
   "location_id": "abc123",
@@ -175,13 +188,14 @@ GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
     {
       "item_id": "item789",
       "quantity": 5.0,
-      "unit_value": 15.00
+      "unit_value": 15.0
     }
   ]
 }
 ```
 
 **How NCR Number is Generated:**
+
 ```typescript
 // Format: NCR-YYYY-NNN
 // Example: NCR-2025-001, NCR-2025-002, etc.
@@ -189,14 +203,12 @@ GET /api/ncrs?locationId=abc123&type=PRICE_VARIANCE&status=OPEN
 const year = new Date().getFullYear();
 const lastNCR = await prisma.nCR.findFirst({
   where: { ncr_no: { startsWith: `NCR-${year}-` } },
-  orderBy: { ncr_no: 'desc' }
+  orderBy: { ncr_no: "desc" },
 });
 
-const nextNumber = lastNCR
-  ? parseInt(lastNCR.ncr_no.split('-')[2]) + 1
-  : 1;
+const nextNumber = lastNCR ? parseInt(lastNCR.ncr_no.split("-")[2]) + 1 : 1;
 
-const ncr_no = `NCR-${year}-${String(nextNumber).padStart(3, '0')}`;
+const ncr_no = `NCR-${year}-${String(nextNumber).padStart(3, "0")}`;
 // Result: NCR-2025-001
 ```
 
@@ -205,15 +217,18 @@ const ncr_no = `NCR-${year}-${String(nextNumber).padStart(3, '0')}`;
 ---
 
 #### Endpoint 3: GET /api/ncrs/:id
+
 **Purpose:** Get single NCR details
 
 **What it does:**
+
 - Returns complete NCR information
 - For PRICE_VARIANCE type: includes delivery details and price comparison
 - Shows creator information
 - Shows resolution details if resolved
 
 **Response for Auto-Generated NCR:**
+
 ```json
 {
   "id": "xyz789",
@@ -224,7 +239,7 @@ const ncr_no = `NCR-${year}-${String(nextNumber).padStart(3, '0')}`;
   "ncr_date": "2025-11-17",
   "location": { "name": "Main Kitchen", "code": "MAIN-KIT" },
   "reason": "Price variance detected on delivery DEL-2025-045...",
-  "ncr_value": 150.00,
+  "ncr_value": 150.0,
 
   "delivery": {
     "delivery_no": "DEL-2025-045",
@@ -235,9 +250,9 @@ const ncr_no = `NCR-${year}-${String(nextNumber).padStart(3, '0')}`;
   "delivery_line": {
     "item": { "name": "All Purpose Flour", "code": "FLR-001" },
     "quantity": 50.0,
-    "unit_price": 15.00,     // What supplier charged
-    "period_price": 12.00,   // What was agreed
-    "price_difference": 3.00 // Overcharge per unit
+    "unit_price": 15.0, // What supplier charged
+    "period_price": 12.0, // What was agreed
+    "price_difference": 3.0 // Overcharge per unit
   },
 
   "created_by": {
@@ -250,15 +265,18 @@ const ncr_no = `NCR-${year}-${String(nextNumber).padStart(3, '0')}`;
 ---
 
 #### Endpoint 4: PATCH /api/ncrs/:id
+
 **Purpose:** Update NCR status and add resolution notes
 
 **What it does:**
+
 - Allows status transitions through NCR lifecycle
 - Records resolution notes
 - Sets resolved_at timestamp for final statuses
 - Validates user has access to location
 
 **Example Request:**
+
 ```json
 {
   "status": "CREDITED",
@@ -310,6 +328,7 @@ stateDiagram-v2
 ```
 
 **Final Statuses (set resolved_at):**
+
 - CREDITED
 - REJECTED
 - RESOLVED
@@ -321,6 +340,7 @@ stateDiagram-v2
 #### 1. NCR Types Explained
 
 **MANUAL NCR:**
+
 ```typescript
 // Created by users when they notice issues
 {
@@ -334,6 +354,7 @@ stateDiagram-v2
 ```
 
 **PRICE_VARIANCE NCR:**
+
 ```typescript
 // Auto-created by system during delivery posting
 {
@@ -355,20 +376,22 @@ stateDiagram-v2
 const user = event.context.user;
 
 // Check if user can access this location
-const hasAccess = user.role === "ADMIN" ||
-                  user.role === "SUPERVISOR" ||
-                  user.locations.some(loc => loc.id === ncr.location_id);
+const hasAccess =
+  user.role === "ADMIN" ||
+  user.role === "SUPERVISOR" ||
+  user.locations.some((loc) => loc.id === ncr.location_id);
 
 if (!hasAccess) {
   throw createError({
     statusCode: 403,
     statusMessage: "LOCATION_ACCESS_DENIED",
-    message: "You cannot access NCRs for this location"
+    message: "You cannot access NCRs for this location",
   });
 }
 ```
 
 **Permissions:**
+
 - **Operator:** View/create/update NCRs for assigned locations only
 - **Supervisor:** View/create/update NCRs for all locations
 - **Admin:** View/create/update NCRs for all locations
@@ -382,16 +405,13 @@ For **manual NCRs** with multiple items:
 ```typescript
 // Example NCR with 3 items
 const lines = [
-  { item: "Flour", quantity: 5.0, unit_value: 15.00 },    // Line value: 75.00
-  { item: "Sugar", quantity: 10.0, unit_value: 8.00 },    // Line value: 80.00
-  { item: "Oil", quantity: 3.0, unit_value: 25.00 }       // Line value: 75.00
+  { item: "Flour", quantity: 5.0, unit_value: 15.0 }, // Line value: 75.00
+  { item: "Sugar", quantity: 10.0, unit_value: 8.0 }, // Line value: 80.00
+  { item: "Oil", quantity: 3.0, unit_value: 25.0 }, // Line value: 75.00
 ];
 
 // Total NCR value
-const ncr_value = lines.reduce((sum, line) =>
-  sum + (line.quantity * line.unit_value),
-  0
-);
+const ncr_value = lines.reduce((sum, line) => sum + line.quantity * line.unit_value, 0);
 // Result: 75 + 80 + 75 = SAR 230.00
 ```
 
@@ -400,24 +420,24 @@ For **price variance NCRs**:
 ```typescript
 // Single item with price difference
 const delivery_line = {
-  quantity: 50.0,           // KG
-  unit_price: 15.00,        // What supplier charged
-  period_price: 12.00       // What was agreed
+  quantity: 50.0, // KG
+  unit_price: 15.0, // What supplier charged
+  period_price: 12.0, // What was agreed
 };
 
-const price_difference = 15.00 - 12.00;  // 3.00 SAR overcharge
-const ncr_value = 50.0 * 3.00;           // SAR 150.00 total variance
+const price_difference = 15.0 - 12.0; // 3.00 SAR overcharge
+const ncr_value = 50.0 * 3.0; // SAR 150.00 total variance
 ```
 
 ---
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/ncrs/index.get.ts` | List all NCRs with filters |
-| `server/api/ncrs/index.post.ts` | Create manual NCR |
-| `server/api/ncrs/[id].get.ts` | Get single NCR details |
+| File                            | What It Does                |
+| ------------------------------- | --------------------------- |
+| `server/api/ncrs/index.get.ts`  | List all NCRs with filters  |
+| `server/api/ncrs/index.post.ts` | Create manual NCR           |
+| `server/api/ncrs/[id].get.ts`   | Get single NCR details      |
 | `server/api/ncrs/[id].patch.ts` | Update NCR status and notes |
 
 ---
@@ -434,6 +454,7 @@ We created a **web page** that displays all NCRs in a table with filters - like 
 
 **1. Table Display**
 Shows all NCRs with columns:
+
 - NCR No (NCR-2025-001) with auto-generated badge
 - Type (Manual / Price Variance) with color badges
 - Date (DD/MM/YYYY format)
@@ -443,6 +464,7 @@ Shows all NCRs with columns:
 - Status (badge with colors)
 
 **2. Filters**
+
 - **Location:** Dropdown to filter by location
 - **Type:** All / Manual / Price Variance
 - **Status:** All / Open / Sent / Credited / Rejected / Resolved
@@ -454,6 +476,7 @@ Shows all NCRs with columns:
 When filters applied, small chips appear showing active filters with X buttons to remove them.
 
 **4. Actions**
+
 - **New NCR** button (for creating manual NCRs)
 - **Click row** to view NCR details
 
@@ -493,16 +516,9 @@ graph LR
 <template>
   <div class="p-4 md:p-6">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Non-Conformance Reports (NCRs)"
-      icon="alert-triangle"
-    >
+    <LayoutPageHeader title="Non-Conformance Reports (NCRs)" icon="alert-triangle">
       <template #actions>
-        <UButton
-          v-if="canCreateNCR"
-          @click="router.push('/ncrs/create')"
-          color="primary"
-        >
+        <UButton v-if="canCreateNCR" @click="router.push('/ncrs/create')" color="primary">
           New NCR
         </UButton>
       </template>
@@ -522,11 +538,7 @@ graph LR
 
         <!-- Type Filter -->
         <UFormGroup label="Type">
-          <USelectMenu
-            v-model="filters.type"
-            :options="typeOptions"
-            placeholder="All Types"
-          />
+          <USelectMenu v-model="filters.type" :options="typeOptions" placeholder="All Types" />
         </UFormGroup>
 
         <!-- Status Filter -->
@@ -540,22 +552,13 @@ graph LR
       </div>
 
       <div class="flex gap-2 mt-4">
-        <UButton @click="applyFilters" color="primary">
-          Apply Filters
-        </UButton>
-        <UButton @click="clearFilters" variant="outline">
-          Clear
-        </UButton>
+        <UButton @click="applyFilters" color="primary">Apply Filters</UButton>
+        <UButton @click="clearFilters" variant="outline">Clear</UButton>
       </div>
     </UCard>
 
     <!-- NCRs Table -->
-    <DataTable
-      :columns="columns"
-      :data="ncrs"
-      :loading="loading"
-      @row-click="navigateToDetail"
-    />
+    <DataTable :columns="columns" :data="ncrs" :loading="loading" @row-click="navigateToDetail" />
   </div>
 </template>
 
@@ -569,8 +572,8 @@ const fetchNCRs = async () => {
       status: filters.status,
       autoGenerated: filters.autoGenerated,
       startDate: filters.startDate,
-      endDate: filters.endDate
-    }
+      endDate: filters.endDate,
+    },
   });
 
   ncrs.value = data.ncrs;
@@ -608,6 +611,7 @@ const typeLabel = computed(() => {
 ```
 
 **Why different colors?**
+
 - **Primary (Navy)** for Manual = User-created, needs attention
 - **Warning (Amber)** for Price Variance = System detected, potential money issue
 
@@ -634,6 +638,7 @@ Some NCRs are created automatically by the system. We show this clearly:
 ```
 
 **Example Display:**
+
 ```
 NCR-2025-001 [Auto]
 NCR-2025-002
@@ -653,6 +658,7 @@ const truncateReason = (reason: string, maxLength: number = 50) => {
 ```
 
 **Example:**
+
 ```
 Full reason: "Price variance detected on delivery DEL-2025-045. Item: All Purpose Flour (FLR-001). Period price: SAR 12.00, Delivery price: SAR 15.00, Difference: SAR 3.00 per KG. Total variance: SAR 150.00"
 
@@ -673,21 +679,21 @@ const formatCurrency = (value: number) => {
     style: "currency",
     currency: "SAR",
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(value);
 };
 
 // Examples:
-formatCurrency(150.00);   // "SAR 150.00"
-formatCurrency(1234.56);  // "SAR 1,234.56"
+formatCurrency(150.0); // "SAR 150.00"
+formatCurrency(1234.56); // "SAR 1,234.56"
 ```
 
 ---
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                       | What It Does   |
+| -------------------------- | -------------- |
 | `app/pages/ncrs/index.vue` | NCRs list page |
 
 ---
@@ -705,11 +711,13 @@ We created a **form page** where users can manually report quality issues, damag
 The form has **two main sections:**
 
 **Section 1: NCR Information**
+
 - Location (dropdown, pre-filled with user's current location)
 - Related Delivery (optional dropdown - if NCR is about specific delivery)
 - Reason (textarea - explain the problem)
 
 **Section 2: NCR Items**
+
 - Dynamic table to add multiple items
 - For each line:
   - Item (searchable dropdown)
@@ -772,8 +780,8 @@ const userReason = "Damaged flour bags received - torn and wet";
 
 // User adds 2 items
 const items = [
-  { name: "All Purpose Flour", code: "FLR-001", quantity: 5.0, unit_value: 15.00 },
-  { name: "Brown Sugar", code: "SGR-002", quantity: 10.0, unit_value: 8.00 }
+  { name: "All Purpose Flour", code: "FLR-001", quantity: 5.0, unit_value: 15.0 },
+  { name: "Brown Sugar", code: "SGR-002", quantity: 10.0, unit_value: 8.0 },
 ];
 
 // System builds detailed reason
@@ -786,9 +794,7 @@ const buildDetailedReason = (userReason, items) => {
     detailed += `${item.quantity} @ SAR ${item.unit_value} = SAR ${lineValue.toFixed(2)}\n`;
   });
 
-  const totalValue = items.reduce((sum, item) =>
-    sum + (item.quantity * item.unit_value), 0
-  );
+  const totalValue = items.reduce((sum, item) => sum + item.quantity * item.unit_value, 0);
   detailed += `\nTotal NCR Value: SAR ${totalValue.toFixed(2)}`;
 
   return detailed;
@@ -817,20 +823,17 @@ const isFormValid = computed(() => {
   return (
     // Location must be selected
     formData.location_id &&
-
     // Reason must be provided
     formData.reason.trim().length > 0 &&
-
     // At least one item line
     lines.value.length > 0 &&
-
     // All lines must have valid data
-    lines.value.every(line =>
-      line.item_id &&           // Item selected
-      line.quantity > 0 &&       // Positive quantity
-      line.unit_value > 0        // Positive value
+    lines.value.every(
+      (line) =>
+        line.item_id && // Item selected
+        line.quantity > 0 && // Positive quantity
+        line.unit_value > 0 // Positive value
     ) &&
-
     // Total value must be positive
     totalValue.value > 0
   );
@@ -842,6 +845,7 @@ const isFormValid = computed(() => {
 #### Real-Time Calculations
 
 **Line Value:**
+
 ```typescript
 const lineValue = computed(() => {
   return line.quantity * line.unit_value;
@@ -849,15 +853,17 @@ const lineValue = computed(() => {
 ```
 
 **Example:**
+
 - Quantity: 5 KG
 - Unit Value: SAR 15.00 (value of damage per KG)
 - Line Value: **SAR 75.00** (automatic)
 
 **Total NCR Value:**
+
 ```typescript
 const totalValue = computed(() => {
   return lines.value.reduce((sum, line) => {
-    return sum + (line.quantity * line.unit_value);
+    return sum + line.quantity * line.unit_value;
   }, 0);
 });
 ```
@@ -884,20 +890,22 @@ User can optionally link NCR to a delivery:
 <script setup>
 // Delivery options show supplier and date
 const deliveryOptions = computed(() => {
-  return deliveries.value.map(d => ({
+  return deliveries.value.map((d) => ({
     id: d.id,
-    label: `${d.delivery_no} - ${d.supplier.name} (${formatDate(d.delivery_date)})`
+    label: `${d.delivery_no} - ${d.supplier.name} (${formatDate(d.delivery_date)})`,
   }));
 });
 </script>
 ```
 
 **When to link delivery:**
+
 - NCR is about items in that specific delivery
 - Makes it easier to track which supplier had issues
 - Provides context for the NCR
 
 **When NOT to link delivery:**
+
 - General quality issue not tied to specific delivery
 - Stock discrepancy found during counting
 - Damage discovered later
@@ -927,24 +935,13 @@ Users can add multiple items to one NCR:
           {{ formatCurrency(line.quantity * line.unit_value) }}
         </td>
         <td>
-          <UButton
-            icon="trash"
-            color="error"
-            size="sm"
-            @click="removeLine(index)"
-          />
+          <UButton icon="trash" color="error" size="sm" @click="removeLine(index)" />
         </td>
       </tr>
     </table>
 
     <!-- Add Item button -->
-    <UButton
-      icon="plus"
-      @click="addLine"
-      variant="outline"
-    >
-      Add Item
-    </UButton>
+    <UButton icon="plus" @click="addLine" variant="outline">Add Item</UButton>
 
     <!-- Total -->
     <div class="text-right">
@@ -985,23 +982,22 @@ const handleSubmit = async () => {
       location_id: formData.location_id,
       delivery_id: formData.delivery_id || null,
       reason: buildDetailedReason(formData.reason, lines.value),
-      lines: lines.value.map(line => ({
+      lines: lines.value.map((line) => ({
         item_id: line.item_id,
         quantity: line.quantity,
-        unit_value: line.unit_value
-      }))
+        unit_value: line.unit_value,
+      })),
     };
 
     // Call API
     const response = await $fetch("/api/ncrs", {
       method: "POST",
-      body: ncrData
+      body: ncrData,
     });
 
     // Success
     toast.success("NCR created successfully");
     router.push(`/ncrs/${response.ncr.id}`);
-
   } catch (error: any) {
     // Handle specific errors
     switch (error.data?.code) {
@@ -1071,8 +1067,8 @@ Total NCR Value: SAR 160.00
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                        | What It Does             |
+| --------------------------- | ------------------------ |
 | `app/pages/ncrs/create.vue` | Manual NCR creation form |
 
 ---
@@ -1088,6 +1084,7 @@ We created a **detail page** that shows complete NCR information and allows supe
 #### Page Sections
 
 **1. NCR Header**
+
 - NCR number (NCR-2025-001)
 - Type badge (Manual / Price Variance)
 - Auto-generated indicator (if auto-created)
@@ -1100,6 +1097,7 @@ We created a **detail page** that shows complete NCR information and allows supe
 
 **2. Related Delivery Card** (for price variance NCRs only)
 Shows delivery context:
+
 - Delivery number and date
 - Supplier name
 - Item details with price comparison table:
@@ -1117,6 +1115,7 @@ Full NCR reason text with proper formatting
 Notes added when status changed
 
 **5. Status Update Section** (supervisors/admins only)
+
 - Only shown for users with permission
 - Update Status button
 - Modal with:
@@ -1139,9 +1138,18 @@ For auto-generated price variance NCRs, we show detailed comparison:
 
     <!-- Delivery Info -->
     <div class="mb-4">
-      <p><strong>Delivery:</strong> {{ ncr.delivery.delivery_no }}</p>
-      <p><strong>Date:</strong> {{ formatDate(ncr.delivery.delivery_date) }}</p>
-      <p><strong>Supplier:</strong> {{ ncr.delivery.supplier.name }}</p>
+      <p>
+        <strong>Delivery:</strong>
+        {{ ncr.delivery.delivery_no }}
+      </p>
+      <p>
+        <strong>Date:</strong>
+        {{ formatDate(ncr.delivery.delivery_date) }}
+      </p>
+      <p>
+        <strong>Supplier:</strong>
+        {{ ncr.delivery.supplier.name }}
+      </p>
     </div>
 
     <!-- Price Comparison Table -->
@@ -1160,9 +1168,7 @@ For auto-generated price variance NCRs, we show detailed comparison:
         <tr>
           <td>
             {{ ncr.delivery_line.item.name }}
-            <span class="text-sm text-gray-500">
-              ({{ ncr.delivery_line.item.code }})
-            </span>
+            <span class="text-sm text-gray-500">({{ ncr.delivery_line.item.code }})</span>
           </td>
           <td>{{ formatQuantity(ncr.delivery_line.quantity) }}</td>
           <td>
@@ -1312,14 +1318,14 @@ const statusOptions = computed(() => {
     SENT: ["CREDITED", "REJECTED", "RESOLVED"],
     CREDITED: ["RESOLVED"],
     REJECTED: ["RESOLVED"],
-    RESOLVED: [] // Final state, no transitions
+    RESOLVED: [], // Final state, no transitions
   };
 
   const allowedStatuses = transitions[currentStatus] || [];
 
-  return allowedStatuses.map(status => ({
+  return allowedStatuses.map((status) => ({
     value: status,
-    label: statusLabels[status]
+    label: statusLabels[status],
   }));
 });
 
@@ -1328,16 +1334,18 @@ const statusLabels = {
   SENT: "Sent to Supplier",
   CREDITED: "Credited",
   REJECTED: "Rejected",
-  RESOLVED: "Resolved"
+  RESOLVED: "Resolved",
 };
 ```
 
 **Example:**
 If NCR status is OPEN, dropdown shows:
+
 - Sent to Supplier
 - Resolved
 
 If NCR status is SENT, dropdown shows:
+
 - Credited
 - Rejected
 - Resolved
@@ -1355,8 +1363,8 @@ const handleUpdateStatus = async () => {
       method: "PATCH",
       body: {
         status: updateData.status,
-        resolution_notes: updateData.resolution_notes || null
-      }
+        resolution_notes: updateData.resolution_notes || null,
+      },
     });
 
     toast.success("NCR status updated successfully");
@@ -1364,7 +1372,6 @@ const handleUpdateStatus = async () => {
 
     // Refresh NCR data to show new status
     await fetchNCR();
-
   } catch (error: any) {
     switch (error.data?.code) {
       case "NCR_NOT_FOUND":
@@ -1392,15 +1399,18 @@ const handleUpdateStatus = async () => {
 Different parts of UI shown based on NCR status:
 
 **All Statuses:**
+
 - NCR header with details
 - Reason card
 - Related delivery (if price variance)
 
 **OPEN, SENT:**
+
 - Update Status button (if has permission)
 - Can transition to next states
 
 **CREDITED, REJECTED, RESOLVED:**
+
 - Resolution notes displayed
 - Resolved date shown
 - No status update button (final states)
@@ -1435,7 +1445,7 @@ export const usePermissions = () => {
     }
 
     // Operators can update NCRs for their assigned locations
-    return user.locations?.some(loc => loc.id === locationId) || false;
+    return user.locations?.some((loc) => loc.id === locationId) || false;
   };
 
   return { canUpdateStatus };
@@ -1457,12 +1467,13 @@ await prisma.nCR.update({
   data: {
     status,
     resolution_notes,
-    resolved_at: isFinalStatus ? new Date() : undefined
-  }
+    resolved_at: isFinalStatus ? new Date() : undefined,
+  },
 });
 ```
 
 **Display:**
+
 ```vue
 <div v-if="ncr.resolved_at">
   <p><strong>Resolved:</strong> {{ formatDateTime(ncr.resolved_at) }}</p>
@@ -1473,8 +1484,8 @@ await prisma.nCR.update({
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                      | What It Does                      |
+| ------------------------- | --------------------------------- |
 | `app/pages/ncrs/[id].vue` | NCR detail and status update page |
 
 ---
@@ -1502,9 +1513,9 @@ for (const line of lines) {
     where: {
       item_id_period_id: {
         item_id: line.item_id,
-        period_id: currentPeriod.id
-      }
-    }
+        period_id: currentPeriod.id,
+      },
+    },
   });
 
   // Check if delivery price differs from period price
@@ -1518,7 +1529,7 @@ for (const line of lines) {
       deliveryPrice: line.unit_price,
       periodPrice: periodPrice.price,
       locationId: locationId,
-      createdBy: user.id
+      createdBy: user.id,
     });
 
     // Mark delivery as having variance
@@ -1529,7 +1540,7 @@ for (const line of lines) {
 // Update delivery header
 await prisma.delivery.update({
   where: { id: delivery.id },
-  data: { has_variance: hasVariance }
+  data: { has_variance: hasVariance },
 });
 ```
 
@@ -1540,6 +1551,7 @@ await prisma.delivery.update({
 **Location:** `server/utils/priceVariance.ts`
 
 **Function 1: Check Price Variance**
+
 ```typescript
 export const checkPriceVariance = (
   deliveryPrice: number,
@@ -1553,12 +1565,13 @@ export const checkPriceVariance = (
     hasVariance: difference > threshold,
     varianceAmount: deliveryPrice - periodPrice,
     variancePercentage: percentageVariance,
-    isOvercharge: deliveryPrice > periodPrice
+    isOvercharge: deliveryPrice > periodPrice,
   };
 };
 ```
 
 **Example:**
+
 ```typescript
 // Period price: SAR 12.00
 // Delivery price: SAR 15.00
@@ -1577,6 +1590,7 @@ const result = checkPriceVariance(15.00, 12.00);
 ---
 
 **Function 2: Generate NCR Number**
+
 ```typescript
 export const generateNCRNumber = async () => {
   const year = new Date().getFullYear();
@@ -1584,22 +1598,21 @@ export const generateNCRNumber = async () => {
   // Find last NCR for current year
   const lastNCR = await prisma.nCR.findFirst({
     where: {
-      ncr_no: { startsWith: `NCR-${year}-` }
+      ncr_no: { startsWith: `NCR-${year}-` },
     },
-    orderBy: { ncr_no: 'desc' }
+    orderBy: { ncr_no: "desc" },
   });
 
   // Calculate next number
-  const nextNumber = lastNCR
-    ? parseInt(lastNCR.ncr_no.split('-')[2]) + 1
-    : 1;
+  const nextNumber = lastNCR ? parseInt(lastNCR.ncr_no.split("-")[2]) + 1 : 1;
 
   // Format: NCR-YYYY-NNN
-  return `NCR-${year}-${String(nextNumber).padStart(3, '0')}`;
+  return `NCR-${year}-${String(nextNumber).padStart(3, "0")}`;
 };
 ```
 
 **Example Sequence:**
+
 ```
 NCR-2025-001
 NCR-2025-002
@@ -1612,6 +1625,7 @@ NCR-2026-001  // New year, reset counter
 ---
 
 **Function 3: Create Price Variance NCR**
+
 ```typescript
 export const createPriceVarianceNCR = async (params: {
   deliveryId: string;
@@ -1631,18 +1645,18 @@ export const createPriceVarianceNCR = async (params: {
     deliveryPrice,
     periodPrice,
     locationId,
-    createdBy
+    createdBy,
   } = params;
 
   // Get item details
   const item = await prisma.item.findUnique({
-    where: { id: itemId }
+    where: { id: itemId },
   });
 
   // Get delivery details
   const delivery = await prisma.delivery.findUnique({
     where: { id: deliveryId },
-    include: { supplier: true }
+    include: { supplier: true },
   });
 
   // Calculate variance
@@ -1657,7 +1671,7 @@ Item: ${item.name} (${item.code})
 Quantity: ${quantity} ${item.unit}
 Period Price (Expected): SAR ${periodPrice.toFixed(2)}
 Delivery Price (Actual): SAR ${deliveryPrice.toFixed(2)}
-Difference: SAR ${variance.varianceAmount.toFixed(2)} per ${item.unit} (${variance.isOvercharge ? 'HIGHER' : 'LOWER'})
+Difference: SAR ${variance.varianceAmount.toFixed(2)} per ${item.unit} (${variance.isOvercharge ? "HIGHER" : "LOWER"})
 
 Total Variance: SAR ${Math.abs(totalVariance).toFixed(2)}
 Supplier: ${delivery.supplier.name}
@@ -1680,8 +1694,8 @@ Delivery Date: ${delivery.delivery_date}
       status: "OPEN",
       delivery_id: deliveryId,
       delivery_line_id: deliveryLineId,
-      created_by: createdBy
-    }
+      created_by: createdBy,
+    },
   });
 
   return ncr;
@@ -1691,13 +1705,11 @@ Delivery Date: ${delivery.delivery_date}
 ---
 
 **Function 4: Detect and Create NCR** (Main Function)
+
 ```typescript
 export const detectAndCreateNCR = async (params) => {
   // Check if variance exists
-  const variance = checkPriceVariance(
-    params.deliveryPrice,
-    params.periodPrice
-  );
+  const variance = checkPriceVariance(params.deliveryPrice, params.periodPrice);
 
   if (!variance.hasVariance) {
     return null; // No variance, no NCR needed
@@ -1727,8 +1739,8 @@ const periodPrices = await Promise.all(
         item_id: item.id,
         period_id: currentPeriod.id,
         price: 10.0, // SAR 10.00 for all items in testing
-        set_by: adminUser.id
-      }
+        set_by: adminUser.id,
+      },
     })
   )
 );
@@ -1737,6 +1749,7 @@ console.log(`✓ Created ${periodPrices.length} period prices`);
 ```
 
 **Why this matters:**
+
 - With period prices set to SAR 10.00 for all items
 - If we post delivery with price SAR 15.00
 - System will detect variance and auto-create NCR
@@ -1787,6 +1800,7 @@ sequenceDiagram
 ### Testing the Auto-NCR System
 
 **Step 1: Check Period Prices**
+
 ```sql
 -- View period prices
 SELECT
@@ -1799,6 +1813,7 @@ WHERE ip.period_id = 'current-period-id';
 ```
 
 **Step 2: Post Delivery with Different Price**
+
 ```typescript
 // In UI: Create delivery
 {
@@ -1815,6 +1830,7 @@ WHERE ip.period_id = 'current-period-id';
 ```
 
 **Step 3: Verify NCR Created**
+
 ```sql
 -- Check NCRs table
 SELECT
@@ -1830,11 +1846,13 @@ ORDER BY ncr_date DESC;
 ```
 
 **Expected Result:**
+
 ```
 NCR-2025-001 | PRICE_VARIANCE | true | 150.00 | OPEN | Price variance detected...
 ```
 
 **Step 4: View in UI**
+
 - Go to deliveries list
 - See variance indicator (⚠️) on delivery row
 - Click delivery to view details
@@ -1845,11 +1863,11 @@ NCR-2025-001 | PRICE_VARIANCE | true | 150.00 | OPEN | Price variance detected..
 
 ### Files Verified
 
-| File | What It Contains |
-|------|------------------|
+| File                                                         | What It Contains                        |
+| ------------------------------------------------------------ | --------------------------------------- |
 | `server/api/locations/[locationId]/deliveries/index.post.ts` | Auto-NCR creation logic (lines 352-372) |
-| `server/utils/priceVariance.ts` | All price variance utility functions |
-| `prisma/seed.ts` | Period prices creation for testing |
+| `server/utils/priceVariance.ts`                              | All price variance utility functions    |
+| `prisma/seed.ts`                                             | Period prices creation for testing      |
 
 ---
 
@@ -1857,26 +1875,26 @@ NCR-2025-001 | PRICE_VARIANCE | true | 150.00 | OPEN | Price variance detected..
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/ncrs/index.get.ts` | ~180 | List NCRs with advanced filters |
-| `server/api/ncrs/index.post.ts` | ~150 | Create manual NCR |
-| `server/api/ncrs/[id].get.ts` | ~120 | Get NCR details with delivery context |
-| `server/api/ncrs/[id].patch.ts` | ~100 | Update NCR status and resolution |
+| File                            | Lines | Purpose                               |
+| ------------------------------- | ----- | ------------------------------------- |
+| `server/api/ncrs/index.get.ts`  | ~180  | List NCRs with advanced filters       |
+| `server/api/ncrs/index.post.ts` | ~150  | Create manual NCR                     |
+| `server/api/ncrs/[id].get.ts`   | ~120  | Get NCR details with delivery context |
+| `server/api/ncrs/[id].patch.ts` | ~100  | Update NCR status and resolution      |
 
 ### Frontend Pages
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/ncrs/index.vue` | ~350 | NCRs list with filters |
-| `app/pages/ncrs/create.vue` | ~400 | Manual NCR creation form |
-| `app/pages/ncrs/[id].vue` | ~450 | NCR detail and status management |
+| File                        | Lines | Purpose                          |
+| --------------------------- | ----- | -------------------------------- |
+| `app/pages/ncrs/index.vue`  | ~350  | NCRs list with filters           |
+| `app/pages/ncrs/create.vue` | ~400  | Manual NCR creation form         |
+| `app/pages/ncrs/[id].vue`   | ~450  | NCR detail and status management |
 
 ### Utilities
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/utils/priceVariance.ts` | ~200 | Price variance detection and NCR creation |
+| File                            | Lines | Purpose                                   |
+| ------------------------------- | ----- | ----------------------------------------- |
+| `server/utils/priceVariance.ts` | ~200  | Price variance detection and NCR creation |
 
 **Total:** ~1,950 lines of code
 
@@ -1889,6 +1907,7 @@ NCR-2025-001 | PRICE_VARIANCE | true | 150.00 | OPEN | Price variance detected..
 **Simple Explanation:** Some records are created by the system automatically, others are created by users manually.
 
 **Automatic (System-Created):**
+
 ```typescript
 // Price variance NCRs
 {
@@ -1900,6 +1919,7 @@ NCR-2025-001 | PRICE_VARIANCE | true | 150.00 | OPEN | Price variance detected..
 ```
 
 **Manual (User-Created):**
+
 ```typescript
 // Quality issue NCRs
 {
@@ -1910,6 +1930,7 @@ NCR-2025-001 | PRICE_VARIANCE | true | 150.00 | OPEN | Price variance detected..
 ```
 
 **Why it matters:**
+
 - Automatic = consistent, never missed, but only for specific cases (price variance)
 - Manual = flexible, covers any issue, but depends on user remembering to create
 
@@ -1985,11 +2006,13 @@ Final: Marked Resolved
 **How Price Locking Works:**
 
 At period start (e.g., November 1st):
+
 1. Admin sets prices for all items
 2. Prices saved in `item_prices` table
 3. These become **locked** for the period
 
 **Example:**
+
 ```sql
 -- Period: November 2025
 -- Item: All Purpose Flour (FLR-001)
@@ -1997,24 +2020,26 @@ At period start (e.g., November 1st):
 ```
 
 When delivery posted (e.g., November 17th):
+
 1. User enters delivery with actual supplier price
 2. System compares: `delivery_price` vs `period_price`
 3. If different → auto-create NCR
 
 **Comparison Logic:**
+
 ```typescript
-const periodPrice = 12.00;  // Locked at period start
-const deliveryPrice = 15.00; // What supplier charged
+const periodPrice = 12.0; // Locked at period start
+const deliveryPrice = 15.0; // What supplier charged
 
 if (deliveryPrice !== periodPrice) {
   // VARIANCE DETECTED!
-  const difference = 15.00 - 12.00;        // SAR 3.00
-  const totalVariance = 3.00 * quantity;   // SAR 3.00 × 50 KG = SAR 150.00
+  const difference = 15.0 - 12.0; // SAR 3.00
+  const totalVariance = 3.0 * quantity; // SAR 3.00 × 50 KG = SAR 150.00
 
   // Create NCR automatically
   await createPriceVarianceNCR({
     variance: totalVariance,
-    reason: "Supplier charged SAR 15.00 but agreed price was SAR 12.00"
+    reason: "Supplier charged SAR 15.00 but agreed price was SAR 12.00",
   });
 }
 ```
@@ -2022,11 +2047,13 @@ if (deliveryPrice !== periodPrice) {
 **Why This Matters:**
 
 Without price locking:
+
 - ❌ Operators could enter any price
 - ❌ No way to catch supplier overcharges
 - ❌ Lost money (SAR 150 in this example)
 
 With price locking:
+
 - ✅ System detects all price differences
 - ✅ Creates NCR automatically
 - ✅ Tracks money owed by supplier
@@ -2070,6 +2097,7 @@ erDiagram
 **Example Relationships:**
 
 **Manual NCR (damage):**
+
 ```typescript
 {
   id: "ncr001",
@@ -2081,6 +2109,7 @@ erDiagram
 ```
 
 **Price Variance NCR:**
+
 ```typescript
 {
   id: "ncr002",
@@ -2092,6 +2121,7 @@ erDiagram
 ```
 
 **Why Link to Delivery?**
+
 - Shows which supplier caused issue
 - Shows when problem occurred
 - Provides complete context for claim
@@ -2104,52 +2134,52 @@ erDiagram
 Different ways to calculate NCR value:
 
 **Price Variance NCR:**
+
 ```typescript
 // Variance per unit × quantity
-const unitVariance = deliveryPrice - periodPrice;  // 15.00 - 12.00 = 3.00
+const unitVariance = deliveryPrice - periodPrice; // 15.00 - 12.00 = 3.00
 const quantity = 50.0;
-const ncrValue = unitVariance * quantity;          // 3.00 × 50 = 150.00
+const ncrValue = unitVariance * quantity; // 3.00 × 50 = 150.00
 ```
 
 **Manual NCR (single item):**
+
 ```typescript
 // Unit value × quantity
-const unitValue = 15.00;    // Value of problem per unit
-const quantity = 5.0;        // 5 damaged bags
-const ncrValue = 15.00 * 5.0; // SAR 75.00
+const unitValue = 15.0; // Value of problem per unit
+const quantity = 5.0; // 5 damaged bags
+const ncrValue = 15.0 * 5.0; // SAR 75.00
 ```
 
 **Manual NCR (multiple items):**
+
 ```typescript
 const lines = [
-  { quantity: 5.0,  unit_value: 15.00 },  // Line 1: SAR 75.00
-  { quantity: 10.0, unit_value: 8.00 },   // Line 2: SAR 80.00
-  { quantity: 3.0,  unit_value: 25.00 }   // Line 3: SAR 75.00
+  { quantity: 5.0, unit_value: 15.0 }, // Line 1: SAR 75.00
+  { quantity: 10.0, unit_value: 8.0 }, // Line 2: SAR 80.00
+  { quantity: 3.0, unit_value: 25.0 }, // Line 3: SAR 75.00
 ];
 
-const ncrValue = lines.reduce((sum, line) =>
-  sum + (line.quantity * line.unit_value),
-  0
-); // Total: SAR 230.00
+const ncrValue = lines.reduce((sum, line) => sum + line.quantity * line.unit_value, 0); // Total: SAR 230.00
 ```
 
 ---
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **NCR** | Non-Conformance Report - record of something wrong with delivery |
-| **Price Variance** | Difference between agreed price and actual charged price |
-| **Auto-Generated** | Created automatically by system (not by user) |
-| **Period Price** | Price locked at start of accounting period |
-| **Delivery Price** | Actual price supplier charged in delivery |
-| **Unit Value** | Value of problem per unit (per KG, per piece, etc.) |
-| **NCR Value** | Total money amount of the problem |
-| **Resolution Notes** | Explanation of how NCR was resolved |
-| **Lifecycle** | Journey of NCR from creation to resolution |
-| **Final Status** | Status that ends NCR (CREDITED, REJECTED, RESOLVED) |
-| **Linked Record** | Another record connected to this NCR (delivery, delivery line) |
+| Term                 | Simple Explanation                                               |
+| -------------------- | ---------------------------------------------------------------- |
+| **NCR**              | Non-Conformance Report - record of something wrong with delivery |
+| **Price Variance**   | Difference between agreed price and actual charged price         |
+| **Auto-Generated**   | Created automatically by system (not by user)                    |
+| **Period Price**     | Price locked at start of accounting period                       |
+| **Delivery Price**   | Actual price supplier charged in delivery                        |
+| **Unit Value**       | Value of problem per unit (per KG, per piece, etc.)              |
+| **NCR Value**        | Total money amount of the problem                                |
+| **Resolution Notes** | Explanation of how NCR was resolved                              |
+| **Lifecycle**        | Journey of NCR from creation to resolution                       |
+| **Final Status**     | Status that ends NCR (CREDITED, REJECTED, RESOLVED)              |
+| **Linked Record**    | Another record connected to this NCR (delivery, delivery line)   |
 
 ---
 
@@ -2158,25 +2188,28 @@ const ncrValue = lines.reduce((sum, line) =>
 ### Issue 1: NCR Not Created for Price Variance
 
 **Symptoms:**
+
 - Delivery posted with different price
 - No NCR created
 - No variance indicator on delivery
 
 **Possible Causes:**
+
 1. No period price set for item
 2. Prices exactly match (no variance)
 3. Auto-NCR code not executing
 
 **Solutions:**
+
 ```typescript
 // 1. Check period price exists
 const periodPrice = await prisma.itemPrice.findUnique({
   where: {
     item_id_period_id: {
       item_id: line.item_id,
-      period_id: currentPeriod.id
-    }
-  }
+      period_id: currentPeriod.id,
+    },
+  },
 });
 
 if (!periodPrice) {
@@ -2195,7 +2228,7 @@ console.log("Creating auto-NCR:", {
   item: line.item_id,
   deliveryPrice: line.unit_price,
   periodPrice: periodPrice.price,
-  variance: line.unit_price - periodPrice.price
+  variance: line.unit_price - periodPrice.price,
 });
 ```
 
@@ -2204,20 +2237,23 @@ console.log("Creating auto-NCR:", {
 ### Issue 2: Cannot Update NCR Status
 
 **Symptoms:**
+
 - Update Status button not showing
 - Error: "INSUFFICIENT_PERMISSIONS"
 
 **Causes:**
+
 1. User doesn't have permission for this location
 2. Permission check incorrect
 
 **Solutions:**
+
 ```typescript
 // Check user has access
 const hasAccess =
   user.role === "ADMIN" ||
   user.role === "SUPERVISOR" ||
-  user.locations.some(loc => loc.id === ncr.location_id);
+  user.locations.some((loc) => loc.id === ncr.location_id);
 
 if (!hasAccess) {
   console.log("User cannot access this location");
@@ -2235,12 +2271,14 @@ const canUpdate = computed(() => {
 ### Issue 3: Resolved Timestamp Not Setting
 
 **Symptoms:**
+
 - NCR status changed to CREDITED/REJECTED
 - `resolved_at` field still null
 
 **Cause:** API not setting timestamp for final statuses
 
 **Solution:**
+
 ```typescript
 // In PATCH /api/ncrs/:id
 const finalStatuses = ["CREDITED", "REJECTED", "RESOLVED"];
@@ -2252,8 +2290,8 @@ await prisma.nCR.update({
     status,
     resolution_notes,
     // Set resolved_at only for final statuses
-    ...(isFinalStatus && { resolved_at: new Date() })
-  }
+    ...(isFinalStatus && { resolved_at: new Date() }),
+  },
 });
 ```
 
@@ -2262,20 +2300,21 @@ await prisma.nCR.update({
 ### Issue 4: NCR Value Calculation Wrong
 
 **Symptoms:**
+
 - Manual NCR shows incorrect total value
 - Line values don't add up
 
 **Cause:** Decimal precision or calculation error
 
 **Solution:**
+
 ```typescript
 // Ensure proper decimal handling
 import { Decimal } from "@prisma/client/runtime/library";
 
 const calculateTotal = (lines) => {
   return lines.reduce((sum, line) => {
-    const lineValue = new Decimal(line.quantity)
-      .times(new Decimal(line.unit_value));
+    const lineValue = new Decimal(line.quantity).times(new Decimal(line.unit_value));
     return sum.plus(lineValue);
   }, new Decimal(0));
 };
@@ -2291,6 +2330,7 @@ const total = calculateTotal(lines).toFixed(2);
 ### Manual Testing Steps
 
 **1. View NCRs List**
+
 - [ ] Page loads correctly
 - [ ] All NCRs display in table
 - [ ] Filters work (location, type, status)
@@ -2300,6 +2340,7 @@ const total = calculateTotal(lines).toFixed(2);
 - [ ] Row click navigates to detail
 
 **2. Create Manual NCR**
+
 - [ ] Form loads with location pre-filled
 - [ ] Can select delivery (optional)
 - [ ] Can add multiple item lines
@@ -2310,6 +2351,7 @@ const total = calculateTotal(lines).toFixed(2);
 - [ ] Redirect to NCR detail page
 
 **3. View NCR Details**
+
 - [ ] All NCR information displays correctly
 - [ ] For price variance: delivery details show
 - [ ] For price variance: price comparison table shows
@@ -2320,6 +2362,7 @@ const total = calculateTotal(lines).toFixed(2);
 - [ ] Update Status button hidden for unauthorized users
 
 **4. Update NCR Status (Supervisor/Admin)**
+
 - [ ] Update Status button visible
 - [ ] Modal opens correctly
 - [ ] Status dropdown shows valid options only
@@ -2330,6 +2373,7 @@ const total = calculateTotal(lines).toFixed(2);
 - [ ] `resolved_at` timestamp sets for final statuses
 
 **5. Auto-Generated Price Variance NCR**
+
 - [ ] Post delivery with different price from period price
 - [ ] NCR creates automatically
 - [ ] NCR type is PRICE_VARIANCE
@@ -2346,12 +2390,14 @@ const total = calculateTotal(lines).toFixed(2);
 After completing NCR Management (Phase 2.2), the next phases are:
 
 **→ Phase 2.3: POB Entry** (Days 17-18)
+
 - POB (Personnel On Board) daily entry
 - Calendar view for entering crew and extra counts
 - Total mandays calculation for period
 - Integration with reconciliation calculations
 
 **→ Phase 2.4: Reconciliations** (Days 18-20)
+
 - Period-end reconciliation calculations
 - Opening stock + Receipts - Issues - Transfers = Closing stock
 - Manday cost calculation (consumption / total mandays)
@@ -2359,6 +2405,7 @@ After completing NCR Management (Phase 2.2), the next phases are:
 - Consolidated reconciliation view for supervisors/admins
 
 **→ Phase 3: Period Management** (Days 21-23)
+
 - Period creation and opening
 - Period-end close workflow with validations
 - Stock snapshots and rollover

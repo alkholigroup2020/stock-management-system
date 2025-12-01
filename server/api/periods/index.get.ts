@@ -19,8 +19,14 @@ import type { Prisma } from "@prisma/client";
 // Query schema for validation
 const querySchema = z.object({
   status: z.enum(["DRAFT", "OPEN", "PENDING_CLOSE", "APPROVED", "CLOSED"]).optional(),
-  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  start_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  end_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export default defineEventHandler(async (event) => {

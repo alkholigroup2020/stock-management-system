@@ -56,18 +56,18 @@ System users with role-based access control.
 
 **Table:** `users`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `username` | VARCHAR(50) | No | - | Unique username |
-| `email` | VARCHAR(100) | No | - | Unique email address |
-| `full_name` | VARCHAR(100) | Yes | - | Display name |
-| `role` | UserRole | No | `OPERATOR` | User role (OPERATOR, SUPERVISOR, ADMIN) |
-| `password_hash` | VARCHAR(255) | No | - | Bcrypt password hash |
-| `default_location_id` | UUID | Yes | - | Default location for user |
-| `is_active` | BOOLEAN | No | `true` | Account active status |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Account creation timestamp |
-| `last_login` | TIMESTAMPTZ | Yes | - | Last login timestamp |
+| Column                | Type         | Nullable | Default    | Description                             |
+| --------------------- | ------------ | -------- | ---------- | --------------------------------------- |
+| `id`                  | UUID         | No       | `uuid()`   | Primary key                             |
+| `username`            | VARCHAR(50)  | No       | -          | Unique username                         |
+| `email`               | VARCHAR(100) | No       | -          | Unique email address                    |
+| `full_name`           | VARCHAR(100) | Yes      | -          | Display name                            |
+| `role`                | UserRole     | No       | `OPERATOR` | User role (OPERATOR, SUPERVISOR, ADMIN) |
+| `password_hash`       | VARCHAR(255) | No       | -          | Bcrypt password hash                    |
+| `default_location_id` | UUID         | Yes      | -          | Default location for user               |
+| `is_active`           | BOOLEAN      | No       | `true`     | Account active status                   |
+| `created_at`          | TIMESTAMPTZ  | No       | `now()`    | Account creation timestamp              |
+| `last_login`          | TIMESTAMPTZ  | Yes      | -          | Last login timestamp                    |
 
 **Relationships:**
 
@@ -95,18 +95,18 @@ Physical sites (Kitchen, Store, Central, Warehouse).
 
 **Table:** `locations`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `code` | VARCHAR(10) | No | - | Unique location code (e.g., "KITCHEN") |
-| `name` | VARCHAR(100) | No | - | Display name |
-| `type` | LocationType | No | - | Location type (KITCHEN, STORE, CENTRAL, WAREHOUSE) |
-| `address` | TEXT | Yes | - | Physical address |
-| `manager_id` | UUID | Yes | - | Location manager user ID |
-| `timezone` | VARCHAR(50) | No | `Asia/Riyadh` | Timezone for date operations |
-| `is_active` | BOOLEAN | No | `true` | Active status |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Creation timestamp |
-| `updated_at` | TIMESTAMPTZ | No | `now()` | Last update timestamp |
+| Column       | Type         | Nullable | Default       | Description                                        |
+| ------------ | ------------ | -------- | ------------- | -------------------------------------------------- |
+| `id`         | UUID         | No       | `uuid()`      | Primary key                                        |
+| `code`       | VARCHAR(10)  | No       | -             | Unique location code (e.g., "KITCHEN")             |
+| `name`       | VARCHAR(100) | No       | -             | Display name                                       |
+| `type`       | LocationType | No       | -             | Location type (KITCHEN, STORE, CENTRAL, WAREHOUSE) |
+| `address`    | TEXT         | Yes      | -             | Physical address                                   |
+| `manager_id` | UUID         | Yes      | -             | Location manager user ID                           |
+| `timezone`   | VARCHAR(50)  | No       | `Asia/Riyadh` | Timezone for date operations                       |
+| `is_active`  | BOOLEAN      | No       | `true`        | Active status                                      |
+| `created_at` | TIMESTAMPTZ  | No       | `now()`       | Creation timestamp                                 |
+| `updated_at` | TIMESTAMPTZ  | No       | `now()`       | Last update timestamp                              |
 
 **Relationships:**
 
@@ -127,13 +127,13 @@ Join table for user-location access control.
 
 **Table:** `user_locations`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `user_id` | UUID | No | - | User ID (part of composite PK) |
-| `location_id` | UUID | No | - | Location ID (part of composite PK) |
-| `access_level` | AccessLevel | No | `VIEW` | Access level (VIEW, POST, MANAGE) |
-| `assigned_at` | TIMESTAMPTZ | No | `now()` | Assignment timestamp |
-| `assigned_by` | UUID | Yes | - | User who assigned access |
+| Column         | Type        | Nullable | Default | Description                        |
+| -------------- | ----------- | -------- | ------- | ---------------------------------- |
+| `user_id`      | UUID        | No       | -       | User ID (part of composite PK)     |
+| `location_id`  | UUID        | No       | -       | Location ID (part of composite PK) |
+| `access_level` | AccessLevel | No       | `VIEW`  | Access level (VIEW, POST, MANAGE)  |
+| `assigned_at`  | TIMESTAMPTZ | No       | `now()` | Assignment timestamp               |
+| `assigned_by`  | UUID        | Yes      | -       | User who assigned access           |
 
 **Primary Key:** `(user_id, location_id)`
 
@@ -155,17 +155,17 @@ Product master data (global across locations).
 
 **Table:** `items`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `code` | VARCHAR(50) | No | - | Unique item code |
-| `name` | VARCHAR(200) | No | - | Item name |
-| `unit` | Unit | No | - | Unit of measure (KG, EA, LTR, BOX, CASE, PACK) |
-| `category` | VARCHAR(50) | Yes | - | Category (e.g., "Meat", "Dairy") |
-| `sub_category` | VARCHAR(50) | Yes | - | Sub-category |
-| `is_active` | BOOLEAN | No | `true` | Active status |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Creation timestamp |
-| `updated_at` | TIMESTAMPTZ | No | `now()` | Last update timestamp |
+| Column         | Type         | Nullable | Default  | Description                                    |
+| -------------- | ------------ | -------- | -------- | ---------------------------------------------- |
+| `id`           | UUID         | No       | `uuid()` | Primary key                                    |
+| `code`         | VARCHAR(50)  | No       | -        | Unique item code                               |
+| `name`         | VARCHAR(200) | No       | -        | Item name                                      |
+| `unit`         | Unit         | No       | -        | Unit of measure (KG, EA, LTR, BOX, CASE, PACK) |
+| `category`     | VARCHAR(50)  | Yes      | -        | Category (e.g., "Meat", "Dairy")               |
+| `sub_category` | VARCHAR(50)  | Yes      | -        | Sub-category                                   |
+| `is_active`    | BOOLEAN      | No       | `true`   | Active status                                  |
+| `created_at`   | TIMESTAMPTZ  | No       | `now()`  | Creation timestamp                             |
+| `updated_at`   | TIMESTAMPTZ  | No       | `now()`  | Last update timestamp                          |
 
 **Relationships:**
 
@@ -185,14 +185,14 @@ Vendor information.
 
 **Table:** `suppliers`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `code` | VARCHAR(50) | No | - | Unique supplier code |
-| `name` | VARCHAR(200) | No | - | Supplier name |
-| `contact` | TEXT | Yes | - | Contact information |
-| `is_active` | BOOLEAN | No | `true` | Active status |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Creation timestamp |
+| Column       | Type         | Nullable | Default  | Description          |
+| ------------ | ------------ | -------- | -------- | -------------------- |
+| `id`         | UUID         | No       | `uuid()` | Primary key          |
+| `code`       | VARCHAR(50)  | No       | -        | Unique supplier code |
+| `name`       | VARCHAR(200) | No       | -        | Supplier name        |
+| `contact`    | TEXT         | Yes      | -        | Contact information  |
+| `is_active`  | BOOLEAN      | No       | `true`   | Active status        |
+| `created_at` | TIMESTAMPTZ  | No       | `now()`  | Creation timestamp   |
 
 **Relationships:**
 
@@ -211,16 +211,16 @@ Monthly accounting periods.
 
 **Table:** `periods`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `name` | VARCHAR(100) | No | - | Period name (e.g., "January 2025") |
-| `start_date` | DATE | No | - | Period start date |
-| `end_date` | DATE | No | - | Period end date |
-| `status` | PeriodStatus | No | `DRAFT` | Period status |
-| `approval_id` | UUID | Yes | - | Approval record ID |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Creation timestamp |
-| `closed_at` | TIMESTAMPTZ | Yes | - | Close timestamp |
+| Column        | Type         | Nullable | Default  | Description                        |
+| ------------- | ------------ | -------- | -------- | ---------------------------------- |
+| `id`          | UUID         | No       | `uuid()` | Primary key                        |
+| `name`        | VARCHAR(100) | No       | -        | Period name (e.g., "January 2025") |
+| `start_date`  | DATE         | No       | -        | Period start date                  |
+| `end_date`    | DATE         | No       | -        | Period end date                    |
+| `status`      | PeriodStatus | No       | `DRAFT`  | Period status                      |
+| `approval_id` | UUID         | Yes      | -        | Approval record ID                 |
+| `created_at`  | TIMESTAMPTZ  | No       | `now()`  | Creation timestamp                 |
+| `closed_at`   | TIMESTAMPTZ  | Yes      | -        | Close timestamp                    |
 
 **Period Status Lifecycle:**
 
@@ -253,17 +253,17 @@ Period status per location for coordinated close.
 
 **Table:** `period_locations`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `period_id` | UUID | No | - | Period ID (part of composite PK) |
-| `location_id` | UUID | No | - | Location ID (part of composite PK) |
-| `status` | PeriodLocationStatus | No | `OPEN` | Location status for this period |
-| `opening_value` | DECIMAL(15,2) | Yes | - | Total opening stock value |
-| `closing_value` | DECIMAL(15,2) | Yes | - | Total closing stock value |
-| `snapshot_id` | UUID | Yes | - | Stock snapshot reference |
-| `snapshot_data` | JSON | Yes | - | Stock snapshot at period close |
-| `ready_at` | TIMESTAMPTZ | Yes | - | When location marked ready |
-| `closed_at` | TIMESTAMPTZ | Yes | - | When location closed |
+| Column          | Type                 | Nullable | Default | Description                        |
+| --------------- | -------------------- | -------- | ------- | ---------------------------------- |
+| `period_id`     | UUID                 | No       | -       | Period ID (part of composite PK)   |
+| `location_id`   | UUID                 | No       | -       | Location ID (part of composite PK) |
+| `status`        | PeriodLocationStatus | No       | `OPEN`  | Location status for this period    |
+| `opening_value` | DECIMAL(15,2)        | Yes      | -       | Total opening stock value          |
+| `closing_value` | DECIMAL(15,2)        | Yes      | -       | Total closing stock value          |
+| `snapshot_id`   | UUID                 | Yes      | -       | Stock snapshot reference           |
+| `snapshot_data` | JSON                 | Yes      | -       | Stock snapshot at period close     |
+| `ready_at`      | TIMESTAMPTZ          | Yes      | -       | When location marked ready         |
+| `closed_at`     | TIMESTAMPTZ          | Yes      | -       | When location closed               |
 
 **Primary Key:** `(period_id, location_id)`
 
@@ -297,15 +297,15 @@ Locked prices per period (for variance detection).
 
 **Table:** `item_prices`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `item_id` | UUID | No | - | Item ID |
-| `period_id` | UUID | No | - | Period ID |
-| `price` | DECIMAL(15,4) | No | - | Unit price |
-| `currency` | VARCHAR(3) | No | `SAR` | Currency code |
-| `set_by` | UUID | Yes | - | User who set price |
-| `set_at` | TIMESTAMPTZ | No | `now()` | Price set timestamp |
+| Column      | Type          | Nullable | Default  | Description         |
+| ----------- | ------------- | -------- | -------- | ------------------- |
+| `id`        | UUID          | No       | `uuid()` | Primary key         |
+| `item_id`   | UUID          | No       | -        | Item ID             |
+| `period_id` | UUID          | No       | -        | Period ID           |
+| `price`     | DECIMAL(15,4) | No       | -        | Unit price          |
+| `currency`  | VARCHAR(3)    | No       | `SAR`    | Currency code       |
+| `set_by`    | UUID          | Yes      | -        | User who set price  |
+| `set_at`    | TIMESTAMPTZ   | No       | `now()`  | Price set timestamp |
 
 **Unique Constraint:** `(item_id, period_id)` - One price per item per period
 
@@ -331,16 +331,16 @@ Current stock levels per location.
 
 **Table:** `location_stock`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `location_id` | UUID | No | - | Location ID (part of composite PK) |
-| `item_id` | UUID | No | - | Item ID (part of composite PK) |
-| `on_hand` | DECIMAL(15,4) | No | `0` | Quantity on hand |
-| `wac` | DECIMAL(15,4) | No | `0` | Weighted Average Cost |
-| `min_stock` | DECIMAL(15,4) | Yes | - | Minimum stock level (alert threshold) |
-| `max_stock` | DECIMAL(15,4) | Yes | - | Maximum stock level |
-| `last_counted` | TIMESTAMPTZ | Yes | - | Last physical count date |
-| `updated_at` | TIMESTAMPTZ | No | `now()` | Last update timestamp |
+| Column         | Type          | Nullable | Default | Description                           |
+| -------------- | ------------- | -------- | ------- | ------------------------------------- |
+| `location_id`  | UUID          | No       | -       | Location ID (part of composite PK)    |
+| `item_id`      | UUID          | No       | -       | Item ID (part of composite PK)        |
+| `on_hand`      | DECIMAL(15,4) | No       | `0`     | Quantity on hand                      |
+| `wac`          | DECIMAL(15,4) | No       | `0`     | Weighted Average Cost                 |
+| `min_stock`    | DECIMAL(15,4) | Yes      | -       | Minimum stock level (alert threshold) |
+| `max_stock`    | DECIMAL(15,4) | Yes      | -       | Maximum stock level                   |
+| `last_counted` | TIMESTAMPTZ   | Yes      | -       | Last physical count date              |
+| `updated_at`   | TIMESTAMPTZ   | No       | `now()` | Last update timestamp                 |
 
 **Primary Key:** `(location_id, item_id)`
 
@@ -369,21 +369,21 @@ Goods receipt transactions (increase stock, update WAC).
 
 **Table:** `deliveries`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `delivery_no` | VARCHAR(50) | No | - | Unique delivery number |
-| `period_id` | UUID | No | - | Period ID |
-| `location_id` | UUID | No | - | Location ID |
-| `supplier_id` | UUID | No | - | Supplier ID |
-| `po_id` | UUID | Yes | - | Purchase Order ID (optional) |
-| `invoice_no` | VARCHAR(100) | Yes | - | Supplier invoice number |
-| `delivery_note` | TEXT | Yes | - | Delivery notes |
-| `delivery_date` | DATE | No | - | Delivery date |
-| `total_amount` | DECIMAL(15,2) | No | `0` | Total delivery value |
-| `has_variance` | BOOLEAN | No | `false` | True if any line has price variance |
-| `posted_by` | UUID | No | - | User who posted |
-| `posted_at` | TIMESTAMPTZ | No | `now()` | Post timestamp |
+| Column          | Type          | Nullable | Default  | Description                         |
+| --------------- | ------------- | -------- | -------- | ----------------------------------- |
+| `id`            | UUID          | No       | `uuid()` | Primary key                         |
+| `delivery_no`   | VARCHAR(50)   | No       | -        | Unique delivery number              |
+| `period_id`     | UUID          | No       | -        | Period ID                           |
+| `location_id`   | UUID          | No       | -        | Location ID                         |
+| `supplier_id`   | UUID          | No       | -        | Supplier ID                         |
+| `po_id`         | UUID          | Yes      | -        | Purchase Order ID (optional)        |
+| `invoice_no`    | VARCHAR(100)  | Yes      | -        | Supplier invoice number             |
+| `delivery_note` | TEXT          | Yes      | -        | Delivery notes                      |
+| `delivery_date` | DATE          | No       | -        | Delivery date                       |
+| `total_amount`  | DECIMAL(15,2) | No       | `0`      | Total delivery value                |
+| `has_variance`  | BOOLEAN       | No       | `false`  | True if any line has price variance |
+| `posted_by`     | UUID          | No       | -        | User who posted                     |
+| `posted_at`     | TIMESTAMPTZ   | No       | `now()`  | Post timestamp                      |
 
 **Relationships:**
 
@@ -410,17 +410,17 @@ Line items in delivery.
 
 **Table:** `delivery_lines`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `delivery_id` | UUID | No | - | Delivery ID |
-| `item_id` | UUID | No | - | Item ID |
-| `quantity` | DECIMAL(15,4) | No | - | Quantity received |
-| `unit_price` | DECIMAL(15,4) | No | - | Actual price from delivery |
-| `period_price` | DECIMAL(15,4) | No | - | Expected price from period |
-| `price_variance` | DECIMAL(15,4) | No | `0` | `unit_price - period_price` |
-| `line_value` | DECIMAL(15,2) | No | - | `quantity × unit_price` |
-| `ncr_id` | UUID | Yes | - | Auto-generated NCR ID |
+| Column           | Type          | Nullable | Default  | Description                 |
+| ---------------- | ------------- | -------- | -------- | --------------------------- |
+| `id`             | UUID          | No       | `uuid()` | Primary key                 |
+| `delivery_id`    | UUID          | No       | -        | Delivery ID                 |
+| `item_id`        | UUID          | No       | -        | Item ID                     |
+| `quantity`       | DECIMAL(15,4) | No       | -        | Quantity received           |
+| `unit_price`     | DECIMAL(15,4) | No       | -        | Actual price from delivery  |
+| `period_price`   | DECIMAL(15,4) | No       | -        | Expected price from period  |
+| `price_variance` | DECIMAL(15,4) | No       | `0`      | `unit_price - period_price` |
+| `line_value`     | DECIMAL(15,2) | No       | -        | `quantity × unit_price`     |
+| `ncr_id`         | UUID          | Yes      | -        | Auto-generated NCR ID       |
 
 **Relationships:**
 
@@ -445,18 +445,18 @@ Stock issue transactions (decrease stock, use current WAC).
 
 **Table:** `issues`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `issue_no` | VARCHAR(50) | No | - | Unique issue number |
-| `period_id` | UUID | No | - | Period ID |
-| `location_id` | UUID | No | - | Location ID |
-| `issue_date` | DATE | No | - | Issue date |
-| `cost_centre` | CostCentre | No | `FOOD` | Cost centre (FOOD, CLEAN, OTHER) |
-| `total_value` | DECIMAL(15,2) | No | `0` | Total issue value at WAC |
-| `notes` | TEXT | Yes | - | Issue notes |
-| `posted_by` | UUID | No | - | User who posted |
-| `posted_at` | TIMESTAMPTZ | No | `now()` | Post timestamp |
+| Column        | Type          | Nullable | Default  | Description                      |
+| ------------- | ------------- | -------- | -------- | -------------------------------- |
+| `id`          | UUID          | No       | `uuid()` | Primary key                      |
+| `issue_no`    | VARCHAR(50)   | No       | -        | Unique issue number              |
+| `period_id`   | UUID          | No       | -        | Period ID                        |
+| `location_id` | UUID          | No       | -        | Location ID                      |
+| `issue_date`  | DATE          | No       | -        | Issue date                       |
+| `cost_centre` | CostCentre    | No       | `FOOD`   | Cost centre (FOOD, CLEAN, OTHER) |
+| `total_value` | DECIMAL(15,2) | No       | `0`      | Total issue value at WAC         |
+| `notes`       | TEXT          | Yes      | -        | Issue notes                      |
+| `posted_by`   | UUID          | No       | -        | User who posted                  |
+| `posted_at`   | TIMESTAMPTZ   | No       | `now()`  | Post timestamp                   |
 
 **Relationships:**
 
@@ -483,14 +483,14 @@ Line items in issue.
 
 **Table:** `issue_lines`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `issue_id` | UUID | No | - | Issue ID |
-| `item_id` | UUID | No | - | Item ID |
-| `quantity` | DECIMAL(15,4) | No | - | Quantity issued |
-| `wac_at_issue` | DECIMAL(15,4) | No | - | WAC at time of issue (frozen) |
-| `line_value` | DECIMAL(15,2) | No | - | `quantity × wac_at_issue` |
+| Column         | Type          | Nullable | Default  | Description                   |
+| -------------- | ------------- | -------- | -------- | ----------------------------- |
+| `id`           | UUID          | No       | `uuid()` | Primary key                   |
+| `issue_id`     | UUID          | No       | -        | Issue ID                      |
+| `item_id`      | UUID          | No       | -        | Item ID                       |
+| `quantity`     | DECIMAL(15,4) | No       | -        | Quantity issued               |
+| `wac_at_issue` | DECIMAL(15,4) | No       | -        | WAC at time of issue (frozen) |
+| `line_value`   | DECIMAL(15,2) | No       | -        | `quantity × wac_at_issue`     |
 
 **Relationships:**
 
@@ -515,22 +515,22 @@ Inter-location stock transfers.
 
 **Table:** `transfers`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `transfer_no` | VARCHAR(50) | No | - | Unique transfer number |
-| `from_location_id` | UUID | No | - | Source location ID |
-| `to_location_id` | UUID | No | - | Destination location ID |
-| `status` | TransferStatus | No | `DRAFT` | Transfer status |
-| `requested_by` | UUID | No | - | User who requested |
-| `approved_by` | UUID | Yes | - | User who approved/rejected |
-| `request_date` | DATE | No | - | Request date |
-| `approval_date` | DATE | Yes | - | Approval date |
-| `transfer_date` | DATE | Yes | - | Actual transfer date (when completed) |
-| `total_value` | DECIMAL(15,2) | No | `0` | Total transfer value at source WAC |
-| `notes` | TEXT | Yes | - | Transfer notes |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Creation timestamp |
-| `updated_at` | TIMESTAMPTZ | No | `now()` | Last update timestamp |
+| Column             | Type           | Nullable | Default  | Description                           |
+| ------------------ | -------------- | -------- | -------- | ------------------------------------- |
+| `id`               | UUID           | No       | `uuid()` | Primary key                           |
+| `transfer_no`      | VARCHAR(50)    | No       | -        | Unique transfer number                |
+| `from_location_id` | UUID           | No       | -        | Source location ID                    |
+| `to_location_id`   | UUID           | No       | -        | Destination location ID               |
+| `status`           | TransferStatus | No       | `DRAFT`  | Transfer status                       |
+| `requested_by`     | UUID           | No       | -        | User who requested                    |
+| `approved_by`      | UUID           | Yes      | -        | User who approved/rejected            |
+| `request_date`     | DATE           | No       | -        | Request date                          |
+| `approval_date`    | DATE           | Yes      | -        | Approval date                         |
+| `transfer_date`    | DATE           | Yes      | -        | Actual transfer date (when completed) |
+| `total_value`      | DECIMAL(15,2)  | No       | `0`      | Total transfer value at source WAC    |
+| `notes`            | TEXT           | Yes      | -        | Transfer notes                        |
+| `created_at`       | TIMESTAMPTZ    | No       | `now()`  | Creation timestamp                    |
+| `updated_at`       | TIMESTAMPTZ    | No       | `now()`  | Last update timestamp                 |
 
 **Transfer Status Lifecycle:**
 
@@ -566,14 +566,14 @@ Line items in transfer.
 
 **Table:** `transfer_lines`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `transfer_id` | UUID | No | - | Transfer ID |
-| `item_id` | UUID | No | - | Item ID |
-| `quantity` | DECIMAL(15,4) | No | - | Quantity transferred |
-| `wac_at_transfer` | DECIMAL(15,4) | No | - | WAC from source location |
-| `line_value` | DECIMAL(15,2) | No | - | `quantity × wac_at_transfer` |
+| Column            | Type          | Nullable | Default  | Description                  |
+| ----------------- | ------------- | -------- | -------- | ---------------------------- |
+| `id`              | UUID          | No       | `uuid()` | Primary key                  |
+| `transfer_id`     | UUID          | No       | -        | Transfer ID                  |
+| `item_id`         | UUID          | No       | -        | Item ID                      |
+| `quantity`        | DECIMAL(15,4) | No       | -        | Quantity transferred         |
+| `wac_at_transfer` | DECIMAL(15,4) | No       | -        | WAC from source location     |
+| `line_value`      | DECIMAL(15,2) | No       | -        | `quantity × wac_at_transfer` |
 
 **Relationships:**
 
@@ -599,23 +599,23 @@ Quality and price variance issues.
 
 **Table:** `ncrs`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `ncr_no` | VARCHAR(50) | No | - | Unique NCR number |
-| `location_id` | UUID | No | - | Location ID |
-| `type` | NCRType | No | `MANUAL` | NCR type (MANUAL, PRICE_VARIANCE) |
-| `auto_generated` | BOOLEAN | No | `false` | True if auto-created from variance |
-| `delivery_id` | UUID | Yes | - | Linked delivery (if price variance) |
-| `delivery_line_id` | UUID | Yes | - | Specific delivery line |
-| `reason` | TEXT | No | - | NCR reason/description |
-| `quantity` | DECIMAL(15,4) | Yes | - | Affected quantity |
-| `value` | DECIMAL(15,2) | No | - | NCR value |
-| `status` | NCRStatus | No | `OPEN` | NCR status |
-| `created_by` | UUID | No | - | User who created |
-| `created_at` | TIMESTAMPTZ | No | `now()` | Creation timestamp |
-| `resolved_at` | TIMESTAMPTZ | Yes | - | Resolution timestamp |
-| `resolution_notes` | TEXT | Yes | - | Resolution notes |
+| Column             | Type          | Nullable | Default  | Description                         |
+| ------------------ | ------------- | -------- | -------- | ----------------------------------- |
+| `id`               | UUID          | No       | `uuid()` | Primary key                         |
+| `ncr_no`           | VARCHAR(50)   | No       | -        | Unique NCR number                   |
+| `location_id`      | UUID          | No       | -        | Location ID                         |
+| `type`             | NCRType       | No       | `MANUAL` | NCR type (MANUAL, PRICE_VARIANCE)   |
+| `auto_generated`   | BOOLEAN       | No       | `false`  | True if auto-created from variance  |
+| `delivery_id`      | UUID          | Yes      | -        | Linked delivery (if price variance) |
+| `delivery_line_id` | UUID          | Yes      | -        | Specific delivery line              |
+| `reason`           | TEXT          | No       | -        | NCR reason/description              |
+| `quantity`         | DECIMAL(15,4) | Yes      | -        | Affected quantity                   |
+| `value`            | DECIMAL(15,2) | No       | -        | NCR value                           |
+| `status`           | NCRStatus     | No       | `OPEN`   | NCR status                          |
+| `created_by`       | UUID          | No       | -        | User who created                    |
+| `created_at`       | TIMESTAMPTZ   | No       | `now()`  | Creation timestamp                  |
+| `resolved_at`      | TIMESTAMPTZ   | Yes      | -        | Resolution timestamp                |
+| `resolution_notes` | TEXT          | Yes      | -        | Resolution notes                    |
 
 **NCR Status Lifecycle:**
 
@@ -649,22 +649,22 @@ Period-end reconciliation per location.
 
 **Table:** `reconciliations`
 
-| Column | Type | Nullable | Default | Description |
-|--------|------|----------|---------|-------------|
-| `id` | UUID | No | `uuid()` | Primary key |
-| `period_id` | UUID | No | - | Period ID |
-| `location_id` | UUID | No | - | Location ID |
-| `opening_stock` | DECIMAL(15,2) | No | `0` | Opening stock value |
-| `receipts` | DECIMAL(15,2) | No | `0` | Total deliveries |
-| `transfers_in` | DECIMAL(15,2) | No | `0` | Inbound transfers |
-| `transfers_out` | DECIMAL(15,2) | No | `0` | Outbound transfers |
-| `issues` | DECIMAL(15,2) | No | `0` | Total issues |
-| `closing_stock` | DECIMAL(15,2) | No | `0` | Closing stock value |
-| `adjustments` | DECIMAL(15,2) | No | `0` | General adjustments |
-| `back_charges` | DECIMAL(15,2) | No | `0` | Back charges |
-| `credits` | DECIMAL(15,2) | No | `0` | Credits received |
-| `condemnations` | DECIMAL(15,2) | No | `0` | Condemned stock |
-| `last_updated` | TIMESTAMPTZ | No | `now()` | Last update timestamp |
+| Column          | Type          | Nullable | Default  | Description           |
+| --------------- | ------------- | -------- | -------- | --------------------- |
+| `id`            | UUID          | No       | `uuid()` | Primary key           |
+| `period_id`     | UUID          | No       | -        | Period ID             |
+| `location_id`   | UUID          | No       | -        | Location ID           |
+| `opening_stock` | DECIMAL(15,2) | No       | `0`      | Opening stock value   |
+| `receipts`      | DECIMAL(15,2) | No       | `0`      | Total deliveries      |
+| `transfers_in`  | DECIMAL(15,2) | No       | `0`      | Inbound transfers     |
+| `transfers_out` | DECIMAL(15,2) | No       | `0`      | Outbound transfers    |
+| `issues`        | DECIMAL(15,2) | No       | `0`      | Total issues          |
+| `closing_stock` | DECIMAL(15,2) | No       | `0`      | Closing stock value   |
+| `adjustments`   | DECIMAL(15,2) | No       | `0`      | General adjustments   |
+| `back_charges`  | DECIMAL(15,2) | No       | `0`      | Back charges          |
+| `credits`       | DECIMAL(15,2) | No       | `0`      | Credits received      |
+| `condemnations` | DECIMAL(15,2) | No       | `0`      | Condemned stock       |
+| `last_updated`  | TIMESTAMPTZ   | No       | `now()`  | Last update timestamp |
 
 **Unique Constraint:** `(period_id, location_id)` - One reconciliation per location per period
 
@@ -691,38 +691,46 @@ Period-end reconciliation per location.
 Strategic compound indexes for common query patterns:
 
 **Deliveries:**
+
 - `(period_id, location_id)` - Location deliveries in period
 - `(location_id, has_variance)` - Variance filtering
 - `(location_id, delivery_date)` - Date-based queries
 
 **Issues:**
+
 - `(period_id, location_id)` - Location issues in period
 - `(location_id, cost_centre)` - Cost centre filtering
 - `(location_id, issue_date)` - Date-based queries
 
 **Transfers:**
+
 - `(from_location_id, status)` - Outbound transfers by status
 - `(to_location_id, status)` - Inbound transfers by status
 - `(status, request_date)` - Filtering and sorting
 
 **NCRs:**
+
 - `(location_id, status)` - Location NCRs by status
 - `(location_id, type)` - NCR type filtering
 - `(location_id, created_at)` - Recent NCRs
 
 **Period Locations:**
+
 - `(period_id, status)` - Close coordination
 
 **Items:**
+
 - `(is_active, category)` - Filtered queries
 
 **User Locations:**
+
 - `(user_id, access_level)` - Permission checks
 
 ### Performance Considerations
 
 **Pagination:** Default 50 items, max 200
 **Response SLAs:**
+
 - Single location operations: < 1s
 - Cross-location queries: < 2s
 - Reports: < 5s
@@ -745,30 +753,34 @@ The following constraints ensure data integrity:
 ### Foreign Key Constraints
 
 **Cascade Delete:**
+
 - UserLocation when User or Location deleted
 - All transaction lines when parent transaction deleted
 - Period data when Period deleted
 
 **Restrict Delete:**
+
 - Items, Suppliers, Locations referenced in transactions
 - Users who posted transactions
 
 **Set Null:**
+
 - Optional references (PO, approver, etc.)
 
 ## Data Types
 
 ### Decimal Precision
 
-| Field Type | Precision | Scale | Use Case |
-|-----------|-----------|-------|----------|
-| Quantities | 15 | 4 | Stock quantities (up to 4 decimal places) |
-| Unit Prices | 15 | 4 | Item prices (precise for WAC calculations) |
-| Monetary Values | 15 | 2 | Transaction totals (2 decimal places for currency) |
+| Field Type      | Precision | Scale | Use Case                                           |
+| --------------- | --------- | ----- | -------------------------------------------------- |
+| Quantities      | 15        | 4     | Stock quantities (up to 4 decimal places)          |
+| Unit Prices     | 15        | 4     | Item prices (precise for WAC calculations)         |
+| Monetary Values | 15        | 2     | Transaction totals (2 decimal places for currency) |
 
 ### UUID
 
 All primary keys use UUIDv4 for:
+
 - Globally unique identifiers
 - Distributed system compatibility
 - Security (non-sequential IDs)
@@ -776,6 +788,7 @@ All primary keys use UUIDv4 for:
 ### Timestamps
 
 All timestamps use `TIMESTAMPTZ` (timezone-aware) for:
+
 - Consistent time handling across locations
 - Correct sorting and comparisons
 - Audit trail accuracy

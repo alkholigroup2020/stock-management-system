@@ -10,10 +10,7 @@
     <UIcon :name="icon" :class="['animate-spin', sizeClasses, colorClasses]" />
 
     <!-- Loading Text -->
-    <p
-      v-if="text"
-      :class="['text-muted', centerContent ? 'mt-3' : 'ml-3', textSizeClasses]"
-    >
+    <p v-if="text" :class="['text-muted', centerContent ? 'mt-3' : 'ml-3', textSizeClasses]">
       {{ text }}
     </p>
   </div>

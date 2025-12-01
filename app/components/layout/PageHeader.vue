@@ -44,10 +44,7 @@ const locationText = computed(() => {
         </div>
 
         <!-- Location and Period Info -->
-        <div
-          v-if="showLocation || showPeriod"
-          class="flex items-center gap-2 text-caption"
-        >
+        <div v-if="showLocation || showPeriod" class="flex items-center gap-2 text-caption">
           <template v-if="locationText">
             <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
             <span>{{ locationText }}</span>

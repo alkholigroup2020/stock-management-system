@@ -88,10 +88,7 @@
           <div
             class="w-10 h-10 rounded-lg bg-[var(--ui-bg-elevated)] flex items-center justify-center"
           >
-            <UIcon
-              name="i-lucide-package"
-              class="w-5 h-5 text-emerald-500 dark:text-emerald-400"
-            />
+            <UIcon name="i-lucide-package" class="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
           </div>
           <div>
             <p class="text-xs text-[var(--ui-text-muted)] mb-0.5">Items</p>
@@ -214,8 +211,7 @@ const iconBackgroundClass = computed(() => {
     STORE:
       "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900",
     CENTRAL: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900",
-    WAREHOUSE:
-      "bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-700",
+    WAREHOUSE: "bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-700",
   };
   return backgrounds[props.location.type] || backgrounds.WAREHOUSE;
 });
@@ -233,23 +229,10 @@ const iconColorClass = computed(() => {
 
 // Badge color for location type
 const locationTypeBadgeColor = computed(
-  ():
-    | "primary"
-    | "secondary"
-    | "success"
-    | "error"
-    | "warning"
-    | "info"
-    | "neutral" => {
+  (): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" => {
     const colors: Record<
       string,
-      | "primary"
-      | "secondary"
-      | "success"
-      | "error"
-      | "warning"
-      | "info"
-      | "neutral"
+      "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral"
     > = {
       KITCHEN: "warning",
       STORE: "success",

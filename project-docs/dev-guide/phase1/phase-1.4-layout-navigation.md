@@ -1,4 +1,5 @@
 # Phase 1.4: Base Layout & Navigation
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -23,6 +24,7 @@
 In this phase, we built the **user interface structure** - the layout, navigation menu, global components, and state management stores that power the entire application.
 
 Think of this phase as building the **house framework**. We created:
+
 - The **walls and ceiling** (layout structure)
 - The **doors** (navigation menu)
 - The **furniture** (reusable components)
@@ -60,6 +62,7 @@ graph TB
 We created the **main structure** of the app - like building the frame of a house. Every page uses this layout.
 
 **What Was Done:**
+
 - Created root `app.vue` file
 - Created default layout (`layouts/default.vue`)
 - Built responsive 3-section layout (navbar + sidebar + main content)
@@ -109,7 +112,8 @@ The layout uses a **slot system** where pages go into the main content area:
 
     <!-- Main content area (pages go here) -->
     <main class="flex-1">
-      <slot />  <!-- Your page appears here -->
+      <slot />
+      <!-- Your page appears here -->
     </main>
   </div>
 </template>
@@ -134,6 +138,7 @@ graph LR
 ```
 
 **Files Created:**
+
 - `app/app.vue` - Root component
 - `app/layouts/default.vue` - Main layout
 - `app/components/layout/AppNavbar.vue` - Top navigation bar
@@ -147,6 +152,7 @@ graph LR
 We created the **top bar** you see on every page. It shows the app name, current location, current period, theme toggle, and user menu.
 
 **What Was Done:**
+
 - Created navbar component with brand logo
 - Added location selector dropdown
 - Added period indicator
@@ -241,10 +247,12 @@ sequenceDiagram
 ```
 
 **Components Created:**
+
 - `app/components/layout/LocationSwitcher.vue` - Location dropdown
 - `app/components/layout/PeriodIndicator.vue` - Period display
 
 **API Endpoints Used:**
+
 - `GET /api/user/locations` - Get user's accessible locations
 - `GET /api/periods/current` - Get current open period
 
@@ -256,6 +264,7 @@ sequenceDiagram
 We created the **side menu** that helps users navigate to different pages. It automatically shows/hides menu items based on user permissions.
 
 **What Was Done:**
+
 - Created sidebar with 10 navigation menu items
 - Added role-based filtering (only show what user can access)
 - Added active route highlighting
@@ -367,16 +376,16 @@ The sidebar uses the **UI Store** to manage its state:
 
 ```typescript
 // UI Store controls sidebar
-const uiStore = useUIStore()
+const uiStore = useUIStore();
 
 // Desktop: Toggle collapse
-uiStore.toggleSidebar()           // Collapse/expand
-uiStore.sidebarCollapsed = true   // Collapse
-uiStore.sidebarCollapsed = false  // Expand
+uiStore.toggleSidebar(); // Collapse/expand
+uiStore.sidebarCollapsed = true; // Collapse
+uiStore.sidebarCollapsed = false; // Expand
 
 // Mobile: Toggle overlay
-uiStore.toggleMobileSidebar()     // Open/close
-uiStore.closeMobileSidebar()      // Close only
+uiStore.toggleMobileSidebar(); // Open/close
+uiStore.closeMobileSidebar(); // Close only
 ```
 
 ---
@@ -387,6 +396,7 @@ uiStore.closeMobileSidebar()      // Close only
 We created **reusable components** that are used throughout the app. Like LEGO blocks you can use anywhere.
 
 **What Was Done:**
+
 - Created 5 essential components
 - Made them customizable with props
 - Styled them with design system colors
@@ -404,12 +414,14 @@ We created **reusable components** that are used throughout the app. Like LEGO b
 ```
 
 **Sizes:**
+
 - `sm` - Small (16px)
 - `md` - Medium (24px) - default
 - `lg` - Large (32px)
 - `xl` - Extra large (48px)
 
 **Colors:**
+
 - `primary` - Navy blue
 - `secondary` - Emerald green
 - `neutral` - Gray
@@ -441,12 +453,14 @@ graph LR
 ```
 
 **Types:**
+
 - `error` - Red, for errors
 - `warning` - Amber, for warnings
 - `info` - Blue, for information
 - `success` - Green, for success
 
 **Features:**
+
 - Dismissible (close button)
 - Retry button (optional)
 - Custom action buttons
@@ -482,6 +496,7 @@ graph TB
 ```
 
 **Features:**
+
 - Custom icon
 - Title and description
 - Action button (optional)
@@ -511,7 +526,7 @@ graph TB
   icon="i-lucide-truck"
   :breadcrumbs="[
     { label: 'Home', to: '/' },
-    { label: 'Deliveries', to: '/deliveries' }
+    { label: 'Deliveries', to: '/deliveries' },
   ]"
 >
   <template #actions>
@@ -521,6 +536,7 @@ graph TB
 ```
 
 **Features:**
+
 - Page title with optional icon and badge
 - Breadcrumb navigation
 - Action buttons slot
@@ -550,7 +566,7 @@ graph LR
   :columns="[
     { key: 'name', label: 'Name' },
     { key: 'role', label: 'Role' },
-    { key: 'email', label: 'Email' }
+    { key: 'email', label: 'Email' },
   ]"
   :data="users"
   :loading="isLoading"
@@ -559,6 +575,7 @@ graph LR
 ```
 
 **Features:**
+
 - Loading state (shows spinner)
 - Error state (shows error message)
 - Empty state (shows empty message)
@@ -590,6 +607,7 @@ graph TB
 ```
 
 **Files Created:**
+
 - `app/components/common/LoadingSpinner.vue`
 - `app/components/common/ErrorAlert.vue`
 - `app/components/common/EmptyState.vue`
@@ -604,6 +622,7 @@ graph TB
 We created a **notification system** that shows small messages at the bottom-right of the screen (like phone notifications).
 
 **What Was Done:**
+
 - Configured Nuxt UI toast system
 - Created `useAppToast()` composable
 - Defined 4 toast types with brand colors
@@ -629,22 +648,22 @@ graph TB
 
 ```typescript
 // Import the composable
-const toast = useAppToast()
+const toast = useAppToast();
 
 // Show success message
-toast.success('Saved successfully', 'Your changes have been saved')
+toast.success("Saved successfully", "Your changes have been saved");
 
 // Show error message
-toast.error('Failed to save', 'Please try again later')
+toast.error("Failed to save", "Please try again later");
 
 // Show warning message
-toast.warning('Low stock', 'Item quantity is below minimum')
+toast.warning("Low stock", "Item quantity is below minimum");
 
 // Show info message
-toast.info('New period', 'November period has started')
+toast.info("New period", "November period has started");
 
 // Clear all toasts
-toast.clear()
+toast.clear();
 ```
 
 **Toast Lifecycle:**
@@ -691,36 +710,35 @@ graph TB
 
 ```typescript
 // Custom duration
-toast.success('Saved', 'Data saved', 10000) // 10 seconds
+toast.success("Saved", "Data saved", 10000); // 10 seconds
 
 // With action button
-toast.error(
-  'Failed to delete',
-  'Item is in use',
-  5000,
-  {
-    actions: [{
-      label: 'View Details',
-      onClick: () => showDetails()
-    }]
-  }
-)
+toast.error("Failed to delete", "Item is in use", 5000, {
+  actions: [
+    {
+      label: "View Details",
+      onClick: () => showDetails(),
+    },
+  ],
+});
 
 // Custom icon
 toast.info(
-  'Update available',
-  'New version is ready',
+  "Update available",
+  "New version is ready",
   0, // No auto-dismiss
   {
-    icon: 'i-lucide-download'
+    icon: "i-lucide-download",
   }
-)
+);
 ```
 
 **Files Created:**
+
 - `app/composables/useAppToast.ts` - Toast composable
 
 **Configuration:**
+
 - Added `UNotifications` component to `app.vue`
 - Configured toast position (bottom-right)
 - Set default durations per type
@@ -735,6 +753,7 @@ We created **3 storage boxes** (Pinia stores) that hold important data used acro
 Think of stores like **shared memory** - any page or component can read or change the data, and everyone sees the update.
 
 **What Was Done:**
+
 - Created UI Store (sidebar, modals, toasts)
 - Created Period Store (current period data)
 - Created Location Store (user locations, active location)
@@ -764,12 +783,14 @@ graph TB
 **File:** `app/stores/ui.ts`
 
 **What it stores:**
+
 - Sidebar collapsed state (desktop)
 - Mobile sidebar open state
 - Modal states (open/closed)
 - Toast notification queue
 
 **State:**
+
 ```typescript
 {
   sidebarCollapsed: false,      // Desktop sidebar collapsed?
@@ -780,48 +801,50 @@ graph TB
 ```
 
 **Actions (Methods):**
+
 ```typescript
 // Sidebar
-toggleSidebar()              // Toggle desktop sidebar
-setSidebarCollapsed(value)   // Set sidebar state
-toggleMobileSidebar()        // Toggle mobile sidebar
-closeMobileSidebar()         // Close mobile sidebar
+toggleSidebar(); // Toggle desktop sidebar
+setSidebarCollapsed(value); // Set sidebar state
+toggleMobileSidebar(); // Toggle mobile sidebar
+closeMobileSidebar(); // Close mobile sidebar
 
 // Toasts
-addToast(toast)              // Add new toast
-removeToast(id)              // Remove toast
-showSuccess(title, desc)     // Success toast
-showError(title, desc)       // Error toast
-showWarning(title, desc)     // Warning toast
-showInfo(title, desc)        // Info toast
+addToast(toast); // Add new toast
+removeToast(id); // Remove toast
+showSuccess(title, desc); // Success toast
+showError(title, desc); // Error toast
+showWarning(title, desc); // Warning toast
+showInfo(title, desc); // Info toast
 
 // Modals
-openModal(id, component)     // Open modal
-closeModal(id)               // Close modal
-isModalOpen(id)              // Check if modal open
+openModal(id, component); // Open modal
+closeModal(id); // Close modal
+isModalOpen(id); // Check if modal open
 ```
 
 **Usage Example:**
+
 ```vue
 <script setup>
-const uiStore = useUIStore()
+const uiStore = useUIStore();
 
 // Toggle sidebar
 function toggle() {
-  uiStore.toggleSidebar()
+  uiStore.toggleSidebar();
 }
 
 // Show toast
 function save() {
-  uiStore.showSuccess('Saved!', 'Data saved successfully')
+  uiStore.showSuccess("Saved!", "Data saved successfully");
 }
 
 // Open modal
 function openDialog() {
-  uiStore.openModal('confirm-delete', 'ConfirmDialog', {
-    title: 'Delete Item?',
-    onConfirm: () => deleteItem()
-  })
+  uiStore.openModal("confirm-delete", "ConfirmDialog", {
+    title: "Delete Item?",
+    onConfirm: () => deleteItem(),
+  });
 }
 </script>
 ```
@@ -831,11 +854,13 @@ function openDialog() {
 **File:** `app/stores/period.ts`
 
 **What it stores:**
+
 - Current active period
 - Period status (OPEN, CLOSED, etc.)
 - Loading and error states
 
 **State:**
+
 ```typescript
 {
   currentPeriod: {
@@ -851,21 +876,23 @@ function openDialog() {
 ```
 
 **Computed Getters:**
+
 ```typescript
-hasPeriod         // Is there a period?
-isPeriodOpen      // Is period status OPEN?
-periodName        // Period name
-periodStatus      // Period status
-periodDateRange   // Formatted dates (01/11/2025 - 30/11/2025)
-daysRemaining     // Days left in period
+hasPeriod; // Is there a period?
+isPeriodOpen; // Is period status OPEN?
+periodName; // Period name
+periodStatus; // Period status
+periodDateRange; // Formatted dates (01/11/2025 - 30/11/2025)
+daysRemaining; // Days left in period
 ```
 
 **Actions:**
+
 ```typescript
-fetchCurrentPeriod()   // Load current period from API
-refresh()              // Reload period data
-clearError()           // Clear error message
-reset()                // Reset store
+fetchCurrentPeriod(); // Load current period from API
+refresh(); // Reload period data
+clearError(); // Clear error message
+reset(); // Reset store
 ```
 
 **Period Data Flow:**
@@ -890,29 +917,28 @@ sequenceDiagram
 ```
 
 **Usage Example:**
+
 ```vue
 <script setup>
-const periodStore = usePeriodStore()
+const periodStore = usePeriodStore();
 
 onMounted(() => {
-  periodStore.fetchCurrentPeriod()
-})
+  periodStore.fetchCurrentPeriod();
+});
 </script>
 
 <template>
   <div>
     <p v-if="periodStore.hasPeriod">
       Period: {{ periodStore.periodName }}
-      <br>
+      <br />
       Dates: {{ periodStore.periodDateRange }}
-      <br>
+      <br />
       Days Left: {{ periodStore.daysRemaining }}
-      <br>
+      <br />
       Status: {{ periodStore.periodStatus }}
     </p>
-    <p v-else-if="!periodStore.loading">
-      No active period
-    </p>
+    <p v-else-if="!periodStore.loading">No active period</p>
   </div>
 </template>
 ```
@@ -922,11 +948,13 @@ onMounted(() => {
 **File:** `app/stores/location.ts`
 
 **What it stores:**
+
 - User's accessible locations
 - Currently active location
 - Loading and error states
 
 **State:**
+
 ```typescript
 {
   activeLocationId: 'abc-123',
@@ -946,18 +974,20 @@ onMounted(() => {
 ```
 
 **Computed Getters:**
+
 ```typescript
-activeLocation        // Current location object
-hasLocations          // Has any locations?
-getLocationById(id)   // Get location by ID
+activeLocation; // Current location object
+hasLocations; // Has any locations?
+getLocationById(id); // Get location by ID
 ```
 
 **Actions:**
+
 ```typescript
-fetchUserLocations()      // Load user's locations from API
-switchLocation(id)        // Switch to different location
-clearError()              // Clear error
-reset()                   // Reset store
+fetchUserLocations(); // Load user's locations from API
+switchLocation(id); // Switch to different location
+clearError(); // Clear error
+reset(); // Reset store
 ```
 
 **Location Switching Flow:**
@@ -983,6 +1013,7 @@ sequenceDiagram
 **Auto-Location Selection:**
 
 When the app loads, the location store automatically:
+
 1. Fetches user's accessible locations
 2. Checks user's default location
 3. If default location is accessible, select it
@@ -1007,16 +1038,17 @@ graph TB
 ```
 
 **Usage Example:**
+
 ```vue
 <script setup>
-const locationStore = useLocationStore()
+const locationStore = useLocationStore();
 
 onMounted(() => {
-  locationStore.fetchUserLocations()
-})
+  locationStore.fetchUserLocations();
+});
 
 function switchTo(locationId) {
-  locationStore.switchLocation(locationId)
+  locationStore.switchLocation(locationId);
 }
 </script>
 
@@ -1063,6 +1095,7 @@ graph TB
 ```
 
 **Files Created:**
+
 - `app/stores/ui.ts` - UI state
 - `app/stores/period.ts` - Period state
 - `app/stores/location.ts` - Location state
@@ -1208,6 +1241,7 @@ graph LR
 We designed for mobile first, then added features for larger screens:
 
 **Mobile (375px - 768px):**
+
 - Hamburger menu icon
 - Overlay sidebar
 - Compact navbar (icons only)
@@ -1215,12 +1249,14 @@ We designed for mobile first, then added features for larger screens:
 - Bottom navigation (optional)
 
 **Tablet (768px - 1024px):**
+
 - Toggle sidebar button
 - Collapsible sidebar
 - Mixed icon + text navbar
 - Side-by-side layout
 
 **Desktop (1024px+):**
+
 - Always-visible sidebar
 - Full navbar with labels
 - Wide content area
@@ -1283,16 +1319,17 @@ graph TB
 
 ### Toast Types & Durations
 
-| Type | Color | Icon | Duration | Use When |
-|------|-------|------|----------|----------|
-| **Success** | Emerald Green | ✅ Check Circle | 5 seconds | Save success, create success |
-| **Error** | Red | ❌ Circle X | 7 seconds | Save failed, validation error |
-| **Warning** | Amber | ⚠️ Alert Triangle | 6 seconds | Low stock, data warning |
-| **Info** | Navy Blue | ℹ️ Info | 5 seconds | General information |
+| Type        | Color         | Icon              | Duration  | Use When                      |
+| ----------- | ------------- | ----------------- | --------- | ----------------------------- |
+| **Success** | Emerald Green | ✅ Check Circle   | 5 seconds | Save success, create success  |
+| **Error**   | Red           | ❌ Circle X       | 7 seconds | Save failed, validation error |
+| **Warning** | Amber         | ⚠️ Alert Triangle | 6 seconds | Low stock, data warning       |
+| **Info**    | Navy Blue     | ℹ️ Info           | 5 seconds | General information           |
 
 ### Toast Best Practices
 
 **DO:**
+
 - ✅ Use success for confirmations
 - ✅ Use error for failures
 - ✅ Keep messages short (1-2 sentences)
@@ -1300,6 +1337,7 @@ graph TB
 - ✅ Auto-dismiss after reading time
 
 **DON'T:**
+
 - ❌ Use for critical errors (use modal instead)
 - ❌ Show multiple toasts at once (queue them)
 - ❌ Use for long messages (truncate or use modal)
@@ -1340,6 +1378,7 @@ graph TB
 ### Browser Testing
 
 We tested the layout on:
+
 - ✅ Desktop Chrome (1280px+)
 - ✅ Tablet view (768px - 1024px)
 - ✅ Mobile view (375px - 768px)
@@ -1349,6 +1388,7 @@ We tested the layout on:
 ### Playwright Automation
 
 We used Playwright to automatically test:
+
 - Sidebar toggle functionality
 - Location switching
 - Theme switching
@@ -1364,36 +1404,36 @@ We used Playwright to automatically test:
 ```vue
 <script setup lang="ts">
 // Import stores
-import { useUIStore } from '~/stores/ui'
-import { usePeriodStore } from '~/stores/period'
-import { useLocationStore } from '~/stores/location'
+import { useUIStore } from "~/stores/ui";
+import { usePeriodStore } from "~/stores/period";
+import { useLocationStore } from "~/stores/location";
 
 // Initialize stores
-const uiStore = useUIStore()
-const periodStore = usePeriodStore()
-const locationStore = useLocationStore()
+const uiStore = useUIStore();
+const periodStore = usePeriodStore();
+const locationStore = useLocationStore();
 
 // Load data on mount
 onMounted(() => {
-  periodStore.fetchCurrentPeriod()
-  locationStore.fetchUserLocations()
-})
+  periodStore.fetchCurrentPeriod();
+  locationStore.fetchUserLocations();
+});
 
 // Use store actions
 function toggleSidebar() {
-  uiStore.toggleSidebar()
+  uiStore.toggleSidebar();
 }
 
 function switchLocation(id: string) {
-  locationStore.switchLocation(id)
-  uiStore.showSuccess('Location switched', 'Now viewing ' + locationStore.activeLocation?.name)
+  locationStore.switchLocation(id);
+  uiStore.showSuccess("Location switched", "Now viewing " + locationStore.activeLocation?.name);
 }
 </script>
 
 <template>
   <div>
     <!-- Use store state -->
-    <p>Sidebar: {{ uiStore.sidebarCollapsed ? 'Collapsed' : 'Expanded' }}</p>
+    <p>Sidebar: {{ uiStore.sidebarCollapsed ? "Collapsed" : "Expanded" }}</p>
     <p>Period: {{ periodStore.periodName }}</p>
     <p>Location: {{ locationStore.activeLocation?.name }}</p>
 
@@ -1407,27 +1447,27 @@ function switchLocation(id: string) {
 
 ```vue
 <script setup>
-const loading = ref(true)
-const error = ref(null)
-const data = ref([])
+const loading = ref(true);
+const error = ref(null);
+const data = ref([]);
 
 async function fetchData() {
-  loading.value = true
-  error.value = null
+  loading.value = true;
+  error.value = null;
 
   try {
-    const response = await $fetch('/api/items')
-    data.value = response.items
+    const response = await $fetch("/api/items");
+    data.value = response.items;
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 onMounted(() => {
-  fetchData()
-})
+  fetchData();
+});
 </script>
 
 <template>
@@ -1453,11 +1493,7 @@ onMounted(() => {
     />
 
     <!-- Data -->
-    <DataTable
-      v-else
-      :data="data"
-      :columns="columns"
-    />
+    <DataTable v-else :data="data" :columns="columns" />
   </div>
 </template>
 ```
@@ -1473,15 +1509,11 @@ onMounted(() => {
       icon="i-lucide-truck"
       :breadcrumbs="[
         { label: 'Home', to: '/' },
-        { label: 'Deliveries', to: '/deliveries' }
+        { label: 'Deliveries', to: '/deliveries' },
       ]"
     >
       <template #actions>
-        <UButton
-          v-if="canPostDeliveries"
-          color="primary"
-          @click="createDelivery"
-        >
+        <UButton v-if="canPostDeliveries" color="primary" @click="createDelivery">
           New Delivery
         </UButton>
       </template>
@@ -1499,33 +1531,33 @@ onMounted(() => {
 
 ```vue
 <script setup>
-const toast = useAppToast()
+const toast = useAppToast();
 
 async function saveItem() {
   try {
-    await $fetch('/api/items', {
-      method: 'POST',
-      body: formData
-    })
+    await $fetch("/api/items", {
+      method: "POST",
+      body: formData,
+    });
 
-    toast.success('Saved!', 'Item created successfully')
-    router.push('/items')
+    toast.success("Saved!", "Item created successfully");
+    router.push("/items");
   } catch (error) {
-    toast.error('Save failed', error.message)
+    toast.error("Save failed", error.message);
   }
 }
 
 async function deleteItem() {
   try {
-    await $fetch(`/api/items/${id}`, { method: 'DELETE' })
-    toast.success('Deleted', 'Item removed')
+    await $fetch(`/api/items/${id}`, { method: "DELETE" });
+    toast.success("Deleted", "Item removed");
   } catch (error) {
-    toast.error('Delete failed', 'Item is still in use')
+    toast.error("Delete failed", "Item is still in use");
   }
 }
 
 function showInfo() {
-  toast.info('Period closing soon', 'Only 3 days remaining')
+  toast.info("Period closing soon", "Only 3 days remaining");
 }
 </script>
 ```
@@ -1536,45 +1568,45 @@ function showInfo() {
 
 ### Layout Files
 
-| File | Purpose | What It Does |
-|------|---------|--------------|
-| `app/app.vue` | Root component | Wraps entire app, includes UNotifications |
-| `app/layouts/default.vue` | Main layout | Header + Sidebar + Content structure |
-| `app/components/layout/AppNavbar.vue` | Top navigation | Logo, location, period, user menu |
-| `app/components/layout/AppSidebar.vue` | Side menu | Navigation with role filtering |
-| `app/components/layout/LocationSwitcher.vue` | Location dropdown | Switch between locations |
-| `app/components/layout/PeriodIndicator.vue` | Period display | Shows current period info |
+| File                                         | Purpose           | What It Does                              |
+| -------------------------------------------- | ----------------- | ----------------------------------------- |
+| `app/app.vue`                                | Root component    | Wraps entire app, includes UNotifications |
+| `app/layouts/default.vue`                    | Main layout       | Header + Sidebar + Content structure      |
+| `app/components/layout/AppNavbar.vue`        | Top navigation    | Logo, location, period, user menu         |
+| `app/components/layout/AppSidebar.vue`       | Side menu         | Navigation with role filtering            |
+| `app/components/layout/LocationSwitcher.vue` | Location dropdown | Switch between locations                  |
+| `app/components/layout/PeriodIndicator.vue`  | Period display    | Shows current period info                 |
 
 ### Component Files
 
-| File | Purpose | What It Does |
-|------|---------|--------------|
+| File                                       | Purpose       | What It Does                           |
+| ------------------------------------------ | ------------- | -------------------------------------- |
 | `app/components/common/LoadingSpinner.vue` | Loading state | Spinning icon, customizable size/color |
-| `app/components/common/ErrorAlert.vue` | Error display | Shows errors, warnings, info, success |
-| `app/components/common/EmptyState.vue` | Empty list | Friendly message when no data |
-| `app/components/common/PageHeader.vue` | Page title | Title, breadcrumbs, actions |
-| `app/components/common/DataTable.vue` | Data table | Paginated table with states |
+| `app/components/common/ErrorAlert.vue`     | Error display | Shows errors, warnings, info, success  |
+| `app/components/common/EmptyState.vue`     | Empty list    | Friendly message when no data          |
+| `app/components/common/PageHeader.vue`     | Page title    | Title, breadcrumbs, actions            |
+| `app/components/common/DataTable.vue`      | Data table    | Paginated table with states            |
 
 ### Store Files
 
-| File | Purpose | What It Stores |
-|------|---------|----------------|
-| `app/stores/ui.ts` | UI state | Sidebar, modals, toasts |
-| `app/stores/period.ts` | Period state | Current period, dates, status |
+| File                     | Purpose        | What It Stores                  |
+| ------------------------ | -------------- | ------------------------------- |
+| `app/stores/ui.ts`       | UI state       | Sidebar, modals, toasts         |
+| `app/stores/period.ts`   | Period state   | Current period, dates, status   |
 | `app/stores/location.ts` | Location state | User locations, active location |
 
 ### Composable Files
 
-| File | Purpose | What It Provides |
-|------|---------|------------------|
+| File                             | Purpose             | What It Provides                      |
+| -------------------------------- | ------------------- | ------------------------------------- |
 | `app/composables/useAppToast.ts` | Toast notifications | success(), error(), warning(), info() |
 
 ### API Endpoints Used
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/user/locations` | GET | Get user's accessible locations |
-| `/api/periods/current` | GET | Get current open period |
+| Endpoint               | Method | Purpose                         |
+| ---------------------- | ------ | ------------------------------- |
+| `/api/user/locations`  | GET    | Get user's accessible locations |
+| `/api/periods/current` | GET    | Get current open period         |
 
 ---
 
@@ -1635,36 +1667,36 @@ graph LR
 
 ### UI Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **Layout** | The structure that wraps all pages | Header + Sidebar + Content |
-| **Component** | Reusable UI piece | Button, Table, Alert |
-| **Slot** | Place where content goes | `<slot />` in layout |
-| **Responsive** | Adapts to different screen sizes | Mobile, Tablet, Desktop |
-| **Breakpoint** | Screen size where design changes | 768px, 1024px |
-| **Toast** | Small notification message | "Saved successfully!" |
-| **Store** | Global state storage (Pinia) | Auth store, UI store |
-| **Composable** | Reusable logic function | useAuth(), useAppToast() |
+| Term           | Simple Explanation                 | Example                    |
+| -------------- | ---------------------------------- | -------------------------- |
+| **Layout**     | The structure that wraps all pages | Header + Sidebar + Content |
+| **Component**  | Reusable UI piece                  | Button, Table, Alert       |
+| **Slot**       | Place where content goes           | `<slot />` in layout       |
+| **Responsive** | Adapts to different screen sizes   | Mobile, Tablet, Desktop    |
+| **Breakpoint** | Screen size where design changes   | 768px, 1024px              |
+| **Toast**      | Small notification message         | "Saved successfully!"      |
+| **Store**      | Global state storage (Pinia)       | Auth store, UI store       |
+| **Composable** | Reusable logic function            | useAuth(), useAppToast()   |
 
 ### Layout Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **Navbar** | Top navigation bar | Logo, menu, user menu |
-| **Sidebar** | Side navigation menu | Dashboard, Items, Reports |
-| **Main Content** | Page content area | Where pages render |
-| **Breadcrumbs** | Navigation trail | Home > Items > Edit |
-| **Overlay** | Layer on top of content | Mobile sidebar overlay |
-| **Sticky** | Stays in place when scrolling | Sticky header |
+| Term             | Simple Explanation            | Example                   |
+| ---------------- | ----------------------------- | ------------------------- |
+| **Navbar**       | Top navigation bar            | Logo, menu, user menu     |
+| **Sidebar**      | Side navigation menu          | Dashboard, Items, Reports |
+| **Main Content** | Page content area             | Where pages render        |
+| **Breadcrumbs**  | Navigation trail              | Home > Items > Edit       |
+| **Overlay**      | Layer on top of content       | Mobile sidebar overlay    |
+| **Sticky**       | Stays in place when scrolling | Sticky header             |
 
 ### Component Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **Props** | Input data to component | `size="lg"` |
-| **Emit** | Send event to parent | `@click="handler"` |
-| **Slot** | Custom content area | `<template #actions>` |
-| **Variant** | Different style version | `variant="outline"` |
+| Term        | Simple Explanation      | Example               |
+| ----------- | ----------------------- | --------------------- |
+| **Props**   | Input data to component | `size="lg"`           |
+| **Emit**    | Send event to parent    | `@click="handler"`    |
+| **Slot**    | Custom content area     | `<template #actions>` |
+| **Variant** | Different style version | `variant="outline"`   |
 
 ---
 
@@ -1758,52 +1790,59 @@ graph LR
 ### Problem: Sidebar not showing
 
 **Check:**
+
 1. Is layout set to `default` in page?
 2. Is sidebar collapsed?
 3. Is mobile sidebar closed?
 
 **Solution:**
+
 ```vue
 <script setup>
 definePageMeta({
-  layout: 'default'  // Make sure this is set
-})
+  layout: "default", // Make sure this is set
+});
 </script>
 ```
 
 ### Problem: Store not updating
 
 **Check:**
+
 1. Did you import the store?
 2. Did you call the action?
 3. Are you using reactive data?
 
 **Solution:**
+
 ```typescript
 // Import store
-import { useLocationStore } from '~/stores/location'
+import { useLocationStore } from "~/stores/location";
 
 // Initialize (not just import)
-const locationStore = useLocationStore()
+const locationStore = useLocationStore();
 
 // Call action
-await locationStore.fetchUserLocations()
+await locationStore.fetchUserLocations();
 ```
 
 ### Problem: Toast not showing
 
 **Check:**
+
 1. Is `UNotifications` in `app.vue`?
 2. Did you import `useAppToast()`?
 3. Did you call the toast method?
 
 **Solution:**
+
 ```vue
 <!-- app.vue should have -->
 <template>
   <UApp>
     <NuxtPage />
-    <UNotifications />  <!-- Must be here -->
+    <UNotifications />
+    <!-- Must be here -->
   </UApp>
 </template>
 ```
@@ -1811,21 +1850,23 @@ await locationStore.fetchUserLocations()
 ### Problem: Location not switching
 
 **Check:**
+
 1. Does user have access to location?
 2. Is location ID valid?
 3. Is location store initialized?
 
 **Solution:**
+
 ```typescript
-const locationStore = useLocationStore()
+const locationStore = useLocationStore();
 
 // Make sure locations are loaded
-await locationStore.fetchUserLocations()
+await locationStore.fetchUserLocations();
 
 // Then switch
-const success = await locationStore.switchLocation(newLocationId)
+const success = await locationStore.switchLocation(newLocationId);
 if (!success) {
-  console.error(locationStore.error)
+  console.error(locationStore.error);
 }
 ```
 
@@ -1844,6 +1885,7 @@ We've successfully built the **user interface foundation** of the Stock Manageme
 ✅ **Dark Mode** - Theme switcher with system preference
 
 **What Works Now:**
+
 - Users see navbar with location and period
 - Navigation menu shows based on permissions
 - Sidebar toggles on mobile/desktop
@@ -1854,6 +1896,7 @@ We've successfully built the **user interface foundation** of the Stock Manageme
 - Theme switches between light/dark
 
 **What's Next:**
+
 - Building location management pages (create, edit, list)
 - Creating item management pages
 - Building transaction pages (deliveries, issues)
@@ -1863,7 +1906,7 @@ We've successfully built the **user interface foundation** of the Stock Manageme
 ---
 
 **Made with ❤️ for Junior Developers**
-*Remember: UI development is like building with LEGO blocks. We create the blocks (components) first, then use them to build pages!*
+_Remember: UI development is like building with LEGO blocks. We create the blocks (components) first, then use them to build pages!_
 
 ---
 

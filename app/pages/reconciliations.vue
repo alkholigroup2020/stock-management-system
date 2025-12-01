@@ -396,9 +396,7 @@ const formattedDateRange = computed(() => {
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-subheading font-semibold">Adjustments</h2>
-            <UBadge v-if="!isSupervisorOrAdmin" color="warning" variant="soft">
-              Read-only
-            </UBadge>
+            <UBadge v-if="!isSupervisorOrAdmin" color="warning" variant="soft">Read-only</UBadge>
           </div>
         </template>
 
@@ -503,10 +501,7 @@ const formattedDateRange = computed(() => {
                   : "N/A"
               }}
             </p>
-            <p
-              v-if="reconciliationData.calculations.total_mandays === 0"
-              class="text-caption mt-1"
-            >
+            <p v-if="reconciliationData.calculations.total_mandays === 0" class="text-caption mt-1">
               No POB entries for this period
             </p>
           </div>
@@ -514,9 +509,7 @@ const formattedDateRange = computed(() => {
 
         <!-- Breakdown Details -->
         <div class="mt-6 pt-6 border-t border-default">
-          <h3 class="text-caption text-muted mb-4">
-            Calculation Breakdown
-          </h3>
+          <h3 class="text-caption text-muted mb-4">Calculation Breakdown</h3>
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
               <span class="text-muted">Stock Change:</span>
@@ -527,13 +520,17 @@ const formattedDateRange = computed(() => {
             <div class="flex justify-between">
               <span class="text-muted">Receipts + Transfers In:</span>
               <span class="text-body font-medium">
-                {{ formatCurrency(reconciliationData.calculations.breakdown.receipts_and_transfers) }}
+                {{
+                  formatCurrency(reconciliationData.calculations.breakdown.receipts_and_transfers)
+                }}
               </span>
             </div>
             <div class="flex justify-between">
               <span class="text-muted">Issues + Stock Change:</span>
               <span class="text-body font-medium">
-                {{ formatCurrency(reconciliationData.calculations.breakdown.issues_and_stock_change) }}
+                {{
+                  formatCurrency(reconciliationData.calculations.breakdown.issues_and_stock_change)
+                }}
               </span>
             </div>
             <div class="flex justify-between">
@@ -558,7 +555,8 @@ const formattedDateRange = computed(() => {
 
       <!-- Last Updated Info -->
       <div v-if="reconciliationData.reconciliation.last_updated" class="text-center text-caption">
-        Last updated: {{ new Date(reconciliationData.reconciliation.last_updated).toLocaleString() }}
+        Last updated:
+        {{ new Date(reconciliationData.reconciliation.last_updated).toLocaleString() }}
       </div>
     </div>
   </div>

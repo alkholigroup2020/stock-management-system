@@ -3,7 +3,6 @@
 **Purpose:** A detailed but simple guide to all screens we plan to build, with quick wireframes and how users move between them.
 
 > Language kept simple. Mermaid used for maps and flows.
-> 
 
 ---
 
@@ -108,7 +107,7 @@ CHK-1KG   Chicken Breast 1kg   KG    CHILL 18.90  55
 
 ---
 
-### 3.4 Orders (PRF â†’ PO)  *optional in MVP*
+### 3.4 Orders (PRF â†’ PO) _optional in MVP_
 
 **Goal:** request â†’ approve â†’ create PO.
 
@@ -243,6 +242,7 @@ Consumption: SAR  XX,XXX      Manday cost: SAR  XX.XX
 **Complete design system documentation:** See `project-docs/UI_DESIGN_GUIDE.md`
 
 **Quick Reference:**
+
 - **Card**: Elevated white box with navy headings - Use `.card-elevated` class
 - **Pill/Badge**: Small rounded labels - Use `.badge-*` classes (e.g., `.badge-primary`, `.badge-success`)
 - **Input**: Consistent form inputs - Use `.form-input` class

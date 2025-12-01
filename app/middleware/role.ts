@@ -38,10 +38,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // Get role requirements from page meta
-  const roleRequired = to.meta.roleRequired as
-    | UserRole
-    | UserRole[]
-    | undefined;
+  const roleRequired = to.meta.roleRequired as UserRole | UserRole[] | undefined;
   const minRole = to.meta.minRole as UserRole | undefined;
 
   // If no role requirement is specified, allow access
@@ -53,17 +50,13 @@ export default defineNuxtRouteMiddleware((to) => {
 
   // Check if user has the required role(s)
   if (roleRequired) {
-    const requiredRoles = Array.isArray(roleRequired)
-      ? roleRequired
-      : [roleRequired];
+    const requiredRoles = Array.isArray(roleRequired) ? roleRequired : [roleRequired];
     const hasRequiredRole = requiredRoles.some((role) => userRole === role);
 
     if (!hasRequiredRole) {
       return abortNavigation({
         statusCode: 403,
-        statusMessage: `Access denied. Required role: ${requiredRoles.join(
-          " or "
-        )}`,
+        statusMessage: `Access denied. Required role: ${requiredRoles.join(" or ")}`,
       });
     }
   }

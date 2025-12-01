@@ -35,14 +35,14 @@ This document outlines the standardized process for onboarding new users to the 
 
 ### Timeline
 
-| Step | Duration | Responsible |
-|------|----------|-------------|
-| Pre-onboarding preparation | 1 day | System Admin |
-| Account creation | 30 minutes | System Admin |
-| Role and location assignment | 15 minutes | System Admin |
-| Initial training | 1-2 hours | Trainer / Supervisor |
-| System access verification | 30 minutes | User + Supervisor |
-| Total onboarding time | 1-2 days | Multiple |
+| Step                         | Duration   | Responsible          |
+| ---------------------------- | ---------- | -------------------- |
+| Pre-onboarding preparation   | 1 day      | System Admin         |
+| Account creation             | 30 minutes | System Admin         |
+| Role and location assignment | 15 minutes | System Admin         |
+| Initial training             | 1-2 hours  | Trainer / Supervisor |
+| System access verification   | 30 minutes | User + Supervisor    |
+| Total onboarding time        | 1-2 days   | Multiple             |
 
 ---
 
@@ -114,40 +114,45 @@ This document outlines the standardized process for onboarding new users to the 
 ## New User Information
 
 **Personal Information:**
-- [ ] Full Name: _______________
-- [ ] Email: _______________
-- [ ] Phone: _______________ (optional)
+
+- [ ] Full Name: ******\_\_\_******
+- [ ] Email: ******\_\_\_******
+- [ ] Phone: ******\_\_\_****** (optional)
 
 **Job Information:**
-- [ ] Job Title: _______________
-- [ ] Department: _______________
-- [ ] Supervisor: _______________
+
+- [ ] Job Title: ******\_\_\_******
+- [ ] Department: ******\_\_\_******
+- [ ] Supervisor: ******\_\_\_******
 - [ ] Start Date: YYYY-MM-DD
 
 **System Access:**
+
 - [ ] Role: ☐ Operator ☐ Supervisor ☐ Admin
 - [ ] Locations: ☐ Kitchen ☐ Store ☐ Central ☐ Warehouse
-- [ ] Special permissions: _______________
+- [ ] Special permissions: ******\_\_\_******
 
 **Training:**
+
 - [ ] Training schedule: YYYY-MM-DD HH:MM
-- [ ] Trainer assigned: _______________
+- [ ] Trainer assigned: ******\_\_\_******
 ```
 
 ### Step 2: Determine Role
 
 Use this decision matrix to assign the appropriate role:
 
-| Job Title | Typical Role | Location Access |
-|-----------|--------------|-----------------|
-| Store Clerk, Kitchen Staff | Operator | Single location (their workplace) |
-| Store Manager, Kitchen Supervisor | Supervisor | All locations or specific regions |
-| Inventory Manager, Finance Manager | Admin | All locations |
-| CEO, Operations Director | Admin | All locations (view-only may be appropriate) |
+| Job Title                          | Typical Role | Location Access                              |
+| ---------------------------------- | ------------ | -------------------------------------------- |
+| Store Clerk, Kitchen Staff         | Operator     | Single location (their workplace)            |
+| Store Manager, Kitchen Supervisor  | Supervisor   | All locations or specific regions            |
+| Inventory Manager, Finance Manager | Admin        | All locations                                |
+| CEO, Operations Director           | Admin        | All locations (view-only may be appropriate) |
 
 **Role Capabilities:**
 
 **Operator:**
+
 - Post deliveries
 - Post issues
 - View stock levels
@@ -155,6 +160,7 @@ Use this decision matrix to assign the appropriate role:
 - Access assigned locations only
 
 **Supervisor:**
+
 - All Operator capabilities
 - Approve transfers
 - Approve PRF/PO (future)
@@ -164,6 +170,7 @@ Use this decision matrix to assign the appropriate role:
 - Access all locations
 
 **Admin:**
+
 - All Supervisor capabilities
 - Manage items and prices
 - Close accounting periods
@@ -333,11 +340,11 @@ If a user's role needs to change (promotion, transfer, etc.):
 
 ### Location Access Matrix
 
-| Role | Typical Access |
-|------|----------------|
-| Operator | Assigned location(s) only - usually 1 |
-| Supervisor | All locations or specific regions |
-| Admin | All locations |
+| Role       | Typical Access                        |
+| ---------- | ------------------------------------- |
+| Operator   | Assigned location(s) only - usually 1 |
+| Supervisor | All locations or specific regions     |
+| Admin      | All locations                         |
 
 ### Assigning Location Access
 
@@ -380,18 +387,21 @@ After assigning locations, verify the user can:
 Use the training materials from `project-docs/user-docs/TRAINING_PRESENTATION.md`:
 
 **All Users (15 minutes):**
+
 - System Overview
 - Navigation
 - Dashboard
 - Login/logout
 
 **Operators (30 minutes):**
+
 - Recording deliveries
 - Posting issues
 - Viewing stock
 - Using mobile app (PWA)
 
 **Supervisors (45 minutes):**
+
 - All Operator topics
 - Transfer approval
 - NCR resolution
@@ -399,6 +409,7 @@ Use the training materials from `project-docs/user-docs/TRAINING_PRESENTATION.md
 - Month-end procedures
 
 **Admins (60 minutes):**
+
 - All Supervisor topics
 - Item master management
 - Price updates
@@ -408,17 +419,20 @@ Use the training materials from `project-docs/user-docs/TRAINING_PRESENTATION.md
 ### Training Delivery Methods
 
 **Option 1: In-person training**
+
 - Schedule 1-2 hour session
 - Use projector for presentation
 - Provide hands-on practice
 - Answer questions
 
 **Option 2: Self-paced online training**
+
 - Provide training materials (PDFs, videos)
 - User completes at their own pace
 - Schedule follow-up Q&A session
 
 **Option 3: One-on-one training**
+
 - Supervisor trains new user
 - More personalized, flexible
 - Good for small teams
@@ -433,16 +447,19 @@ After training, user should be able to:
 - [ ] Perform role-specific tasks (see below)
 
 **Operator verification:**
+
 - [ ] Create a test delivery
 - [ ] Post a test issue
 - [ ] View stock levels
 
 **Supervisor verification:**
+
 - [ ] Approve a test transfer
 - [ ] Create a test NCR
 - [ ] Perform a test reconciliation
 
 **Admin verification:**
+
 - [ ] Create a test item
 - [ ] Update a test price
 - [ ] Mark location ready for period close
@@ -456,21 +473,25 @@ After training, user should be able to:
 Complete within 1 day of account creation:
 
 **Login Verification:**
+
 - [ ] User can log in with credentials
 - [ ] User can reset password if needed
 - [ ] User can navigate to dashboard
 
 **Role Verification:**
+
 - [ ] User sees appropriate menu items for role
 - [ ] User cannot access unauthorized pages
 - [ ] User cannot perform unauthorized actions
 
 **Location Verification:**
+
 - [ ] User sees assigned locations in switcher
 - [ ] User cannot access unauthorized locations
 - [ ] User can switch between assigned locations
 
 **Functionality Verification:**
+
 - [ ] User can create test transactions
 - [ ] User can view reports
 - [ ] User can access mobile app (PWA)
@@ -480,21 +501,25 @@ Complete within 1 day of account creation:
 Have the user complete these test transactions:
 
 **All Users:**
+
 - [ ] Log in and out
 - [ ] View dashboard
 - [ ] Switch location (if multiple)
 
 **Operators:**
+
 - [ ] Create test delivery (mark as test in notes)
 - [ ] Post test issue
 - [ ] View stock levels
 
 **Supervisors:**
+
 - [ ] Create test transfer
 - [ ] Approve test transfer
 - [ ] Create test NCR
 
 **Admins:**
+
 - [ ] Create test item (with "TEST" in name)
 - [ ] Update test item price
 - [ ] View period management page
@@ -508,16 +533,19 @@ Have the user complete these test transactions:
 ### Support Channels
 
 **Primary Support:**
+
 - Email: support@company.com
 - Response time: Within 4 business hours
 - For: How-to questions, minor issues
 
 **Urgent Support:**
+
 - Phone: [TO BE FILLED]
 - Available: Business hours (8 AM - 5 PM)
 - For: System down, critical errors, data issues
 
 **Self-Service Support:**
+
 - User Manual: `project-docs/user-docs/USER_MANUAL.md`
 - FAQ: `project-docs/user-docs/FAQ.md`
 - Quick Reference Card: Keep printed copy at desk
@@ -525,18 +553,22 @@ Have the user complete these test transactions:
 ### Follow-up Schedule
 
 **Day 1 (after training):**
+
 - User receives welcome email
 - User logs in and completes test transactions
 
 **Day 3:**
+
 - Admin checks for any questions or issues
 - Quick email: "How's it going?"
 
 **Week 1:**
+
 - Supervisor checks in with user
 - Address any questions or concerns
 
 **Month 1:**
+
 - User completes feedback survey
 - Admin reviews usage patterns
 - Additional training if needed
@@ -610,9 +642,9 @@ import { PrismaClient } from "@prisma/client";
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-27 | System Administrator | Initial documentation |
+| Version | Date       | Author               | Changes               |
+| ------- | ---------- | -------------------- | --------------------- |
+| 1.0     | 2025-11-27 | System Administrator | Initial documentation |
 
 ---
 

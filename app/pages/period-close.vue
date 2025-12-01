@@ -30,12 +30,7 @@
       <p class="text-body text-muted mb-6">
         There is no active period to close. Create a new period first.
       </p>
-      <UButton
-        color="primary"
-        icon="i-lucide-plus"
-        to="/periods"
-        class="cursor-pointer"
-      >
+      <UButton color="primary" icon="i-lucide-plus" to="/periods" class="cursor-pointer">
         Go to Period Management
       </UButton>
     </UCard>
@@ -94,7 +89,7 @@
             <div
               :class="[
                 'flex items-center justify-center w-6 h-6 rounded-full',
-                item.completed ? 'bg-success text-white' : 'bg-elevated text-muted'
+                item.completed ? 'bg-success text-white' : 'bg-elevated text-muted',
               ]"
             >
               <UIcon
@@ -127,10 +122,7 @@
               <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary" />
               <h2 class="text-subheading font-semibold">Location Readiness</h2>
             </div>
-            <UBadge
-              :color="allLocationsReady ? 'success' : 'warning'"
-              variant="subtle"
-            >
+            <UBadge :color="allLocationsReady ? 'success' : 'warning'" variant="subtle">
               {{ readyLocationsCount }}/{{ totalLocationsCount }} Ready
             </UBadge>
           </div>
@@ -163,11 +155,7 @@
                   </UBadge>
                 </td>
                 <td class="py-4 px-4">
-                  <UBadge
-                    :color="getLocationStatusColor(pl.status)"
-                    variant="subtle"
-                    size="md"
-                  >
+                  <UBadge :color="getLocationStatusColor(pl.status)" variant="subtle" size="md">
                     {{ pl.status }}
                   </UBadge>
                 </td>
@@ -191,20 +179,10 @@
                   >
                     Mark Ready
                   </UButton>
-                  <UBadge
-                    v-else-if="pl.status === 'READY'"
-                    color="success"
-                    variant="soft"
-                  >
+                  <UBadge v-else-if="pl.status === 'READY'" color="success" variant="soft">
                     Ready
                   </UBadge>
-                  <UBadge
-                    v-else
-                    color="neutral"
-                    variant="soft"
-                  >
-                    Closed
-                  </UBadge>
+                  <UBadge v-else color="neutral" variant="soft">Closed</UBadge>
                 </td>
               </tr>
             </tbody>
@@ -212,9 +190,7 @@
         </div>
 
         <template v-if="periodLocations.length === 0" #default>
-          <div class="text-center py-8 text-muted">
-            No locations configured for this period
-          </div>
+          <div class="text-center py-8 text-muted">No locations configured for this period</div>
         </template>
       </UCard>
 
@@ -292,73 +268,74 @@
     <UModal v-model:open="showConfirmModal">
       <template #content>
         <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <UIcon name="i-lucide-alert-triangle" class="w-5 h-5 text-warning" />
-              <h3 class="text-heading3 font-semibold">Confirm Period Close</h3>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <UIcon name="i-lucide-alert-triangle" class="w-5 h-5 text-warning" />
+                <h3 class="text-heading3 font-semibold">Confirm Period Close</h3>
+              </div>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                class="cursor-pointer"
+                @click="showConfirmModal = false"
+              />
             </div>
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-x"
-              size="sm"
-              class="cursor-pointer"
-              @click="showConfirmModal = false"
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-body">
+              You are about to close the period
+              <strong>{{ currentPeriod?.name }}</strong>
+              . This action will:
+            </p>
+            <ul class="list-disc list-inside text-body text-muted space-y-2">
+              <li>Create a snapshot of all stock levels for each location</li>
+              <li>Lock all transactions for this period</li>
+              <li>Prevent any further changes to deliveries, issues, or transfers</li>
+              <li>Create a new period for the next accounting cycle</li>
+            </ul>
+
+            <UAlert
+              color="warning"
+              icon="i-lucide-alert-triangle"
+              title="This action cannot be undone"
+              description="Once closed, the period cannot be reopened. Make sure all transactions are complete and reconciliations are accurate."
             />
           </div>
-        </template>
 
-        <div class="space-y-4">
-          <p class="text-body">
-            You are about to close the period <strong>{{ currentPeriod?.name }}</strong>.
-            This action will:
-          </p>
-          <ul class="list-disc list-inside text-body text-muted space-y-2">
-            <li>Create a snapshot of all stock levels for each location</li>
-            <li>Lock all transactions for this period</li>
-            <li>Prevent any further changes to deliveries, issues, or transfers</li>
-            <li>Create a new period for the next accounting cycle</li>
-          </ul>
-
-          <UAlert
-            color="warning"
-            icon="i-lucide-alert-triangle"
-            title="This action cannot be undone"
-            description="Once closed, the period cannot be reopened. Make sure all transactions are complete and reconciliations are accurate."
-          />
-        </div>
-
-        <template #footer>
-          <div class="flex items-center justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              :disabled="closingPeriod"
-              class="cursor-pointer"
-              @click="showConfirmModal = false"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              color="primary"
-              icon="i-lucide-lock"
-              :loading="closingPeriod"
-              :disabled="!isOnline"
-              class="cursor-pointer"
-              @click="handleClosePeriod"
-            >
-              Confirm & Close Period
-            </UButton>
-          </div>
-        </template>
+          <template #footer>
+            <div class="flex items-center justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                :disabled="closingPeriod"
+                class="cursor-pointer"
+                @click="showConfirmModal = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="primary"
+                icon="i-lucide-lock"
+                :loading="closingPeriod"
+                :disabled="!isOnline"
+                class="cursor-pointer"
+                @click="handleClosePeriod"
+              >
+                Confirm & Close Period
+              </UButton>
+            </div>
+          </template>
         </UCard>
       </template>
     </UModal>
 
     <!-- Loading Overlay for Period Close -->
     <LoadingOverlay
-      v-if="closingPeriod && (currentStep > 0)"
+      v-if="closingPeriod && currentStep > 0"
       title="Closing Period..."
       message="Please wait while we process your request"
       :current-step="currentStep"
@@ -370,38 +347,43 @@
     <UModal v-model:open="showSuccessModal" :closeable="false">
       <template #content>
         <UCard>
-        <div class="text-center py-6">
-          <UIcon name="i-lucide-check-circle" class="w-16 h-16 mx-auto text-success mb-4" />
-          <h3 class="text-heading3 font-semibold mb-2">Period Closed Successfully</h3>
-          <p class="text-body text-muted mb-6">
-            The period has been closed and a new period has been created.
-          </p>
+          <div class="text-center py-6">
+            <UIcon name="i-lucide-check-circle" class="w-16 h-16 mx-auto text-success mb-4" />
+            <h3 class="text-heading3 font-semibold mb-2">Period Closed Successfully</h3>
+            <p class="text-body text-muted mb-6">
+              The period has been closed and a new period has been created.
+            </p>
 
-          <div v-if="closeSummary" class="mb-6 p-4 bg-elevated rounded-lg text-left">
-            <h4 class="text-label font-semibold mb-3">Summary</h4>
-            <div class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <span class="text-muted">Total Locations:</span>
-                <span class="font-medium">{{ closeSummary.totalLocations }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-muted">Total Closing Value:</span>
-                <span class="font-medium text-success">
-                  SAR {{ closeSummary.totalClosingValue?.toLocaleString("en-US", { minimumFractionDigits: 2 }) }}
-                </span>
+            <div v-if="closeSummary" class="mb-6 p-4 bg-elevated rounded-lg text-left">
+              <h4 class="text-label font-semibold mb-3">Summary</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-muted">Total Locations:</span>
+                  <span class="font-medium">{{ closeSummary.totalLocations }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted">Total Closing Value:</span>
+                  <span class="font-medium text-success">
+                    SAR
+                    {{
+                      closeSummary.totalClosingValue?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })
+                    }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <UButton
-            color="primary"
-            icon="i-lucide-arrow-right"
-            class="cursor-pointer"
-            @click="handleSuccessClose"
-          >
-            Go to Period Management
-          </UButton>
-        </div>
+            <UButton
+              color="primary"
+              icon="i-lucide-arrow-right"
+              class="cursor-pointer"
+              @click="handleSuccessClose"
+            >
+              Go to Period Management
+            </UButton>
+          </div>
         </UCard>
       </template>
     </UModal>
@@ -444,7 +426,8 @@ const periodLocations = computed(() => {
 const totalLocationsCount = computed(() => periodLocations.value.length);
 
 const readyLocationsCount = computed(() => {
-  return periodLocations.value.filter((pl: any) => pl.status === "READY" || pl.status === "CLOSED").length;
+  return periodLocations.value.filter((pl: any) => pl.status === "READY" || pl.status === "CLOSED")
+    .length;
 });
 
 const allLocationsReady = computed(() => {
@@ -718,7 +701,9 @@ function getStatusColor(status: string): "success" | "warning" | "neutral" | "pr
   }
 }
 
-function getLocationStatusColor(status: string): "success" | "warning" | "neutral" | "primary" | "error" {
+function getLocationStatusColor(
+  status: string
+): "success" | "warning" | "neutral" | "primary" | "error" {
   switch (status) {
     case "READY":
       return "success";

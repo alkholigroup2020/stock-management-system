@@ -113,6 +113,7 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
 ```
 
 Get this from your Supabase project:
+
 1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
 2. Select your project
 3. Navigate to **Project Settings > Database**
@@ -127,6 +128,7 @@ SUPABASE_SERVICE_KEY="your-service-role-key"
 ```
 
 Get these from your Supabase project:
+
 1. Go to **Project Settings > API**
 2. Copy the **Project URL** (SUPABASE_URL)
 3. Copy the **anon/public key** (SUPABASE_ANON_KEY)
@@ -184,6 +186,7 @@ The application will be available at [http://localhost:3000](http://localhost:30
 This project follows a feature-branch workflow with comprehensive type checking and testing:
 
 1. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -196,16 +199,20 @@ This project follows a feature-branch workflow with comprehensive type checking 
    - Pages: Create in `app/pages/` (auto-routed)
 
 3. **Type Checking** (Required before commit)
+
    ```bash
    pnpm typecheck
    ```
+
    Must show **zero errors**. All code must be properly typed with no `any` types.
 
 4. **Code Formatting** (Automatic with Prettier)
+
    ```bash
    pnpm format        # Format all files
    pnpm format:check  # Check formatting (CI)
    ```
+
    Files are auto-formatted on save in VS Code. Follow these rules:
    - Semicolons: Always use `;`
    - Quotes: Always use double quotes `"`
@@ -213,6 +220,7 @@ This project follows a feature-branch workflow with comprehensive type checking 
    - Line width: 100 characters max
 
 5. **Testing** (When applicable)
+
    ```bash
    pnpm test:unit     # Unit tests (WAC, reconciliation, validation)
    pnpm test:api      # API integration tests
@@ -220,6 +228,7 @@ This project follows a feature-branch workflow with comprehensive type checking 
    ```
 
 6. **Commit & Push**
+
    ```bash
    git add .
    git commit -m "feat: your feature description"
@@ -340,15 +349,15 @@ pnpm prisma generate
 
 ## Environment Variables Reference
 
-| Variable | Type | Required | Description |
-|----------|------|----------|-------------|
-| `DATABASE_URL` | Private | Yes | PostgreSQL connection string from Supabase |
-| `SUPABASE_URL` | Public | Yes | Supabase project URL |
-| `SUPABASE_ANON_KEY` | Public | Yes | Supabase anonymous/public key |
-| `SUPABASE_SERVICE_KEY` | Private | Yes | Supabase service role key (keep secret!) |
-| `AUTH_SECRET` | Private | Yes | JWT signing secret (generate random string) |
-| `NUXT_PUBLIC_SITE_URL` | Public | Yes | Application URL (localhost or production) |
-| `NUXT_PUBLIC_CURRENCY` | Public | No | Currency code (default: SAR) |
+| Variable               | Type    | Required | Description                                 |
+| ---------------------- | ------- | -------- | ------------------------------------------- |
+| `DATABASE_URL`         | Private | Yes      | PostgreSQL connection string from Supabase  |
+| `SUPABASE_URL`         | Public  | Yes      | Supabase project URL                        |
+| `SUPABASE_ANON_KEY`    | Public  | Yes      | Supabase anonymous/public key               |
+| `SUPABASE_SERVICE_KEY` | Private | Yes      | Supabase service role key (keep secret!)    |
+| `AUTH_SECRET`          | Private | Yes      | JWT signing secret (generate random string) |
+| `NUXT_PUBLIC_SITE_URL` | Public  | Yes      | Application URL (localhost or production)   |
+| `NUXT_PUBLIC_CURRENCY` | Public  | No       | Currency code (default: SAR)                |
 
 **Note:** Variables prefixed with `NUXT_PUBLIC_` are exposed to the client. All others are server-only.
 
@@ -359,6 +368,7 @@ The application is designed to be deployed on Vercel with Supabase as the databa
 ### Deploying to Vercel
 
 1. **Prepare Repository**
+
    ```bash
    git push origin main
    ```

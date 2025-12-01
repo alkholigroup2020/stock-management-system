@@ -1,4 +1,5 @@
 # Phase 2.4: Reconciliation Management
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -21,12 +22,14 @@
 ### The Problem
 
 At the end of each month, businesses need to know:
+
 - How much food was consumed (used up)?
 - How much did it cost per person per day?
 - Are the numbers correct (does Opening + Receipts - Issues = Closing)?
 - What happened to the stock differences (back-charges, credits, condemnations)?
 
 **Problems with manual tracking:**
+
 - ❌ Complicated calculations with multiple data sources
 - ❌ Human errors in adding/subtracting large numbers
 - ❌ Missing adjustments (credits, back-charges not recorded)
@@ -37,6 +40,7 @@ At the end of each month, businesses need to know:
 ### Our Solution
 
 We built a **Reconciliation System** that:
+
 - ✅ Automatically calculates opening stock from previous period
 - ✅ Sums all deliveries (receipts) for the period
 - ✅ Tracks transfers in and transfers out
@@ -109,6 +113,7 @@ Consumption = Opening Stock + Receipts + Transfers In
 ```
 
 **In simple terms:**
+
 - Start with what you had (Opening)
 - Add what came in (Receipts, Transfers In)
 - Subtract what went out (Transfers Out, Issues)
@@ -133,6 +138,7 @@ Opening Stock:    SAR 125,000  (what we had at start of month)
 ```
 
 **Verification:**
+
 ```
 125,000 + 45,000 + 15,000 - 10,000 - 95,000 - 50,000 + 4,500 = 34,500 ✓
 ```
@@ -146,6 +152,7 @@ Manday Cost = Total Consumption ÷ Total Mandays
 ```
 
 **Example:**
+
 - Consumption: SAR 34,500
 - Total Mandays: 2,100 (70 people × 30 days)
 - Manday Cost: SAR 34,500 ÷ 2,100 = **SAR 16.43 per person per day**
@@ -181,25 +188,22 @@ Takes all the numbers and applies the formula:
 
 ```typescript
 interface ConsumptionInput {
-  opening_stock: number;      // Starting value
-  receipts: number;           // Deliveries total
-  transfers_in: number;       // Received from other locations
-  transfers_out: number;      // Sent to other locations
-  issues: number;             // Given to production
-  closing_stock: number;      // Current stock value
-  back_charges: number;       // Extra charges to adjust
-  credits: number;            // Credits due from suppliers
-  condemnations: number;      // Condemned/wasted items
-  adjustments: number;        // Other adjustments
+  opening_stock: number; // Starting value
+  receipts: number; // Deliveries total
+  transfers_in: number; // Received from other locations
+  transfers_out: number; // Sent to other locations
+  issues: number; // Given to production
+  closing_stock: number; // Current stock value
+  back_charges: number; // Extra charges to adjust
+  credits: number; // Credits due from suppliers
+  condemnations: number; // Condemned/wasted items
+  adjustments: number; // Other adjustments
 }
 
 function calculateConsumption(input: ConsumptionInput): ConsumptionResult {
   // Apply the formula
   const totalAdjustments =
-    input.back_charges +
-    input.credits +
-    input.condemnations +
-    input.adjustments;
+    input.back_charges + input.credits + input.condemnations + input.adjustments;
 
   const consumption =
     input.opening_stock +
@@ -213,7 +217,7 @@ function calculateConsumption(input: ConsumptionInput): ConsumptionResult {
   return {
     consumption: roundCurrency(consumption),
     totalAdjustments: roundCurrency(totalAdjustments),
-    breakdown: { ...input }  // For audit trail
+    breakdown: { ...input }, // For audit trail
   };
 }
 ```
@@ -223,16 +227,13 @@ function calculateConsumption(input: ConsumptionInput): ConsumptionResult {
 Divides consumption by total mandays:
 
 ```typescript
-function calculateMandayCost(
-  consumption: number,
-  totalMandays: number
-): MandayCostResult {
+function calculateMandayCost(consumption: number, totalMandays: number): MandayCostResult {
   // Prevent division by zero
   if (totalMandays === 0) {
     return {
       consumption,
       totalMandays: 0,
-      mandayCost: 0
+      mandayCost: 0,
     };
   }
 
@@ -241,7 +242,7 @@ function calculateMandayCost(
   return {
     consumption: roundCurrency(consumption),
     totalMandays,
-    mandayCost: roundCurrency(mandayCost)
+    mandayCost: roundCurrency(mandayCost),
   };
 }
 ```
@@ -251,22 +252,16 @@ function calculateMandayCost(
 Combines both calculations in one function:
 
 ```typescript
-function calculateReconciliation(
-  input: ConsumptionInput,
-  totalMandays: number
-) {
+function calculateReconciliation(input: ConsumptionInput, totalMandays: number) {
   // First calculate consumption
   const consumptionResult = calculateConsumption(input);
 
   // Then calculate manday cost
-  const mandayResult = calculateMandayCost(
-    consumptionResult.consumption,
-    totalMandays
-  );
+  const mandayResult = calculateMandayCost(consumptionResult.consumption, totalMandays);
 
   return {
     ...consumptionResult,
-    ...mandayResult
+    ...mandayResult,
   };
 }
 ```
@@ -289,18 +284,18 @@ const result = calculateConsumption({
   back_charges: 0,
   credits: 0,
   condemnations: 0,
-  adjustments: 4500
+  adjustments: 4500,
 });
 
-expect(result.consumption).toBe(34500);  // ✓ Correct!
+expect(result.consumption).toBe(34500); // ✓ Correct!
 
 // Test 2: Manday cost calculation
 const cost = calculateMandayCost(34500, 2100);
-expect(cost.mandayCost).toBe(16.43);  // ✓ Correct!
+expect(cost.mandayCost).toBe(16.43); // ✓ Correct!
 
 // Test 3: Zero mandays (prevent division by zero)
 const zeroMandays = calculateMandayCost(34500, 0);
-expect(zeroMandays.mandayCost).toBe(0);  // ✓ Doesn't crash!
+expect(zeroMandays.mandayCost).toBe(0); // ✓ Doesn't crash!
 
 // Test 4: Negative consumption (over-stocking)
 const overStock = calculateConsumption({
@@ -309,14 +304,14 @@ const overStock = calculateConsumption({
   transfers_in: 0,
   transfers_out: 0,
   issues: 15000,
-  closing_stock: 60000,  // More than we should have!
+  closing_stock: 60000, // More than we should have!
   back_charges: 0,
   credits: 0,
   condemnations: 0,
-  adjustments: 0
+  adjustments: 0,
 });
 
-expect(overStock.consumption).toBe(-5000);  // Negative = over-stocked
+expect(overStock.consumption).toBe(-5000); // Negative = over-stocked
 ```
 
 All 10 tests passed successfully! ✓
@@ -328,17 +323,20 @@ All 10 tests passed successfully! ✓
 #### 1. Why We Need Adjustments
 
 **Back-charges:**
+
 - You ordered 100 KG flour
 - Supplier delivered 90 KG
 - You add back-charge of SAR 150 (10 KG × SAR 15)
 - This increases consumption (you used more from existing stock)
 
 **Credits:**
+
 - Supplier overcharged SAR 500
 - You add credit of SAR 500
 - This reduces consumption (actual cost was lower)
 
 **Condemnations:**
+
 - 50 KG vegetables spoiled
 - You add condemnation of SAR 750
 - This increases consumption (food wasted, not in closing stock)
@@ -355,9 +353,9 @@ function roundCurrency(value: number): number {
 }
 
 // Examples:
-roundCurrency(16.428571)  // → 16.43
-roundCurrency(125000.005) // → 125000.01
-roundCurrency(0.004)      // → 0.00
+roundCurrency(16.428571); // → 16.43
+roundCurrency(125000.005); // → 125000.01
+roundCurrency(0.004); // → 0.00
 ```
 
 **Why?** SAR currency has 2 decimal places (SAR 16.43, not SAR 16.428571)
@@ -398,10 +396,10 @@ This prevents calculation errors from bad data.
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/utils/reconciliation.ts` | All reconciliation calculation functions |
-| `tests/unit/reconciliation.test.ts` | 10 test cases verifying calculations |
+| File                                | What It Does                             |
+| ----------------------------------- | ---------------------------------------- |
+| `server/utils/reconciliation.ts`    | All reconciliation calculation functions |
+| `tests/unit/reconciliation.test.ts` | 10 test cases verifying calculations     |
 
 ---
 
@@ -427,14 +425,12 @@ We created **3 API endpoints** that fetch reconciliation data, allow supervisors
 // Step 1: Get opening stock from previous period
 const previousPeriod = await prisma.period.findFirst({
   where: {
-    end_date: { lt: currentPeriod.start_date }
+    end_date: { lt: currentPeriod.start_date },
   },
-  orderBy: { end_date: "desc" }
+  orderBy: { end_date: "desc" },
 });
 
-const openingStock = previousPeriod
-  ? await sumClosingStock(locationId, previousPeriod.id)
-  : 0;  // First period starts with 0
+const openingStock = previousPeriod ? await sumClosingStock(locationId, previousPeriod.id) : 0; // First period starts with 0
 
 // Step 2: Sum all deliveries (receipts)
 const receipts = await prisma.deliveryLine.aggregate({
@@ -442,10 +438,10 @@ const receipts = await prisma.deliveryLine.aggregate({
     delivery: {
       location_id: locationId,
       period_id: periodId,
-      status: "POSTED"
-    }
+      status: "POSTED",
+    },
   },
-  _sum: { line_value: true }
+  _sum: { line_value: true },
 });
 
 // Step 3: Sum transfers IN (from other locations)
@@ -454,10 +450,10 @@ const transfersIn = await prisma.transferLine.aggregate({
     transfer: {
       to_location_id: locationId,
       period_id: periodId,
-      status: "COMPLETED"
-    }
+      status: "COMPLETED",
+    },
   },
-  _sum: { line_value: true }
+  _sum: { line_value: true },
 });
 
 // Step 4: Sum transfers OUT (to other locations)
@@ -466,10 +462,10 @@ const transfersOut = await prisma.transferLine.aggregate({
     transfer: {
       from_location_id: locationId,
       period_id: periodId,
-      status: "COMPLETED"
-    }
+      status: "COMPLETED",
+    },
   },
-  _sum: { line_value: true }
+  _sum: { line_value: true },
 });
 
 // Step 5: Sum all issues
@@ -478,20 +474,20 @@ const issues = await prisma.issueLine.aggregate({
     issue: {
       location_id: locationId,
       period_id: periodId,
-      status: "POSTED"
-    }
+      status: "POSTED",
+    },
   },
-  _sum: { line_value: true }
+  _sum: { line_value: true },
 });
 
 // Step 6: Get current stock values (closing stock)
 const closingStock = await prisma.locationStock.aggregate({
   where: {
-    location_id: locationId
+    location_id: locationId,
   },
   _sum: {
     // on_hand × wac for each item
-  }
+  },
 });
 ```
 
@@ -505,20 +501,20 @@ const closingStock = await prisma.locationStock.aggregate({
   "reconciliation": {
     "location_id": "abc123",
     "period_id": "def456",
-    "opening_stock": 125000.00,
-    "receipts": 45000.00,
-    "transfers_in": 15000.00,
-    "transfers_out": 10000.00,
-    "issues": 95000.00,
-    "closing_stock": 50000.00,
-    "back_charges": 0.00,
-    "credits": 0.00,
-    "condemnations": 0.00,
-    "adjustments": 4500.00,
-    "consumption": 34500.00,
+    "opening_stock": 125000.0,
+    "receipts": 45000.0,
+    "transfers_in": 15000.0,
+    "transfers_out": 10000.0,
+    "issues": 95000.0,
+    "closing_stock": 50000.0,
+    "back_charges": 0.0,
+    "credits": 0.0,
+    "condemnations": 0.0,
+    "adjustments": 4500.0,
+    "consumption": 34500.0,
     "manday_cost": 16.43,
     "total_mandays": 2100,
-    "is_saved": false  // Auto-calculated, not saved yet
+    "is_saved": false // Auto-calculated, not saved yet
   }
 }
 ```
@@ -547,10 +543,10 @@ const closingStock = await prisma.locationStock.aggregate({
 
 ```json
 {
-  "back_charges": 1000.00,
-  "credits": 500.00,
-  "condemnations": 750.00,
-  "adjustments": 3250.00
+  "back_charges": 1000.0,
+  "credits": 500.0,
+  "condemnations": 750.0,
+  "adjustments": 3250.0
 }
 ```
 
@@ -594,35 +590,35 @@ const closingStock = await prisma.locationStock.aggregate({
   "reconciliations": [
     {
       "location": { "id": "loc1", "name": "Main Kitchen", "code": "MAIN-KIT" },
-      "opening_stock": 125000.00,
-      "receipts": 45000.00,
+      "opening_stock": 125000.0,
+      "receipts": 45000.0,
       // ... other fields
-      "consumption": 34500.00,
+      "consumption": 34500.0,
       "manday_cost": 16.43,
       "is_saved": true
     },
     {
       "location": { "id": "loc2", "name": "Central Store", "code": "CENTRAL-01" },
       // ... location 2 data
-      "is_saved": false  // Auto-calculated
+      "is_saved": false // Auto-calculated
     }
   ],
   "totals": {
-    "total_opening": 380000.00,
-    "total_receipts": 125000.00,
-    "total_transfers_in": 35000.00,
-    "total_transfers_out": 35000.00,
-    "total_issues": 280000.00,
-    "total_closing": 150000.00,
-    "total_adjustments": 10000.00,
-    "total_consumption": 85000.00,
+    "total_opening": 380000.0,
+    "total_receipts": 125000.0,
+    "total_transfers_in": 35000.0,
+    "total_transfers_out": 35000.0,
+    "total_issues": 280000.0,
+    "total_closing": 150000.0,
+    "total_adjustments": 10000.0,
+    "total_consumption": 85000.0,
     "total_mandays": 6300,
     "average_manday_cost": 13.49
   },
   "summary": {
     "total_locations": 3,
-    "saved_count": 1,      // 1 location has saved reconciliation
-    "auto_count": 2        // 2 locations auto-calculated
+    "saved_count": 1, // 1 location has saved reconciliation
+    "auto_count": 2 // 2 locations auto-calculated
   }
 }
 ```
@@ -658,12 +654,14 @@ stateDiagram-v2
 ```
 
 **Auto-Calculated:**
+
 - No database record exists
 - System calculates from transactions
 - Updates automatically as transactions change
 - Shown with warning badge "Auto-Calculated"
 
 **Saved:**
+
 - Database record exists
 - Supervisor has reviewed and saved
 - Adjustments (back-charges, credits) recorded
@@ -680,9 +678,9 @@ Opening stock for current period = Closing stock of previous period
 // Get previous period
 const previousPeriod = await prisma.period.findFirst({
   where: {
-    end_date: { lt: currentPeriod.start_date }
+    end_date: { lt: currentPeriod.start_date },
   },
-  orderBy: { end_date: "desc" }
+  orderBy: { end_date: "desc" },
 });
 
 if (!previousPeriod) {
@@ -695,9 +693,9 @@ const previousReconciliation = await prisma.reconciliation.findUnique({
   where: {
     location_id_period_id: {
       location_id: locationId,
-      period_id: previousPeriod.id
-    }
-  }
+      period_id: previousPeriod.id,
+    },
+  },
 });
 
 return previousReconciliation?.closing_stock || 0;
@@ -715,7 +713,7 @@ We sum line values, not header totals:
 // ❌ WRONG: Sum header totals
 const receipts = await prisma.delivery.aggregate({
   where: { location_id: locationId, period_id: periodId },
-  _sum: { total_value: true }
+  _sum: { total_value: true },
 });
 
 // ✅ CORRECT: Sum line values
@@ -724,10 +722,10 @@ const receipts = await prisma.deliveryLine.aggregate({
     delivery: {
       location_id: locationId,
       period_id: periodId,
-      status: "POSTED"
-    }
+      status: "POSTED",
+    },
   },
-  _sum: { line_value: true }
+  _sum: { line_value: true },
 });
 ```
 
@@ -744,8 +742,8 @@ await prisma.reconciliation.upsert({
   where: {
     location_id_period_id: {
       location_id: locationId,
-      period_id: periodId
-    }
+      period_id: periodId,
+    },
   },
   create: {
     // Create new record with all fields
@@ -757,7 +755,7 @@ await prisma.reconciliation.upsert({
     back_charges: adjustments.back_charges,
     credits: adjustments.credits,
     consumption: newConsumption,
-    manday_cost: newMandayCost
+    manday_cost: newMandayCost,
   },
   update: {
     // Update only adjustments and recalculated fields
@@ -767,8 +765,8 @@ await prisma.reconciliation.upsert({
     adjustments: adjustments.adjustments,
     consumption: newConsumption,
     manday_cost: newMandayCost,
-    updated_at: new Date()
-  }
+    updated_at: new Date(),
+  },
 });
 ```
 
@@ -778,11 +776,11 @@ This ensures we create if missing, update if exists - all in one atomic operatio
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/locations/[locationId]/reconciliations/[periodId].get.ts` | Get single reconciliation |
-| `server/api/locations/[locationId]/reconciliations/[periodId].patch.ts` | Save adjustments |
-| `server/api/reconciliations/consolidated.get.ts` | Get all locations report |
+| File                                                                    | What It Does              |
+| ----------------------------------------------------------------------- | ------------------------- |
+| `server/api/locations/[locationId]/reconciliations/[periodId].get.ts`   | Get single reconciliation |
+| `server/api/locations/[locationId]/reconciliations/[periodId].patch.ts` | Save adjustments          |
+| `server/api/reconciliations/consolidated.get.ts`                        | Get all locations report  |
 
 ---
 
@@ -799,12 +797,14 @@ We created a **web page** where users can view reconciliation calculations for t
 The page has **4 main sections:**
 
 **1. Period & Location Info Card**
+
 - Current period name and dates
 - Active location (with selector for supervisors)
 - Auto-calculated warning (if not saved)
 
 **2. Stock Movement Card (Read-Only)**
 Shows the 6 calculated values:
+
 - Opening Stock (what we started with)
 - Receipts (deliveries) - green
 - Transfers In (from other locations) - green
@@ -814,6 +814,7 @@ Shows the 6 calculated values:
 
 **3. Adjustments Card (Editable by Supervisors)**
 4 input fields for adjustments:
+
 - Back-charges
 - Credits Due
 - Condemnations
@@ -823,6 +824,7 @@ Plus a "Save Adjustments" button.
 
 **4. Consumption Analysis Card**
 Shows the final results:
+
 - Total Consumption (bold, primary color)
 - Total Mandays (from POB entries)
 - Manday Cost per person per day (success color)
@@ -885,6 +887,7 @@ graph TB
 ```
 
 **Color meaning:**
+
 - **Success (green):** Stock coming in (receipts, transfers in)
 - **Error (red):** Stock going out (transfers out, issues)
 - **Primary (navy):** Total consumption
@@ -1171,11 +1174,13 @@ graph LR
 ```
 
 **Read-Only (from transactions):**
+
 - Opening, Receipts, Transfers, Issues, Closing
 - Calculated automatically
 - Cannot be edited (would break audit trail)
 
 **Editable (supervisor adjustments):**
+
 - Back-charges, Credits, Condemnations, Other
 - Entered manually
 - Only supervisors/admins can edit
@@ -1205,6 +1210,7 @@ const isValid = computed(() => {
 ```
 
 **Save button only enabled when:**
+
 - User has made changes
 - All values are non-negative
 
@@ -1230,8 +1236,8 @@ Shows "N/A" instead of "0.00" when no POB data exists.
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                            | What It Does                        |
+| ------------------------------- | ----------------------------------- |
 | `app/pages/reconciliations.vue` | Single-location reconciliation page |
 
 ---
@@ -1249,6 +1255,7 @@ We created a **management report page** that shows reconciliations for ALL locat
 **1. All Locations Table**
 
 Shows one row per location with 12 columns:
+
 - Location (code and name)
 - Opening Stock
 - Receipts
@@ -1265,6 +1272,7 @@ Shows one row per location with 12 columns:
 **2. Grand Totals Row**
 
 Bottom row showing:
+
 - Sum of all locations' values
 - **Average Manday Cost** (not sum, but average across locations)
 - Total locations count
@@ -1272,6 +1280,7 @@ Bottom row showing:
 **3. Summary Card**
 
 Top card showing:
+
 - Total Consumption (all locations)
 - Total Mandays (all locations)
 - Average Manday Cost
@@ -1288,19 +1297,9 @@ Button to download complete report as CSV file.
 <template>
   <div class="p-4 md:p-6">
     <!-- Header -->
-    <LayoutPageHeader
-      title="Consolidated Reconciliation"
-      icon="chart-bar"
-      location-scope="none"
-    >
+    <LayoutPageHeader title="Consolidated Reconciliation" icon="chart-bar" location-scope="none">
       <template #actions>
-        <UButton
-          icon="download"
-          color="primary"
-          @click="exportToCSV"
-        >
-          Export CSV
-        </UButton>
+        <UButton icon="download" color="primary" @click="exportToCSV">Export CSV</UButton>
       </template>
     </LayoutPageHeader>
 
@@ -1374,15 +1373,10 @@ Button to download complete report as CSV file.
               </td>
               <td>{{ recon.total_mandays }}</td>
               <td class="font-bold text-success">
-                {{ recon.total_mandays > 0
-                    ? formatCurrency(recon.manday_cost)
-                    : "N/A" }}
+                {{ recon.total_mandays > 0 ? formatCurrency(recon.manday_cost) : "N/A" }}
               </td>
               <td>
-                <UBadge
-                  :color="recon.is_saved ? 'success' : 'warning'"
-                  variant="soft"
-                >
+                <UBadge :color="recon.is_saved ? 'success' : 'warning'" variant="soft">
                   {{ recon.is_saved ? "Saved" : "Auto" }}
                 </UBadge>
               </td>
@@ -1407,7 +1401,8 @@ Button to download complete report as CSV file.
               </td>
               <td>
                 <div class="text-xs">
-                  {{ summary.saved_count }} Saved<br/>
+                  {{ summary.saved_count }} Saved
+                  <br />
                   {{ summary.auto_count }} Auto
                 </div>
               </td>
@@ -1434,9 +1429,11 @@ const exportToCSV = () => {
 
   // Title rows
   rows.push(["Stock Management System - Consolidated Reconciliation"]);
-  rows.push([`Period: ${period.name} (${formatDate(period.start_date)} - ${formatDate(period.end_date)})`]);
+  rows.push([
+    `Period: ${period.name} (${formatDate(period.start_date)} - ${formatDate(period.end_date)})`,
+  ]);
   rows.push([`Generated: ${formatDate(new Date())}`]);
-  rows.push([]);  // Empty row
+  rows.push([]); // Empty row
 
   // Headers
   rows.push([
@@ -1452,7 +1449,7 @@ const exportToCSV = () => {
     "Consumption",
     "Mandays",
     "Cost per Manday",
-    "Status"
+    "Status",
   ]);
 
   // Location rows
@@ -1470,7 +1467,7 @@ const exportToCSV = () => {
       recon.consumption.toFixed(2),
       recon.total_mandays.toString(),
       recon.total_mandays > 0 ? recon.manday_cost.toFixed(2) : "N/A",
-      recon.is_saved ? "Saved" : "Auto"
+      recon.is_saved ? "Saved" : "Auto",
     ]);
   });
 
@@ -1488,18 +1485,18 @@ const exportToCSV = () => {
     totals.value.total_consumption.toFixed(2),
     totals.value.total_mandays.toString(),
     totals.value.average_manday_cost.toFixed(2),
-    `${summary.value.saved_count} Saved / ${summary.value.auto_count} Auto`
+    `${summary.value.saved_count} Saved / ${summary.value.auto_count} Auto`,
   ]);
 
   // Convert to CSV string
   const csvContent = rows
     .map((row) =>
-      row.map((cell) =>
-        // Escape cells containing commas
-        typeof cell === "string" && cell.includes(",")
-          ? `"${cell}"`
-          : cell
-      ).join(",")
+      row
+        .map((cell) =>
+          // Escape cells containing commas
+          typeof cell === "string" && cell.includes(",") ? `"${cell}"` : cell
+        )
+        .join(",")
     )
     .join("\n");
 
@@ -1509,7 +1506,10 @@ const exportToCSV = () => {
   const url = URL.createObjectURL(blob);
 
   link.setAttribute("href", url);
-  link.setAttribute("download", `reconciliation_${period.name}_${formatDate(new Date(), "YYYYMMDD")}.csv`);
+  link.setAttribute(
+    "download",
+    `reconciliation_${period.name}_${formatDate(new Date(), "YYYYMMDD")}.csv`
+  );
   link.style.visibility = "hidden";
 
   document.body.appendChild(link);
@@ -1541,7 +1541,7 @@ const navigateToLocation = (locationId: string) => {
   // Navigate to single-location reconciliation page with location selected
   router.push({
     path: "/reconciliations",
-    query: { location: locationId }
+    query: { location: locationId },
   });
 };
 ```
@@ -1556,10 +1556,7 @@ Clicking a row takes you to detailed view for that location.
 
 ```typescript
 // ❌ WRONG: Sum manday costs (meaningless)
-const totalMandayCost = reconciliations.reduce(
-  (sum, r) => sum + r.manday_cost,
-  0
-);
+const totalMandayCost = reconciliations.reduce((sum, r) => sum + r.manday_cost, 0);
 
 // ✅ CORRECT: Calculate average
 const averageMandayCost = totals.total_consumption / totals.total_mandays;
@@ -1568,6 +1565,7 @@ const averageMandayCost = totals.total_consumption / totals.total_mandays;
 **Why?** Manday cost is a ratio, not an absolute value. We need to recalculate from total consumption and total mandays.
 
 **Example:**
+
 - Location A: 30,000 consumption ÷ 2,000 mandays = 15.00 per day
 - Location B: 20,000 consumption ÷ 1,000 mandays = 20.00 per day
 - Average: (15.00 + 20.00) ÷ 2 = 17.50 ❌ WRONG!
@@ -1584,7 +1582,7 @@ onMounted(() => {
   // Only supervisors and admins can view consolidated
   if (!["ADMIN", "SUPERVISOR"].includes(authStore.user?.role)) {
     toast.error("You don't have permission to view this page");
-    router.push("/reconciliations");  // Redirect to single-location
+    router.push("/reconciliations"); // Redirect to single-location
     return;
   }
 
@@ -1620,8 +1618,8 @@ Table on desktop, cards on mobile.
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                                         | What It Does                     |
+| -------------------------------------------- | -------------------------------- |
 | `app/pages/reconciliations/consolidated.vue` | Multi-location management report |
 
 ---
@@ -1660,13 +1658,14 @@ interface Props {
     total_mandays: number;
     manday_cost: number;
   };
-  showBreakdown?: boolean;  // Optional: show calculation details
+  showBreakdown?: boolean; // Optional: show calculation details
 }
 ```
 
 **What it displays:**
 
 **Card 1: Stock Movement**
+
 ```vue
 <UCard>
   <template #header>
@@ -1726,6 +1725,7 @@ interface Props {
 ```
 
 **Card 2: Consumption Analysis**
+
 ```vue
 <UCard>
   <template #header>
@@ -1791,7 +1791,7 @@ interface Props {
     condemnations: number;
     adjustments: number;
   };
-  readonly?: boolean;  // Disable editing for operators
+  readonly?: boolean; // Disable editing for operators
 }
 ```
 
@@ -1799,12 +1799,14 @@ interface Props {
 
 ```typescript
 const emit = defineEmits<{
-  save: [adjustments: {
-    back_charges: number;
-    credits: number;
-    condemnations: number;
-    adjustments: number;
-  }];
+  save: [
+    adjustments: {
+      back_charges: number;
+      credits: number;
+      condemnations: number;
+      adjustments: number;
+    },
+  ];
 }>();
 ```
 
@@ -1871,13 +1873,16 @@ const formData = ref({
   back_charges: props.reconciliation.back_charges,
   credits: props.reconciliation.credits,
   condemnations: props.reconciliation.condemnations,
-  adjustments: props.reconciliation.adjustments
+  adjustments: props.reconciliation.adjustments,
 });
 
 // Watch for prop changes
-watch(() => props.reconciliation, (newValue) => {
-  formData.value = { ...newValue };
-});
+watch(
+  () => props.reconciliation,
+  (newValue) => {
+    formData.value = { ...newValue };
+  }
+);
 
 // Computed values
 const totalAdjustments = computed(() => {
@@ -1930,7 +1935,7 @@ const handleSave = () => {
 const saveAdjustments = async (adjustments) => {
   await $fetch(`/api/locations/${locationId}/reconciliations/${periodId}`, {
     method: "PATCH",
-    body: adjustments
+    body: adjustments,
   });
 
   toast.success("Adjustments saved successfully");
@@ -1976,9 +1981,13 @@ const props = defineProps<{ reconciliation: Reconciliation }>();
 const formData = ref({ ...props.reconciliation });
 
 // Watch for parent updates
-watch(() => props.reconciliation, (newValue) => {
-  formData.value = { ...newValue };
-}, { deep: true });
+watch(
+  () => props.reconciliation,
+  (newValue) => {
+    formData.value = { ...newValue };
+  },
+  { deep: true }
+);
 ```
 
 **Why?** Props are read-only. We need local copy for v-model binding.
@@ -1991,7 +2000,7 @@ watch(() => props.reconciliation, (newValue) => {
 const hasChanges = computed(() => {
   // Compare current form values with original props
   return Object.keys(formData.value).some(
-    key => formData.value[key] !== props.reconciliation[key]
+    (key) => formData.value[key] !== props.reconciliation[key]
   );
 });
 ```
@@ -2004,9 +2013,7 @@ Detects if user has changed any field.
 
 ```typescript
 const isValid = computed(() => {
-  return Object.values(formData.value).every(
-    value => typeof value === "number" && value >= 0
-  );
+  return Object.values(formData.value).every((value) => typeof value === "number" && value >= 0);
 });
 ```
 
@@ -2016,10 +2023,10 @@ All adjustment fields must be non-negative numbers.
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                                                      | What It Does                        |
+| --------------------------------------------------------- | ----------------------------------- |
 | `app/components/reconciliation/ReconciliationSummary.vue` | Display stock movement and analysis |
-| `app/components/reconciliation/AdjustmentsForm.vue` | Editable adjustments form |
+| `app/components/reconciliation/AdjustmentsForm.vue`       | Editable adjustments form           |
 
 ---
 
@@ -2027,31 +2034,31 @@ All adjustment fields must be non-negative numbers.
 
 ### Server Utilities
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/utils/reconciliation.ts` | ~200 | Consumption and manday cost calculations |
+| File                             | Lines | Purpose                                  |
+| -------------------------------- | ----- | ---------------------------------------- |
+| `server/utils/reconciliation.ts` | ~200  | Consumption and manday cost calculations |
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/locations/[locationId]/reconciliations/[periodId].get.ts` | ~180 | Get/auto-calculate single reconciliation |
-| `server/api/locations/[locationId]/reconciliations/[periodId].patch.ts` | ~120 | Save adjustments |
-| `server/api/reconciliations/consolidated.get.ts` | ~150 | Get all locations report |
+| File                                                                    | Lines | Purpose                                  |
+| ----------------------------------------------------------------------- | ----- | ---------------------------------------- |
+| `server/api/locations/[locationId]/reconciliations/[periodId].get.ts`   | ~180  | Get/auto-calculate single reconciliation |
+| `server/api/locations/[locationId]/reconciliations/[periodId].patch.ts` | ~120  | Save adjustments                         |
+| `server/api/reconciliations/consolidated.get.ts`                        | ~150  | Get all locations report                 |
 
 ### Frontend Pages
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/reconciliations.vue` | ~450 | Single-location reconciliation page |
-| `app/pages/reconciliations/consolidated.vue` | ~380 | Multi-location management report |
+| File                                         | Lines | Purpose                             |
+| -------------------------------------------- | ----- | ----------------------------------- |
+| `app/pages/reconciliations.vue`              | ~450  | Single-location reconciliation page |
+| `app/pages/reconciliations/consolidated.vue` | ~380  | Multi-location management report    |
 
 ### Components
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/components/reconciliation/ReconciliationSummary.vue` | ~180 | Display reconciliation breakdown |
-| `app/components/reconciliation/AdjustmentsForm.vue` | ~220 | Editable adjustments form |
+| File                                                      | Lines | Purpose                          |
+| --------------------------------------------------------- | ----- | -------------------------------- |
+| `app/components/reconciliation/ReconciliationSummary.vue` | ~180  | Display reconciliation breakdown |
+| `app/components/reconciliation/AdjustmentsForm.vue`       | ~220  | Editable adjustments form        |
 
 **Total:** ~1,880 lines of code
 
@@ -2069,6 +2076,7 @@ Consumption = Opening + Receipts + Transfers In
 This formula answers: "How much food did we actually consume this period?"
 
 **Verification check:**
+
 ```
 If Opening + Receipts + Transfers In
    - Transfers Out - Issues - Closing = 0
@@ -2107,6 +2115,7 @@ sequenceDiagram
 ```
 
 **Benefits:**
+
 - No manual data entry required
 - Always shows current state
 - Supervisor can review before saving
@@ -2121,16 +2130,19 @@ sequenceDiagram
 Manday cost tells you **how efficiently you're feeding people**.
 
 **Example comparison:**
+
 - **Main Kitchen:** SAR 16.43 per person per day
 - **Central Store:** SAR 14.00 per person per day
 - **Warehouse:** SAR 8.47 per person per day
 
 **Analysis:**
+
 - Warehouse is most efficient (lowest cost)
 - Main Kitchen needs review (highest cost)
 - Possible reasons: Different menus, wastage, pricing
 
 **Management action:**
+
 - Investigate Main Kitchen for savings opportunities
 - Share Warehouse best practices
 - Adjust budgets based on actual costs
@@ -2160,6 +2172,7 @@ graph TB
 ```
 
 **Key points:**
+
 1. Transactions happen throughout period
 2. Reconciliation auto-calculates continuously
 3. Supervisor reviews at period-end
@@ -2184,12 +2197,14 @@ graph TB
 ```
 
 **Reasons:**
+
 1. **Audit trail:** Transaction history must not change
 2. **Data integrity:** Values come from actual transactions
 3. **Traceability:** Can drill down to see source transactions
 4. **Trust:** Management trusts numbers because they're calculated
 
 **Only adjustments are editable** because they represent things not captured in transactions:
+
 - Back-charges (shortages discovered later)
 - Credits (supplier negotiations)
 - Condemnations (spoilage not recorded as issues)
@@ -2198,22 +2213,22 @@ graph TB
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Reconciliation** | Matching expected stock (calculated) vs actual stock to find consumption |
-| **Consumption** | Total value of food used up during the period |
-| **Opening Stock** | Value of inventory at start of period (from previous period's closing) |
-| **Receipts** | Total value of deliveries received during period |
-| **Closing Stock** | Value of inventory at end of period (from current stock levels) |
-| **Mandays** | Total person-days (crew + extra × number of days) |
-| **Manday Cost** | Cost to feed one person for one day (consumption ÷ mandays) |
-| **Adjustments** | Manual corrections for things not in transactions |
-| **Back-charges** | Extra charges added for shortages or damages |
-| **Credits** | Money owed back from suppliers for overcharges or returns |
-| **Condemnations** | Value of spoiled/wasted food not recorded as issues |
-| **Auto-Calculated** | System calculated from transactions, not saved yet |
-| **Saved** | Supervisor has reviewed and saved with adjustments |
-| **Consolidated** | Combined report showing all locations together |
+| Term                | Simple Explanation                                                       |
+| ------------------- | ------------------------------------------------------------------------ |
+| **Reconciliation**  | Matching expected stock (calculated) vs actual stock to find consumption |
+| **Consumption**     | Total value of food used up during the period                            |
+| **Opening Stock**   | Value of inventory at start of period (from previous period's closing)   |
+| **Receipts**        | Total value of deliveries received during period                         |
+| **Closing Stock**   | Value of inventory at end of period (from current stock levels)          |
+| **Mandays**         | Total person-days (crew + extra × number of days)                        |
+| **Manday Cost**     | Cost to feed one person for one day (consumption ÷ mandays)              |
+| **Adjustments**     | Manual corrections for things not in transactions                        |
+| **Back-charges**    | Extra charges added for shortages or damages                             |
+| **Credits**         | Money owed back from suppliers for overcharges or returns                |
+| **Condemnations**   | Value of spoiled/wasted food not recorded as issues                      |
+| **Auto-Calculated** | System calculated from transactions, not saved yet                       |
+| **Saved**           | Supervisor has reviewed and saved with adjustments                       |
+| **Consolidated**    | Combined report showing all locations together                           |
 
 ---
 
@@ -2222,19 +2237,21 @@ graph TB
 ### Issue 1: Wrong Opening Stock
 
 **Symptoms:**
+
 - Opening stock doesn't match last period's closing
 - Period-over-period numbers don't connect
 
 **Cause:** Previous period not properly closed
 
 **Solution:**
+
 ```typescript
 // Ensure previous period is closed before opening new period
 const previousPeriod = await prisma.period.findFirst({
   where: {
     end_date: { lt: currentPeriod.start_date },
-    status: "CLOSED"  // Must be closed!
-  }
+    status: "CLOSED", // Must be closed!
+  },
 });
 
 if (!previousPeriod) {
@@ -2247,9 +2264,9 @@ const previousRecon = await prisma.reconciliation.findUnique({
   where: {
     location_id_period_id: {
       location_id,
-      period_id: previousPeriod.id
-    }
-  }
+      period_id: previousPeriod.id,
+    },
+  },
 });
 
 return previousRecon?.closing_stock || 0;
@@ -2262,12 +2279,14 @@ return previousRecon?.closing_stock || 0;
 ### Issue 2: Consumption is Negative
 
 **Symptoms:**
+
 - Consumption shows negative value (e.g., -5,000)
 - Manday cost calculation is negative
 
 **Cause:** Closing stock is higher than expected (over-stocking)
 
 **Analysis:**
+
 ```
 Opening:  50,000
 Receipts: 20,000
@@ -2280,6 +2299,7 @@ Difference = -5,000 (negative consumption)
 ```
 
 **Possible reasons:**
+
 1. Issues not recorded (stock issued but not documented)
 2. Transfer in not recorded
 3. Physical count error
@@ -2292,20 +2312,22 @@ Difference = -5,000 (negative consumption)
 ### Issue 3: Zero Mandays, Cannot Calculate Cost
 
 **Symptoms:**
+
 - Manday cost shows "N/A" or error
 - Cannot complete reconciliation
 
 **Cause:** No POB entries for the period
 
 **Solution:**
+
 ```typescript
 // In the calculation
 if (totalMandays === 0) {
   return {
     consumption,
     totalMandays: 0,
-    mandayCost: 0,  // or null
-    warning: "No POB entries for this period"
+    mandayCost: 0, // or null
+    warning: "No POB entries for this period",
   };
 }
 ```
@@ -2317,18 +2339,18 @@ if (totalMandays === 0) {
 ### Issue 4: Consolidated Totals Don't Match
 
 **Symptoms:**
+
 - Sum of locations doesn't equal grand total
 - Average manday cost seems wrong
 
 **Cause 1:** Mixing auto-calculated and saved reconciliations
 
 **Solution:**
+
 ```typescript
 // Always fetch fresh data for consolidated
 const reconciliations = await Promise.all(
-  locations.map(loc =>
-    getOrCalculateReconciliation(loc.id, periodId)
-  )
+  locations.map((loc) => getOrCalculateReconciliation(loc.id, periodId))
 );
 ```
 
@@ -2336,9 +2358,7 @@ const reconciliations = await Promise.all(
 
 ```typescript
 // ❌ WRONG: Average of averages
-const avgCost = reconciliations.reduce(
-  (sum, r) => sum + r.manday_cost, 0
-) / reconciliations.length;
+const avgCost = reconciliations.reduce((sum, r) => sum + r.manday_cost, 0) / reconciliations.length;
 
 // ✅ CORRECT: Total consumption ÷ total mandays
 const avgCost = totalConsumption / totalMandays;
@@ -2349,12 +2369,14 @@ const avgCost = totalConsumption / totalMandays;
 ### Issue 5: Adjustments Not Saving
 
 **Symptoms:**
+
 - Click save, but adjustments revert
 - Error message not shown
 
 **Cause:** Validation failing silently
 
 **Solution:**
+
 ```typescript
 const handleSave = async () => {
   // Validate before sending
@@ -2371,12 +2393,11 @@ const handleSave = async () => {
   try {
     await $fetch(`/api/reconciliations/${periodId}`, {
       method: "PATCH",
-      body: adjustments
+      body: adjustments,
     });
 
     toast.success("Adjustments saved successfully");
-    await fetchReconciliation();  // Refresh to show saved state
-
+    await fetchReconciliation(); // Refresh to show saved state
   } catch (error: any) {
     console.error("Save failed:", error);
     toast.error(error.data?.message || "Failed to save adjustments");
@@ -2391,6 +2412,7 @@ const handleSave = async () => {
 ### Manual Testing Steps
 
 **1. View Auto-Calculated Reconciliation**
+
 - [ ] Page loads correctly
 - [ ] All calculated fields populated
 - [ ] "Auto-Calculated" warning shown
@@ -2399,6 +2421,7 @@ const handleSave = async () => {
 - [ ] Calculation breakdown expands/collapses
 
 **2. Save Adjustments (Supervisor)**
+
 - [ ] Adjustments section visible for supervisors
 - [ ] Read-only badge shown for operators
 - [ ] All 4 adjustment fields editable
@@ -2411,6 +2434,7 @@ const handleSave = async () => {
 - [ ] Consumption recalculates with adjustments
 
 **3. Location Selector (Supervisor)**
+
 - [ ] Location dropdown visible for supervisors
 - [ ] Dropdown hidden for operators
 - [ ] Selecting location loads correct data
@@ -2418,6 +2442,7 @@ const handleSave = async () => {
 - [ ] Data refreshes without page reload
 
 **4. Consolidated View (Supervisor/Admin)**
+
 - [ ] Permission check redirects operators
 - [ ] All active locations shown in table
 - [ ] Status badges correct (Auto vs Saved)
@@ -2430,6 +2455,7 @@ const handleSave = async () => {
 - [ ] CSV export button works
 
 **5. CSV Export**
+
 - [ ] File downloads successfully
 - [ ] Filename includes period and date
 - [ ] CSV opens in Excel/Numbers
@@ -2439,6 +2465,7 @@ const handleSave = async () => {
 - [ ] No formatting errors
 
 **6. Period Changes**
+
 - [ ] Switching period updates all data
 - [ ] Opening stock changes with period
 - [ ] Transaction totals recalculate
@@ -2452,12 +2479,14 @@ const handleSave = async () => {
 After completing Reconciliation Management (Phase 2.4), the next phases are:
 
 **→ Phase 2.5: Slice 2 Testing & Polish** (Days 20-22)
+
 - Integration testing of complete workflows
 - UI/UX refinements for consistency
 - Performance optimization
 - Bug fixes and polish
 
 **→ Phase 3: Period Management** (Days 23-27)
+
 - Period creation and configuration
 - Period closing workflow with approval
 - Closing validations (all reconciliations saved, all locations ready)
@@ -2465,6 +2494,7 @@ After completing Reconciliation Management (Phase 2.4), the next phases are:
 - Historical period viewing
 
 **→ Phase 4: Polish & Performance** (Days 28-32)
+
 - Final UI polish
 - Performance optimization
 - Database indexing

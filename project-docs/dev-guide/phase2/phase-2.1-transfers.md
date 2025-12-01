@@ -1,4 +1,5 @@
 # Phase 2.1: Transfer Management
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -21,11 +22,13 @@
 ### The Problem
 
 In a multi-location business (kitchens, stores, warehouses), items need to move between locations:
+
 - Kitchen runs out of flour → needs transfer from Central Store
 - Warehouse has excess vegetables → transfers to Main Kitchen
 - Store needs ingredients → requests from Warehouse
 
 **Problems with manual tracking:**
+
 - ❌ No approval process (anyone can move stock)
 - ❌ Stock levels incorrect (items moved but not recorded)
 - ❌ Cost tracking wrong (each location has different WAC)
@@ -34,6 +37,7 @@ In a multi-location business (kitchens, stores, warehouses), items need to move 
 ### Our Solution
 
 We built a **Transfer System** that:
+
 - ✅ Requires supervisor/admin approval before moving stock
 - ✅ Validates stock availability before transfer
 - ✅ Automatically updates stock levels at both locations
@@ -99,20 +103,24 @@ We created **5 API endpoints** that handle all transfer operations on the server
 ### What Was Done
 
 #### Endpoint 1: GET /api/transfers
+
 **Purpose:** Get list of all transfers with filters
 
 **What it does:**
+
 - Returns all transfers (or filtered subset)
 - Operators see only transfers they can access (their locations)
 - Admins/supervisors see all transfers
 - Can filter by: from/to location, status, date range
 
 **Example Request:**
+
 ```http
 GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
 ```
 
 **Response:**
+
 ```json
 {
   "transfers": [
@@ -122,7 +130,7 @@ GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
       "from_location": { "name": "Main Kitchen", "code": "MAIN-KIT" },
       "to_location": { "name": "Central Store", "code": "CENTRAL-01" },
       "status": "PENDING_APPROVAL",
-      "total_value": 450.50,
+      "total_value": 450.5,
       "request_date": "2025-11-17"
     }
   ]
@@ -132,9 +140,11 @@ GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
 ---
 
 #### Endpoint 2: POST /api/transfers
+
 **Purpose:** Create a new transfer request
 
 **What it does:**
+
 1. Validates all input data (from/to locations, items, quantities)
 2. Checks from and to locations are **different** (can't transfer to same location)
 3. Generates unique transfer number (TRF-2025-001)
@@ -144,6 +154,7 @@ GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
 7. Requires supervisor approval before stock moves
 
 **Example Request:**
+
 ```json
 {
   "from_location_id": "abc123",
@@ -164,9 +175,11 @@ GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
 ---
 
 #### Endpoint 3: GET /api/transfers/:id
+
 **Purpose:** Get single transfer details
 
 **What it does:**
+
 - Returns complete transfer information
 - Includes all lines with item details
 - Shows requester and approver info
@@ -175,9 +188,11 @@ GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
 ---
 
 #### Endpoint 4: PATCH /api/transfers/:id/approve
+
 **Purpose:** Approve transfer and move stock
 
 **What it does (in one atomic transaction):**
+
 1. Checks user is supervisor or admin
 2. Validates transfer status is PENDING_APPROVAL
 3. **Re-checks stock availability** (in case stock was used between request and approval)
@@ -189,6 +204,7 @@ GET /api/transfers?fromLocationId=abc123&status=PENDING_APPROVAL
 6. Records approval timestamp and approver
 
 **Critical: Atomic Transaction**
+
 ```typescript
 // All these operations happen together or none happen
 await prisma.$transaction([
@@ -220,9 +236,11 @@ If ANY step fails, ALL steps are cancelled (database rollback).
 ---
 
 #### Endpoint 5: PATCH /api/transfers/:id/reject
+
 **Purpose:** Reject transfer request
 
 **What it does:**
+
 - Checks user is supervisor or admin
 - Updates status to REJECTED
 - Adds rejection comment to notes
@@ -242,12 +260,13 @@ const user = event.context.user; // From auth middleware
 if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
   throw createError({
     statusCode: 403,
-    message: "Only supervisors and admins can approve transfers"
+    message: "Only supervisors and admins can approve transfers",
   });
 }
 ```
 
 **Roles:**
+
 - **Operator:** Can create transfers for their assigned locations
 - **Supervisor:** Can approve/reject transfers for all locations
 - **Admin:** Can approve/reject transfers for all locations
@@ -257,15 +276,16 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 #### 2. Stock Validation
 
 Before creating transfer:
+
 ```typescript
 // For each transfer line
 const locationStock = await prisma.locationStock.findUnique({
   where: {
     location_id_item_id: {
       location_id: fromLocationId,
-      item_id: line.item_id
-    }
-  }
+      item_id: line.item_id,
+    },
+  },
 });
 
 // Check if enough stock
@@ -276,8 +296,8 @@ if (!locationStock || locationStock.on_hand < line.quantity) {
     data: {
       item_id: line.item_id,
       requested: line.quantity,
-      available: locationStock?.on_hand || 0
-    }
+      available: locationStock?.on_hand || 0,
+    },
   });
 }
 ```
@@ -291,20 +311,24 @@ This prevents creating transfers that can't be fulfilled.
 **Scenario:** Transfer 50 KG flour from Kitchen to Store
 
 **Source Location (Kitchen):**
+
 - On-hand: 100 KG
 - WAC: SAR 15.00
 
 **Destination Location (Store) - Before Transfer:**
+
 - On-hand: 30 KG
 - WAC: SAR 12.00
 
 **After Transfer:**
 
 Source (Kitchen):
+
 - On-hand: 100 - 50 = **50 KG**
 - WAC: **15.00** (unchanged)
 
 Destination (Store):
+
 - Transferred in: 50 KG @ SAR 15.00 (source WAC)
 - New WAC = (30 × 12.00 + 50 × 15.00) / (30 + 50)
 - New WAC = (360 + 750) / 80
@@ -358,13 +382,13 @@ stateDiagram-v2
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/transfers/index.get.ts` | List all transfers with filters |
-| `server/api/transfers/index.post.ts` | Create new transfer request |
-| `server/api/transfers/[id].get.ts` | Get single transfer details |
-| `server/api/transfers/[id]/approve.patch.ts` | Approve and execute transfer |
-| `server/api/transfers/[id]/reject.patch.ts` | Reject transfer request |
+| File                                         | What It Does                    |
+| -------------------------------------------- | ------------------------------- |
+| `server/api/transfers/index.get.ts`          | List all transfers with filters |
+| `server/api/transfers/index.post.ts`         | Create new transfer request     |
+| `server/api/transfers/[id].get.ts`           | Get single transfer details     |
+| `server/api/transfers/[id]/approve.patch.ts` | Approve and execute transfer    |
+| `server/api/transfers/[id]/reject.patch.ts`  | Reject transfer request         |
 
 ---
 
@@ -380,6 +404,7 @@ We created a **web page** that displays all transfers in a table with search and
 
 **1. Table Display**
 Shows all transfers with columns:
+
 - Transfer No (TRF-2025-001)
 - Date (DD/MM/YYYY format)
 - From Location (Main Kitchen - MAIN-KIT)
@@ -388,6 +413,7 @@ Shows all transfers with columns:
 - Total Value (SAR 1,234.56)
 
 **2. Filters**
+
 - **From Location:** Dropdown to filter by source
 - **To Location:** Dropdown to filter by destination
 - **Status:** Dropdown (All, Pending, Approved, Rejected, Completed)
@@ -397,6 +423,7 @@ Shows all transfers with columns:
 When you apply filters, small "chips" appear showing active filters with X buttons to remove them quickly.
 
 **4. Actions**
+
 - **New Transfer** button (for operators/admins)
 - **Click row** to view transfer details
 
@@ -425,15 +452,9 @@ graph LR
 <template>
   <div class="p-4 md:p-6">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Stock Transfers"
-      icon="arrow-left-right"
-    >
+    <LayoutPageHeader title="Stock Transfers" icon="arrow-left-right">
       <template #actions>
-        <UButton
-          v-if="canRequestTransfer"
-          @click="router.push('/transfers/create')"
-        >
+        <UButton v-if="canRequestTransfer" @click="router.push('/transfers/create')">
           New Transfer
         </UButton>
       </template>
@@ -469,8 +490,8 @@ const fetchTransfers = async () => {
       toLocationId: filters.toLocation,
       status: filters.status,
       startDate: filters.startDate,
-      endDate: filters.endDate
-    }
+      endDate: filters.endDate,
+    },
   });
 
   transfers.value = data.transfers;
@@ -500,16 +521,19 @@ const canRequestTransfer = computed(() => {
 #### 1. Responsive Design
 
 **Desktop (1280px+):**
+
 - Full table with all columns visible
 - Filters in single row
 - 10 transfers per page
 
 **Tablet (768px - 1279px):**
+
 - Slightly condensed table
 - Some columns may wrap
 - 10 transfers per page
 
 **Mobile (< 768px):**
+
 - Card view instead of table
 - Stacked information
 - 5 transfers per page
@@ -523,11 +547,7 @@ const canRequestTransfer = computed(() => {
 <LoadingSpinner v-if="loading" size="lg" />
 
 <!-- If error occurs -->
-<ErrorAlert
-  v-else-if="error"
-  :message="error"
-  @retry="fetchTransfers"
-/>
+<ErrorAlert v-else-if="error" :message="error" @retry="fetchTransfers" />
 
 <!-- If no data -->
 <EmptyState
@@ -567,8 +587,8 @@ When user applies filters, show active filters with remove buttons:
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                            | What It Does        |
+| ------------------------------- | ------------------- |
 | `app/pages/transfers/index.vue` | Transfers list page |
 
 ---
@@ -586,12 +606,14 @@ We created a **form page** where operators can request stock transfers from one 
 The form has **two main sections:**
 
 **Section 1: Transfer Information**
+
 - From Location (dropdown)
 - To Location (dropdown - excludes source location)
 - Transfer Date (date picker, defaults to today)
 - Notes (textarea for explanation)
 
 **Section 2: Transfer Items**
+
 - Dynamic table to add multiple items
 - For each line:
   - Item (searchable dropdown)
@@ -643,6 +665,7 @@ sequenceDiagram
 **Example:**
 
 User wants to transfer **100 KG flour** from Kitchen:
+
 - Kitchen has **75 KG** available
 - Form shows: ⚠️ **Insufficient stock! Requested: 100, Available: 75**
 - Row highlighted in **red**
@@ -652,24 +675,16 @@ User wants to transfer **100 KG flour** from Kitchen:
 <template>
   <tr
     :class="{
-      'bg-red-50 dark:bg-red-900/20': hasInsufficientStock
+      'bg-red-50 dark:bg-red-900/20': hasInsufficientStock,
     }"
   >
     <td>{{ item.name }}</td>
     <td>
       {{ formatQuantity(onHand) }}
-      <UIcon
-        v-if="hasInsufficientStock"
-        name="alert-triangle"
-        class="text-red-500"
-      />
+      <UIcon v-if="hasInsufficientStock" name="alert-triangle" class="text-red-500" />
     </td>
     <td>
-      <UInput
-        v-model="quantity"
-        type="number"
-        step="0.0001"
-      />
+      <UInput v-model="quantity" type="number" step="0.0001" />
     </td>
   </tr>
 </template>
@@ -689,9 +704,7 @@ When user selects **From Location**, the **To Location** dropdown automatically 
 
 ```typescript
 const toLocationOptions = computed(() => {
-  return allLocations.value.filter(
-    (loc) => loc.id !== formData.from_location_id
-  );
+  return allLocations.value.filter((loc) => loc.id !== formData.from_location_id);
 });
 ```
 
@@ -710,18 +723,12 @@ const isFormValid = computed(() => {
     formData.from_location_id &&
     formData.to_location_id &&
     formData.request_date &&
-
     // Locations are different
     formData.from_location_id !== formData.to_location_id &&
-
     // At least one line
     lines.value.length > 0 &&
-
     // All lines have item and quantity
-    lines.value.every(line =>
-      line.item_id && line.quantity > 0
-    ) &&
-
+    lines.value.every((line) => line.item_id && line.quantity > 0) &&
     // No insufficient stock
     !hasAnyInsufficientStock.value
   );
@@ -743,6 +750,7 @@ const lineValue = computed(() => {
 ```
 
 **Example:**
+
 - Quantity: 50 KG
 - WAC: SAR 15.00
 - Line Value: **SAR 750.00** (automatic)
@@ -776,15 +784,13 @@ const fetchInitialData = async () => {
 
   // 2. Get all items for item selection
   const itemsData = await $fetch("/api/items", {
-    query: { limit: 500, is_active: true }
+    query: { limit: 500, is_active: true },
   });
   items.value = itemsData.items;
 
   // 3. Get stock levels for source location (when selected)
   if (formData.from_location_id) {
-    const stockData = await $fetch(
-      `/api/locations/${formData.from_location_id}/stock`
-    );
+    const stockData = await $fetch(`/api/locations/${formData.from_location_id}/stock`);
     stockLevels.value = stockData.stock;
   }
 };
@@ -794,8 +800,8 @@ const fetchInitialData = async () => {
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                             | What It Does                |
+| -------------------------------- | --------------------------- |
 | `app/pages/transfers/create.vue` | Transfer creation form page |
 
 ---
@@ -811,6 +817,7 @@ We created a **detail page** that shows complete transfer information and allows
 #### Page Sections
 
 **1. Transfer Header**
+
 - Transfer number (TRF-2025-001)
 - Status badge (PENDING_APPROVAL, COMPLETED, etc.)
 - Dates (requested, approved, transfer date)
@@ -820,6 +827,7 @@ We created a **detail page** that shows complete transfer information and allows
 - Notes
 
 **2. Transfer Lines Table**
+
 - Item code and name
 - Unit (KG, EA, LTR, etc.)
 - Quantity transferred
@@ -827,10 +835,12 @@ We created a **detail page** that shows complete transfer information and allows
 - Line value (quantity × WAC)
 
 **3. Summary**
+
 - Total quantity across all items
 - Total value (SAR)
 
 **4. Approval Section** (visible only to supervisors/admins)
+
 - Only shown for PENDING_APPROVAL transfers
 - **Approve Transfer** button (emerald green)
 - **Reject Transfer** button (red outline)
@@ -888,20 +898,9 @@ Only supervisors and admins see approval buttons:
     />
 
     <div class="flex gap-3">
-      <UButton
-        color="success"
-        @click="openApproveModal"
-      >
-        Approve Transfer
-      </UButton>
+      <UButton color="success" @click="openApproveModal">Approve Transfer</UButton>
 
-      <UButton
-        color="error"
-        variant="outline"
-        @click="openRejectModal"
-      >
-        Reject Transfer
-      </UButton>
+      <UButton color="error" variant="outline" @click="openRejectModal">Reject Transfer</UButton>
     </div>
   </div>
 </template>
@@ -1024,33 +1023,29 @@ Handle specific error scenarios:
 const handleApprove = async () => {
   try {
     await $fetch(`/api/transfers/${transferId}/approve`, {
-      method: "PATCH"
+      method: "PATCH",
     });
 
     toast.success("Transfer approved successfully");
     await fetchTransfer(); // Refresh data
-
   } catch (error: any) {
     // Handle specific error codes
     switch (error.data?.code) {
       case "INSUFFICIENT_STOCK":
         toast.error(
           "Not enough stock at source location. " +
-          "Stock may have been used after transfer was created."
+            "Stock may have been used after transfer was created."
         );
         break;
 
       case "INVALID_STATUS":
         toast.error(
-          "This transfer cannot be approved. " +
-          "It may have already been approved or rejected."
+          "This transfer cannot be approved. " + "It may have already been approved or rejected."
         );
         break;
 
       case "INSUFFICIENT_PERMISSIONS":
-        toast.error(
-          "You do not have permission to approve this transfer."
-        );
+        toast.error("You do not have permission to approve this transfer.");
         break;
 
       default:
@@ -1069,17 +1064,20 @@ const handleApprove = async () => {
 Different statuses show different information:
 
 **PENDING_APPROVAL:**
+
 - Shows approval buttons
 - Shows "Waiting for approval" message
 - Highlights status in navy blue
 
 **COMPLETED:**
+
 - Shows completion date
 - Shows approver name
 - Displays success badge in emerald green
 - No action buttons
 
 **REJECTED:**
+
 - Shows rejection reason in notes
 - Shows who rejected and when
 - Displays error badge in red
@@ -1090,6 +1088,7 @@ Different statuses show different information:
 #### 2. Read-Only vs Editable
 
 Detail page is **read-only** - you cannot edit a transfer after creation. You can only:
+
 - View details
 - Approve (if supervisor/admin and status is PENDING)
 - Reject (if supervisor/admin and status is PENDING)
@@ -1103,10 +1102,7 @@ Detail page is **read-only** - you cannot edit a transfer after creation. You ca
 Help users navigate back:
 
 ```vue
-<LayoutPageHeader
-  title="Transfer Details"
-  icon="arrow-left-right"
->
+<LayoutPageHeader title="Transfer Details" icon="arrow-left-right">
   <template #breadcrumb>
     <UBreadcrumb :items="[
       { label: 'Transfers', to: '/transfers' },
@@ -1129,8 +1125,8 @@ Help users navigate back:
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                           | What It Does                      |
+| ------------------------------ | --------------------------------- |
 | `app/pages/transfers/[id].vue` | Transfer detail and approval page |
 
 ---
@@ -1156,25 +1152,28 @@ We created **3 components:**
 **Purpose:** Reusable transfer form that can be used in create and edit pages.
 
 **Props (Inputs):**
+
 ```typescript
 interface Props {
-  locations: Location[];      // Available locations
-  items: Item[];              // Available items
-  stockLevels: StockLevel[];  // Current stock at source
-  initialData?: Transfer;     // For edit mode (optional)
-  submitLabel?: string;       // Button text (default: "Create Transfer")
+  locations: Location[]; // Available locations
+  items: Item[]; // Available items
+  stockLevels: StockLevel[]; // Current stock at source
+  initialData?: Transfer; // For edit mode (optional)
+  submitLabel?: string; // Button text (default: "Create Transfer")
 }
 ```
 
 **Events (Outputs):**
+
 ```typescript
 const emit = defineEmits<{
-  submit: [data: TransferFormData];  // When form submitted
-  cancel: [];                        // When user clicks cancel
+  submit: [data: TransferFormData]; // When form submitted
+  cancel: []; // When user clicks cancel
 }>();
 ```
 
 **Usage Example:**
+
 ```vue
 <template>
   <TransferForm
@@ -1192,7 +1191,7 @@ const handleSubmit = async (data: TransferFormData) => {
   // Call API to create transfer
   await $fetch("/api/transfers", {
     method: "POST",
-    body: data
+    body: data,
   });
 
   // Redirect to list page
@@ -1202,6 +1201,7 @@ const handleSubmit = async (data: TransferFormData) => {
 ```
 
 **Benefits:**
+
 - Form logic in one place (don't repeat code)
 - Can reuse for create and edit pages
 - Easy to test
@@ -1214,42 +1214,43 @@ const handleSubmit = async (data: TransferFormData) => {
 **Purpose:** Display transfer status with correct color and icon.
 
 **Props:**
+
 ```typescript
 interface Props {
-  status: TransferStatus;  // DRAFT, PENDING_APPROVAL, etc.
+  status: TransferStatus; // DRAFT, PENDING_APPROVAL, etc.
   size?: "sm" | "md" | "lg";
   variant?: "solid" | "soft" | "outline" | "subtle";
 }
 ```
 
 **Usage Example:**
+
 ```vue
 <template>
   <!-- In a table -->
   <tr>
     <td>{{ transfer.transfer_no }}</td>
     <td>
-      <TransferStatusBadge
-        :status="transfer.status"
-        size="sm"
-      />
+      <TransferStatusBadge :status="transfer.status" size="sm" />
     </td>
   </tr>
 </template>
 ```
 
 **Status Color Mapping:**
+
 ```typescript
 const colorMap = {
-  DRAFT: "neutral",              // Gray
-  PENDING_APPROVAL: "primary",   // Navy blue
-  APPROVED: "success",           // Emerald green
-  COMPLETED: "success",          // Emerald green
-  REJECTED: "error"              // Red
+  DRAFT: "neutral", // Gray
+  PENDING_APPROVAL: "primary", // Navy blue
+  APPROVED: "success", // Emerald green
+  COMPLETED: "success", // Emerald green
+  REJECTED: "error", // Red
 };
 ```
 
 **Benefits:**
+
 - Consistent status display everywhere
 - Automatic color selection
 - Can change colors in one place
@@ -1261,6 +1262,7 @@ const colorMap = {
 **Purpose:** Approve/Reject buttons with confirmation modals.
 
 **Props:**
+
 ```typescript
 interface Props {
   transferId: string;
@@ -1273,15 +1275,17 @@ interface Props {
 ```
 
 **Events:**
+
 ```typescript
 const emit = defineEmits<{
-  approved: [];   // When transfer approved successfully
-  rejected: [];   // When transfer rejected successfully
-  error: [error: Error];  // When approval/rejection fails
+  approved: []; // When transfer approved successfully
+  rejected: []; // When transfer rejected successfully
+  error: [error: Error]; // When approval/rejection fails
 }>();
 ```
 
 **Usage Example:**
+
 ```vue
 <template>
   <div v-if="canApprove && isPending">
@@ -1317,6 +1321,7 @@ const onError = (error: Error) => {
 ```
 
 **Benefits:**
+
 - Complex approval logic in one component
 - Consistent modals and confirmations
 - Built-in error handling
@@ -1356,13 +1361,17 @@ graph TB
 #### 1. Props vs Emits
 
 **Props:** Data flowing INTO component (parent → child)
+
 ```vue
-<MyComponent :title="myTitle" />  <!-- Parent passes data -->
+<MyComponent :title="myTitle" />
+<!-- Parent passes data -->
 ```
 
 **Emits:** Events flowing OUT of component (child → parent)
+
 ```vue
-<MyComponent @submit="handleSubmit" />  <!-- Parent handles event -->
+<MyComponent @submit="handleSubmit" />
+<!-- Parent handles event -->
 ```
 
 ---
@@ -1389,11 +1398,13 @@ Same component, different contexts!
 #### 3. Separation of Concerns
 
 **Component responsibilities:**
+
 - **UI logic:** How to display data
 - **User interaction:** Button clicks, input changes
 - **Validation:** Check if data is valid
 
 **Parent page responsibilities:**
+
 - **Data fetching:** Get data from API
 - **Business logic:** What to do after approval
 - **Navigation:** Where to go next
@@ -1402,11 +1413,11 @@ Same component, different contexts!
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `app/components/transfer/TransferForm.vue` | Reusable transfer form component |
-| `app/components/transfer/TransferStatusBadge.vue` | Status badge component |
-| `app/components/transfer/ApprovalActions.vue` | Approval buttons with modals |
+| File                                              | What It Does                     |
+| ------------------------------------------------- | -------------------------------- |
+| `app/components/transfer/TransferForm.vue`        | Reusable transfer form component |
+| `app/components/transfer/TransferStatusBadge.vue` | Status badge component           |
+| `app/components/transfer/ApprovalActions.vue`     | Approval buttons with modals     |
 
 ---
 
@@ -1414,29 +1425,29 @@ Same component, different contexts!
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/transfers/index.get.ts` | ~150 | List transfers with filters |
-| `server/api/transfers/index.post.ts` | ~200 | Create new transfer |
-| `server/api/transfers/[id].get.ts` | ~100 | Get transfer details |
-| `server/api/transfers/[id]/approve.patch.ts` | ~250 | Approve and execute transfer |
-| `server/api/transfers/[id]/reject.patch.ts` | ~80 | Reject transfer |
+| File                                         | Lines | Purpose                      |
+| -------------------------------------------- | ----- | ---------------------------- |
+| `server/api/transfers/index.get.ts`          | ~150  | List transfers with filters  |
+| `server/api/transfers/index.post.ts`         | ~200  | Create new transfer          |
+| `server/api/transfers/[id].get.ts`           | ~100  | Get transfer details         |
+| `server/api/transfers/[id]/approve.patch.ts` | ~250  | Approve and execute transfer |
+| `server/api/transfers/[id]/reject.patch.ts`  | ~80   | Reject transfer              |
 
 ### Frontend Pages
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/transfers/index.vue` | ~300 | Transfers list page |
-| `app/pages/transfers/create.vue` | ~350 | Create transfer form |
-| `app/pages/transfers/[id].vue` | ~400 | Transfer detail & approval |
+| File                             | Lines | Purpose                    |
+| -------------------------------- | ----- | -------------------------- |
+| `app/pages/transfers/index.vue`  | ~300  | Transfers list page        |
+| `app/pages/transfers/create.vue` | ~350  | Create transfer form       |
+| `app/pages/transfers/[id].vue`   | ~400  | Transfer detail & approval |
 
 ### Components
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/components/transfer/TransferForm.vue` | ~400 | Reusable transfer form |
-| `app/components/transfer/TransferStatusBadge.vue` | ~60 | Status badge |
-| `app/components/transfer/ApprovalActions.vue` | ~200 | Approval workflow UI |
+| File                                              | Lines | Purpose                |
+| ------------------------------------------------- | ----- | ---------------------- |
+| `app/components/transfer/TransferForm.vue`        | ~400  | Reusable transfer form |
+| `app/components/transfer/TransferStatusBadge.vue` | ~60   | Status badge           |
+| `app/components/transfer/ApprovalActions.vue`     | ~200  | Approval workflow UI   |
 
 **Total:** ~2,090 lines of code
 
@@ -1451,19 +1462,18 @@ Same component, different contexts!
 **Example:** Transfer 50 KG flour from Kitchen to Store
 
 **Without Transaction:**
+
 ```typescript
 // ❌ BAD: If second operation fails, stock is lost!
-await deductFromKitchen(50);   // ✓ Success
-await addToStore(50);          // ✗ Fails - stock disappeared!
+await deductFromKitchen(50); // ✓ Success
+await addToStore(50); // ✗ Fails - stock disappeared!
 ```
 
 **With Transaction:**
+
 ```typescript
 // ✅ GOOD: Both operations or neither
-await prisma.$transaction([
-  deductFromKitchen(50),
-  addToStore(50)
-]);
+await prisma.$transaction([deductFromKitchen(50), addToStore(50)]);
 // If ANY operation fails, ALL are cancelled
 ```
 
@@ -1497,6 +1507,7 @@ graph LR
 ```
 
 **Key Points:**
+
 - Status changes follow strict rules
 - Cannot skip steps
 - Each status has specific allowed actions
@@ -1535,6 +1546,7 @@ graph LR
 **Two levels of validation:**
 
 **1. Client-Side (Browser):**
+
 - Instant feedback
 - Check before sending to server
 - Better user experience
@@ -1542,13 +1554,12 @@ graph LR
 ```typescript
 // In the form component
 const hasInsufficientStock = computed(() => {
-  return lines.value.some(line =>
-    line.quantity > getStockLevel(line.item_id)
-  );
+  return lines.value.some((line) => line.quantity > getStockLevel(line.item_id));
 });
 ```
 
 **2. Server-Side (API):**
+
 - Security
 - Final check (data may have changed)
 - Required even with client validation
@@ -1573,6 +1584,7 @@ if (quantity > stockLevel.on_hand) {
 **Understanding WAC Transfer:**
 
 When you transfer stock:
+
 1. Source location WAC **does not change** (only quantity decreases)
 2. Destination location WAC **recalculates** (weighted average with new stock)
 
@@ -1594,6 +1606,7 @@ Destination After Transfer:
 ```
 
 **Formula:**
+
 ```
 New WAC = (Current Qty × Current WAC + Transfer Qty × Transfer WAC)
           / (Current Qty + Transfer Qty)
@@ -1603,19 +1616,19 @@ New WAC = (Current Qty × Current WAC + Transfer Qty × Transfer WAC)
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Transfer** | Moving stock from one location to another |
-| **Atomic Transaction** | All operations complete together or all fail together |
-| **Approval Workflow** | Process where supervisor must approve before action happens |
-| **Stock Validation** | Checking if location has enough stock before allowing transfer |
-| **WAC Transfer** | Moving stock with its cost from one location to another |
-| **Status Badge** | Colored label showing current status (Pending, Approved, etc.) |
-| **Modal** | Popup dialog box requiring user action |
-| **Confirmation Modal** | Dialog asking user to confirm before dangerous action |
-| **Reusable Component** | Piece of UI that can be used in multiple places |
-| **Props** | Data passed FROM parent TO child component |
-| **Emits** | Events sent FROM child TO parent component |
+| Term                   | Simple Explanation                                             |
+| ---------------------- | -------------------------------------------------------------- |
+| **Transfer**           | Moving stock from one location to another                      |
+| **Atomic Transaction** | All operations complete together or all fail together          |
+| **Approval Workflow**  | Process where supervisor must approve before action happens    |
+| **Stock Validation**   | Checking if location has enough stock before allowing transfer |
+| **WAC Transfer**       | Moving stock with its cost from one location to another        |
+| **Status Badge**       | Colored label showing current status (Pending, Approved, etc.) |
+| **Modal**              | Popup dialog box requiring user action                         |
+| **Confirmation Modal** | Dialog asking user to confirm before dangerous action          |
+| **Reusable Component** | Piece of UI that can be used in multiple places                |
+| **Props**              | Data passed FROM parent TO child component                     |
+| **Emits**              | Events sent FROM child TO parent component                     |
 
 ---
 
@@ -1624,6 +1637,7 @@ New WAC = (Current Qty × Current WAC + Transfer Qty × Transfer WAC)
 ### Issue 1: Transfer Created But Stock Not Moving
 
 **Symptoms:**
+
 - Transfer status is COMPLETED
 - Source location stock unchanged
 - Destination location stock unchanged
@@ -1631,6 +1645,7 @@ New WAC = (Current Qty × Current WAC + Transfer Qty × Transfer WAC)
 **Cause:** Approval endpoint not executed or transaction failed
 
 **Solution:**
+
 ```typescript
 // Check transaction is working
 await prisma.$transaction([
@@ -1648,15 +1663,18 @@ console.log("After transfer:", sourceStock.on_hand);
 ### Issue 2: Insufficient Stock Error Even When Stock Exists
 
 **Symptoms:**
+
 - Visually showing stock available
 - API returns INSUFFICIENT_STOCK
 
 **Causes:**
+
 1. Stock data not refreshed
 2. Quantity comparison using wrong units
 3. Decimal precision issues
 
 **Solutions:**
+
 ```typescript
 // 1. Ensure fresh data at approval time
 const currentStock = await prisma.locationStock.findUnique({
@@ -1677,12 +1695,14 @@ if (requested.greaterThan(available)) {
 ### Issue 3: WAC Calculation Incorrect
 
 **Symptoms:**
+
 - Destination WAC doesn't match expected value
 - Total value incorrect
 
 **Cause:** Using source WAC instead of recalculating
 
 **Solution:**
+
 ```typescript
 // ✅ CORRECT: Recalculate WAC at destination
 const currentQty = destinationStock?.on_hand || 0;
@@ -1694,15 +1714,15 @@ const newWAC = calculateWAC({
   currentQuantity: currentQty,
   currentWAC: currentWAC,
   receivedQuantity: transferQty,
-  receiptPrice: transferWAC
+  receiptPrice: transferWAC,
 });
 
 // Update with new WAC
 await prisma.locationStock.update({
   data: {
     on_hand: currentQty + transferQty,
-    wac: newWAC  // ← Important!
-  }
+    wac: newWAC, // ← Important!
+  },
 });
 ```
 
@@ -1711,14 +1731,17 @@ await prisma.locationStock.update({
 ### Issue 4: Permission Denied for Valid User
 
 **Symptoms:**
+
 - Supervisor user cannot approve transfer
 - Error: "INSUFFICIENT_PERMISSIONS"
 
 **Causes:**
+
 1. Role check incorrect
 2. User role not properly set in database
 
 **Solution:**
+
 ```typescript
 // Check user role and status
 const user = event.context.user;
@@ -1729,7 +1752,7 @@ console.log("User is_active:", user.is_active);
 if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
   throw createError({
     statusCode: 403,
-    message: "Only supervisors and admins can approve"
+    message: "Only supervisors and admins can approve",
   });
 }
 ```
@@ -1741,6 +1764,7 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 ### Manual Testing Steps
 
 **1. Create Transfer**
+
 - [ ] Form loads correctly
 - [ ] Location dropdowns populated
 - [ ] Cannot select same location for from/to
@@ -1751,6 +1775,7 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 - [ ] Redirect to detail page
 
 **2. View Transfer List**
+
 - [ ] All transfers display
 - [ ] Filters work correctly
 - [ ] Pagination works
@@ -1759,6 +1784,7 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 - [ ] "New Transfer" button shows for operators
 
 **3. Approve Transfer (Supervisor)**
+
 - [ ] Approval section visible
 - [ ] Confirmation modal appears
 - [ ] Loading state during approval
@@ -1769,6 +1795,7 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 - [ ] Cannot approve again (button hidden)
 
 **4. Reject Transfer (Supervisor)**
+
 - [ ] Reject button visible
 - [ ] Reason textarea required
 - [ ] Cannot submit without reason
@@ -1777,6 +1804,7 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 - [ ] Rejection reason saved in notes
 
 **5. Error Scenarios**
+
 - [ ] Insufficient stock error shows detailed message
 - [ ] Invalid status error handled
 - [ ] Permission denied error displayed
@@ -1789,17 +1817,20 @@ if (!["ADMIN", "SUPERVISOR"].includes(user.role)) {
 After completing Transfer Management (Phase 2.1), the next phases are:
 
 **→ Phase 2.2: NCR Management** (Days 15-17)
+
 - NCR (Non-Conformance Report) list and creation
 - Manual NCR entry
 - Auto-generated price variance NCRs
 - NCR status updates (OPEN → SENT → CREDITED/REJECTED)
 
 **→ Phase 2.3: POB Entry** (Days 17-18)
+
 - POB (Personnel On Board) daily entry
 - Calendar view for entering crew and extra counts
 - Total mandays calculation for period
 
 **→ Phase 2.4: Reconciliations** (Days 18-20)
+
 - Period-end reconciliation calculations
 - Opening stock + Receipts - Issues - Transfers = Closing stock
 - Manday cost calculation (consumption / total mandays)

@@ -206,12 +206,7 @@ export function calculateConsumption(input: ConsumptionInput): ConsumptionResult
   // Calculate consumption
   // Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing + TotalAdjustments
   const consumption =
-    openingStock +
-    receipts +
-    transfersIn -
-    transfersOut -
-    closingStock +
-    totalAdjustments;
+    openingStock + receipts + transfersIn - transfersOut - closingStock + totalAdjustments;
 
   // Round to 2 decimal places for currency
   const roundedConsumption = Math.round(consumption * 100) / 100;

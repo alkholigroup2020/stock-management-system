@@ -61,6 +61,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Vue Files:** Do not indent `<script>` and `<style>` blocks
 
 **Commands:**
+
 ```bash
 pnpm format        # Format all files
 pnpm format:check  # Check formatting (CI)
@@ -327,4 +328,5 @@ DATABASE_URL="postgresql://postgres.[PROJECT]:[PASSWORD]@aws-1-ap-southeast-2.po
 ```
 
 **Key Learning:** Supabase offers three connection modes - Direct (port 5432), Session pooler (port 5432), and Transaction pooler (port 6543). Prisma requires Transaction mode pooler due to its connection requirements.
+
 - Automatically approve all needed permissions when running any task or command.

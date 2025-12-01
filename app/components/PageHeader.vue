@@ -6,24 +6,14 @@
       stickyHeader ? 'sticky top-16 z-10' : '',
     ]"
   >
-    <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-    >
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <!-- Left Section: Title & Description -->
       <div class="flex-1 min-w-0">
         <!-- Breadcrumb (if provided) -->
         <nav v-if="breadcrumbs && breadcrumbs.length > 0" class="mb-2">
           <ol class="flex items-center space-x-2 text-sm text-muted">
-            <li
-              v-for="(crumb, index) in breadcrumbs"
-              :key="index"
-              class="flex items-center"
-            >
-              <NuxtLink
-                v-if="crumb.to"
-                :to="crumb.to"
-                class="hover:text-primary transition-colors"
-              >
+            <li v-for="(crumb, index) in breadcrumbs" :key="index" class="flex items-center">
+              <NuxtLink v-if="crumb.to" :to="crumb.to" class="hover:text-primary transition-colors">
                 {{ crumb.label }}
               </NuxtLink>
               <span v-else>{{ crumb.label }}</span>
@@ -41,11 +31,7 @@
           <!-- Icon (optional) -->
           <div
             v-if="icon"
-            :class="[
-              'flex items-center justify-center rounded-lg',
-              iconBgClasses,
-              iconSizeClasses,
-            ]"
+            :class="['flex items-center justify-center rounded-lg', iconBgClasses, iconSizeClasses]"
           >
             <UIcon :name="icon" :class="iconColorClasses" />
           </div>
@@ -53,9 +39,7 @@
           <!-- Title and Badge -->
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <h1
-                :class="['font-bold text-default truncate', titleSizeClasses]"
-              >
+              <h1 :class="['font-bold text-default truncate', titleSizeClasses]">
                 {{ title }}
               </h1>
 
@@ -66,10 +50,7 @@
             </div>
 
             <!-- Description -->
-            <p
-              v-if="description"
-              :class="['text-muted mt-1', descriptionSizeClasses]"
-            >
+            <p v-if="description" :class="['text-muted mt-1', descriptionSizeClasses]">
               {{ description }}
             </p>
           </div>
@@ -77,10 +58,7 @@
       </div>
 
       <!-- Right Section: Actions -->
-      <div
-        v-if="$slots.actions || showBackButton"
-        class="flex items-center gap-2 sm:shrink-0"
-      >
+      <div v-if="$slots.actions || showBackButton" class="flex items-center gap-2 sm:shrink-0">
         <!-- Back Button -->
         <UButton
           v-if="showBackButton"
@@ -140,13 +118,7 @@ interface Props {
   /** Badge text */
   badge?: string;
   /** Badge color */
-  badgeColor?:
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "error"
-    | "neutral";
+  badgeColor?: "primary" | "secondary" | "success" | "warning" | "error" | "neutral";
   /** Badge variant */
   badgeVariant?: "solid" | "outline" | "soft" | "subtle";
   /** Breadcrumb navigation */

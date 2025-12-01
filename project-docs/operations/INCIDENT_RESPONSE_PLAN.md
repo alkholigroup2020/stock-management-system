@@ -34,6 +34,7 @@ This document outlines the incident response procedures for the Stock Management
 ### Scope
 
 This plan covers all incidents affecting:
+
 - Application availability
 - Data integrity
 - System performance
@@ -46,34 +47,38 @@ This plan covers all incidents affecting:
 
 ### Severity Levels
 
-| Severity | Impact | Response Time | Examples |
-|----------|--------|---------------|----------|
-| **P0 - Critical** | Complete service outage, data loss | 15 minutes | Application down, database unavailable, data corruption |
-| **P1 - High** | Major feature unusable, significant performance degradation | 1 hour | Critical API failing, login broken, period close failing |
-| **P2 - Medium** | Partial feature degradation, workaround available | 4 hours | Slow queries, minor UI bugs, non-critical API errors |
-| **P3 - Low** | Minor issues, cosmetic bugs | Next business day | UI styling issues, typos, minor UX improvements |
+| Severity          | Impact                                                      | Response Time     | Examples                                                 |
+| ----------------- | ----------------------------------------------------------- | ----------------- | -------------------------------------------------------- |
+| **P0 - Critical** | Complete service outage, data loss                          | 15 minutes        | Application down, database unavailable, data corruption  |
+| **P1 - High**     | Major feature unusable, significant performance degradation | 1 hour            | Critical API failing, login broken, period close failing |
+| **P2 - Medium**   | Partial feature degradation, workaround available           | 4 hours           | Slow queries, minor UI bugs, non-critical API errors     |
+| **P3 - Low**      | Minor issues, cosmetic bugs                                 | Next business day | UI styling issues, typos, minor UX improvements          |
 
 ### Incident Types
 
 **1. Application Incidents**
+
 - Service outages (P0)
 - Feature failures (P1-P2)
 - Performance degradation (P1-P3)
 - UI/UX issues (P2-P3)
 
 **2. Data Incidents**
+
 - Data corruption (P0)
 - Data loss (P0)
 - Incorrect calculations (P1)
 - Sync issues (P2)
 
 **3. Security Incidents**
+
 - Unauthorized access (P0)
 - Data breach (P0)
 - Authentication bypass (P0)
 - Suspicious activity (P1)
 
 **4. Infrastructure Incidents**
+
 - Vercel deployment failures (P1)
 - Supabase database issues (P0-P1)
 - Third-party API failures (P1-P2)
@@ -91,6 +96,7 @@ This plan covers all incidents affecting:
 **Backup:** Development Team Lead
 
 **Responsibilities:**
+
 - Declare incident severity
 - Coordinate response efforts
 - Make rollback/escalation decisions
@@ -103,6 +109,7 @@ This plan covers all incidents affecting:
 **Backup:** System Administrator
 
 **Responsibilities:**
+
 - Investigate root cause
 - Implement fixes or workarounds
 - Test solutions
@@ -114,6 +121,7 @@ This plan covers all incidents affecting:
 **Backup:** Incident Commander
 
 **Responsibilities:**
+
 - Draft status updates
 - Notify affected users
 - Update status page (if available)
@@ -122,6 +130,7 @@ This plan covers all incidents affecting:
 #### Database Administrator (if applicable)
 
 **Responsibilities:**
+
 - Investigate database issues
 - Perform database recovery
 - Optimize query performance
@@ -136,6 +145,7 @@ This plan covers all incidents affecting:
 **1. Incident Detection**
 
 Incidents may be detected through:
+
 - Monitoring alerts (UptimeRobot, Vercel, Supabase)
 - User reports (support email, phone)
 - Internal discovery (team member notices issue)
@@ -151,6 +161,7 @@ Incidents may be detected through:
 **3. Notify Response Team**
 
 For P0/P1 incidents:
+
 ```
 TO: incident-response@company.com
 SUBJECT: [P0/P1] Brief description of incident
@@ -174,6 +185,7 @@ BODY:
 **2. Identify Root Cause**
 
 Common root causes:
+
 - Recent deployment introduced bug
 - Database query performance degradation
 - Third-party service outage
@@ -184,6 +196,7 @@ Common root causes:
 **3. Determine Resolution Strategy**
 
 Options (in order of preference):
+
 1. **Quick fix:** Deploy hotfix if root cause is known
 2. **Rollback:** Revert to last known good deployment
 3. **Workaround:** Temporary solution while investigating
@@ -194,6 +207,7 @@ Options (in order of preference):
 **1. Implement Solution**
 
 **Option A: Deploy Hotfix**
+
 ```bash
 # Create hotfix branch
 git checkout -b hotfix/incident-description
@@ -211,6 +225,7 @@ git push origin hotfix/incident-description
 ```
 
 **Option B: Rollback Deployment**
+
 ```bash
 # Via Vercel CLI
 vercel ls  # List recent deployments
@@ -221,6 +236,7 @@ vercel promote LAST_GOOD_DEPLOYMENT_URL
 ```
 
 **Option C: Database Recovery**
+
 ```bash
 # Restore from backup (see BACKUP_PROCEDURES.md)
 # Contact Supabase support for point-in-time recovery
@@ -287,29 +303,34 @@ See [Post-Incident Review](#post-incident-review) section below.
 ### Internal Communication
 
 **P0/P1 Incidents:**
+
 - Use dedicated incident channel: `#incidents` (Slack/Teams)
 - Or create group email thread: incident-YYYYMMDD@company.com
 - All updates posted to channel/thread
 - Video call for complex incidents
 
 **P2/P3 Incidents:**
+
 - Use standard support channel
 - Email updates to response team
 
 ### External Communication
 
 **Who to notify:**
+
 - **P0:** All users via email
 - **P1:** Affected users via email
 - **P2/P3:** No proactive notification, respond to support tickets
 
 **Status page (optional):**
+
 - Use Vercel status page or create simple status page
 - Update status: Operational, Degraded, Partial Outage, Major Outage
 
 ### Escalation to Management
 
 **Notify management for:**
+
 - P0 incidents (immediately)
 - P1 incidents lasting > 2 hours
 - Any data loss or security breach
@@ -338,6 +359,7 @@ Next Steps: [what we're doing]
 ### Scenario 1: Complete Application Outage (P0)
 
 **Symptoms:**
+
 - Uptime monitor reports service down
 - Users cannot access application (500 error)
 - Vercel shows deployment failure
@@ -369,6 +391,7 @@ Next Steps: [what we're doing]
 ### Scenario 2: Database Connection Errors (P0/P1)
 
 **Symptoms:**
+
 - "Too many connections" errors
 - API requests failing with database errors
 - Supabase dashboard shows high connection count
@@ -398,6 +421,7 @@ Next Steps: [what we're doing]
 ### Scenario 3: Slow Performance (P1/P2)
 
 **Symptoms:**
+
 - API response times > 2s
 - Users report slow page loads
 - Performance metrics show degradation
@@ -424,6 +448,7 @@ Next Steps: [what we're doing]
 ### Scenario 4: Data Corruption (P0)
 
 **Symptoms:**
+
 - Incorrect stock quantities
 - Missing transactions
 - WAC calculations incorrect
@@ -462,6 +487,7 @@ Next Steps: [what we're doing]
 ### Scenario 5: Security Breach (P0)
 
 **Symptoms:**
+
 - Unauthorized access detected
 - Unusual activity in logs
 - User reports suspicious behavior
@@ -496,6 +522,7 @@ Next Steps: [what we're doing]
 ### Scenario 6: Third-Party Service Outage (P1)
 
 **Symptoms:**
+
 - Vercel deployment failures
 - Supabase database unavailable
 - GitHub API errors
@@ -596,15 +623,15 @@ Conduct post-incident review within **48 hours** of resolution.
 
 ## Timeline
 
-| Time (UTC) | Event |
-|------------|-------|
-| HH:MM | Incident detected |
-| HH:MM | Response team notified |
-| HH:MM | Investigation started |
-| HH:MM | Root cause identified |
-| HH:MM | Fix deployed |
-| HH:MM | Service restored |
-| HH:MM | Incident closed |
+| Time (UTC) | Event                  |
+| ---------- | ---------------------- |
+| HH:MM      | Incident detected      |
+| HH:MM      | Response team notified |
+| HH:MM      | Investigation started  |
+| HH:MM      | Root cause identified  |
+| HH:MM      | Fix deployed           |
+| HH:MM      | Service restored       |
+| HH:MM      | Incident closed        |
 
 ## Root Cause
 
@@ -626,10 +653,10 @@ Conduct post-incident review within **48 hours** of resolution.
 
 ## Action Items
 
-| Action | Owner | Deadline | Status |
-|--------|-------|----------|--------|
-| [Action 1] | [Name] | YYYY-MM-DD | Open |
-| [Action 2] | [Name] | YYYY-MM-DD | Open |
+| Action     | Owner  | Deadline   | Status |
+| ---------- | ------ | ---------- | ------ |
+| [Action 1] | [Name] | YYYY-MM-DD | Open   |
+| [Action 2] | [Name] | YYYY-MM-DD | Open   |
 
 ## Lessons Learned
 
@@ -669,30 +696,37 @@ Use this template to document incidents in real-time:
 ## Timeline (all times UTC)
 
 **HH:MM - Incident detected**
+
 - Source: [monitoring alert / user report / internal]
 - Description: [what was observed]
 
 **HH:MM - Response team notified**
+
 - Notified: [names/roles]
 - Method: [email/call/slack]
 
 **HH:MM - Investigation started**
+
 - Checked: [monitoring dashboards, logs, etc.]
 - Findings: [initial observations]
 
 **HH:MM - Root cause identified**
+
 - Cause: [description]
 - Evidence: [logs, metrics, etc.]
 
 **HH:MM - Fix implemented**
+
 - Action: [what was done]
 - Deployed: [Yes/No, how]
 
 **HH:MM - Service restored**
+
 - Verification: [how confirmed]
 - Monitoring: [ongoing watch]
 
 **HH:MM - Incident closed**
+
 - Post-incident review scheduled: [date/time]
 
 ---
@@ -740,28 +774,32 @@ Phone: [TO BE FILLED]
 ### External Contacts
 
 **Vercel Support:**
+
 - Email: support@vercel.com
 - Dashboard: https://vercel.com/support
 - Status: https://www.vercel-status.com
 
 **Supabase Support:**
+
 - Email: support@supabase.com
 - Dashboard: https://app.supabase.com/support
 - Status: https://status.supabase.com
 
 **Domain Registrar (if applicable):**
+
 - [TO BE FILLED]
 
 **Legal/Compliance (for security incidents):**
+
 - [TO BE FILLED]
 
 ---
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-27 | System Administrator | Initial documentation |
+| Version | Date       | Author               | Changes               |
+| ------- | ---------- | -------------------- | --------------------- |
+| 1.0     | 2025-11-27 | System Administrator | Initial documentation |
 
 ---
 

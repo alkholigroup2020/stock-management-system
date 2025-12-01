@@ -1,4 +1,5 @@
 # Development Progress Guide
+
 ## Stock Management System - Journey So Far
 
 **For Junior Developers**
@@ -62,25 +63,25 @@ graph TB
 
 ### Frontend (What Users See)
 
-| Technology | What It Does | Why We Use It |
-|------------|--------------|---------------|
-| **Nuxt 4** | Main framework | Builds modern web apps with Vue.js |
-| **Vue 3** | UI library | Creates interactive user interfaces |
-| **Nuxt UI** | Component library | Ready-made buttons, forms, cards, etc. |
-| **Tailwind CSS v4** | Styling | Makes the app look good with utility classes |
-| **Pinia** | State management | Stores user data, settings across pages |
-| **TypeScript** | Type checking | Catches errors before they happen |
+| Technology          | What It Does      | Why We Use It                                |
+| ------------------- | ----------------- | -------------------------------------------- |
+| **Nuxt 4**          | Main framework    | Builds modern web apps with Vue.js           |
+| **Vue 3**           | UI library        | Creates interactive user interfaces          |
+| **Nuxt UI**         | Component library | Ready-made buttons, forms, cards, etc.       |
+| **Tailwind CSS v4** | Styling           | Makes the app look good with utility classes |
+| **Pinia**           | State management  | Stores user data, settings across pages      |
+| **TypeScript**      | Type checking     | Catches errors before they happen            |
 
 ### Backend (Behind the Scenes)
 
-| Technology | What It Does | Why We Use It |
-|------------|--------------|---------------|
-| **Nuxt Server Routes** | API endpoints | Handles requests from the frontend |
-| **Prisma ORM** | Database tool | Talks to the database easily |
-| **PostgreSQL** | Database | Stores all our data (users, items, stock) |
-| **Supabase** | Database hosting | Cloud service for PostgreSQL |
-| **nuxt-auth-utils** | Authentication | Manages user login/logout |
-| **Zod** | Validation | Checks if data is correct |
+| Technology             | What It Does     | Why We Use It                             |
+| ---------------------- | ---------------- | ----------------------------------------- |
+| **Nuxt Server Routes** | API endpoints    | Handles requests from the frontend        |
+| **Prisma ORM**         | Database tool    | Talks to the database easily              |
+| **PostgreSQL**         | Database         | Stores all our data (users, items, stock) |
+| **Supabase**           | Database hosting | Cloud service for PostgreSQL              |
+| **nuxt-auth-utils**    | Authentication   | Manages user login/logout                 |
+| **Zod**                | Validation       | Checks if data is correct                 |
 
 ### How They Work Together
 
@@ -150,6 +151,7 @@ In this phase, we **set up the basic structure** of our project - like building 
 We created a new Nuxt 4 project and installed all the tools (packages) we need.
 
 **What Was Done:**
+
 - Created the project folder structure
 - Installed 289 packages using `pnpm` (like downloading all the tools)
 - Set up TypeScript for type checking
@@ -166,12 +168,14 @@ Dev server runs on `http://localhost:3000` ✅
 We set up **secret keys** and **configuration** that the app needs to work (like passwords for databases).
 
 **What Was Done:**
+
 - Created `.env.example` (template file)
 - Created `.env` (actual secrets file - not in git)
 - Set up configuration in `nuxt.config.ts`
 - Documented what each environment variable does
 
 **Important Files Created:**
+
 ```
 .env.example          # Template (safe to share)
 .env                  # Real secrets (NEVER share)
@@ -179,6 +183,7 @@ nuxt.config.ts        # App configuration
 ```
 
 **Environment Variables:**
+
 ```bash
 # Database
 DATABASE_URL=postgresql://...
@@ -204,6 +209,7 @@ NUXT_PUBLIC_CURRENCY=SAR
 We set up the **design system** - the colors and styles that make the app look good.
 
 **What Was Done:**
+
 - Configured Tailwind CSS v4 using `@theme` directive
 - Created color palettes for brand colors:
   - **Navy Blue** (#000046) - primary brand color
@@ -212,16 +218,18 @@ We set up the **design system** - the colors and styles that make the app look g
 - Tested all colors work correctly
 
 **Color System:**
+
 ```css
 /* In app/assets/css/main.css */
 @theme {
-  --color-navy-500: #000046;     /* Main brand color */
-  --color-emerald-500: #45cf7b;  /* Success color */
+  --color-navy-500: #000046; /* Main brand color */
+  --color-emerald-500: #45cf7b; /* Success color */
   /* + 50 more shades from 50-950 */
 }
 ```
 
 **How to Use Colors:**
+
 ```vue
 <!-- In components -->
 <button class="bg-navy-500 text-white">
@@ -237,6 +245,7 @@ We set up the **design system** - the colors and styles that make the app look g
 We created a **complete style guide** with colors, buttons, forms, and badges that match our brand.
 
 **What Was Done:**
+
 - Expanded to 6 color palettes (navy, emerald, zinc, amber, red, blue)
 - Created 40+ semantic color tokens (like variables for colors)
 - Created 40+ utility classes for common styles
@@ -244,21 +253,23 @@ We created a **complete style guide** with colors, buttons, forms, and badges th
 - Documented everything in `DESIGN_SYSTEM.md` (750+ lines)
 
 **Semantic Tokens:**
+
 ```css
 /* Background Colors */
---ui-bg: var(--color-zinc-50);           /* Page background */
---ui-bg-elevated: var(--color-white);    /* Cards, modals */
+--ui-bg: var(--color-zinc-50); /* Page background */
+--ui-bg-elevated: var(--color-white); /* Cards, modals */
 
 /* Text Colors */
---ui-text: var(--color-zinc-900);        /* Main text */
---ui-text-muted: var(--color-zinc-500);  /* Less important text */
+--ui-text: var(--color-zinc-900); /* Main text */
+--ui-text-muted: var(--color-zinc-500); /* Less important text */
 
 /* Status Colors */
---ui-success: var(--color-emerald-500);  /* Success messages */
---ui-error: var(--color-red-500);        /* Error messages */
+--ui-success: var(--color-emerald-500); /* Success messages */
+--ui-error: var(--color-red-500); /* Error messages */
 ```
 
 **Utility Classes:**
+
 ```vue
 <!-- Card with elevation -->
 <div class="card-elevated">
@@ -342,6 +353,7 @@ erDiagram
 We created a **cloud database** on Supabase (like renting storage space online).
 
 **What Was Done:**
+
 - Created Supabase account and project
 - Set database region close to Saudi Arabia
 - Got connection credentials (URL, keys)
@@ -349,6 +361,7 @@ We created a **cloud database** on Supabase (like renting storage space online).
 - Enabled daily backups
 
 **Connection Details:**
+
 ```bash
 DATABASE_URL="postgresql://postgres.xxx:[PASSWORD]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true"
 SUPABASE_URL="https://xxx.supabase.co"
@@ -364,6 +377,7 @@ SUPABASE_SERVICE_KEY="eyJhbGc..."
 We set up **Prisma** - a tool that makes it easy to talk to the database using TypeScript code instead of SQL.
 
 **What Was Done:**
+
 - Installed Prisma packages
 - Created `prisma/schema.prisma` file
 - Set up database connection
@@ -371,6 +385,7 @@ We set up **Prisma** - a tool that makes it easy to talk to the database using T
 - Fixed connection issue (switched to Session pooler)
 
 **Important Files:**
+
 ```
 prisma/
   schema.prisma         # Database structure definition
@@ -399,14 +414,15 @@ graph LR
 ```
 
 **Example Usage:**
+
 ```typescript
 // Instead of SQL:
 // SELECT * FROM users WHERE email = 'test@example.com'
 
 // We write:
 const user = await prisma.user.findUnique({
-  where: { email: 'test@example.com' }
-})
+  where: { email: "test@example.com" },
+});
 ```
 
 ---
@@ -417,6 +433,7 @@ const user = await prisma.user.findUnique({
 We defined the **main tables** for users, locations, items, and suppliers.
 
 **What Was Done:**
+
 - Created 5 core models (tables)
 - Created 4 enums (fixed lists of values)
 - Set up relationships between tables
@@ -442,6 +459,7 @@ model User {
 ```
 
 **User Roles:**
+
 - **OPERATOR**: Can post deliveries/issues, view stock
 - **SUPERVISOR**: Can approve transfers, manage reconciliations
 - **ADMIN**: Full access to everything
@@ -462,6 +480,7 @@ model Location {
 ```
 
 **Location Types:**
+
 - **KITCHEN**: Food preparation area
 - **STORE**: Central storage
 - **CENTRAL**: Main depot
@@ -480,6 +499,7 @@ model UserLocation {
 ```
 
 **Access Levels:**
+
 - **VIEW**: Can only view data
 - **POST**: Can create transactions
 - **MANAGE**: Full control
@@ -902,6 +922,7 @@ model NCR {
 ```
 
 **NCR Types:**
+
 - **PRICE_VARIANCE**: Auto-created when delivery price ≠ period price
 - **MANUAL**: Created by users for other issues
 
@@ -1008,6 +1029,7 @@ graph TB
 We added **indexes** (speed up searches) and verified all **relationships** between tables work correctly.
 
 **What Was Done:**
+
 - Added 23 performance indexes
 - Documented 8 database constraints
 - Verified all relationships (80+ relations)
@@ -1015,6 +1037,7 @@ We added **indexes** (speed up searches) and verified all **relationships** betw
 **Why Indexes Matter:**
 
 Imagine finding a book in a library:
+
 - ❌ **Without index**: Check every book (slow)
 - ✅ **With index**: Use catalog to find it quickly (fast)
 
@@ -1048,6 +1071,7 @@ Imagine finding a book in a library:
 We **applied all the schema** to the actual database on Supabase. Now all 22 tables exist!
 
 **What Was Done:**
+
 - Generated Prisma Client
 - Created migration file
 - Applied migration to Supabase
@@ -1070,13 +1094,13 @@ graph LR
 
 **Tables Created:**
 
-| Category | Tables |
-|----------|--------|
-| **Core** | users, locations, user_locations, items, suppliers |
-| **Period & Stock** | periods, period_locations, item_prices, location_stock |
-| **Transactions** | prfs, purchase_orders, deliveries, delivery_lines, issues, issue_lines |
-| **Transfers** | transfers, transfer_lines |
-| **Controls** | ncrs, pob, reconciliations, approvals |
+| Category           | Tables                                                                 |
+| ------------------ | ---------------------------------------------------------------------- |
+| **Core**           | users, locations, user_locations, items, suppliers                     |
+| **Period & Stock** | periods, period_locations, item_prices, location_stock                 |
+| **Transactions**   | prfs, purchase_orders, deliveries, delivery_lines, issues, issue_lines |
+| **Transfers**      | transfers, transfer_lines                                              |
+| **Controls**       | ncrs, pob, reconciliations, approvals                                  |
 
 **Total:** 22 tables, 14 enums, 81 indexes ✅
 
@@ -1088,6 +1112,7 @@ graph LR
 We added **test data** to the database so we can start testing the app.
 
 **What Was Done:**
+
 - Created seed script (`prisma/seed.ts`)
 - Added 1 admin user
 - Added 3 test locations
@@ -1097,6 +1122,7 @@ We added **test data** to the database so we can start testing the app.
 **Seed Data Details:**
 
 **Admin User:**
+
 ```
 Username: admin
 Email: admin@foodstock.local
@@ -1105,17 +1131,20 @@ Role: ADMIN
 ```
 
 **Locations:**
+
 1. Main Kitchen (MAIN-KIT) - Type: KITCHEN
 2. Central Store (CENTRAL-01) - Type: CENTRAL
 3. Main Warehouse (WH-01) - Type: WAREHOUSE
 
 **Items (15 total):**
+
 - **Dairy** (4): Fresh Milk, Butter, Yogurt, Cheese
 - **Vegetables** (4): Tomatoes, Onions, Carrots, Potatoes
 - **Meat** (3): Chicken Breast, Beef, Lamb
 - **Dry Goods** (4): Rice, Flour, Sugar, Salt
 
 **Running the Seed:**
+
 ```bash
 pnpm db:seed
 ```
@@ -1159,6 +1188,7 @@ graph TB
 We installed and configured **nuxt-auth-utils** - a tool that manages login sessions using secure cookies.
 
 **What Was Done:**
+
 - Installed nuxt-auth-utils package (v0.5.25)
 - Configured session settings:
   - **httpOnly cookies** (JavaScript can't access them - safer)
@@ -1184,6 +1214,7 @@ graph TB
 ```
 
 **Configuration:**
+
 ```typescript
 // nuxt.config.ts
 auth: {
@@ -1206,6 +1237,7 @@ auth: {
 We created functions to **safely store passwords**. Never store plain text passwords!
 
 **What Was Done:**
+
 - Created password hashing function (uses bcrypt with 10 salt rounds)
 - Created password verification function (checks if password is correct)
 - Created password strength validator (checks if password is strong enough)
@@ -1230,24 +1262,26 @@ graph LR
 ```
 
 **Password Strength Requirements:**
+
 - ✅ Minimum 8 characters
 - ✅ At least one uppercase letter (A-Z)
 - ✅ At least one lowercase letter (a-z)
 - ✅ At least one number (0-9)
-- ✅ At least one special character (!@#$%^&*)
+- ✅ At least one special character (!@#$%^&\*)
 
 **Functions Created:**
+
 ```typescript
 // Hash a password
-const hashed = await hashUserPassword('Admin@123')
+const hashed = await hashUserPassword("Admin@123");
 // Result: $2a$10$aB3Xc...
 
 // Verify a password
-const isValid = await verifyUserPassword('Admin@123', hashed)
+const isValid = await verifyUserPassword("Admin@123", hashed);
 // Result: true
 
 // Check password strength
-const validation = validatePasswordStrength('weak')
+const validation = validatePasswordStrength("weak");
 // Result: { valid: false, message: "...", strength: "weak" }
 ```
 
@@ -1265,14 +1299,16 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 **What it does:** Logs in a user
 
 **Request:**
+
 ```json
 {
-  "email": "admin@foodstock.local",  // or "admin" (username)
+  "email": "admin@foodstock.local", // or "admin" (username)
   "password": "Admin@123"
 }
 ```
 
 **Response (Success):**
+
 ```json
 {
   "user": {
@@ -1296,6 +1332,7 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 ```
 
 **Response (Error):**
+
 ```json
 {
   "statusCode": 401,
@@ -1308,6 +1345,7 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 **What it does:** Logs out the current user
 
 **Response:**
+
 ```json
 {
   "message": "Logged out successfully"
@@ -1319,6 +1357,7 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 **What it does:** Gets the current user's session
 
 **Response (Logged in):**
+
 ```json
 {
   "user": { ... }  // Same as login response
@@ -1326,6 +1365,7 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 ```
 
 **Response (Not logged in):**
+
 ```json
 {
   "user": null
@@ -1337,6 +1377,7 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 **What it does:** Creates a new user (Admin only)
 
 **Request:**
+
 ```json
 {
   "username": "operator1",
@@ -1349,6 +1390,7 @@ We created **4 API endpoints** for login, logout, session check, and user regist
 ```
 
 **Security:**
+
 - ✅ Only admins can create users
 - ✅ Username must be unique
 - ✅ Email must be unique
@@ -1388,6 +1430,7 @@ sequenceDiagram
 We created **guards** that protect API routes. If you're not logged in, you can't access them.
 
 **What Was Done:**
+
 - Created auth middleware (protects all `/api/*` routes)
 - Created location-access middleware (checks if user can access a location)
 
@@ -1398,6 +1441,7 @@ We created **guards** that protect API routes. If you're not logged in, you can'
 **File:** `server/middleware/auth.ts`
 
 **What it does:**
+
 - ✅ Runs on ALL API routes except `/api/auth/*`
 - ✅ Checks if user is logged in
 - ✅ If not logged in → Returns 401 error
@@ -1408,6 +1452,7 @@ We created **guards** that protect API routes. If you're not logged in, you can'
 **File:** `server/middleware/location-access.ts`
 
 **What it does:**
+
 - ✅ Extracts `locationId` from URL
 - ✅ Checks if user has access to that location
 - ✅ Admins/Supervisors → Access to ALL locations
@@ -1438,13 +1483,13 @@ graph TB
 // In API route handlers:
 export default defineEventHandler(async (event) => {
   // User is already attached by auth middleware
-  const user = event.context.user
+  const user = event.context.user;
 
-  console.log(user.role)  // "ADMIN"
-  console.log(user.email) // "admin@foodstock.local"
+  console.log(user.role); // "ADMIN"
+  console.log(user.email); // "admin@foodstock.local"
 
   // Do your logic here...
-})
+});
 ```
 
 ---
@@ -1455,6 +1500,7 @@ export default defineEventHandler(async (event) => {
 We created a **state manager** that stores user information across all pages in the app.
 
 **What Was Done:**
+
 - Created Pinia store (`app/stores/auth.ts`)
 - Added user state, loading state, error state
 - Created 9 computed getters (quick checks)
@@ -1465,41 +1511,41 @@ We created a **state manager** that stores user information across all pages in 
 
 ```typescript
 interface AuthState {
-  user: SessionUser | null    // Current user data
-  loading: boolean            // Is loading?
-  error: string | null        // Error message
+  user: SessionUser | null; // Current user data
+  loading: boolean; // Is loading?
+  error: string | null; // Error message
 }
 ```
 
 **Computed Getters:**
 
 ```typescript
-isAuthenticated  // Is user logged in?
-role             // User's role (ADMIN, SUPERVISOR, OPERATOR)
-locations        // User's accessible locations
-isAdmin          // Is user an admin?
-isSupervisor     // Is user a supervisor?
-isOperator       // Is user an operator?
-fullName         // User's full name
-defaultLocation  // User's default location
+isAuthenticated; // Is user logged in?
+role; // User's role (ADMIN, SUPERVISOR, OPERATOR)
+locations; // User's accessible locations
+isAdmin; // Is user an admin?
+isSupervisor; // Is user a supervisor?
+isOperator; // Is user an operator?
+fullName; // User's full name
+defaultLocation; // User's default location
 ```
 
 **Actions:**
 
 ```typescript
-login(email, password)      // Log in
-logout()                    // Log out
-fetchSession()              // Get current session
+login(email, password); // Log in
+logout(); // Log out
+fetchSession(); // Get current session
 ```
 
 **Location Helpers:**
 
 ```typescript
-hasLocationAccess(locationId)        // Can access this location?
-getLocationAccessLevel(locationId)   // VIEW, POST, or MANAGE?
-canPostAtLocation(locationId)        // Can create transactions?
-canManageLocation(locationId)        // Can manage location?
-getAccessibleLocationIds()           // Array of accessible IDs
+hasLocationAccess(locationId); // Can access this location?
+getLocationAccessLevel(locationId); // VIEW, POST, or MANAGE?
+canPostAtLocation(locationId); // Can create transactions?
+canManageLocation(locationId); // Can manage location?
+getAccessibleLocationIds(); // Array of accessible IDs
 ```
 
 **How the Store Works:**
@@ -1542,6 +1588,7 @@ graph TB
 We created a **wrapper function** that makes it easy to use the auth store in any component.
 
 **What Was Done:**
+
 - Created `useAuth()` composable
 - Exported all state as reactive refs
 - Added role checking helpers
@@ -1573,8 +1620,8 @@ const {
   // Permissions
   canApproveTransfers,
   canClosePeriods,
-  canPostDeliveries
-} = useAuth()
+  canPostDeliveries,
+} = useAuth();
 </script>
 
 <template>
@@ -1582,13 +1629,9 @@ const {
     <p>Welcome {{ user.full_name }}!</p>
     <p>Role: {{ role }}</p>
 
-    <button v-if="canPostDeliveries">
-      Post Delivery
-    </button>
+    <button v-if="canPostDeliveries">Post Delivery</button>
 
-    <button v-if="canApproveTransfers">
-      Approve Transfer
-    </button>
+    <button v-if="canApproveTransfers">Approve Transfer</button>
   </div>
 </template>
 ```
@@ -1597,14 +1640,14 @@ const {
 
 ```typescript
 // Role-based
-canApproveTransfers()      // Supervisor or Admin
-canClosePeriods()          // Admin only
-canManageItems()           // Admin only
-canManageUsers()           // Admin only
+canApproveTransfers(); // Supervisor or Admin
+canClosePeriods(); // Admin only
+canManageItems(); // Admin only
+canManageUsers(); // Admin only
 
 // Location-based
-canPostDeliveries(locId)   // Can post at this location
-canEditReconciliations()   // Supervisor or Admin
+canPostDeliveries(locId); // Can post at this location
+canEditReconciliations(); // Supervisor or Admin
 ```
 
 ---
@@ -1615,6 +1658,7 @@ canEditReconciliations()   // Supervisor or Admin
 We created the **login page** where users enter their email and password.
 
 **What Was Done:**
+
 - Created `/login` page
 - Built login form with validation
 - Added error handling
@@ -1640,21 +1684,25 @@ graph TB
 ```
 
 **Form Fields:**
+
 - **Email/Username** (required, supports both)
 - **Password** (required, hidden)
 - **Remember Me** (optional checkbox)
 
 **Validation:**
+
 - Email must be valid format
 - Password required
 
 **Error Messages:**
+
 - Invalid credentials
 - User not found
 - Account disabled
 - Network errors
 
 **Screenshot:**
+
 ```
 ┌─────────────────────────────────────┐
 │  Stock Management System            │
@@ -1689,6 +1737,7 @@ graph TB
 We created **guards** that protect pages. If you're not logged in or don't have permission, you can't access them.
 
 **What Was Done:**
+
 - Created global auth middleware (redirects to login)
 - Created role middleware (checks user role)
 - Enhanced login page with redirect support
@@ -1700,6 +1749,7 @@ We created **guards** that protect pages. If you're not logged in or don't have 
 **File:** `app/middleware/auth.global.ts`
 
 **What it does:**
+
 - ✅ Runs on EVERY page navigation
 - ✅ Checks if user is logged in
 - ✅ If not logged in → Redirect to `/login?redirect=/intended-page`
@@ -1711,6 +1761,7 @@ We created **guards** that protect pages. If you're not logged in or don't have 
 **File:** `app/middleware/role.ts`
 
 **What it does:**
+
 - ✅ Checks if user has required role
 - ✅ Supports single role: `roleRequired: 'ADMIN'`
 - ✅ Supports multiple roles: `roleRequired: ['ADMIN', 'SUPERVISOR']`
@@ -1723,9 +1774,9 @@ We created **guards** that protect pages. If you're not logged in or don't have 
 <!-- pages/admin-only.vue -->
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'role',
-  roleRequired: 'ADMIN'  // Only admins can access
-})
+  middleware: "role",
+  roleRequired: "ADMIN", // Only admins can access
+});
 </script>
 
 <template>
@@ -1739,9 +1790,9 @@ definePageMeta({
 <!-- pages/supervisors.vue -->
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'role',
-  minRole: 'SUPERVISOR'  // SUPERVISOR or ADMIN can access
-})
+  middleware: "role",
+  minRole: "SUPERVISOR", // SUPERVISOR or ADMIN can access
+});
 </script>
 
 <template>
@@ -1784,6 +1835,7 @@ sequenceDiagram
 We created **permission checks** that show/hide buttons and features based on user role.
 
 **What Was Done:**
+
 - Created `usePermissions()` composable
 - Added 30+ permission check functions
 - Created reusable `PermissionCheck` component
@@ -1814,39 +1866,21 @@ graph TB
 
 ```vue
 <script setup lang="ts">
-const {
-  canPostDeliveries,
-  canApproveTransfers,
-  canClosePeriod,
-  canEditItems
-} = usePermissions()
+const { canPostDeliveries, canApproveTransfers, canClosePeriod, canEditItems } = usePermissions();
 </script>
 
 <template>
   <div>
     <!-- Show button only if user can post deliveries -->
-    <UButton
-      v-if="canPostDeliveries(currentLocationId)"
-      @click="createDelivery"
-    >
+    <UButton v-if="canPostDeliveries(currentLocationId)" @click="createDelivery">
       New Delivery
     </UButton>
 
     <!-- Show button only if user can approve transfers -->
-    <UButton
-      v-if="canApproveTransfers"
-      @click="approveTransfer"
-    >
-      Approve Transfer
-    </UButton>
+    <UButton v-if="canApproveTransfers" @click="approveTransfer">Approve Transfer</UButton>
 
     <!-- Show button only if user is admin -->
-    <UButton
-      v-if="canClosePeriod"
-      @click="closePeriod"
-    >
-      Close Period
-    </UButton>
+    <UButton v-if="canClosePeriod" @click="closePeriod">Close Period</UButton>
   </div>
 </template>
 ```
@@ -2004,6 +2038,7 @@ graph LR
 ```
 
 **What We'll Build:**
+
 1. **App Layout** - Header, sidebar, main content area
 2. **Navbar** - Logo, location selector, user menu
 3. **Sidebar** - Navigation menu with role-based filtering
@@ -2014,6 +2049,7 @@ graph LR
 ### Phase 1.5: Location Management (Days 5-6)
 
 **What We'll Build:**
+
 1. Location list page
 2. Create location page
 3. Edit location page
@@ -2023,6 +2059,7 @@ graph LR
 ### Phase 1.6: Items & Prices (Days 6-8)
 
 **What We'll Build:**
+
 1. Items list page
 2. Create item page
 3. Edit item page
@@ -2043,45 +2080,45 @@ graph LR
 
 ### Configuration Files
 
-| File | What It Does |
-|------|--------------|
-| `nuxt.config.ts` | Main app configuration |
-| `package.json` | Dependencies and scripts |
-| `.env` | Environment variables (secrets) |
-| `tsconfig.json` | TypeScript configuration |
+| File             | What It Does                    |
+| ---------------- | ------------------------------- |
+| `nuxt.config.ts` | Main app configuration          |
+| `package.json`   | Dependencies and scripts        |
+| `.env`           | Environment variables (secrets) |
+| `tsconfig.json`  | TypeScript configuration        |
 
 ### Backend Files
 
-| File/Folder | What It Does |
-|-------------|--------------|
-| `prisma/schema.prisma` | Database structure |
-| `server/api/` | API endpoints |
-| `server/middleware/` | Server middleware (auth, location) |
-| `server/utils/` | Server utilities (Prisma client, auth) |
+| File/Folder            | What It Does                           |
+| ---------------------- | -------------------------------------- |
+| `prisma/schema.prisma` | Database structure                     |
+| `server/api/`          | API endpoints                          |
+| `server/middleware/`   | Server middleware (auth, location)     |
+| `server/utils/`        | Server utilities (Prisma client, auth) |
 
 ### Frontend Files
 
-| File/Folder | What It Does |
-|-------------|--------------|
-| `app/pages/` | Pages (auto-routing) |
-| `app/components/` | Reusable components |
+| File/Folder        | What It Does                             |
+| ------------------ | ---------------------------------------- |
+| `app/pages/`       | Pages (auto-routing)                     |
+| `app/components/`  | Reusable components                      |
 | `app/composables/` | Reusable logic (useAuth, usePermissions) |
-| `app/stores/` | Pinia stores (auth.ts) |
-| `app/middleware/` | Client middleware (route guards) |
-| `app/layouts/` | Page layouts |
-| `app/assets/css/` | Styles (main.css with design system) |
+| `app/stores/`      | Pinia stores (auth.ts)                   |
+| `app/middleware/`  | Client middleware (route guards)         |
+| `app/layouts/`     | Page layouts                             |
+| `app/assets/css/`  | Styles (main.css with design system)     |
 
 ### Documentation Files
 
-| File | What It Does |
-|------|--------------|
-| `CLAUDE.md` | Instructions for Claude Code |
-| `README.md` | Project overview and setup |
-| `project-docs/MVP_DEVELOPMENT_TASKS.md` | Complete task list |
-| `project-docs/TASK_COMPLETION_LOG.md` | Completed tasks log |
-| `project-docs/DESIGN_SYSTEM.md` | Design system documentation |
-| `project-docs/PRD.md` | Product requirements |
-| `project-docs/System_Design.md` | Technical design |
+| File                                    | What It Does                 |
+| --------------------------------------- | ---------------------------- |
+| `CLAUDE.md`                             | Instructions for Claude Code |
+| `README.md`                             | Project overview and setup   |
+| `project-docs/MVP_DEVELOPMENT_TASKS.md` | Complete task list           |
+| `project-docs/TASK_COMPLETION_LOG.md`   | Completed tasks log          |
+| `project-docs/DESIGN_SYSTEM.md`         | Design system documentation  |
+| `project-docs/PRD.md`                   | Product requirements         |
+| `project-docs/System_Design.md`         | Technical design             |
 
 ---
 
@@ -2089,44 +2126,44 @@ graph LR
 
 ### Technical Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **API** | Application Programming Interface - how frontend talks to backend | `/api/auth/login` |
-| **ORM** | Object-Relational Mapping - talks to database using code instead of SQL | Prisma |
-| **JWT** | JSON Web Token - encrypted session token | Login token |
-| **httpOnly** | Cookie that JavaScript can't access (more secure) | Session cookie |
-| **Migration** | Database version control - applying schema changes | Creating tables |
-| **Seed** | Adding test data to database | Admin user, test items |
-| **Middleware** | Code that runs before route handlers | Auth check, permission check |
-| **Composable** | Reusable logic function in Vue | useAuth(), usePermissions() |
-| **Store** | Global state manager (Pinia) | Auth store |
-| **Component** | Reusable UI piece | Login form, button |
-| **WAC** | Weighted Average Cost - inventory costing method | Stock valuation |
-| **NCR** | Non-Conformance Report - quality issue report | Price variance |
-| **POB** | People on Board - daily headcount | Manday tracking |
+| Term           | Simple Explanation                                                      | Example                      |
+| -------------- | ----------------------------------------------------------------------- | ---------------------------- |
+| **API**        | Application Programming Interface - how frontend talks to backend       | `/api/auth/login`            |
+| **ORM**        | Object-Relational Mapping - talks to database using code instead of SQL | Prisma                       |
+| **JWT**        | JSON Web Token - encrypted session token                                | Login token                  |
+| **httpOnly**   | Cookie that JavaScript can't access (more secure)                       | Session cookie               |
+| **Migration**  | Database version control - applying schema changes                      | Creating tables              |
+| **Seed**       | Adding test data to database                                            | Admin user, test items       |
+| **Middleware** | Code that runs before route handlers                                    | Auth check, permission check |
+| **Composable** | Reusable logic function in Vue                                          | useAuth(), usePermissions()  |
+| **Store**      | Global state manager (Pinia)                                            | Auth store                   |
+| **Component**  | Reusable UI piece                                                       | Login form, button           |
+| **WAC**        | Weighted Average Cost - inventory costing method                        | Stock valuation              |
+| **NCR**        | Non-Conformance Report - quality issue report                           | Price variance               |
+| **POB**        | People on Board - daily headcount                                       | Manday tracking              |
 
 ### Business Terms
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **Location** | Physical site where stock is stored | Kitchen, Warehouse |
-| **Period** | Monthly accounting cycle | November 2025 |
-| **Delivery** | Goods received from supplier | Food delivery |
-| **Issue** | Stock taken out for use | Kitchen issues flour |
-| **Transfer** | Moving stock between locations | Warehouse → Kitchen |
-| **Reconciliation** | Period-end stock calculation | Monthly stock report |
-| **Cost Centre** | Department that uses items | FOOD, CLEAN, OTHER |
+| Term               | Simple Explanation                         | Example                     |
+| ------------------ | ------------------------------------------ | --------------------------- |
+| **Location**       | Physical site where stock is stored        | Kitchen, Warehouse          |
+| **Period**         | Monthly accounting cycle                   | November 2025               |
+| **Delivery**       | Goods received from supplier               | Food delivery               |
+| **Issue**          | Stock taken out for use                    | Kitchen issues flour        |
+| **Transfer**       | Moving stock between locations             | Warehouse → Kitchen         |
+| **Reconciliation** | Period-end stock calculation               | Monthly stock report        |
+| **Cost Centre**    | Department that uses items                 | FOOD, CLEAN, OTHER          |
 | **Price Variance** | Delivery price different from locked price | Expected SAR 10, got SAR 12 |
-| **Period Close** | Closing accounting period | End of month process |
-| **Approval** | Manager permission for action | Approve transfer |
+| **Period Close**   | Closing accounting period                  | End of month process        |
+| **Approval**       | Manager permission for action              | Approve transfer            |
 
 ### Role Terms
 
-| Role | What They Can Do |
-|------|-----------------|
-| **OPERATOR** | Post deliveries, issues; view stock |
+| Role           | What They Can Do                                            |
+| -------------- | ----------------------------------------------------------- |
+| **OPERATOR**   | Post deliveries, issues; view stock                         |
 | **SUPERVISOR** | Approve transfers, edit reconciliations, view all locations |
-| **ADMIN** | Full access - manage items, users, close periods |
+| **ADMIN**      | Full access - manage items, users, close periods            |
 
 ---
 
@@ -2177,6 +2214,7 @@ We've successfully built the **foundation** of the Stock Management System:
 ✅ **Security** - Password hashing, httpOnly cookies, middleware
 
 **What Works Now:**
+
 - Users can log in/out
 - Sessions persist for 7 days
 - Pages are protected by authentication
@@ -2186,6 +2224,7 @@ We've successfully built the **foundation** of the Stock Management System:
 - API endpoints are secure
 
 **What's Next:**
+
 - Building the UI (layout, navigation)
 - Creating location management pages
 - Creating item management pages
@@ -2196,7 +2235,7 @@ We've successfully built the **foundation** of the Stock Management System:
 ---
 
 **Made with ❤️ for Junior Developers**
-*Remember: Every expert was once a beginner. Take your time, ask questions, and keep learning!*
+_Remember: Every expert was once a beginner. Take your time, ask questions, and keep learning!_
 
 ---
 

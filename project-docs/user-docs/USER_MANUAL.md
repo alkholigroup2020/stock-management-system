@@ -60,17 +60,17 @@ The Stock Management System is a modern web application designed to replace Exce
 
 The main navigation menu provides access to all features:
 
-| Icon | Page | Description |
-|------|------|-------------|
-| Dashboard | Home | Overview of current period activity |
-| Items | Items & Prices | Product catalog and pricing |
-| Deliveries | Deliveries | Record incoming goods |
-| Issues | Issues | Record goods sent to kitchen |
-| Transfers | Transfers | Move stock between locations |
-| Stock | Stock Levels | Current inventory by location |
-| NCR | Non-Conformance | Track delivery problems |
-| Reconciliation | Reconciliation | Month-end calculations |
-| Periods | Periods | Manage accounting periods |
+| Icon           | Page            | Description                         |
+| -------------- | --------------- | ----------------------------------- |
+| Dashboard      | Home            | Overview of current period activity |
+| Items          | Items & Prices  | Product catalog and pricing         |
+| Deliveries     | Deliveries      | Record incoming goods               |
+| Issues         | Issues          | Record goods sent to kitchen        |
+| Transfers      | Transfers       | Move stock between locations        |
+| Stock          | Stock Levels    | Current inventory by location       |
+| NCR            | Non-Conformance | Track delivery problems             |
+| Reconciliation | Reconciliation  | Month-end calculations              |
+| Periods        | Periods         | Manage accounting periods           |
 
 ### Location Switcher
 
@@ -85,12 +85,14 @@ The main navigation menu provides access to all features:
 ### Operator
 
 **Primary Responsibilities:**
+
 - Post deliveries as goods arrive
 - Post issues as kitchen uses items
 - Check stock levels
 - Create NCRs for delivery problems
 
 **What You Cannot Do:**
+
 - Edit item prices
 - Close periods
 - Modify reconciliation values
@@ -99,6 +101,7 @@ The main navigation menu provides access to all features:
 ### Supervisor
 
 **Primary Responsibilities:**
+
 - Everything an Operator can do
 - Approve transfer requests
 - Edit reconciliation adjustments (back-charges, credits)
@@ -106,6 +109,7 @@ The main navigation menu provides access to all features:
 - Generate reports
 
 **What You Cannot Do:**
+
 - Close periods
 - Manage item master data
 - Manage user accounts
@@ -113,6 +117,7 @@ The main navigation menu provides access to all features:
 ### Admin
 
 **Primary Responsibilities:**
+
 - Everything a Supervisor can do
 - Manage Items & Prices catalog
 - Close accounting periods
@@ -147,16 +152,19 @@ NCR → Credits ───────────────┘  PERIOD CLOSE
 ### Key Concepts
 
 **Weighted Average Cost (WAC)**
+
 - The system calculates average cost automatically
 - Only deliveries recalculate WAC
 - Issues use current WAC but don't change it
 
 **Period Management**
+
 - All transactions belong to an accounting period (usually monthly)
 - Periods must be OPEN to post transactions
 - Once closed, periods become read-only
 
 **Location Isolation**
+
 - Each location maintains its own stock levels
 - Transfers move stock between locations
 - Users can only access assigned locations
@@ -170,12 +178,14 @@ NCR → Credits ───────────────┘  PERIOD CLOSE
 **Purpose:** Quick overview of current period activity
 
 **What You See:**
+
 - **Total Receipts**: Sum of all deliveries this period
 - **Total Issues**: Sum of all issues this period
 - **Stock Value**: Current inventory value
 - **Recent Activity**: Latest transactions
 
 **Actions Available:**
+
 - View summary metrics
 - Click cards to navigate to detailed pages
 - Quick-access buttons for common actions
@@ -197,11 +207,13 @@ NCR → Credits ───────────────┘  PERIOD CLOSE
 | WAC | Current weighted average cost |
 
 **For Admins:**
+
 - Click **+ New Item** to add products
 - Click an item row to edit details
 - Set period prices before closing periods
 
 **Price Variance:**
+
 - When delivery price differs from period price, an NCR is auto-generated
 - This tracks unexpected price changes
 
@@ -224,12 +236,14 @@ NCR → Credits ───────────────┘  PERIOD CLOSE
 6. Click **Post Delivery**
 
 **What Happens:**
+
 - Stock quantity increases
 - WAC is recalculated
 - If price differs from period price, NCR is created
 - Transaction appears in audit trail
 
 **Example:**
+
 ```
 Before: 50 KG chicken @ SAR 27.00 = SAR 1,350
 Receive: 10 KG @ SAR 28.90 = SAR 289
@@ -237,6 +251,7 @@ After: 60 KG @ SAR 27.32 = SAR 1,639 (new WAC)
 ```
 
 **Important Notes:**
+
 - Verify quantities before posting
 - Keep invoice/delivery note for reference
 - Report problems via NCR, not by adjusting quantities
@@ -259,11 +274,13 @@ After: 60 KG @ SAR 27.32 = SAR 1,639 (new WAC)
 6. Click **Post Issue**
 
 **What Happens:**
+
 - Stock quantity decreases
 - Value calculated at current WAC
 - Transaction logged in audit trail
 
 **Example:**
+
 ```
 Before: 60 KG chicken @ SAR 27.32
 Issue: 8 KG @ SAR 27.32 = SAR 218.56
@@ -271,6 +288,7 @@ After: 52 KG @ SAR 27.32 (WAC unchanged)
 ```
 
 **Important Rules:**
+
 - Cannot issue more than available stock
 - Cost center affects reporting categories
 - Posted issues cannot be edited (contact supervisor)
@@ -302,6 +320,7 @@ After: 52 KG @ SAR 27.32 (WAC unchanged)
    - Status: COMPLETED
 
 **Important Notes:**
+
 - Cannot transfer more than available stock
 - WAC transfers with the goods
 - Both locations must be accessible to complete
@@ -313,6 +332,7 @@ After: 52 KG @ SAR 27.32 (WAC unchanged)
 **Purpose:** View current inventory across locations
 
 **What You See:**
+
 - Item code and name
 - Current quantity on hand
 - Current WAC per unit
@@ -323,11 +343,13 @@ After: 52 KG @ SAR 27.32 (WAC unchanged)
   - **Critical**: Near zero
 
 **Actions:**
+
 - Filter by category
 - Search by item name/code
 - Export to CSV
 
 **Multi-Location View:**
+
 - Switch locations to see different stock levels
 - Compare stock across locations
 
@@ -338,23 +360,27 @@ After: 52 KG @ SAR 27.32 (WAC unchanged)
 **Purpose:** Track problems with deliveries
 
 **When to Create an NCR:**
+
 - Items arrived damaged
 - Quantity short from invoice
 - Items expired or poor quality
 - Price different from expected (auto-generated)
 
 **NCR Types:**
+
 - **Quality**: Damaged or poor quality items
 - **Quantity**: Short shipments
 - **Price Variance**: Unexpected price change (auto-generated)
 
 **NCR Status Flow:**
+
 ```
 OPEN → SENT_TO_SUPPLIER → CREDITED → CLOSED
                        └→ REJECTED → CLOSED
 ```
 
 **How to Create:**
+
 1. Click **+ New NCR**
 2. Select the related Delivery
 3. Choose affected line items
@@ -362,6 +388,7 @@ OPEN → SENT_TO_SUPPLIER → CREDITED → CLOSED
 5. Submit NCR
 
 **Resolution:**
+
 - Supervisor updates status as supplier responds
 - Credit value reduces consumption in reconciliation
 
@@ -372,6 +399,7 @@ OPEN → SENT_TO_SUPPLIER → CREDITED → CLOSED
 **Purpose:** Calculate month-end consumption and costs
 
 **The Formula:**
+
 ```
 CONSUMPTION = Opening Stock
             + Receipts (deliveries)
@@ -388,10 +416,12 @@ CONSUMPTION = Opening Stock
 | Others | Miscellaneous adjustments |
 
 **Key Outputs:**
+
 - **Total Consumption**: What was actually used
 - **Manday Cost**: Consumption ÷ Total Mandays
 
 **How to Complete:**
+
 1. Enter physical count as **Closing Stock**
 2. Enter any adjustments
 3. Review calculated consumption
@@ -404,11 +434,13 @@ CONSUMPTION = Opening Stock
 **Purpose:** Manage accounting periods
 
 **Period Status:**
+
 - **Open**: Current active period (transactions allowed)
 - **Ready**: Location prepared for close
 - **Closed**: Locked (read-only)
 
 **Period Close Checklist:**
+
 1. All deliveries posted
 2. All issues posted
 3. Physical count entered in reconciliation
@@ -416,6 +448,7 @@ CONSUMPTION = Opening Stock
 5. All locations marked Ready
 
 **How to Close (Admin only):**
+
 1. Verify checklist is complete
 2. Click **Close Period**
 3. Confirm the action
@@ -530,21 +563,25 @@ CONSUMPTION = Opening Stock
 ### Common Issues
 
 **"Insufficient Stock" Error**
+
 - You're trying to issue more than available
 - Check Stock Levels for actual quantity
 - Adjust issue quantity or post a delivery first
 
 **"Period Closed" Error**
+
 - The current period is locked
 - Contact admin to confirm correct period
 - Transactions must go in the next period
 
 **"Location Access Denied"**
+
 - You don't have permission for this location
 - Contact admin to request access
 - Switch to an assigned location
 
 **"Price Variance Detected"**
+
 - Delivery price differs from period price
 - An NCR was automatically created
 - Review with supervisor if unexpected
@@ -559,18 +596,18 @@ CONSUMPTION = Opening Stock
 
 ## Glossary
 
-| Term | Definition |
-|------|------------|
-| **WAC** | Weighted Average Cost - the average cost per unit calculated from all purchases |
-| **NCR** | Non-Conformance Report - documents problems with deliveries |
-| **Period** | An accounting period, typically one month |
-| **Issue** | Goods taken from stock for use (consumption) |
-| **Delivery** | Goods received from suppliers |
-| **Transfer** | Movement of goods between locations |
-| **Reconciliation** | Month-end calculation comparing book vs. physical stock |
-| **Manday** | One person's daily food allocation |
-| **POB** | People on Board - daily headcount for manday calculations |
-| **Cost Center** | Category for expense tracking (Food, Clean) |
+| Term               | Definition                                                                      |
+| ------------------ | ------------------------------------------------------------------------------- |
+| **WAC**            | Weighted Average Cost - the average cost per unit calculated from all purchases |
+| **NCR**            | Non-Conformance Report - documents problems with deliveries                     |
+| **Period**         | An accounting period, typically one month                                       |
+| **Issue**          | Goods taken from stock for use (consumption)                                    |
+| **Delivery**       | Goods received from suppliers                                                   |
+| **Transfer**       | Movement of goods between locations                                             |
+| **Reconciliation** | Month-end calculation comparing book vs. physical stock                         |
+| **Manday**         | One person's daily food allocation                                              |
+| **POB**            | People on Board - daily headcount for manday calculations                       |
+| **Cost Center**    | Category for expense tracking (Food, Clean)                                     |
 
 ---
 
@@ -585,6 +622,6 @@ CONSUMPTION = Opening Stock
 
 ---
 
-*For additional support, please contact your system administrator.*
+_For additional support, please contact your system administrator._
 
-*Document Version: 1.0 | Stock Management System*
+_Document Version: 1.0 | Stock Management System_

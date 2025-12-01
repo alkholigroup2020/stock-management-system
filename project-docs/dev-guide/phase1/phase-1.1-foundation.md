@@ -1,4 +1,5 @@
 # Phase 1.1: Project Foundation
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -55,25 +56,25 @@ graph TB
 
 ### Frontend (What Users See)
 
-| Technology | What It Does | Why We Use It |
-|------------|--------------|---------------|
-| **Nuxt 4** | Main framework | Builds modern web apps with Vue.js |
-| **Vue 3** | UI library | Creates interactive user interfaces |
-| **Nuxt UI** | Component library | Ready-made buttons, forms, cards, etc. |
-| **Tailwind CSS v4** | Styling | Makes the app look good with utility classes |
-| **Pinia** | State management | Stores user data, settings across pages |
-| **TypeScript** | Type checking | Catches errors before they happen |
+| Technology          | What It Does      | Why We Use It                                |
+| ------------------- | ----------------- | -------------------------------------------- |
+| **Nuxt 4**          | Main framework    | Builds modern web apps with Vue.js           |
+| **Vue 3**           | UI library        | Creates interactive user interfaces          |
+| **Nuxt UI**         | Component library | Ready-made buttons, forms, cards, etc.       |
+| **Tailwind CSS v4** | Styling           | Makes the app look good with utility classes |
+| **Pinia**           | State management  | Stores user data, settings across pages      |
+| **TypeScript**      | Type checking     | Catches errors before they happen            |
 
 ### Backend (Behind the Scenes)
 
-| Technology | What It Does | Why We Use It |
-|------------|--------------|---------------|
-| **Nuxt Server Routes** | API endpoints | Handles requests from the frontend |
-| **Prisma ORM** | Database tool | Talks to the database easily |
-| **PostgreSQL** | Database | Stores all our data (users, items, stock) |
-| **Supabase** | Database hosting | Cloud service for PostgreSQL |
-| **nuxt-auth-utils** | Authentication | Manages user login/logout |
-| **Zod** | Validation | Checks if data is correct |
+| Technology             | What It Does     | Why We Use It                             |
+| ---------------------- | ---------------- | ----------------------------------------- |
+| **Nuxt Server Routes** | API endpoints    | Handles requests from the frontend        |
+| **Prisma ORM**         | Database tool    | Talks to the database easily              |
+| **PostgreSQL**         | Database         | Stores all our data (users, items, stock) |
+| **Supabase**           | Database hosting | Cloud service for PostgreSQL              |
+| **nuxt-auth-utils**    | Authentication   | Manages user login/logout                 |
+| **Zod**                | Validation       | Checks if data is correct                 |
 
 ### How They Work Together
 
@@ -111,6 +112,7 @@ In this phase, we **set up the basic structure** of our project - like building 
 We created a new Nuxt 4 project and installed all the tools (packages) we need.
 
 **What Was Done:**
+
 - Created the project folder structure
 - Installed 289 packages using `pnpm` (like downloading all the tools)
 - Set up TypeScript for type checking
@@ -127,12 +129,14 @@ Dev server runs on `http://localhost:3000` ✅
 We set up **secret keys** and **configuration** that the app needs to work (like passwords for databases).
 
 **What Was Done:**
+
 - Created `.env.example` (template file)
 - Created `.env` (actual secrets file - not in git)
 - Set up configuration in `nuxt.config.ts`
 - Documented what each environment variable does
 
 **Important Files Created:**
+
 ```
 .env.example          # Template (safe to share)
 .env                  # Real secrets (NEVER share)
@@ -140,6 +144,7 @@ nuxt.config.ts        # App configuration
 ```
 
 **Environment Variables:**
+
 ```bash
 # Database
 DATABASE_URL=postgresql://...
@@ -165,6 +170,7 @@ NUXT_PUBLIC_CURRENCY=SAR
 We set up the **design system** - the colors and styles that make the app look good.
 
 **What Was Done:**
+
 - Configured Tailwind CSS v4 using `@theme` directive
 - Created color palettes for brand colors:
   - **Navy Blue** (#000046) - primary brand color
@@ -173,16 +179,18 @@ We set up the **design system** - the colors and styles that make the app look g
 - Tested all colors work correctly
 
 **Color System:**
+
 ```css
 /* In app/assets/css/main.css */
 @theme {
-  --color-navy-500: #000046;     /* Main brand color */
-  --color-emerald-500: #45cf7b;  /* Success color */
+  --color-navy-500: #000046; /* Main brand color */
+  --color-emerald-500: #45cf7b; /* Success color */
   /* + 50 more shades from 50-950 */
 }
 ```
 
 **How to Use Colors:**
+
 ```vue
 <!-- In components -->
 <button class="bg-navy-500 text-white">
@@ -198,6 +206,7 @@ We set up the **design system** - the colors and styles that make the app look g
 We created a **complete style guide** with colors, buttons, forms, and badges that match our brand.
 
 **What Was Done:**
+
 - Expanded to 6 color palettes (navy, emerald, zinc, amber, red, blue)
 - Created 40+ semantic color tokens (like variables for colors)
 - Created 40+ utility classes for common styles
@@ -205,21 +214,23 @@ We created a **complete style guide** with colors, buttons, forms, and badges th
 - Documented everything in `DESIGN_SYSTEM.md` (750+ lines)
 
 **Semantic Tokens:**
+
 ```css
 /* Background Colors */
---ui-bg: var(--color-zinc-50);           /* Page background */
---ui-bg-elevated: var(--color-white);    /* Cards, modals */
+--ui-bg: var(--color-zinc-50); /* Page background */
+--ui-bg-elevated: var(--color-white); /* Cards, modals */
 
 /* Text Colors */
---ui-text: var(--color-zinc-900);        /* Main text */
---ui-text-muted: var(--color-zinc-500);  /* Less important text */
+--ui-text: var(--color-zinc-900); /* Main text */
+--ui-text-muted: var(--color-zinc-500); /* Less important text */
 
 /* Status Colors */
---ui-success: var(--color-emerald-500);  /* Success messages */
---ui-error: var(--color-red-500);        /* Error messages */
+--ui-success: var(--color-emerald-500); /* Success messages */
+--ui-error: var(--color-red-500); /* Error messages */
 ```
 
 **Utility Classes:**
+
 ```vue
 <!-- Card with elevation -->
 <div class="card-elevated">
@@ -269,19 +280,19 @@ graph TB
 
 ### Configuration Files
 
-| File | What It Does |
-|------|--------------|
-| `nuxt.config.ts` | Main app configuration |
-| `package.json` | Dependencies and scripts |
-| `.env` | Environment variables (secrets) |
-| `.env.example` | Environment template |
-| `tsconfig.json` | TypeScript configuration |
+| File             | What It Does                    |
+| ---------------- | ------------------------------- |
+| `nuxt.config.ts` | Main app configuration          |
+| `package.json`   | Dependencies and scripts        |
+| `.env`           | Environment variables (secrets) |
+| `.env.example`   | Environment template            |
+| `tsconfig.json`  | TypeScript configuration        |
 
 ### Styling Files
 
-| File | What It Does |
-|------|--------------|
-| `app/assets/css/main.css` | Tailwind CSS v4 theme with @theme directive |
+| File                            | What It Does                                      |
+| ------------------------------- | ------------------------------------------------- |
+| `app/assets/css/main.css`       | Tailwind CSS v4 theme with @theme directive       |
 | `project-docs/DESIGN_SYSTEM.md` | Complete design system documentation (750+ lines) |
 
 ---
@@ -291,6 +302,7 @@ graph TB
 ### 1. Nuxt 4 Project Structure
 
 Nuxt 4 uses `/app/` directory instead of `/src/`:
+
 ```
 /app/
   /assets/css/     # Styles
@@ -308,18 +320,20 @@ Nuxt 4 uses `/app/` directory instead of `/src/`:
 **Two types:**
 
 **Private (server-only):**
+
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
   runtimeConfig: {
     // Private - only available server-side
     databaseUrl: process.env.DATABASE_URL,
-    authSecret: process.env.AUTH_SECRET
-  }
-})
+    authSecret: process.env.AUTH_SECRET,
+  },
+});
 ```
 
 **Public (client + server):**
+
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
@@ -327,29 +341,31 @@ export default defineNuxtConfig({
     public: {
       // Public - available client + server
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL,
-      currency: process.env.NUXT_PUBLIC_CURRENCY
-    }
-  }
-})
+      currency: process.env.NUXT_PUBLIC_CURRENCY,
+    },
+  },
+});
 ```
 
 ### 3. Tailwind CSS v4 `@theme` Directive
 
 **Old way (Tailwind v3):**
+
 ```javascript
 // tailwind.config.js
 module.exports = {
   theme: {
     extend: {
       colors: {
-        navy: '#000046'
-      }
-    }
-  }
-}
+        navy: "#000046",
+      },
+    },
+  },
+};
 ```
 
 **New way (Tailwind v4):**
+
 ```css
 /* app/assets/css/main.css */
 @theme {
@@ -360,11 +376,13 @@ module.exports = {
 ### 4. Design System Best Practices
 
 **✅ Do:**
+
 - Use semantic color tokens: `var(--ui-bg)`
 - Use utility classes: `card-elevated`
 - Use semantic Nuxt UI colors: `color="primary"`
 
 **❌ Don't:**
+
 - Inline hex colors: `style="color: #000046"`
 - Use custom names in Nuxt UI: `color="navy"`
 - Use `@apply` with custom classes (Tailwind v4 limitation)
@@ -373,14 +391,14 @@ module.exports = {
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Package Manager** | Tool to install code libraries (we use pnpm) |
-| **Environment Variable** | Secret configuration value (like passwords) |
-| **TypeScript** | JavaScript with type checking to catch errors |
-| **Semantic Token** | Color variable with meaning (--ui-bg, --ui-error) |
-| **Utility Class** | Pre-built CSS class (card-elevated, badge-primary) |
-| **Design System** | Complete style guide (colors, fonts, components) |
+| Term                     | Simple Explanation                                 |
+| ------------------------ | -------------------------------------------------- |
+| **Package Manager**      | Tool to install code libraries (we use pnpm)       |
+| **Environment Variable** | Secret configuration value (like passwords)        |
+| **TypeScript**           | JavaScript with type checking to catch errors      |
+| **Semantic Token**       | Color variable with meaning (--ui-bg, --ui-error)  |
+| **Utility Class**        | Pre-built CSS class (card-elevated, badge-primary) |
+| **Design System**        | Complete style guide (colors, fonts, components)   |
 
 ---
 
@@ -391,6 +409,7 @@ After completing the foundation, we moved to:
 **→ [Phase 1.2: Database Setup](phase-1.2-database.md)**
 
 In the next phase, we:
+
 - Set up Supabase cloud database
 - Created Prisma schema (22 tables)
 - Applied database migrations

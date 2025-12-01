@@ -84,9 +84,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     } else {
       // Login failed - show error
       const message =
-        result.message ||
-        authError.value ||
-        "Login failed. Please check your credentials.";
+        result.message || authError.value || "Login failed. Please check your credentials.";
       errorMessage.value = message;
 
       toast.add({
@@ -124,38 +122,25 @@ watch([() => state.email, () => state.password], () => {
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8"
-  >
+  <div class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8">
     <main class="w-full max-w-md space-y-8">
       <!-- Header -->
       <header class="text-center">
         <h1 class="text-display">Stock Management System</h1>
-        <p class="mt-2 text-caption">
-          Multi-Location Inventory Management
-        </p>
+        <p class="mt-2 text-caption">Multi-Location Inventory Management</p>
       </header>
 
       <!-- Login Card -->
       <UCard class="card-elevated">
         <template #header>
           <div class="text-center">
-            <h2 class="text-heading">
-              Sign in to your account
-            </h2>
-            <p class="mt-1 text-caption">
-              Enter your credentials to access the system
-            </p>
+            <h2 class="text-heading">Sign in to your account</h2>
+            <p class="mt-1 text-caption">Enter your credentials to access the system</p>
           </div>
         </template>
 
         <!-- Login Form -->
-        <UForm
-          :schema="schema"
-          :state="state"
-          class="space-y-6"
-          @submit="onSubmit"
-        >
+        <UForm :schema="schema" :state="state" class="space-y-6" @submit="onSubmit">
           <!-- Error Alert -->
           <UAlert
             v-if="errorMessage"
@@ -217,9 +202,7 @@ watch([() => state.email, () => state.password], () => {
         <template #footer>
           <div class="text-center text-caption">
             <p>Default credentials for testing:</p>
-            <p class="mt-1 font-mono text-caption">
-              admin@foodstock.local / Admin@123
-            </p>
+            <p class="mt-1 font-mono text-caption">admin@foodstock.local / Admin@123</p>
           </div>
         </template>
       </UCard>

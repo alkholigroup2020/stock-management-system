@@ -9,6 +9,7 @@ This file tracks changes made during E2E testing that affect the system design o
 **Reason:** The location manager field was creating confusion as it was separate from user assignments. A user designated as "manager" did not automatically have access to the location - they needed to be separately assigned via the user assignments feature.
 
 **Changes Made:**
+
 - Removed `manager_id` field from `Location` model in database schema
 - Removed `managed_locations` relation from `User` model
 - Removed manager selection field from location create page (app/pages/locations/create.vue)
@@ -31,6 +32,7 @@ This file tracks changes made during E2E testing that affect the system design o
 **Reason:** Added ability to delete locations with smart hard/soft delete logic and UI consistency improvements.
 
 **Changes Made:**
+
 - Created DELETE endpoint at `server/api/locations/[id].delete.ts` with intelligent deletion logic:
   - Hard delete (permanent removal) for locations with no transaction history
   - Soft delete (is_active = false) for locations with existing transactions to preserve audit trail

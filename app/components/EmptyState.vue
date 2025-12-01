@@ -1,10 +1,5 @@
 <template>
-  <div
-    :class="[
-      'flex flex-col items-center justify-center text-center',
-      paddingClasses,
-    ]"
-  >
+  <div :class="['flex flex-col items-center justify-center text-center', paddingClasses]">
     <!-- Icon -->
     <div class="mb-4">
       <UIcon :name="icon" :class="[iconSizeClasses, iconColorClasses]" />
@@ -16,18 +11,12 @@
     </h3>
 
     <!-- Description -->
-    <p
-      v-if="description"
-      :class="['text-muted max-w-md mb-6', descriptionSizeClasses]"
-    >
+    <p v-if="description" :class="['text-muted max-w-md mb-6', descriptionSizeClasses]">
       {{ description }}
     </p>
 
     <!-- Primary Action Button -->
-    <div
-      v-if="showAction || $slots.action"
-      class="flex flex-col sm:flex-row gap-3"
-    >
+    <div v-if="showAction || $slots.action" class="flex flex-col sm:flex-row gap-3">
       <slot name="action">
         <UButton
           v-if="showAction"

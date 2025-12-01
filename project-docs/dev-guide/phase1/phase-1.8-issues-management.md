@@ -1,4 +1,5 @@
 # Phase 1.8: Issues Management
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -60,6 +61,7 @@ graph TB
 An **Issue** = Taking items out of storage to use them
 
 **Examples:**
+
 - Kitchen takes 10 KG of rice to cook meals → **Issue to Food cost center**
 - Cleaning staff takes 2 bottles of detergent → **Issue to Cleaning cost center**
 - Taking 5 boxes of paper towels for offices → **Issue to Other cost center**
@@ -121,6 +123,7 @@ sequenceDiagram
 4. **Atomic transaction:** If any item fails, the entire issue is rejected
 
 **Why three checks?**
+
 - Real-time = Better user experience (immediate feedback)
 - Pre-submission = Prevents wasted API calls
 - Database check = **Final safety** (stock might have changed since page load)
@@ -158,20 +161,18 @@ We created the backend endpoints (API routes) that handle creating and fetching 
 ```typescript
 // Generate sequential issue number
 async function generateIssueNumber(): Promise<string> {
-  const currentYear = new Date().getFullYear()
-  const prefix = `ISS-${currentYear}-`
+  const currentYear = new Date().getFullYear();
+  const prefix = `ISS-${currentYear}-`;
 
   // Format: ISS-2025-001, ISS-2025-002, etc.
   const lastIssue = await prisma.issue.findFirst({
     where: { issue_no: { startsWith: prefix } },
-    orderBy: { issue_no: 'desc' },
-  })
+    orderBy: { issue_no: "desc" },
+  });
 
-  const nextNumber = lastIssue
-    ? parseInt(lastIssue.issue_no.split('-')[2]) + 1
-    : 1
+  const nextNumber = lastIssue ? parseInt(lastIssue.issue_no.split("-")[2]) + 1 : 1;
 
-  return `${prefix}${nextNumber.toString().padStart(3, '0')}`
+  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
 }
 ```
 
@@ -180,14 +181,14 @@ async function generateIssueNumber(): Promise<string> {
 ```typescript
 // Check each item has sufficient stock
 for (const lineData of data.lines) {
-  const stock = stockMap.get(lineData.item_id)
+  const stock = stockMap.get(lineData.item_id);
 
   if (!stock || stock.on_hand < lineData.quantity) {
     insufficientStockErrors.push({
       item_name: item.name,
       requested: lineData.quantity,
       available: stock?.on_hand || 0,
-    })
+    });
   }
 }
 
@@ -196,10 +197,10 @@ if (insufficientStockErrors.length > 0) {
   throw createError({
     statusCode: 400,
     data: {
-      code: 'INSUFFICIENT_STOCK',
-      details: { errors: insufficientStockErrors }
-    }
-  })
+      code: "INSUFFICIENT_STOCK",
+      details: { errors: insufficientStockErrors },
+    },
+  });
 }
 ```
 
@@ -214,16 +215,17 @@ We created reusable functions to check if there's enough stock before issuing it
 
 Created `server/utils/stockValidation.ts` with helper functions:
 
-| Function | What It Does |
-|----------|--------------|
-| `checkStockSufficiency()` | Pure logic - checks if available >= requested |
-| `validateSufficientStock()` | Fetches stock from DB and validates |
-| `validateSufficientStockBulk()` | Validates multiple items at once |
-| `createInsufficientStockError()` | Creates detailed error message |
-| `getCurrentStockLevel()` | Gets current on-hand quantity |
-| `hasStock()` | Checks if item has any stock |
+| Function                         | What It Does                                  |
+| -------------------------------- | --------------------------------------------- |
+| `checkStockSufficiency()`        | Pure logic - checks if available >= requested |
+| `validateSufficientStock()`      | Fetches stock from DB and validates           |
+| `validateSufficientStockBulk()`  | Validates multiple items at once              |
+| `createInsufficientStockError()` | Creates detailed error message                |
+| `getCurrentStockLevel()`         | Gets current on-hand quantity                 |
+| `hasStock()`                     | Checks if item has any stock                  |
 
 **Why separate utility?**
+
 - **Reusability:** Can use in Issues, Transfers, Adjustments
 - **Testability:** Easy to write unit tests
 - **Maintainability:** All stock logic in one place
@@ -232,24 +234,25 @@ Created `server/utils/stockValidation.ts` with helper functions:
 
 ```typescript
 // In API route
-import { validateSufficientStockBulk, hasAllSufficientStock } from '~/server/utils/stockValidation'
+import { validateSufficientStockBulk, hasAllSufficientStock } from "~/server/utils/stockValidation";
 
 // Validate all items
 const results = await validateSufficientStockBulk(locationId, [
-  { itemId: 'item-1', quantity: 10 },
-  { itemId: 'item-2', quantity: 5 },
-])
+  { itemId: "item-1", quantity: 10 },
+  { itemId: "item-2", quantity: 5 },
+]);
 
 // Check if all passed
 if (!hasAllSufficientStock(results)) {
-  const insufficientItems = getInsufficientStockItems(results)
-  throw createInsufficientStockError(locationId, locationName, insufficientItems)
+  const insufficientItems = getInsufficientStockItems(results);
+  throw createInsufficientStockError(locationId, locationName, insufficientItems);
 }
 ```
 
 **Test Coverage:**
 
 Created 27 unit tests covering:
+
 - Standard validation scenarios
 - Edge cases (zero stock, exact quantity, decimals)
 - Error handling
@@ -265,6 +268,7 @@ We built the page where users can see all issues (like a table of all items that
 **What Was Done:**
 
 **Features:**
+
 - Table showing: Issue No, Date, Cost Centre, Total Value
 - Filters: Date range, Cost centre dropdown
 - Pagination: Navigate through pages of issues
@@ -273,11 +277,11 @@ We built the page where users can see all issues (like a table of all items that
 
 **Responsive Design:**
 
-| Screen Size | What Happens |
-|-------------|--------------|
-| Desktop | Full table with all columns |
-| Tablet | Condensed layout |
-| Mobile | Scrollable table |
+| Screen Size | What Happens                |
+| ----------- | --------------------------- |
+| Desktop     | Full table with all columns |
+| Tablet      | Condensed layout            |
+| Mobile      | Scrollable table            |
 
 **Filter System:**
 
@@ -287,10 +291,7 @@ We built the page where users can see all issues (like a table of all items that
 <UInput v-model="filters.endDate" type="date" />
 
 // Cost Centre Filter
-<USelectMenu
-  v-model="filters.costCentre"
-  :options="['All', 'Food', 'Cleaning', 'Other']"
-/>
+<USelectMenu v-model="filters.costCentre" :options="['All', 'Food', 'Cleaning', 'Other']" />
 
 // Active Filter Chips
 <UBadge @click="clearFilter('date')">
@@ -328,18 +329,18 @@ We built the form where users enter new issues - which items and how much they'r
 ```typescript
 // As user types, check stock
 const updateLineCalculations = (line: any) => {
-  const quantity = parseFloat(line.quantity) || 0
-  const stockInfo = stockLevels.value[line.item_id]
+  const quantity = parseFloat(line.quantity) || 0;
+  const stockInfo = stockLevels.value[line.item_id];
 
   if (stockInfo) {
-    line.wac = stockInfo.wac
-    line.on_hand = stockInfo.on_hand
-    line.line_value = quantity * stockInfo.wac
+    line.wac = stockInfo.wac;
+    line.on_hand = stockInfo.on_hand;
+    line.line_value = quantity * stockInfo.wac;
 
     // Check if quantity exceeds available stock
-    line.has_insufficient_stock = quantity > stockInfo.on_hand
+    line.has_insufficient_stock = quantity > stockInfo.on_hand;
   }
-}
+};
 ```
 
 **Visual Feedback:**
@@ -384,14 +385,10 @@ const isFormValid = computed(() => {
     formData.value.issue_date &&
     formData.value.cost_centre &&
     lines.value.length > 0 &&
-    lines.value.every(line =>
-      line.item_id &&
-      line.quantity &&
-      parseFloat(line.quantity) > 0
-    ) &&
-    !hasInsufficientStock.value  // ← Key check!
-  )
-})
+    lines.value.every((line) => line.item_id && line.quantity && parseFloat(line.quantity) > 0) &&
+    !hasInsufficientStock.value // ← Key check!
+  );
+});
 ```
 
 ---
@@ -431,12 +428,16 @@ We built the page that shows complete information about one specific issue.
 ```typescript
 const costCentreBadgeColor = (costCentre: string) => {
   switch (costCentre) {
-    case 'FOOD': return 'success'    // Green
-    case 'CLEAN': return 'primary'   // Blue
-    case 'OTHER': return 'neutral'   // Gray
-    default: return 'neutral'
+    case "FOOD":
+      return "success"; // Green
+    case "CLEAN":
+      return "primary"; // Blue
+    case "OTHER":
+      return "neutral"; // Gray
+    default:
+      return "neutral";
   }
-}
+};
 ```
 
 **Page Layout:**
@@ -494,16 +495,19 @@ Created 3 components:
 **Purpose:** Encapsulates all form logic in one reusable component
 
 **Props:**
+
 - `suppliers` - List of suppliers
 - `items` - List of items with stock
 - `periodPrices` - Period-locked prices (not used in issues)
 - `submitLabel` - Custom submit button text
 
 **Emits:**
+
 - `@submit` - When form is valid and submitted
 - `@cancel` - When user clicks cancel
 
 **Usage:**
+
 ```vue
 <IssueForm
   :items="items"
@@ -519,12 +523,14 @@ Created 3 components:
 **Purpose:** Table row for one issue line
 
 **Props:**
+
 - `line` - Line data (item_id, quantity, wac, on_hand)
 - `items` - Available items
 - `stockLevels` - Stock info map
 - `canRemove` - Whether remove button is enabled
 
 **Features:**
+
 - Item dropdown with search
 - On-hand quantity display
 - Quantity input with validation
@@ -533,6 +539,7 @@ Created 3 components:
 - Visual indicators (red for insufficient stock)
 
 **Example:**
+
 ```vue
 <tr>
   <IssueLineInput
@@ -551,6 +558,7 @@ Created 3 components:
 **Purpose:** Display stock-related warnings
 
 **Props:**
+
 - `type` - Alert type (error/warning/info)
 - `variant` - Visual style (subtle/solid/outline)
 - `title` - Alert title
@@ -559,6 +567,7 @@ Created 3 components:
 - `dismissible` - Whether can close
 
 **Usage:**
+
 ```vue
 <StockAlert
   type="error"
@@ -571,12 +580,12 @@ Created 3 components:
 
 **Component Benefits:**
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Reusability** | Use same form in create/edit pages |
-| **Testability** | Test components in isolation |
-| **Maintainability** | Fix bugs in one place |
-| **Consistency** | Same UI across all pages |
+| Benefit             | Explanation                        |
+| ------------------- | ---------------------------------- |
+| **Reusability**     | Use same form in create/edit pages |
+| **Testability**     | Test components in isolation       |
+| **Maintainability** | Fix bugs in one place              |
+| **Consistency**     | Same UI across all pages           |
 
 ---
 
@@ -584,33 +593,33 @@ Created 3 components:
 
 ### API Routes
 
-| File | Purpose |
-|------|---------|
-| `server/api/locations/[locationId]/issues/index.get.ts` | Fetch issues list with filters |
+| File                                                     | Purpose                          |
+| -------------------------------------------------------- | -------------------------------- |
+| `server/api/locations/[locationId]/issues/index.get.ts`  | Fetch issues list with filters   |
 | `server/api/locations/[locationId]/issues/index.post.ts` | Create new issue with validation |
-| `server/api/issues/[id].get.ts` | Get single issue details |
+| `server/api/issues/[id].get.ts`                          | Get single issue details         |
 
 ### Utilities
 
-| File | Purpose |
-|------|---------|
+| File                              | Purpose                           |
+| --------------------------------- | --------------------------------- |
 | `server/utils/stockValidation.ts` | Stock validation logic (27 tests) |
 
 ### Pages
 
-| File | Purpose |
-|------|---------|
-| `app/pages/issues/index.vue` | Issues list with filters |
-| `app/pages/issues/create.vue` | Create new issue form |
-| `app/pages/issues/[id].vue` | Issue detail view |
+| File                          | Purpose                  |
+| ----------------------------- | ------------------------ |
+| `app/pages/issues/index.vue`  | Issues list with filters |
+| `app/pages/issues/create.vue` | Create new issue form    |
+| `app/pages/issues/[id].vue`   | Issue detail view        |
 
 ### Components
 
-| File | Purpose |
-|------|---------|
-| `app/components/issue/IssueForm.vue` | Reusable issue form |
+| File                                      | Purpose               |
+| ----------------------------------------- | --------------------- |
+| `app/components/issue/IssueForm.vue`      | Reusable issue form   |
 | `app/components/issue/IssueLineInput.vue` | Single line input row |
-| `app/components/common/StockAlert.vue` | Stock warning alerts |
+| `app/components/common/StockAlert.vue`    | Stock warning alerts  |
 
 ---
 
@@ -623,6 +632,7 @@ A transaction ensures **all database operations succeed or all fail** together.
 
 **Why important?**
 When creating an issue:
+
 1. Create issue record
 2. Create 5 issue lines
 3. Update stock for 5 items
@@ -657,10 +667,10 @@ const result = await prisma.$transaction(async (tx) => {
 
 **Important Rule:**
 
-| Transaction Type | WAC Calculation |
-|------------------|-----------------|
-| **Delivery** | ✅ **YES** - Recalculates WAC |
-| **Issue** | ❌ **NO** - Uses current WAC but doesn't change it |
+| Transaction Type | WAC Calculation                                    |
+| ---------------- | -------------------------------------------------- |
+| **Delivery**     | ✅ **YES** - Recalculates WAC                      |
+| **Issue**        | ❌ **NO** - Uses current WAC but doesn't change it |
 
 **Why?**
 
@@ -671,19 +681,14 @@ const result = await prisma.$transaction(async (tx) => {
 
 ```typescript
 // In Delivery API
-const newWAC = calculateWAC(
-  currentQty,
-  currentWAC,
-  receivedQty,
-  receiptPrice
-)
+const newWAC = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice);
 
 await tx.locationStock.update({
   data: {
     on_hand: currentQty + receivedQty,
-    wac: newWAC  // ← WAC CHANGES
-  }
-})
+    wac: newWAC, // ← WAC CHANGES
+  },
+});
 ```
 
 ```typescript
@@ -692,16 +697,16 @@ await tx.locationStock.update({
   data: {
     on_hand: currentQty - issuedQty,
     // wac: wac  ← WAC STAYS THE SAME (no update)
-  }
-})
+  },
+});
 
 // But we record the WAC at time of issue
 await tx.issueLine.create({
   data: {
-    wac_at_issue: currentWAC,  // Historical record
-    line_value: quantity * currentWAC
-  }
-})
+    wac_at_issue: currentWAC, // Historical record
+    line_value: quantity * currentWAC,
+  },
+});
 ```
 
 ### 3. Three-Level Validation
@@ -732,11 +737,13 @@ graph TD
 ### 4. Error Handling with Details
 
 **Bad error message:**
+
 ```
 ❌ "Insufficient stock"
 ```
 
 **Good error message:**
+
 ```
 ✅ "Insufficient stock for 2 item(s):
    - Rice (RICE-001): requested 50 KG, available 40 KG
@@ -748,28 +755,28 @@ graph TD
 ```typescript
 // Build detailed error message
 const insufficientStockErrors = lines
-  .filter(line => line.quantity > stockMap.get(line.item_id).on_hand)
-  .map(line => ({
+  .filter((line) => line.quantity > stockMap.get(line.item_id).on_hand)
+  .map((line) => ({
     item_name: line.item.name,
     item_code: line.item.code,
     requested: line.quantity,
-    available: stockMap.get(line.item_id).on_hand
-  }))
+    available: stockMap.get(line.item_id).on_hand,
+  }));
 
 // Return with details
 throw createError({
   statusCode: 400,
   data: {
-    code: 'INSUFFICIENT_STOCK',
+    code: "INSUFFICIENT_STOCK",
     message: `Insufficient stock for ${insufficientStockErrors.length} item(s)`,
     details: {
       errors: insufficientStockErrors,
-      messages: insufficientStockErrors.map(e =>
-        `${e.item_name} (${e.item_code}): requested ${e.requested}, available ${e.available}`
-      )
-    }
-  }
-})
+      messages: insufficientStockErrors.map(
+        (e) => `${e.item_name} (${e.item_code}): requested ${e.requested}, available ${e.available}`
+      ),
+    },
+  },
+});
 ```
 
 ### 5. Cost Centers
@@ -781,6 +788,7 @@ Cost centers = Different departments/categories that consume stock
 **Why important?**
 
 Helps business understand:
+
 - How much is spent on food vs cleaning?
 - Which department uses the most stock?
 - Where to optimize costs?
@@ -789,9 +797,9 @@ Helps business understand:
 
 ```typescript
 enum CostCentre {
-  FOOD = 'FOOD',      // Kitchen/Restaurant use
-  CLEAN = 'CLEAN',    // Cleaning supplies
-  OTHER = 'OTHER'     // Everything else
+  FOOD = "FOOD", // Kitchen/Restaurant use
+  CLEAN = "CLEAN", // Cleaning supplies
+  OTHER = "OTHER", // Everything else
 }
 ```
 
@@ -896,9 +904,9 @@ LocationStock Table:
 ```typescript
 // Bad - no validation
 await prisma.locationStock.update({
-  data: { on_hand: currentStock - quantity }
+  data: { on_hand: currentStock - quantity },
   // ← What if quantity > currentStock? Negative stock!
-})
+});
 ```
 
 ```typescript
@@ -906,13 +914,13 @@ await prisma.locationStock.update({
 if (currentStock < quantity) {
   throw createError({
     statusCode: 400,
-    data: { code: 'INSUFFICIENT_STOCK' }
-  })
+    data: { code: "INSUFFICIENT_STOCK" },
+  });
 }
 
 await prisma.locationStock.update({
-  data: { on_hand: currentStock - quantity }
-})
+  data: { on_hand: currentStock - quantity },
+});
 ```
 
 ### ❌ Don't: Recalculate WAC on issues
@@ -932,10 +940,10 @@ await prisma.locationStock.update({
 // Good - keep WAC unchanged
 await prisma.locationStock.update({
   data: {
-    on_hand: currentStock - quantity
+    on_hand: currentStock - quantity,
     // No WAC update - it stays the same
-  }
-})
+  },
+});
 ```
 
 ### ❌ Don't: Forget atomic transactions
@@ -1016,6 +1024,7 @@ await createIssue(...)  // ← API also validates
 ### Manual Testing Checklist
 
 **Issues List Page:**
+
 - [ ] Page loads without errors
 - [ ] Shows all issues for active location
 - [ ] Date filter works
@@ -1025,6 +1034,7 @@ await createIssue(...)  // ← API also validates
 - [ ] "New Issue" button shows for authorized users
 
 **Create Issue Page:**
+
 - [ ] Page loads without errors
 - [ ] Can select items from dropdown
 - [ ] Shows current stock level
@@ -1038,6 +1048,7 @@ await createIssue(...)  // ← API also validates
 - [ ] Redirects to issue details after creation
 
 **Issue Detail Page:**
+
 - [ ] Page loads without errors
 - [ ] Shows all issue information
 - [ ] Shows all line items
@@ -1046,6 +1057,7 @@ await createIssue(...)  // ← API also validates
 - [ ] Shows poster information
 
 **Stock Validation:**
+
 - [ ] Real-time validation works in UI
 - [ ] API rejects when insufficient stock
 - [ ] Error message includes item details
@@ -1061,26 +1073,26 @@ await createIssue(...)  // ← API also validates
 
 ```typescript
 // ✅ Good - fetch all items with stock in one query
-const items = await $fetch('/api/items', {
+const items = await $fetch("/api/items", {
   query: {
     locationId: activeLocationId,
-    limit: 500
-  }
-})
+    limit: 500,
+  },
+});
 
 // Build stock map
-const stockLevels = {}
-items.forEach(item => {
+const stockLevels = {};
+items.forEach((item) => {
   if (item.location_stock?.length > 0) {
-    stockLevels[item.id] = item.location_stock[0]
+    stockLevels[item.id] = item.location_stock[0];
   }
-})
+});
 ```
 
 ```typescript
 // ❌ Bad - fetch stock for each item separately
 for (const item of items) {
-  const stock = await $fetch(`/api/items/${item.id}/stock`)
+  const stock = await $fetch(`/api/items/${item.id}/stock`);
   // ← N queries instead of 1!
 }
 ```
@@ -1110,27 +1122,27 @@ const issues = await prisma.issue.findMany({
     total_value: true,
     // Don't include lines in list view
   },
-  take: 50,  // Pagination
+  take: 50, // Pagination
   skip: (page - 1) * 50,
-})
+});
 ```
 
 ---
 
 ## Common Terms Explained
 
-| Term | Simple Explanation | Example |
-|------|-------------------|---------|
-| **Issue** | Taking items from storage to use | Kitchen takes 10 KG rice |
-| **Cost Center** | Department/category using the items | Food, Cleaning, Other |
-| **WAC** | Weighted Average Cost (average price per unit) | 15.50 SAR per KG |
-| **On-Hand** | Quantity currently in stock | 100.00 KG available |
-| **Line Value** | Cost of one line (quantity × WAC) | 10 KG × 15.50 = 155.00 SAR |
-| **Atomic Transaction** | All operations succeed or all fail | Create issue + deduct stock (both or neither) |
-| **Stock Validation** | Checking if enough items are available | Requested 50, available 40 = FAIL |
-| **Insufficient Stock** | Not enough items to fulfill request | Want 100, have 40 |
-| **Real-time Validation** | Checking as user types | Red warning appears immediately |
-| **Sequential Number** | Auto-generated number in order | ISS-2025-001, ISS-2025-002, ... |
+| Term                     | Simple Explanation                             | Example                                       |
+| ------------------------ | ---------------------------------------------- | --------------------------------------------- |
+| **Issue**                | Taking items from storage to use               | Kitchen takes 10 KG rice                      |
+| **Cost Center**          | Department/category using the items            | Food, Cleaning, Other                         |
+| **WAC**                  | Weighted Average Cost (average price per unit) | 15.50 SAR per KG                              |
+| **On-Hand**              | Quantity currently in stock                    | 100.00 KG available                           |
+| **Line Value**           | Cost of one line (quantity × WAC)              | 10 KG × 15.50 = 155.00 SAR                    |
+| **Atomic Transaction**   | All operations succeed or all fail             | Create issue + deduct stock (both or neither) |
+| **Stock Validation**     | Checking if enough items are available         | Requested 50, available 40 = FAIL             |
+| **Insufficient Stock**   | Not enough items to fulfill request            | Want 100, have 40                             |
+| **Real-time Validation** | Checking as user types                         | Red warning appears immediately               |
+| **Sequential Number**    | Auto-generated number in order                 | ISS-2025-001, ISS-2025-002, ...               |
 
 ---
 
@@ -1141,6 +1153,7 @@ After completing Issues Management, we move to:
 **→ Phase 1.9: Stock Now & Dashboard**
 
 In the next phase, we will:
+
 - Create Stock Now page showing current inventory levels
 - Build consolidated stock view across all locations
 - Create dashboard with key metrics and recent activity
@@ -1154,18 +1167,21 @@ In the next phase, we will:
 ### What We Accomplished
 
 ✅ **Backend (API):**
+
 - Created 3 API endpoints for issues
 - Implemented stock validation utility with 27 tests
 - Added atomic transactions for data integrity
 - Built sequential numbering system
 
 ✅ **Frontend (UI):**
+
 - Created issues list page with filters
 - Built create issue form with real-time validation
 - Developed issue detail page
 - Made 3 reusable components
 
 ✅ **Business Logic:**
+
 - Stock validation prevents negative inventory
 - WAC-based valuation without recalculation
 - Cost center tracking for expenses

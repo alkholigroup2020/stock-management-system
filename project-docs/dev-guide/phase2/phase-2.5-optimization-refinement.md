@@ -1,4 +1,5 @@
 # Phase 2.5: Testing, Optimization & Refinements
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -132,31 +133,34 @@ sequenceDiagram
 #### Bug #1: Items API Validation Error
 
 **Problem:**
+
 - Create transfer page failed to load items
 - Console error: "Validation error: is_active must be string"
 - Transfer creation failed
 
 **Cause:**
+
 ```typescript
 // ❌ WRONG: Sending boolean
 const items = await $fetch("/api/items", {
   query: {
-    is_active: true,  // Boolean value
-    limit: 500
-  }
+    is_active: true, // Boolean value
+    limit: 500,
+  },
 });
 ```
 
 The API expected a **string** `"true"` or `"false"`, but we sent a **boolean** `true`.
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Sending string
 const items = await $fetch("/api/items", {
   query: {
-    is_active: "true",  // String value
-    limit: 500
-  }
+    is_active: "true", // String value
+    limit: 500,
+  },
 });
 ```
 
@@ -167,30 +171,33 @@ const items = await $fetch("/api/items", {
 #### Bug #2: Items API Limit Exceeded
 
 **Problem:**
+
 - API returned error: "Limit cannot exceed 200"
 - Transfer creation failed to load all items
 
 **Cause:**
+
 ```typescript
 // ❌ WRONG: Requesting 500 items
 const items = await $fetch("/api/items", {
   query: {
     is_active: "true",
-    limit: 500  // Too high!
-  }
+    limit: 500, // Too high!
+  },
 });
 ```
 
 The API has a maximum limit of **200 items per request**, but we requested **500**.
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Using maximum allowed limit
 const items = await $fetch("/api/items", {
   query: {
     is_active: "true",
-    limit: 200  // Maximum allowed
-  }
+    limit: 200, // Maximum allowed
+  },
 });
 ```
 
@@ -203,24 +210,27 @@ const items = await $fetch("/api/items", {
 #### Bug #3: User Locations Assignment Error
 
 **Problem:**
+
 - From/To location dropdowns empty
 - Console error: "filter is not a function"
 - Cannot create transfer
 
 **Cause:**
+
 ```typescript
 // ❌ WRONG: Assigning entire response object
 const locationsData = await $fetch("/api/user/locations");
-locations.value = locationsData;  // This is an object!
+locations.value = locationsData; // This is an object!
 ```
 
 The API returns an **object** like `{ locations: [...] }`, but we need just the **array**.
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Extracting locations array
 const locationsData = await $fetch("/api/user/locations");
-locations.value = locationsData.locations;  // Extract array
+locations.value = locationsData.locations; // Extract array
 ```
 
 **File Changed:** `app/pages/transfers/create.vue:156`
@@ -280,6 +290,7 @@ graph LR
 #### Bug #4: Reconciliation Undefined Values
 
 **Problem:**
+
 - Reconciliation page crashed on load
 - Console error: "Cannot read property 'back_charges' of undefined"
 - Adjustments form showed errors
@@ -309,13 +320,14 @@ const adjustments = ref({
   back_charges: reconciliation.value?.back_charges ?? 0,
   credits: reconciliation.value?.credits ?? 0,
   condemnations: reconciliation.value?.condemnations ?? 0,
-  adjustments: reconciliation.value?.adjustments ?? 0
+  adjustments: reconciliation.value?.adjustments ?? 0,
 });
 ```
 
 **File Changed:** `app/pages/reconciliations.vue:178-181`
 
 **Explanation:**
+
 - `??` is the **nullish coalescing operator**
 - It means: "If value is null or undefined, use 0 instead"
 - This prevents crashes when adjustments haven't been saved yet
@@ -367,6 +379,7 @@ const adjustments = ref({
 The NCR create form looked different from other forms (deliveries, issues, transfers). It used **native HTML elements** instead of **Nuxt UI components**.
 
 **Before:**
+
 ```vue
 <!-- ❌ Using native HTML -->
 <select v-model="formData.location_id">
@@ -380,6 +393,7 @@ The NCR create form looked different from other forms (deliveries, issues, trans
 ```
 
 **After:**
+
 ```vue
 <!-- ✅ Using Nuxt UI Components -->
 <USelectMenu
@@ -388,14 +402,11 @@ The NCR create form looked different from other forms (deliveries, issues, trans
   placeholder="Select Location"
 />
 
-<UInput
-  v-model="line.quantity"
-  type="number"
-  step="0.0001"
-/>
+<UInput v-model="line.quantity" type="number" step="0.0001" />
 ```
 
 **Benefits:**
+
 - Consistent styling across all forms
 - Better validation
 - Consistent error handling
@@ -426,26 +437,39 @@ graph LR
 ```
 
 **Example Usage:**
+
 ```vue
 <!-- Transfer Status -->
 <UBadge
-  :color="transfer.status === 'PENDING_APPROVAL' ? 'primary' :
-          transfer.status === 'COMPLETED' ? 'success' :
-          transfer.status === 'REJECTED' ? 'error' : 'neutral'"
+  :color="
+    transfer.status === 'PENDING_APPROVAL'
+      ? 'primary'
+      : transfer.status === 'COMPLETED'
+        ? 'success'
+        : transfer.status === 'REJECTED'
+          ? 'error'
+          : 'neutral'
+  "
 >
   {{ transfer.status }}
 </UBadge>
 
 <!-- Stock Alert -->
 <UAlert
-  :color="stock.on_hand < stock.reorder_level ? 'error' :
-          stock.on_hand < stock.reorder_level * 2 ? 'warning' : 'success'"
+  :color="
+    stock.on_hand < stock.reorder_level
+      ? 'error'
+      : stock.on_hand < stock.reorder_level * 2
+        ? 'warning'
+        : 'success'
+  "
 >
   Stock Level: {{ stock.on_hand }}
 </UAlert>
 ```
 
 **Verification Results:**
+
 - ✅ 65+ loading states use consistent spinner component
 - ✅ 82+ toast notifications use semantic colors
 - ✅ All buttons use primary/success/error colors
@@ -483,6 +507,7 @@ We tested all pages on **mobile viewport (375x667 - iPhone SE)**:
 ```
 
 **Mobile Responsive Features:**
+
 1. **Metric Cards:** Stack vertically (1 column)
 2. **Forms:** Single column layout
 3. **Tables:** Scroll horizontally or switch to card view
@@ -490,6 +515,7 @@ We tested all pages on **mobile viewport (375x667 - iPhone SE)**:
 5. **Padding:** Consistent `p-4` on mobile, `md:p-6` on desktop
 
 **Code Example:**
+
 ```vue
 <!-- Responsive Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -511,17 +537,13 @@ Every async operation now has a **loading indicator**:
 #### Button Loading States
 
 ```vue
-<UButton
-  color="primary"
-  :loading="isSubmitting"
-  :disabled="isSubmitting"
-  @click="handleSubmit"
->
+<UButton color="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="handleSubmit">
   {{ isSubmitting ? "Creating..." : "Create Transfer" }}
 </UButton>
 ```
 
 **When button is loading:**
+
 - Shows spinning icon
 - Button disabled (can't click again)
 - Text changes to show action in progress
@@ -536,11 +558,7 @@ Every async operation now has a **loading indicator**:
     <LoadingSpinner v-if="loading" size="lg" />
 
     <!-- If error -->
-    <ErrorAlert
-      v-else-if="error"
-      :message="error"
-      @retry="fetchData"
-    />
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchData" />
 
     <!-- When loaded -->
     <div v-else>
@@ -557,6 +575,7 @@ Every async operation now has a **loading indicator**:
 All error messages are now **clear and helpful**:
 
 **Before:**
+
 ```typescript
 // ❌ Generic, unhelpful error
 catch (error) {
@@ -565,6 +584,7 @@ catch (error) {
 ```
 
 **After:**
+
 ```typescript
 // ✅ Specific, helpful error
 catch (error: any) {
@@ -596,6 +616,7 @@ catch (error: any) {
 ```
 
 **Benefits:**
+
 - User knows exactly what went wrong
 - User knows how to fix it
 - Reduces support requests
@@ -628,6 +649,7 @@ toast.success("Adjustments saved successfully");
 ```
 
 **Why this matters:**
+
 - User knows action succeeded
 - Provides confidence
 - Prevents user from submitting again
@@ -727,6 +749,7 @@ model Delivery {
 When we filter deliveries by location AND date range (very common), the database can use this composite index to find matching records instantly.
 
 **Example Query:**
+
 ```sql
 -- Fast with composite index
 SELECT * FROM Delivery
@@ -769,6 +792,7 @@ model Transfer {
 Transfers list filters by status (PENDING_APPROVAL, COMPLETED, etc.) and sorts by date.
 
 **Example Query:**
+
 ```sql
 -- Fast with composite index
 SELECT * FROM Transfer
@@ -821,7 +845,7 @@ graph LR
 // Accept pagination parameters
 const schema = z.object({
   page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().min(1).max(200).default(50)
+  limit: z.coerce.number().int().min(1).max(200).default(50),
 });
 
 const { page, limit } = schema.parse(query);
@@ -836,14 +860,18 @@ const [deliveries, total] = await Promise.all([
   prisma.delivery.findMany({
     skip,
     take,
-    where: { /* filters */ },
-    orderBy: { posted_at: "desc" }
+    where: {
+      /* filters */
+    },
+    orderBy: { posted_at: "desc" },
   }),
 
   // Count total records
   prisma.delivery.count({
-    where: { /* same filters */ }
-  })
+    where: {
+      /* same filters */
+    },
+  }),
 ]);
 
 // Return with pagination metadata
@@ -855,8 +883,8 @@ return {
     limit,
     totalPages: Math.ceil(total / limit),
     hasNextPage: page < Math.ceil(total / limit),
-    hasPrevPage: page > 1
-  }
+    hasPrevPage: page > 1,
+  },
 };
 ```
 
@@ -871,24 +899,14 @@ return {
     <!-- Pagination Controls -->
     <div class="flex justify-between items-center mt-4">
       <div>
-        Showing {{ (page - 1) * limit + 1 }} to
-        {{ Math.min(page * limit, total) }} of {{ total }} deliveries
+        Showing {{ (page - 1) * limit + 1 }} to {{ Math.min(page * limit, total) }} of
+        {{ total }} deliveries
       </div>
 
       <div class="flex gap-2">
-        <UButton
-          :disabled="!hasPrevPage"
-          @click="page--"
-        >
-          Previous
-        </UButton>
+        <UButton :disabled="!hasPrevPage" @click="page--">Previous</UButton>
 
-        <UButton
-          :disabled="!hasNextPage"
-          @click="page++"
-        >
-          Next
-        </UButton>
+        <UButton :disabled="!hasNextPage" @click="page++">Next</UButton>
       </div>
     </div>
   </div>
@@ -900,7 +918,7 @@ const limit = ref(50);
 
 const fetchDeliveries = async () => {
   const data = await $fetch("/api/deliveries", {
-    query: { page: page.value, limit: limit.value }
+    query: { page: page.value, limit: limit.value },
   });
 
   deliveries.value = data.deliveries;
@@ -917,6 +935,7 @@ watch(page, () => {
 ```
 
 **Benefits:**
+
 - Initial page load: **50 records** instead of 5000 (100x faster!)
 - Less memory usage in browser
 - Faster rendering
@@ -931,6 +950,7 @@ watch(page, () => {
 **Caching** means storing data in memory for a short time so you don't have to fetch it again.
 
 **Example:**
+
 - You open the deliveries page → Fetches locations (for dropdown)
 - You create a delivery → Uses cached locations (no fetch!)
 - You open issues page → Uses cached locations (no fetch!)
@@ -980,7 +1000,7 @@ export const useLocationStore = defineStore("location", () => {
     locations,
     fetchUserLocations,
     invalidateCache,
-    isCacheValid
+    isCacheValid,
   };
 });
 ```
@@ -1004,6 +1024,7 @@ onMounted(async () => {
 ```
 
 **Benefits:**
+
 - Reduces API calls by **80-90%**
 - Faster page loads
 - Less server load
@@ -1042,12 +1063,13 @@ export const usePeriodStore = defineStore("period", () => {
   return {
     currentPeriod,
     fetchCurrentPeriod,
-    isCacheValid
+    isCacheValid,
   };
 });
 ```
 
 **Why 10 minutes for periods?**
+
 - Periods change rarely (once per month)
 - Longer cache = better performance
 - 10 minutes is safe balance
@@ -1060,16 +1082,17 @@ We tested API response times using **Playwright browser automation**:
 
 #### Test Results
 
-| Page | Load Time | Status | Notes |
-|------|-----------|--------|-------|
-| Login | 134ms | ✅ Excellent | Simple page, no data fetching |
-| Dashboard | 183ms | ✅ Excellent | 4 metric calculations |
-| Items List | 58ms | ✅ Excellent | Cached data |
-| Deliveries List | 72ms | ✅ Excellent | Paginated (50 records) |
-| Transfers List | 49ms | ✅ Excellent | Cached locations |
-| NCRs List | 48ms | ✅ Excellent | Filtered query with index |
+| Page            | Load Time | Status       | Notes                         |
+| --------------- | --------- | ------------ | ----------------------------- |
+| Login           | 134ms     | ✅ Excellent | Simple page, no data fetching |
+| Dashboard       | 183ms     | ✅ Excellent | 4 metric calculations         |
+| Items List      | 58ms      | ✅ Excellent | Cached data                   |
+| Deliveries List | 72ms      | ✅ Excellent | Paginated (50 records)        |
+| Transfers List  | 49ms      | ✅ Excellent | Cached locations              |
+| NCRs List       | 48ms      | ✅ Excellent | Filtered query with index     |
 
 **Performance Targets (from PRD):**
+
 - ✅ Single location operations: < 1 second (achieved: < 200ms)
 - ✅ Cross-location operations: < 2 seconds (achieved: < 200ms)
 - ✅ Reports: < 5 seconds (achieved: < 200ms)
@@ -1131,6 +1154,7 @@ graph TB
 ```
 
 **Summary:**
+
 - ⚡ **118x faster** page loads (8.5s → 72ms)
 - ⚡ **347x faster** queries (5.2s → 15ms)
 - ⚡ **95% fewer** API calls (245 → 12)
@@ -1142,11 +1166,13 @@ graph TB
 ### 1. Integration Testing vs Unit Testing
 
 **Unit Testing:**
+
 - Tests **one function** at a time
 - Example: Test `calculateWAC()` function
 - Fast and focused
 
 **Integration Testing:**
+
 - Tests **multiple parts working together**
 - Example: Test complete transfer flow (UI → API → Database)
 - Slower but more realistic
@@ -1159,7 +1185,7 @@ graph TB
 
 ```typescript
 // Problem: value might be undefined
-const value = reconciliation.back_charges;  // undefined
+const value = reconciliation.back_charges; // undefined
 
 // Solution 1: Using || (not recommended)
 const value1 = reconciliation.back_charges || 0;
@@ -1171,6 +1197,7 @@ const value2 = reconciliation.back_charges ?? 0;
 ```
 
 **When to use:**
+
 - Providing default values
 - Preventing "undefined" errors
 - Handling optional API fields
@@ -1180,11 +1207,13 @@ const value2 = reconciliation.back_charges ?? 0;
 ### 3. Composite Database Indexes
 
 **Single Index:**
+
 ```prisma
 @@index([location_id])  // Fast for: WHERE location_id = 'abc'
 ```
 
 **Composite Index:**
+
 ```prisma
 @@index([location_id, delivery_date])
 // Fast for:
@@ -1194,6 +1223,7 @@ const value2 = reconciliation.back_charges ?? 0;
 ```
 
 **Rule of thumb:**
+
 - Create composite index for columns used **together** in WHERE or ORDER BY
 
 ---
@@ -1201,23 +1231,26 @@ const value2 = reconciliation.back_charges ?? 0;
 ### 4. Promise.all() for Parallel Queries
 
 **Sequential (Slow):**
+
 ```typescript
 // ❌ Total time: 150ms + 200ms = 350ms
-const deliveries = await prisma.delivery.findMany();  // 150ms
-const count = await prisma.delivery.count();          // 200ms
+const deliveries = await prisma.delivery.findMany(); // 150ms
+const count = await prisma.delivery.count(); // 200ms
 ```
 
 **Parallel (Fast):**
+
 ```typescript
 // ✅ Total time: max(150ms, 200ms) = 200ms
 const [deliveries, count] = await Promise.all([
-  prisma.delivery.findMany(),  // 150ms
-  prisma.delivery.count()      // 200ms
+  prisma.delivery.findMany(), // 150ms
+  prisma.delivery.count(), // 200ms
 ]);
 // Both queries run at the same time!
 ```
 
 **When to use:**
+
 - Multiple independent database queries
 - Multiple API calls
 - Any async operations that don't depend on each other
@@ -1230,12 +1263,13 @@ const [deliveries, count] = await Promise.all([
 If location names change in database but we use cached data, users see old names.
 
 **The Solution:**
+
 ```typescript
 // Invalidate cache when data changes
 const createLocation = async (data) => {
   await $fetch("/api/locations", {
     method: "POST",
-    body: data
+    body: data,
   });
 
   // Clear cache so next fetch gets fresh data
@@ -1245,7 +1279,7 @@ const createLocation = async (data) => {
 const updateLocation = async (id, data) => {
   await $fetch(`/api/locations/${id}`, {
     method: "PATCH",
-    body: data
+    body: data,
   });
 
   // Clear cache
@@ -1254,25 +1288,26 @@ const updateLocation = async (id, data) => {
 ```
 
 **Rule:**
+
 - Always invalidate cache after CREATE, UPDATE, or DELETE operations
 
 ---
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Integration Testing** | Testing multiple parts of the app working together |
-| **Unit Testing** | Testing one small piece of code in isolation |
-| **Database Index** | Like a book index - helps find data quickly |
-| **Composite Index** | Index on multiple columns together |
-| **Pagination** | Loading data in small chunks (pages) instead of all at once |
-| **Caching** | Storing data in memory temporarily to avoid re-fetching |
-| **Cache Invalidation** | Clearing cached data so fresh data is fetched |
-| **Response Time** | How long it takes for server to respond to request |
-| **Load Time** | How long it takes for page to fully load |
-| **API Call** | Request from client to server asking for data |
-| **Nullish Coalescing** | Using ?? to provide default value for null/undefined |
+| Term                    | Simple Explanation                                          |
+| ----------------------- | ----------------------------------------------------------- |
+| **Integration Testing** | Testing multiple parts of the app working together          |
+| **Unit Testing**        | Testing one small piece of code in isolation                |
+| **Database Index**      | Like a book index - helps find data quickly                 |
+| **Composite Index**     | Index on multiple columns together                          |
+| **Pagination**          | Loading data in small chunks (pages) instead of all at once |
+| **Caching**             | Storing data in memory temporarily to avoid re-fetching     |
+| **Cache Invalidation**  | Clearing cached data so fresh data is fetched               |
+| **Response Time**       | How long it takes for server to respond to request          |
+| **Load Time**           | How long it takes for page to fully load                    |
+| **API Call**            | Request from client to server asking for data               |
+| **Nullish Coalescing**  | Using ?? to provide default value for null/undefined        |
 
 ---
 
@@ -1281,6 +1316,7 @@ const updateLocation = async (id, data) => {
 ### Issue 1: "is_active must be string" Error
 
 **Symptoms:**
+
 - Items API returns 400 error
 - Error message: "Validation error: is_active must be string"
 
@@ -1288,10 +1324,11 @@ const updateLocation = async (id, data) => {
 Sending boolean `true` instead of string `"true"`
 
 **Solution:**
+
 ```typescript
 // ✅ CORRECT
 const items = await $fetch("/api/items", {
-  query: { is_active: "true" }  // String, not boolean
+  query: { is_active: "true" }, // String, not boolean
 });
 ```
 
@@ -1300,6 +1337,7 @@ const items = await $fetch("/api/items", {
 ### Issue 2: Cache Not Refreshing
 
 **Symptoms:**
+
 - User updates location name
 - Old name still shows in dropdown
 - Refresh page and new name appears
@@ -1308,11 +1346,12 @@ const items = await $fetch("/api/items", {
 Cache not invalidated after update
 
 **Solution:**
+
 ```typescript
 const updateLocation = async (id, data) => {
   await $fetch(`/api/locations/${id}`, {
     method: "PATCH",
-    body: data
+    body: data,
   });
 
   // ← Add this!
@@ -1328,6 +1367,7 @@ const updateLocation = async (id, data) => {
 ### Issue 3: Pagination Not Working
 
 **Symptoms:**
+
 - "Next" button does nothing
 - Same data on all pages
 - Total count incorrect
@@ -1336,16 +1376,17 @@ const updateLocation = async (id, data) => {
 Forgot to update page number or fetch new data
 
 **Solution:**
+
 ```typescript
 // ✅ CORRECT: Watch page changes
 watch(page, () => {
-  fetchData();  // Fetch new data when page changes
+  fetchData(); // Fetch new data when page changes
 });
 
 // ✅ CORRECT: Update page on button click
 const nextPage = () => {
   if (hasNextPage.value) {
-    page.value++;  // This triggers the watch
+    page.value++; // This triggers the watch
   }
 };
 ```
@@ -1355,6 +1396,7 @@ const nextPage = () => {
 ### Issue 4: Slow Database Queries
 
 **Symptoms:**
+
 - Page takes 3-5 seconds to load
 - Database query taking too long
 - Console shows slow query warning
@@ -1363,6 +1405,7 @@ const nextPage = () => {
 No database index on filtered/sorted columns
 
 **Solution:**
+
 ```prisma
 // Add index to schema.prisma
 model Delivery {
@@ -1375,6 +1418,7 @@ model Delivery {
 ```
 
 Then create and apply migration:
+
 ```bash
 pnpm db:migrate dev --name add_indexes
 ```
@@ -1469,6 +1513,7 @@ pnpm db:migrate dev --name add_indexes
 After completing Phase 2.5 (Testing, Optimization & Refinements), the next phase is:
 
 **→ Phase 3: Period Management** (Slice 3)
+
 - Period Close workflow
 - Supervisor/Admin approval
 - Snapshot creation
@@ -1482,11 +1527,13 @@ After completing Phase 2.5 (Testing, Optimization & Refinements), the next phase
 In Phase 2.5, we completed comprehensive testing, refinement, and optimization of the Stock Management System:
 
 ✅ **Integration Testing**
+
 - Tested complete workflows end-to-end
 - Found and fixed 4 critical bugs
 - Verified all features work together correctly
 
 ✅ **UI/UX Refinements**
+
 - Standardized all forms with Nuxt UI components
 - Ensured consistent brand colors (65+ loading states, 82+ toasts)
 - Verified responsive design on mobile/tablet/desktop
@@ -1494,6 +1541,7 @@ In Phase 2.5, we completed comprehensive testing, refinement, and optimization o
 - Implemented success confirmations for all actions
 
 ✅ **Performance Optimization**
+
 - Added 6 strategic database indexes
 - Implemented pagination on 4 major list endpoints
 - Added client-side caching (5-min locations, 10-min periods)
@@ -1501,6 +1549,7 @@ In Phase 2.5, we completed comprehensive testing, refinement, and optimization o
 - Achieved 118x faster page loads and 95% fewer API calls
 
 The application is now **production-ready** with:
+
 - Fast, responsive performance even with large datasets
 - Consistent, professional user interface
 - Comprehensive error handling and user feedback

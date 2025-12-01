@@ -1,4 +1,5 @@
 # Phase 4.4: Testing Implementation
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -28,6 +29,7 @@
 **Testing** is the process of checking if your code works correctly. It's like checking your math homework before submitting it to the teacher.
 
 Think of it like this:
+
 - You write code that should calculate stock values
 - You create tests that check if the calculation is correct
 - You run the tests to see if everything works
@@ -36,6 +38,7 @@ Think of it like this:
 ### Why We Need Testing
 
 **Problems without testing:**
+
 - ❌ Changes break existing features without you knowing
 - ❌ You must manually check everything after each change
 - ❌ Bugs are found by users, not by you
@@ -43,6 +46,7 @@ Think of it like this:
 - ❌ Refactoring is scary because you might break things
 
 **Benefits of testing:**
+
 - ✅ Automatically check if code works correctly
 - ✅ Catch bugs before they reach users
 - ✅ Confidence when changing code
@@ -67,6 +71,7 @@ graph TD
 ```
 
 **The testing pyramid shows:**
+
 - **Unit Tests** (Bottom): Many fast tests for small pieces of code
 - **API Tests** (Middle): Medium number of tests for API endpoints
 - **Integration Tests** (Upper): Fewer tests for complete workflows
@@ -116,12 +121,12 @@ We use **Vitest** as our testing framework. Vitest is like a tool that runs your
 
 **Key Vitest functions:**
 
-| Function | Purpose | Example |
-|----------|---------|---------|
-| `describe()` | Group related tests | `describe("WAC calculation", ...)` |
-| `test()` or `it()` | Define a test case | `test("should calculate WAC correctly", ...)` |
-| `expect()` | Check if result is correct | `expect(result).toBe(100)` |
-| `beforeEach()` | Run code before each test | `beforeEach(() => { reset() })` |
+| Function           | Purpose                    | Example                                       |
+| ------------------ | -------------------------- | --------------------------------------------- |
+| `describe()`       | Group related tests        | `describe("WAC calculation", ...)`            |
+| `test()` or `it()` | Define a test case         | `test("should calculate WAC correctly", ...)` |
+| `expect()`         | Check if result is correct | `expect(result).toBe(100)`                    |
+| `beforeEach()`     | Run code before each test  | `beforeEach(() => { reset() })`               |
 
 **Example test structure:**
 
@@ -144,6 +149,7 @@ describe("WAC calculation", () => {
 ```
 
 This pattern is called **Arrange-Act-Assert (AAA)**:
+
 1. **Arrange**: Set up the test data
 2. **Act**: Call the function you're testing
 3. **Assert**: Check if the result is correct
@@ -157,6 +163,7 @@ This pattern is called **Arrange-Act-Assert (AAA)**:
 WAC (Weighted Average Cost) is a method to calculate the average cost of inventory. When you receive new stock at different prices, you need to calculate the new average.
 
 **Formula:**
+
 ```
 newWAC = (currentQty × currentWAC + receivedQty × receiptPrice) / (currentQty + receivedQty)
 ```
@@ -216,6 +223,7 @@ test("should calculate WAC correctly for two deliveries at different prices", ()
 Reconciliation is the process of comparing actual stock (counted physically) with system stock (recorded in the database). We calculate the variance and variance value.
 
 **Formulas:**
+
 ```
 variance = actual_qty - system_qty
 variance_value = variance × WAC
@@ -280,6 +288,7 @@ test("should calculate negative variance correctly", () => {
 Before we allow an issue (stock withdrawal) or transfer, we must check if there is enough stock available. This prevents negative stock situations.
 
 **Validation rules:**
+
 - `requestedQty <= availableStock`
 - `availableStock >= 0`
 - All quantities must be positive numbers
@@ -314,8 +323,8 @@ Before we allow an issue (stock withdrawal) or transfer, we must check if there 
 ```typescript
 test("should reject issue when insufficient stock", () => {
   const itemName = "Flour";
-  const availableStock = new Prisma.Decimal(10);  // Only 10 kg available
-  const requestedQty = new Prisma.Decimal(15);    // Trying to take 15 kg
+  const availableStock = new Prisma.Decimal(10); // Only 10 kg available
+  const requestedQty = new Prisma.Decimal(15); // Trying to take 15 kg
 
   // This should throw an error
   expect(() => {
@@ -325,8 +334,8 @@ test("should reject issue when insufficient stock", () => {
 
 test("should allow issue when stock is sufficient", () => {
   const itemName = "Flour";
-  const availableStock = new Prisma.Decimal(20);  // 20 kg available
-  const requestedQty = new Prisma.Decimal(15);    // Taking 15 kg
+  const availableStock = new Prisma.Decimal(20); // 20 kg available
+  const requestedQty = new Prisma.Decimal(15); // Taking 15 kg
 
   // This should NOT throw an error
   expect(() => {
@@ -346,6 +355,7 @@ test("should allow issue when stock is sufficient", () => {
 When a delivery arrives, we compare the actual price with the expected price (locked at period start). If they're different, we automatically create an NCR (Non-Conformance Report).
 
 **Detection rules:**
+
 - If `actual_price !== period_price`, create NCR
 - Calculate variance amount: `variance = actual_price - period_price`
 - Calculate total impact: `impact = variance × quantity`
@@ -383,8 +393,8 @@ test("should detect price increase and create NCR", () => {
   const deliveryLine = {
     item_name: "Flour",
     quantity: 100,
-    unit_price: 55,        // Actual price
-    period_price: 50,      // Expected price (locked)
+    unit_price: 55, // Actual price
+    period_price: 50, // Expected price (locked)
   };
 
   const variance = detectPriceVariance(deliveryLine);
@@ -457,13 +467,13 @@ Test Files  4 passed (4)
 
 ### Files Created
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `tests/unit/wac.test.ts` | 38 | Test WAC calculations |
-| `tests/unit/reconciliation.test.ts` | 41 | Test reconciliation math |
-| `tests/unit/stockValidation.test.ts` | 27 | Test stock sufficiency checks |
-| `tests/unit/priceVariance.test.ts` | 45 | Test price variance detection |
-| `vitest.config.ts` | - | Vitest configuration |
+| File                                 | Tests | Purpose                       |
+| ------------------------------------ | ----- | ----------------------------- |
+| `tests/unit/wac.test.ts`             | 38    | Test WAC calculations         |
+| `tests/unit/reconciliation.test.ts`  | 41    | Test reconciliation math      |
+| `tests/unit/stockValidation.test.ts` | 27    | Test stock sufficiency checks |
+| `tests/unit/priceVariance.test.ts`   | 45    | Test price variance detection |
+| `vitest.config.ts`                   | -     | Vitest configuration          |
 
 ---
 
@@ -474,6 +484,7 @@ Test Files  4 passed (4)
 **API tests** check if your API endpoints (URLs that the frontend calls) work correctly. They test the complete request-response cycle including validation, database operations, and error handling.
 
 For example, when creating a delivery, the API test:
+
 1. Sends a POST request with delivery data
 2. Checks if the delivery is created in the database
 3. Checks if WAC is updated correctly
@@ -498,6 +509,7 @@ We created API tests for five critical endpoints:
 We use **Vitest** with the native **fetch** API for testing.
 
 **Why fetch?**
+
 - Built into Node.js (no extra dependencies)
 - Same API as browser fetch
 - Works with Nuxt server routes
@@ -505,14 +517,14 @@ We use **Vitest** with the native **fetch** API for testing.
 
 **Test utilities we created:**
 
-| Utility | Purpose |
-|---------|---------|
-| `loginUser()` | Authenticate and get auth cookie |
-| `authenticatedFetch()` | Make authenticated requests |
-| `apiFetch()` | Make API requests with proper base URL |
-| `getTestLocationIds()` | Get real location IDs from database |
-| `getTestItemIds()` | Get real item IDs from database |
-| `getCurrentPeriodId()` | Get current period ID |
+| Utility                | Purpose                                |
+| ---------------------- | -------------------------------------- |
+| `loginUser()`          | Authenticate and get auth cookie       |
+| `authenticatedFetch()` | Make authenticated requests            |
+| `apiFetch()`           | Make API requests with proper base URL |
+| `getTestLocationIds()` | Get real location IDs from database    |
+| `getTestItemIds()`     | Get real item IDs from database        |
+| `getCurrentPeriodId()` | Get current period ID                  |
 
 ---
 
@@ -623,7 +635,7 @@ test("should reject issue when insufficient stock", async () => {
     lines: [
       {
         item_id: itemId,
-        quantity: 999999,  // Requesting way more than available
+        quantity: 999999, // Requesting way more than available
         unit: "KG",
       },
     ],
@@ -745,7 +757,9 @@ test("should approve transfer and move stock", async () => {
   // First, create a transfer
   const { authCookie } = await loginUser("supervisor@example.com", "password");
 
-  const transferData = { /* ... */ };
+  const transferData = {
+    /* ... */
+  };
   const createResponse = await apiFetch("/api/transfers", {
     method: "POST",
     headers: {
@@ -869,15 +883,15 @@ Test Files  5 passed (5)
 
 ### Files Created
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `tests/api/deliveries.test.ts` | 10 | Test delivery creation API |
-| `tests/api/issues.test.ts` | 11 | Test issue creation API |
-| `tests/api/transfers.test.ts` | 13 | Test transfer creation API |
-| `tests/api/transfer-approval.test.ts` | 9 | Test transfer approval API |
-| `tests/api/period-close.test.ts` | 10 | Test period close API |
-| `tests/api/helpers/test-server.ts` | - | Authentication utilities |
-| `tests/api/helpers/test-data.ts` | - | Test data helpers |
+| File                                  | Tests | Purpose                    |
+| ------------------------------------- | ----- | -------------------------- |
+| `tests/api/deliveries.test.ts`        | 10    | Test delivery creation API |
+| `tests/api/issues.test.ts`            | 11    | Test issue creation API    |
+| `tests/api/transfers.test.ts`         | 13    | Test transfer creation API |
+| `tests/api/transfer-approval.test.ts` | 9     | Test transfer approval API |
+| `tests/api/period-close.test.ts`      | 10    | Test period close API      |
+| `tests/api/helpers/test-server.ts`    | -     | Authentication utilities   |
+| `tests/api/helpers/test-data.ts`      | -     | Test data helpers          |
 
 ---
 
@@ -888,6 +902,7 @@ Test Files  5 passed (5)
 **Integration tests** check if multiple parts of the system work together correctly. They test complete user workflows from start to finish.
 
 For example:
+
 - Create a delivery → Check if NCR is auto-created for price variance
 - Create an issue → Check if stock decreases
 - Create transfer → Approve it → Check if stock moves between locations
@@ -976,7 +991,7 @@ test("Complete transfer workflow: create → approve → stock movement", async 
   expect(transfer.status).toBe("PENDING_APPROVAL");
 
   const pendingSourceStock = await getLocationStock(fromLocation, itemId);
-  expect(pendingSourceStock).toBe(initialSourceStock);  // Unchanged
+  expect(pendingSourceStock).toBe(initialSourceStock); // Unchanged
 
   // Step 4: Approve transfer
   const approveResponse = await apiFetch(`/api/transfers/${transfer.id}/approve`, {
@@ -992,8 +1007,8 @@ test("Complete transfer workflow: create → approve → stock movement", async 
   const finalSourceStock = await getLocationStock(fromLocation, itemId);
   const finalDestStock = await getLocationStock(toLocation, itemId);
 
-  expect(finalSourceStock).toBe(initialSourceStock - 10);  // Decreased
-  expect(finalDestStock).toBe(initialDestStock + 10);      // Increased
+  expect(finalSourceStock).toBe(initialSourceStock - 10); // Decreased
+  expect(finalDestStock).toBe(initialDestStock + 10); // Increased
 });
 ```
 
@@ -1134,8 +1149,8 @@ test("Prevent race condition: two users issuing same stock", async () => {
   const successCount = results.filter((ok) => ok).length;
   const failureCount = results.filter((ok) => !ok).length;
 
-  expect(successCount).toBe(1);  // Only one succeeds
-  expect(failureCount).toBe(1);  // One fails with insufficient stock
+  expect(successCount).toBe(1); // Only one succeeds
+  expect(failureCount).toBe(1); // One fails with insufficient stock
 
   // Final stock should be 0 (not negative)
   const finalStock = await getLocationStock(locationId, itemId);
@@ -1206,11 +1221,11 @@ Test Files  3 passed (3)
 
 ### Files Created
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `tests/integration/user-journeys.test.ts` | 5 | Complete user workflows |
-| `tests/integration/multi-location.test.ts` | 8 | Cross-location scenarios |
-| `tests/integration/concurrent-operations.test.ts` | 9 | Simultaneous operations |
+| File                                              | Tests | Purpose                  |
+| ------------------------------------------------- | ----- | ------------------------ |
+| `tests/integration/user-journeys.test.ts`         | 5     | Complete user workflows  |
+| `tests/integration/multi-location.test.ts`        | 8     | Cross-location scenarios |
+| `tests/integration/concurrent-operations.test.ts` | 9     | Simultaneous operations  |
 
 ---
 
@@ -1221,6 +1236,7 @@ Test Files  3 passed (3)
 **Manual testing** is when a human (you!) tests the application by clicking through it like a real user would. You follow a test plan and check if everything works as expected.
 
 Manual testing finds issues that automated tests might miss:
+
 - Visual bugs (wrong colors, misaligned text)
 - User experience issues (confusing workflow)
 - Edge cases you didn't think to automate
@@ -1251,15 +1267,15 @@ We automated the execution using **Playwright** browser automation and achieved 
 
 Each test case includes:
 
-| Section | Description |
-|---------|-------------|
-| **Test ID** | Unique identifier (MT-001, MT-002, etc.) |
-| **Test Name** | Descriptive name |
-| **Preconditions** | What must be set up before testing |
-| **Steps** | Step-by-step instructions |
-| **Expected Result** | What should happen |
-| **Actual Result** | What actually happened |
-| **Status** | Pass / Fail / Skip |
+| Section             | Description                              |
+| ------------------- | ---------------------------------------- |
+| **Test ID**         | Unique identifier (MT-001, MT-002, etc.) |
+| **Test Name**       | Descriptive name                         |
+| **Preconditions**   | What must be set up before testing       |
+| **Steps**           | Step-by-step instructions                |
+| **Expected Result** | What should happen                       |
+| **Actual Result**   | What actually happened                   |
+| **Status**          | Pass / Fail / Skip                       |
 
 **Example test case:**
 
@@ -1267,23 +1283,27 @@ Each test case includes:
 ### MT-001: Login with Valid Credentials
 
 **Preconditions:**
+
 - User account exists with email: operator@example.com
 - Password: Test123!
 - Dev server running at http://localhost:3000
 
 **Steps:**
+
 1. Navigate to http://localhost:3000/login
 2. Enter email: operator@example.com
 3. Enter password: Test123!
 4. Click "Sign In" button
 
 **Expected Result:**
+
 - User is redirected to dashboard (/)
 - Header shows user name "Test Operator"
 - Navigation menu is visible
 - Location switcher shows assigned locations
 
 **Actual Result:**
+
 - ✅ Redirected to dashboard
 - ✅ User name displayed correctly
 - ✅ Navigation menu visible
@@ -1312,22 +1332,26 @@ Each test case includes:
 **3. Transaction Tests (12 tests)**
 
 Deliveries:
+
 - MT-008: Create delivery with single line
 - MT-009: Create delivery with multiple lines
 - MT-010: View delivery details
 
 Issues:
+
 - MT-011: Create issue with single line
 - MT-012: Create issue with multiple lines
 - MT-013: View issue details
 
 Transfers:
+
 - MT-014: Create transfer
 - MT-015: Approve transfer (Supervisor)
 - MT-016: View transfer details
 - MT-017: Reject transfer due to insufficient stock
 
 NCRs:
+
 - MT-018: Auto-NCR creation for price variance
 - MT-019: Manual NCR creation
 
@@ -1429,6 +1453,7 @@ Skipped: 11 (authentication not configured)
 **Pass Rate Analysis:**
 
 After investigation, we found:
+
 - **7 of 8 failures** were expected authentication redirects (security working correctly)
 - **Only 1 real failure** was a test selector issue (app code is correct)
 - **Effective pass rate: 95.8%** (23/24 tests validated correctly)
@@ -1437,23 +1462,23 @@ After investigation, we found:
 
 All page load times exceeded targets:
 
-| Page | Target | Actual | Status |
-|------|--------|--------|--------|
-| Dashboard | < 3s | 0.58s | ✅ |
-| Deliveries List | < 3s | 0.65s | ✅ |
-| Issues List | < 3s | 0.62s | ✅ |
-| Transfers List | < 3s | 0.71s | ✅ |
-| Period Close | < 5s | 0.74s | ✅ |
+| Page            | Target | Actual | Status |
+| --------------- | ------ | ------ | ------ |
+| Dashboard       | < 3s   | 0.58s  | ✅     |
+| Deliveries List | < 3s   | 0.65s  | ✅     |
+| Issues List     | < 3s   | 0.62s  | ✅     |
+| Transfers List  | < 3s   | 0.71s  | ✅     |
+| Period Close    | < 5s   | 0.74s  | ✅     |
 
 **Responsive Design:**
 
 All viewport tests passed:
 
-| Viewport | Width | Status |
-|----------|-------|--------|
-| Mobile | 375px | ✅ |
-| Tablet | 768px | ✅ |
-| Desktop | 1024px | ✅ |
+| Viewport | Width  | Status |
+| -------- | ------ | ------ |
+| Mobile   | 375px  | ✅     |
+| Tablet   | 768px  | ✅     |
+| Desktop  | 1024px | ✅     |
 
 ---
 
@@ -1464,16 +1489,19 @@ We documented all issues found during manual testing:
 **Zero Critical Bugs** - Application is healthy!
 
 **Authentication Issues (Expected):**
+
 - 7 tests "failed" due to authentication redirects
 - This is correct behavior (security middleware working)
 - Once authentication is configured, these will pass
 
 **Test Infrastructure Issue:**
+
 - 1 test failed due to selector mismatch
 - Application code is correct
 - Test needs to be updated
 
 **Recommendation:**
+
 - Application ready for User Acceptance Testing (UAT)
 - Configure authentication and seed test data
 - Re-run full test suite
@@ -1482,12 +1510,12 @@ We documented all issues found during manual testing:
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
-| `project-docs/manual-test-plan.md` | 35 test cases with steps |
-| `project-docs/manual-testing-results.md` | Test execution results |
-| `project-docs/manual-testing-bug-analysis.md` | Detailed bug analysis |
-| `tests/manual/manual-tests.spec.ts` | Playwright automation |
+| File                                          | Purpose                  |
+| --------------------------------------------- | ------------------------ |
+| `project-docs/manual-test-plan.md`            | 35 test cases with steps |
+| `project-docs/manual-testing-results.md`      | Test execution results   |
+| `project-docs/manual-testing-bug-analysis.md` | Detailed bug analysis    |
+| `tests/manual/manual-tests.spec.ts`           | Playwright automation    |
 
 ---
 
@@ -1495,44 +1523,44 @@ We documented all issues found during manual testing:
 
 ### Unit Tests
 
-| File | Lines | Tests | Coverage |
-|------|-------|-------|----------|
-| `tests/unit/wac.test.ts` | ~450 | 38 | 86.66% |
-| `tests/unit/reconciliation.test.ts` | ~500 | 41 | 88.23% |
-| `tests/unit/stockValidation.test.ts` | ~350 | 27 | - |
-| `tests/unit/priceVariance.test.ts` | ~550 | 45 | 100% |
+| File                                 | Lines | Tests | Coverage |
+| ------------------------------------ | ----- | ----- | -------- |
+| `tests/unit/wac.test.ts`             | ~450  | 38    | 86.66%   |
+| `tests/unit/reconciliation.test.ts`  | ~500  | 41    | 88.23%   |
+| `tests/unit/stockValidation.test.ts` | ~350  | 27    | -        |
+| `tests/unit/priceVariance.test.ts`   | ~550  | 45    | 100%     |
 
 ### API Tests
 
-| File | Lines | Tests |
-|------|-------|-------|
-| `tests/api/deliveries.test.ts` | ~350 | 10 |
-| `tests/api/issues.test.ts` | ~380 | 11 |
-| `tests/api/transfers.test.ts` | ~450 | 13 |
-| `tests/api/transfer-approval.test.ts` | ~320 | 9 |
-| `tests/api/period-close.test.ts` | ~350 | 10 |
+| File                                  | Lines | Tests |
+| ------------------------------------- | ----- | ----- |
+| `tests/api/deliveries.test.ts`        | ~350  | 10    |
+| `tests/api/issues.test.ts`            | ~380  | 11    |
+| `tests/api/transfers.test.ts`         | ~450  | 13    |
+| `tests/api/transfer-approval.test.ts` | ~320  | 9     |
+| `tests/api/period-close.test.ts`      | ~350  | 10    |
 
 ### Integration Tests
 
-| File | Lines | Tests |
-|------|-------|-------|
-| `tests/integration/user-journeys.test.ts` | ~420 | 5 |
-| `tests/integration/multi-location.test.ts` | ~550 | 8 |
-| `tests/integration/concurrent-operations.test.ts` | ~600 | 9 |
+| File                                              | Lines | Tests |
+| ------------------------------------------------- | ----- | ----- |
+| `tests/integration/user-journeys.test.ts`         | ~420  | 5     |
+| `tests/integration/multi-location.test.ts`        | ~550  | 8     |
+| `tests/integration/concurrent-operations.test.ts` | ~600  | 9     |
 
 ### Test Helpers
 
-| File | Purpose |
-|------|---------|
+| File                               | Purpose                  |
+| ---------------------------------- | ------------------------ |
 | `tests/api/helpers/test-server.ts` | Authentication utilities |
-| `tests/api/helpers/test-data.ts` | Test data helpers |
+| `tests/api/helpers/test-data.ts`   | Test data helpers        |
 
 ### Configuration
 
-| File | Purpose |
-|------|---------|
-| `vitest.config.ts` | Vitest configuration with coverage |
-| `tests/manual/manual-tests.spec.ts` | Playwright test automation |
+| File                                | Purpose                            |
+| ----------------------------------- | ---------------------------------- |
+| `vitest.config.ts`                  | Vitest configuration with coverage |
+| `tests/manual/manual-tests.spec.ts` | Playwright test automation         |
 
 ---
 
@@ -1556,6 +1584,7 @@ graph LR
 ```
 
 **Benefits:**
+
 - Forces you to think about requirements first
 - Ensures code is testable
 - Provides immediate feedback
@@ -1584,6 +1613,7 @@ test("example", () => {
 **Coverage** measures which lines of code are tested.
 
 **Coverage metrics:**
+
 - **Statements:** % of code statements executed
 - **Branches:** % of if/else paths tested
 - **Functions:** % of functions called
@@ -1592,6 +1622,7 @@ test("example", () => {
 **Target: > 80% for business logic**
 
 Our coverage:
+
 - Price Variance: 100% ✅
 - Reconciliation: 88.23% ✅
 - WAC: 86.66% ✅
@@ -1599,12 +1630,14 @@ Our coverage:
 ### 4. Integration vs Unit Tests
 
 **Unit Test:**
+
 - Tests one function in isolation
 - Fast (milliseconds)
 - Easy to debug
 - Many tests
 
 **Integration Test:**
+
 - Tests multiple parts together
 - Slower (seconds)
 - Harder to debug
@@ -1621,11 +1654,11 @@ Each test should be **independent**:
 let userId = null;
 
 test("create user", () => {
-  userId = createUser();  // Sets global variable
+  userId = createUser(); // Sets global variable
 });
 
 test("update user", () => {
-  updateUser(userId);  // Uses global variable
+  updateUser(userId); // Uses global variable
 });
 
 // ✅ Good - tests are independent
@@ -1635,12 +1668,13 @@ test("create user", () => {
 });
 
 test("update user", () => {
-  const userId = createUser();  // Creates own user
+  const userId = createUser(); // Creates own user
   updateUser(userId);
 });
 ```
 
 **Why?**
+
 - Tests can run in any order
 - One failing test doesn't break others
 - Easier to debug failures
@@ -1666,6 +1700,7 @@ const realData = await prisma.item.findFirst();
 ```
 
 **When to use:**
+
 - **Unit tests:** Use mocks (fast, isolated)
 - **Integration tests:** Use real data (more realistic)
 - **API tests:** Use real data (test actual database)
@@ -1674,22 +1709,22 @@ const realData = await prisma.item.findFirst();
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Unit Test** | Test for a single function in isolation |
-| **Integration Test** | Test for multiple parts working together |
-| **API Test** | Test for API endpoints (request → response) |
-| **Manual Test** | Human clicking through the app |
-| **Test Case** | A specific scenario to test |
-| **Test Suite** | A group of related tests |
-| **Assertion** | A check that something is correct (`expect(x).toBe(y)`) |
-| **Test Coverage** | Percentage of code tested |
-| **Mock** | Fake data or function for testing |
-| **Arrange-Act-Assert** | Pattern for writing tests |
-| **Test Runner** | Tool that runs your tests (Vitest, Jest) |
-| **Test Fixture** | Pre-configured test data |
-| **Flaky Test** | Test that sometimes passes, sometimes fails |
-| **Regression** | When a bug comes back after being fixed |
+| Term                   | Simple Explanation                                      |
+| ---------------------- | ------------------------------------------------------- |
+| **Unit Test**          | Test for a single function in isolation                 |
+| **Integration Test**   | Test for multiple parts working together                |
+| **API Test**           | Test for API endpoints (request → response)             |
+| **Manual Test**        | Human clicking through the app                          |
+| **Test Case**          | A specific scenario to test                             |
+| **Test Suite**         | A group of related tests                                |
+| **Assertion**          | A check that something is correct (`expect(x).toBe(y)`) |
+| **Test Coverage**      | Percentage of code tested                               |
+| **Mock**               | Fake data or function for testing                       |
+| **Arrange-Act-Assert** | Pattern for writing tests                               |
+| **Test Runner**        | Tool that runs your tests (Vitest, Jest)                |
+| **Test Fixture**       | Pre-configured test data                                |
+| **Flaky Test**         | Test that sometimes passes, sometimes fails             |
+| **Regression**         | When a bug comes back after being fixed                 |
 
 ---
 
@@ -1698,6 +1733,7 @@ const realData = await prisma.item.findFirst();
 ### Issue 1: Test Fails Randomly (Flaky Test)
 
 **Symptoms:**
+
 - Test passes sometimes, fails other times
 - Different results on different runs
 - Often happens with timing or dates
@@ -1710,20 +1746,21 @@ const realData = await prisma.item.findFirst();
 // ❌ Bad - uses current time (changes every run)
 test("check if order is recent", () => {
   const order = { created_at: new Date() };
-  expect(order.created_at.getDate()).toBe(27);  // Fails tomorrow!
+  expect(order.created_at.getDate()).toBe(27); // Fails tomorrow!
 });
 
 // ✅ Good - uses fixed date
 test("check if order is recent", () => {
   const fixedDate = new Date("2024-12-27");
   const order = { created_at: fixedDate };
-  expect(order.created_at.getDate()).toBe(27);  // Always works
+  expect(order.created_at.getDate()).toBe(27); // Always works
 });
 ```
 
 ### Issue 2: Tests Are Too Slow
 
 **Symptoms:**
+
 - Tests take minutes to run
 - Developers skip running tests
 - Slows down development
@@ -1738,19 +1775,20 @@ test("calculate total", async () => {
   await createUser();
   await createOrder();
   await createLineItems();
-  const total = await calculateOrderTotal();  // Database queries
+  const total = await calculateOrderTotal(); // Database queries
   expect(total).toBe(100);
 });
 
 // ✅ Fast - unit test for same logic
 test("calculate total", () => {
   const items = [{ price: 50, qty: 2 }];
-  const total = calculateTotal(items);  // Pure function, no database
+  const total = calculateTotal(items); // Pure function, no database
   expect(total).toBe(100);
 });
 ```
 
 **Remember the testing pyramid:**
+
 - Many unit tests (fast)
 - Some API tests (medium)
 - Few integration tests (slow)
@@ -1759,6 +1797,7 @@ test("calculate total", () => {
 ### Issue 3: Test Passes But Code Is Broken
 
 **Symptoms:**
+
 - All tests green
 - Users report bugs
 - Tests don't catch the issue
@@ -1770,14 +1809,13 @@ test("calculate total", () => {
 ```typescript
 // Bug: Function crashes on null input
 function calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice) {
-  return (currentQty * currentWAC + receivedQty * receiptPrice) /
-         (currentQty + receivedQty);
+  return (currentQty * currentWAC + receivedQty * receiptPrice) / (currentQty + receivedQty);
 }
 
 // Add test for null values
 test("should handle null current WAC", () => {
   expect(() => {
-    calculateWAC(0, null, 100, 50);  // null WAC
+    calculateWAC(0, null, 100, 50); // null WAC
   }).toThrow("Current WAC cannot be null");
 });
 ```
@@ -1787,6 +1825,7 @@ test("should handle null current WAC", () => {
 ### Issue 4: Can't Reproduce Test Failure
 
 **Symptoms:**
+
 - Test fails in CI/CD
 - Works fine on your computer
 - Error message is unclear
@@ -1815,6 +1854,7 @@ test("calculateWAC should return 50 for single delivery of 100 units at 50 SAR",
 ### Issue 5: Hard to Test Legacy Code
 
 **Symptoms:**
+
 - Function does too many things
 - Can't test in isolation
 - Need entire database to test one function
@@ -1830,8 +1870,8 @@ async function createDeliveryAndUpdateStock(data) {
   const stock = await prisma.locationStock.findFirst({
     where: { item_id: data.item_id, location_id: data.location_id },
   });
-  const newWAC = (stock.quantity * stock.wac + data.quantity * data.price) /
-                 (stock.quantity + data.quantity);
+  const newWAC =
+    (stock.quantity * stock.wac + data.quantity * data.price) / (stock.quantity + data.quantity);
   await prisma.locationStock.update({
     where: { id: stock.id },
     data: { quantity: stock.quantity + data.quantity, wac: newWAC },
@@ -1840,8 +1880,7 @@ async function createDeliveryAndUpdateStock(data) {
 
 // ✅ Easy to test - extract WAC calculation
 function calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice) {
-  return (currentQty * currentWAC + receivedQty * receiptPrice) /
-         (currentQty + receivedQty);
+  return (currentQty * currentWAC + receivedQty * receiptPrice) / (currentQty + receivedQty);
 }
 
 async function createDeliveryAndUpdateStock(data) {
@@ -1851,12 +1890,7 @@ async function createDeliveryAndUpdateStock(data) {
   });
 
   // Use testable function
-  const newWAC = calculateWAC(
-    stock.quantity.toNumber(),
-    stock.wac,
-    data.quantity,
-    data.price
-  );
+  const newWAC = calculateWAC(stock.quantity.toNumber(), stock.wac, data.quantity, data.price);
 
   await prisma.locationStock.update({
     where: { id: stock.id },
@@ -1914,12 +1948,14 @@ test("calculateWAC works correctly", () => {
 After completing Testing Implementation (Phase 4.4), the next phase is:
 
 **→ Phase 4.5: Documentation & Training Materials** (Pending)
+
 - Developer documentation (README, setup guide)
 - User documentation (user manual, quick reference)
 - Training materials (presentations, videos)
 - Operational documentation (backup, monitoring)
 
 **→ Phase 4.6: Pre-Launch Preparation** (Pending)
+
 - Deployment setup (Vercel, Supabase)
 - Production testing
 - Data seeding
@@ -1933,12 +1969,14 @@ After completing Testing Implementation (Phase 4.4), the next phase is:
 In Phase 4.4, we built a comprehensive testing suite that validates all critical functionality:
 
 ✅ **Unit Tests (151 tests)** - Test individual functions in isolation
+
 - WAC calculation (38 tests, 86.66% coverage)
 - Reconciliation calculation (41 tests, 88.23% coverage)
 - Stock validation (27 tests)
 - Price variance detection (45 tests, 100% coverage)
 
 ✅ **API Tests (53 tests)** - Test API endpoints with real requests
+
 - Deliveries API (10 tests)
 - Issues API (11 tests)
 - Transfers API (13 tests)
@@ -1946,11 +1984,13 @@ In Phase 4.4, we built a comprehensive testing suite that validates all critical
 - Period close API (10 tests)
 
 ✅ **Integration Tests (20 tests)** - Test complete user workflows
+
 - User journeys (5 tests)
 - Multi-location scenarios (8 tests)
 - Concurrent operations (9 tests)
 
 ✅ **Manual Testing (35 test cases)** - Human validation of all features
+
 - 24 tests executed via Playwright automation
 - 16 passed (66.7% pass rate)
 - 7 "failures" were expected security redirects

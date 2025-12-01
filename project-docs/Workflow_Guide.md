@@ -82,11 +82,11 @@ The new Stock Management System helps you:
 
 ## Who Uses What
 
-| Role | What Youâ€™ll Do |
-| --- | --- |
-| **Operator** (Store/Kitchen Staff) | Post deliveries and issues; check stock levels |
-| **Supervisor** | Review numbers, enter adjustments, print reports |
-| **Admin** | Manage item catalog, close periods, set permissions |
+| Role                               | What Youâ€™ll Do                                   |
+| ---------------------------------- | --------------------------------------------------- |
+| **Operator** (Store/Kitchen Staff) | Post deliveries and issues; check stock levels      |
+| **Supervisor**                     | Review numbers, enter adjustments, print reports    |
+| **Admin**                          | Manage item catalog, close periods, set permissions |
 
 ---
 
@@ -136,6 +136,7 @@ CLOSE PERIOD (Day 31)
 - **Extra:** Guest or additional meals
 
 **Example:**
+
 - Monday: 45 crew + 3 extra = 48 mandays
 - Tuesday: 45 crew + 0 extra = 45 mandays
 
@@ -149,16 +150,17 @@ CLOSE PERIOD (Day 31)
 
 **What you see:** Your complete item catalog
 
-| Column | What It Shows |
-| --- | --- |
-| Code | Unique identifier (e.g., â€œCHK001â€) |
-| Name | Item description (e.g., â€œChicken Breastâ€) |
-| Unit | How itâ€™s measured (KG, EA, LTR) |
-| Category | Group (Meat, Dairy, Vegetables, etc.) |
-| On-Hand | Current quantity in stock |
-| Cost (WAC) | Weighted Average Cost per unit |
+| Column     | What It Shows                                |
+| ---------- | -------------------------------------------- |
+| Code       | Unique identifier (e.g., â€œCHK001â€)        |
+| Name       | Item description (e.g., â€œChicken Breastâ€) |
+| Unit       | How itâ€™s measured (KG, EA, LTR)           |
+| Category   | Group (Meat, Dairy, Vegetables, etc.)        |
+| On-Hand    | Current quantity in stock                    |
+| Cost (WAC) | Weighted Average Cost per unit               |
 
 **How it updates automatically:**
+
 - âœ… **Deliveries** â†’ On-hand increases, Cost recalculates
 - âœ… **Issues** â†’ On-hand decreases, Cost stays the same
 
@@ -171,11 +173,13 @@ CLOSE PERIOD (Day 31)
 **What you do:** Manage purchase requests and orders
 
 **The Flow:**
+
 1. **PRF (Purchase Request Form)** - Draft what you need
 2. **Approve** - Supervisor reviews and approves
 3. **PO (Purchase Order)** - Create official order for supplier
 
 **Statuses:**
+
 - PRF: Draft â†’ Approved â†’ PO Created
 - PO: Open â†’ Closed
 
@@ -188,6 +192,7 @@ CLOSE PERIOD (Day 31)
 **What you do:** Record what actually arrived
 
 **Steps:**
+
 1. Select supplier
 2. Optionally link to a PO
 3. Enter invoice number and delivery note
@@ -209,6 +214,7 @@ AFTER:
 ```
 
 **Why it matters:**
+
 - Updates your stock quantity immediately
 - Recalculates the average cost (WAC)
 - Feeds into Dashboard and Reconciliations
@@ -222,10 +228,13 @@ AFTER:
 **What you do:** Record what the kitchen uses
 
 **Steps:**
+
 1. Select date
 2. Choose cost center:
+
 - **Food** - Kitchen operations
 - **Clean** - Cleaning supplies
+
 3. Add lines: Item, Quantity
 4. Click â€œPost Issueâ€
 
@@ -244,6 +253,7 @@ AFTER:
 ```
 
 **Important Rules:**
+
 - â›” **No negative stock** - System blocks issues that exceed on-hand
 - ðŸ’° **Current cost** - Uses the WAC at the moment you post
 - ðŸ”’ **Cost doesnâ€™t change** - Issues donâ€™t recalculate item costs
@@ -255,11 +265,13 @@ AFTER:
 **What you do:** Log problems with deliveries
 
 **When to use:**
+
 - Items arrived damaged
 - Quantities short
 - Items expired or poor quality
 
 **Information to record:**
+
 - Which delivery (reference)
 - Which item line
 - Reason (damaged/short/expired)
@@ -267,6 +279,7 @@ AFTER:
 - Value of the problem
 
 **Status tracking:**
+
 - Open â†’ Sent to Supplier â†’ Credited â†’ (or Rejected)
 
 **Why it matters:** Credited values reduce your month-end Consumption, so youâ€™re not paying for problems.
@@ -277,13 +290,14 @@ AFTER:
 
 **What you see:** Real-time inventory snapshot
 
-| Item | On-Hand | Cost (WAC) | Total Value |
-| --- | --- | --- | --- |
-| Chicken Breast | 52 KG | SAR 27.32 | SAR 1,420.64 |
-| Rice | 120 KG | SAR 4.50 | SAR 540.00 |
-| **TOTAL** |  |  | **SAR 1,960.64** |
+| Item           | On-Hand | Cost (WAC) | Total Value      |
+| -------------- | ------- | ---------- | ---------------- |
+| Chicken Breast | 52 KG   | SAR 27.32  | SAR 1,420.64     |
+| Rice           | 120 KG  | SAR 4.50   | SAR 540.00       |
+| **TOTAL**      |         |            | **SAR 1,960.64** |
 
 **Why it matters:**
+
 - Check stock levels anytime
 - Compare to physical counts at month-end
 - See your total inventory value
@@ -306,12 +320,14 @@ CONSUMPTION = Opening Stock
 ```
 
 **Adjustments you enter:**
+
 - **Back-charges** - Costs charged back (subtract)
 - **Condemnations** - Items written off (add)
 - **Credits Due** - Supplier credits from NCRs (subtract)
 - **Others** - Miscellaneous adjustments
 
 **Key Outputs:**
+
 1. **Total Consumption** - What you actually used this month
 2. **Manday Cost** - Consumption Ã· Total Mandays (from POB)
 
@@ -338,16 +354,19 @@ MANDAY COST = SAR 45,000 Ã· 1,350 = SAR 33.33 per person/day
 **What you do:** Lock the month and move forward
 
 **The Checklist:**
+
 1. âœ… All deliveries posted
 2. âœ… All issues posted
 3. âœ… Reconciliations reviewed and complete
 
 **Steps:**
+
 1. Verify checklist is complete
 2. Click â€œClose Periodâ€
 3. Confirm your action
 
 **What happens:**
+
 - ðŸ”’ Period locks (no more edits possible)
 - ðŸ“¸ System saves a permanent snapshot
 - ðŸ”„ Opening stock for next month is set
@@ -362,22 +381,22 @@ MANDAY COST = SAR 45,000 Ã· 1,350 = SAR 33.33 per person/day
 ### Morning
 
 1. **Receive deliveries**
-    - Post in Deliveries & Invoices
-    - Check any damaged items â†’ create NCR if needed
+   - Post in Deliveries & Invoices
+   - Check any damaged items â†’ create NCR if needed
 
 ### Throughout the Day
 
 1. **Kitchen requests items**
-    - Post in Issues (Food or Clean)
-    - Stock decreases automatically
+   - Post in Issues (Food or Clean)
+   - Stock decreases automatically
 2. **Update POB**
-    - Enter todayâ€™s crew and extra meals
+   - Enter todayâ€™s crew and extra meals
 
 ### Anytime
 
 1. **Check Stock Now**
-    - See whatâ€™s on hand
-    - Plan tomorrowâ€™s orders
+   - See whatâ€™s on hand
+   - Plan tomorrowâ€™s orders
 
 ---
 
@@ -433,9 +452,9 @@ MANDAY COST = SAR 45,000 Ã· 1,350 = SAR 33.33 per person/day
 ### ðŸ“ Audit Trail
 
 - Every transaction records:
-    - Who did it
-    - When it was done
-    - What was changed
+  - Who did it
+  - When it was done
+  - What was changed
 - This keeps everything traceable and accountable
 
 ---
@@ -529,4 +548,4 @@ Everything else in the system supports these three simple actions.
 
 ---
 
-*Document Version: 1.0 | Last Updated: October 2025*
+_Document Version: 1.0 | Last Updated: October 2025_

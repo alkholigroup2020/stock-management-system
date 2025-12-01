@@ -1,11 +1,7 @@
 <template>
   <div class="w-full">
     <!-- Loading State -->
-    <LoadingSpinner
-      v-if="loading"
-      text="Loading data..."
-      :size="loadingSize"
-    />
+    <LoadingSpinner v-if="loading" text="Loading data..." :size="loadingSize" />
 
     <!-- Error State -->
     <ErrorAlert
@@ -33,16 +29,8 @@
     <div v-else class="overflow-x-auto">
       <UTable :data="paginatedData" :columns="normalizedColumns">
         <!-- Custom column slots -->
-        <template
-          v-for="column in columns"
-          :key="column.key"
-          #[`${column.key}-data`]="{ row }"
-        >
-          <slot
-            :name="`column-${column.key}`"
-            :row="row"
-            :value="getRowValue(row, column.key)"
-          >
+        <template v-for="column in columns" :key="column.key" #[`${column.key}-data`]="{ row }">
+          <slot :name="`column-${column.key}`" :row="row" :value="getRowValue(row, column.key)">
             {{ getRowValue(row, column.key) }}
           </slot>
         </template>
@@ -60,8 +48,7 @@
       >
         <!-- Page info -->
         <div class="text-caption">
-          Showing {{ startIndex + 1 }} to {{ endIndex }} of
-          {{ data.length }} results
+          Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ data.length }} results
         </div>
 
         <!-- Pagination controls -->

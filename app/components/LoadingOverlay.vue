@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div class="rounded-lg bg-elevated p-6 shadow-xl">
       <!-- Progress Bar (if step-based) -->
       <div v-if="totalSteps && totalSteps > 1" class="mb-4 w-80">
@@ -19,10 +17,7 @@
 
       <!-- Loading Content -->
       <div class="flex items-center gap-4">
-        <UIcon
-          name="i-heroicons-arrow-path"
-          class="h-8 w-8 animate-spin text-primary"
-        />
+        <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
         <div>
           <p class="text-body font-semibold">{{ title }}</p>
           <p v-if="message" class="text-caption">{{ message }}</p>

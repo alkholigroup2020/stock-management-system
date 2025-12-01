@@ -1,4 +1,5 @@
 # Phase 1.2: Database Setup
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -53,6 +54,7 @@ erDiagram
 We created a **cloud database** on Supabase (like renting storage space online).
 
 **What Was Done:**
+
 - Created Supabase account and project
 - Set database region close to Saudi Arabia
 - Got connection credentials (URL, keys)
@@ -60,6 +62,7 @@ We created a **cloud database** on Supabase (like renting storage space online).
 - Enabled daily backups
 
 **Connection Details:**
+
 ```bash
 DATABASE_URL="postgresql://postgres.xxx:[PASSWORD]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true"
 SUPABASE_URL="https://xxx.supabase.co"
@@ -75,6 +78,7 @@ SUPABASE_SERVICE_KEY="eyJhbGc..."
 We set up **Prisma** - a tool that makes it easy to talk to the database using TypeScript code instead of SQL.
 
 **What Was Done:**
+
 - Installed Prisma packages
 - Created `prisma/schema.prisma` file
 - Set up database connection
@@ -82,6 +86,7 @@ We set up **Prisma** - a tool that makes it easy to talk to the database using T
 - Fixed connection issue (switched to Session pooler)
 
 **Important Files:**
+
 ```
 prisma/
   schema.prisma         # Database structure definition
@@ -110,14 +115,15 @@ graph LR
 ```
 
 **Example Usage:**
+
 ```typescript
 // Instead of SQL:
 // SELECT * FROM users WHERE email = 'test@example.com'
 
 // We write:
 const user = await prisma.user.findUnique({
-  where: { email: 'test@example.com' }
-})
+  where: { email: "test@example.com" },
+});
 ```
 
 ---
@@ -128,6 +134,7 @@ const user = await prisma.user.findUnique({
 We defined the **main tables** for users, locations, items, and suppliers.
 
 **What Was Done:**
+
 - Created 5 core models (tables)
 - Created 4 enums (fixed lists of values)
 - Set up relationships between tables
@@ -153,6 +160,7 @@ model User {
 ```
 
 **User Roles:**
+
 - **OPERATOR**: Can post deliveries/issues, view stock
 - **SUPERVISOR**: Can approve transfers, manage reconciliations
 - **ADMIN**: Full access to everything
@@ -173,6 +181,7 @@ model Location {
 ```
 
 **Location Types:**
+
 - **KITCHEN**: Food preparation area
 - **STORE**: Central storage
 - **CENTRAL**: Main depot
@@ -191,6 +200,7 @@ model UserLocation {
 ```
 
 **Access Levels:**
+
 - **VIEW**: Can only view data
 - **POST**: Can create transactions
 - **MANAGE**: Full control
@@ -613,6 +623,7 @@ model NCR {
 ```
 
 **NCR Types:**
+
 - **PRICE_VARIANCE**: Auto-created when delivery price ≠ period price
 - **MANUAL**: Created by users for other issues
 
@@ -719,6 +730,7 @@ graph TB
 We added **indexes** (speed up searches) and verified all **relationships** between tables work correctly.
 
 **What Was Done:**
+
 - Added 23 performance indexes
 - Documented 8 database constraints
 - Verified all relationships (80+ relations)
@@ -726,6 +738,7 @@ We added **indexes** (speed up searches) and verified all **relationships** betw
 **Why Indexes Matter:**
 
 Imagine finding a book in a library:
+
 - ❌ **Without index**: Check every book (slow)
 - ✅ **With index**: Use catalog to find it quickly (fast)
 
@@ -759,6 +772,7 @@ Imagine finding a book in a library:
 We **applied all the schema** to the actual database on Supabase. Now all 22 tables exist!
 
 **What Was Done:**
+
 - Generated Prisma Client
 - Created migration file
 - Applied migration to Supabase
@@ -781,13 +795,13 @@ graph LR
 
 **Tables Created:**
 
-| Category | Tables |
-|----------|--------|
-| **Core** | users, locations, user_locations, items, suppliers |
-| **Period & Stock** | periods, period_locations, item_prices, location_stock |
-| **Transactions** | prfs, purchase_orders, deliveries, delivery_lines, issues, issue_lines |
-| **Transfers** | transfers, transfer_lines |
-| **Controls** | ncrs, pob, reconciliations, approvals |
+| Category           | Tables                                                                 |
+| ------------------ | ---------------------------------------------------------------------- |
+| **Core**           | users, locations, user_locations, items, suppliers                     |
+| **Period & Stock** | periods, period_locations, item_prices, location_stock                 |
+| **Transactions**   | prfs, purchase_orders, deliveries, delivery_lines, issues, issue_lines |
+| **Transfers**      | transfers, transfer_lines                                              |
+| **Controls**       | ncrs, pob, reconciliations, approvals                                  |
 
 **Total:** 22 tables, 14 enums, 81 indexes ✅
 
@@ -799,6 +813,7 @@ graph LR
 We added **test data** to the database so we can start testing the app.
 
 **What Was Done:**
+
 - Created seed script (`prisma/seed.ts`)
 - Added 1 admin user
 - Added 3 test locations
@@ -808,6 +823,7 @@ We added **test data** to the database so we can start testing the app.
 **Seed Data Details:**
 
 **Admin User:**
+
 ```
 Username: admin
 Email: admin@foodstock.local
@@ -816,17 +832,20 @@ Role: ADMIN
 ```
 
 **Locations:**
+
 1. Main Kitchen (MAIN-KIT) - Type: KITCHEN
 2. Central Store (CENTRAL-01) - Type: CENTRAL
 3. Main Warehouse (WH-01) - Type: WAREHOUSE
 
 **Items (15 total):**
+
 - **Dairy** (4): Fresh Milk, Butter, Yogurt, Cheese
 - **Vegetables** (4): Tomatoes, Onions, Carrots, Potatoes
 - **Meat** (3): Chicken Breast, Beef, Lamb
 - **Dry Goods** (4): Rice, Flour, Sugar, Salt
 
 **Running the Seed:**
+
 ```bash
 pnpm db:seed
 ```
@@ -878,6 +897,7 @@ model UserLocation {
 WAC is an inventory costing method that averages the cost of all items.
 
 **Formula:**
+
 ```
 New WAC = (Current Value + Receipt Value) / (Current Qty + Receipt Qty)
 
@@ -887,6 +907,7 @@ Where:
 ```
 
 **Example:**
+
 ```
 Day 1: Buy 100 KG at SAR 10 = SAR 1,000
        WAC = SAR 10
@@ -903,6 +924,7 @@ Day 10: Issue 80 KG
 ### 3. Database Migrations
 
 **Development workflow:**
+
 ```bash
 # Make schema changes in schema.prisma
 # Then:
@@ -912,6 +934,7 @@ pnpm db:migrate dev
 ```
 
 **Production workflow:**
+
 ```bash
 # Never use db:push in production!
 # Use migrations:
@@ -924,54 +947,54 @@ pnpm db:migrate deploy
 // Create
 const user = await prisma.user.create({
   data: {
-    username: 'john',
-    email: 'john@example.com',
-    role: 'OPERATOR'
-  }
-})
+    username: "john",
+    email: "john@example.com",
+    role: "OPERATOR",
+  },
+});
 
 // Read
 const user = await prisma.user.findUnique({
-  where: { email: 'john@example.com' }
-})
+  where: { email: "john@example.com" },
+});
 
 // Update
 const user = await prisma.user.update({
   where: { id: userId },
-  data: { is_active: false }
-})
+  data: { is_active: false },
+});
 
 // Delete
 await prisma.user.delete({
-  where: { id: userId }
-})
+  where: { id: userId },
+});
 
 // Relations
 const user = await prisma.user.findUnique({
   where: { id: userId },
   include: {
-    locations: true,  // Include user locations
-    default_location: true
-  }
-})
+    locations: true, // Include user locations
+    default_location: true,
+  },
+});
 ```
 
 ---
 
 ## Common Database Terms
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Schema** | Blueprint of database structure |
-| **Model** | Table definition in Prisma |
-| **Migration** | Version-controlled database change |
-| **Seed** | Initial test data |
-| **Relation** | Connection between tables |
-| **Index** | Speed up searches |
-| **Constraint** | Rule enforced by database |
-| **Primary Key** | Unique identifier for a row |
-| **Foreign Key** | Reference to another table |
-| **Join Table** | Connects two tables (many-to-many) |
+| Term            | Simple Explanation                 |
+| --------------- | ---------------------------------- |
+| **Schema**      | Blueprint of database structure    |
+| **Model**       | Table definition in Prisma         |
+| **Migration**   | Version-controlled database change |
+| **Seed**        | Initial test data                  |
+| **Relation**    | Connection between tables          |
+| **Index**       | Speed up searches                  |
+| **Constraint**  | Rule enforced by database          |
+| **Primary Key** | Unique identifier for a row        |
+| **Foreign Key** | Reference to another table         |
+| **Join Table**  | Connects two tables (many-to-many) |
 
 ---
 
@@ -982,6 +1005,7 @@ After completing the database setup, we moved to:
 **→ [Phase 1.3: Authentication & Security](phase-1.3-authentication.md)**
 
 In the next phase, we:
+
 - Set up nuxt-auth-utils for sessions
 - Created password hashing utilities
 - Built authentication API routes

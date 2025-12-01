@@ -24,12 +24,14 @@ These scenarios provide hands-on practice for new users to become familiar with 
 ### How to Use This Document
 
 **For Trainers:**
+
 - Use scenarios during training sessions
 - Walk through each scenario step-by-step
 - Encourage trainees to ask questions
 - Verify understanding at each checkpoint
 
 **For Self-Learning:**
+
 - Read scenario completely first
 - Follow steps in the system
 - Check your work against expected results
@@ -40,6 +42,7 @@ These scenarios provide hands-on practice for new users to become familiar with 
 **Important:** These scenarios should be completed in a **test/training environment**, not in production.
 
 **Test Environment Setup:**
+
 - Use test user accounts
 - Use test locations and items
 - Transactions won't affect real data
@@ -60,6 +63,7 @@ These scenarios provide hands-on practice for new users to become familiar with 
 You work in the Kitchen location. Today is Monday, November 27th. A delivery truck has arrived from "ABC Food Suppliers" with your weekly rice order. You have the delivery invoice in hand.
 
 **Invoice Details:**
+
 ```
 Invoice #: INV-2024-1127
 Date: 27/11/2024
@@ -79,16 +83,19 @@ Record this delivery in the system.
 ### Step-by-Step Instructions
 
 **1. Login to System**
+
 - Navigate to the application
 - Login with your operator credentials
 - Verify you see "Kitchen" as your location
 
 **2. Navigate to Deliveries**
+
 - Click **"Deliveries"** in the main menu
 - You should see list of past deliveries
 - Click **"New Delivery"** button (top-right)
 
 **3. Fill Header Information**
+
 ```
 Location: Kitchen (should be pre-selected)
 Supplier: ABC Food Suppliers (select from dropdown)
@@ -98,6 +105,7 @@ Notes: (leave blank for now)
 ```
 
 **4. Add First Item - Rice**
+
 - Click **"Add Item"** button
 - Select item: "Rice, Basmati 5kg"
 - Enter quantity: 10
@@ -105,6 +113,7 @@ Notes: (leave blank for now)
 - Line total should show: SAR 250.00
 
 **5. Add Second Item - Oil**
+
 - Click **"Add Item"** button again
 - Select item: "Oil, Vegetable 1L"
 - Enter quantity: 5
@@ -112,11 +121,13 @@ Notes: (leave blank for now)
 - Line total should show: SAR 42.50
 
 **6. Verify Total**
+
 - Check delivery total: SAR 292.50
 - Compare with invoice total
 - Should match ✓
 
 **7. Submit Delivery**
+
 - Click **"Submit Delivery"** button
 - Wait for confirmation message
 - You should see: "Delivery recorded successfully"
@@ -124,16 +135,19 @@ Notes: (leave blank for now)
 ### Expected Results
 
 **✓ Delivery Created:**
+
 - Delivery number assigned (e.g., DL-2024-11-027)
 - Status: Posted
 - Visible in deliveries list
 
 **✓ Stock Updated:**
+
 - Navigate to Items or Dashboard
 - Rice stock increased by 10 bags
 - Oil stock increased by 5 bottles
 
 **✓ WAC Updated:**
+
 - System recalculated WAC for both items
 - New WAC visible on item details
 
@@ -157,6 +171,7 @@ Notes: (leave blank for now)
 You work in the Store location. A delivery has arrived from "XYZ Supplies" with flour. However, the price on the invoice is higher than usual.
 
 **Invoice Details:**
+
 ```
 Invoice #: INV-2024-1128
 Date: 27/11/2024
@@ -169,6 +184,7 @@ Total: SAR 640.00
 ```
 
 **Known Information:**
+
 - Normal price for flour: SAR 30.00 per bag
 - Price variance: +SAR 2.00 per bag (+6.7%)
 
@@ -179,9 +195,11 @@ Record the delivery even though the price is different. The system will handle t
 ### Step-by-Step Instructions
 
 **1. Navigate to Deliveries**
+
 - Click **"Deliveries"** → **"New Delivery"**
 
 **2. Fill Header Information**
+
 ```
 Location: Store
 Supplier: XYZ Supplies
@@ -191,12 +209,14 @@ Notes: "Price increase noted on invoice"
 ```
 
 **3. Add Item**
+
 - Click **"Add Item"**
 - Select: "Flour, All-Purpose 10kg"
 - Quantity: 20
 - Unit Price: SAR 32.00 (actual invoice price)
 
 **4. Notice Price Variance Warning**
+
 - System should show yellow banner:
   ```
   ⚠ Price Variance Detected
@@ -207,11 +227,13 @@ Notes: "Price increase noted on invoice"
   ```
 
 **5. Verify and Submit**
+
 - Total should be: SAR 640.00
 - Click **"Submit Delivery"**
 - Confirm when prompted
 
 **6. Check NCR Created**
+
 - Navigate to **"NCRs"** menu
 - Find auto-generated NCR
 - Should show:
@@ -226,15 +248,18 @@ Notes: "Price increase noted on invoice"
 ### Expected Results
 
 **✓ Delivery Posted:**
+
 - Flour stock increased by 20 bags
 - Delivery recorded with actual price (SAR 32.00)
 
 **✓ NCR Auto-Created:**
+
 - NCR type: PRICE_VARIANCE
 - Status: Pending Review
 - Assigned to supervisors for disposition
 
 **✓ WAC Updated:**
+
 - WAC recalculated using actual price (SAR 32.00)
 
 ### Self-Check Questions
@@ -245,6 +270,7 @@ Notes: "Price increase noted on invoice"
 4. ❓ Can you still post the delivery even with price variance?
 
 **Answers:**
+
 1. System detected delivery price ≠ locked period price
 2. No - always enter the actual invoice price
 3. Supervisor will review and disposition the NCR
@@ -263,6 +289,7 @@ Notes: "Price increase noted on invoice"
 You work in the Kitchen. The chef has used ingredients for today's meal preparation and has given you the usage list to record.
 
 **Usage List - November 27, 2024:**
+
 ```
 Morning Shift:
 - Rice, Basmati 5kg: 3.5 bags used
@@ -279,9 +306,11 @@ Record this usage as an ISSUE (CONSUMPTION type).
 ### Step-by-Step Instructions
 
 **1. Navigate to Issues**
+
 - Click **"Issues"** → **"New Issue"**
 
 **2. Fill Header**
+
 ```
 Location: Kitchen
 Issue Type: CONSUMPTION
@@ -293,22 +322,26 @@ Notes: "Morning shift meal preparation"
 **3. Add Items**
 
 **Item 1: Rice**
+
 - Click **"Add Item"**
 - Item: "Rice, Basmati 5kg"
 - Quantity: 3.5
 - Check current stock is sufficient (should show available qty)
 
 **Item 2: Oil**
+
 - Click **"Add Item"**
 - Item: "Oil, Vegetable 1L"
 - Quantity: 1.2
 
 **Item 3: Salt**
+
 - Click **"Add Item"**
 - Item: "Salt, Table 1kg"
 - Quantity: 0.5
 
 **4. Submit Issue**
+
 - Verify all quantities
 - Click **"Submit Issue"**
 - Confirm submission
@@ -316,15 +349,18 @@ Notes: "Morning shift meal preparation"
 ### Expected Results
 
 **✓ Issue Posted:**
+
 - Issue number assigned (e.g., IS-2024-11-027)
 - Status: Posted
 
 **✓ Stock Reduced:**
+
 - Rice: -3.5 bags
 - Oil: -1.2 liters
 - Salt: -0.5 kg
 
 **✓ WAC Unchanged:**
+
 - Issue does not recalculate WAC
 - Stock deducted at current WAC
 
@@ -334,6 +370,7 @@ Notes: "Morning shift meal preparation"
 Try to issue 100 bags of Rice (more than available stock).
 
 **What happens?**
+
 - System shows error: "Insufficient stock"
 - Current stock: [X bags]
 - Requested: 100 bags
@@ -354,6 +391,7 @@ Try to issue 100 bags of Rice (more than available stock).
 You work in the Store. A customer requests 50 bottles of Oil, but you suspect you don't have enough stock.
 
 **Request:**
+
 - Oil, Vegetable 1L: 50 bottles
 - Issue type: SALE
 - Reference: CUSTOMER-ORDER-1128
@@ -365,12 +403,15 @@ Attempt to issue the oil, identify the stock shortage, and take appropriate acti
 ### Step-by-Step Instructions
 
 **1. Check Current Stock First**
+
 - Navigate to **"Items"** or **"Dashboard"**
 - Find "Oil, Vegetable 1L"
 - Note current stock (let's say 25 bottles)
 
 **2. Attempt to Create Issue**
+
 - Navigate to **"Issues"** → **"New Issue"**
+
 ```
 Location: Store
 Issue Type: SALE
@@ -379,12 +420,14 @@ Issue Date: 27/11/2024
 ```
 
 **3. Add Item**
+
 - Click **"Add Item"**
 - Item: "Oil, Vegetable 1L"
 - Quantity: 50
 - Notice current stock shows: 25 bottles
 
 **4. Try to Submit**
+
 - Click **"Submit Issue"**
 - System shows error:
   ```
@@ -398,11 +441,13 @@ Issue Date: 27/11/2024
 **5. Take Corrective Action**
 
 **Option A: Partial Issue**
+
 - Change quantity to 25 (available amount)
 - Submit partial issue
 - Note shortage for supervisor
 
 **Option B: Request Transfer**
+
 - Cancel this issue
 - Navigate to **"Transfers"**
 - Create transfer request from another location
@@ -410,6 +455,7 @@ Issue Date: 27/11/2024
 - Complete issue after transfer arrives
 
 **Option C: Contact Supervisor**
+
 - Don't post issue
 - Inform supervisor of shortage
 - Supervisor arranges emergency delivery or transfer
@@ -417,11 +463,13 @@ Issue Date: 27/11/2024
 ### Expected Results
 
 **✓ Understanding:**
+
 - System prevents negative stock
 - Cannot override insufficient stock
 - Must use proper workflow (transfer/delivery)
 
 **✓ Best Practice:**
+
 - Check stock before promising to customer
 - Use dashboard alerts for low stock
 - Plan ahead for transfers/deliveries
@@ -433,6 +481,7 @@ Issue Date: 27/11/2024
 3. ❓ Should you force the issue and manually adjust stock later?
 
 **Answers:**
+
 1. To maintain data integrity and prevent negative inventory
 2. Partial issue, request transfer, order delivery, contact supervisor
 3. No - never manually adjust. Use proper processes.
@@ -452,6 +501,7 @@ Issue Date: 27/11/2024
 You are a Supervisor with access to all locations. An operator at the Kitchen has requested a transfer of flour from Central warehouse because Kitchen stock is low.
 
 **Transfer Request:**
+
 ```
 Transfer #: TR-2024-11-027
 From: Central → To: Kitchen
@@ -471,11 +521,13 @@ Review and approve this transfer request.
 ### Step-by-Step Instructions
 
 **1. Navigate to Transfers**
+
 - Click **"Transfers"** menu
 - Filter: **"Pending Approval"**
 - Find transfer: TR-2024-11-027
 
 **2. Review Transfer Details**
+
 - From: Central
 - To: Kitchen
 - Requester: Maria Garcia
@@ -484,28 +536,33 @@ Review and approve this transfer request.
 **3. Verification Checklist**
 
 **Check 1: Stock Availability at Source**
+
 - Click on "Central" location
 - Check stock for "Flour, All-Purpose 10kg"
 - Verify Central has at least 15 bags
 - ✓ Central has 50 bags available
 
 **Check 2: Business Justification**
+
 - Read reason: "Kitchen running low"
 - Check Kitchen current stock
 - Kitchen has 5 bags (reorder point: 10 bags)
 - ✓ Transfer is justified
 
 **Check 3: Quantity Reasonable**
+
 - Requesting: 15 bags
 - Kitchen min: 10 bags, max: 30 bags
 - After transfer: 5 + 15 = 20 bags (within range)
 - ✓ Quantity reasonable
 
 **Check 4: Period Status**
+
 - Verify current period is OPEN
 - ✓ Transactions allowed
 
 **4. Approve Transfer**
+
 - Click **"Approve Transfer"** button
 - Add approval comment: "Approved - stock justified, source has inventory"
 - Confirm approval
@@ -513,11 +570,13 @@ Review and approve this transfer request.
 **5. Verify Stock Movement**
 
 **Central (Source):**
+
 - Before: 50 bags
 - After: 50 - 15 = 35 bags
 - WAC: Unchanged (source WAC stays same)
 
 **Kitchen (Destination):**
+
 - Before: 5 bags @ SAR 30.00 = SAR 150.00
 - Received: 15 bags @ SAR 30.00 = SAR 450.00
 - After: 20 bags @ SAR 30.00 = SAR 600.00
@@ -526,16 +585,19 @@ Review and approve this transfer request.
 ### Expected Results
 
 **✓ Transfer Approved:**
+
 - Status changed to: COMPLETED
 - Stock moved atomically
 
 **✓ Audit Trail:**
+
 - System records:
   - Who approved: Your name
   - When: Timestamp
   - Comment: Your approval note
 
 **✓ Notifications:**
+
 - Requester notified (if notifications enabled)
 
 ### Self-Check Questions
@@ -545,6 +607,7 @@ Review and approve this transfer request.
 3. ❓ What happens if you reject the transfer?
 
 **Answers:**
+
 1. Reject or approve partial quantity, add comment explaining
 2. No - transfers require approval by a different supervisor
 3. Transfer status changes to REJECTED, stock doesn't move, requester notified
@@ -562,6 +625,7 @@ Review and approve this transfer request.
 It's November 29th, end of the month. You need to complete a physical inventory count for the Store location and reconcile it against the system's book stock.
 
 **Physical Count Sheet:**
+
 ```
 Store Location - Physical Inventory
 Date: 29/11/2024
@@ -578,6 +642,7 @@ Milk, UHT 1L                 | 48.0 liters
 ```
 
 **Book Stock (System):**
+
 ```
 Item                          | Book Qty
 ------------------------------|----------
@@ -596,9 +661,11 @@ Enter the physical count into the system and investigate/document all variances.
 ### Step-by-Step Instructions
 
 **1. Navigate to Reconciliations**
+
 - Click **"Reconciliations"** → **"New Reconciliation"**
 
 **2. Start Reconciliation**
+
 ```
 Location: Store
 Period: November 2024 (auto-selected)
@@ -607,6 +674,7 @@ Notes: "End of month physical inventory"
 ```
 
 **3. System Pre-Fills Book Stock**
+
 - Table shows all items with current book stock
 - Your job: Enter counted quantities
 
@@ -615,31 +683,37 @@ Notes: "End of month physical inventory"
 For each item, enter the physical count:
 
 **Rice:**
+
 - Book: 45.5 bags
 - Counted: 44.0 bags
 - Variance: -1.5 bags (shortage)
 
 **Flour:**
+
 - Book: 38.5 bags
 - Counted: 38.5 bags
 - Variance: 0.0 (perfect match ✓)
 
 **Oil:**
+
 - Book: 20.0 liters
 - Counted: 19.0 liters
 - Variance: -1.0 liter (shortage)
 
 **Salt:**
+
 - Book: 25.0 kg
 - Counted: 24.5 kg
 - Variance: -0.5 kg (shortage)
 
 **Sugar:**
+
 - Book: 30.0 bags
 - Counted: 30.0 bags
 - Variance: 0.0 (perfect match ✓)
 
 **Milk:**
+
 - Book: 50.0 liters
 - Counted: 48.0 liters
 - Variance: -2.0 liters (shortage)
@@ -647,6 +721,7 @@ For each item, enter the physical count:
 **5. Investigate Variances**
 
 **Rice: -1.5 bags (-3.3%)**
+
 - Acceptable threshold: ±2%
 - Variance: 3.3% (slightly over)
 - Investigation:
@@ -654,6 +729,7 @@ For each item, enter the physical count:
   - Add note: "1 bag staff meal not recorded, 0.5 bag spillage during storage"
 
 **Oil: -1.0 liter (-5%)**
+
 - Acceptable threshold: ±3%
 - Variance: 5% (exceeds threshold)
 - Investigation:
@@ -663,10 +739,12 @@ For each item, enter the physical count:
   - Add note: "Investigated - possible container leak, no unrecorded issues found"
 
 **Salt: -0.5 kg (-2%)**
+
 - Within threshold
 - Add note: "Normal consumption variance, within acceptable range"
 
 **Milk: -2.0 liters (-4%)**
+
 - Acceptable threshold: ±3%
 - Variance: 4% (exceeds threshold)
 - Investigation:
@@ -674,11 +752,13 @@ For each item, enter the physical count:
   - Add note: "2 liters expired product discarded, not recorded as waste issue"
 
 **6. Document All Findings**
+
 - For each variance, add clear notes
 - Explain investigation results
 - Note corrective actions
 
 **7. Submit Reconciliation**
+
 - Review all variances one final time
 - Click **"Submit Reconciliation"**
 - System updates book stock to match counted stock
@@ -686,6 +766,7 @@ For each item, enter the physical count:
 **8. Post-Reconciliation Actions**
 
 **Create Waste Issue for Milk:**
+
 - Navigate to **"Issues"** → **"New Issue"**
 - Type: WASTE
 - Item: Milk, UHT 1L
@@ -693,6 +774,7 @@ For each item, enter the physical count:
 - Notes: "Documented via month-end reconciliation - expired product"
 
 **Tighten Controls:**
+
 - Remind team to record all issues immediately
 - Implement daily expiry date checks for milk
 - Investigate oil container for leaks
@@ -700,11 +782,13 @@ For each item, enter the physical count:
 ### Expected Results
 
 **✓ Reconciliation Complete:**
+
 - All variances documented
 - Book stock adjusted to match physical count
 - Audit trail created
 
 **✓ Financial Impact:**
+
 ```
 Rice: -1.5 bags @ SAR 30.00 = -SAR 45.00
 Oil: -1.0 L @ SAR 8.50 = -SAR 8.50
@@ -715,6 +799,7 @@ Total variance: -SAR 64.00 (write-off)
 ```
 
 **✓ Process Improvements Identified:**
+
 - Staff meal recording process
 - Waste disposal documentation
 - Container quality checks
@@ -739,6 +824,7 @@ Total variance: -SAR 64.00 (write-off)
 An operator posted a delivery yesterday with a price variance. An NCR was auto-generated. You need to review and disposition this NCR.
 
 **NCR Details:**
+
 ```
 NCR #: NCR-2024-11-028
 Type: PRICE_VARIANCE (Auto-generated)
@@ -764,11 +850,13 @@ Investigate the price variance and disposition the NCR appropriately.
 ### Step-by-Step Instructions
 
 **1. Navigate to NCRs**
+
 - Click **"NCRs"** menu
 - Filter: **"Pending Review"**
 - Find NCR: NCR-2024-11-028
 
 **2. Review NCR Details**
+
 - Read all information
 - Note: 10% price increase
 - Total impact: +SAR 150.00
@@ -776,18 +864,21 @@ Investigate the price variance and disposition the NCR appropriately.
 **3. Gather Additional Information**
 
 **Check Delivery:**
+
 - Click on delivery link: DL-2024-11-145
 - View delivery document
 - Verify invoice price: SAR 16.50 ✓
 - Operator notes: "Supplier advised price increase"
 
 **Check Supplier Communication:**
+
 - Contact supplier or check emails
 - Supplier sent price increase notice on 20/11/2024
 - New price: SAR 16.50 effective 25/11/2024
 - Reason: Raw material cost increase
 
 **Check Market Rates:**
+
 - Call other suppliers
 - Market rate for sugar: SAR 16.00 - SAR 17.00
 - Our price: SAR 16.50 (competitive) ✓
@@ -795,6 +886,7 @@ Investigate the price variance and disposition the NCR appropriately.
 **4. Make Disposition Decision**
 
 **Analysis:**
+
 - ✓ Price increase is legitimate (supplier notification)
 - ✓ New price is competitive (market rate check)
 - ✓ Price increase is permanent (not temporary)
@@ -805,9 +897,11 @@ Investigate the price variance and disposition the NCR appropriately.
 **5. Complete NCR**
 
 **Navigate back to NCR:**
+
 - Click **"Edit NCR"** or **"Update Disposition"**
 
 **Fill in Disposition:**
+
 ```
 Disposition: ACCEPT
 Comments:
@@ -824,6 +918,7 @@ Disposition Date: 29/11/2024
 ```
 
 **6. Save NCR**
+
 - Click **"Save"** or **"Update NCR"**
 - Status changes to: CLOSED
 - NCR archived
@@ -831,11 +926,13 @@ Disposition Date: 29/11/2024
 **7. Follow-up Actions**
 
 **Notify Admin:**
+
 - Send message or email to Admin
 - Request item price update
 - Attach supplier communication
 
 **Update Purchasing Team:**
+
 - New baseline price: SAR 16.50
 - Update procurement budget
 - Adjust reorder calculations
@@ -843,16 +940,19 @@ Disposition Date: 29/11/2024
 ### Expected Results
 
 **✓ NCR Closed:**
+
 - Disposition: ACCEPT
 - Detailed investigation documented
 - Follow-up actions identified
 
 **✓ Audit Trail:**
+
 - Who dispositioned: Your name
 - When: Timestamp
 - Justification: Complete documentation
 
 **✓ Price Update Workflow Initiated:**
+
 - Admin notified
 - Price will be updated for next period
 
@@ -861,6 +961,7 @@ Disposition Date: 29/11/2024
 **Scenario A: REJECT Disposition**
 
 **Example:**
+
 ```
 NCR shows delivery price: SAR 20.00
 Supplier invoice shows: SAR 16.50
@@ -873,6 +974,7 @@ Action: Correct delivery price, reimburse supplier
 **Scenario B: INVESTIGATE Disposition**
 
 **Example:**
+
 ```
 NCR shows sudden 50% price increase
 No supplier communication found
@@ -898,6 +1000,7 @@ Action: Contact supplier, verify invoice authenticity,
 The purchasing team has started buying a new product that needs to be added to the system: "Tomato Paste, Canned 800g".
 
 **Product Information:**
+
 ```
 Item Name: Tomato Paste, Canned 800g
 Item Code: TOM-PASTE-800
@@ -924,10 +1027,12 @@ Create this new item in the system.
 ### Step-by-Step Instructions
 
 **1. Navigate to Items**
+
 - Click **"Items"** menu
 - Click **"New Item"** button
 
 **2. Fill Basic Information**
+
 ```
 Item Code: TOM-PASTE-800
 Name: Tomato Paste, Canned 800g
@@ -938,12 +1043,14 @@ Unit: EA (select from dropdown)
 ```
 
 **3. Set Stock Control**
+
 ```
 Reorder Point: 50
 Maximum Stock: 200
 ```
 
 **4. Set Supplier Information**
+
 ```
 Default Supplier: Global Food Distributors
 Supplier Item Code: GFD-TOM-800
@@ -952,28 +1059,35 @@ Supplier Item Code: GFD-TOM-800
 **5. Set Prices by Location**
 
 **Kitchen:**
+
 - Price: SAR 5.00
 
 **Store:**
+
 - Price: SAR 5.00
 
 **Central:**
+
 - Price: SAR 4.50
 
 **Warehouse:**
+
 - Price: SAR 4.50
 
 **6. Activate Item**
+
 - Toggle **"Is Active"**: ☑ Enabled
 - Review all fields
 - Click **"Save Item"**
 
 **7. Verify Item Created**
+
 - Search for "Tomato Paste" in items list
 - Click to view details
 - Verify all information correct
 
 **8. Test Item in Transaction**
+
 - Navigate to **"Deliveries"** → **"New Delivery"**
 - Try to add the new item
 - ✓ Should appear in item dropdown
@@ -982,16 +1096,19 @@ Supplier Item Code: GFD-TOM-800
 ### Expected Results
 
 **✓ Item Created:**
+
 - Visible in items list
 - Searchable by name or code
 - Available for all transaction types
 
 **✓ Prices Locked:**
+
 - Current period prices set
 - Different locations have different prices
 - Prices cannot be changed until period lock
 
 **✓ Stock Control Active:**
+
 - Reorder alerts will trigger at 50 cans
 - Maximum prevents over-ordering
 
@@ -1014,6 +1131,7 @@ Supplier Item Code: GFD-TOM-800
 It's November 30th, the last day of the month. You need to close the November 2024 period and open December 2024.
 
 **Current Status:**
+
 - Period: November 2024
 - Status: OPEN
 - All locations operating normally
@@ -1028,6 +1146,7 @@ Coordinate and execute the period close process.
 **Phase 1: Pre-Close Communication (Day -3)**
 
 **1. Send Closure Notice**
+
 ```
 To: All users
 Subject: November Period Close - Nov 30
@@ -1044,6 +1163,7 @@ Questions? Contact admin@company.com
 ```
 
 **2. Create Cutoff Checklist**
+
 ```
 ☐ All deliveries posted (by Nov 30, 4 PM)
 ☐ All issues posted (by Nov 30, 4 PM)
@@ -1056,8 +1176,10 @@ Questions? Contact admin@company.com
 **Phase 2: Monitor Readiness (Nov 29-30)**
 
 **1. Check Reconciliation Progress**
+
 - Navigate to **"Reconciliations"**
 - Filter by Period: November 2024
+
 ```
 Location  | Status     | Completed Date
 ----------|------------|---------------
@@ -1068,13 +1190,16 @@ Warehouse | ✓ Done     | Nov 29
 ```
 
 **2. Follow Up on Store**
+
 - Contact Store supervisor
 - Reminder: Reconciliation due today
 - Offer assistance if needed
 
 **3. Check NCR Status**
+
 - Navigate to **"NCRs"**
 - Filter: Status = Pending
+
 ```
 NCRs Pending: 2
 
@@ -1086,6 +1211,7 @@ NCR-2024-11-029: Quality Issue - Damaged Rice
 ```
 
 **4. Follow Up on Pending NCRs**
+
 - Message supervisors
 - Request disposition by end of day
 - Critical for period close
@@ -1093,11 +1219,13 @@ NCR-2024-11-029: Quality Issue - Damaged Rice
 **Phase 3: Location Readiness (Nov 30, Morning)**
 
 **1. Navigate to Period Close Page**
+
 - Click **"Periods"** menu
 - Click current period: "November 2024"
 - Click **"Period Close"** tab
 
 **2. Review Location Status**
+
 ```
 Location  | Reconciliation | NCRs | Pending   | Ready Status
           |                |      | Transfers |
@@ -1111,6 +1239,7 @@ Warehouse | ✓ Complete     | 0    | 0         | ⏳ Not Ready
 **3. Resolve Blocking Issues**
 
 **Central has pending transfer:**
+
 - Navigate to **"Transfers"**
 - Find pending transfer: TR-2024-11-150
 - From Central → To Kitchen
@@ -1118,6 +1247,7 @@ Warehouse | ✓ Complete     | 0    | 0         | ⏳ Not Ready
 - Wait for approval... ✓ Approved
 
 **4. Coordinate with Supervisors**
+
 - Each location supervisor must mark ready
 - Send reminder at 2:00 PM
 - Deadline: 4:00 PM
@@ -1125,6 +1255,7 @@ Warehouse | ✓ Complete     | 0    | 0         | ⏳ Not Ready
 **Phase 4: Execute Close (Nov 30, 4:00 PM)**
 
 **1. Verify All Locations Ready**
+
 ```
 Navigate to: Periods → November 2024 → Period Close
 
@@ -1135,14 +1266,17 @@ Navigate to: Periods → November 2024 → Period Close
 ```
 
 **2. Final Validation**
+
 - All reconciliations: Complete ✓
 - All NCRs: Closed ✓
 - All transfers: Approved or cancelled ✓
 - All locations: Ready ✓
 
 **3. Execute Period Close**
+
 - Click **"Close Period"** button
 - System confirms:
+
   ```
   ⚠ Warning: This action cannot be undone
 
@@ -1155,9 +1289,11 @@ Navigate to: Periods → November 2024 → Period Close
 
   Are you sure? [Cancel] [Confirm Close]
   ```
+
 - Click **"Confirm Close"**
 
 **4. System Processing**
+
 ```
 Closing period November 2024...
 
@@ -1174,8 +1310,10 @@ Period November 2024 successfully closed.
 ```
 
 **5. Verify Snapshots**
+
 - Navigate to **"Periods"** → **"November 2024"** → **"Snapshots"**
 - View snapshots for each location
+
 ```
 Kitchen Snapshot - Nov 30, 2024, 4:05 PM
 Total Items: 45
@@ -1188,10 +1326,12 @@ Total Value: SAR 125,340.00
 **Phase 5: Open Next Period (Nov 30, 4:10 PM)**
 
 **1. Create December Period**
+
 - Navigate to **"Periods"**
 - Click **"New Period"**
 
 **2. Fill Period Details**
+
 ```
 Period Name: December 2024
 Start Date: 01/12/2024
@@ -1200,12 +1340,14 @@ Fiscal Year: 2024
 ```
 
 **3. System Actions**
+
 - Locks prices from November period
 - Creates period price snapshot
 - Sets as current period
 - Status: OPEN
 
 **4. Verify New Period Active**
+
 ```
 Current Period: December 2024
 Status: OPEN
@@ -1216,6 +1358,7 @@ Prices locked: 150 items
 ```
 
 **5. Test Transactions Allowed**
+
 - Navigate to **"Deliveries"** → **"New Delivery"**
 - Verify period shows: December 2024 ✓
 - Transactions can be posted ✓
@@ -1224,12 +1367,14 @@ Prices locked: 150 items
 **Phase 6: Post-Close Tasks (Nov 30-Dec 1)**
 
 **1. Generate Reports**
+
 - Month-end summary
 - Stock valuation report
 - Variance analysis
 - NCR summary
 
 **2. Communicate Completion**
+
 ```
 To: All users
 Subject: November Period Closed - December Open
@@ -1247,15 +1392,18 @@ Thank you for your cooperation.
 **3. Price Updates**
 
 **Review accepted NCRs:**
+
 - Sugar: SAR 15.00 → SAR 16.50 (ACCEPTED)
 - Flour: SAR 30.00 → SAR 32.00 (ACCEPTED)
 
 **Update item prices:**
+
 - Navigate to **"Items"**
 - Update prices for next period
 - Prices will apply to December transactions
 
 **4. Backup Verification**
+
 - Check automated backup completed
 - Verify snapshot data accessible
 - Test restore capability (optional)
@@ -1263,21 +1411,25 @@ Thank you for your cooperation.
 ### Expected Results
 
 **✓ November Period Closed:**
+
 - Status: CLOSED
 - No further transactions allowed
 - Snapshots created for all locations
 
 **✓ December Period Open:**
+
 - Status: OPEN
 - Prices locked
 - Ready for transactions
 
 **✓ Data Integrity:**
+
 - All reconciliations complete
 - All NCRs resolved
 - Clean cutover
 
 **✓ Reporting:**
+
 - Month-end reports generated
 - Financial data accurate
 - Audit trail complete
@@ -1308,6 +1460,7 @@ This scenario walks through a complete business cycle from delivery to period cl
 **Day 1 (Nov 27) - Operator Activities**
 
 **1. Morning Delivery (Kitchen)**
+
 ```
 Role: Operator - Kitchen
 Task: Record delivery
@@ -1324,6 +1477,7 @@ Expected Result:
 ```
 
 **2. Mid-Day Issue (Kitchen)**
+
 ```
 Role: Operator - Kitchen
 Task: Record consumption
@@ -1339,6 +1493,7 @@ Expected Result:
 ```
 
 **3. Low Stock Alert (Kitchen)**
+
 ```
 Role: Operator - Kitchen
 Task: Notice low stock alert for Flour
@@ -1349,6 +1504,7 @@ Reorder point: 10 bags
 ```
 
 **4. Create Transfer Request**
+
 ```
 Role: Operator - Kitchen
 Task: Request transfer
@@ -1365,6 +1521,7 @@ Expected Result:
 **Day 2 (Nov 28) - Supervisor Activities**
 
 **5. Approve Transfer (Supervisor)**
+
 ```
 Role: Supervisor
 Task: Review and approve transfer TR-2024-11-027
@@ -1383,6 +1540,7 @@ Expected Result:
 ```
 
 **6. Price Variance NCR (Supervisor)**
+
 ```
 Role: Supervisor
 Task: Disposition NCR-2024-11-028
@@ -1399,6 +1557,7 @@ Expected Result:
 **Day 3 (Nov 29) - Month-End Activities**
 
 **7. Physical Reconciliation (Supervisor - Kitchen)**
+
 ```
 Role: Supervisor - Kitchen
 Task: Month-end reconciliation
@@ -1417,6 +1576,7 @@ Expected Result:
 ```
 
 **8. Mark Location Ready (Supervisor - All Locations)**
+
 ```
 Role: Supervisor (each location)
 Task: Mark locations ready for period close
@@ -1434,6 +1594,7 @@ Expected Result:
 **Day 4 (Nov 30) - Admin Period Close**
 
 **9. Execute Period Close (Admin)**
+
 ```
 Role: Admin
 Task: Close November 2024 period
@@ -1451,6 +1612,7 @@ Expected Result:
 ```
 
 **10. Open December Period (Admin)**
+
 ```
 Role: Admin
 Task: Open December 2024 period
@@ -1466,6 +1628,7 @@ Expected Result:
 ```
 
 **11. Update Prices (Admin)**
+
 ```
 Role: Admin
 Task: Update item prices based on accepted NCRs
@@ -1484,6 +1647,7 @@ Expected Result:
 ### Complete Cycle Verification
 
 **Financial Summary:**
+
 ```
 November 2024 - Kitchen Location
 
@@ -1497,6 +1661,7 @@ Opening Stock (Nov 1): SAR 120,000.00
 ```
 
 **Audit Trail:**
+
 ```
 Nov 27: Delivery DL-2024-11-145 - Rice, Oil (Operator: Maria)
 Nov 27: Issue IS-2024-11-098 - Rice, Oil (Operator: Maria)

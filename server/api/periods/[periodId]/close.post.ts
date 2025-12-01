@@ -127,14 +127,12 @@ export default defineEventHandler(async (event) => {
         data: {
           code: "LOCATIONS_NOT_READY",
           message: "All locations must be ready before closing the period",
-          notReadyLocations: notReadyLocations.map(
-            (pl: PeriodLocationWithLocation) => ({
-              locationId: pl.location_id,
-              locationCode: pl.location.code,
-              locationName: pl.location.name,
-              status: pl.status,
-            })
-          ),
+          notReadyLocations: notReadyLocations.map((pl: PeriodLocationWithLocation) => ({
+            locationId: pl.location_id,
+            locationCode: pl.location.code,
+            locationName: pl.location.name,
+            status: pl.status,
+          })),
         },
       });
     }

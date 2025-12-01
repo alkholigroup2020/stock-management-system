@@ -10,17 +10,8 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  apiFetch,
-  type TestUser,
-} from "./helpers/test-server";
-import {
-  testUsers,
-  getTestLocationIds,
-  getTestItemIds,
-} from "./helpers/test-data";
+import { loginUser, authenticatedFetch, apiFetch, type TestUser } from "./helpers/test-server";
+import { testUsers, getTestLocationIds, getTestItemIds } from "./helpers/test-data";
 
 describe("POST /api/transfers", () => {
   let adminUser: TestUser;
@@ -32,10 +23,7 @@ describe("POST /api/transfers", () => {
   beforeAll(async () => {
     // Login users
     adminUser = await loginUser(testUsers.admin.username, testUsers.admin.password);
-    supervisorUser = await loginUser(
-      testUsers.supervisor.username,
-      testUsers.supervisor.password
-    );
+    supervisorUser = await loginUser(testUsers.supervisor.username, testUsers.supervisor.password);
     operatorUser = await loginUser(testUsers.operator.username, testUsers.operator.password);
 
     // Get test data IDs
@@ -175,10 +163,7 @@ describe("POST /api/transfers", () => {
       expect(line!.line_value).toBeCloseTo(expectedLineValue, 2);
 
       // Verify total value matches sum of line values
-      const expectedTotal = result.data?.transfer.lines.reduce(
-        (sum, l) => sum + l.line_value,
-        0
-      );
+      const expectedTotal = result.data?.transfer.lines.reduce((sum, l) => sum + l.line_value, 0);
       expect(result.data?.transfer.total_value).toBeCloseTo(expectedTotal!, 2);
     }, 10000);
   });

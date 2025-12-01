@@ -122,24 +122,28 @@ pnpm db:studio
 The following check constraints should be implemented in future migrations for data integrity:
 
 1. **Positive Stock Check:**
+
    ```sql
    ALTER TABLE location_stock ADD CONSTRAINT check_positive_stock
    CHECK (on_hand >= 0);
    ```
 
 2. **Positive WAC Check:**
+
    ```sql
    ALTER TABLE location_stock ADD CONSTRAINT check_positive_wac
    CHECK (wac >= 0);
    ```
 
 3. **Positive Price Check:**
+
    ```sql
    ALTER TABLE item_prices ADD CONSTRAINT check_positive_price
    CHECK (price > 0);
    ```
 
 4. **Different Locations for Transfers:**
+
    ```sql
    ALTER TABLE transfers ADD CONSTRAINT check_different_locations
    CHECK (from_location_id != to_location_id);

@@ -132,12 +132,7 @@ onMounted(() => {
       location-scope="current"
     >
       <template #actions>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-arrow-left"
-          @click="goBack"
-        >
+        <UButton color="neutral" variant="outline" icon="i-lucide-arrow-left" @click="goBack">
           Back to Issues
         </UButton>
       </template>
@@ -221,13 +216,9 @@ onMounted(() => {
             <thead>
               <tr class="bg-default">
                 <th class="px-4 py-3 text-left text-label uppercase">Item</th>
-                <th class="px-4 py-3 text-right text-label uppercase">
-                  Quantity
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase">Quantity</th>
                 <th class="px-4 py-3 text-right text-label uppercase">WAC</th>
-                <th class="px-4 py-3 text-right text-label uppercase">
-                  Line Value
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase">Line Value</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-default">
@@ -237,9 +228,7 @@ onMounted(() => {
                   <div class="font-medium">
                     {{ line.item?.name }}
                   </div>
-                  <div class="text-caption">
-                    {{ line.item?.code }} - {{ line.item?.unit }}
-                  </div>
+                  <div class="text-caption">{{ line.item?.code }} - {{ line.item?.unit }}</div>
                   <div v-if="line.item?.category" class="text-caption">
                     {{ line.item.category }}
                   </div>

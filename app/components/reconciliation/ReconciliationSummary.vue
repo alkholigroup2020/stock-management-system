@@ -139,7 +139,10 @@ function formatCurrency(value: number | null): string {
           <p class="text-2xl font-bold text-[var(--ui-success)] mt-1">
             {{ calculations.manday_cost ? formatCurrency(calculations.manday_cost) : "N/A" }}
           </p>
-          <p v-if="calculations.total_mandays === 0" class="text-xs text-[var(--ui-text-muted)] mt-1">
+          <p
+            v-if="calculations.total_mandays === 0"
+            class="text-xs text-[var(--ui-text-muted)] mt-1"
+          >
             No POB entries for this period
           </p>
         </div>

@@ -321,28 +321,28 @@ export default defineEventHandler(async (event) => {
     }));
 
     // Process cost centre summaries with top items
-    const costCentreSummaries: CostCentreSummary[] = (["FOOD", "CLEAN", "OTHER"] as CostCentre[]).map(
-      (cc) => {
-        const data = costCentreMap.get(cc)!;
-        const topItems = Array.from(data.itemMap.values())
-          .sort((a, b) => b.value - a.value)
-          .slice(0, 10)
-          .map((item) => ({
-            item_code: item.code,
-            item_name: item.name,
-            total_quantity: Math.round(item.quantity * 10000) / 10000,
-            total_value: Math.round(item.value * 100) / 100,
-          }));
+    const costCentreSummaries: CostCentreSummary[] = (
+      ["FOOD", "CLEAN", "OTHER"] as CostCentre[]
+    ).map((cc) => {
+      const data = costCentreMap.get(cc)!;
+      const topItems = Array.from(data.itemMap.values())
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10)
+        .map((item) => ({
+          item_code: item.code,
+          item_name: item.name,
+          total_quantity: Math.round(item.quantity * 10000) / 10000,
+          total_value: Math.round(item.value * 100) / 100,
+        }));
 
-        return {
-          cost_centre: cc,
-          issue_count: data.issue_count,
-          total_value: Math.round(data.total_value * 100) / 100,
-          line_count: data.line_count,
-          top_items: topItems,
-        };
-      }
-    );
+      return {
+        cost_centre: cc,
+        issue_count: data.issue_count,
+        total_value: Math.round(data.total_value * 100) / 100,
+        line_count: data.line_count,
+        top_items: topItems,
+      };
+    });
 
     // Calculate grand totals
     const grandTotals = {

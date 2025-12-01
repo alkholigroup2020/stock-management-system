@@ -92,12 +92,9 @@ async function fetchPOBData() {
   error.value = null;
 
   try {
-    const response = await $fetch<POBData>(
-      `/api/locations/${activeLocationId.value}/pob`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await $fetch<POBData>(`/api/locations/${activeLocationId.value}/pob`, {
+      method: "GET",
+    });
 
     pobData.value = response;
 
@@ -189,21 +186,18 @@ async function saveEntry(dateStr: string) {
   savingDates.value.add(dateStr);
 
   try {
-    const response = await $fetch(
-      `/api/locations/${activeLocationId.value}/pob`,
-      {
-        method: "POST",
-        body: {
-          entries: [
-            {
-              date: entry.date,
-              crew_count: entry.crew_count,
-              extra_count: entry.extra_count,
-            },
-          ],
-        },
-      }
-    );
+    const response = await $fetch(`/api/locations/${activeLocationId.value}/pob`, {
+      method: "POST",
+      body: {
+        entries: [
+          {
+            date: entry.date,
+            crew_count: entry.crew_count,
+            extra_count: entry.extra_count,
+          },
+        ],
+      },
+    });
 
     // Update POB data with new summary
     if (pobData.value && response.summary) {
@@ -234,7 +228,6 @@ function handleBlur(dateStr: string) {
 function handleChange(dateStr: string) {
   updateTotal(dateStr);
 }
-
 </script>
 
 <template>

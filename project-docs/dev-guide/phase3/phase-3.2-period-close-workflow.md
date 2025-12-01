@@ -1,4 +1,5 @@
 # Phase 3.2: Period Close Workflow
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -86,11 +87,11 @@ In this phase, we created the **complete period close workflow** with location r
 
 ### Tasks Completed
 
-| Task | Description | Status |
-|------|-------------|--------|
+| Task  | Description                 | Status      |
+| ----- | --------------------------- | ----------- |
 | 3.2.1 | Location Readiness Tracking | ✅ Complete |
-| 3.2.2 | Period Close API | ✅ Complete |
-| 3.2.3 | Snapshot Creation | ✅ Complete |
+| 3.2.2 | Period Close API            | ✅ Complete |
+| 3.2.3 | Snapshot Creation           | ✅ Complete |
 | 3.2.4 | Roll Forward to Next Period | ✅ Complete |
 
 ---
@@ -102,6 +103,7 @@ In this phase, we created the **complete period close workflow** with location r
 Before we can close a period, each location must tell us "I am ready". This is like a checklist - we need all items checked before we can proceed.
 
 **Why do we need this?**
+
 - Ensures all reconciliations are complete
 - Prevents closing when some location is still working
 - Creates a clear handoff point from Supervisors to Admins
@@ -117,6 +119,7 @@ This endpoint marks a single location as ready for period close.
 **Who can use it:** SUPERVISOR or ADMIN only
 
 **What it checks:**
+
 1. User is logged in
 2. User has correct role (SUPERVISOR or ADMIN)
 3. Period exists
@@ -178,6 +181,7 @@ if (user.role !== "SUPERVISOR" && user.role !== "ADMIN") {
 ```
 
 **What this does:**
+
 - First, we check if `user` exists (user is logged in)
 - Then we check if user's role is SUPERVISOR or ADMIN
 - If not, we throw an error with status code 403 (Forbidden)
@@ -207,6 +211,7 @@ if (!reconciliation) {
 ```
 
 **What this does:**
+
 - Uses Prisma's `findUnique` with a composite key (`period_id_location_id`)
 - A composite key is a unique identifier made of two fields together
 - If no reconciliation exists, we cannot mark as ready
@@ -233,6 +238,7 @@ const updatedPeriodLocation = await prisma.periodLocation.update({
 ```
 
 **What this does:**
+
 - Updates the `PeriodLocation` record with new status
 - Sets `status` to "READY"
 - Records `ready_at` timestamp (current date/time)
@@ -241,12 +247,14 @@ const updatedPeriodLocation = await prisma.periodLocation.update({
 ### Example API Request and Response
 
 **Request:**
+
 ```http
 PATCH /api/periods/period-123/locations/kitchen-456/ready
 Authorization: Bearer <token>
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "periodLocation": {
@@ -271,6 +279,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (400) - No Reconciliation:**
+
 ```json
 {
   "statusCode": 400,
@@ -298,12 +307,12 @@ This is similar to how you need two people to approve a large bank transfer.
 
 #### 4 API Endpoints
 
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /api/periods/:periodId/close` | Request period close |
-| `GET /api/approvals/:id` | Get approval details |
-| `PATCH /api/approvals/:id/approve` | Approve and execute close |
-| `PATCH /api/approvals/:id/reject` | Reject the request |
+| Endpoint                            | Purpose                   |
+| ----------------------------------- | ------------------------- |
+| `POST /api/periods/:periodId/close` | Request period close      |
+| `GET /api/approvals/:id`            | Get approval details      |
+| `PATCH /api/approvals/:id/approve`  | Approve and execute close |
+| `PATCH /api/approvals/:id/reject`   | Reject the request        |
 
 ### How the Approval Workflow Works
 
@@ -340,6 +349,7 @@ stateDiagram-v2
 **File:** `server/api/periods/[periodId]/close.post.ts`
 
 **What this endpoint does:**
+
 1. Checks user is ADMIN
 2. Verifies period status is OPEN
 3. Checks ALL locations are READY
@@ -362,9 +372,7 @@ const period = await prisma.period.findUnique({
 });
 
 // Find locations that are NOT ready
-const notReadyLocations = period.period_locations.filter(
-  (pl) => pl.status !== "READY"
-);
+const notReadyLocations = period.period_locations.filter((pl) => pl.status !== "READY");
 
 // If any location is not ready, throw error
 if (notReadyLocations.length > 0) {
@@ -376,7 +384,7 @@ if (notReadyLocations.length > 0) {
       notReadyLocations: notReadyLocations.map((pl) => ({
         locationId: pl.location_id,
         locationName: pl.location.name,
-        status: pl.status,  // Shows current status (OPEN, not READY)
+        status: pl.status, // Shows current status (OPEN, not READY)
       })),
     },
   });
@@ -384,6 +392,7 @@ if (notReadyLocations.length > 0) {
 ```
 
 **What this code does:**
+
 - Uses `filter()` to find all locations where status is NOT "READY"
 - If we find any, we return an error with the list of locations
 - This helps the user know exactly which locations need attention
@@ -416,6 +425,7 @@ const result = await prisma.$transaction(async (tx) => {
 ```
 
 **What this code does:**
+
 - Uses `$transaction` to run multiple operations together
 - Creates an Approval record with entity_type = "PERIOD_CLOSE"
 - Updates the Period to PENDING_CLOSE status
@@ -427,6 +437,7 @@ const result = await prisma.$transaction(async (tx) => {
 **File:** `server/api/approvals/[id]/approve.patch.ts`
 
 **What this endpoint does:**
+
 1. Finds the approval record
 2. Checks it's still PENDING
 3. Routes to the correct handler based on entity_type
@@ -463,6 +474,7 @@ switch (approval.entity_type) {
 ```
 
 **What this code does:**
+
 - Uses a `switch` statement to handle different approval types
 - Each approval type (PERIOD_CLOSE, TRANSFER, PRF, PO) has different logic
 - Currently only PERIOD_CLOSE is implemented
@@ -484,7 +496,7 @@ async function handlePeriodCloseRejection(approvalId, periodId, reviewerId, comm
         status: "REJECTED",
         reviewed_by: reviewerId,
         reviewed_at: now,
-        comments,  // Optional rejection reason
+        comments, // Optional rejection reason
       },
     });
 
@@ -493,7 +505,7 @@ async function handlePeriodCloseRejection(approvalId, periodId, reviewerId, comm
       where: { id: periodId },
       data: {
         status: "OPEN",
-        approval_id: null,  // Remove the approval link
+        approval_id: null, // Remove the approval link
       },
     });
 
@@ -507,6 +519,7 @@ async function handlePeriodCloseRejection(approvalId, periodId, reviewerId, comm
 ```
 
 **What this code does:**
+
 - Updates approval status to "REJECTED"
 - Records who rejected and when
 - Saves the rejection comment (if provided)
@@ -542,33 +555,35 @@ Kitchen shows SAR 65,000 ❌           Kitchen shows SAR 50,000 ✅
 Each location's snapshot contains two main parts:
 
 **Part 1: Stock Items**
+
 ```typescript
 interface StockSnapshot {
-  item_id: string;       // Item identifier
-  item_code: string;     // e.g., "RICE-001"
-  item_name: string;     // e.g., "Basmati Rice"
-  item_unit: string;     // e.g., "KG"
-  quantity: number;      // e.g., 150 (on hand)
-  wac: number;           // e.g., 12.50 (weighted average cost)
-  value: number;         // quantity × wac = 1875.00
+  item_id: string; // Item identifier
+  item_code: string; // e.g., "RICE-001"
+  item_name: string; // e.g., "Basmati Rice"
+  item_unit: string; // e.g., "KG"
+  quantity: number; // e.g., 150 (on hand)
+  wac: number; // e.g., 12.50 (weighted average cost)
+  value: number; // quantity × wac = 1875.00
 }
 ```
 
 **Part 2: Reconciliation Summary**
+
 ```typescript
 interface ReconciliationSnapshot {
-  opening_stock: number;     // Value at period start
-  receipts: number;          // Deliveries received
-  transfers_in: number;      // Stock transferred in
-  transfers_out: number;     // Stock transferred out
-  issues: number;            // Stock issued to cost centers
-  adjustments: number;       // Manual adjustments
-  back_charges: number;      // Charges back to supplier
-  credits: number;           // Credit notes received
-  condemnations: number;     // Damaged/spoiled stock
-  closing_stock: number;     // Actual value at period end
+  opening_stock: number; // Value at period start
+  receipts: number; // Deliveries received
+  transfers_in: number; // Stock transferred in
+  transfers_out: number; // Stock transferred out
+  issues: number; // Stock issued to cost centers
+  adjustments: number; // Manual adjustments
+  back_charges: number; // Charges back to supplier
+  credits: number; // Credit notes received
+  condemnations: number; // Damaged/spoiled stock
+  closing_stock: number; // Actual value at period end
   calculated_closing: number; // Expected value (math)
-  variance: number;          // Difference (actual - expected)
+  variance: number; // Difference (actual - expected)
 }
 ```
 
@@ -593,6 +608,7 @@ const variance = closingStock - calculatedClosing;
 ```
 
 **Example:**
+
 ```
 Opening Stock:     SAR 10,000
 + Receipts:        SAR  5,000
@@ -620,8 +636,8 @@ Variance:          SAR   -100 (missing SAR 100)
 // Get all stock items for all locations in this period
 const allLocationStock = await prisma.locationStock.findMany({
   where: {
-    location_id: { in: locationIds },  // All location IDs
-    on_hand: { gt: 0 },  // Only items with stock > 0
+    location_id: { in: locationIds }, // All location IDs
+    on_hand: { gt: 0 }, // Only items with stock > 0
   },
   include: {
     item: {
@@ -632,6 +648,7 @@ const allLocationStock = await prisma.locationStock.findMany({
 ```
 
 **What this does:**
+
 - Fetches all LocationStock records for the locations
 - Only includes items where `on_hand > 0` (has stock)
 - Includes related item information (code, name, unit)
@@ -658,6 +675,7 @@ for (const recon of allReconciliations) {
 ```
 
 **What this does:**
+
 - Fetches all reconciliations in one query (efficient)
 - Creates a JavaScript Map for O(1) lookup by location ID
 - O(1) means constant time - very fast regardless of data size
@@ -669,9 +687,7 @@ const snapshotsByLocation = new Map<string, LocationSnapshot>();
 
 for (const pl of period.period_locations) {
   // Filter stock for this specific location
-  const locationStock = allLocationStock.filter(
-    (s) => s.location_id === pl.location_id
-  );
+  const locationStock = allLocationStock.filter((s) => s.location_id === pl.location_id);
 
   // Transform to snapshot format
   const items = locationStock.map((s) => ({
@@ -705,6 +721,7 @@ for (const pl of period.period_locations) {
 ```
 
 **What this does:**
+
 - Loops through each location in the period
 - Filters the stock data for that specific location
 - Uses `map()` to transform each stock record into snapshot format
@@ -727,7 +744,7 @@ await prisma.$transaction(async (tx) => {
       data: {
         status: "CLOSED",
         closing_value: snapshot.total_value,
-        snapshot_data: snapshot as Prisma.JsonObject,  // JSON column
+        snapshot_data: snapshot as Prisma.JsonObject, // JSON column
         closed_at: now,
       },
     });
@@ -736,6 +753,7 @@ await prisma.$transaction(async (tx) => {
 ```
 
 **What this does:**
+
 - Uses transaction to update all locations together
 - Sets status to "CLOSED"
 - Saves total_value as closing_value
@@ -758,6 +776,7 @@ After closing a period (e.g., November 2025), we need to create the next period 
 ### Why DRAFT Status?
 
 The new period starts in DRAFT so admins can:
+
 - Review the copied prices
 - Update any prices that changed
 - Only then change to OPEN to start transactions
@@ -793,7 +812,7 @@ const sourcePeriod = await prisma.period.findUnique({
       select: { location_id: true, closing_value: true },
     },
     item_prices: {
-      where: { item: { is_active: true } },  // Only active items
+      where: { item: { is_active: true } }, // Only active items
       select: { item_id: true, price: true, currency: true },
     },
   },
@@ -812,6 +831,7 @@ if (sourcePeriod.status !== "CLOSED") {
 ```
 
 **What this does:**
+
 - Fetches the source period with its locations and prices
 - Only fetches prices for active items
 - Checks that the period is CLOSED before rolling forward
@@ -836,12 +856,14 @@ const newEndDate = getLastDayOfMonth(newStartDate);
 ```
 
 **What this does:**
+
 - New period starts the day after old one ends
 - Uses JavaScript's `setDate()` to add 1 day
 - Calculates last day of month using a date trick
 - `new Date(year, month + 1, 0)` gives last day of previous month
 
 **Example:**
+
 ```
 Source Period:      November 2025 (Nov 1 - Nov 30)
 Source End Date:    2025-11-30
@@ -860,24 +882,15 @@ const overlappingPeriod = await prisma.period.findFirst({
     OR: [
       // New period starts during existing period
       {
-        AND: [
-          { start_date: { lte: newStartDate } },
-          { end_date: { gte: newStartDate } },
-        ],
+        AND: [{ start_date: { lte: newStartDate } }, { end_date: { gte: newStartDate } }],
       },
       // New period ends during existing period
       {
-        AND: [
-          { start_date: { lte: newEndDate } },
-          { end_date: { gte: newEndDate } },
-        ],
+        AND: [{ start_date: { lte: newEndDate } }, { end_date: { gte: newEndDate } }],
       },
       // New period completely contains existing period
       {
-        AND: [
-          { start_date: { gte: newStartDate } },
-          { end_date: { lte: newEndDate } },
-        ],
+        AND: [{ start_date: { gte: newStartDate } }, { end_date: { lte: newEndDate } }],
       },
     ],
   },
@@ -885,7 +898,7 @@ const overlappingPeriod = await prisma.period.findFirst({
 
 if (overlappingPeriod) {
   throw createError({
-    statusCode: 409,  // Conflict
+    statusCode: 409, // Conflict
     data: {
       code: "OVERLAPPING_PERIOD",
       message: `Would overlap with '${overlappingPeriod.name}'`,
@@ -895,6 +908,7 @@ if (overlappingPeriod) {
 ```
 
 **What this does:**
+
 - Checks if new dates would overlap with any existing period
 - Uses Prisma's `OR` to check three overlap scenarios
 - Returns 409 (Conflict) if overlap found
@@ -906,10 +920,10 @@ const result = await prisma.$transaction(async (tx) => {
   // Create new period with PeriodLocation entries
   const newPeriod = await tx.period.create({
     data: {
-      name: periodName,          // "December 2025"
-      start_date: newStartDate,  // 2025-12-01
-      end_date: newEndDate,      // 2025-12-31
-      status: "DRAFT",           // Always starts as DRAFT
+      name: periodName, // "December 2025"
+      start_date: newStartDate, // 2025-12-01
+      end_date: newEndDate, // 2025-12-31
+      status: "DRAFT", // Always starts as DRAFT
       period_locations: {
         create: activeLocations.map((location) => ({
           location_id: location.id,
@@ -939,6 +953,7 @@ const result = await prisma.$transaction(async (tx) => {
 ```
 
 **What this does:**
+
 - Creates the new period in a transaction
 - Uses Prisma's nested `create` to make PeriodLocation records
 - Copies closing values from source as opening values
@@ -947,6 +962,7 @@ const result = await prisma.$transaction(async (tx) => {
 ### Request and Response Example
 
 **Request:**
+
 ```http
 POST /api/periods/nov-2025-id/roll-forward
 Content-Type: application/json
@@ -959,6 +975,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Period rolled forward successfully",
@@ -1005,14 +1022,14 @@ Content-Type: application/json
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts` | ~197 | Mark location ready |
-| `server/api/periods/[periodId]/close.post.ts` | ~233 | Request period close |
-| `server/api/periods/[periodId]/roll-forward.post.ts` | ~365 | Roll forward |
-| `server/api/approvals/[id].get.ts` | ~214 | Get approval details |
-| `server/api/approvals/[id]/approve.patch.ts` | ~493 | Approve and execute |
-| `server/api/approvals/[id]/reject.patch.ts` | ~257 | Reject request |
+| File                                                                  | Lines | Purpose              |
+| --------------------------------------------------------------------- | ----- | -------------------- |
+| `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts` | ~197  | Mark location ready  |
+| `server/api/periods/[periodId]/close.post.ts`                         | ~233  | Request period close |
+| `server/api/periods/[periodId]/roll-forward.post.ts`                  | ~365  | Roll forward         |
+| `server/api/approvals/[id].get.ts`                                    | ~214  | Get approval details |
+| `server/api/approvals/[id]/approve.patch.ts`                          | ~493  | Approve and execute  |
+| `server/api/approvals/[id]/reject.patch.ts`                           | ~257  | Reject request       |
 
 **Total:** ~1,759 lines of API code
 
@@ -1038,6 +1055,7 @@ const result = await prisma.$transaction(async (tx) => {
 ```
 
 **Why use transactions?**
+
 - Prevents partial updates (half the data changed)
 - If error occurs, database stays in a good state
 - Critical for financial operations
@@ -1062,6 +1080,7 @@ await prisma.periodLocation.findUnique({
 ```
 
 **Why use composite keys?**
+
 - Ensures one record per period-location combination
 - More efficient than searching by two separate fields
 
@@ -1082,6 +1101,7 @@ const kitchenRecon = reconciliationsByLocation.get("kitchen-id");
 ```
 
 **Why use Map instead of Array?**
+
 - Array lookup is O(n) - searches through all items
 - Map lookup is O(1) - instantly finds by key
 - With 1000 locations, Map is 1000x faster
@@ -1089,12 +1109,14 @@ const kitchenRecon = reconciliationsByLocation.get("kitchen-id");
 ### 4. Array Methods: filter, map, reduce
 
 **filter()** - Keep items that match a condition:
+
 ```typescript
 // Get only locations that are NOT ready
 const notReady = locations.filter((loc) => loc.status !== "READY");
 ```
 
 **map()** - Transform each item:
+
 ```typescript
 // Convert stock records to snapshot format
 const items = stockRecords.map((s) => ({
@@ -1105,6 +1127,7 @@ const items = stockRecords.map((s) => ({
 ```
 
 **reduce()** - Calculate a single value from array:
+
 ```typescript
 // Calculate total value of all items
 const totalValue = items.reduce((sum, item) => sum + item.value, 0);
@@ -1115,16 +1138,16 @@ const totalValue = items.reduce((sum, item) => sum + item.value, 0);
 
 We use standard error codes so the frontend knows what went wrong:
 
-| Code | Meaning |
-|------|---------|
-| `NOT_AUTHENTICATED` | User not logged in |
-| `INSUFFICIENT_PERMISSIONS` | User lacks required role |
-| `PERIOD_NOT_FOUND` | Period ID doesn't exist |
-| `RECONCILIATION_NOT_COMPLETED` | Must complete reconciliation first |
-| `LOCATIONS_NOT_READY` | Some locations not marked ready |
-| `PERIOD_NOT_CLOSED` | Can only roll forward closed periods |
-| `OVERLAPPING_PERIOD` | New period would overlap existing |
-| `APPROVAL_ALREADY_PROCESSED` | Already approved or rejected |
+| Code                           | Meaning                              |
+| ------------------------------ | ------------------------------------ |
+| `NOT_AUTHENTICATED`            | User not logged in                   |
+| `INSUFFICIENT_PERMISSIONS`     | User lacks required role             |
+| `PERIOD_NOT_FOUND`             | Period ID doesn't exist              |
+| `RECONCILIATION_NOT_COMPLETED` | Must complete reconciliation first   |
+| `LOCATIONS_NOT_READY`          | Some locations not marked ready      |
+| `PERIOD_NOT_CLOSED`            | Can only roll forward closed periods |
+| `OVERLAPPING_PERIOD`           | New period would overlap existing    |
+| `APPROVAL_ALREADY_PROCESSED`   | Already approved or rejected         |
 
 ---
 
@@ -1137,6 +1160,7 @@ We use standard error codes so the frontend knows what went wrong:
 **Cause:** No reconciliation record exists for this period-location.
 
 **Solution:**
+
 1. Go to Reconciliation page for this location
 2. Complete and save the reconciliation
 3. Then mark as ready
@@ -1148,6 +1172,7 @@ We use standard error codes so the frontend knows what went wrong:
 **Cause:** Some locations are still OPEN, not READY.
 
 **Solution:**
+
 1. Check which locations are not ready (error shows the list)
 2. Have supervisors mark each one as ready
 3. Then request close again
@@ -1159,6 +1184,7 @@ We use standard error codes so the frontend knows what went wrong:
 **Cause:** Trying to roll forward a period that is OPEN or DRAFT.
 
 **Solution:**
+
 1. Complete the period close process first
 2. Only CLOSED periods can be rolled forward
 
@@ -1167,6 +1193,7 @@ We use standard error codes so the frontend knows what went wrong:
 **Cause:** No LocationStock records with on_hand > 0.
 
 **Solution:**
+
 1. Check if deliveries were posted
 2. Verify stock exists in the location
 3. Remember: snapshot only includes items where quantity > 0
@@ -1176,6 +1203,7 @@ We use standard error codes so the frontend knows what went wrong:
 ## Testing Checklist
 
 ### Location Readiness (3.2.1)
+
 - [ ] Cannot mark ready without reconciliation
 - [ ] Only SUPERVISOR/ADMIN can mark ready
 - [ ] ready_at timestamp is recorded
@@ -1183,6 +1211,7 @@ We use standard error codes so the frontend knows what went wrong:
 - [ ] Error shows correct code
 
 ### Period Close Request (3.2.2)
+
 - [ ] Cannot request if any location not ready
 - [ ] Error lists which locations not ready
 - [ ] Creates approval record
@@ -1190,6 +1219,7 @@ We use standard error codes so the frontend knows what went wrong:
 - [ ] Cannot request twice (duplicate check)
 
 ### Approval Workflow (3.2.2)
+
 - [ ] Can fetch approval details
 - [ ] Only ADMIN can approve/reject
 - [ ] Cannot approve already-processed approval
@@ -1197,6 +1227,7 @@ We use standard error codes so the frontend knows what went wrong:
 - [ ] Rejection comment is saved
 
 ### Snapshot Creation (3.2.3)
+
 - [ ] Snapshot includes all stock items
 - [ ] Values calculated correctly (qty × WAC)
 - [ ] Reconciliation data included
@@ -1204,6 +1235,7 @@ We use standard error codes so the frontend knows what went wrong:
 - [ ] Snapshot timestamp recorded
 
 ### Roll Forward (3.2.4)
+
 - [ ] Can only roll forward CLOSED periods
 - [ ] New dates calculated correctly
 - [ ] Opening values equal closing values
@@ -1218,12 +1250,14 @@ We use standard error codes so the frontend knows what went wrong:
 After completing Phase 3.2, the next phases are:
 
 **→ Phase 3.3: Period Close UI** (Days 27-28)
+
 - Period close page with checklist
 - Visual location readiness tracking
 - Close confirmation modal
 - Approval workflow UI
 
 **→ Phase 3.4: Reporting & Exports** (Days 28-30)
+
 - Stock reports
 - Reconciliation reports
 - Delivery/Issue reports

@@ -153,10 +153,7 @@
           </template>
 
           <div class="space-y-4">
-            <div
-              v-if="userToDelete"
-              class="p-4 rounded-lg border-2 border-warning bg-warning/10"
-            >
+            <div v-if="userToDelete" class="p-4 rounded-lg border-2 border-warning bg-warning/10">
               <p class="font-semibold text-warning">
                 {{ userToDelete.full_name }}
               </p>

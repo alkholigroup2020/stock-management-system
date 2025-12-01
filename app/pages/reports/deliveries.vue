@@ -399,7 +399,7 @@ onMounted(async () => {
         <!-- Actions -->
         <UFormField label="Actions">
           <div class="flex gap-2">
-            <UButton color="primary" class="cursor-pointer" @click="fetchReport"> Generate </UButton>
+            <UButton color="primary" class="cursor-pointer" @click="fetchReport">Generate</UButton>
             <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
               Clear
             </UButton>
@@ -553,12 +553,7 @@ onMounted(async () => {
                   <span v-else class="text-muted">-</span>
                 </td>
                 <td class="px-4 py-3 text-center">
-                  <UBadge
-                    v-if="delivery.ncr_count > 0"
-                    color="warning"
-                    variant="subtle"
-                    size="sm"
-                  >
+                  <UBadge v-if="delivery.ncr_count > 0" color="warning" variant="subtle" size="sm">
                     {{ delivery.ncr_count }}
                   </UBadge>
                   <span v-else class="text-muted">-</span>

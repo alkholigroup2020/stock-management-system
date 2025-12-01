@@ -29,10 +29,7 @@ export const useLocationStore = defineStore("location", {
     // Get the active location object
     activeLocation: (state: LocationState): LocationWithAccess | null => {
       if (!state.activeLocationId) return null;
-      return (
-        state.userLocations.find((loc) => loc.id === state.activeLocationId) ||
-        null
-      );
+      return state.userLocations.find((loc) => loc.id === state.activeLocationId) || null;
     },
 
     // Check if user has any locations
@@ -70,12 +67,9 @@ export const useLocationStore = defineStore("location", {
       this.error = null;
 
       try {
-        const response = await $fetch<{ locations: LocationWithAccess[] }>(
-          "/api/user/locations",
-          {
-            method: "GET",
-          }
-        );
+        const response = await $fetch<{ locations: LocationWithAccess[] }>("/api/user/locations", {
+          method: "GET",
+        });
 
         this.userLocations = response.locations;
         this.lastFetched = Date.now();
@@ -87,9 +81,7 @@ export const useLocationStore = defineStore("location", {
           const defaultLocationId = authStore.user?.default_location_id;
 
           if (defaultLocationId) {
-            const defaultLoc = this.userLocations.find(
-              (loc) => loc.id === defaultLocationId
-            );
+            const defaultLoc = this.userLocations.find((loc) => loc.id === defaultLocationId);
             if (defaultLoc) {
               this.activeLocationId = defaultLocationId;
             } else if (this.userLocations.length > 0) {

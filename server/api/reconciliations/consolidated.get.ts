@@ -282,10 +282,7 @@ export default defineEventHandler(async (event) => {
       // Calculate manday cost if mandays > 0
       let mandayCostResult = null;
       if (totalMandays > 0) {
-        mandayCostResult = calculateMandayCost(
-          consumptionResult.consumption,
-          totalMandays
-        );
+        mandayCostResult = calculateMandayCost(consumptionResult.consumption, totalMandays);
       }
 
       return {

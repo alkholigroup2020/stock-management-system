@@ -5,6 +5,7 @@ This directory contains composables that implement client-side caching for frequ
 ## Overview
 
 The caching composables provide:
+
 - **Automatic caching** using Nuxt's `useAsyncData`
 - **Cache invalidation** helpers for after mutations
 - **Smart cache management** with time-based expiration
@@ -196,17 +197,17 @@ const { locations, loading, error } = useLocations();
 
 ### When to Invalidate
 
-| Operation | Cache to Invalidate | Use |
-|-----------|-------------------|-----|
-| Create/Update/Delete Location | `invalidateLocations()` | After location mutations |
-| Create/Update/Delete Item | `invalidateItems()` | After item mutations |
-| Change Item Price | `invalidatePriceChange()` | After price updates |
-| Post Delivery | `afterDelivery(locationId)` | After delivery posted |
-| Post Issue | `afterIssue(locationId)` | After issue posted |
-| Create/Approve Transfer | `afterTransfer(fromId, toId)` | After transfer mutation |
-| Close Period | `afterPeriodClose()` | After period closed |
-| Mark Location Ready | `afterLocationReady()` | After location marked ready |
-| Reconciliation | `afterReconciliation(locationId)` | After reconciliation saved |
+| Operation                     | Cache to Invalidate               | Use                         |
+| ----------------------------- | --------------------------------- | --------------------------- |
+| Create/Update/Delete Location | `invalidateLocations()`           | After location mutations    |
+| Create/Update/Delete Item     | `invalidateItems()`               | After item mutations        |
+| Change Item Price             | `invalidatePriceChange()`         | After price updates         |
+| Post Delivery                 | `afterDelivery(locationId)`       | After delivery posted       |
+| Post Issue                    | `afterIssue(locationId)`          | After issue posted          |
+| Create/Approve Transfer       | `afterTransfer(fromId, toId)`     | After transfer mutation     |
+| Close Period                  | `afterPeriodClose()`              | After period closed         |
+| Mark Location Ready           | `afterLocationReady()`            | After location marked ready |
+| Reconciliation                | `afterReconciliation(locationId)` | After reconciliation saved  |
 
 ### Smart Invalidation
 

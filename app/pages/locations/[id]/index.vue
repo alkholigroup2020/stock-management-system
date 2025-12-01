@@ -55,11 +55,7 @@
             <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
               Location Information
             </h2>
-            <UBadge
-              :color="location.is_active ? 'success' : 'neutral'"
-              variant="subtle"
-              size="lg"
-            >
+            <UBadge :color="location.is_active ? 'success' : 'neutral'" variant="subtle" size="lg">
               {{ location.is_active ? "Active" : "Inactive" }}
             </UBadge>
           </div>
@@ -212,8 +208,8 @@
           <div>
             <p class="text-[var(--ui-text)] font-medium mb-2">Delete this location</p>
             <p class="text-caption text-[var(--ui-text-muted)] mb-4">
-              Once you delete a location, there is no going back. If the location has
-              transaction history, it will be deactivated instead.
+              Once you delete a location, there is no going back. If the location has transaction
+              history, it will be deactivated instead.
             </p>
             <UButton
               color="error"
@@ -241,7 +237,7 @@
 
           <UForm
             :schema="assignUserSchema"
-            :state="(assignFormData as any)"
+            :state="assignFormData as any"
             @submit="submitUserAssignment"
           >
             <div class="space-y-6">
@@ -276,7 +272,9 @@
               </UFormField>
 
               <!-- Actions -->
-              <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+              <div
+                class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
+              >
                 <UButton
                   color="error"
                   variant="soft"
@@ -307,22 +305,21 @@
       <template #content>
         <UCard :ui="{ body: 'p-6' }">
           <template #header>
-            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
-              Confirm Removal
-            </h3>
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Confirm Removal</h3>
           </template>
 
           <div class="space-y-4">
             <p class="text-[var(--ui-text)]">
               Are you sure you want to remove
-              <strong>{{ userToRemove?.name }}</strong> from this location?
+              <strong>{{ userToRemove?.name }}</strong>
+              from this location?
             </p>
-            <p class="text-caption text-[var(--ui-text-muted)]">
-              This action cannot be undone.
-            </p>
+            <p class="text-caption text-[var(--ui-text-muted)]">This action cannot be undone.</p>
 
             <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+            <div
+              class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
+            >
               <UButton
                 color="error"
                 variant="soft"
@@ -372,7 +369,9 @@
               <p class="font-medium text-[var(--ui-text)]">
                 Are you sure you want to delete this location?
               </p>
-              <ul class="list-disc list-inside text-caption text-[var(--ui-text-muted)] space-y-1 pl-2">
+              <ul
+                class="list-disc list-inside text-caption text-[var(--ui-text-muted)] space-y-1 pl-2"
+              >
                 <li>If the location has transaction history, it will be deactivated</li>
                 <li>If the location is empty, it will be permanently deleted</li>
                 <li>Users assigned to this location will remain assigned</li>
@@ -381,7 +380,9 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+            <div
+              class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
+            >
               <UButton
                 color="error"
                 variant="soft"
@@ -464,23 +465,10 @@ const accessLevelOptions = [
 
 // Computed
 const locationTypeColor = computed(
-  ():
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "neutral" => {
+  (): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
     const colors: Record<
       string,
-      | "error"
-      | "info"
-      | "primary"
-      | "secondary"
-      | "success"
-      | "warning"
-      | "neutral"
+      "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
     > = {
       KITCHEN: "warning",
       STORE: "success",
@@ -504,23 +492,10 @@ const locationTypeIcon = computed(() => {
 // Helper functions
 const roleColor = (
   role: string
-):
-  | "error"
-  | "info"
-  | "primary"
-  | "secondary"
-  | "success"
-  | "warning"
-  | "neutral" => {
+): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
   const colors: Record<
     string,
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "neutral"
+    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
   > = {
     ADMIN: "error",
     SUPERVISOR: "warning",
@@ -531,23 +506,10 @@ const roleColor = (
 
 const accessLevelColor = (
   level: string
-):
-  | "error"
-  | "info"
-  | "primary"
-  | "secondary"
-  | "success"
-  | "warning"
-  | "neutral" => {
+): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
   const colors: Record<
     string,
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "neutral"
+    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
   > = {
     MANAGE: "success",
     POST: "primary",
@@ -703,12 +665,9 @@ const confirmDeleteLocation = async () => {
   deletingLocation.value = true;
 
   try {
-    const response = await $fetch<LocationDeleteResponse>(
-      `/api/locations/${location.value.id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const response = await $fetch<LocationDeleteResponse>(`/api/locations/${location.value.id}`, {
+      method: "DELETE",
+    });
 
     // Show appropriate success message based on delete type
     if (response.deactivated) {

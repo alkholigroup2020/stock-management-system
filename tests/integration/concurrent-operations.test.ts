@@ -9,11 +9,7 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  type TestUser,
-} from "../api/helpers/test-server";
+import { loginUser, authenticatedFetch, type TestUser } from "../api/helpers/test-server";
 import {
   testUsers,
   getTestLocationIds,
@@ -103,9 +99,7 @@ describe("Integration: Concurrent Operations", () => {
         user: adminUser,
       });
 
-      const finalRice = stockAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
+      const finalRice = stockAfter.data?.stock?.find((s) => s.item_id === itemIds.rice);
 
       // Total added: 10 + 15 + 20 = 45
       expect(finalRice?.on_hand).toBe(initialRice + 45);
@@ -165,9 +159,7 @@ describe("Integration: Concurrent Operations", () => {
         user: adminUser,
       });
 
-      const initialChicken = stockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const initialChicken = stockBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken);
 
       if (!initialChicken || initialChicken.on_hand < 10) {
         console.warn("Insufficient chicken stock for concurrent issue test, skipping");
@@ -205,9 +197,7 @@ describe("Integration: Concurrent Operations", () => {
         user: adminUser,
       });
 
-      const finalChicken = stockAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const finalChicken = stockAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken);
 
       // Total issued: 5 issues * 2 units = 10
       expect(finalChicken?.on_hand).toBe(initialOnHand - 10);
@@ -224,9 +214,7 @@ describe("Integration: Concurrent Operations", () => {
         user: adminUser,
       });
 
-      const currentOil = stockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.oil
-      );
+      const currentOil = stockBefore.data?.stock?.find((s) => s.item_id === itemIds.oil);
 
       if (!currentOil || currentOil.on_hand < 3) {
         console.warn("Insufficient oil stock for over-depletion test, skipping");
@@ -286,9 +274,7 @@ describe("Integration: Concurrent Operations", () => {
         user: adminUser,
       });
 
-      const initialRice = stockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
+      const initialRice = stockBefore.data?.stock?.find((s) => s.item_id === itemIds.rice);
 
       if (!initialRice || initialRice.on_hand < 15) {
         console.warn("Insufficient rice stock for concurrent transfer test, skipping");
@@ -444,8 +430,7 @@ describe("Integration: Concurrent Operations", () => {
       });
 
       const initialChicken =
-        stockBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand ||
-        0;
+        stockBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
 
       // Run mixed operations
       const operations: Promise<{ status: number }>[] = [];
@@ -499,8 +484,7 @@ describe("Integration: Concurrent Operations", () => {
       });
 
       const finalChicken =
-        stockAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand ||
-        0;
+        stockAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
 
       // Calculate expected change
       const delivered = deliverySuccesses * 5;

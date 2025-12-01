@@ -9,11 +9,7 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  type TestUser,
-} from "../api/helpers/test-server";
+import { loginUser, authenticatedFetch, type TestUser } from "../api/helpers/test-server";
 import {
   testUsers,
   getTestLocationIds,
@@ -56,18 +52,18 @@ describe("Integration: Multi-Location Scenarios", () => {
       });
 
       // Stock endpoints may return 200 or 400 depending on data state
-      if (kitchenStock.status !== 200 || storeStock.status !== 200 || warehouseStock.status !== 200) {
+      if (
+        kitchenStock.status !== 200 ||
+        storeStock.status !== 200 ||
+        warehouseStock.status !== 200
+      ) {
         console.warn("Stock endpoints not available, skipping test");
         return;
       }
 
       // Find chicken stock at each location
-      const kitchenChicken = kitchenStock.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
-      const storeChicken = storeStock.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const kitchenChicken = kitchenStock.data?.stock?.find((s) => s.item_id === itemIds.chicken);
+      const storeChicken = storeStock.data?.stock?.find((s) => s.item_id === itemIds.chicken);
       const warehouseChicken = warehouseStock.data?.stock?.find(
         (s) => s.item_id === itemIds.chicken
       );
@@ -99,12 +95,8 @@ describe("Integration: Multi-Location Scenarios", () => {
         }),
       ]);
 
-      const kitchenRiceBefore = kitchenBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
-      const storeRiceBefore = storeBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
+      const kitchenRiceBefore = kitchenBefore.data?.stock?.find((s) => s.item_id === itemIds.rice);
+      const storeRiceBefore = storeBefore.data?.stock?.find((s) => s.item_id === itemIds.rice);
 
       if (!kitchenRiceBefore || kitchenRiceBefore.on_hand < 2) {
         console.warn("Insufficient kitchen rice stock, skipping test");
@@ -118,15 +110,12 @@ describe("Integration: Multi-Location Scenarios", () => {
         lines: [{ item_id: itemIds.rice, quantity: 1 }],
       };
 
-      const issueResult = await authenticatedFetch(
-        `/api/locations/${locationIds.kitchen}/issues`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(issueData),
-          user: adminUser,
-        }
-      );
+      const issueResult = await authenticatedFetch(`/api/locations/${locationIds.kitchen}/issues`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(issueData),
+        user: adminUser,
+      });
 
       expect(issueResult.status).toBe(200);
 
@@ -144,12 +133,8 @@ describe("Integration: Multi-Location Scenarios", () => {
         }),
       ]);
 
-      const kitchenRiceAfter = kitchenAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
-      const storeRiceAfter = storeAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
+      const kitchenRiceAfter = kitchenAfter.data?.stock?.find((s) => s.item_id === itemIds.rice);
+      const storeRiceAfter = storeAfter.data?.stock?.find((s) => s.item_id === itemIds.rice);
 
       // Kitchen stock should decrease
       expect(kitchenRiceAfter?.on_hand).toBe(kitchenRiceBefore.on_hand - 1);
@@ -204,12 +189,8 @@ describe("Integration: Multi-Location Scenarios", () => {
         }),
       ]);
 
-      const kitchenOil = kitchenStock.data?.stock?.find(
-        (s) => s.item_id === itemIds.oil
-      );
-      const storeOil = storeStock.data?.stock?.find(
-        (s) => s.item_id === itemIds.oil
-      );
+      const kitchenOil = kitchenStock.data?.stock?.find((s) => s.item_id === itemIds.oil);
+      const storeOil = storeStock.data?.stock?.find((s) => s.item_id === itemIds.oil);
 
       // Both locations should have the item, potentially at different WACs
       if (!kitchenOil || !storeOil) {
@@ -258,11 +239,9 @@ describe("Integration: Multi-Location Scenarios", () => {
 
       const warehouseInitial = warehouseChicken.on_hand;
       const kitchenInitial =
-        kitchenBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken)
-          ?.on_hand || 0;
+        kitchenBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
       const storeInitial =
-        storeBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken)
-          ?.on_hand || 0;
+        storeBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
 
       // Step 2: Transfer Warehouse → Kitchen
       const transfer1Data = {
@@ -336,14 +315,11 @@ describe("Integration: Multi-Location Scenarios", () => {
       ]);
 
       const warehouseFinal =
-        warehouseAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)
-          ?.on_hand || 0;
+        warehouseAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
       const kitchenFinal =
-        kitchenAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)
-          ?.on_hand || 0;
+        kitchenAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
       const storeFinal =
-        storeAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)
-          ?.on_hand || 0;
+        storeAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken)?.on_hand || 0;
 
       // Warehouse: lost 3
       expect(warehouseFinal).toBe(warehouseInitial - 3);
@@ -383,9 +359,7 @@ describe("Integration: Multi-Location Scenarios", () => {
       ]);
 
       // Calculate total stock value per location
-      const calculateLocationValue = (
-        stock: Array<{ on_hand: number; wac: number }> | undefined
-      ) =>
+      const calculateLocationValue = (stock: Array<{ on_hand: number; wac: number }> | undefined) =>
         stock?.reduce((sum, item) => sum + item.on_hand * item.wac, 0) || 0;
 
       const kitchenValue = calculateLocationValue(kitchen.data?.stock);

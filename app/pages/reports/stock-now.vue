@@ -273,9 +273,7 @@ onMounted(async () => {
         <!-- Actions -->
         <UFormField label="Actions">
           <div class="flex gap-2">
-            <UButton color="primary" class="cursor-pointer" @click="fetchReport">
-              Generate
-            </UButton>
+            <UButton color="primary" class="cursor-pointer" @click="fetchReport">Generate</UButton>
             <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
               Clear
             </UButton>
@@ -364,7 +362,9 @@ onMounted(async () => {
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-subheading font-semibold">{{ location.location_name }}</h3>
-                <p class="text-caption">{{ location.location_code }} - {{ location.location_type }}</p>
+                <p class="text-caption">
+                  {{ location.location_code }} - {{ location.location_type }}
+                </p>
               </div>
               <div class="flex gap-4 text-right">
                 <div>
@@ -389,27 +389,39 @@ onMounted(async () => {
           <div class="p-4 overflow-x-auto">
             <UTable :columns="columns" :data="location.items" class="w-full">
               <template #item_code-data="{ row }">
-                <span class="font-mono text-body">{{ (row as unknown as StockReportItem).item_code }}</span>
+                <span class="font-mono text-body">
+                  {{ (row as unknown as StockReportItem).item_code }}
+                </span>
               </template>
 
               <template #item_name-data="{ row }">
                 <div>
                   <p class="font-medium">{{ (row as unknown as StockReportItem).item_name }}</p>
-                  <p v-if="(row as unknown as StockReportItem).item_sub_category" class="text-caption">
+                  <p
+                    v-if="(row as unknown as StockReportItem).item_sub_category"
+                    class="text-caption"
+                  >
                     {{ (row as unknown as StockReportItem).item_sub_category }}
                   </p>
                 </div>
               </template>
 
               <template #item_category-data="{ row }">
-                <UBadge v-if="(row as unknown as StockReportItem).item_category" color="neutral" variant="subtle" size="sm">
+                <UBadge
+                  v-if="(row as unknown as StockReportItem).item_category"
+                  color="neutral"
+                  variant="subtle"
+                  size="sm"
+                >
                   {{ (row as unknown as StockReportItem).item_category }}
                 </UBadge>
                 <span v-else class="text-muted">-</span>
               </template>
 
               <template #on_hand-data="{ row }">
-                <span class="font-semibold">{{ formatQuantity((row as unknown as StockReportItem).on_hand) }}</span>
+                <span class="font-semibold">
+                  {{ formatQuantity((row as unknown as StockReportItem).on_hand) }}
+                </span>
               </template>
 
               <template #wac-data="{ row }">
@@ -417,18 +429,38 @@ onMounted(async () => {
               </template>
 
               <template #stock_value-data="{ row }">
-                <span class="font-semibold">{{ formatCurrency((row as unknown as StockReportItem).stock_value) }}</span>
+                <span class="font-semibold">
+                  {{ formatCurrency((row as unknown as StockReportItem).stock_value) }}
+                </span>
               </template>
 
               <template #status-data="{ row }">
                 <div class="flex gap-1">
-                  <UBadge v-if="(row as unknown as StockReportItem).is_low_stock" color="error" variant="subtle" size="xs">
+                  <UBadge
+                    v-if="(row as unknown as StockReportItem).is_low_stock"
+                    color="error"
+                    variant="subtle"
+                    size="xs"
+                  >
                     Low
                   </UBadge>
-                  <UBadge v-if="(row as unknown as StockReportItem).is_over_stock" color="warning" variant="subtle" size="xs">
+                  <UBadge
+                    v-if="(row as unknown as StockReportItem).is_over_stock"
+                    color="warning"
+                    variant="subtle"
+                    size="xs"
+                  >
                     Over
                   </UBadge>
-                  <span v-if="!(row as unknown as StockReportItem).is_low_stock && !(row as unknown as StockReportItem).is_over_stock" class="text-muted">-</span>
+                  <span
+                    v-if="
+                      !(row as unknown as StockReportItem).is_low_stock &&
+                      !(row as unknown as StockReportItem).is_over_stock
+                    "
+                    class="text-muted"
+                  >
+                    -
+                  </span>
                 </div>
               </template>
             </UTable>

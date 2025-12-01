@@ -192,20 +192,10 @@ onMounted(async () => {
       location-scope="current"
     >
       <template #actions>
-        <UButton
-          icon="i-lucide-arrow-left"
-          color="neutral"
-          variant="outline"
-          @click="goBack"
-        >
+        <UButton icon="i-lucide-arrow-left" color="neutral" variant="outline" @click="goBack">
           Back
         </UButton>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-printer"
-          @click="printDelivery"
-        >
+        <UButton color="neutral" variant="outline" icon="i-lucide-printer" @click="printDelivery">
           Print
         </UButton>
       </template>
@@ -362,36 +352,14 @@ onMounted(async () => {
           <table class="w-full">
             <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
               <tr>
-                <th
-                  class="px-4 py-3 text-left text-label uppercase tracking-wider"
-                >
-                  Item
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
-                >
-                  Quantity
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
-                >
-                  Unit Price
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
-                >
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Quantity</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Unit Price</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
                   Period Price
                 </th>
-                <th
-                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
-                >
-                  Variance
-                </th>
-                <th
-                  class="px-4 py-3 text-right text-label uppercase tracking-wider"
-                >
-                  Line Value
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Variance</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-default">

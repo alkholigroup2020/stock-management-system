@@ -118,7 +118,7 @@ const statusOptions = [
 
 // Status badge helper
 function getStatusColor(
-  status: NCR["status"],
+  status: NCR["status"]
 ): "success" | "warning" | "error" | "neutral" | "primary" {
   const statusColors = {
     OPEN: "primary" as const,
@@ -193,16 +193,13 @@ async function handleUpdateStatus() {
   updateLoading.value = true;
 
   try {
-    const response = await $fetch<{ message: string; ncr: NCR }>(
-      `/api/ncrs/${ncrId.value}`,
-      {
-        method: "PATCH",
-        body: {
-          status: statusUpdateForm.value.status,
-          resolution_notes: statusUpdateForm.value.resolution_notes || undefined,
-        },
+    const response = await $fetch<{ message: string; ncr: NCR }>(`/api/ncrs/${ncrId.value}`, {
+      method: "PATCH",
+      body: {
+        status: statusUpdateForm.value.status,
+        resolution_notes: statusUpdateForm.value.resolution_notes || undefined,
       },
-    );
+    });
 
     toast.success("NCR Updated", {
       description: response.message || "NCR status has been updated successfully",
@@ -418,7 +415,9 @@ onMounted(async () => {
             </div>
 
             <!-- Price Variance Details -->
-            <div class="mt-4 p-4 rounded-lg bg-warning-50 dark:bg-warning-950 border border-warning">
+            <div
+              class="mt-4 p-4 rounded-lg bg-warning-50 dark:bg-warning-950 border border-warning"
+            >
               <h3 class="text-label font-semibold mb-3 text-warning-700 dark:text-warning-300">
                 Price Variance Details
               </h3>
@@ -452,7 +451,7 @@ onMounted(async () => {
                   <p class="text-body font-bold text-error">
                     {{
                       formatCurrency(
-                        Math.abs(ncr.delivery_line.unit_price - ncr.delivery_line.period_price),
+                        Math.abs(ncr.delivery_line.unit_price - ncr.delivery_line.period_price)
                       )
                     }}
                     ({{

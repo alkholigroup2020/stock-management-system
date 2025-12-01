@@ -63,35 +63,41 @@ The Excel file is slow to update, easy to break, and hard to audit. Month-end ta
 ### 5.1 User Stories (Core)
 
 **Multi-Location Management:**
+
 - As an Admin, I can create and manage multiple locations
 - As an Operator, I am assigned to specific location(s) and can only post to those locations
 - As a Supervisor, I can view all locations and initiate transfers between them
 - As an Admin, I can view consolidated reports across all locations
 
 **Stock Movement:**
+
 - As an Operator, I post a Delivery to increase stock at my location and update WAC
 - As an Operator, I post an Issue to record usage at my location
 - As a Supervisor, I can create Transfer Orders to move stock between locations
 - As any user, I can view current stock levels for authorized locations
 
 **Price Control (NEW):**
+
 - As the system, I enforce fixed prices per period per item
 - As the system, I automatically create an NCR when a delivery price differs from the period price
 - As an Admin, I can review and resolve price variance NCRs
 
 **Period Management:**
+
 - As a Supervisor, I enter daily POB for each location
 - As a Supervisor, I review Reconciliations for each location
 - As an Admin, I approve and close periods for all locations simultaneously
 - As an Admin, I can view consolidated period summaries
 
 **Progressive Web App (PWA):**
+
 - As any user, I can install the app on my device for quick access
 - As any user, I see clear offline status when internet is unavailable
 - As any user, I can view cached data when offline
 - As the system, I prevent data-modifying operations when offline
 
 **Approvals (CONFIRMED):**
+
 - PRF/PO: Requires Supervisor approval
 - Issues: No approval needed (posts immediately)
 - Reconciliations: No approval needed
@@ -101,44 +107,44 @@ The Excel file is slow to update, easy to break, and hard to audit. Month-end ta
 ### 5.2 Features (MVP)
 
 1. **Location Management**
-    - Create/edit locations
-    - Assign users to locations
-    - Set location types (Kitchen, Store, Central)
+   - Create/edit locations
+   - Assign users to locations
+   - Set location types (Kitchen, Store, Central)
 2. **Dashboard**
-    - Location selector
-    - Period totals per location
-    - Consolidated view for supervisors/admins
-    - Recent activity across locations
+   - Location selector
+   - Period totals per location
+   - Consolidated view for supervisors/admins
+   - Recent activity across locations
 3. **Items & Prices**
-    - Global item master
-    - Period price setting (fixed per period)
-    - Location-specific stock levels
-    - Automatic price variance detection
+   - Global item master
+   - Period price setting (fixed per period)
+   - Location-specific stock levels
+   - Automatic price variance detection
 4. **Orders (PRF â†’ PO)**
-    - Location-specific PRFs
-    - Supervisor approval workflow
-    - PO creation with approved PRFs
+   - Location-specific PRFs
+   - Supervisor approval workflow
+   - PO creation with approved PRFs
 5. **Deliveries & Invoices**
-    - Post to specific location
-    - Automatic NCR generation for price variances
-    - Update location-specific WAC and stock
+   - Post to specific location
+   - Automatic NCR generation for price variances
+   - Update location-specific WAC and stock
 6. **Issues (Food/Clean)**
-    - Location-specific posting
-    - No approval required
-    - Prevent negative stock at location level
+   - Location-specific posting
+   - No approval required
+   - Prevent negative stock at location level
 7. **Transfers (NEW)**
-    - Inter-location stock transfers
-    - Transfer at current WAC
-    - Supervisor approval required
-    - Transfer tracking and history
+   - Inter-location stock transfers
+   - Transfer at current WAC
+   - Supervisor approval required
+   - Transfer tracking and history
 8. **NCR (Non-Conformance Report)**
-    - Manual NCRs for damaged/short items
-    - Automatic NCRs for price variances
-    - Credit tracking per location
+   - Manual NCRs for damaged/short items
+   - Automatic NCRs for price variances
+   - Credit tracking per location
 9. **Stock Now**
-    - View by location
-    - Consolidated view across locations
-    - Real-time valuation per location
+   - View by location
+   - Consolidated view across locations
+   - Real-time valuation per location
 10. **POB (People on Board)**
     - Entry per location
     - Daily crew + extra counts

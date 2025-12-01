@@ -92,7 +92,8 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "PERIOD_LOCKED",
-          message: "Cannot set prices for a period that is not in DRAFT status. Prices are locked once a period is opened.",
+          message:
+            "Cannot set prices for a period that is not in DRAFT status. Prices are locked once a period is opened.",
         },
       });
     }

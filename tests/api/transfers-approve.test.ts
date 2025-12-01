@@ -10,17 +10,8 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  apiFetch,
-  type TestUser,
-} from "./helpers/test-server";
-import {
-  testUsers,
-  getTestLocationIds,
-  getTestItemIds,
-} from "./helpers/test-data";
+import { loginUser, authenticatedFetch, apiFetch, type TestUser } from "./helpers/test-server";
+import { testUsers, getTestLocationIds, getTestItemIds } from "./helpers/test-data";
 
 describe("PATCH /api/transfers/:id/approve", () => {
   let adminUser: TestUser;
@@ -32,10 +23,7 @@ describe("PATCH /api/transfers/:id/approve", () => {
   beforeAll(async () => {
     // Login users
     adminUser = await loginUser(testUsers.admin.username, testUsers.admin.password);
-    supervisorUser = await loginUser(
-      testUsers.supervisor.username,
-      testUsers.supervisor.password
-    );
+    supervisorUser = await loginUser(testUsers.supervisor.username, testUsers.supervisor.password);
     operatorUser = await loginUser(testUsers.operator.username, testUsers.operator.password);
 
     // Get test data IDs
@@ -75,13 +63,10 @@ describe("PATCH /api/transfers/:id/approve", () => {
       expect(transferId).toBeDefined();
 
       // Now approve the transfer
-      const approveResult = await authenticatedFetch(
-        `/api/transfers/${transferId}/approve`,
-        {
-          method: "PATCH",
-          user: supervisorUser, // Supervisor can approve
-        }
-      );
+      const approveResult = await authenticatedFetch(`/api/transfers/${transferId}/approve`, {
+        method: "PATCH",
+        user: supervisorUser, // Supervisor can approve
+      });
 
       expect(approveResult.status).toBe(200);
 
@@ -239,13 +224,10 @@ describe("PATCH /api/transfers/:id/approve", () => {
       });
 
       // Try to approve again (should fail)
-      const secondApproval = await authenticatedFetch(
-        `/api/transfers/${transferId}/approve`,
-        {
-          method: "PATCH",
-          user: adminUser,
-        }
-      );
+      const secondApproval = await authenticatedFetch(`/api/transfers/${transferId}/approve`, {
+        method: "PATCH",
+        user: adminUser,
+      });
 
       expect(secondApproval.status).toBe(400);
 
@@ -283,13 +265,10 @@ describe("PATCH /api/transfers/:id/approve", () => {
       if (createResult.status === 200) {
         const transferId = createResult.data?.transfer.id;
 
-        const approveResult = await authenticatedFetch(
-          `/api/transfers/${transferId}/approve`,
-          {
-            method: "PATCH",
-            user: adminUser,
-          }
-        );
+        const approveResult = await authenticatedFetch(`/api/transfers/${transferId}/approve`, {
+          method: "PATCH",
+          user: adminUser,
+        });
 
         expect(approveResult.status).toBe(400);
 

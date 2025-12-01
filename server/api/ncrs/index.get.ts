@@ -124,56 +124,56 @@ export default defineEventHandler(async (event) => {
     // Fetch NCRs with pagination
     const [ncrs, total] = await Promise.all([
       prisma.nCR.findMany({
-      where,
-      include: {
-        location: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            type: true,
-          },
-        },
-        delivery: {
-          select: {
-            id: true,
-            delivery_no: true,
-            delivery_date: true,
-          },
-        },
-        delivery_line: {
-          select: {
-            id: true,
-            item: {
-              select: {
-                id: true,
-                code: true,
-                name: true,
-                unit: true,
-              },
+        where,
+        include: {
+          location: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              type: true,
             },
-            quantity: true,
-            unit_price: true,
-            period_price: true,
+          },
+          delivery: {
+            select: {
+              id: true,
+              delivery_no: true,
+              delivery_date: true,
+            },
+          },
+          delivery_line: {
+            select: {
+              id: true,
+              item: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  unit: true,
+                },
+              },
+              quantity: true,
+              unit_price: true,
+              period_price: true,
+            },
+          },
+          creator: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              role: true,
+            },
           },
         },
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-            role: true,
-          },
+        orderBy: {
+          created_at: "desc",
         },
-      },
-      orderBy: {
-        created_at: "desc",
-      },
-      skip,
-      take,
-    }),
-    prisma.nCR.count({ where }),
-  ]);
+        skip,
+        take,
+      }),
+      prisma.nCR.count({ where }),
+    ]);
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(total / limit);

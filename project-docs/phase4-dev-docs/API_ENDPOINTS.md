@@ -38,6 +38,7 @@ All API routes (except `/api/auth/*` and `/api/health`) require authentication.
 **Authentication Header:** Cookie-based (automatic with browser)
 
 **For external clients:**
+
 ```http
 Cookie: auth_token=<your_jwt_token>
 ```
@@ -69,18 +70,18 @@ Cookie: auth_token=<your_jwt_token>
 
 ### Common Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `UNAUTHORIZED` | 401 | Not authenticated |
-| `PERMISSION_DENIED` | 403 | Insufficient permissions |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request data |
-| `PERIOD_CLOSED` | 400 | Period is not open |
-| `INSUFFICIENT_STOCK` | 400 | Not enough stock |
-| `LOCATION_ACCESS_DENIED` | 403 | No access to location |
-| `SAME_LOCATION` | 400 | Transfer from/to same location |
-| `PRICE_VARIANCE` | 201 | Price variance detected (auto-NCR created) |
-| `SERVER_ERROR` | 500 | Internal server error |
+| Code                     | HTTP Status | Description                                |
+| ------------------------ | ----------- | ------------------------------------------ |
+| `UNAUTHORIZED`           | 401         | Not authenticated                          |
+| `PERMISSION_DENIED`      | 403         | Insufficient permissions                   |
+| `NOT_FOUND`              | 404         | Resource not found                         |
+| `VALIDATION_ERROR`       | 400         | Invalid request data                       |
+| `PERIOD_CLOSED`          | 400         | Period is not open                         |
+| `INSUFFICIENT_STOCK`     | 400         | Not enough stock                           |
+| `LOCATION_ACCESS_DENIED` | 403         | No access to location                      |
+| `SAME_LOCATION`          | 400         | Transfer from/to same location             |
+| `PRICE_VARIANCE`         | 201         | Price variance detected (auto-NCR created) |
+| `SERVER_ERROR`           | 500         | Internal server error                      |
 
 ## Authentication Endpoints
 
@@ -116,6 +117,7 @@ Authenticate user and create session.
 **Sets Cookie:** `auth_token` (httpOnly, secure in production)
 
 **Errors:**
+
 - `401` - Invalid credentials
 - `403` - Account inactive
 
@@ -150,6 +152,7 @@ Register new user (admin only).
 ```
 
 **Errors:**
+
 - `403` - Not admin
 - `409` - Username/email already exists
 
@@ -192,6 +195,7 @@ Get current user session.
 ```
 
 **Errors:**
+
 - `401` - Not authenticated
 
 ---
@@ -204,10 +208,10 @@ Get all locations.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `type` | string | No | Filter by location type (KITCHEN, STORE, etc.) |
-| `is_active` | boolean | No | Filter by active status |
+| Parameter   | Type    | Required | Description                                    |
+| ----------- | ------- | -------- | ---------------------------------------------- |
+| `type`      | string  | No       | Filter by location type (KITCHEN, STORE, etc.) |
+| `is_active` | boolean | No       | Filter by active status                        |
 
 **Response (200):**
 
@@ -252,6 +256,7 @@ Get single location details.
 ```
 
 **Errors:**
+
 - `404` - Location not found
 - `403` - No access to this location
 
@@ -286,6 +291,7 @@ Create new location (admin only).
 ```
 
 **Errors:**
+
 - `403` - Not admin
 - `409` - Location code already exists
 
@@ -300,7 +306,7 @@ Get location dashboard data.
 ```json
 {
   "summary": {
-    "total_stock_value": 150000.00,
+    "total_stock_value": 150000.0,
     "low_stock_items": 5,
     "pending_transfers": 3,
     "open_ncrs": 2
@@ -311,7 +317,7 @@ Get location dashboard data.
       "id": "uuid",
       "number": "DEL-2025-001",
       "date": "2025-01-15",
-      "total": 5000.00
+      "total": 5000.0
     }
   ],
   "stock_alerts": [
@@ -319,8 +325,8 @@ Get location dashboard data.
       "item_id": "uuid",
       "item_code": "RICE001",
       "item_name": "Basmati Rice",
-      "on_hand": 10.00,
-      "min_stock": 50.00
+      "on_hand": 10.0,
+      "min_stock": 50.0
     }
   ]
 }
@@ -336,13 +342,13 @@ Get all items with pagination.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `page` | number | No | 1 | Page number |
-| `limit` | number | No | 50 | Items per page (max 200) |
-| `category` | string | No | - | Filter by category |
-| `is_active` | boolean | No | true | Filter by active status |
-| `search` | string | No | - | Search by code or name |
+| Parameter   | Type    | Required | Default | Description              |
+| ----------- | ------- | -------- | ------- | ------------------------ |
+| `page`      | number  | No       | 1       | Page number              |
+| `limit`     | number  | No       | 50      | Items per page (max 200) |
+| `category`  | string  | No       | -       | Filter by category       |
+| `is_active` | boolean | No       | true    | Filter by active status  |
+| `search`    | string  | No       | -       | Search by code or name   |
 
 **Response (200):**
 
@@ -389,7 +395,7 @@ Get single item details.
     {
       "period_id": "uuid",
       "period_name": "January 2025",
-      "price": 25.50,
+      "price": 25.5,
       "currency": "SAR"
     }
   ],
@@ -397,8 +403,8 @@ Get single item details.
     {
       "location_id": "uuid",
       "location_name": "Main Kitchen",
-      "on_hand": 100.00,
-      "wac": 24.80
+      "on_hand": 100.0,
+      "wac": 24.8
     }
   ]
 }
@@ -433,6 +439,7 @@ Create new item (admin only).
 ```
 
 **Errors:**
+
 - `403` - Not admin
 - `409` - Item code already exists
 
@@ -471,15 +478,15 @@ Get deliveries for a location.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `page` | number | No | 1 | Page number |
-| `limit` | number | No | 50 | Items per page |
-| `period_id` | string | No | Current | Filter by period |
-| `has_variance` | boolean | No | - | Filter by price variance |
-| `supplier_id` | string | No | - | Filter by supplier |
-| `start_date` | string | No | - | Filter by date range (ISO 8601) |
-| `end_date` | string | No | - | Filter by date range (ISO 8601) |
+| Parameter      | Type    | Required | Default | Description                     |
+| -------------- | ------- | -------- | ------- | ------------------------------- |
+| `page`         | number  | No       | 1       | Page number                     |
+| `limit`        | number  | No       | 50      | Items per page                  |
+| `period_id`    | string  | No       | Current | Filter by period                |
+| `has_variance` | boolean | No       | -       | Filter by price variance        |
+| `supplier_id`  | string  | No       | -       | Filter by supplier              |
+| `start_date`   | string  | No       | -       | Filter by date range (ISO 8601) |
+| `end_date`     | string  | No       | -       | Filter by date range (ISO 8601) |
 
 **Response (200):**
 
@@ -494,7 +501,7 @@ Get deliveries for a location.
         "id": "uuid",
         "name": "ABC Suppliers"
       },
-      "total_amount": 5000.00,
+      "total_amount": 5000.0,
       "has_variance": true,
       "posted_by": {
         "id": "uuid",
@@ -529,13 +536,13 @@ Post a new delivery.
   "lines": [
     {
       "item_id": "uuid",
-      "quantity": 100.00,
-      "unit_price": 25.50
+      "quantity": 100.0,
+      "unit_price": 25.5
     },
     {
       "item_id": "uuid",
-      "quantity": 50.00,
-      "unit_price": 15.00
+      "quantity": 50.0,
+      "unit_price": 15.0
     }
   ]
 }
@@ -547,14 +554,14 @@ Post a new delivery.
 {
   "id": "uuid",
   "delivery_no": "DEL-2025-001",
-  "total_amount": 3300.00,
+  "total_amount": 3300.0,
   "has_variance": true,
   "ncrs_created": [
     {
       "ncr_id": "uuid",
       "ncr_no": "NCR-2025-001",
       "item_id": "uuid",
-      "variance_amount": 50.00
+      "variance_amount": 50.0
     }
   ]
 }
@@ -570,6 +577,7 @@ Post a new delivery.
 6. WAC formula: `(currentQty × currentWAC + receivedQty × receiptPrice) / (currentQty + receivedQty)`
 
 **Errors:**
+
 - `400` - Period closed, invalid data
 - `403` - No access to location
 - `404` - Supplier or items not found
@@ -603,7 +611,7 @@ Get single delivery details.
   "invoice_no": "INV-12345",
   "delivery_date": "2025-01-15",
   "delivery_note": "All items received",
-  "total_amount": 3300.00,
+  "total_amount": 3300.0,
   "has_variance": true,
   "lines": [
     {
@@ -614,11 +622,11 @@ Get single delivery details.
         "name": "Basmati Rice",
         "unit": "KG"
       },
-      "quantity": 100.00,
-      "unit_price": 25.50,
-      "period_price": 25.00,
-      "price_variance": 0.50,
-      "line_value": 2550.00,
+      "quantity": 100.0,
+      "unit_price": 25.5,
+      "period_price": 25.0,
+      "price_variance": 0.5,
+      "line_value": 2550.0,
       "ncr_id": "uuid"
     }
   ],
@@ -640,14 +648,14 @@ Get issues for a location.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `page` | number | No | 1 | Page number |
-| `limit` | number | No | 50 | Items per page |
-| `period_id` | string | No | Current | Filter by period |
-| `cost_centre` | string | No | - | Filter by cost centre |
-| `start_date` | string | No | - | Filter by date range |
-| `end_date` | string | No | - | Filter by date range |
+| Parameter     | Type   | Required | Default | Description           |
+| ------------- | ------ | -------- | ------- | --------------------- |
+| `page`        | number | No       | 1       | Page number           |
+| `limit`       | number | No       | 50      | Items per page        |
+| `period_id`   | string | No       | Current | Filter by period      |
+| `cost_centre` | string | No       | -       | Filter by cost centre |
+| `start_date`  | string | No       | -       | Filter by date range  |
+| `end_date`    | string | No       | -       | Filter by date range  |
 
 **Response (200):**
 
@@ -659,7 +667,7 @@ Get issues for a location.
       "issue_no": "ISS-2025-001",
       "issue_date": "2025-01-15",
       "cost_centre": "FOOD",
-      "total_value": 1500.00,
+      "total_value": 1500.0,
       "posted_by": {
         "id": "uuid",
         "full_name": "Operator One"
@@ -691,11 +699,11 @@ Post a new issue.
   "lines": [
     {
       "item_id": "uuid",
-      "quantity": 10.00
+      "quantity": 10.0
     },
     {
       "item_id": "uuid",
-      "quantity": 5.00
+      "quantity": 5.0
     }
   ]
 }
@@ -707,7 +715,7 @@ Post a new issue.
 {
   "id": "uuid",
   "issue_no": "ISS-2025-001",
-  "total_value": 1500.00
+  "total_value": 1500.0
 }
 ```
 
@@ -720,6 +728,7 @@ Post a new issue.
 5. Calculates line_value = quantity × wac_at_issue
 
 **Errors:**
+
 - `400` - Period closed, insufficient stock
 - `403` - No access to location
 - `404` - Items not found
@@ -746,7 +755,7 @@ Get single issue details.
   },
   "issue_date": "2025-01-15",
   "cost_centre": "FOOD",
-  "total_value": 1500.00,
+  "total_value": 1500.0,
   "notes": "Daily consumption",
   "lines": [
     {
@@ -757,9 +766,9 @@ Get single issue details.
         "name": "Basmati Rice",
         "unit": "KG"
       },
-      "quantity": 10.00,
-      "wac_at_issue": 25.00,
-      "line_value": 250.00
+      "quantity": 10.0,
+      "wac_at_issue": 25.0,
+      "line_value": 250.0
     }
   ],
   "posted_by": {
@@ -780,14 +789,14 @@ Get all transfers (with filters).
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `page` | number | No | 1 | Page number |
-| `limit` | number | No | 50 | Items per page |
-| `status` | string | No | - | Filter by status |
-| `from_location_id` | string | No | - | Filter by source location |
-| `to_location_id` | string | No | - | Filter by destination location |
-| `direction` | string | No | - | `outbound` or `inbound` (requires location_id context) |
+| Parameter          | Type   | Required | Default | Description                                            |
+| ------------------ | ------ | -------- | ------- | ------------------------------------------------------ |
+| `page`             | number | No       | 1       | Page number                                            |
+| `limit`            | number | No       | 50      | Items per page                                         |
+| `status`           | string | No       | -       | Filter by status                                       |
+| `from_location_id` | string | No       | -       | Filter by source location                              |
+| `to_location_id`   | string | No       | -       | Filter by destination location                         |
+| `direction`        | string | No       | -       | `outbound` or `inbound` (requires location_id context) |
 
 **Response (200):**
 
@@ -807,7 +816,7 @@ Get all transfers (with filters).
       },
       "status": "PENDING_APPROVAL",
       "request_date": "2025-01-15",
-      "total_value": 500.00,
+      "total_value": 500.0,
       "requested_by": {
         "id": "uuid",
         "full_name": "Operator One"
@@ -839,7 +848,7 @@ Create new transfer.
   "lines": [
     {
       "item_id": "uuid",
-      "quantity": 20.00
+      "quantity": 20.0
     }
   ]
 }
@@ -852,7 +861,7 @@ Create new transfer.
   "id": "uuid",
   "transfer_no": "TRF-2025-001",
   "status": "DRAFT",
-  "total_value": 500.00
+  "total_value": 500.0
 }
 ```
 
@@ -865,6 +874,7 @@ Create new transfer.
 5. Does NOT move stock yet (happens on approval)
 
 **Errors:**
+
 - `400` - Same location
 - `403` - No access to locations
 - `404` - Locations or items not found
@@ -891,7 +901,7 @@ Approve transfer and execute stock movement (Supervisor/Admin only).
   "transfer_no": "TRF-2025-001",
   "status": "COMPLETED",
   "transfer_date": "2025-01-15",
-  "total_value": 500.00
+  "total_value": 500.0
 }
 ```
 
@@ -907,6 +917,7 @@ Approve transfer and execute stock movement (Supervisor/Admin only).
    - Sets approval_date and transfer_date
 
 **Errors:**
+
 - `403` - Not supervisor/admin
 - `400` - Invalid status, insufficient stock
 - `404` - Transfer not found
@@ -961,7 +972,7 @@ Get single transfer details.
   "request_date": "2025-01-15",
   "approval_date": "2025-01-15",
   "transfer_date": "2025-01-15",
-  "total_value": 500.00,
+  "total_value": 500.0,
   "notes": "Stock replenishment",
   "lines": [
     {
@@ -972,9 +983,9 @@ Get single transfer details.
         "name": "Basmati Rice",
         "unit": "KG"
       },
-      "quantity": 20.00,
-      "wac_at_transfer": 25.00,
-      "line_value": 500.00
+      "quantity": 20.0,
+      "wac_at_transfer": 25.0,
+      "line_value": 500.0
     }
   ],
   "requested_by": {
@@ -998,9 +1009,9 @@ Get all periods.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `status` | string | No | - | Filter by status |
+| Parameter | Type   | Required | Default | Description      |
+| --------- | ------ | -------- | ------- | ---------------- |
+| `status`  | string | No       | -       | Filter by status |
 
 **Response (200):**
 
@@ -1038,6 +1049,7 @@ Get currently open period.
 ```
 
 **Errors:**
+
 - `404` - No open period
 
 ---
@@ -1066,7 +1078,7 @@ Initiate period close (Admin only).
       "location_id": "uuid",
       "location_name": "Main Kitchen",
       "status": "READY",
-      "closing_value": 150000.00
+      "closing_value": 150000.0
     }
   ]
 }
@@ -1081,6 +1093,7 @@ Initiate period close (Admin only).
 5. Creates next period (if not exists)
 
 **Errors:**
+
 - `403` - Not admin
 - `400` - Not all locations ready
 
@@ -1097,7 +1110,7 @@ Mark location as ready for period close (Supervisor/Admin).
   "period_id": "uuid",
   "location_id": "uuid",
   "status": "READY",
-  "closing_value": 150000.00,
+  "closing_value": 150000.0,
   "ready_at": "2025-01-31T23:59:00Z"
 }
 ```
@@ -1110,6 +1123,7 @@ Mark location as ready for period close (Supervisor/Admin).
 4. Updates PeriodLocation status to READY
 
 **Errors:**
+
 - `403` - Not supervisor/admin or no access
 - `400` - Period not open
 
@@ -1123,11 +1137,11 @@ Get current stock report (all locations or specific location).
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `location_id` | string | No | All | Filter by location |
-| `category` | string | No | - | Filter by item category |
-| `low_stock_only` | boolean | No | false | Show only low stock items |
+| Parameter        | Type    | Required | Default | Description               |
+| ---------------- | ------- | -------- | ------- | ------------------------- |
+| `location_id`    | string  | No       | All     | Filter by location        |
+| `category`       | string  | No       | -       | Filter by item category   |
+| `low_stock_only` | boolean | No       | false   | Show only low stock items |
 
 **Response (200):**
 
@@ -1148,15 +1162,15 @@ Get current stock report (all locations or specific location).
         "code": "KITCHEN",
         "name": "Main Kitchen"
       },
-      "on_hand": 100.00,
-      "wac": 25.00,
-      "stock_value": 2500.00,
-      "min_stock": 50.00,
+      "on_hand": 100.0,
+      "wac": 25.0,
+      "stock_value": 2500.0,
+      "min_stock": 50.0,
       "is_low_stock": false
     }
   ],
   "summary": {
-    "total_stock_value": 150000.00,
+    "total_stock_value": 150000.0,
     "low_stock_items": 5
   }
 }
@@ -1170,10 +1184,10 @@ Get reconciliation report for a period and location.
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `period_id` | string | Yes | Period ID |
-| `location_id` | string | Yes | Location ID |
+| Parameter     | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `period_id`   | string | Yes      | Period ID   |
+| `location_id` | string | Yes      | Location ID |
 
 **Response (200):**
 
@@ -1187,21 +1201,22 @@ Get reconciliation report for a period and location.
     "id": "uuid",
     "name": "Main Kitchen"
   },
-  "opening_stock": 100000.00,
-  "receipts": 75000.00,
-  "transfers_in": 5000.00,
-  "transfers_out": 10000.00,
-  "issues": 50000.00,
-  "adjustments": 0.00,
-  "back_charges": 500.00,
-  "credits": 200.00,
-  "condemnations": 300.00,
-  "closing_stock": 119400.00,
-  "variance": 0.00
+  "opening_stock": 100000.0,
+  "receipts": 75000.0,
+  "transfers_in": 5000.0,
+  "transfers_out": 10000.0,
+  "issues": 50000.0,
+  "adjustments": 0.0,
+  "back_charges": 500.0,
+  "credits": 200.0,
+  "condemnations": 300.0,
+  "closing_stock": 119400.0,
+  "variance": 0.0
 }
 ```
 
 **Formula:**
+
 ```
 closing_stock = opening_stock + receipts + transfers_in
                 - transfers_out - issues + adjustments
@@ -1283,7 +1298,7 @@ Content-Type: application/json
 {
   "id": "del-789",
   "delivery_no": "DEL-2025-001",
-  "total_amount": 2600.00,
+  "total_amount": 2600.0,
   "has_variance": true,
   "ncrs_created": [
     {
@@ -1291,9 +1306,9 @@ Content-Type: application/json
       "ncr_no": "NCR-2025-001",
       "item_id": "item-456",
       "item_name": "Basmati Rice",
-      "expected_price": 25.00,
-      "actual_price": 26.00,
-      "variance_amount": 100.00,
+      "expected_price": 25.0,
+      "actual_price": 26.0,
+      "variance_amount": 100.0,
       "reason": "Price variance: Actual SAR 26.00 vs Period SAR 25.00 (Variance: SAR 1.00 per KG, Total: SAR 100.00)"
     }
   ]
@@ -1317,6 +1332,7 @@ Currently no rate limiting implemented. Future versions may include:
 Current version: **v1** (implicit, no version prefix)
 
 Future versions will use:
+
 - `GET /api/v2/items` - Versioned endpoints
 
 ---

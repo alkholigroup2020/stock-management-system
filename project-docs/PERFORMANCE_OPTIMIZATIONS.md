@@ -105,7 +105,7 @@ This document outlines the performance optimizations implemented to ensure all A
 
 ```typescript
 setCacheHeaders(event, {
-  maxAge: 300,              // Browser cache: 5 minutes
+  maxAge: 300, // Browser cache: 5 minutes
   staleWhileRevalidate: 60, // Serve stale for 60s while revalidating
 });
 ```
@@ -193,13 +193,13 @@ node scripts/test-api-performance.mjs
 
 Based on the PRD requirements:
 
-| Operation Type | Target | Implementation Status |
-|---------------|--------|----------------------|
-| Single location operations | < 1s | ✅ Achieved with caching |
-| Cross-location operations | < 2s | ✅ Optimized queries |
-| Report generation | < 5s | ✅ Pagination + indexes |
-| Master data retrieval | < 500ms | ✅ Caching enabled |
-| Health checks | < 100ms | ✅ Lightweight endpoint |
+| Operation Type             | Target  | Implementation Status    |
+| -------------------------- | ------- | ------------------------ |
+| Single location operations | < 1s    | ✅ Achieved with caching |
+| Cross-location operations  | < 2s    | ✅ Optimized queries     |
+| Report generation          | < 5s    | ✅ Pagination + indexes  |
+| Master data retrieval      | < 500ms | ✅ Caching enabled       |
+| Health checks              | < 100ms | ✅ Lightweight endpoint  |
 
 ---
 
@@ -273,14 +273,14 @@ When to invalidate caches:
 
 Based on implementation:
 
-| Endpoint | First Request | Cached Request | Notes |
-|----------|--------------|----------------|-------|
-| /api/items | 200-400ms | 10-50ms | Depends on item count |
-| /api/locations | 100-300ms | 10-50ms | Few locations |
-| /api/suppliers | 100-300ms | 10-50ms | Few suppliers |
-| /api/periods/current | 150-350ms | 10-50ms | Single query |
-| /api/user/locations | 100-300ms | 10-50ms | User-specific |
-| /api/health | 5-20ms | N/A | No database |
+| Endpoint             | First Request | Cached Request | Notes                 |
+| -------------------- | ------------- | -------------- | --------------------- |
+| /api/items           | 200-400ms     | 10-50ms        | Depends on item count |
+| /api/locations       | 100-300ms     | 10-50ms        | Few locations         |
+| /api/suppliers       | 100-300ms     | 10-50ms        | Few suppliers         |
+| /api/periods/current | 150-350ms     | 10-50ms        | Single query          |
+| /api/user/locations  | 100-300ms     | 10-50ms        | User-specific         |
+| /api/health          | 5-20ms        | N/A            | No database           |
 
 **All targets achieved:** All endpoints return < 1s even on first request.
 

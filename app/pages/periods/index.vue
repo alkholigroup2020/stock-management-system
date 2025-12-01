@@ -62,7 +62,11 @@
         <UIcon name="i-lucide-calendar-x" class="w-16 h-16 mx-auto mb-4 text-muted" />
         <h3 class="text-heading3 font-semibold mb-2">No Periods Found</h3>
         <p class="text-body text-muted mb-6">
-          {{ searchQuery ? "No periods match your search." : "Get started by creating your first period." }}
+          {{
+            searchQuery
+              ? "No periods match your search."
+              : "Get started by creating your first period."
+          }}
         </p>
         <UButton
           v-if="isAdmin && !searchQuery"
@@ -107,20 +111,14 @@
 
               <!-- Status -->
               <td class="py-4 px-4">
-                <UBadge
-                  :color="getStatusColor(period.status) as any"
-                  variant="subtle"
-                  size="md"
-                >
+                <UBadge :color="getStatusColor(period.status) as any" variant="subtle" size="md">
                   {{ period.status }}
                 </UBadge>
               </td>
 
               <!-- Locations -->
               <td class="py-4 px-4">
-                <div class="text-body">
-                  {{ period.period_locations?.length || 0 }} locations
-                </div>
+                <div class="text-body">{{ period.period_locations?.length || 0 }} locations</div>
               </td>
 
               <!-- Actions -->
@@ -158,130 +156,130 @@
     <UModal v-model:open="showCreateModal">
       <template #content>
         <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-heading3 font-semibold">Create New Period</h3>
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-x"
-              size="sm"
-              @click="closeCreateModal"
-            />
-          </div>
-        </template>
-
-        <form @submit.prevent="handleCreatePeriod">
-          <div class="space-y-6">
-            <!-- Period Name -->
-            <div>
-              <label for="period-name" class="form-label">
-                Period Name
-                <span class="text-error">*</span>
-              </label>
-              <UInput
-                id="period-name"
-                v-model="createForm.name"
-                placeholder="e.g., January 2025"
-                size="lg"
-                :disabled="isCreating"
-                :error="!!createErrors.name"
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-heading3 font-semibold">Create New Period</h3>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                @click="closeCreateModal"
               />
-              <p v-if="createErrors.name" class="mt-1 text-caption text-error">
-                {{ createErrors.name }}
-              </p>
             </div>
+          </template>
 
-            <!-- Start Date -->
-            <div>
-              <label for="start-date" class="form-label">
-                Start Date
-                <span class="text-error">*</span>
-              </label>
-              <UInput
-                id="start-date"
-                v-model="createForm.start_date"
-                type="date"
-                size="lg"
-                :disabled="isCreating"
-                :error="!!createErrors.start_date"
+          <form @submit.prevent="handleCreatePeriod">
+            <div class="space-y-6">
+              <!-- Period Name -->
+              <div>
+                <label for="period-name" class="form-label">
+                  Period Name
+                  <span class="text-error">*</span>
+                </label>
+                <UInput
+                  id="period-name"
+                  v-model="createForm.name"
+                  placeholder="e.g., January 2025"
+                  size="lg"
+                  :disabled="isCreating"
+                  :error="!!createErrors.name"
+                />
+                <p v-if="createErrors.name" class="mt-1 text-caption text-error">
+                  {{ createErrors.name }}
+                </p>
+              </div>
+
+              <!-- Start Date -->
+              <div>
+                <label for="start-date" class="form-label">
+                  Start Date
+                  <span class="text-error">*</span>
+                </label>
+                <UInput
+                  id="start-date"
+                  v-model="createForm.start_date"
+                  type="date"
+                  size="lg"
+                  :disabled="isCreating"
+                  :error="!!createErrors.start_date"
+                />
+                <p v-if="createErrors.start_date" class="mt-1 text-caption text-error">
+                  {{ createErrors.start_date }}
+                </p>
+              </div>
+
+              <!-- End Date -->
+              <div>
+                <label for="end-date" class="form-label">
+                  End Date
+                  <span class="text-error">*</span>
+                </label>
+                <UInput
+                  id="end-date"
+                  v-model="createForm.end_date"
+                  type="date"
+                  size="lg"
+                  :disabled="isCreating"
+                  :error="!!createErrors.end_date"
+                />
+                <p v-if="createErrors.end_date" class="mt-1 text-caption text-error">
+                  {{ createErrors.end_date }}
+                </p>
+              </div>
+
+              <!-- Status -->
+              <div>
+                <label for="status" class="form-label">
+                  Initial Status
+                  <span class="text-error">*</span>
+                </label>
+                <USelectMenu
+                  v-model="createForm.status"
+                  :items="statusOptions"
+                  value-key="value"
+                  placeholder="Select status"
+                  size="lg"
+                  :disabled="isCreating"
+                />
+                <p class="mt-1 text-caption text-muted">
+                  DRAFT periods can be edited before opening. OPEN periods are immediately active.
+                </p>
+              </div>
+
+              <!-- Info Alert -->
+              <UAlert
+                v-if="previousPeriodInfo"
+                color="primary"
+                icon="i-lucide-info"
+                :title="previousPeriodInfo.title"
+                :description="previousPeriodInfo.description"
               />
-              <p v-if="createErrors.start_date" class="mt-1 text-caption text-error">
-                {{ createErrors.start_date }}
-              </p>
             </div>
+          </form>
 
-            <!-- End Date -->
-            <div>
-              <label for="end-date" class="form-label">
-                End Date
-                <span class="text-error">*</span>
-              </label>
-              <UInput
-                id="end-date"
-                v-model="createForm.end_date"
-                type="date"
-                size="lg"
+          <template #footer>
+            <div class="flex items-center justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="closeCreateModal"
                 :disabled="isCreating"
-                :error="!!createErrors.end_date"
-              />
-              <p v-if="createErrors.end_date" class="mt-1 text-caption text-error">
-                {{ createErrors.end_date }}
-              </p>
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="primary"
+                icon="i-lucide-plus"
+                class="cursor-pointer"
+                :loading="isCreating"
+                @click="handleCreatePeriod"
+              >
+                Create Period
+              </UButton>
             </div>
-
-            <!-- Status -->
-            <div>
-              <label for="status" class="form-label">
-                Initial Status
-                <span class="text-error">*</span>
-              </label>
-              <USelectMenu
-                v-model="createForm.status"
-                :items="statusOptions"
-                value-key="value"
-                placeholder="Select status"
-                size="lg"
-                :disabled="isCreating"
-              />
-              <p class="mt-1 text-caption text-muted">
-                DRAFT periods can be edited before opening. OPEN periods are immediately active.
-              </p>
-            </div>
-
-            <!-- Info Alert -->
-            <UAlert
-              v-if="previousPeriodInfo"
-              color="primary"
-              icon="i-lucide-info"
-              :title="previousPeriodInfo.title"
-              :description="previousPeriodInfo.description"
-            />
-          </div>
-        </form>
-
-        <template #footer>
-          <div class="flex items-center justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              class="cursor-pointer"
-              @click="closeCreateModal"
-              :disabled="isCreating"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              color="primary"
-              icon="i-lucide-plus"
-              class="cursor-pointer"
-              :loading="isCreating"
-              @click="handleCreatePeriod"
-            >
-              Create Period
-            </UButton>
-          </div>
-        </template>
+          </template>
         </UCard>
       </template>
     </UModal>
@@ -304,7 +302,12 @@ const isAdmin = computed(() => user.value?.role === "ADMIN");
 const searchQuery = ref("");
 
 // Fetch periods
-const { data: periods, pending, error, refresh } = await useFetch("/api/periods", {
+const {
+  data: periods,
+  pending,
+  error,
+  refresh,
+} = await useFetch("/api/periods", {
   method: "GET",
 });
 
@@ -322,9 +325,8 @@ const filteredPeriods = computed(() => {
   const query = searchQuery.value.toLowerCase();
   if (!query) return periods.value.periods;
 
-  return periods.value.periods.filter((p: any) =>
-    p.name.toLowerCase().includes(query) ||
-    p.status.toLowerCase().includes(query)
+  return periods.value.periods.filter(
+    (p: any) => p.name.toLowerCase().includes(query) || p.status.toLowerCase().includes(query)
   );
 });
 
@@ -355,8 +357,8 @@ const previousPeriodInfo = computed(() => {
   const closedPeriods = periods.value.periods.filter((p: any) => p.status === "CLOSED");
   if (closedPeriods.length === 0) return null;
 
-  const sortedPeriods = closedPeriods.sort((a: any, b: any) =>
-    new Date(b.end_date).getTime() - new Date(a.end_date).getTime()
+  const sortedPeriods = closedPeriods.sort(
+    (a: any, b: any) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime()
   );
 
   const latest = sortedPeriods[0];

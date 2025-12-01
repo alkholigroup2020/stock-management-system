@@ -9,17 +9,20 @@ Imagine you have a big house with multiple storage rooms. The **Kitchen** runs o
 ### Real Business Scenario
 
 Let's say you manage 4 locations:
+
 - **Kitchen** - Where food is prepared
 - **Store** - Main storage area
 - **Central** - Distribution center
 - **Warehouse** - Bulk storage
 
 Every day, these locations need to share stock:
+
 - Kitchen needs ingredients from Store
 - Store needs bulk items broken down from Warehouse
 - Central distributes to all locations
 
 Without a transfer system, you would need to:
+
 1. Manually reduce stock in one location
 2. Manually add stock in another location
 3. Keep paper records
@@ -59,6 +62,7 @@ journey
 **Rule:** You cannot transfer more than you have.
 
 **Example:**
+
 - Store has 50 KG rice
 - Kitchen requests 60 KG rice
 - System **blocks** this transfer
@@ -71,12 +75,14 @@ journey
 **Rule:** All transfers need supervisor approval before stock moves.
 
 **Example:**
+
 - Operator creates transfer for 100 KG flour
 - Status = PENDING_APPROVAL
 - Supervisor must approve
 - Only then stock moves
 
 **Why:**
+
 - Prevents mistakes (what if someone typed 1000 instead of 100?)
 - Prevents theft (unauthorized stock movement)
 - Creates accountability (we know who approved)
@@ -86,6 +92,7 @@ journey
 **Rule:** Source and destination must be different.
 
 **Example:**
+
 - Cannot transfer from Kitchen to Kitchen
 - Must be Kitchen to Store, or Store to Central, etc.
 
@@ -96,6 +103,7 @@ journey
 **Rule:** When stock moves, its cost (WAC) moves too.
 
 **Example:**
+
 - Store has rice at SAR 5.00/KG
 - Transfer 20 KG to Kitchen
 - Kitchen receives 20 KG at SAR 5.00/KG
@@ -109,6 +117,7 @@ journey
 
 **Example:**
 If transferring 3 items:
+
 - Rice: 10 KG
 - Oil: 5 LTR
 - Sugar: 15 KG
@@ -173,13 +182,13 @@ erDiagram
 
 ### Status Values
 
-| Status | Description | Who Can Set |
-|--------|-------------|-------------|
-| DRAFT | Being created, not submitted | Operator |
+| Status           | Description                  | Who Can Set        |
+| ---------------- | ---------------------------- | ------------------ |
+| DRAFT            | Being created, not submitted | Operator           |
 | PENDING_APPROVAL | Awaiting supervisor approval | System (on submit) |
-| APPROVED | Approved but not executed | Supervisor/Admin |
-| REJECTED | Supervisor rejected | Supervisor/Admin |
-| COMPLETED | Stock moved successfully | System (automatic) |
+| APPROVED         | Approved but not executed    | Supervisor/Admin   |
+| REJECTED         | Supervisor rejected          | Supervisor/Admin   |
+| COMPLETED        | Stock moved successfully     | System (automatic) |
 
 ## API Implementation Details
 
@@ -242,6 +251,7 @@ erDiagram
    - If insufficient now, rollback and error
 
 5. **Move Stock** (for each item)
+
    ```
    a. Deduct from source:
       - LocationStock.quantity -= transfer_quantity
@@ -327,6 +337,7 @@ erDiagram
    - Change from location → resets items (different stock)
 
 2. **Item Lines Management**
+
    ```
    For each line:
    - Item dropdown (only active items)
@@ -354,6 +365,7 @@ erDiagram
 **Comprehensive View:**
 
 1. **Header Information**
+
    ```
    Transfer No: TRF-2025-001        Status: [PENDING_APPROVAL]
    Request Date: 15/11/2025 10:30
@@ -385,10 +397,12 @@ erDiagram
 ### Error 1: Insufficient Stock
 
 **When it happens:**
+
 - During transfer creation
 - During approval (stock changed)
 
 **Error Message:**
+
 ```
 Insufficient stock for transfer:
 - Rice: Requested 50 KG, Available 30 KG
@@ -396,6 +410,7 @@ Insufficient stock for transfer:
 ```
 
 **Solution:**
+
 - Reduce quantities
 - Or wait for new delivery
 - Or transfer from different location
@@ -403,29 +418,35 @@ Insufficient stock for transfer:
 ### Error 2: Location Access Denied
 
 **When it happens:**
+
 - Operator tries to transfer from location they don't have access to
 
 **Error Message:**
+
 ```
 You don't have access to location: Central Kitchen
 ```
 
 **Solution:**
+
 - Admin must grant location access
 - Or use a location you have access to
 
 ### Error 3: Invalid Status Transition
 
 **When it happens:**
+
 - Trying to approve already completed transfer
 - Trying to reject already rejected transfer
 
 **Error Message:**
+
 ```
 Transfer already completed and cannot be modified
 ```
 
 **Solution:**
+
 - Check transfer status first
 - Create new transfer if needed
 
@@ -434,6 +455,7 @@ Transfer already completed and cannot be modified
 ### Database Indexes
 
 We added indexes for:
+
 - `transfer.status` + `transfer.request_date` (composite)
 - `transfer.from_location_id`
 - `transfer.to_location_id`
@@ -450,6 +472,7 @@ We added indexes for:
 ### Batch Operations
 
 When approving transfer with 20 items:
+
 - Use single transaction
 - Batch all LocationStock updates
 - Single commit at end
@@ -459,12 +482,14 @@ When approving transfer with 20 items:
 ## Testing Checklist
 
 ### Unit Tests
+
 - ✅ WAC calculation after transfer
 - ✅ Stock validation logic
 - ✅ Transfer number generation
 - ✅ Permission checks
 
 ### Integration Tests
+
 - ✅ Create transfer with multiple items
 - ✅ Approve with stock movement
 - ✅ Reject with reason
@@ -472,6 +497,7 @@ When approving transfer with 20 items:
 - ✅ Same location validation
 
 ### End-to-End Tests
+
 - ✅ Complete transfer workflow
 - ✅ Filter and pagination
 - ✅ Permission-based UI elements
@@ -480,29 +506,36 @@ When approving transfer with 20 items:
 ## Best Practices Learned
 
 ### 1. Always Re-validate
+
 Don't trust that stock is still available at approval time. Always check again.
 
 ### 2. Use Transactions
+
 Stock movement must be atomic. Use database transactions.
 
 ### 3. Clear Error Messages
+
 Tell users exactly what's wrong and how to fix it.
 
 ### 4. Audit Everything
+
 Keep complete records of who requested, who approved, when, and why.
 
 ### 5. Think About Scale
+
 Design for thousands of transfers per month from day one.
 
 ## Future Enhancements
 
 ### Phase 3 Possibilities
+
 - Bulk transfers (multiple items in one go)
 - Transfer templates (save common transfers)
 - Scheduled transfers (recurring needs)
 - Transfer analytics (patterns and trends)
 
 ### Post-MVP Ideas
+
 - Barcode scanning for transfers
 - Mobile app for on-the-go transfers
 - Email notifications for approvals
@@ -511,6 +544,7 @@ Design for thousands of transfers per month from day one.
 ## Summary
 
 Transfer Management is a **critical feature** that enables multi-location operations. It ensures:
+
 - Stock moves safely between locations
 - Proper approval workflow
 - Accurate cost tracking
@@ -521,4 +555,4 @@ The implementation handles all edge cases, provides clear user feedback, and sca
 
 ---
 
-*Remember: Good transfer management prevents stock-outs, reduces waste, and keeps operations running smoothly.*
+_Remember: Good transfer management prevents stock-outs, reduces waste, and keeps operations running smoothly._

@@ -6,12 +6,12 @@ This document describes the custom slash commands available for UI development a
 
 ## Quick Reference
 
-| Command | Purpose |
-|---------|---------|
-| `/audit-ui` | Check UI consistency against UI_DESIGN_GUIDE.md |
-| `/validate-tokens` | Find design token violations |
-| `/generate-component` | Create component boilerplate |
-| `/audit-a11y` | Run live accessibility audit |
+| Command               | Purpose                                         |
+| --------------------- | ----------------------------------------------- |
+| `/audit-ui`           | Check UI consistency against UI_DESIGN_GUIDE.md |
+| `/validate-tokens`    | Find design token violations                    |
+| `/generate-component` | Create component boilerplate                    |
+| `/audit-a11y`         | Run live accessibility audit                    |
 
 ---
 
@@ -76,13 +76,13 @@ Creates boilerplate code following project standards.
 
 ### Available templates
 
-| Type | Description | Output Path |
-|------|-------------|-------------|
-| `page` | Full page with header, padding, offline handling | `app/pages/[name].vue` |
-| `feature` | Feature component with typed props/emits | `app/components/[feature]/[Name].vue` |
-| `form` | Form with Zod validation and error handling | `app/components/[feature]/[Name]Form.vue` |
-| `store` | Pinia store with typed state/actions | `app/stores/[name].ts` |
-| `composable` | Composable with proper typing | `app/composables/use[Name].ts` |
+| Type         | Description                                      | Output Path                               |
+| ------------ | ------------------------------------------------ | ----------------------------------------- |
+| `page`       | Full page with header, padding, offline handling | `app/pages/[name].vue`                    |
+| `feature`    | Feature component with typed props/emits         | `app/components/[feature]/[Name].vue`     |
+| `form`       | Form with Zod validation and error handling      | `app/components/[feature]/[Name]Form.vue` |
+| `store`      | Pinia store with typed state/actions             | `app/stores/[name].ts`                    |
+| `composable` | Composable with proper typing                    | `app/composables/use[Name].ts`            |
 
 ### Usage
 

@@ -156,7 +156,9 @@ function handleChange(dateStr: string) {
             </td>
 
             <!-- Total -->
-            <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-semibold text-[var(--ui-text)]">
+            <td
+              class="px-4 py-3 whitespace-nowrap text-center text-sm font-semibold text-[var(--ui-text)]"
+            >
               <div class="flex items-center justify-center gap-2">
                 <span>{{ entries.get(dateStr)!.total_count }}</span>
                 <UIcon

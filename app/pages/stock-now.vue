@@ -128,16 +128,12 @@ const filteredStock = computed(() => {
 
     // Apply category filter
     if (selectedCategory.value) {
-      items = items.filter(
-        (item) => item.item_category === selectedCategory.value
-      );
+      items = items.filter((item) => item.item_category === selectedCategory.value);
     }
 
     // Apply low stock filter
     if (showLowStockOnly.value) {
-      items = items.filter((item) =>
-        item.locations.some((loc) => loc.is_low_stock)
-      );
+      items = items.filter((item) => item.locations.some((loc) => loc.is_low_stock));
     }
 
     return items;
@@ -156,9 +152,7 @@ const filteredStock = computed(() => {
 
     // Apply category filter
     if (selectedCategory.value) {
-      items = items.filter(
-        (item) => item.item_category === selectedCategory.value
-      );
+      items = items.filter((item) => item.item_category === selectedCategory.value);
     }
 
     // Apply low stock filter
@@ -358,8 +352,7 @@ const exportToCSV = () => {
 
   if (viewMode.value === "consolidated") {
     // Consolidated view CSV
-    csvContent =
-      "Item Code,Item Name,Unit,Category,Total On Hand,Total Value,Locations\n";
+    csvContent = "Item Code,Item Name,Unit,Category,Total On Hand,Total Value,Locations\n";
     filteredStock.value.forEach((item: any) => {
       const locationCount = item.locations?.length || 0;
       const row = [
@@ -473,10 +466,7 @@ watch(
     </LayoutPageHeader>
 
     <!-- Location Selector (when in single location mode and supervisor/admin) -->
-    <div
-      v-if="isAtLeastSupervisor && viewMode === 'single'"
-      class="card-elevated p-4"
-    >
+    <div v-if="isAtLeastSupervisor && viewMode === 'single'" class="card-elevated p-4">
       <UFormField label="Select Location">
         <USelectMenu
           v-model="selectedLocationId"
@@ -504,9 +494,7 @@ watch(
               {{ formatCurrency(totalInventoryValue) }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 rounded-lg bg-(--ui-primary)/10 flex items-center justify-center"
-          >
+          <div class="w-12 h-12 rounded-lg bg-(--ui-primary)/10 flex items-center justify-center">
             <UIcon name="i-lucide-coins" class="text-2xl text-primary" />
           </div>
         </div>
@@ -521,19 +509,14 @@ watch(
               {{ totalItems }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center"
-          >
+          <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
             <UIcon name="i-lucide-boxes" class="text-2xl text-emerald-500" />
           </div>
         </div>
       </div>
 
       <!-- Locations (consolidated view only) -->
-      <div
-        v-if="viewMode === 'consolidated' && consolidatedData"
-        class="card-elevated p-6"
-      >
+      <div v-if="viewMode === 'consolidated' && consolidatedData" class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-caption">Active Locations</p>
@@ -541,9 +524,7 @@ watch(
               {{ consolidatedData.total_locations }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center"
-          >
+          <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
             <UIcon name="i-lucide-map-pin" class="text-2xl text-blue-500" />
           </div>
         </div>
@@ -561,9 +542,7 @@ watch(
               {{ stockData.location.code }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center"
-          >
+          <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
             <UIcon name="i-lucide-warehouse" class="text-2xl text-blue-500" />
           </div>
         </div>
@@ -603,14 +582,7 @@ watch(
         <!-- Filter Actions -->
         <UFormField label="Actions">
           <div class="flex gap-2">
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="clearFilters"
-              block
-            >
-              Clear
-            </UButton>
+            <UButton color="neutral" variant="outline" @click="clearFilters" block>Clear</UButton>
           </div>
         </UFormField>
       </div>
@@ -643,11 +615,7 @@ watch(
 
       <!-- Stock Table - Single Location View -->
       <div v-else-if="viewMode === 'single'" class="p-6">
-        <UTable
-          :columns="stockColumns"
-          :data="filteredStock as StockItem[]"
-          class="w-full"
-        >
+        <UTable :columns="stockColumns" :data="filteredStock as StockItem[]" class="w-full">
           <!-- Item Code -->
           <template #item_code-data="{ row }">
             <span class="font-mono text-body">{{ (row as any).item_code }}</span>
@@ -657,10 +625,7 @@ watch(
           <template #item_name-data="{ row }">
             <div>
               <p class="font-medium">{{ (row as any).item_name }}</p>
-              <p
-                v-if="(row as any).item_sub_category"
-                class="text-caption"
-              >
+              <p v-if="(row as any).item_sub_category" class="text-caption">
                 {{ (row as any).item_sub_category }}
               </p>
             </div>
@@ -673,11 +638,7 @@ watch(
 
           <!-- Category -->
           <template #item_category-data="{ row }">
-            <UBadge
-              v-if="(row as any).item_category"
-              color="neutral"
-              variant="subtle"
-            >
+            <UBadge v-if="(row as any).item_category" color="neutral" variant="subtle">
               {{ (row as any).item_category }}
             </UBadge>
             <span v-else class="text-muted">-</span>
@@ -686,15 +647,8 @@ watch(
           <!-- On Hand -->
           <template #on_hand-data="{ row }">
             <div class="flex items-center gap-2">
-              <span class="font-semibold">{{
-                formatQuantity((row as any).on_hand)
-              }}</span>
-              <UBadge
-                v-if="(row as any).is_low_stock"
-                color="error"
-                variant="subtle"
-                size="xs"
-              >
+              <span class="font-semibold">{{ formatQuantity((row as any).on_hand) }}</span>
+              <UBadge v-if="(row as any).is_low_stock" color="error" variant="subtle" size="xs">
                 Low
               </UBadge>
             </div>
@@ -707,9 +661,7 @@ watch(
 
           <!-- Value -->
           <template #value-data="{ row }">
-            <span class="font-semibold">{{
-              formatCurrency((row as any).value)
-            }}</span>
+            <span class="font-semibold">{{ formatCurrency((row as any).value) }}</span>
           </template>
         </UTable>
       </div>
@@ -730,10 +682,7 @@ watch(
           <template #item_name-data="{ row }">
             <div>
               <p class="font-medium">{{ (row as any).item_name }}</p>
-              <p
-                v-if="(row as any).item_sub_category"
-                class="text-caption"
-              >
+              <p v-if="(row as any).item_sub_category" class="text-caption">
                 {{ (row as any).item_sub_category }}
               </p>
             </div>
@@ -746,11 +695,7 @@ watch(
 
           <!-- Category -->
           <template #item_category-data="{ row }">
-            <UBadge
-              v-if="(row as any).item_category"
-              color="neutral"
-              variant="subtle"
-            >
+            <UBadge v-if="(row as any).item_category" color="neutral" variant="subtle">
               {{ (row as any).item_category }}
             </UBadge>
             <span v-else class="text-muted">-</span>
@@ -758,16 +703,12 @@ watch(
 
           <!-- Total On Hand -->
           <template #total_on_hand-data="{ row }">
-            <span class="font-semibold">{{
-              formatQuantity((row as any).total_on_hand)
-            }}</span>
+            <span class="font-semibold">{{ formatQuantity((row as any).total_on_hand) }}</span>
           </template>
 
           <!-- Total Value -->
           <template #total_value-data="{ row }">
-            <span class="font-semibold">{{
-              formatCurrency((row as any).total_value)
-            }}</span>
+            <span class="font-semibold">{{ formatCurrency((row as any).total_value) }}</span>
           </template>
 
           <!-- Locations -->

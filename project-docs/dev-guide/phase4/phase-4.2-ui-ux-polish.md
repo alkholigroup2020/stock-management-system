@@ -1,4 +1,5 @@
 # Phase 4.2: UI/UX Polish
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -32,12 +33,14 @@
 **Polish** means making everything smooth, consistent, and professional - like polishing a rough stone to make it shiny.
 
 Think of it like this:
+
 - **Before Polish:** A working car with rough paint, uncomfortable seats, and confusing buttons
 - **After Polish:** The same car but with shiny paint, comfortable seats, and clear buttons
 
 ### Why We Need UI/UX Polish
 
 **Problems before polish:**
+
 - ❌ Pages look different from each other
 - ❌ Users wait without knowing what's happening
 - ❌ Error messages are confusing
@@ -46,6 +49,7 @@ Think of it like this:
 - ❌ Hard to use with keyboard only
 
 **Benefits after polish:**
+
 - ✅ All pages look similar and professional
 - ✅ Loading spinners show when waiting
 - ✅ Clear error messages with helpful suggestions
@@ -83,6 +87,7 @@ We made all pages look similar by using the same colors, spacing, fonts, and but
 #### The Problem
 
 Before this task, different pages looked different:
+
 - Some pages used `p-6` (padding), others used `p-4` or custom padding
 - Some pages used CSS variables like `var(--ui-text-muted)`, others used `text-gray-500`
 - Some buttons had `cursor-pointer` class, others didn't
@@ -111,6 +116,7 @@ We created **rules** that all pages must follow:
 **1. Page Padding Rule**
 
 All pages (except login) must use:
+
 ```vue
 <div class="p-4 md:p-6">
   <!-- Page content -->
@@ -118,12 +124,14 @@ All pages (except login) must use:
 ```
 
 This means:
+
 - **Mobile phones:** `p-4` = 16 pixels padding
 - **Tablets/Computers:** `md:p-6` = 24 pixels padding
 
 **2. Spacing Between Elements**
 
 Use `space-y-6` for vertical spacing:
+
 ```vue
 <div class="space-y-6">
   <ComponentA />  <!-- 24px gap -->
@@ -136,12 +144,12 @@ Use `space-y-6` for vertical spacing:
 
 Instead of CSS variables or manual Tailwind colors, use design system classes:
 
-| Old (Wrong) | New (Correct) | Purpose |
-|-------------|---------------|---------|
-| `style="color: var(--ui-text-muted)"` | `class="text-muted"` | Muted text color |
-| `bg-[var(--ui-bg-elevated)]` | `bg-elevated` | Card background |
-| `border-[var(--ui-border)]` | `border-default` | Border color |
-| `text-gray-600` | `text-muted` | Consistent muted text |
+| Old (Wrong)                           | New (Correct)        | Purpose               |
+| ------------------------------------- | -------------------- | --------------------- |
+| `style="color: var(--ui-text-muted)"` | `class="text-muted"` | Muted text color      |
+| `bg-[var(--ui-bg-elevated)]`          | `bg-elevated`        | Card background       |
+| `border-[var(--ui-border)]`           | `border-default`     | Border color          |
+| `text-gray-600`                       | `text-muted`         | Consistent muted text |
 
 **4. Typography Classes**
 
@@ -193,25 +201,26 @@ Instead of writing manual headers, use the reusable component:
 
 #### Pages We Fixed
 
-| Page | What We Fixed |
-|------|---------------|
-| `pob.vue` | Added `space-y-6`, switched to PageHeader, replaced CSS vars with utilities |
-| `reconciliations.vue` | Fixed padding, used typography classes, added PageHeader |
-| `period-close.vue` | Replaced manual spacing, added design system classes |
-| `periods/index.vue` | Fixed header, used consistent spacing |
-| `deliveries/create.vue` | Added `cursor-pointer` to buttons |
-| `issues/create.vue` | Added `cursor-pointer` to buttons |
-| `transfers/create.vue` | Added `cursor-pointer` to buttons |
-| `ncrs/create.vue` | Added `cursor-pointer` to buttons |
-| `items/index.vue` | Added `cursor-pointer` to buttons |
-| `items/[id]/edit.vue` | Added `cursor-pointer` to buttons |
-| `locations/index.vue` | Added `cursor-pointer` to buttons |
+| Page                    | What We Fixed                                                               |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `pob.vue`               | Added `space-y-6`, switched to PageHeader, replaced CSS vars with utilities |
+| `reconciliations.vue`   | Fixed padding, used typography classes, added PageHeader                    |
+| `period-close.vue`      | Replaced manual spacing, added design system classes                        |
+| `periods/index.vue`     | Fixed header, used consistent spacing                                       |
+| `deliveries/create.vue` | Added `cursor-pointer` to buttons                                           |
+| `issues/create.vue`     | Added `cursor-pointer` to buttons                                           |
+| `transfers/create.vue`  | Added `cursor-pointer` to buttons                                           |
+| `ncrs/create.vue`       | Added `cursor-pointer` to buttons                                           |
+| `items/index.vue`       | Added `cursor-pointer` to buttons                                           |
+| `items/[id]/edit.vue`   | Added `cursor-pointer` to buttons                                           |
+| `locations/index.vue`   | Added `cursor-pointer` to buttons                                           |
 
 ---
 
 ### Files Modified
 
 Over **10+ pages** were updated with consistent styling rules:
+
 - `app/pages/pob.vue`
 - `app/pages/reconciliations.vue`
 - `app/pages/period-close.vue`
@@ -234,6 +243,7 @@ Over **10+ pages** were updated with consistent styling rules:
 When the app is loading data from the server (database), users need to know "something is happening." Without loading indicators, users think the app is broken or frozen.
 
 We created three types of loading indicators:
+
 1. **Table Skeleton** - shows when loading a list
 2. **Card Skeleton** - shows when loading content inside a card
 3. **Loading Overlay** - shows during multi-step processes
@@ -243,11 +253,13 @@ We created three types of loading indicators:
 #### The Problem
 
 Before this task, pages showed either:
+
 - Nothing (blank page while loading)
 - A simple spinner (not professional)
 - Different loading styles on different pages
 
 **Example:**
+
 ```vue
 <!-- Old way - just a spinner -->
 <div v-if="isLoading" class="flex justify-center p-8">
@@ -279,8 +291,8 @@ Used when loading a **list of items** (deliveries, issues, transfers):
 
 <script setup lang="ts">
 defineProps<{
-  columns?: number;  // How many columns (default: 5)
-  rows?: number;     // How many rows to show (default: 5)
+  columns?: number; // How many columns (default: 5)
+  rows?: number; // How many rows to show (default: 5)
 }>();
 </script>
 ```
@@ -345,9 +357,9 @@ Used when loading **content inside a card**:
 
 <script setup lang="ts">
 defineProps<{
-  showTitle?: boolean;     // Show title skeleton (default: true)
-  showSubtitle?: boolean;  // Show subtitle skeleton (default: false)
-  showActions?: boolean;   // Show action buttons skeleton (default: false)
+  showTitle?: boolean; // Show title skeleton (default: true)
+  showSubtitle?: boolean; // Show subtitle skeleton (default: false)
+  showActions?: boolean; // Show action buttons skeleton (default: false)
 }>();
 </script>
 ```
@@ -377,7 +389,9 @@ Used for **multi-step processes** like period close:
 ```vue
 <!-- app/components/Common/LoadingOverlay.vue -->
 <template>
-  <div class="fixed inset-0 bg-default/80 backdrop-blur-sm flex items-center justify-center z-[200]">
+  <div
+    class="fixed inset-0 bg-default/80 backdrop-blur-sm flex items-center justify-center z-[200]"
+  >
     <div class="bg-elevated border border-default rounded-lg p-8 max-w-md w-full space-y-6">
       <!-- Spinner icon -->
       <div class="flex justify-center">
@@ -409,10 +423,10 @@ Used for **multi-step processes** like period close:
 
 <script setup lang="ts">
 const props = defineProps<{
-  title: string;           // e.g., "Closing Period"
-  description?: string;    // e.g., "Please wait while we process..."
-  currentStep?: number;    // e.g., 1
-  totalSteps?: number;     // e.g., 2
+  title: string; // e.g., "Closing Period"
+  description?: string; // e.g., "Please wait while we process..."
+  currentStep?: number; // e.g., 1
+  totalSteps?: number; // e.g., 2
 }>();
 
 const progressPercent = computed(() => {
@@ -450,11 +464,11 @@ const currentStep = ref(0);
 
 const handleClosePeriod = async () => {
   isClosing.value = true;
-  currentStep.value = 1;  // Step 1: Locking prices
+  currentStep.value = 1; // Step 1: Locking prices
 
   await lockPrices();
 
-  currentStep.value = 2;  // Step 2: Closing period
+  currentStep.value = 2; // Step 2: Closing period
 
   await closePeriod();
 
@@ -500,6 +514,7 @@ sequenceDiagram
 ```
 
 **Without loading states:**
+
 - User clicks button
 - **Nothing happens for 2 seconds**
 - User clicks again (double click)
@@ -507,6 +522,7 @@ sequenceDiagram
 - Confusion and bugs
 
 **With loading states:**
+
 - User clicks button
 - **Skeleton appears immediately**
 - User waits patiently
@@ -517,22 +533,22 @@ sequenceDiagram
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
-| `app/components/Common/TableSkeleton.vue` | Skeleton for table lists |
-| `app/components/Common/CardSkeleton.vue` | Skeleton for card content |
+| File                                       | Purpose                           |
+| ------------------------------------------ | --------------------------------- |
+| `app/components/Common/TableSkeleton.vue`  | Skeleton for table lists          |
+| `app/components/Common/CardSkeleton.vue`   | Skeleton for card content         |
 | `app/components/Common/LoadingOverlay.vue` | Full-screen loading with progress |
 
 ### Files Modified
 
-| File | Change |
-|------|--------|
+| File                             | Change                                |
+| -------------------------------- | ------------------------------------- |
 | `app/pages/deliveries/index.vue` | Uses TableSkeleton instead of spinner |
-| `app/pages/issues/index.vue` | Uses TableSkeleton instead of spinner |
-| `app/pages/transfers/index.vue` | Uses TableSkeleton instead of spinner |
-| `app/pages/items/index.vue` | Uses TableSkeleton instead of spinner |
-| `app/pages/ncrs/index.vue` | Uses TableSkeleton instead of spinner |
-| `app/pages/period-close.vue` | Uses LoadingOverlay for close process |
+| `app/pages/issues/index.vue`     | Uses TableSkeleton instead of spinner |
+| `app/pages/transfers/index.vue`  | Uses TableSkeleton instead of spinner |
+| `app/pages/items/index.vue`      | Uses TableSkeleton instead of spinner |
+| `app/pages/ncrs/index.vue`       | Uses TableSkeleton instead of spinner |
+| `app/pages/period-close.vue`     | Uses LoadingOverlay for close process |
 
 ---
 
@@ -543,6 +559,7 @@ sequenceDiagram
 When something goes wrong (network error, validation error, database error), we need to show **clear** and **helpful** error messages. Not just "Error 500" - that doesn't help the user!
 
 We created a system that:
+
 1. Knows about common errors
 2. Shows friendly messages
 3. Gives helpful suggestions
@@ -552,6 +569,7 @@ We created a system that:
 #### The Problem
 
 Before this task, error messages were:
+
 - **Technical:** "H3Error: Insufficient stock at location"
 - **Unhelpful:** "An error occurred"
 - **Inconsistent:** Different pages showed errors differently
@@ -559,12 +577,8 @@ Before this task, error messages were:
 **Example of bad error handling:**
 
 ```vue
-try {
-  await submitDelivery();
-} catch (error) {
-  // Not helpful!
-  toast.error("Error: " + error.message);
-}
+try { await submitDelivery(); } catch (error) { // Not helpful! toast.error("Error: " +
+error.message); }
 ```
 
 #### The Solution: useErrorHandler Composable
@@ -678,43 +692,43 @@ flowchart TD
 
 **1. Stock Errors**
 
-| Code | When It Happens | Message |
-|------|----------------|---------|
-| `INSUFFICIENT_STOCK` | Issuing more than available | "There is not enough stock available. Check current stock levels." |
-| `NEGATIVE_STOCK_NOT_ALLOWED` | Operation would create negative stock | "This would result in negative stock. Verify the quantity." |
-| `STOCK_LOCKED` | Period closed, can't modify stock | "Stock is locked for this period. Wait for next period." |
+| Code                         | When It Happens                       | Message                                                            |
+| ---------------------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `INSUFFICIENT_STOCK`         | Issuing more than available           | "There is not enough stock available. Check current stock levels." |
+| `NEGATIVE_STOCK_NOT_ALLOWED` | Operation would create negative stock | "This would result in negative stock. Verify the quantity."        |
+| `STOCK_LOCKED`               | Period closed, can't modify stock     | "Stock is locked for this period. Wait for next period."           |
 
 **2. Location Errors**
 
-| Code | When It Happens | Message |
-|------|----------------|---------|
-| `LOCATION_ACCESS_DENIED` | User accessing wrong location | "You don't have permission. Contact your supervisor." |
-| `SAME_LOCATION` | Transfer from/to same location | "Cannot transfer within the same location. Choose a different destination." |
-| `LOCATION_NOT_FOUND` | Location doesn't exist | "The location was not found. It may have been deleted." |
+| Code                     | When It Happens                | Message                                                                     |
+| ------------------------ | ------------------------------ | --------------------------------------------------------------------------- |
+| `LOCATION_ACCESS_DENIED` | User accessing wrong location  | "You don't have permission. Contact your supervisor."                       |
+| `SAME_LOCATION`          | Transfer from/to same location | "Cannot transfer within the same location. Choose a different destination." |
+| `LOCATION_NOT_FOUND`     | Location doesn't exist         | "The location was not found. It may have been deleted."                     |
 
 **3. Period Errors**
 
-| Code | When It Happens | Message |
-|------|----------------|---------|
-| `PERIOD_CLOSED` | Trying to post to closed period | "The accounting period is closed. Wait for next period." |
-| `PERIOD_NOT_READY` | Trying to close unready period | "Location not ready to close. Complete reconciliation first." |
-| `PERIOD_ALREADY_CLOSED` | Trying to close already-closed period | "This period is already closed. No action needed." |
+| Code                    | When It Happens                       | Message                                                       |
+| ----------------------- | ------------------------------------- | ------------------------------------------------------------- |
+| `PERIOD_CLOSED`         | Trying to post to closed period       | "The accounting period is closed. Wait for next period."      |
+| `PERIOD_NOT_READY`      | Trying to close unready period        | "Location not ready to close. Complete reconciliation first." |
+| `PERIOD_ALREADY_CLOSED` | Trying to close already-closed period | "This period is already closed. No action needed."            |
 
 **4. Permission Errors**
 
-| Code | When It Happens | Message |
-|------|----------------|---------|
+| Code                | When It Happens          | Message                                             |
+| ------------------- | ------------------------ | --------------------------------------------------- |
 | `PERMISSION_DENIED` | Insufficient permissions | "You don't have permission. Contact administrator." |
-| `UNAUTHORIZED` | Not logged in | "Your session expired. Please log in again." |
-| `ROLE_REQUIRED` | Need higher role | "This action requires supervisor or admin role." |
+| `UNAUTHORIZED`      | Not logged in            | "Your session expired. Please log in again."        |
+| `ROLE_REQUIRED`     | Need higher role         | "This action requires supervisor or admin role."    |
 
 **5. Network Errors**
 
-| Code | When It Happens | Message |
-|------|----------------|---------|
+| Code            | When It Happens        | Message                                             |
+| --------------- | ---------------------- | --------------------------------------------------- |
 | `NETWORK_ERROR` | No internet connection | "Could not connect to server. Check your internet." |
-| `SERVER_ERROR` | Server down or broken | "Server error occurred. Please try again later." |
-| `TIMEOUT` | Request took too long | "Request timed out. Please try again." |
+| `SERVER_ERROR`  | Server down or broken  | "Server error occurred. Please try again later."    |
+| `TIMEOUT`       | Request took too long  | "Request timed out. Please try again."              |
 
 ---
 
@@ -770,18 +784,18 @@ const submitDelivery = async () => {
 
 ### Files Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/composables/useErrorHandler.ts` | ~200 | Error handling composable with 20+ error codes |
+| File                                 | Lines | Purpose                                        |
+| ------------------------------------ | ----- | ---------------------------------------------- |
+| `app/composables/useErrorHandler.ts` | ~200  | Error handling composable with 20+ error codes |
 
 ### Files Modified
 
-| File | Change |
-|------|--------|
+| File                              | Change                               |
+| --------------------------------- | ------------------------------------ |
 | `app/pages/deliveries/create.vue` | Uses `handleError()` in catch blocks |
-| `app/pages/issues/create.vue` | Uses `handleError()` in catch blocks |
-| `app/pages/transfers/create.vue` | Uses `handleError()` in catch blocks |
-| `app/pages/ncrs/create.vue` | Uses `handleError()` in catch blocks |
+| `app/pages/issues/create.vue`     | Uses `handleError()` in catch blocks |
+| `app/pages/transfers/create.vue`  | Uses `handleError()` in catch blocks |
+| `app/pages/ncrs/create.vue`       | Uses `handleError()` in catch blocks |
 
 ---
 
@@ -790,6 +804,7 @@ const submitDelivery = async () => {
 ### Simple Explanation
 
 When a list has no items (no deliveries, no issues, etc.), we should show a helpful message instead of a blank page. Empty states:
+
 - Tell users why the list is empty
 - Suggest what to do next
 - Include a button to create the first item
@@ -799,11 +814,13 @@ When a list has no items (no deliveries, no issues, etc.), we should show a help
 #### The Problem
 
 Before this task, empty lists showed:
+
 - Nothing at all (confusing!)
 - Generic text like "No data" (not helpful!)
 - No guidance on what to do next
 
 **Example:**
+
 ```vue
 <!-- Old way - not helpful -->
 <div v-if="deliveries.length === 0" class="text-center p-8">
@@ -814,6 +831,7 @@ Before this task, empty lists showed:
 #### The Solution: CommonEmptyState Component
 
 We created a reusable component that shows:
+
 - An icon
 - A title
 - A helpful message
@@ -824,7 +842,9 @@ We created a reusable component that shows:
 <template>
   <div class="flex flex-col items-center justify-center p-12 text-center">
     <!-- Icon -->
-    <div class="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
+    <div
+      class="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4"
+    >
       <UIcon :name="icon" class="w-8 h-8 text-muted" />
     </div>
 
@@ -841,9 +861,9 @@ We created a reusable component that shows:
 
 <script setup lang="ts">
 defineProps<{
-  icon: string;         // e.g., "i-heroicons-inbox"
-  title: string;        // e.g., "No Deliveries Yet"
-  description: string;  // e.g., "Start by creating your first delivery"
+  icon: string; // e.g., "i-heroicons-inbox"
+  title: string; // e.g., "No Deliveries Yet"
+  description: string; // e.g., "Start by creating your first delivery"
 }>();
 </script>
 ```
@@ -900,12 +920,7 @@ const emptyStateMessage = computed(() => {
   >
     <!-- Only show action button if no filters -->
     <template #action>
-      <UButton
-        v-if="!hasFilters"
-        to="/deliveries/create"
-        color="primary"
-        class="cursor-pointer"
-      >
+      <UButton v-if="!hasFilters" to="/deliveries/create" color="primary" class="cursor-pointer">
         New Delivery
       </UButton>
     </template>
@@ -916,6 +931,7 @@ const emptyStateMessage = computed(() => {
 **Two scenarios:**
 
 **Scenario 1: No data at all**
+
 ```
 ┌────────────────────────────────┐
 │         📦                     │
@@ -932,6 +948,7 @@ const emptyStateMessage = computed(() => {
 ```
 
 **Scenario 2: Filters applied, no results**
+
 ```
 ┌────────────────────────────────┐
 │         📦                     │
@@ -951,31 +968,31 @@ const emptyStateMessage = computed(() => {
 
 #### Empty States for All Lists
 
-| Page | Icon | Title | Message (No Filters) |
-|------|------|-------|---------------------|
-| Deliveries | `i-heroicons-inbox` | No Deliveries Yet | Start by creating your first delivery |
-| Issues | `i-heroicons-arrow-up-tray` | No Issues Yet | Create your first stock issue |
-| Transfers | `i-heroicons-arrow-path` | No Transfers Yet | Create your first transfer between locations |
-| NCRs | `i-heroicons-exclamation-triangle` | No NCRs | No non-conformance reports created yet |
-| Items | `i-heroicons-cube` | No Items Yet | Add your first inventory item |
+| Page       | Icon                               | Title             | Message (No Filters)                         |
+| ---------- | ---------------------------------- | ----------------- | -------------------------------------------- |
+| Deliveries | `i-heroicons-inbox`                | No Deliveries Yet | Start by creating your first delivery        |
+| Issues     | `i-heroicons-arrow-up-tray`        | No Issues Yet     | Create your first stock issue                |
+| Transfers  | `i-heroicons-arrow-path`           | No Transfers Yet  | Create your first transfer between locations |
+| NCRs       | `i-heroicons-exclamation-triangle` | No NCRs           | No non-conformance reports created yet       |
+| Items      | `i-heroicons-cube`                 | No Items Yet      | Add your first inventory item                |
 
 ---
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                   | Purpose                        |
+| -------------------------------------- | ------------------------------ |
 | `app/components/Common/EmptyState.vue` | Reusable empty state component |
 
 ### Files Modified
 
-| File | Change |
-|------|--------|
+| File                             | Change                                          |
+| -------------------------------- | ----------------------------------------------- |
 | `app/pages/deliveries/index.vue` | Uses CommonEmptyState with filter-aware message |
-| `app/pages/issues/index.vue` | Uses CommonEmptyState with filter-aware message |
-| `app/pages/transfers/index.vue` | Uses CommonEmptyState with filter-aware message |
-| `app/pages/ncrs/index.vue` | Uses CommonEmptyState with filter-aware message |
-| `app/pages/items/index.vue` | Uses CommonEmptyState with filter-aware message |
+| `app/pages/issues/index.vue`     | Uses CommonEmptyState with filter-aware message |
+| `app/pages/transfers/index.vue`  | Uses CommonEmptyState with filter-aware message |
+| `app/pages/ncrs/index.vue`       | Uses CommonEmptyState with filter-aware message |
+| `app/pages/items/index.vue`      | Uses CommonEmptyState with filter-aware message |
 
 ---
 
@@ -984,6 +1001,7 @@ const emptyStateMessage = computed(() => {
 ### Simple Explanation
 
 **Responsive** means the app works well on **all screen sizes**:
+
 - Small phones (320px wide)
 - Large phones (400px wide)
 - Tablets (768px wide)
@@ -997,6 +1015,7 @@ The layout must **adapt** to each size - not just shrink!
 #### The Problem
 
 Before this task:
+
 - Mobile users couldn't access the navigation menu
 - Tables were too wide on phones
 - Buttons were too small to tap
@@ -1026,10 +1045,7 @@ We need TWO components for navigation:
 <template>
   <UDashboardLayout>
     <!-- Navigation Sidebar -->
-    <UDashboardSidebar
-      :open="isSidebarOpen"
-      @update:open="(value) => (isSidebarOpen = value)"
-    >
+    <UDashboardSidebar :open="isSidebarOpen" @update:open="(value) => (isSidebarOpen = value)">
       <!-- Mobile: Hamburger menu button (visible only on phones) -->
       <UDashboardSidebarToggle
         :open="isSidebarOpen"
@@ -1079,28 +1095,19 @@ flowchart TD
 
 Tailwind CSS uses these screen sizes:
 
-| Breakpoint | Size | Device | Prefix |
-|------------|------|--------|--------|
-| (default) | 0px - 639px | Small phones | (none) |
-| `sm:` | 640px - 767px | Large phones | `sm:` |
-| `md:` | 768px - 1023px | Tablets | `md:` |
-| `lg:` | 1024px - 1279px | Laptops | `lg:` |
-| `xl:` | 1280px+ | Desktop | `xl:` |
+| Breakpoint | Size            | Device       | Prefix |
+| ---------- | --------------- | ------------ | ------ |
+| (default)  | 0px - 639px     | Small phones | (none) |
+| `sm:`      | 640px - 767px   | Large phones | `sm:`  |
+| `md:`      | 768px - 1023px  | Tablets      | `md:`  |
+| `lg:`      | 1024px - 1279px | Laptops      | `lg:`  |
+| `xl:`      | 1280px+         | Desktop      | `xl:`  |
 
 **Example of responsive classes:**
 
 ```vue
 <!-- Mobile: 4 padding, Tablet/Desktop: 6 padding -->
-<div class="p-4 md:p-6">
-
-<!-- Hidden on mobile, visible on desktop -->
-<div class="hidden lg:flex">
-
-<!-- Full width on mobile, 1/2 width on tablet, 1/3 on desktop -->
-<div class="w-full md:w-1/2 lg:w-1/3">
-
-<!-- Single column on mobile, 2 columns on tablet, 3 on desktop -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="p-4 md:p-6"></div>
 ```
 
 ---
@@ -1116,6 +1123,7 @@ await page.setViewportSize({ width: 375, height: 812 });
 ```
 
 **What we verified:**
+
 - ✅ Hamburger menu button appears
 - ✅ Clicking hamburger opens full-screen menu
 - ✅ Navigation items stack vertically
@@ -1131,6 +1139,7 @@ await page.setViewportSize({ width: 768, height: 1024 });
 ```
 
 **What we verified:**
+
 - ✅ Hamburger menu still visible (below 1024px)
 - ✅ Cards display in 2-column grid
 - ✅ Padding switches to `md:p-6` (24px)
@@ -1144,6 +1153,7 @@ await page.setViewportSize({ width: 1920, height: 1080 });
 ```
 
 **What we verified:**
+
 - ✅ Sidebar always visible (not modal)
 - ✅ Collapse button shows (not hamburger)
 - ✅ Cards display in 3+ column grid
@@ -1155,6 +1165,7 @@ await page.setViewportSize({ width: 1920, height: 1080 });
 #### Visual Comparison
 
 **Mobile Layout:**
+
 ```
 ┌─────────────────────┐
 │ [☰] Header          │ ← Hamburger menu
@@ -1172,6 +1183,7 @@ await page.setViewportSize({ width: 1920, height: 1080 });
 ```
 
 **Desktop Layout:**
+
 ```
 ┌──────┬────────────────────────────────┐
 │      │  Header                        │
@@ -1188,10 +1200,10 @@ await page.setViewportSize({ width: 1920, height: 1080 });
 
 ### Files Modified
 
-| File | Change |
-|------|--------|
+| File                      | Change                                         |
+| ------------------------- | ---------------------------------------------- |
 | `app/layouts/default.vue` | Added mobile toggle + desktop collapse buttons |
-| All pages | Verified responsive padding `p-4 md:p-6` |
+| All pages                 | Verified responsive padding `p-4 md:p-6`       |
 
 ---
 
@@ -1200,6 +1212,7 @@ await page.setViewportSize({ width: 1920, height: 1080 });
 ### Simple Explanation
 
 **Accessibility** means making the app usable by **everyone**, including:
+
 - People who use keyboard instead of mouse
 - People who use screen readers (for blind users)
 - People with color blindness
@@ -1212,6 +1225,7 @@ Our goal: **WCAG 2.1 AA compliance** (international accessibility standard).
 #### The Problem
 
 Before this task:
+
 - Keyboard users couldn't skip navigation (had to Tab through 20+ links)
 - Screen reader users didn't know what sections of the page were
 - Some buttons had no labels (just icons)
@@ -1339,14 +1353,14 @@ Buttons with only icons need labels for screen readers:
 
 **All icon buttons we labeled:**
 
-| Button | Icon | ARIA Label |
-|--------|------|------------|
-| Logo | `i-heroicons-building-storefront` | "Go to dashboard" |
-| Notifications | `i-heroicons-bell` | "Notifications" |
-| Theme Toggle | `i-heroicons-moon` / `i-heroicons-sun` | "Toggle dark mode" |
-| User Menu | Avatar | "User menu: [Name]" |
-| Mobile Location | `i-heroicons-map-pin` | "Switch location" |
-| Mobile Toggle | `i-heroicons-bars-3` | "Open navigation menu" |
+| Button          | Icon                                   | ARIA Label             |
+| --------------- | -------------------------------------- | ---------------------- |
+| Logo            | `i-heroicons-building-storefront`      | "Go to dashboard"      |
+| Notifications   | `i-heroicons-bell`                     | "Notifications"        |
+| Theme Toggle    | `i-heroicons-moon` / `i-heroicons-sun` | "Toggle dark mode"     |
+| User Menu       | Avatar                                 | "User menu: [Name]"    |
+| Mobile Location | `i-heroicons-map-pin`                  | "Switch location"      |
+| Mobile Toggle   | `i-heroicons-bars-3`                   | "Open navigation menu" |
 
 ---
 
@@ -1357,12 +1371,15 @@ Headings must follow order: H1 → H2 → H3 (no skipping!):
 ```vue
 <!-- Wrong - skips H2 -->
 <h1>Dashboard</h1>
-<h3>Recent Activity</h3>  ❌
+<h3>Recent Activity</h3>
+❌
 
 <!-- Correct - follows order -->
 <h1>Dashboard</h1>
-<h2>Recent Activity</h2>  ✅
-<h3>Today's Deliveries</h3>  ✅
+<h2>Recent Activity</h2>
+✅
+<h3>Today's Deliveries</h3>
+✅
 ```
 
 **Why this matters:**
@@ -1375,20 +1392,20 @@ Screen reader users navigate by headings (like a table of contents). Skipping le
 
 All text must have enough contrast against the background:
 
-| WCAG Level | Contrast Ratio | Required For |
-|------------|---------------|--------------|
-| AA (Normal text) | 4.5:1 | Body text, labels |
-| AA (Large text) | 3:1 | Headings (18px+) |
-| AAA (Enhanced) | 7:1 | Maximum accessibility |
+| WCAG Level       | Contrast Ratio | Required For          |
+| ---------------- | -------------- | --------------------- |
+| AA (Normal text) | 4.5:1          | Body text, labels     |
+| AA (Large text)  | 3:1            | Headings (18px+)      |
+| AAA (Enhanced)   | 7:1            | Maximum accessibility |
 
 **Our colors:**
 
-| Element | Foreground | Background | Ratio | Result |
-|---------|-----------|------------|-------|--------|
-| Body text | `#000000` | `#FFFFFF` | 21:1 | ✅ AAA |
-| Muted text | `#71717A` | `#FFFFFF` | 4.6:1 | ✅ AA |
-| Primary button | `#FFFFFF` | `#000046` | 16.3:1 | ✅ AAA |
-| Success badge | `#064E3B` | `#D1FAE5` | 7.5:1 | ✅ AAA |
+| Element        | Foreground | Background | Ratio  | Result |
+| -------------- | ---------- | ---------- | ------ | ------ |
+| Body text      | `#000000`  | `#FFFFFF`  | 21:1   | ✅ AAA |
+| Muted text     | `#71717A`  | `#FFFFFF`  | 4.6:1  | ✅ AA  |
+| Primary button | `#FFFFFF`  | `#000046`  | 16.3:1 | ✅ AAA |
+| Success badge  | `#064E3B`  | `#D1FAE5`  | 7.5:1  | ✅ AAA |
 
 ---
 
@@ -1413,6 +1430,7 @@ Tab Order:
 ```
 
 **Verified:**
+
 - ✅ All interactive elements reachable by Tab
 - ✅ Tab order is logical (top-to-bottom, left-to-right)
 - ✅ Focus ring visible on all elements
@@ -1450,6 +1468,7 @@ No Issues Found!
 We validated the accessibility tree structure using Chrome DevTools:
 
 **Accessibility Tree:**
+
 ```
 application
 ├─ navigation "Main navigation"
@@ -1470,6 +1489,7 @@ application
 ```
 
 **Verified:**
+
 - ✅ All landmarks have descriptive labels
 - ✅ Headings follow sequential order (H1 → H2 → H3)
 - ✅ All buttons have accessible names
@@ -1479,32 +1499,32 @@ application
 
 #### Accessibility Checklist
 
-| Category | Test | Result |
-|----------|------|--------|
-| **Keyboard** | All elements reachable by Tab | ✅ Pass |
-| **Keyboard** | Focus order is logical | ✅ Pass |
-| **Keyboard** | Focus ring visible | ✅ Pass |
-| **Keyboard** | Skip to main content works | ✅ Pass |
-| **ARIA** | Landmarks have labels | ✅ Pass |
-| **ARIA** | Icon buttons have labels | ✅ Pass |
-| **ARIA** | Form inputs have labels | ✅ Pass |
-| **Structure** | Proper heading hierarchy | ✅ Pass |
-| **Structure** | Semantic HTML used | ✅ Pass |
-| **Color** | Sufficient contrast (AA) | ✅ Pass |
-| **Color** | Enhanced contrast (AAA) | ✅ Pass |
-| **Screen Reader** | Landmarks navigable | ✅ Pass |
-| **Screen Reader** | Accessible names present | ✅ Pass |
-| **Lighthouse** | Automated audit score | ✅ 100% |
+| Category          | Test                          | Result  |
+| ----------------- | ----------------------------- | ------- |
+| **Keyboard**      | All elements reachable by Tab | ✅ Pass |
+| **Keyboard**      | Focus order is logical        | ✅ Pass |
+| **Keyboard**      | Focus ring visible            | ✅ Pass |
+| **Keyboard**      | Skip to main content works    | ✅ Pass |
+| **ARIA**          | Landmarks have labels         | ✅ Pass |
+| **ARIA**          | Icon buttons have labels      | ✅ Pass |
+| **ARIA**          | Form inputs have labels       | ✅ Pass |
+| **Structure**     | Proper heading hierarchy      | ✅ Pass |
+| **Structure**     | Semantic HTML used            | ✅ Pass |
+| **Color**         | Sufficient contrast (AA)      | ✅ Pass |
+| **Color**         | Enhanced contrast (AAA)       | ✅ Pass |
+| **Screen Reader** | Landmarks navigable           | ✅ Pass |
+| **Screen Reader** | Accessible names present      | ✅ Pass |
+| **Lighthouse**    | Automated audit score         | ✅ 100% |
 
 ---
 
 ### Files Modified
 
-| File | Changes |
-|------|---------|
-| `app/layouts/default.vue` | Added skip link, landmarks, ARIA labels |
-| `app/components/layout/AppNavbar.vue` | Added ARIA labels to icon buttons |
-| `app/components/layout/AppFooter.vue` | Added `role="contentinfo"` |
+| File                                  | Changes                                 |
+| ------------------------------------- | --------------------------------------- |
+| `app/layouts/default.vue`             | Added skip link, landmarks, ARIA labels |
+| `app/components/layout/AppNavbar.vue` | Added ARIA labels to icon buttons       |
+| `app/components/layout/AppFooter.vue` | Added `role="contentinfo"`              |
 
 ---
 
@@ -1512,22 +1532,23 @@ application
 
 ### Components Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/components/Common/TableSkeleton.vue` | ~40 | Loading skeleton for tables |
-| `app/components/Common/CardSkeleton.vue` | ~50 | Loading skeleton for cards |
-| `app/components/Common/LoadingOverlay.vue` | ~60 | Full-screen loading with progress |
-| `app/components/Common/EmptyState.vue` | ~40 | Empty state with icon, message, action |
+| File                                       | Lines | Purpose                                |
+| ------------------------------------------ | ----- | -------------------------------------- |
+| `app/components/Common/TableSkeleton.vue`  | ~40   | Loading skeleton for tables            |
+| `app/components/Common/CardSkeleton.vue`   | ~50   | Loading skeleton for cards             |
+| `app/components/Common/LoadingOverlay.vue` | ~60   | Full-screen loading with progress      |
+| `app/components/Common/EmptyState.vue`     | ~40   | Empty state with icon, message, action |
 
 ### Composables Created
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/composables/useErrorHandler.ts` | ~200 | Error handler with 20+ error codes |
+| File                                 | Lines | Purpose                            |
+| ------------------------------------ | ----- | ---------------------------------- |
+| `app/composables/useErrorHandler.ts` | ~200  | Error handler with 20+ error codes |
 
 ### Pages Modified (10+)
 
 All major pages updated with:
+
 - Consistent styling (padding, spacing, colors)
 - Loading states (skeletons instead of spinners)
 - Error handling (friendly messages)
@@ -1544,16 +1565,17 @@ A **design system** is a collection of reusable components, patterns, and rules 
 
 **Our Design System Rules:**
 
-| Aspect | Rule |
-|--------|------|
-| Spacing | Always use `space-y-6` for vertical gaps |
-| Padding | Always use `p-4 md:p-6` for page padding |
-| Colors | Use design system classes (`text-muted`, `bg-elevated`) |
-| Typography | Use semantic classes (`text-caption`, `text-body`) |
-| Buttons | Always include `cursor-pointer` class |
-| Headers | Always use `LayoutPageHeader` component |
+| Aspect     | Rule                                                    |
+| ---------- | ------------------------------------------------------- |
+| Spacing    | Always use `space-y-6` for vertical gaps                |
+| Padding    | Always use `p-4 md:p-6` for page padding                |
+| Colors     | Use design system classes (`text-muted`, `bg-elevated`) |
+| Typography | Use semantic classes (`text-caption`, `text-body`)      |
+| Buttons    | Always include `cursor-pointer` class                   |
+| Headers    | Always use `LayoutPageHeader` component                 |
 
 **Benefits:**
+
 - ✅ All pages look similar (consistency)
 - ✅ Easier to maintain (change in one place)
 - ✅ Faster development (reuse components)
@@ -1579,6 +1601,7 @@ stateDiagram-v2
 ```
 
 Instead of showing nothing (confusing) or everything at once (overwhelming), we show:
+
 1. **First:** Skeleton (loading)
 2. **Then:** Data or error (result)
 
@@ -1599,9 +1622,11 @@ Good error messages have **three parts**:
 ```
 
 **Bad error message:**
+
 > "Error 500"
 
 **Good error message:**
+
 > **Insufficient Stock**
 > There is not enough stock available for this operation.
 > Check current stock levels and adjust the quantity.
@@ -1617,23 +1642,23 @@ Good error messages have **three parts**:
 
 /* Default (mobile) */
 .card {
-  width: 100%;        /* Full width */
-  padding: 1rem;      /* Small padding */
+  width: 100%; /* Full width */
+  padding: 1rem; /* Small padding */
 }
 
 /* Tablet (md: 768px+) */
 @media (min-width: 768px) {
   .card {
-    width: 50%;       /* Half width */
-    padding: 1.5rem;  /* More padding */
+    width: 50%; /* Half width */
+    padding: 1.5rem; /* More padding */
   }
 }
 
 /* Desktop (lg: 1024px+) */
 @media (min-width: 1024px) {
   .card {
-    width: 33.333%;   /* One third width */
-    padding: 2rem;    /* Even more padding */
+    width: 33.333%; /* One third width */
+    padding: 2rem; /* Even more padding */
   }
 }
 ```
@@ -1642,7 +1667,7 @@ Good error messages have **three parts**:
 
 ```vue
 <!-- Same concept, but with utility classes -->
-<div class="w-full md:w-1/2 lg:w-1/3 p-4 md:p-6 lg:p-8">
+<div class="w-full md:w-1/2 lg:w-1/3 p-4 md:p-6 lg:p-8"></div>
 ```
 
 ---
@@ -1664,28 +1689,30 @@ Visual DOM:                 Accessibility Tree:
 ```
 
 **Without ARIA:**
+
 - Screen reader: "Button" (not helpful!)
 
 **With ARIA:**
+
 - Screen reader: "Notifications button" (helpful!)
 
 ---
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **UI** | User Interface - what users see and touch |
-| **UX** | User Experience - how users feel when using the app |
-| **Skeleton** | Placeholder shapes shown while loading |
-| **Empty State** | Message shown when a list has no items |
-| **Responsive** | Works on all screen sizes (phone, tablet, desktop) |
-| **Accessibility** | Usable by everyone, including people with disabilities |
-| **ARIA** | Attributes that help screen readers understand the page |
-| **Landmark** | Section of a page (nav, header, main, footer) |
-| **Screen Reader** | Software that reads the page aloud for blind users |
-| **Contrast Ratio** | Difference between text and background colors |
-| **WCAG** | Web Content Accessibility Guidelines (international standard) |
+| Term               | Simple Explanation                                            |
+| ------------------ | ------------------------------------------------------------- |
+| **UI**             | User Interface - what users see and touch                     |
+| **UX**             | User Experience - how users feel when using the app           |
+| **Skeleton**       | Placeholder shapes shown while loading                        |
+| **Empty State**    | Message shown when a list has no items                        |
+| **Responsive**     | Works on all screen sizes (phone, tablet, desktop)            |
+| **Accessibility**  | Usable by everyone, including people with disabilities        |
+| **ARIA**           | Attributes that help screen readers understand the page       |
+| **Landmark**       | Section of a page (nav, header, main, footer)                 |
+| **Screen Reader**  | Software that reads the page aloud for blind users            |
+| **Contrast Ratio** | Difference between text and background colors                 |
+| **WCAG**           | Web Content Accessibility Guidelines (international standard) |
 
 ---
 
@@ -1694,12 +1721,14 @@ Visual DOM:                 Accessibility Tree:
 ### Issue 1: Buttons Not Showing Cursor
 
 **Symptoms:**
+
 - Buttons look clickable but cursor doesn't change to hand
 - Users unsure if element is clickable
 
 **Cause:** Missing `cursor-pointer` class
 
 **Solution:**
+
 ```vue
 <!-- Add cursor-pointer to all buttons -->
 <UButton class="cursor-pointer">Submit</UButton>
@@ -1710,12 +1739,14 @@ Visual DOM:                 Accessibility Tree:
 ### Issue 2: Different Padding on Pages
 
 **Symptoms:**
+
 - Some pages have more space than others
 - Inconsistent look across the app
 
 **Cause:** Using different padding values
 
 **Solution:**
+
 ```vue
 <!-- Always use this exact pattern -->
 <div class="p-4 md:p-6">
@@ -1728,12 +1759,14 @@ Visual DOM:                 Accessibility Tree:
 ### Issue 3: Mobile Menu Not Opening
 
 **Symptoms:**
+
 - Hamburger button not visible on mobile
 - Sidebar doesn't open when clicked
 
 **Cause:** Missing mobile toggle component
 
 **Solution:**
+
 ```vue
 <UDashboardSidebar>
   <!-- Mobile toggle - shows on phones -->
@@ -1749,18 +1782,17 @@ Visual DOM:                 Accessibility Tree:
 ### Issue 4: Screen Reader Can't Find Buttons
 
 **Symptoms:**
+
 - Lighthouse shows "button-name" error
 - Screen reader says "Button" with no description
 
 **Cause:** Icon-only buttons without labels
 
 **Solution:**
+
 ```vue
 <!-- Add aria-label to icon buttons -->
-<UButton
-  icon="i-heroicons-bell"
-  aria-label="Notifications"
-/>
+<UButton icon="i-heroicons-bell" aria-label="Notifications" />
 ```
 
 ---
@@ -1768,12 +1800,14 @@ Visual DOM:                 Accessibility Tree:
 ### Issue 5: Error Messages Too Technical
 
 **Symptoms:**
+
 - Users see "H3Error: INSUFFICIENT_STOCK"
 - Users don't know what to do
 
 **Cause:** Not using error handler
 
 **Solution:**
+
 ```vue
 <script setup>
 const { handleError } = useErrorHandler();
@@ -1781,7 +1815,7 @@ const { handleError } = useErrorHandler();
 try {
   await submitForm();
 } catch (error) {
-  handleError(error);  // Shows friendly message
+  handleError(error); // Shows friendly message
 }
 </script>
 ```
@@ -1793,30 +1827,35 @@ try {
 ### Manual Testing Steps
 
 **1. Styling Consistency**
+
 - [ ] All pages use `p-4 md:p-6` padding
 - [ ] All pages use `space-y-6` for spacing
 - [ ] All buttons have `cursor-pointer` class
 - [ ] All pages use design system colors (not custom hex)
 
 **2. Loading States**
+
 - [ ] List pages show TableSkeleton while loading
 - [ ] Card pages show CardSkeleton while loading
 - [ ] Period close shows LoadingOverlay with progress
 - [ ] All skeletons have smooth animations
 
 **3. Error Handling**
+
 - [ ] Try submitting invalid forms
 - [ ] Disconnect internet and try actions
 - [ ] Error messages are clear and helpful
 - [ ] Errors show suggestions for fixing
 
 **4. Empty States**
+
 - [ ] Clear all filters, verify empty message
 - [ ] Apply filters, verify "no results" message
 - [ ] Action buttons appear when no filters
 - [ ] Action buttons hidden when filters active
 
 **5. Responsive Design (Mobile)**
+
 - [ ] Resize browser to 375px width
 - [ ] Hamburger menu button appears
 - [ ] Click hamburger, menu opens full-screen
@@ -1824,18 +1863,21 @@ try {
 - [ ] Buttons are at least 44×44px (tappable)
 
 **6. Responsive Design (Tablet)**
+
 - [ ] Resize browser to 768px width
 - [ ] Cards display in 2-column grid
 - [ ] Padding switches to `md:p-6`
 - [ ] Navigation still works
 
 **7. Responsive Design (Desktop)**
+
 - [ ] Resize browser to 1920px width
 - [ ] Sidebar always visible (not modal)
 - [ ] Cards display in 3+ columns
 - [ ] Collapse button shows (not hamburger)
 
 **8. Keyboard Navigation**
+
 - [ ] Press Tab repeatedly
 - [ ] First tab shows "Skip to main content"
 - [ ] Press Enter on skip link, focus jumps to content
@@ -1844,6 +1886,7 @@ try {
 - [ ] Enter activates buttons
 
 **9. Accessibility**
+
 - [ ] Run Lighthouse audit in Chrome DevTools
 - [ ] Accessibility score is 100%
 - [ ] No contrast issues
@@ -1857,24 +1900,28 @@ try {
 After completing UI/UX Polish (Phase 4.2), the next phases are:
 
 **→ Phase 4.3: Performance Optimization** (Pending)
+
 - Database query optimization
 - API response time improvements
 - Frontend bundle optimization
 - Data caching strategies
 
 **→ Phase 4.4: Testing** (Pending)
+
 - Unit tests for business logic
 - API endpoint tests
 - Integration tests
 - Manual testing completion
 
 **→ Phase 4.5: Documentation & Training** (Pending)
+
 - Developer documentation
 - User manuals
 - Training materials
 - Video walkthroughs
 
 **→ Phase 4.6: Pre-Launch Preparation** (Pending)
+
 - Production deployment setup
 - User account creation
 - Monitoring and alerts

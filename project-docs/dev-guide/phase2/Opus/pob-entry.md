@@ -7,6 +7,7 @@
 It answers one simple question: **"How many people did we feed today?"**
 
 Think of it like taking attendance, but for meals. Every day, you count:
+
 - How many regular staff (crew)
 - How many visitors/guests (extra)
 - Total = Crew + Extra
@@ -16,6 +17,7 @@ Think of it like taking attendance, but for meals. Every day, you count:
 ### The Business Problem
 
 Imagine you run a kitchen that spent SAR 50,000 on food this month. Your boss asks:
+
 - "Is that good or bad?"
 - "Are we efficient?"
 - "How does it compare to last month?"
@@ -25,6 +27,7 @@ Without knowing how many people you fed, you can't answer!
 ### The Solution
 
 If you know you fed 1,650 people over the month:
+
 - Cost per person = SAR 50,000 ÷ 1,650 = **SAR 30.30 per day**
 - Last month was SAR 28.50 per day
 - Conclusion: Costs increased by SAR 1.80 per person
@@ -76,6 +79,7 @@ flowchart TD
 **Manday = One person fed for one day**
 
 Examples:
+
 - 50 people for 1 day = 50 mandays
 - 1 person for 50 days = 50 mandays
 - 50 people for 30 days = 1,500 mandays
@@ -83,18 +87,21 @@ Examples:
 ### Crew vs Extra
 
 **Crew:** Regular employees who eat every day
+
 - Kitchen staff
 - Security guards
 - Maintenance team
 - Office workers
 
 **Extra:** Temporary or occasional people
+
 - Visitors
 - Contractors
 - Temporary workers
 - Guests
 
 **Why separate them?**
+
 - Different cost allocations
 - Crew is predictable, extras vary
 - Management wants to know both
@@ -102,12 +109,14 @@ Examples:
 ### Auto-Save Magic
 
 **Traditional way:**
+
 1. Enter all data
 2. Click Save button
 3. Hope nothing crashes
 4. If error, lose everything
 
 **Our way:**
+
 1. Enter data for one day
 2. Move to next field
 3. Automatically saves
@@ -160,21 +169,25 @@ erDiagram
 ### Important Fields
 
 **date:** The specific day
+
 - Must be within period dates
 - Format: YYYY-MM-DD
 - Unique per location per day
 
 **crew_count:** Regular staff count
+
 - Non-negative integer
 - Can be zero (holiday/closed)
 - Usually consistent
 
 **extra_count:** Additional people
+
 - Non-negative integer
 - Often zero
 - Varies daily
 
 **total:** Calculated field
+
 - Always = crew_count + extra_count
 - Used for manday calculations
 
@@ -183,16 +196,19 @@ erDiagram
 ### 1. Get POB Entries (GET /api/locations/:locationId/pob)
 
 **What it does:**
+
 - Fetches all POB entries for a location and period
 - Returns empty entries for dates without data
 - Sorted by date ascending
 
 **Request:**
+
 ```
 GET /api/locations/abc123/pob?periodId=xyz789
 ```
 
 **Response:**
+
 ```json
 {
   "entries": [
@@ -224,16 +240,19 @@ GET /api/locations/abc123/pob?periodId=xyz789
 ### 2. Bulk Upsert (POST /api/locations/:locationId/pob)
 
 **What it does:**
+
 - Creates or updates multiple entries at once
 - Uses database upsert (insert or update)
 - Atomic operation
 
 **Why bulk?**
+
 - More efficient than individual saves
 - Can save entire month at once
 - Better for imports
 
 **Request:**
+
 ```json
 {
   "entries": [
@@ -254,11 +273,13 @@ GET /api/locations/abc123/pob?periodId=xyz789
 ### 3. Update Single Entry (PATCH /api/pob/:id)
 
 **What it does:**
+
 - Updates one specific entry
 - Used by auto-save feature
 - Returns updated entry
 
 **Request:**
+
 ```json
 {
   "crew_count": 52,
@@ -267,6 +288,7 @@ GET /api/locations/abc123/pob?periodId=xyz789
 ```
 
 **Validation:**
+
 - Must be non-negative integers
 - Period must be OPEN
 - User must have location access
@@ -305,6 +327,7 @@ graph TD
 **How it works:**
 
 1. **Setup Phase**
+
    ```
    - Page loads
    - Fetch existing POB data
@@ -313,6 +336,7 @@ graph TD
    ```
 
 2. **User Interaction**
+
    ```
    User types: 50 in crew field
    → onChange event triggered
@@ -322,6 +346,7 @@ graph TD
    ```
 
 3. **Auto-Save Trigger**
+
    ```
    User presses Tab or clicks away
    → onBlur event triggered
@@ -342,22 +367,24 @@ graph TD
 
 **States for each row:**
 
-| State | Visual | Meaning |
-|-------|--------|---------|
-| Clean | Normal | No changes |
-| Dirty | Yellow background | Changed, not saved |
-| Saving | Spinner icon | Saving in progress |
-| Saved | Green check | Successfully saved |
-| Error | Red border | Save failed |
+| State  | Visual            | Meaning            |
+| ------ | ----------------- | ------------------ |
+| Clean  | Normal            | No changes         |
+| Dirty  | Yellow background | Changed, not saved |
+| Saving | Spinner icon      | Saving in progress |
+| Saved  | Green check       | Successfully saved |
+| Error  | Red border        | Save failed        |
 
 ### Period State Handling
 
 **When Period is OPEN:**
+
 - All inputs enabled
 - Auto-save active
 - Can modify any day
 
 **When Period is CLOSED:**
+
 - All inputs disabled
 - Gray background
 - Warning message shown
@@ -371,6 +398,7 @@ Instead of: "2025-11-01"
 We show: "Monday, 01/11/2025"
 
 Why?
+
 - Users think in weekdays
 - Easier to spot weekends
 - More human-friendly
@@ -385,6 +413,7 @@ Why?
 ### 3. Validation Feedback
 
 **Invalid input examples:**
+
 - Negative number: Shows "Must be positive"
 - Decimal: Rounds to integer automatically
 - Text: Prevents entry, shows error
@@ -392,6 +421,7 @@ Why?
 ### 4. Progress Indicator
 
 Shows at top of page:
+
 ```
 Progress: 28 of 30 days entered (93%)
 Missing: November 15, November 20
@@ -404,6 +434,7 @@ Missing: November 15, November 20
 **Problem:** Some days have no POB data
 **Impact:** Manday calculation incorrect
 **Solution:**
+
 - System highlights missing days
 - Shows warning in reconciliation
 - Supervisor must ensure all days entered
@@ -413,6 +444,7 @@ Missing: November 15, November 20
 **Problem:** Two users editing same day
 **Impact:** Last save wins
 **Solution:**
+
 - Show who's currently editing
 - Refresh data periodically
 - Warn before overwriting
@@ -422,6 +454,7 @@ Missing: November 15, November 20
 **Problem:** User tries to enter outside period
 **Impact:** Data for wrong period
 **Solution:**
+
 - Only show current period dates
 - Validate date on server
 - Clear error messages
@@ -432,6 +465,7 @@ Missing: November 15, November 20
 
 **Challenge:** Loading 30 days of data
 **Solution:**
+
 - Single API call for all days
 - Virtual scrolling for large tables
 - Lazy load historical data
@@ -440,6 +474,7 @@ Missing: November 15, November 20
 
 **Challenge:** Too many API calls
 **Solution:**
+
 - Debounce saves (wait 500ms after typing)
 - Batch multiple changes
 - Show pending saves indicator
@@ -486,6 +521,7 @@ flowchart LR
 ### Missing POB Impact
 
 If POB data missing:
+
 - Shows warning in reconciliation
 - Displays "N/A" for manday cost
 - Can't complete period close
@@ -519,6 +555,7 @@ If POB data missing:
 ### 1. Enter Daily
 
 Don't wait until month-end:
+
 - Fresh memory
 - Spot patterns
 - Catch errors early
@@ -526,6 +563,7 @@ Don't wait until month-end:
 ### 2. Verify Totals
 
 Check weekly totals make sense:
+
 - Weekends different?
 - Holidays reflected?
 - Special events counted?
@@ -533,6 +571,7 @@ Check weekly totals make sense:
 ### 3. Document Variations
 
 If unusual counts, add notes:
+
 - "Company event - 50 extra"
 - "Holiday - skeleton crew"
 - "Training day - 20 visitors"
@@ -582,6 +621,7 @@ If unusual counts, add notes:
 ## Summary
 
 POB Entry is **simple but critical**:
+
 - Counts people daily
 - Enables cost per person calculation
 - Uses auto-save for efficiency
@@ -591,4 +631,4 @@ Without accurate POB data, you can't calculate true food service costs.
 
 ---
 
-*Remember: Every person counts, literally! Accurate POB data drives informed business decisions.*
+_Remember: Every person counts, literally! Accurate POB data drives informed business decisions._

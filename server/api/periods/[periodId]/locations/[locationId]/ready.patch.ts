@@ -103,8 +103,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "RECONCILIATION_NOT_COMPLETED",
-          message:
-            "Reconciliation must be completed before marking location as ready",
+          message: "Reconciliation must be completed before marking location as ready",
         },
       });
     }

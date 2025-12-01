@@ -1,4 +1,5 @@
 # Phase 3.1: Period Management
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -24,11 +25,13 @@
 ### The Problem
 
 In any business, you need to track finances for specific time periods (usually months). At the end of each period, you need to know:
+
 - How much stock you had at the start of the period?
 - How much stock you have at the end of the period?
 - What was the total value of your inventory?
 
 **Problems with manual period tracking:**
+
 - ❌ No clear separation between months (data gets mixed)
 - ❌ Can't lock previous months (people keep changing old data)
 - ❌ No snapshot of stock at period end (values change daily)
@@ -38,6 +41,7 @@ In any business, you need to track finances for specific time periods (usually m
 ### Our Solution
 
 We built a **Period Management System** that:
+
 - ✅ Creates clear boundaries between accounting periods
 - ✅ Locks periods after closing (no more changes)
 - ✅ Takes snapshots of stock at period end (frozen in time)
@@ -77,6 +81,7 @@ stateDiagram-v2
 ```
 
 **Key Points:**
+
 - **DRAFT:** Period exists but is not active yet. Prices can be changed.
 - **OPEN:** Period is active. Prices are locked. All transactions happen here.
 - **PENDING_CLOSE:** All locations are ready. Waiting for admin approval.
@@ -102,11 +107,13 @@ In this phase, we created the **complete period management system** including AP
 ### Tasks Completed
 
 **Phase 3.1: Period Lifecycle**
+
 - ✅ 3.1.1: Period API Routes
 - ✅ 3.1.2: Period Opening
 - ✅ 3.1.3: Period Price Setting
 
 **Phase 3.2: Period Close Workflow**
+
 - ✅ 3.2.1: Location Readiness Tracking
 - ✅ 3.2.2: Period Close API
 - ✅ 3.2.3: Snapshot Creation
@@ -123,20 +130,24 @@ We created **4 API endpoints** to manage accounting periods - listing all period
 ### What Was Done
 
 #### Endpoint 1: GET /api/periods
+
 **Purpose:** Get list of all periods with optional filters
 
 **What it does:**
+
 - Returns all periods in the system
 - Can filter by status (DRAFT, OPEN, CLOSED, etc.)
 - Can filter by date range
 - Includes location readiness data
 
 **Example Request:**
+
 ```http
 GET /api/periods?status=OPEN
 ```
 
 **Response:**
+
 ```json
 {
   "periods": [
@@ -164,9 +175,11 @@ GET /api/periods?status=OPEN
 ---
 
 #### Endpoint 2: GET /api/periods/current
+
 **Purpose:** Get the currently active period
 
 **What it does:**
+
 - Finds the period with status = OPEN
 - Returns period with all location statuses
 - Most frequently used endpoint (needed for all transactions)
@@ -174,9 +187,11 @@ GET /api/periods?status=OPEN
 ---
 
 #### Endpoint 3: POST /api/periods
+
 **Purpose:** Create a new accounting period
 
 **What it does:**
+
 1. Validates input (name, dates)
 2. Checks user is ADMIN (only admins can create periods)
 3. Checks for overlapping periods
@@ -184,6 +199,7 @@ GET /api/periods?status=OPEN
 5. Copies closing stock values from previous period as opening values
 
 **Example Request:**
+
 ```json
 {
   "name": "February 2025",
@@ -198,9 +214,11 @@ GET /api/periods?status=OPEN
 ---
 
 #### Endpoint 4: GET /api/periods/:id
+
 **Purpose:** Get single period details
 
 **What it does:**
+
 - Returns complete period information
 - Includes all location statuses with timestamps
 - Shows transaction counts (deliveries, issues, etc.)
@@ -220,24 +238,15 @@ const overlappingPeriod = await prisma.period.findFirst({
     OR: [
       // New period starts during existing period
       {
-        AND: [
-          { start_date: { lte: startDate } },
-          { end_date: { gte: startDate } },
-        ],
+        AND: [{ start_date: { lte: startDate } }, { end_date: { gte: startDate } }],
       },
       // New period ends during existing period
       {
-        AND: [
-          { start_date: { lte: endDate } },
-          { end_date: { gte: endDate } },
-        ],
+        AND: [{ start_date: { lte: endDate } }, { end_date: { gte: endDate } }],
       },
       // New period completely contains existing period
       {
-        AND: [
-          { start_date: { gte: startDate } },
-          { end_date: { lte: endDate } },
-        ],
+        AND: [{ start_date: { gte: startDate } }, { end_date: { lte: endDate } }],
       },
     ],
   },
@@ -342,12 +351,12 @@ graph LR
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/periods/index.get.ts` | List all periods with filters |
-| `server/api/periods/current.get.ts` | Get current open period |
-| `server/api/periods/index.post.ts` | Create new period |
-| `server/api/periods/[id].get.ts` | Get single period details |
+| File                                | What It Does                  |
+| ----------------------------------- | ----------------------------- |
+| `server/api/periods/index.get.ts`   | List all periods with filters |
+| `server/api/periods/current.get.ts` | Get current open period       |
+| `server/api/periods/index.post.ts`  | Create new period             |
+| `server/api/periods/[id].get.ts`    | Get single period details     |
 
 ---
 
@@ -363,6 +372,7 @@ We created a **user interface** where admins can view all periods and create new
 
 **1. Period List Display**
 Shows all periods in a table with columns:
+
 - Name (January 2025)
 - Start Date (01/01/2025)
 - End Date (31/01/2025)
@@ -371,6 +381,7 @@ Shows all periods in a table with columns:
 
 **2. Create Period Modal**
 Form with fields:
+
 - Period Name (text input)
 - Start Date (date picker)
 - End Date (date picker)
@@ -378,12 +389,12 @@ Form with fields:
 
 **3. Status-Based Colors**
 
-| Status | Color | Meaning |
-|--------|-------|---------|
-| DRAFT | Gray | Period created, not active yet |
-| OPEN | Navy Blue | Currently active period |
-| PENDING_CLOSE | Amber | Waiting for admin approval |
-| CLOSED | Emerald Green | Finished and locked |
+| Status        | Color         | Meaning                        |
+| ------------- | ------------- | ------------------------------ |
+| DRAFT         | Gray          | Period created, not active yet |
+| OPEN          | Navy Blue     | Currently active period        |
+| PENDING_CLOSE | Amber         | Waiting for admin approval     |
+| CLOSED        | Emerald Green | Finished and locked            |
 
 ---
 
@@ -418,10 +429,7 @@ const previousClosingValues = new Map<string, number>();
 if (previousPeriod) {
   previousPeriod.period_locations.forEach((pl) => {
     if (pl.closing_value !== null) {
-      previousClosingValues.set(
-        pl.location_id,
-        Number(pl.closing_value)
-      );
+      previousClosingValues.set(pl.location_id, Number(pl.closing_value));
     }
   });
 }
@@ -431,8 +439,8 @@ if (previousPeriod) {
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                          | What It Does           |
+| ----------------------------- | ---------------------- |
 | `app/pages/periods/index.vue` | Period management page |
 
 ---
@@ -488,6 +496,7 @@ Copy all prices from the previous closed period.
 Every period needs item prices set. Instead of entering them manually each month, we can copy from the previous period and only change what's different.
 
 **How it works:**
+
 ```typescript
 // Find the most recent closed period
 const previousPeriod = await prisma.period.findFirst({
@@ -506,9 +515,7 @@ const previousPeriod = await prisma.period.findFirst({
 });
 
 // Filter only active items
-const activePrices = previousPeriod.item_prices.filter(
-  (price) => price.item.is_active
-);
+const activePrices = previousPeriod.item_prices.filter((price) => price.item.is_active);
 
 // Copy prices using upsert (insert or update)
 const results = await prisma.$transaction(
@@ -555,6 +562,7 @@ if (period.status !== "DRAFT") {
 ```
 
 **Why prices lock when period opens:**
+
 - Prevents unauthorized price changes during active period
 - Ensures all deliveries use the same agreed prices
 - Creates automatic price variance detection when actual prices differ
@@ -563,12 +571,12 @@ if (period.status !== "DRAFT") {
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/periods/[periodId]/prices.get.ts` | Get prices for period |
-| `server/api/periods/[periodId]/prices.post.ts` | Set/update prices |
+| File                                                | What It Does              |
+| --------------------------------------------------- | ------------------------- |
+| `server/api/periods/[periodId]/prices.get.ts`       | Get prices for period     |
+| `server/api/periods/[periodId]/prices.post.ts`      | Set/update prices         |
 | `server/api/periods/[periodId]/prices/copy.post.ts` | Copy from previous period |
-| `app/pages/periods/[periodId]/prices.vue` | Price management UI |
+| `app/pages/periods/[periodId]/prices.vue`           | Price management UI       |
 
 ---
 
@@ -585,12 +593,14 @@ Before closing a period, each location must be marked as "ready". This ensures a
 **Purpose:** Mark a location as ready for period close
 
 **What it does:**
+
 1. Checks user is SUPERVISOR or ADMIN
 2. Verifies reconciliation exists for this period-location
 3. Updates PeriodLocation status to READY
 4. Records the ready_at timestamp
 
 **Example Request:**
+
 ```http
 PATCH /api/periods/abc123/locations/loc456/ready
 ```
@@ -649,8 +659,8 @@ stateDiagram-v2
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                                                                  | What It Does        |
+| --------------------------------------------------------------------- | ------------------- |
 | `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts` | Mark location ready |
 
 ---
@@ -697,9 +707,11 @@ sequenceDiagram
 ---
 
 #### Endpoint 1: POST /api/periods/:periodId/close
+
 **Purpose:** Request period close (creates approval request)
 
 **What it does:**
+
 1. Checks user is ADMIN
 2. Validates period status is OPEN
 3. Checks ALL locations are READY
@@ -707,11 +719,10 @@ sequenceDiagram
 5. Updates period status to PENDING_CLOSE
 
 **Validation Example:**
+
 ```typescript
 // Check all locations are READY
-const notReadyLocations = period.period_locations.filter(
-  (pl) => pl.status !== "READY"
-);
+const notReadyLocations = period.period_locations.filter((pl) => pl.status !== "READY");
 
 if (notReadyLocations.length > 0) {
   throw createError({
@@ -732,9 +743,11 @@ if (notReadyLocations.length > 0) {
 ---
 
 #### Endpoint 2: PATCH /api/approvals/:id/approve
+
 **Purpose:** Approve the close request and execute the period close
 
 **What it does (all in one transaction):**
+
 1. Creates stock snapshots for each location
 2. Calculates closing values
 3. Updates all PeriodLocation statuses to CLOSED
@@ -744,9 +757,11 @@ if (notReadyLocations.length > 0) {
 ---
 
 #### Endpoint 3: PATCH /api/approvals/:id/reject
+
 **Purpose:** Reject the close request
 
 **What it does:**
+
 - Updates approval status to REJECTED
 - Reverts period status to OPEN
 - Adds rejection comment to notes
@@ -756,6 +771,7 @@ if (notReadyLocations.length > 0) {
 ### Why Two-Step Process?
 
 **Benefits of approval workflow:**
+
 1. **Double-check:** Admin must review before finalizing
 2. **Audit trail:** Records who requested and who approved
 3. **Cancel option:** Can reject if something is wrong
@@ -765,12 +781,12 @@ if (notReadyLocations.length > 0) {
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
-| `server/api/periods/[periodId]/close.post.ts` | Request period close |
-| `server/api/approvals/[id].get.ts` | Get approval details |
-| `server/api/approvals/[id]/approve.patch.ts` | Approve and execute close |
-| `server/api/approvals/[id]/reject.patch.ts` | Reject close request |
+| File                                          | What It Does              |
+| --------------------------------------------- | ------------------------- |
+| `server/api/periods/[periodId]/close.post.ts` | Request period close      |
+| `server/api/approvals/[id].get.ts`            | Get approval details      |
+| `server/api/approvals/[id]/approve.patch.ts`  | Approve and execute close |
+| `server/api/approvals/[id]/reject.patch.ts`   | Reject close request      |
 
 ---
 
@@ -787,12 +803,14 @@ When we close a period, we take a "photograph" of all stock levels at that momen
 Each location gets a snapshot containing:
 
 **1. Stock Items:**
+
 - Item code, name, unit
 - Quantity on hand
 - WAC (Weighted Average Cost)
 - Total value (quantity × WAC)
 
 **2. Reconciliation Summary:**
+
 - Opening stock value
 - Receipts (deliveries)
 - Transfers in/out
@@ -871,9 +889,7 @@ const allLocationStock = await prisma.locationStock.findMany({
 
 // Build snapshot for each location
 for (const pl of period.period_locations) {
-  const locationStock = allLocationStock.filter(
-    (s) => s.location_id === pl.location_id
-  );
+  const locationStock = allLocationStock.filter((s) => s.location_id === pl.location_id);
 
   const items = locationStock.map((s) => ({
     item_id: s.item.id,
@@ -927,8 +943,8 @@ graph TB
 
 ### Files Modified
 
-| File | What Changed |
-|------|--------------|
+| File                                         | What Changed                          |
+| -------------------------------------------- | ------------------------------------- |
 | `server/api/approvals/[id]/approve.patch.ts` | Added comprehensive snapshot creation |
 
 ---
@@ -946,6 +962,7 @@ After closing a period, admins need to create the next one. The **Roll Forward**
 **Purpose:** Create the next period from a closed period
 
 **What it does:**
+
 1. Validates source period is CLOSED
 2. Calculates next period dates (starts day after source ends)
 3. Creates new period in DRAFT status
@@ -1004,6 +1021,7 @@ const newEndDate = getLastDayOfMonth(newStartDate);
 ```
 
 **Example:**
+
 - January ends: 31/01/2025
 - February starts: 01/02/2025 (next day)
 - February ends: 28/02/2025 (last day of month)
@@ -1021,6 +1039,7 @@ const newEndDate = getLastDayOfMonth(newStartDate);
 ```
 
 If not provided:
+
 - `name`: Auto-generated (e.g., "February 2025")
 - `end_date`: Last day of the month
 - `copy_prices`: true (copies prices by default)
@@ -1066,8 +1085,8 @@ If not provided:
 
 ### Files Created
 
-| File | What It Does |
-|------|--------------|
+| File                                                 | What It Does                |
+| ---------------------------------------------------- | --------------------------- |
 | `server/api/periods/[periodId]/roll-forward.post.ts` | Roll forward to next period |
 
 ---
@@ -1076,28 +1095,28 @@ If not provided:
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/periods/index.get.ts` | ~80 | List periods with filters |
-| `server/api/periods/current.get.ts` | ~60 | Get current open period |
-| `server/api/periods/index.post.ts` | ~220 | Create new period |
-| `server/api/periods/[id].get.ts` | ~100 | Get period details |
-| `server/api/periods/[periodId]/prices.get.ts` | ~80 | Get period prices |
-| `server/api/periods/[periodId]/prices.post.ts` | ~150 | Set/update prices |
-| `server/api/periods/[periodId]/prices/copy.post.ts` | ~215 | Copy from previous |
-| `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts` | ~200 | Mark location ready |
-| `server/api/periods/[periodId]/close.post.ts` | ~235 | Request period close |
-| `server/api/periods/[periodId]/roll-forward.post.ts` | ~365 | Roll forward to next |
-| `server/api/approvals/[id].get.ts` | ~80 | Get approval details |
-| `server/api/approvals/[id]/approve.patch.ts` | ~495 | Approve and execute |
-| `server/api/approvals/[id]/reject.patch.ts` | ~100 | Reject request |
+| File                                                                  | Lines | Purpose                   |
+| --------------------------------------------------------------------- | ----- | ------------------------- |
+| `server/api/periods/index.get.ts`                                     | ~80   | List periods with filters |
+| `server/api/periods/current.get.ts`                                   | ~60   | Get current open period   |
+| `server/api/periods/index.post.ts`                                    | ~220  | Create new period         |
+| `server/api/periods/[id].get.ts`                                      | ~100  | Get period details        |
+| `server/api/periods/[periodId]/prices.get.ts`                         | ~80   | Get period prices         |
+| `server/api/periods/[periodId]/prices.post.ts`                        | ~150  | Set/update prices         |
+| `server/api/periods/[periodId]/prices/copy.post.ts`                   | ~215  | Copy from previous        |
+| `server/api/periods/[periodId]/locations/[locationId]/ready.patch.ts` | ~200  | Mark location ready       |
+| `server/api/periods/[periodId]/close.post.ts`                         | ~235  | Request period close      |
+| `server/api/periods/[periodId]/roll-forward.post.ts`                  | ~365  | Roll forward to next      |
+| `server/api/approvals/[id].get.ts`                                    | ~80   | Get approval details      |
+| `server/api/approvals/[id]/approve.patch.ts`                          | ~495  | Approve and execute       |
+| `server/api/approvals/[id]/reject.patch.ts`                           | ~100  | Reject request            |
 
 ### Frontend Pages
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/periods/index.vue` | ~300 | Period management page |
-| `app/pages/periods/[periodId]/prices.vue` | ~400 | Price management page |
+| File                                      | Lines | Purpose                |
+| ----------------------------------------- | ----- | ---------------------- |
+| `app/pages/periods/index.vue`             | ~300  | Period management page |
+| `app/pages/periods/[periodId]/prices.vue` | ~400  | Price management page  |
 
 **Total:** ~3,080 lines of code
 
@@ -1114,11 +1133,13 @@ DRAFT → OPEN → PENDING_CLOSE → CLOSED
 ```
 
 **Rules:**
+
 - Cannot skip states (no DRAFT → CLOSED directly)
 - Cannot go backwards (no OPEN → DRAFT)
 - Each state has specific allowed actions
 
 **Implementation:**
+
 ```typescript
 // Before any operation, check current state
 if (period.status !== "OPEN") {
@@ -1185,6 +1206,7 @@ If ANY operation fails, ALL operations are cancelled. This prevents partial clos
 ### 4. Data Locking for Integrity
 
 **Price Locking:**
+
 ```typescript
 // Prices locked when period status is not DRAFT
 if (period.status !== "DRAFT") {
@@ -1196,6 +1218,7 @@ if (period.status !== "DRAFT") {
 ```
 
 **Period Locking:**
+
 ```typescript
 // Closed periods cannot be modified
 if (period.status === "CLOSED") {
@@ -1213,6 +1236,7 @@ if (period.status === "CLOSED") {
 Two-step process for important operations:
 
 **Step 1: Request**
+
 ```typescript
 const approval = await prisma.approval.create({
   data: {
@@ -1225,6 +1249,7 @@ const approval = await prisma.approval.create({
 ```
 
 **Step 2: Approve (or Reject)**
+
 ```typescript
 await prisma.approval.update({
   where: { id: approvalId },
@@ -1240,20 +1265,20 @@ await prisma.approval.update({
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Period** | A time range (usually one month) for tracking finances |
-| **PeriodLocation** | A record tracking one location's status within a period |
-| **Snapshot** | A "photograph" of data at a specific moment in time |
-| **Roll Forward** | Creating the next period from a closed period |
-| **Price Locking** | Preventing price changes after period opens |
-| **Location Ready** | A location has completed its reconciliation |
-| **Period Close** | The process of finalizing a period |
-| **Approval** | A request that needs review before execution |
-| **Opening Value** | Stock value at the start of a period |
-| **Closing Value** | Stock value at the end of a period |
-| **Overlapping Period** | Two periods covering the same dates (not allowed) |
-| **Atomic Transaction** | Multiple operations that succeed or fail together |
+| Term                   | Simple Explanation                                      |
+| ---------------------- | ------------------------------------------------------- |
+| **Period**             | A time range (usually one month) for tracking finances  |
+| **PeriodLocation**     | A record tracking one location's status within a period |
+| **Snapshot**           | A "photograph" of data at a specific moment in time     |
+| **Roll Forward**       | Creating the next period from a closed period           |
+| **Price Locking**      | Preventing price changes after period opens             |
+| **Location Ready**     | A location has completed its reconciliation             |
+| **Period Close**       | The process of finalizing a period                      |
+| **Approval**           | A request that needs review before execution            |
+| **Opening Value**      | Stock value at the start of a period                    |
+| **Closing Value**      | Stock value at the end of a period                      |
+| **Overlapping Period** | Two periods covering the same dates (not allowed)       |
+| **Atomic Transaction** | Multiple operations that succeed or fail together       |
 
 ---
 
@@ -1262,12 +1287,14 @@ await prisma.approval.update({
 ### Issue 1: Cannot Create Period - Overlapping
 
 **Symptoms:**
+
 - Error: "Period overlaps with existing period"
 - Cannot create January period
 
 **Cause:** Another period already covers those dates
 
 **Solution:**
+
 ```typescript
 // Check existing periods first
 const existingPeriods = await $fetch("/api/periods");
@@ -1283,18 +1310,18 @@ console.log("Existing periods:", existingPeriods);
 ### Issue 2: Cannot Close Period - Locations Not Ready
 
 **Symptoms:**
+
 - Error: "All locations must be ready"
 - Close button doesn't work
 
 **Cause:** Some locations haven't been marked as ready
 
 **Solution:**
+
 ```typescript
 // Check which locations are not ready
 const period = await $fetch(`/api/periods/${periodId}`);
-const notReady = period.period_locations.filter(
-  (pl) => pl.status !== "READY"
-);
+const notReady = period.period_locations.filter((pl) => pl.status !== "READY");
 console.log("Locations not ready:", notReady);
 
 // Each location needs reconciliation first
@@ -1307,12 +1334,14 @@ console.log("Locations not ready:", notReady);
 ### Issue 3: Cannot Modify Prices - Period Locked
 
 **Symptoms:**
+
 - Price inputs are disabled
 - Error: "Cannot modify prices"
 
 **Cause:** Period is not in DRAFT status
 
 **Solution:**
+
 ```typescript
 // Check period status
 const period = await $fetch(`/api/periods/${periodId}`);
@@ -1328,11 +1357,13 @@ console.log("Period status:", period.status);
 ### Issue 4: Roll Forward Failed - Period Not Closed
 
 **Symptoms:**
+
 - Error: "Cannot roll forward a period that is not closed"
 
 **Cause:** Trying to roll forward from an OPEN or DRAFT period
 
 **Solution:**
+
 ```typescript
 // Can only roll forward from CLOSED periods
 const period = await $fetch(`/api/periods/${periodId}`);
@@ -1347,12 +1378,14 @@ if (period.status !== "CLOSED") {
 ### Issue 5: Snapshot Missing Data
 
 **Symptoms:**
+
 - Snapshot shows empty items array
 - Total value is 0
 
 **Cause:** LocationStock records don't exist or have 0 quantity
 
 **Solution:**
+
 ```typescript
 // Check actual stock levels
 const stock = await $fetch(`/api/locations/${locationId}/stock`);
@@ -1369,6 +1402,7 @@ console.log("Stock items:", stock);
 ### Manual Testing Steps
 
 **1. Period Creation**
+
 - [ ] Form loads correctly
 - [ ] Date validation works (end must be after start)
 - [ ] Overlapping period error shows correctly
@@ -1376,34 +1410,40 @@ console.log("Stock items:", stock);
 - [ ] Redirect to periods list
 
 **2. Period Opening (DRAFT → OPEN)**
+
 - [ ] Only admins can change status
 - [ ] Prices are locked after opening
 - [ ] Status badge updates correctly
 
 **3. Price Management**
+
 - [ ] "Copy from Previous" button works
 - [ ] Manual price entry works
 - [ ] Prices disabled when period not DRAFT
 - [ ] Warning message shows for locked periods
 
 **4. Location Readiness**
+
 - [ ] Cannot mark ready without reconciliation
 - [ ] Only supervisor/admin can mark ready
 - [ ] Ready timestamp recorded
 - [ ] Status badge updates
 
 **5. Period Close Request**
+
 - [ ] Error if locations not ready
 - [ ] Approval record created
 - [ ] Period status changes to PENDING_CLOSE
 
 **6. Period Close Approval**
+
 - [ ] Snapshots created for all locations
 - [ ] Closing values calculated correctly
 - [ ] All PeriodLocations set to CLOSED
 - [ ] Period status set to CLOSED
 
 **7. Roll Forward**
+
 - [ ] Can only roll forward CLOSED periods
 - [ ] New period created with correct dates
 - [ ] Opening values match closing values
@@ -1411,6 +1451,7 @@ console.log("Stock items:", stock);
 - [ ] New period in DRAFT status
 
 **8. Error Scenarios**
+
 - [ ] Overlapping period error
 - [ ] Insufficient permissions error
 - [ ] Invalid status transitions error
@@ -1423,12 +1464,14 @@ console.log("Stock items:", stock);
 After completing Period Management (Phase 3.1 and 3.2), the next phases are:
 
 **→ Phase 3.3: Period Close UI** ✅ Complete
+
 - Period close page with checklist
 - Visual location readiness tracking
 - Close confirmation modal
 - Approval workflow UI
 
 **→ Phase 3.4: Reporting & Exports** (Days 28-30)
+
 - Stock reports
 - Reconciliation reports
 - Delivery/Issue reports

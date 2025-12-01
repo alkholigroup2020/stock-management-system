@@ -46,8 +46,7 @@ const reports = [
   {
     id: "issues",
     title: "Issues Report",
-    description:
-      "Stock consumption report by location and cost centre with top consumed items.",
+    description: "Stock consumption report by location and cost centre with top consumed items.",
     icon: "i-lucide-package-minus",
     href: "/reports/issues",
     color: "warning" as const,

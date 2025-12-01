@@ -73,17 +73,17 @@ Colors in this system map directly to business logic and user intent:
 **Full palette:**
 
 ```css
---color-navy-50: #e6e6f0;   /* Lightest */
+--color-navy-50: #e6e6f0; /* Lightest */
 --color-navy-100: #b3b3d9;
 --color-navy-200: #8080c2;
 --color-navy-300: #4d4dab;
---color-navy-400: #26269b;   /* Dark mode primary */
---color-navy-500: #000046;   /* Light mode primary, brand color */
+--color-navy-400: #26269b; /* Dark mode primary */
+--color-navy-500: #000046; /* Light mode primary, brand color */
 --color-navy-600: #00003f;
 --color-navy-700: #000037;
 --color-navy-800: #00002f;
 --color-navy-900: #000020;
---color-navy-950: #000010;   /* Darkest */
+--color-navy-950: #000010; /* Darkest */
 ```
 
 ### Secondary Color - Emerald Green (#45cf7b)
@@ -98,7 +98,7 @@ Colors in this system map directly to business logic and user intent:
 
 ```css
 --color-emerald-50: #edfcf4;
---color-emerald-400: #45cf7b;  /* Brand emerald green */
+--color-emerald-400: #45cf7b; /* Brand emerald green */
 --color-emerald-600: #1f9a4c;
 --color-emerald-950: #0a2916;
 ```
@@ -108,18 +108,18 @@ Colors in this system map directly to business logic and user intent:
 **Zinc (Neutral/Gray):**
 
 ```css
---color-zinc-50: #fafafa;    /* Very light gray backgrounds */
---color-zinc-300: #d4d4d8;   /* Borders */
---color-zinc-600: #52525b;   /* Muted text */
---color-zinc-900: #18181b;   /* Primary text */
---color-zinc-950: #09090b;   /* Darkest gray */
+--color-zinc-50: #fafafa; /* Very light gray backgrounds */
+--color-zinc-300: #d4d4d8; /* Borders */
+--color-zinc-600: #52525b; /* Muted text */
+--color-zinc-900: #18181b; /* Primary text */
+--color-zinc-950: #09090b; /* Darkest gray */
 ```
 
 **Amber (Warning):**
 
 ```css
 --color-amber-50: #fffbeb;
---color-amber-500: #f59e0b;  /* Warning color */
+--color-amber-500: #f59e0b; /* Warning color */
 --color-amber-950: #451a03;
 ```
 
@@ -127,7 +127,7 @@ Colors in this system map directly to business logic and user intent:
 
 ```css
 --color-red-50: #fef2f2;
---color-red-600: #dc2626;    /* Error color */
+--color-red-600: #dc2626; /* Error color */
 --color-red-950: #450a0a;
 ```
 
@@ -135,7 +135,7 @@ Colors in this system map directly to business logic and user intent:
 
 ```css
 --color-blue-50: #eff6ff;
---color-blue-600: #2563eb;   /* Info color */
+--color-blue-600: #2563eb; /* Info color */
 --color-blue-950: #172554;
 ```
 
@@ -175,11 +175,11 @@ The main content area in the layout applies the primary horizontal padding:
 </main>
 ```
 
-| Breakpoint | X-axis (horizontal) | Y-axis (vertical) |
-|------------|---------------------|-------------------|
-| Mobile (<640px) | `px-0` (0) | `py-2` (8px) |
-| sm (≥640px) | `px-12` (48px) | `py-2` (8px) |
-| xl (≥1280px) | `px-16` (64px) | `py-4` (16px) |
+| Breakpoint      | X-axis (horizontal) | Y-axis (vertical) |
+| --------------- | ------------------- | ----------------- |
+| Mobile (<640px) | `px-0` (0)          | `py-2` (8px)      |
+| sm (≥640px)     | `px-12` (48px)      | `py-2` (8px)      |
+| xl (≥1280px)    | `px-16` (64px)      | `py-4` (16px)     |
 
 **Key:** Mobile screens have **zero horizontal padding** at the layout level, allowing pages to use full viewport width.
 
@@ -193,10 +193,10 @@ Individual pages apply their own wrapper padding:
 </div>
 ```
 
-| Breakpoint | X-axis (horizontal) | Y-axis (vertical) |
-|------------|---------------------|-------------------|
-| Mobile (<768px) | `px-0` (0) | `py-0` (0) |
-| md (≥768px) | `px-4` (16px) | `py-1` (4px) |
+| Breakpoint      | X-axis (horizontal) | Y-axis (vertical) |
+| --------------- | ------------------- | ----------------- |
+| Mobile (<768px) | `px-0` (0)          | `py-0` (0)        |
+| md (≥768px)     | `px-4` (16px)       | `py-1` (4px)      |
 
 **Key:** Mobile screens have **zero padding** at the page level, relying on component-level padding (cards, etc.) for spacing.
 
@@ -205,17 +205,17 @@ Individual pages apply their own wrapper padding:
 Individual components like filter cards apply their own internal padding:
 
 ```vue
-<UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+<UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }"></UCard>
 ```
 
 ### Combined Padding Summary
 
-| Viewport | Layout Body | Page Container | Total Before Components |
-|----------|-------------|----------------|------------------------|
-| Mobile (<640px) | 0 | 0 | **0** |
-| sm-md (640-767px) | 48px | 0 | **48px per side** |
-| md-xl (768-1279px) | 48px | 16px | **64px per side** |
-| xl (≥1280px) | 64px | 16px | **80px per side** |
+| Viewport           | Layout Body | Page Container | Total Before Components |
+| ------------------ | ----------- | -------------- | ----------------------- |
+| Mobile (<640px)    | 0           | 0              | **0**                   |
+| sm-md (640-767px)  | 48px        | 0              | **48px per side**       |
+| md-xl (768-1279px) | 48px        | 16px           | **64px per side**       |
+| xl (≥1280px)       | 64px        | 16px           | **80px per side**       |
 
 ### Page Container Pattern
 
@@ -228,14 +228,17 @@ Individual components like filter cards apply their own internal padding:
 ```
 
 **Rules:**
+
 - **Horizontal padding:** `px-0` (mobile), `md:px-4` (desktop)
 - **Vertical padding:** `py-0` (mobile), `md:py-1` (desktop) - minimal vertical padding
 - **Section spacing:** `space-y-3` between major sections
 
 **Login Page Exception:**
+
 - Special centered layout with `px-4 py-12 sm:px-6 lg:px-8`
 
 **Full-Height Pages:**
+
 - Combine with `min-h-screen bg-default`
 
 **Examples:**
@@ -300,6 +303,7 @@ Individual components like filter cards apply their own internal padding:
 ```
 
 **Rules:**
+
 - **All pages use full-width content** by default
 - **Direct children** of the page container benefit from `space-y-3` spacing
 - **No max-width constraints** needed for standard pages (list pages, form pages, detail pages)
@@ -320,6 +324,7 @@ For special pages that need narrow, centered content (e.g., login, simple modals
 ```
 
 **When to use max-width constraints:**
+
 - `max-w-md`: Login page, authentication forms
 - `max-w-lg`: Simple modals, confirmation dialogs
 - Generally **avoid** max-width on standard pages - let content flow full width
@@ -370,6 +375,7 @@ For special pages that need narrow, centered content (e.g., login, simple modals
 ### Location & Period Display
 
 For pages that need location and period context:
+
 - **Location display:** Current location name OR "All Locations" for global pages
 - **Period display:** Current period name (e.g., "November 2025")
 
@@ -489,11 +495,13 @@ const getButtonClass = (value: string | null) => {
 ### Rules
 
 **Desktop (lg and above):**
+
 - Single row: Search | Toggle buttons | Status dropdown
 - Dropdown at far right using `ml-auto`
 - Full dropdown button with icon + label
 
 **Mobile (below lg):**
+
 - **Row 1:** Search input + Status dropdown (side by side)
 - **Row 2:** Toggle buttons (horizontally scrollable)
 - Dropdown shows icon only (no label) with `px-3`
@@ -502,6 +510,7 @@ const getButtonClass = (value: string | null) => {
 - Smaller button padding (`px-3` instead of `px-4`)
 
 **General:**
+
 - Card padding: `:ui="{ body: 'p-3 sm:p-4' }"`
 - Toggle container: `bg-muted rounded-full` with `gap-1 p-1`
 - Selected button: `bg-primary text-white shadow-sm`
@@ -512,6 +521,7 @@ const getButtonClass = (value: string | null) => {
 **IMPORTANT:** On small screens (below `lg` breakpoint), toggle button groups should be **hidden** to simplify the mobile experience. Users can still filter using the search input and status dropdown.
 
 **Rationale:**
+
 - Toggle buttons take up significant horizontal space on mobile
 - Scrollable toggle rows can feel cluttered on small screens
 - Search and status dropdown provide sufficient filtering for mobile users
@@ -561,11 +571,13 @@ const getButtonClass = (value: string | null) => {
 ```
 
 **When to apply this rule:**
+
 - List pages with category/type toggle filters (Locations, Users, Items, etc.)
 - Pages where the toggle options are "nice to have" but not critical for basic filtering
 - When search + status dropdown provide sufficient filtering capability
 
 **When NOT to apply this rule:**
+
 - If toggle buttons are essential for the page's primary use case
 - Dashboard pages where quick category switching is critical
 - When user testing shows mobile users need the toggle options
@@ -637,6 +649,7 @@ Inverted surface (dark in light mode, light in dark mode).
 #### Responsive Grid Layout
 
 **Pattern:** Use Tailwind's responsive grid system to create forms that are:
+
 - **Single column on mobile and tablet** (default)
 - **Two columns side-by-side on large screens** (lg breakpoint and above)
 
@@ -651,6 +664,7 @@ Inverted surface (dark in light mode, light in dark mode).
 #### Full-Width Fields
 
 Some fields should span the entire width regardless of screen size:
+
 - **Textareas** (Description, Address, Notes)
 - **Special read-only fields** (like Location Code displays)
 - **Full-width select menus** (when contextually appropriate)
@@ -701,7 +715,9 @@ Some fields should span the entire width regardless of screen size:
     <!-- Responsive Grid: 1 column mobile, 2 columns lg+ -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Read-only field - Full width -->
-      <div class="lg:col-span-2 p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]">
+      <div
+        class="lg:col-span-2 p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]"
+      >
         <label class="form-label text-xs mb-2">Location Code</label>
         <span class="text-lg font-mono font-semibold">LOC-001</span>
       </div>
@@ -736,20 +752,21 @@ Some fields should span the entire width regardless of screen size:
 
 #### Form Layout Rules Summary
 
-| Rule | Specification |
-|------|---------------|
-| **Grid Container** | `grid grid-cols-1 lg:grid-cols-2 gap-6` |
-| **Gap Between Fields** | `gap-6` (1.5rem / 24px) |
-| **Full-Width Fields** | Add `lg:col-span-2` class |
-| **Input Width** | Always include `class="w-full"` |
-| **Breakpoint** | Use `lg:` prefix (1024px and above) |
-| **Mobile Behavior** | Single column stack (grid-cols-1) |
+| Rule                   | Specification                           |
+| ---------------------- | --------------------------------------- |
+| **Grid Container**     | `grid grid-cols-1 lg:grid-cols-2 gap-6` |
+| **Gap Between Fields** | `gap-6` (1.5rem / 24px)                 |
+| **Full-Width Fields**  | Add `lg:col-span-2` class               |
+| **Input Width**        | Always include `class="w-full"`         |
+| **Breakpoint**         | Use `lg:` prefix (1024px and above)     |
+| **Mobile Behavior**    | Single column stack (grid-cols-1)       |
 
 #### Single Column Section Layout (Exception)
 
 Some form sections work better with a single-column layout (e.g., Settings sections with just 2-3 fields). In these cases:
 
 **Rules:**
+
 - Use `space-y-6` for vertical spacing between fields
 - Apply `w-full lg:w-1/2` to individual fields for 50% width on large screens
 - Fields stack vertically on all screen sizes
@@ -778,6 +795,7 @@ Some form sections work better with a single-column layout (e.g., Settings secti
 ```
 
 **When to use:**
+
 - Settings sections with 2-3 fields
 - When fields don't naturally pair with each other
 - When visual balance is better with stacked layout
@@ -858,11 +876,16 @@ All badge classes extend `.badge-base`:
 **Standard Badges:**
 
 ```vue
-<span class="badge-primary">Primary</span>    <!-- Navy -->
-<span class="badge-success">Success</span>    <!-- Emerald -->
-<span class="badge-warning">Warning</span>    <!-- Amber -->
-<span class="badge-error">Error</span>        <!-- Red -->
-<span class="badge-info">Info</span>          <!-- Blue -->
+<span class="badge-primary">Primary</span>
+<!-- Navy -->
+<span class="badge-success">Success</span>
+<!-- Emerald -->
+<span class="badge-warning">Warning</span>
+<!-- Amber -->
+<span class="badge-error">Error</span>
+<!-- Red -->
+<span class="badge-info">Info</span>
+<!-- Blue -->
 ```
 
 **Business-Specific Badges:**
@@ -1085,12 +1108,7 @@ const iconColor = computed(() => {
 ### Primary Action Button
 
 ```vue
-<UButton
-  color="primary"
-  icon="i-lucide-plus"
-  size="lg"
-  class="cursor-pointer rounded-full px-6"
->
+<UButton color="primary" icon="i-lucide-plus" size="lg" class="cursor-pointer rounded-full px-6">
   Action Text
 </UButton>
 ```
@@ -1098,12 +1116,7 @@ const iconColor = computed(() => {
 ### Outline/Secondary Button
 
 ```vue
-<UButton
-  color="neutral"
-  variant="outline"
-  size="lg"
-  class="cursor-pointer rounded-full px-5"
->
+<UButton color="neutral" variant="outline" size="lg" class="cursor-pointer rounded-full px-5">
   Button Text
 </UButton>
 ```
@@ -1120,39 +1133,23 @@ const iconColor = computed(() => {
 
 ```vue
 <!-- Recommended: Soft error styling for cancel -->
-<UButton
-  color="error"
-  variant="soft"
-  size="lg"
-  class="cursor-pointer"
-  @click="handleCancel"
->
+<UButton color="error" variant="soft" size="lg" class="cursor-pointer" @click="handleCancel">
   Cancel
 </UButton>
 
 <!-- Alternative: Outline variant for less aggressive look -->
-<UButton
-  color="error"
-  variant="outline"
-  size="lg"
-  class="cursor-pointer"
-  @click="handleCancel"
->
+<UButton color="error" variant="outline" size="lg" class="cursor-pointer" @click="handleCancel">
   Cancel
 </UButton>
 
 <!-- For truly destructive actions (delete, remove) -->
-<UButton
-  color="error"
-  size="lg"
-  class="cursor-pointer"
-  @click="handleDelete"
->
+<UButton color="error" size="lg" class="cursor-pointer" @click="handleDelete">
   Delete Location
 </UButton>
 ```
 
 **Rationale:**
+
 - Red/error color draws attention to potentially destructive actions
 - Helps prevent accidental cancellations or deletions
 - Clear visual distinction from primary action buttons
@@ -1232,11 +1229,7 @@ const statusIcon = computed(() => {
 ### Structure
 
 ```vue
-<EmptyState
-  icon="i-lucide-{icon-name}"
-  title="No items found"
-  description="Description text here."
->
+<EmptyState icon="i-lucide-{icon-name}" title="No items found" description="Description text here.">
   <template #actions>
     <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer">
       Create Item
@@ -1717,23 +1710,23 @@ When creating a new page, ensure:
 
 ## Summary of Key Design Rules
 
-| Rule | Specification |
-|------|---------------|
-| **Page Container** | `px-0 py-0 md:px-4 md:py-1 space-y-3` |
-| **Layout Body** | `py-2 px-0 sm:px-12 xl:py-4 xl:px-16` (in default.vue) |
-| **Page Content Width** | Full width by default (no max-width), sections as direct children |
-| **Section Spacing** | `space-y-3` (automatic via container)
-| **Page Header Icon** | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background) |
-| **Page Title** | `text-xl sm:text-3xl font-bold text-primary` |
-| **Page Description** | `hidden sm:block` (hidden on mobile, visible on sm+) |
-| **Cards** | `card-elevated` (NO hover effects) |
-| **Buttons - Primary** | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6` |
-| **Buttons - Cancel** | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer` |
-| **Icons** | NO backgrounds, NO borders, NO rounded containers |
-| **Filter Layout** | Dual layout: desktop full filters, mobile search + dropdown only (no toggles) |
-| **Dropdown Handler** | Use `onSelect` (not `click`) |
-| **Form Layout - Standard** | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full` |
-| **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2` |
+| Rule                            | Specification                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| **Page Container**              | `px-0 py-0 md:px-4 md:py-1 space-y-3`                                           |
+| **Layout Body**                 | `py-2 px-0 sm:px-12 xl:py-4 xl:px-16` (in default.vue)                          |
+| **Page Content Width**          | Full width by default (no max-width), sections as direct children               |
+| **Section Spacing**             | `space-y-3` (automatic via container)                                           |
+| **Page Header Icon**            | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background)                          |
+| **Page Title**                  | `text-xl sm:text-3xl font-bold text-primary`                                    |
+| **Page Description**            | `hidden sm:block` (hidden on mobile, visible on sm+)                            |
+| **Cards**                       | `card-elevated` (NO hover effects)                                              |
+| **Buttons - Primary**           | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6`            |
+| **Buttons - Cancel**            | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer` |
+| **Icons**                       | NO backgrounds, NO borders, NO rounded containers                               |
+| **Filter Layout**               | Dual layout: desktop full filters, mobile search + dropdown only (no toggles)   |
+| **Dropdown Handler**            | Use `onSelect` (not `click`)                                                    |
+| **Form Layout - Standard**      | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full`                    |
+| **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2`                                       |
 
 ---
 

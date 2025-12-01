@@ -1,4 +1,5 @@
 # Phase 3.4: Reporting System
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -25,12 +26,14 @@
 ### The Problem
 
 In a stock management system, managers need to see data in meaningful ways:
+
 - How much stock do we have right now?
 - How much did we spend this month?
 - Which suppliers delivered the most?
 - Where are we consuming the most stock?
 
 **Problems with accessing raw data:**
+
 - ❌ Database tables are hard to read
 - ❌ Need technical skills to write SQL queries
 - ❌ No summarized views (must calculate manually)
@@ -40,6 +43,7 @@ In a stock management system, managers need to see data in meaningful ways:
 ### Our Solution
 
 We built a **Reporting System** that:
+
 - ✅ Provides clean, formatted reports
 - ✅ Summarizes data with totals and calculations
 - ✅ Filters data based on user's role and locations
@@ -72,12 +76,12 @@ flowchart TB
 
 **Four Report Types:**
 
-| Report | Purpose | Key Data |
-|--------|---------|----------|
-| **Stock Now** | Current inventory snapshot | Quantities, values, low stock alerts |
-| **Reconciliation** | Period financial summary | Opening, movements, closing values |
-| **Deliveries** | Purchase history | Suppliers, amounts, price variances |
-| **Issues** | Consumption tracking | Cost centres, top items consumed |
+| Report             | Purpose                    | Key Data                             |
+| ------------------ | -------------------------- | ------------------------------------ |
+| **Stock Now**      | Current inventory snapshot | Quantities, values, low stock alerts |
+| **Reconciliation** | Period financial summary   | Opening, movements, closing values   |
+| **Deliveries**     | Purchase history           | Suppliers, amounts, price variances  |
+| **Issues**         | Consumption tracking       | Cost centres, top items consumed     |
 
 ---
 
@@ -97,6 +101,7 @@ In this phase, we created a **complete reporting system** with API endpoints for
 ### Tasks Completed
 
 **Phase 3.4: Reporting & Exports**
+
 - ✅ 3.4.1: Report API Routes (4 endpoints)
 - ✅ 3.4.2: Report Pages (5 pages)
 - ✅ 3.4.3: CSV Export Utility
@@ -131,6 +136,7 @@ flowchart TD
 ```
 
 **Key Steps:**
+
 1. **Authentication** - User must be logged in
 2. **Location Access** - Based on role, determine which locations user can see
 3. **Parse Filters** - Read query parameters (periodId, locationId, etc.)
@@ -185,6 +191,7 @@ Admin/Supervisor sees:     Operator sees:
 **Purpose:** Show current stock levels across all locations
 
 **Query Parameters:**
+
 - `locationId` - Filter by specific location (optional)
 - `category` - Filter by item category (optional)
 - `lowStock` - Show only items below minimum stock (optional)
@@ -211,7 +218,7 @@ Admin/Supervisor sees:     Operator sees:
       "location_name": "Main Kitchen",
       "location_type": "KITCHEN",
       "total_items": 45,
-      "total_value": 50000.00,
+      "total_value": 50000.0,
       "low_stock_items": 3,
       "items": [
         {
@@ -221,8 +228,8 @@ Admin/Supervisor sees:     Operator sees:
           "item_unit": "KG",
           "item_category": "DRY_GOODS",
           "on_hand": 100,
-          "wac": 5.50,
-          "stock_value": 550.00,
+          "wac": 5.5,
+          "stock_value": 550.0,
           "min_stock": 50,
           "max_stock": 200,
           "is_low_stock": false,
@@ -234,7 +241,7 @@ Admin/Supervisor sees:     Operator sees:
   "grand_totals": {
     "total_locations": 3,
     "total_items": 120,
-    "total_value": 130000.00,
+    "total_value": 130000.0,
     "low_stock_items": 8
   },
   "available_categories": ["DRY_GOODS", "DAIRY", "VEGETABLES"]
@@ -242,6 +249,7 @@ Admin/Supervisor sees:     Operator sees:
 ```
 
 **Key Features:**
+
 - Groups items by location
 - Calculates low stock indicators (compares `on_hand` with `min_stock`)
 - Includes available categories for filter dropdown
@@ -254,6 +262,7 @@ Admin/Supervisor sees:     Operator sees:
 **Purpose:** Show period financial summary for reconciliation
 
 **Query Parameters:**
+
 - `periodId` - **Required** - Which period to report on
 - `locationId` - Filter by specific location (optional)
 
@@ -274,19 +283,19 @@ Admin/Supervisor sees:     Operator sees:
       "location_id": "loc-1",
       "location_name": "Main Kitchen",
       "reconciliation": {
-        "opening_stock": 50000.00,
-        "receipts": 15000.00,
-        "transfers_in": 3000.00,
-        "transfers_out": 2000.00,
-        "issues": 12000.00,
-        "closing_stock": 54000.00,
+        "opening_stock": 50000.0,
+        "receipts": 15000.0,
+        "transfers_in": 3000.0,
+        "transfers_out": 2000.0,
+        "issues": 12000.0,
+        "closing_stock": 54000.0,
         "adjustments": 0,
         "back_charges": 0,
         "credits": 0,
         "condemnations": 0
       },
       "calculations": {
-        "consumption": 12000.00,
+        "consumption": 12000.0,
         "total_adjustments": 0,
         "total_mandays": 900,
         "manday_cost": 13.33
@@ -295,11 +304,11 @@ Admin/Supervisor sees:     Operator sees:
     }
   ],
   "grand_totals": {
-    "opening_stock": 150000.00,
-    "receipts": 45000.00,
-    "closing_stock": 162000.00,
-    "consumption": 36000.00,
-    "average_manday_cost": 12.50
+    "opening_stock": 150000.0,
+    "receipts": 45000.0,
+    "closing_stock": 162000.0,
+    "consumption": 36000.0,
+    "average_manday_cost": 12.5
   }
 }
 ```
@@ -307,6 +316,7 @@ Admin/Supervisor sees:     Operator sees:
 **Special Feature - Auto-Calculate:**
 
 If no saved reconciliation exists, the system automatically calculates values from:
+
 - Deliveries (receipts)
 - Transfers (in/out)
 - Issues
@@ -321,6 +331,7 @@ This is shown with `is_saved: false` in the response.
 **Purpose:** Show delivery history with supplier breakdown
 
 **Query Parameters:**
+
 - `periodId` - Filter by period (optional)
 - `locationId` - Filter by location (optional)
 - `supplierId` - Filter by supplier (optional)
@@ -340,19 +351,19 @@ This is shown with `is_saved: false` in the response.
       "delivery_date": "2025-11-15",
       "supplier_name": "ABC Foods",
       "location_name": "Main Kitchen",
-      "total_amount": 5000.00,
+      "total_amount": 5000.0,
       "has_variance": true,
-      "total_variance": 150.00,
+      "total_variance": 150.0,
       "ncr_count": 1,
       "lines": [
         {
           "item_code": "RICE-01",
           "item_name": "Basmati Rice",
           "quantity": 100,
-          "unit_price": 5.50,
-          "period_price": 5.00,
-          "price_variance": 0.50,
-          "line_value": 550.00
+          "unit_price": 5.5,
+          "period_price": 5.0,
+          "price_variance": 0.5,
+          "line_value": 550.0
         }
       ]
     }
@@ -361,29 +372,30 @@ This is shown with `is_saved: false` in the response.
     {
       "location_name": "Main Kitchen",
       "delivery_count": 15,
-      "total_value": 25000.00,
+      "total_value": 25000.0,
       "variance_count": 3,
-      "total_variance": 450.00
+      "total_variance": 450.0
     }
   ],
   "by_supplier": [
     {
       "supplier_name": "ABC Foods",
       "delivery_count": 20,
-      "total_value": 35000.00
+      "total_value": 35000.0
     }
   ],
   "grand_totals": {
     "total_deliveries": 45,
-    "total_value": 120000.00,
+    "total_value": 120000.0,
     "deliveries_with_variance": 8,
-    "total_variance": 1200.00,
+    "total_variance": 1200.0,
     "total_ncrs": 5
   }
 }
 ```
 
 **Key Features:**
+
 - Tracks price variances (when actual price differs from locked period price)
 - Counts NCRs (Non-Conformance Reports) created for price issues
 - Groups data by location and supplier
@@ -396,6 +408,7 @@ This is shown with `is_saved: false` in the response.
 **Purpose:** Show stock consumption by location and cost centre
 
 **Query Parameters:**
+
 - `periodId` - Filter by period (optional)
 - `locationId` - Filter by location (optional)
 - `costCentre` - Filter by cost centre: FOOD, CLEAN, OTHER (optional)
@@ -414,15 +427,15 @@ This is shown with `is_saved: false` in the response.
       "issue_date": "2025-11-15",
       "location_name": "Main Kitchen",
       "cost_centre": "FOOD",
-      "total_value": 500.00,
+      "total_value": 500.0,
       "line_count": 5,
       "lines": [
         {
           "item_code": "RICE-01",
           "item_name": "Basmati Rice",
           "quantity": 10,
-          "wac_at_issue": 5.50,
-          "line_value": 55.00
+          "wac_at_issue": 5.5,
+          "line_value": 55.0
         }
       ]
     }
@@ -431,11 +444,11 @@ This is shown with `is_saved: false` in the response.
     {
       "location_name": "Main Kitchen",
       "issue_count": 30,
-      "total_value": 15000.00,
+      "total_value": 15000.0,
       "by_cost_centre": {
-        "FOOD": 12000.00,
-        "CLEAN": 2000.00,
-        "OTHER": 1000.00
+        "FOOD": 12000.0,
+        "CLEAN": 2000.0,
+        "OTHER": 1000.0
       }
     }
   ],
@@ -443,24 +456,24 @@ This is shown with `is_saved: false` in the response.
     {
       "cost_centre": "FOOD",
       "issue_count": 25,
-      "total_value": 20000.00,
+      "total_value": 20000.0,
       "top_items": [
         {
           "item_code": "RICE-01",
           "item_name": "Basmati Rice",
           "total_quantity": 500,
-          "total_value": 2750.00
+          "total_value": 2750.0
         }
       ]
     }
   ],
   "grand_totals": {
     "total_issues": 50,
-    "total_value": 30000.00,
+    "total_value": 30000.0,
     "by_cost_centre": {
-      "FOOD": { "count": 40, "value": 25000.00 },
-      "CLEAN": { "count": 8, "value": 4000.00 },
-      "OTHER": { "count": 2, "value": 1000.00 }
+      "FOOD": { "count": 40, "value": 25000.0 },
+      "CLEAN": { "count": 8, "value": 4000.0 },
+      "OTHER": { "count": 2, "value": 1000.0 }
     }
   }
 }
@@ -480,8 +493,9 @@ All reports follow a similar response structure:
 interface ReportResponse {
   // Report identification
   report_type: string;
-  generated_at: string;        // When report was created
-  generated_by: {              // Who created it
+  generated_at: string; // When report was created
+  generated_by: {
+    // Who created it
     id: string;
     username: string;
   };
@@ -514,12 +528,12 @@ interface ReportResponse {
 
 ### Files Created
 
-| File | Lines | What It Does |
-|------|-------|--------------|
-| `server/api/reports/stock-now.get.ts` | ~305 | Current stock levels report |
-| `server/api/reports/reconciliation.get.ts` | ~515 | Period reconciliation report |
-| `server/api/reports/deliveries.get.ts` | ~415 | Deliveries report with variance tracking |
-| `server/api/reports/issues.get.ts` | ~435 | Issues/consumption report |
+| File                                       | Lines | What It Does                             |
+| ------------------------------------------ | ----- | ---------------------------------------- |
+| `server/api/reports/stock-now.get.ts`      | ~305  | Current stock levels report              |
+| `server/api/reports/reconciliation.get.ts` | ~515  | Period reconciliation report             |
+| `server/api/reports/deliveries.get.ts`     | ~415  | Deliveries report with variance tracking |
+| `server/api/reports/issues.get.ts`         | ~435  | Issues/consumption report                |
 
 ---
 
@@ -536,6 +550,7 @@ We created **5 frontend pages** that display reports with filters, summary cards
 **File:** `app/pages/reports/index.vue`
 
 This is the main entry point for all reports. It shows cards for each report type with:
+
 - Icon and title
 - Description
 - Feature badges
@@ -600,6 +615,7 @@ flowchart TB
 **File:** `app/pages/reports/stock-now.vue`
 
 **Features:**
+
 - Filter by location, category, low stock only
 - Summary cards: Total Locations, Total Items, Total Value, Low Stock Items
 - Tables grouped by location with item details
@@ -612,7 +628,6 @@ flowchart TB
   <div class="card-elevated p-6 mb-6">
     <h3 class="text-subheading font-semibold mb-4">Filters</h3>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
       <!-- Location Filter (visible to supervisors only) -->
       <UFormField v-if="isAtLeastSupervisor" label="Location">
         <USelectMenu
@@ -640,12 +655,9 @@ flowchart TB
       <UFormField label="Actions">
         <div class="flex gap-2">
           <UButton color="primary" @click="fetchReport">Generate</UButton>
-          <UButton color="neutral" variant="outline" @click="clearFilters">
-            Clear
-          </UButton>
+          <UButton color="neutral" variant="outline" @click="clearFilters">Clear</UButton>
         </div>
       </UFormField>
-
     </div>
   </div>
 </template>
@@ -658,6 +670,7 @@ flowchart TB
 **File:** `app/pages/reports/reconciliation.vue`
 
 **Features:**
+
 - Period selector (required)
 - Location filter
 - Flow diagram: Opening → Receipts → Transfers → Issues → Closing
@@ -688,6 +701,7 @@ flowchart TB
 **File:** `app/pages/reports/deliveries.vue`
 
 **Features:**
+
 - Filter by period, location, supplier, date range
 - Checkbox to show only deliveries with price variance
 - Summary by supplier (sorted by value)
@@ -701,6 +715,7 @@ flowchart TB
 **File:** `app/pages/reports/issues.vue`
 
 **Features:**
+
 - Filter by period, location, cost centre, date range
 - Breakdown by cost centre (FOOD, CLEAN, OTHER)
 - Top 10 consumed items per cost centre
@@ -715,7 +730,6 @@ All pages use a consistent pattern for summary cards:
 ```vue
 <template>
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-
     <!-- Card 1: Count -->
     <div class="card-elevated p-4">
       <p class="text-caption">Total Locations</p>
@@ -747,7 +761,6 @@ All pages use a consistent pattern for summary cards:
         {{ reportData.grand_totals.low_stock_items }}
       </p>
     </div>
-
   </div>
 </template>
 ```
@@ -756,13 +769,13 @@ All pages use a consistent pattern for summary cards:
 
 ### Files Created
 
-| File | Lines | What It Does |
-|------|-------|--------------|
-| `app/pages/reports/index.vue` | ~165 | Reports hub with navigation cards |
-| `app/pages/reports/stock-now.vue` | ~450 | Current stock report page |
-| `app/pages/reports/reconciliation.vue` | ~400 | Reconciliation report page |
-| `app/pages/reports/deliveries.vue` | ~400 | Deliveries report page |
-| `app/pages/reports/issues.vue` | ~400 | Issues report page |
+| File                                   | Lines | What It Does                      |
+| -------------------------------------- | ----- | --------------------------------- |
+| `app/pages/reports/index.vue`          | ~165  | Reports hub with navigation cards |
+| `app/pages/reports/stock-now.vue`      | ~450  | Current stock report page         |
+| `app/pages/reports/reconciliation.vue` | ~400  | Reconciliation report page        |
+| `app/pages/reports/deliveries.vue`     | ~400  | Deliveries report page            |
+| `app/pages/reports/issues.vue`         | ~400  | Issues report page                |
 
 ---
 
@@ -798,10 +811,10 @@ function escapeCSVValue(value: unknown): string {
 
   // If value contains special characters, wrap in quotes
   if (
-    stringValue.includes(",") ||      // Commas
-    stringValue.includes('"') ||      // Double quotes
-    stringValue.includes("\n") ||     // New lines
-    stringValue.includes("\r")        // Carriage returns
+    stringValue.includes(",") || // Commas
+    stringValue.includes('"') || // Double quotes
+    stringValue.includes("\n") || // New lines
+    stringValue.includes("\r") // Carriage returns
   ) {
     // Escape existing quotes by doubling them
     return `"${stringValue.replace(/"/g, '""')}"`;
@@ -813,12 +826,12 @@ function escapeCSVValue(value: unknown): string {
 
 **Example:**
 
-| Input | Output |
-|-------|--------|
-| `Hello` | `Hello` |
+| Input          | Output           |
+| -------------- | ---------------- |
+| `Hello`        | `Hello`          |
 | `Hello, World` | `"Hello, World"` |
-| `Say "Hi"` | `"Say ""Hi"""` |
-| `null` | (empty string) |
+| `Say "Hi"`     | `"Say ""Hi"""`   |
+| `null`         | (empty string)   |
 
 ---
 
@@ -832,9 +845,7 @@ export function generateCSV<T extends Record<string, unknown>>(
   columns: CsvColumn<T>[]
 ): string {
   // Generate header row
-  const headerRow = columns
-    .map((col) => escapeCSVValue(col.header))
-    .join(",");
+  const headerRow = columns.map((col) => escapeCSVValue(col.header)).join(",");
 
   // Generate data rows
   const dataRows = data.map((row) => {
@@ -948,10 +959,7 @@ export function formatDateForCSV(date: Date | string | null): string {
 }
 
 // Format number with specific decimal places
-export function formatNumberForCSV(
-  num: number | string | null,
-  decimals: number = 2
-): string {
+export function formatNumberForCSV(num: number | string | null, decimals: number = 2): string {
   if (num === null || num === undefined || num === "") return "";
   const numValue = typeof num === "string" ? parseFloat(num) : num;
   if (isNaN(numValue)) return "";
@@ -1057,9 +1065,9 @@ sequenceDiagram
 
 ### Files Created
 
-| File | Lines | What It Does |
-|------|-------|--------------|
-| `app/utils/csvExport.ts` | ~197 | CSV generation and download utilities |
+| File                     | Lines | What It Does                          |
+| ------------------------ | ----- | ------------------------------------- |
+| `app/utils/csvExport.ts` | ~197  | CSV generation and download utilities |
 
 ---
 
@@ -1067,28 +1075,28 @@ sequenceDiagram
 
 ### API Routes
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `server/api/reports/stock-now.get.ts` | ~305 | Current stock report |
-| `server/api/reports/reconciliation.get.ts` | ~515 | Period reconciliation report |
-| `server/api/reports/deliveries.get.ts` | ~415 | Deliveries with variance tracking |
-| `server/api/reports/issues.get.ts` | ~435 | Issues by cost centre |
+| File                                       | Lines | Purpose                           |
+| ------------------------------------------ | ----- | --------------------------------- |
+| `server/api/reports/stock-now.get.ts`      | ~305  | Current stock report              |
+| `server/api/reports/reconciliation.get.ts` | ~515  | Period reconciliation report      |
+| `server/api/reports/deliveries.get.ts`     | ~415  | Deliveries with variance tracking |
+| `server/api/reports/issues.get.ts`         | ~435  | Issues by cost centre             |
 
 ### Frontend Pages
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/pages/reports/index.vue` | ~165 | Reports hub |
-| `app/pages/reports/stock-now.vue` | ~450 | Stock now report page |
-| `app/pages/reports/reconciliation.vue` | ~400 | Reconciliation report page |
-| `app/pages/reports/deliveries.vue` | ~400 | Deliveries report page |
-| `app/pages/reports/issues.vue` | ~400 | Issues report page |
+| File                                   | Lines | Purpose                    |
+| -------------------------------------- | ----- | -------------------------- |
+| `app/pages/reports/index.vue`          | ~165  | Reports hub                |
+| `app/pages/reports/stock-now.vue`      | ~450  | Stock now report page      |
+| `app/pages/reports/reconciliation.vue` | ~400  | Reconciliation report page |
+| `app/pages/reports/deliveries.vue`     | ~400  | Deliveries report page     |
+| `app/pages/reports/issues.vue`         | ~400  | Issues report page         |
 
 ### Utilities
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/utils/csvExport.ts` | ~197 | CSV generation utilities |
+| File                     | Lines | Purpose                  |
+| ------------------------ | ----- | ------------------------ |
+| `app/utils/csvExport.ts` | ~197  | CSV generation utilities |
 
 **Total:** ~3,680 lines of code
 
@@ -1114,6 +1122,7 @@ const { periodId, locationId, startDate, endDate } = querySchema.parse(query);
 ```
 
 **Why this matters:**
+
 - Ensures parameters are valid before using them
 - Provides clear error messages for invalid input
 - TypeScript knows the types after parsing
@@ -1206,6 +1215,7 @@ const locationSummaries = Array.from(locationMap.values());
 ```
 
 **Why use Maps instead of arrays?**
+
 - O(1) lookup by key (constant time)
 - Easy to check if item exists
 - No duplicate entries
@@ -1231,6 +1241,7 @@ const items = stock.map((s) => ({
 ```
 
 **Common Rounding:**
+
 - Currency: 2 decimal places (`Math.round(value * 100) / 100`)
 - Quantities: 4 decimal places (`Math.round(value * 10000) / 10000`)
 
@@ -1261,20 +1272,20 @@ URL.revokeObjectURL(url);
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **Report** | A formatted view of data with summaries and totals |
-| **CSV** | Comma-Separated Values - a text format Excel can read |
-| **Query Parameter** | Values passed in URL like `?periodId=abc&locationId=xyz` |
-| **Grand Total** | Sum of all values across all groups |
-| **Summary** | Grouped totals (e.g., total by location) |
-| **BOM** | Byte Order Mark - special character for Excel UTF-8 support |
-| **Blob** | Binary Large Object - used for file downloads in browser |
-| **Accessor** | A key or function to get a value from an object |
-| **Cost Centre** | Category of expense (FOOD, CLEAN, OTHER) |
-| **Price Variance** | Difference between actual price and expected price |
-| **Manday Cost** | Total consumption divided by number of people-days |
-| **Low Stock** | When quantity is below minimum stock level |
+| Term                | Simple Explanation                                          |
+| ------------------- | ----------------------------------------------------------- |
+| **Report**          | A formatted view of data with summaries and totals          |
+| **CSV**             | Comma-Separated Values - a text format Excel can read       |
+| **Query Parameter** | Values passed in URL like `?periodId=abc&locationId=xyz`    |
+| **Grand Total**     | Sum of all values across all groups                         |
+| **Summary**         | Grouped totals (e.g., total by location)                    |
+| **BOM**             | Byte Order Mark - special character for Excel UTF-8 support |
+| **Blob**            | Binary Large Object - used for file downloads in browser    |
+| **Accessor**        | A key or function to get a value from an object             |
+| **Cost Centre**     | Category of expense (FOOD, CLEAN, OTHER)                    |
+| **Price Variance**  | Difference between actual price and expected price          |
+| **Manday Cost**     | Total consumption divided by number of people-days          |
+| **Low Stock**       | When quantity is below minimum stock level                  |
 
 ---
 
@@ -1283,6 +1294,7 @@ URL.revokeObjectURL(url);
 ### Issue 1: CSV Export Shows Garbled Characters
 
 **Symptoms:**
+
 - Arabic or special characters show as `????` or strange symbols
 - Numbers show incorrectly
 
@@ -1300,6 +1312,7 @@ const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
 ### Issue 2: Cannot See All Locations
 
 **Symptoms:**
+
 - Report only shows 1-2 locations
 - Other locations are missing
 
@@ -1322,12 +1335,14 @@ console.log("Accessible locations:", locations);
 ### Issue 3: Reconciliation Shows "Auto-Calculated"
 
 **Symptoms:**
+
 - Report shows `is_saved: false`
 - Values might not match expectations
 
 **Cause:** No reconciliation record saved for that period-location
 
 **Solution:** This is normal behavior. The system auto-calculates from:
+
 - Deliveries (receipts)
 - Transfers (in/out)
 - Issues
@@ -1340,14 +1355,17 @@ To get "saved" data, user must complete and save reconciliation form.
 ### Issue 4: Empty Report Data
 
 **Symptoms:**
+
 - Report shows no items
 - Grand totals are all zero
 
 **Cause:**
+
 1. No data in database matching filters
 2. Period might not have any transactions
 
 **Solution:**
+
 ```typescript
 // Check if data exists
 const deliveries = await $fetch("/api/reports/deliveries?periodId=xxx");
@@ -1363,6 +1381,7 @@ console.log("Period:", period.name, period.status);
 ### Issue 5: Date Filter Not Working
 
 **Symptoms:**
+
 - Date range filter doesn't filter correctly
 - All data still shows
 
@@ -1386,11 +1405,13 @@ const url = `/api/reports/deliveries?startDate=${startDate}&endDate=${endDate}`;
 ### Manual Testing Steps
 
 **1. Reports Hub**
+
 - [ ] All report cards display correctly
 - [ ] Links navigate to correct report pages
 - [ ] Feature badges visible
 
 **2. Stock Now Report**
+
 - [ ] Report loads with current data
 - [ ] Location filter works (supervisor only)
 - [ ] Category filter populates from data
@@ -1400,6 +1421,7 @@ const url = `/api/reports/deliveries?startDate=${startDate}&endDate=${endDate}`;
 - [ ] CSV opens correctly in Excel
 
 **3. Reconciliation Report**
+
 - [ ] Period selector required
 - [ ] Report shows all locations
 - [ ] "Auto-calculated" indicator shows for unsaved
@@ -1408,6 +1430,7 @@ const url = `/api/reports/deliveries?startDate=${startDate}&endDate=${endDate}`;
 - [ ] Grand totals add up correctly
 
 **4. Deliveries Report**
+
 - [ ] Filters by period, location, supplier
 - [ ] Date range filter works
 - [ ] Variance filter shows only variance deliveries
@@ -1416,12 +1439,14 @@ const url = `/api/reports/deliveries?startDate=${startDate}&endDate=${endDate}`;
 - [ ] Supplier summary sorted by value
 
 **5. Issues Report**
+
 - [ ] Filters by period, location, cost centre
 - [ ] Cost centre breakdown shows correct values
 - [ ] Top 10 items shows per cost centre
 - [ ] Location summary has cost centre split
 
 **6. CSV Export (All Reports)**
+
 - [ ] Export button disabled when no data
 - [ ] CSV file downloads with correct name
 - [ ] CSV opens in Excel without errors
@@ -1429,6 +1454,7 @@ const url = `/api/reports/deliveries?startDate=${startDate}&endDate=${endDate}`;
 - [ ] Numbers formatted properly
 
 **7. Role-Based Access**
+
 - [ ] OPERATOR sees only assigned locations
 - [ ] SUPERVISOR sees all locations
 - [ ] ADMIN sees all locations
@@ -1441,12 +1467,14 @@ const url = `/api/reports/deliveries?startDate=${startDate}&endDate=${endDate}`;
 After completing Phase 3.4 (Reporting System), Phase 3 is now **COMPLETE**. The next phases are:
 
 **→ Phase 4: Polish & Performance**
+
 - UI/UX improvements
 - Performance optimization
 - Error handling improvements
 - PWA enhancements
 
 **→ Phase 5: UAT & Launch**
+
 - User Acceptance Testing
 - Bug fixes from testing
 - Production deployment
@@ -1475,6 +1503,7 @@ In Phase 3.4, we built a complete reporting system with:
 ✅ **Error Handling** with validation and user-friendly messages
 
 The reporting system provides managers with the data visibility they need to:
+
 - Monitor current inventory levels
 - Track period financial performance
 - Analyze supplier purchasing patterns
@@ -1482,6 +1511,7 @@ The reporting system provides managers with the data visibility they need to:
 - Export data for further analysis
 
 All reports follow consistent patterns for:
+
 - Authentication and authorization
 - Query parameter validation
 - Role-based location filtering

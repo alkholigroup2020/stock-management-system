@@ -1,4 +1,5 @@
 # Phase 1.7: Deliveries with Price Variance Detection
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -38,6 +39,7 @@ Imagine you ordered 100 KG of chicken. Last month you paid SAR 10.00 per KG. Tod
 **Without our system:** Someone might not notice, and you lose money.
 
 **With our system:** The system automatically:
+
 - Detects the SAR 2.00 price increase
 - Calculates it's a 20% variance
 - Creates an NCR (Non-Conformance Report) automatically
@@ -56,6 +58,7 @@ WAC is the **average price** you paid for an item, considering all your purchase
 When you receive goods at different prices, WAC helps you know the true average cost of your inventory.
 
 **Formula:**
+
 ```
 New WAC = (Current Stock Value + New Delivery Value) / Total Quantity
 ```
@@ -63,12 +66,15 @@ New WAC = (Current Stock Value + New Delivery Value) / Total Quantity
 **Example:**
 
 You have:
+
 - 100 KG chicken @ SAR 10.00/KG = SAR 1,000 (current stock)
 
 You receive:
+
 - 50 KG chicken @ SAR 12.00/KG = SAR 600 (new delivery)
 
 New WAC calculation:
+
 ```
 New WAC = (1,000 + 600) / (100 + 50)
         = 1,600 / 150
@@ -95,6 +101,7 @@ graph TB
 Price variance happens when the **actual delivery price** is different from the **expected price** (the price locked at the start of the accounting period).
 
 **Why it matters:**
+
 - Prevents unauthorized price changes
 - Detects supplier price increases
 - Creates audit trail for accounting
@@ -116,11 +123,11 @@ graph TB
 
 **Example:**
 
-| Item | Period Price | Delivery Price | Variance | Action |
-|------|-------------|----------------|----------|--------|
-| Chicken | SAR 10.00 | SAR 10.00 | SAR 0.00 | ✅ No action |
-| Beef | SAR 50.00 | SAR 55.00 | SAR 5.00 | ⚠️ Create NCR |
-| Milk | SAR 5.00 | SAR 4.50 | -SAR 0.50 | ⚠️ Create NCR |
+| Item    | Period Price | Delivery Price | Variance  | Action        |
+| ------- | ------------ | -------------- | --------- | ------------- |
+| Chicken | SAR 10.00    | SAR 10.00      | SAR 0.00  | ✅ No action  |
+| Beef    | SAR 50.00    | SAR 55.00      | SAR 5.00  | ⚠️ Create NCR |
+| Milk    | SAR 5.00     | SAR 4.50       | -SAR 0.50 | ⚠️ Create NCR |
 
 ---
 
@@ -186,6 +193,7 @@ We created a **calculator** that computes the new average cost when you receive 
 **File Created:** `server/utils/wac.ts`
 
 **Main Function:**
+
 ```typescript
 calculateWAC(
   currentQty: number,      // 100 KG
@@ -196,6 +204,7 @@ calculateWAC(
 ```
 
 **Returns:**
+
 ```typescript
 {
   newWAC: 10.67,           // New average cost
@@ -207,6 +216,7 @@ calculateWAC(
 ```
 
 **Input Validation:**
+
 - ✅ No negative values
 - ✅ No zero quantities
 - ✅ No infinity or NaN values
@@ -214,6 +224,7 @@ calculateWAC(
 **Why This Matters:**
 
 Without accurate WAC:
+
 - You don't know your true inventory cost
 - Your profit calculations are wrong
 - Period-end reports are incorrect
@@ -221,12 +232,14 @@ Without accurate WAC:
 **Testing:**
 
 We created **38 test cases** using Vitest:
+
 - Standard calculations
 - Edge cases (zero stock, price changes)
 - Decimal precision (4 decimals)
 - Error handling
 
 **Running Tests:**
+
 ```bash
 pnpm test:unit
 ```
@@ -246,6 +259,7 @@ We created a **price checker** that compares delivery prices to expected prices 
 **Main Functions:**
 
 #### 1. Check Price Variance
+
 ```typescript
 checkPriceVariance(
   unitPrice: 12.00,        // What supplier charged
@@ -255,6 +269,7 @@ checkPriceVariance(
 ```
 
 **Returns:**
+
 ```typescript
 {
   hasVariance: true,
@@ -265,6 +280,7 @@ checkPriceVariance(
 ```
 
 #### 2. Create Auto-NCR
+
 ```typescript
 createPriceVarianceNCR({
   locationId: "location-id",
@@ -272,14 +288,15 @@ createPriceVarianceNCR({
   deliveryLineId: "line-id",
   itemName: "Chicken",
   quantity: 100,
-  unitPrice: 12.00,
-  periodPrice: 10.00,
-  variance: 2.00,
-  totalVariance: 200.00
-})
+  unitPrice: 12.0,
+  periodPrice: 10.0,
+  variance: 2.0,
+  totalVariance: 200.0,
+});
 ```
 
 **Creates NCR with:**
+
 - Type: `PRICE_VARIANCE`
 - Auto-generated: `true`
 - Status: `OPEN`
@@ -307,6 +324,7 @@ graph TB
 **Testing:**
 
 We created **45 test cases** covering:
+
 - Standard variance calculations
 - Threshold checks (only create NCR if variance > 5%)
 - Decimal precision
@@ -320,6 +338,7 @@ We created **45 test cases** covering:
 ### Simple Explanation
 
 We built **3 API endpoints** that let the frontend:
+
 1. Get all deliveries for a location
 2. Post a new delivery (with automatic price check)
 3. Get details of one delivery
@@ -331,11 +350,13 @@ We built **3 API endpoints** that let the frontend:
 **Route:** `GET /api/locations/:locationId/deliveries`
 
 **What it does:**
+
 - Fetches all deliveries for a location
 - Supports filtering (period, supplier, date range, has variance)
 - Returns delivery list with supplier info
 
 **Query Parameters:**
+
 ```typescript
 ?periodId=xxx          // Filter by period
 &supplierId=xxx        // Filter by supplier
@@ -346,6 +367,7 @@ We built **3 API endpoints** that let the frontend:
 ```
 
 **Example Response:**
+
 ```json
 {
   "deliveries": [
@@ -358,7 +380,7 @@ We built **3 API endpoints** that let the frontend:
         "code": "SUP-001"
       },
       "invoice_no": "INV-12345",
-      "total_amount": 5000.00,
+      "total_amount": 5000.0,
       "has_variance": true
     }
   ]
@@ -407,26 +429,28 @@ graph TB
 **Step-by-Step Explanation:**
 
 **Step 1-5: Validation**
+
 ```typescript
 // 1. Validate input data
-const validatedData = deliverySchema.parse(body)
+const validatedData = deliverySchema.parse(body);
 
 // 2. Check period is OPEN
-if (period.status !== 'OPEN') {
-  throw createError({ statusCode: 400, message: "Period is closed" })
+if (period.status !== "OPEN") {
+  throw createError({ statusCode: 400, message: "Period is closed" });
 }
 
 // 3. Check user has access to location
 if (!hasLocationAccess(user, locationId)) {
-  throw createError({ statusCode: 403, message: "Access denied" })
+  throw createError({ statusCode: 403, message: "Access denied" });
 }
 
 // 4. Generate delivery number
-const deliveryNo = await generateDeliveryNumber(periodId)
+const deliveryNo = await generateDeliveryNumber(periodId);
 // Result: "DEL-2025-001"
 ```
 
 **Step 6-9: Process Each Line**
+
 ```typescript
 for (const line of validatedData.lines) {
   // Get the expected price for this period
@@ -434,17 +458,17 @@ for (const line of validatedData.lines) {
     where: {
       item_id_period_id: {
         item_id: line.item_id,
-        period_id: periodId
-      }
-    }
-  })
+        period_id: periodId,
+      },
+    },
+  });
 
   // Check if prices match
   const variance = checkPriceVariance(
-    line.unit_price,      // SAR 12.00
-    periodPrice.price,    // SAR 10.00
-    line.quantity         // 100
-  )
+    line.unit_price, // SAR 12.00
+    periodPrice.price, // SAR 10.00
+    line.quantity // 100
+  );
 
   // Create NCR if variance found
   if (variance.hasVariance) {
@@ -457,8 +481,8 @@ for (const line of validatedData.lines) {
       unitPrice: line.unit_price,
       periodPrice: periodPrice.price,
       variance: variance.absoluteVariance,
-      totalVariance: variance.totalVarianceAmount
-    })
+      totalVariance: variance.totalVarianceAmount,
+    });
   }
 
   // Update stock
@@ -466,32 +490,35 @@ for (const line of validatedData.lines) {
     where: {
       location_id_item_id: {
         location_id: locationId,
-        item_id: line.item_id
-      }
-    }
-  })
+        item_id: line.item_id,
+      },
+    },
+  });
 
   // Recalculate WAC
   const newWAC = calculateWAC(
-    currentStock.on_hand,     // 100 KG
-    currentStock.wac,         // SAR 10.00
-    line.quantity,            // 50 KG
-    line.unit_price          // SAR 12.00
-  )
+    currentStock.on_hand, // 100 KG
+    currentStock.wac, // SAR 10.00
+    line.quantity, // 50 KG
+    line.unit_price // SAR 12.00
+  );
   // New WAC: SAR 10.67
 
   // Update location stock
   await prisma.locationStock.upsert({
-    where: { /* ... */ },
+    where: {
+      /* ... */
+    },
     update: {
-      on_hand: newWAC.newQuantity,  // 150 KG
-      wac: newWAC.newWAC            // SAR 10.67
-    }
-  })
+      on_hand: newWAC.newQuantity, // 150 KG
+      wac: newWAC.newWAC, // SAR 10.67
+    },
+  });
 }
 ```
 
 **Input Example:**
+
 ```json
 {
   "supplier_id": "sup-1",
@@ -503,12 +530,12 @@ for (const line of validatedData.lines) {
     {
       "item_id": "item-1",
       "quantity": 100,
-      "unit_price": 12.00
+      "unit_price": 12.0
     },
     {
       "item_id": "item-2",
       "quantity": 50,
-      "unit_price": 25.00
+      "unit_price": 25.0
     }
   ]
 }
@@ -517,6 +544,7 @@ for (const line of validatedData.lines) {
 **Why Use Transaction?**
 
 If ANY step fails (e.g., stock update fails), ALL changes are rolled back:
+
 - Delivery not created
 - NCRs not created
 - Stock not updated
@@ -530,11 +558,13 @@ This keeps your database **consistent** - no partial deliveries!
 **Route:** `GET /api/deliveries/:id`
 
 **What it does:**
+
 - Fetches one delivery with all lines
 - Includes all linked NCRs
 - Shows variance summary
 
 **Response:**
+
 ```json
 {
   "delivery": {
@@ -543,16 +573,16 @@ This keeps your database **consistent** - no partial deliveries!
     "delivery_date": "2025-01-15",
     "supplier": { "name": "Al-Safi", "code": "SUP-001" },
     "invoice_no": "INV-12345",
-    "total_amount": 5000.00,
+    "total_amount": 5000.0,
     "has_variance": true,
     "lines": [
       {
         "item": { "name": "Chicken", "code": "CHK-001" },
         "quantity": 100,
-        "unit_price": 12.00,
-        "period_price": 10.00,
-        "price_variance": 2.00,
-        "line_value": 1200.00,
+        "unit_price": 12.0,
+        "period_price": 10.0,
+        "price_variance": 2.0,
+        "line_value": 1200.0,
         "ncr": {
           "ncr_no": "NCR-2025-001",
           "status": "OPEN"
@@ -563,7 +593,7 @@ This keeps your database **consistent** - no partial deliveries!
       "total_lines": 5,
       "total_items": 5,
       "variance_lines": 2,
-      "total_variance_amount": 300.00,
+      "total_variance_amount": 300.0,
       "ncr_count": 2
     }
   }
@@ -587,6 +617,7 @@ We created a **table page** that shows all deliveries for the current location w
 #### 1. Deliveries Table
 
 Displays 6 columns:
+
 - **Delivery No** - DEL-2025-001
 - **Date** - 15/01/2025
 - **Supplier** - Al-Safi Danone (SUP-001)
@@ -597,38 +628,25 @@ Displays 6 columns:
 #### 2. Filters
 
 Three filters with "Apply" button:
+
 ```vue
 <template>
   <!-- Date Range -->
-  <UInput
-    type="date"
-    v-model="filters.startDate"
-    label="From Date"
-  />
-  <UInput
-    type="date"
-    v-model="filters.endDate"
-    label="To Date"
-  />
+  <UInput type="date" v-model="filters.startDate" label="From Date" />
+  <UInput type="date" v-model="filters.endDate" label="To Date" />
 
   <!-- Supplier Dropdown -->
-  <USelectMenu
-    v-model="filters.supplierId"
-    :options="suppliers"
-    label="Supplier"
-  />
+  <USelectMenu v-model="filters.supplierId" :options="suppliers" label="Supplier" />
 
   <!-- Has Variance Checkbox -->
-  <UCheckbox
-    v-model="filters.hasVariance"
-    label="Show only price variances"
-  />
+  <UCheckbox v-model="filters.hasVariance" label="Show only price variances" />
 </template>
 ```
 
 #### 3. Active Filter Chips
 
 Shows active filters with remove buttons:
+
 ```
 [📅 01/01/2025 - 31/01/2025 ✕] [👤 Al-Safi Danone ✕] [⚠️ Has Variance ✕]
 ```
@@ -636,6 +654,7 @@ Shows active filters with remove buttons:
 #### 4. Pagination
 
 Smart pagination showing:
+
 ```
 [1] [2] [3] ... [10] [Next]
 Showing 1-20 of 157 deliveries
@@ -644,26 +663,29 @@ Showing 1-20 of 157 deliveries
 #### 5. Location Integration
 
 Automatically switches deliveries when you change location:
+
 ```typescript
 watch(
   () => locationStore.activeLocation?.id,
   () => {
-    fetchDeliveries()
+    fetchDeliveries();
   }
-)
+);
 ```
 
 #### 6. Permission-Based Actions
 
 **"New Delivery" button** only shows if:
+
 ```typescript
-const canCreate = permissions.canPostDeliveries()
+const canCreate = permissions.canPostDeliveries();
 ```
 
 **Row Click** - Navigate to delivery details:
+
 ```typescript
 function onRowClick(row) {
-  router.push(`/deliveries/${row.id}`)
+  router.push(`/deliveries/${row.id}`);
 }
 ```
 
@@ -702,6 +724,7 @@ We created a **form page** where operators can post new deliveries with automati
 **Form Sections:**
 
 #### Section 1: Delivery Information
+
 ```vue
 <UCard>
   <template #header>Delivery Information</template>
@@ -744,6 +767,7 @@ We created a **form page** where operators can post new deliveries with automati
 #### Section 2: Delivery Items (Dynamic Lines)
 
 **Price Variance Warning:**
+
 ```vue
 <!-- Show warning if any line has variance -->
 <UAlert
@@ -758,6 +782,7 @@ We created a **form page** where operators can post new deliveries with automati
 ```
 
 **Items Table:**
+
 ```vue
 <table>
   <thead>
@@ -853,27 +878,26 @@ watchEffect(() => {
   form.lines.forEach((line) => {
     if (line.item_id && line.unit_price) {
       // Get period price for this item
-      const periodPrice = periodPrices.find(
-        p => p.item_id === line.item_id
-      )?.price
+      const periodPrice = periodPrices.find((p) => p.item_id === line.item_id)?.price;
 
       if (periodPrice) {
         // Check if prices match
-        const variance = line.unit_price - periodPrice
+        const variance = line.unit_price - periodPrice;
 
         // Flag variance if difference exists
-        line.hasVariance = variance !== 0
-        line.variance = variance
-        line.periodPrice = periodPrice
+        line.hasVariance = variance !== 0;
+        line.variance = variance;
+        line.periodPrice = periodPrice;
       }
     }
-  })
-})
+  });
+});
 ```
 
 **Visual Feedback:**
 
 When variance detected:
+
 1. Row background turns **amber** (light yellow)
 2. Shows ⚠️ **warning icon**
 3. Displays **variance amount**: "Variance: SAR 2.00"
@@ -882,20 +906,21 @@ When variance detected:
 #### Form Validation
 
 **Submit button disabled if:**
+
 ```typescript
 const isFormValid = computed(() => {
   return (
-    form.supplier_id &&        // Supplier selected
-    form.invoice_no &&         // Invoice entered
-    form.delivery_date &&      // Date selected
-    form.lines.length > 0 &&   // At least one line
-    form.lines.every(line =>   // All lines complete
-      line.item_id &&
-      line.quantity > 0 &&
-      line.unit_price > 0
+    form.supplier_id && // Supplier selected
+    form.invoice_no && // Invoice entered
+    form.delivery_date && // Date selected
+    form.lines.length > 0 && // At least one line
+    form.lines.every(
+      (
+        line // All lines complete
+      ) => line.item_id && line.quantity > 0 && line.unit_price > 0
     )
-  )
-})
+  );
+});
 ```
 
 #### Submit Handler
@@ -903,32 +928,25 @@ const isFormValid = computed(() => {
 ```typescript
 async function submitDelivery() {
   try {
-    loading.value = true
+    loading.value = true;
 
     // Call API
-    const result = await $fetch(
-      `/api/locations/${locationId}/deliveries`,
-      {
-        method: 'POST',
-        body: form
-      }
-    )
+    const result = await $fetch(`/api/locations/${locationId}/deliveries`, {
+      method: "POST",
+      body: form,
+    });
 
     // Show success message
     if (result.ncrCount > 0) {
-      toast.warning(
-        'Delivery Created',
-        `${result.ncrCount} NCR(s) created for price variances`
-      )
+      toast.warning("Delivery Created", `${result.ncrCount} NCR(s) created for price variances`);
     } else {
-      toast.success('Delivery Created', 'Stock updated successfully')
+      toast.success("Delivery Created", "Stock updated successfully");
     }
 
     // Navigate to delivery details
-    router.push(`/deliveries/${result.delivery.id}`)
-
+    router.push(`/deliveries/${result.delivery.id}`);
   } catch (error) {
-    toast.error('Failed to create delivery', error.message)
+    toast.error("Failed to create delivery", error.message);
   }
 }
 ```
@@ -1203,16 +1221,17 @@ We created a **view page** that shows complete delivery details including all it
 ```
 
 **NCR Status Colors:**
+
 ```typescript
 function getNcrStatusColor(status) {
   const colors = {
-    OPEN: 'warning',      // Amber
-    SENT: 'primary',      // Navy
-    CREDITED: 'success',  // Emerald
-    REJECTED: 'error',    // Red
-    RESOLVED: 'neutral'   // Gray
-  }
-  return colors[status] || 'neutral'
+    OPEN: "warning", // Amber
+    SENT: "primary", // Navy
+    CREDITED: "success", // Emerald
+    REJECTED: "error", // Red
+    RESOLVED: "neutral", // Gray
+  };
+  return colors[status] || "neutral";
 }
 ```
 
@@ -1264,15 +1283,13 @@ We created **3 building blocks** that can be reused in different delivery forms 
 **Purpose:** Show a warning box when price variances are detected.
 
 **Usage:**
+
 ```vue
-<DeliveryPriceVarianceAlert
-  :count="2"
-  :totalVariance="350.00"
-  variant="solid"
-/>
+<DeliveryPriceVarianceAlert :count="2" :totalVariance="350.0" variant="solid" />
 ```
 
 **Displays:**
+
 ```
 ⚠️ Price Variance Detected
 2 item(s) have price differences from period prices.
@@ -1281,6 +1298,7 @@ NCRs will be created automatically upon submission.
 ```
 
 **Props:**
+
 - `count` - Number of items with variance
 - `totalVariance` - Total variance amount (optional)
 - `variant` - Display style: `subtle`, `solid`, `outline`
@@ -1294,6 +1312,7 @@ NCRs will be created automatically upon submission.
 **Purpose:** A single table row for entering one delivery item.
 
 **Usage:**
+
 ```vue
 <DeliveryLineInput
   v-model="line"
@@ -1305,6 +1324,7 @@ NCRs will be created automatically upon submission.
 ```
 
 **What it does:**
+
 1. Shows item dropdown
 2. Shows quantity input
 3. Shows price input
@@ -1314,6 +1334,7 @@ NCRs will be created automatically upon submission.
 7. Shows remove button
 
 **Props:**
+
 - `modelValue` - Line data object
 - `items` - Array of available items
 - `periodPrices` - Array of period prices
@@ -1321,6 +1342,7 @@ NCRs will be created automatically upon submission.
 - `@remove` - Event when remove clicked
 
 **Emits:**
+
 - `update:modelValue` - When line data changes
 - `remove` - When remove button clicked
 
@@ -1333,6 +1355,7 @@ NCRs will be created automatically upon submission.
 **Purpose:** Complete delivery form (header + lines) that can be reused.
 
 **Usage:**
+
 ```vue
 <DeliveryForm
   v-model="form"
@@ -1347,6 +1370,7 @@ NCRs will be created automatically upon submission.
 ```
 
 **What it includes:**
+
 1. Supplier dropdown
 2. PO input
 3. Invoice input
@@ -1358,6 +1382,7 @@ NCRs will be created automatically upon submission.
 9. Submit/Cancel buttons
 
 **Props:**
+
 - `modelValue` - Form data
 - `suppliers` - Supplier list
 - `items` - Item list
@@ -1366,6 +1391,7 @@ NCRs will be created automatically upon submission.
 - `submitLabel` - Button text (default: "Submit")
 
 **Emits:**
+
 - `update:modelValue` - When form changes
 - `submit` - When form submitted
 - `cancel` - When cancel clicked
@@ -1465,35 +1491,35 @@ graph TB
 
 ### Backend (Server)
 
-| File | What It Does | Lines |
-|------|--------------|-------|
-| `server/utils/wac.ts` | WAC calculation functions | 150 |
-| `server/utils/priceVariance.ts` | Price variance detection | 200 |
-| `server/api/locations/[locationId]/deliveries/index.get.ts` | Fetch deliveries | 80 |
-| `server/api/locations/[locationId]/deliveries/index.post.ts` | Create delivery | 250 |
-| `server/api/deliveries/[id].get.ts` | Get delivery details | 100 |
+| File                                                         | What It Does              | Lines |
+| ------------------------------------------------------------ | ------------------------- | ----- |
+| `server/utils/wac.ts`                                        | WAC calculation functions | 150   |
+| `server/utils/priceVariance.ts`                              | Price variance detection  | 200   |
+| `server/api/locations/[locationId]/deliveries/index.get.ts`  | Fetch deliveries          | 80    |
+| `server/api/locations/[locationId]/deliveries/index.post.ts` | Create delivery           | 250   |
+| `server/api/deliveries/[id].get.ts`                          | Get delivery details      | 100   |
 
 **Total Backend:** ~780 lines
 
 ### Frontend (Client)
 
-| File | What It Does | Lines |
-|------|--------------|-------|
-| `app/pages/deliveries/index.vue` | Deliveries list page | 300 |
-| `app/pages/deliveries/create.vue` | Create delivery form | 400 |
-| `app/pages/deliveries/[id].vue` | Delivery detail page | 350 |
-| `app/components/delivery/PriceVarianceAlert.vue` | Variance alert component | 80 |
-| `app/components/delivery/DeliveryLineInput.vue` | Line input component | 200 |
-| `app/components/delivery/DeliveryForm.vue` | Complete form component | 350 |
+| File                                             | What It Does             | Lines |
+| ------------------------------------------------ | ------------------------ | ----- |
+| `app/pages/deliveries/index.vue`                 | Deliveries list page     | 300   |
+| `app/pages/deliveries/create.vue`                | Create delivery form     | 400   |
+| `app/pages/deliveries/[id].vue`                  | Delivery detail page     | 350   |
+| `app/components/delivery/PriceVarianceAlert.vue` | Variance alert component | 80    |
+| `app/components/delivery/DeliveryLineInput.vue`  | Line input component     | 200   |
+| `app/components/delivery/DeliveryForm.vue`       | Complete form component  | 350   |
 
 **Total Frontend:** ~1,680 lines
 
 ### Tests
 
-| File | What It Does | Lines |
-|------|--------------|-------|
-| `tests/unit/wac.test.ts` | WAC calculation tests (38 cases) | 400 |
-| `tests/unit/priceVariance.test.ts` | Price variance tests (45 cases) | 500 |
+| File                               | What It Does                     | Lines |
+| ---------------------------------- | -------------------------------- | ----- |
+| `tests/unit/wac.test.ts`           | WAC calculation tests (38 cases) | 400   |
+| `tests/unit/priceVariance.test.ts` | Price variance tests (45 cases)  | 500   |
 
 **Total Tests:** ~900 lines
 
@@ -1512,21 +1538,28 @@ A way to group multiple database operations that must ALL succeed or ALL fail to
 If creating a delivery involves 10 steps and step 7 fails, we don't want partial data (steps 1-6) saved.
 
 **How we use it:**
+
 ```typescript
 await prisma.$transaction(async (tx) => {
   // Step 1: Create delivery
-  const delivery = await tx.delivery.create({ /* ... */ })
+  const delivery = await tx.delivery.create({
+    /* ... */
+  });
 
   // Step 2: Create lines
   for (const line of lines) {
-    await tx.deliveryLine.create({ /* ... */ })
+    await tx.deliveryLine.create({
+      /* ... */
+    });
   }
 
   // Step 3: Update stock
-  await tx.locationStock.update({ /* ... */ })
+  await tx.locationStock.update({
+    /* ... */
+  });
 
   // If ANY step fails, ALL changes are rolled back
-})
+});
 ```
 
 ---
@@ -1540,6 +1573,7 @@ Update the UI immediately, assume success, rollback if fails.
 Wait for API response before updating UI.
 
 **We use pessimistic** because:
+
 - Stock updates are critical
 - NCR creation needs confirmation
 - WAC calculations must be accurate
@@ -1551,6 +1585,7 @@ Wait for API response before updating UI.
 We validate at **3 levels**:
 
 **Level 1: Client-Side (Vue)**
+
 ```typescript
 const isFormValid = computed(() => {
   return form.supplier_id && form.invoice_no && /* ... */
@@ -1558,23 +1593,26 @@ const isFormValid = computed(() => {
 ```
 
 **Level 2: Schema (Zod)**
+
 ```typescript
 const deliverySchema = z.object({
   supplier_id: z.string().uuid(),
   invoice_no: z.string().min(1),
-  lines: z.array(/* ... */).min(1)
-})
+  lines: z.array(/* ... */).min(1),
+});
 ```
 
 **Level 3: Business Logic (Server)**
+
 ```typescript
 // Check period is open
-if (period.status !== 'OPEN') {
-  throw createError({ statusCode: 400, message: "Period closed" })
+if (period.status !== "OPEN") {
+  throw createError({ statusCode: 400, message: "Period closed" });
 }
 ```
 
 **Why 3 levels?**
+
 - Level 1: Fast feedback to user
 - Level 2: Type safety
 - Level 3: Security (never trust client)
@@ -1586,13 +1624,15 @@ if (period.status !== 'OPEN') {
 **Critical for money/quantities:**
 
 **Wrong:**
+
 ```typescript
-const price = 10.1234567890  // JavaScript number (loses precision)
+const price = 10.123456789; // JavaScript number (loses precision)
 ```
 
 **Right:**
+
 ```typescript
-const price = new Prisma.Decimal('10.1234567890')  // Exact precision
+const price = new Prisma.Decimal("10.1234567890"); // Exact precision
 ```
 
 **Why it matters:**
@@ -1600,6 +1640,7 @@ const price = new Prisma.Decimal('10.1234567890')  // Exact precision
 If you have 10,000 transactions with 0.001 SAR rounding errors each = SAR 10 error!
 
 **Our precision:**
+
 - **Quantities:** 4 decimals (0.0001 KG)
 - **Prices:** 4 decimals (SAR 0.0001)
 - **Currency:** 2 decimals (SAR 0.01)
@@ -1611,19 +1652,23 @@ If you have 10,000 transactions with 0.001 SAR rounding errors each = SAR 10 err
 ### 1. Forgetting Period Validation
 
 **❌ Wrong:**
+
 ```typescript
 // Just create the delivery
 await prisma.delivery.create({
-  data: { /* ... */ }
-})
+  data: {
+    /* ... */
+  },
+});
 ```
 
 **✅ Right:**
+
 ```typescript
 // Check period is open first
-const period = await prisma.period.findUnique({ where: { id: periodId } })
-if (period.status !== 'OPEN') {
-  throw createError({ statusCode: 400, message: "Cannot post to closed period" })
+const period = await prisma.period.findUnique({ where: { id: periodId } });
+if (period.status !== "OPEN") {
+  throw createError({ statusCode: 400, message: "Cannot post to closed period" });
 }
 ```
 
@@ -1632,20 +1677,30 @@ if (period.status !== 'OPEN') {
 ### 2. Not Using Transactions
 
 **❌ Wrong:**
+
 ```typescript
 // Create delivery
-const delivery = await prisma.delivery.create({ /* ... */ })
+const delivery = await prisma.delivery.create({
+  /* ... */
+});
 
 // Update stock (if this fails, delivery already created!)
-await prisma.locationStock.update({ /* ... */ })
+await prisma.locationStock.update({
+  /* ... */
+});
 ```
 
 **✅ Right:**
+
 ```typescript
 await prisma.$transaction(async (tx) => {
-  const delivery = await tx.delivery.create({ /* ... */ })
-  await tx.locationStock.update({ /* ... */ })
-})
+  const delivery = await tx.delivery.create({
+    /* ... */
+  });
+  await tx.locationStock.update({
+    /* ... */
+  });
+});
 ```
 
 ---
@@ -1653,18 +1708,20 @@ await prisma.$transaction(async (tx) => {
 ### 3. Ignoring Decimal Precision
 
 **❌ Wrong:**
+
 ```typescript
-const newWAC = (100 * 10.5 + 50 * 12.3) / 150  // JavaScript math
+const newWAC = (100 * 10.5 + 50 * 12.3) / 150; // JavaScript math
 // Result: 11.099999999999998 (floating point error!)
 ```
 
 **✅ Right:**
-```typescript
-import { Decimal } from '@prisma/client/runtime/library'
 
-const currentValue = new Decimal(100).mul(10.5)
-const newValue = new Decimal(50).mul(12.3)
-const newWAC = currentValue.add(newValue).div(150)
+```typescript
+import { Decimal } from "@prisma/client/runtime/library";
+
+const currentValue = new Decimal(100).mul(10.5);
+const newValue = new Decimal(50).mul(12.3);
+const newWAC = currentValue.add(newValue).div(150);
 // Result: 11.10 (exact!)
 ```
 
@@ -1673,18 +1730,24 @@ const newWAC = currentValue.add(newValue).div(150)
 ### 4. Not Handling NCR Creation Errors
 
 **❌ Wrong:**
+
 ```typescript
 // If NCR creation fails, whole delivery fails
-await createNCR({ /* ... */ })
+await createNCR({
+  /* ... */
+});
 ```
 
 **✅ Right:**
+
 ```typescript
 try {
-  await createNCR({ /* ... */ })
+  await createNCR({
+    /* ... */
+  });
 } catch (error) {
   // Log error but don't fail delivery
-  console.error('NCR creation failed:', error)
+  console.error("NCR creation failed:", error);
   // Continue with delivery
 }
 ```
@@ -1767,6 +1830,7 @@ After completing the Deliveries module, we move to:
 **→ Phase 1.8: Issues & Stock Validation**
 
 In the next phase, we will:
+
 - Build Issue API routes (stock consumption)
 - Implement stock validation (prevent negative stock)
 - Create Issues list and create pages

@@ -156,11 +156,7 @@ export const useUIStore = defineStore("ui", {
     /**
      * Open a modal
      */
-    openModal(
-      modalId: string,
-      component?: string,
-      props?: Record<string, unknown>
-    ) {
+    openModal(modalId: string, component?: string, props?: Record<string, unknown>) {
       this.modals[modalId] = {
         isOpen: true,
         component,

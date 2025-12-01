@@ -1,4 +1,5 @@
 # Phase 4.1: PWA Implementation
+
 ## Stock Management System - Development Guide
 
 **For Junior Developers**
@@ -27,6 +28,7 @@
 **PWA** stands for **Progressive Web App**. It is a special type of website that can work like a mobile app on your phone or computer.
 
 Think of it like this:
+
 - A normal website lives only in your browser
 - A mobile app (like WhatsApp) is installed on your phone
 - A **PWA** is in between - it's a website that you can install like an app!
@@ -34,6 +36,7 @@ Think of it like this:
 ### Why We Need PWA
 
 **Problems with normal websites:**
+
 - ❌ Cannot install on phone's home screen
 - ❌ Breaks completely when no internet
 - ❌ Looks like a browser tab, not an app
@@ -41,6 +44,7 @@ Think of it like this:
 - ❌ Users forget about it
 
 **Benefits of PWA:**
+
 - ✅ Can be installed like a real app
 - ✅ Has an icon on home screen
 - ✅ Opens in full screen (no browser bar)
@@ -51,14 +55,14 @@ Think of it like this:
 
 Our Stock Management System PWA is a **Level 1 PWA**, which means:
 
-| Feature | Included | Description |
-|---------|----------|-------------|
-| Installable | ✅ Yes | Users can install the app on their device |
-| App Icon | ✅ Yes | Custom navy blue icon with stock symbol |
-| Offline Detection | ✅ Yes | Shows banner when user goes offline |
-| Offline Guards | ✅ Yes | Prevents form submissions when offline |
-| Cached Assets | ✅ Yes | Static files load faster |
-| Full Offline Mode | ❌ No (MVP) | Cannot work completely offline (future) |
+| Feature           | Included    | Description                               |
+| ----------------- | ----------- | ----------------------------------------- |
+| Installable       | ✅ Yes      | Users can install the app on their device |
+| App Icon          | ✅ Yes      | Custom navy blue icon with stock symbol   |
+| Offline Detection | ✅ Yes      | Shows banner when user goes offline       |
+| Offline Guards    | ✅ Yes      | Prevents form submissions when offline    |
+| Cached Assets     | ✅ Yes      | Static files load faster                  |
+| Full Offline Mode | ❌ No (MVP) | Cannot work completely offline (future)   |
 
 ---
 
@@ -89,6 +93,7 @@ We told Nuxt (our framework) to add PWA features to our website. This is done by
 #### The PWA Module
 
 We use a module called `@vite-pwa/nuxt`. This module:
+
 - Creates a **Service Worker** (a background script that handles caching)
 - Generates a **Manifest** (a file that tells browsers this is an app)
 - Configures **Workbox** (a tool by Google for caching)
@@ -99,7 +104,7 @@ We use a module called `@vite-pwa/nuxt`. This module:
 // In nuxt.config.ts
 export default defineNuxtConfig({
   modules: [
-    "@vite-pwa/nuxt",  // The PWA module
+    "@vite-pwa/nuxt", // The PWA module
   ],
 
   pwa: {
@@ -111,9 +116,9 @@ export default defineNuxtConfig({
       name: "Stock Management System",
       short_name: "FoodStock",
       description: "Multi-Location Inventory Management System",
-      theme_color: "#000046",      // Navy blue for browser bar
+      theme_color: "#000046", // Navy blue for browser bar
       background_color: "#000046", // Navy blue splash screen
-      display: "standalone",       // Full screen, no browser bar
+      display: "standalone", // Full screen, no browser bar
       orientation: "portrait",
       icons: [
         {
@@ -136,12 +141,14 @@ export default defineNuxtConfig({
       navigateFallback: "/",
       globPatterns: ["**/*.{js,css,html,png,svg,ico,woff2}"],
       cleanupOutdatedCaches: true,
-      runtimeCaching: [/* ... */],
+      runtimeCaching: [
+        /* ... */
+      ],
     },
 
     // Development settings
     devOptions: {
-      enabled: true,  // Enable PWA in dev mode for testing
+      enabled: true, // Enable PWA in dev mode for testing
       type: "module",
     },
   },
@@ -168,6 +175,7 @@ graph LR
 ```
 
 **What it does:**
+
 - Catches all network requests from your app
 - If online: sends request to server and caches the response
 - If offline: returns data from cache (if available)
@@ -176,25 +184,26 @@ graph LR
 #### 2. What is the Manifest?
 
 The **Manifest** is a JSON file that tells browsers:
+
 - "This website wants to be an app"
 - "Here is the app name and description"
 - "Use this icon for the home screen"
 - "Show it in full screen mode"
 
 **Example manifest content:**
+
 ```json
 {
   "name": "Stock Management System",
   "short_name": "FoodStock",
   "theme_color": "#000046",
-  "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192" }
-  ],
+  "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }],
   "display": "standalone"
 }
 ```
 
 **Where to find it:**
+
 - URL: `http://localhost:3000/manifest.webmanifest`
 - Browser DevTools → Application → Manifest
 
@@ -241,12 +250,13 @@ workbox: {
 
 There are two ways the service worker can update:
 
-| Type | Behavior |
-|------|----------|
+| Type         | Behavior                                          |
+| ------------ | ------------------------------------------------- |
 | `autoUpdate` | Updates automatically in background (what we use) |
-| `prompt` | Shows a button asking user to update |
+| `prompt`     | Shows a button asking user to update              |
 
 We chose `autoUpdate` because:
+
 - Users always get the latest version
 - No confusing "Update Available" prompts
 - Works automatically in background
@@ -255,8 +265,8 @@ We chose `autoUpdate` because:
 
 ### Files Modified
 
-| File | What Changed |
-|------|--------------|
+| File             | What Changed                     |
+| ---------------- | -------------------------------- |
 | `nuxt.config.ts` | Added complete PWA configuration |
 
 ---
@@ -272,11 +282,13 @@ We created custom icons for the app. When users install the app, they will see t
 #### Icon Design
 
 Our icon has three parts:
+
 1. **Navy blue background** (#000046) - matches our brand color
 2. **White building/warehouse** - represents storage/stock
 3. **Emerald green arrow** (#45cf7b) - represents stock movement up
 
 **Visual representation:**
+
 ```
 ┌──────────────────┐
 │  ████████████    │  Navy Blue Background
@@ -291,11 +303,11 @@ Our icon has three parts:
 
 #### Generated Icons
 
-| File | Size | Purpose |
-|------|------|---------|
-| `public/icon-192.png` | 192×192 px | Standard app icon |
+| File                  | Size       | Purpose                    |
+| --------------------- | ---------- | -------------------------- |
+| `public/icon-192.png` | 192×192 px | Standard app icon          |
 | `public/icon-512.png` | 512×512 px | High-res for splash screen |
-| `public/favicon.ico` | 32×32 px | Browser tab icon |
+| `public/favicon.ico`  | 32×32 px   | Browser tab icon           |
 
 #### How We Generated Icons
 
@@ -327,31 +339,27 @@ const svg = `
 `;
 
 // Generate 512x512
-await sharp(Buffer.from(svg))
-  .png()
-  .toFile("public/icon-512.png");
+await sharp(Buffer.from(svg)).png().toFile("public/icon-512.png");
 
 // Generate 192x192
-await sharp(Buffer.from(svg))
-  .resize(192, 192)
-  .png()
-  .toFile("public/icon-192.png");
+await sharp(Buffer.from(svg)).resize(192, 192).png().toFile("public/icon-192.png");
 ```
 
 #### Icon Requirements for PWA
 
 For a PWA to be installable, it needs:
 
-| Requirement | Our Implementation |
-|-------------|-------------------|
-| At least 192×192 | ✅ `icon-192.png` |
-| At least 512×512 | ✅ `icon-512.png` |
-| PNG format | ✅ Both are PNG |
+| Requirement      | Our Implementation           |
+| ---------------- | ---------------------------- |
+| At least 192×192 | ✅ `icon-192.png`            |
+| At least 512×512 | ✅ `icon-512.png`            |
+| PNG format       | ✅ Both are PNG              |
 | Maskable support | ✅ `purpose: "any maskable"` |
 
 **What is "maskable"?**
 
 Different devices show icons in different shapes:
+
 - Android: circles, rounded squares, squares
 - iOS: rounded squares
 - Windows: squares
@@ -374,12 +382,12 @@ A **maskable** icon has extra padding so it looks good in all shapes:
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
-| `public/icon-192.png` | PWA icon for app manifest |
-| `public/icon-512.png` | High-resolution PWA icon |
-| `public/favicon.ico` | Browser tab favicon |
-| `scripts/generate-icons.mjs` | Script to generate icons |
+| File                         | Purpose                   |
+| ---------------------------- | ------------------------- |
+| `public/icon-192.png`        | PWA icon for app manifest |
+| `public/icon-512.png`        | High-resolution PWA icon  |
+| `public/favicon.ico`         | Browser tab favicon       |
+| `scripts/generate-icons.mjs` | Script to generate icons  |
 
 ---
 
@@ -465,12 +473,14 @@ sequenceDiagram
 **1. navigator.onLine**
 
 The browser provides a property called `navigator.onLine` that tells us if the device has internet:
+
 - `true` = connected to internet
 - `false` = no internet connection
 
 **2. Event Listeners**
 
 The browser fires events when connection changes:
+
 - `"online"` event: fired when connection restored
 - `"offline"` event: fired when connection lost
 
@@ -497,7 +507,7 @@ We return `readonly(isOnline)` so other components cannot accidentally change th
 
 ```typescript
 return {
-  isOnline: readonly(isOnline),  // Can read but not write
+  isOnline: readonly(isOnline), // Can read but not write
 };
 ```
 
@@ -564,12 +574,12 @@ onUnmounted(() => {
 
 **Banner States:**
 
-| State | Banner Shown | Color | Message |
-|-------|--------------|-------|---------|
-| Online (was always online) | None | - | - |
-| Offline | Offline banner | Red | "You're offline..." |
+| State                             | Banner Shown     | Color | Message                |
+| --------------------------------- | ---------------- | ----- | ---------------------- |
+| Online (was always online)        | None             | -     | -                      |
+| Offline                           | Offline banner   | Red   | "You're offline..."    |
 | Back online (after being offline) | Reconnect banner | Green | "Connection restored!" |
-| 3 seconds after reconnect | None | - | - |
+| 3 seconds after reconnect         | None             | -     | -                      |
 
 **Animation:**
 
@@ -583,7 +593,7 @@ The banner slides down from the top of the screen using CSS transitions:
 
 .slide-down-enter-from,
 .slide-down-leave-to {
-  transform: translateY(-100%);  /* Start above the screen */
+  transform: translateY(-100%); /* Start above the screen */
 }
 ```
 
@@ -616,15 +626,15 @@ The login page uses `layout: false` to have no layout. If we put the banner in t
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                 | Purpose                                  |
+| ------------------------------------ | ---------------------------------------- |
 | `app/composables/useOnlineStatus.ts` | Composable to track online/offline state |
-| `app/components/OfflineBanner.vue` | Visual banner component |
+| `app/components/OfflineBanner.vue`   | Visual banner component                  |
 
 ### Files Modified
 
-| File | Change |
-|------|--------|
+| File          | Change                        |
+| ------------- | ----------------------------- |
 | `app/app.vue` | Added OfflineBanner component |
 
 ---
@@ -634,6 +644,7 @@ The login page uses `layout: false` to have no layout. If we put the banner in t
 ### Simple Explanation
 
 We created a way to **prevent actions** when the user is offline. For example, if someone tries to submit a delivery while offline, we:
+
 1. Stop the submission
 2. Show a warning message
 3. Disable the submit button
@@ -683,9 +694,7 @@ export const useOfflineGuard = () => {
   }): boolean => {
     if (!isOnline.value) {
       toast.warning(options?.offlineMessage || "You are offline", {
-        description:
-          options?.offlineDescription ||
-          "This action requires an internet connection.",
+        description: options?.offlineDescription || "This action requires an internet connection.",
         icon: "i-lucide-wifi-off",
       });
       return false;
@@ -694,9 +703,9 @@ export const useOfflineGuard = () => {
   };
 
   return {
-    isOnline,      // Use for disabling buttons
-    guardAction,   // Use to wrap async actions
-    checkOnline,   // Use for quick checks
+    isOnline, // Use for disabling buttons
+    guardAction, // Use to wrap async actions
+    checkOnline, // Use for quick checks
   };
 };
 ```
@@ -741,14 +750,14 @@ const submitDelivery = async () => {
 
 #### Where We Applied Offline Guards
 
-| Page | Function | What it Protects |
-|------|----------|------------------|
-| `deliveries/create.vue` | `submitDelivery` | Delivery posting |
-| `issues/create.vue` | `submitIssue` | Issue posting |
-| `transfers/create.vue` | `submitTransfer` | Transfer creation |
-| `period-close.vue` | `handleMarkReady` | Marking location ready |
-| `period-close.vue` | `handleClosePeriod` | Period close request |
-| `period-close.vue` | `handleApprovePeriodClose` | Close approval |
+| Page                    | Function                   | What it Protects       |
+| ----------------------- | -------------------------- | ---------------------- |
+| `deliveries/create.vue` | `submitDelivery`           | Delivery posting       |
+| `issues/create.vue`     | `submitIssue`              | Issue posting          |
+| `transfers/create.vue`  | `submitTransfer`           | Transfer creation      |
+| `period-close.vue`      | `handleMarkReady`          | Marking location ready |
+| `period-close.vue`      | `handleClosePeriod`        | Period close request   |
+| `period-close.vue`      | `handleApprovePeriodClose` | Close approval         |
 
 ---
 
@@ -777,28 +786,28 @@ const isSubmitting = ref(false);
 
 **Visual feedback:**
 
-| State | Button Appearance |
-|-------|-------------------|
-| Online, not submitting | Normal, clickable |
-| Online, submitting | Loading spinner |
-| Offline | Grayed out, not clickable |
+| State                  | Button Appearance         |
+| ---------------------- | ------------------------- |
+| Online, not submitting | Normal, clickable         |
+| Online, submitting     | Loading spinner           |
+| Offline                | Grayed out, not clickable |
 
 ---
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                 | Purpose                              |
+| ------------------------------------ | ------------------------------------ |
 | `app/composables/useOfflineGuard.ts` | Guard composable with toast warnings |
 
 ### Files Modified
 
-| File | Changes |
-|------|---------|
-| `app/pages/deliveries/create.vue` | Added guardAction, disabled button |
-| `app/pages/issues/create.vue` | Added guardAction, disabled button |
-| `app/pages/transfers/create.vue` | Added guardAction, disabled button |
-| `app/pages/period-close.vue` | Added guardAction to all submit functions |
+| File                              | Changes                                   |
+| --------------------------------- | ----------------------------------------- |
+| `app/pages/deliveries/create.vue` | Added guardAction, disabled button        |
+| `app/pages/issues/create.vue`     | Added guardAction, disabled button        |
+| `app/pages/transfers/create.vue`  | Added guardAction, disabled button        |
+| `app/pages/period-close.vue`      | Added guardAction to all submit functions |
 
 ---
 
@@ -813,11 +822,12 @@ We tested all PWA features to make sure they work correctly on different devices
 #### Testing Categories
 
 **1. Service Worker Registration**
+
 ```javascript
 // Check if service worker is registered
 const swRegistrations = await page.evaluate(async () => {
   const regs = await navigator.serviceWorker.getRegistrations();
-  return regs.map(r => ({
+  return regs.map((r) => ({
     scope: r.scope,
     active: r.active?.state,
   }));
@@ -826,6 +836,7 @@ const swRegistrations = await page.evaluate(async () => {
 ```
 
 **2. Manifest Configuration**
+
 ```javascript
 // Fetch and verify manifest
 const manifest = await page.evaluate(async () => {
@@ -837,6 +848,7 @@ const manifest = await page.evaluate(async () => {
 ```
 
 **3. Mobile Viewport Testing**
+
 ```javascript
 // Test Android viewport (375×812)
 await page.setViewportSize({ width: 375, height: 812 });
@@ -846,6 +858,7 @@ await page.setViewportSize({ width: 393, height: 852 });
 ```
 
 **4. Offline Behavior Testing**
+
 ```javascript
 // Simulate going offline
 await page.evaluate(() => {
@@ -861,26 +874,26 @@ await expect(banner).toBeVisible();
 
 #### Test Results Summary
 
-| Category | Tests | Passed |
-|----------|-------|--------|
-| Service Worker | 4 | 4 ✅ |
-| Desktop Installation | 4 | 4 ✅ |
-| Android Installation | 4 | 4 ✅ |
-| iOS Installation | 6 | 6 ✅ |
-| Offline Behavior | 5 | 5 ✅ |
-| Cache Updates | 5 | 5 ✅ |
-| **Total** | **28** | **28 ✅** |
+| Category             | Tests  | Passed    |
+| -------------------- | ------ | --------- |
+| Service Worker       | 4      | 4 ✅      |
+| Desktop Installation | 4      | 4 ✅      |
+| Android Installation | 4      | 4 ✅      |
+| iOS Installation     | 6      | 6 ✅      |
+| Offline Behavior     | 5      | 5 ✅      |
+| Cache Updates        | 5      | 5 ✅      |
+| **Total**            | **28** | **28 ✅** |
 
 ---
 
 #### Browser Compatibility
 
-| Browser | Desktop Support | Mobile Support |
-|---------|-----------------|----------------|
-| Chrome | ✅ Full PWA | ✅ Full PWA |
-| Edge | ✅ Full PWA | ✅ Full PWA |
-| Firefox | ⚠️ No install prompt | ⚠️ No install prompt |
-| Safari | ⚠️ No install prompt | ✅ Add to Home Screen |
+| Browser | Desktop Support      | Mobile Support        |
+| ------- | -------------------- | --------------------- |
+| Chrome  | ✅ Full PWA          | ✅ Full PWA           |
+| Edge    | ✅ Full PWA          | ✅ Full PWA           |
+| Firefox | ⚠️ No install prompt | ⚠️ No install prompt  |
+| Safari  | ⚠️ No install prompt | ✅ Add to Home Screen |
 
 **Note:** Firefox does not support PWA installation, but service workers and caching still work.
 
@@ -888,8 +901,8 @@ await expect(banner).toBeVisible();
 
 ### Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                  | Purpose                             |
+| ------------------------------------- | ----------------------------------- |
 | `project-docs/pwa-testing-results.md` | Detailed test results documentation |
 
 ---
@@ -898,35 +911,35 @@ await expect(banner).toBeVisible();
 
 ### Composables
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/composables/useOnlineStatus.ts` | ~60 | Track browser online/offline state |
-| `app/composables/useOfflineGuard.ts` | ~90 | Guard actions and show warnings |
+| File                                 | Lines | Purpose                            |
+| ------------------------------------ | ----- | ---------------------------------- |
+| `app/composables/useOnlineStatus.ts` | ~60   | Track browser online/offline state |
+| `app/composables/useOfflineGuard.ts` | ~90   | Guard actions and show warnings    |
 
 ### Components
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app/components/OfflineBanner.vue` | ~70 | Show offline/reconnected banners |
+| File                               | Lines | Purpose                          |
+| ---------------------------------- | ----- | -------------------------------- |
+| `app/components/OfflineBanner.vue` | ~70   | Show offline/reconnected banners |
 
 ### Configuration
 
-| File | Lines Changed | Purpose |
-|------|---------------|---------|
-| `nuxt.config.ts` | ~70 | PWA module configuration |
+| File             | Lines Changed | Purpose                  |
+| ---------------- | ------------- | ------------------------ |
+| `nuxt.config.ts` | ~70           | PWA module configuration |
 
 ### Assets
 
-| File | Size | Purpose |
-|------|------|---------|
+| File                  | Size    | Purpose           |
+| --------------------- | ------- | ----------------- |
 | `public/icon-192.png` | 192×192 | PWA manifest icon |
 | `public/icon-512.png` | 512×512 | High-res PWA icon |
-| `public/favicon.ico` | 32×32 | Browser tab icon |
+| `public/favicon.ico`  | 32×32   | Browser tab icon  |
 
 ### Scripts
 
-| File | Purpose |
-|------|---------|
+| File                         | Purpose                       |
+| ---------------------------- | ----------------------------- |
 | `scripts/generate-icons.mjs` | Generate app icons with Sharp |
 
 ---
@@ -936,6 +949,7 @@ await expect(banner).toBeVisible();
 ### 1. Progressive Enhancement
 
 Our PWA adds features **progressively**:
+
 - Basic: Works as normal website
 - Better: Shows offline warnings
 - Best: Installable on device
@@ -954,6 +968,7 @@ stateDiagram-v2
 ```
 
 **States:**
+
 - **Installing:** Downloading and caching files
 - **Installed:** All files cached, waiting
 - **Activating:** Taking control of pages
@@ -964,10 +979,10 @@ stateDiagram-v2
 
 Different content needs different caching:
 
-| Strategy | Description | Good For |
-|----------|-------------|----------|
-| Cache First | Check cache, then network | Fonts, images |
-| Network First | Check network, fallback to cache | API data |
+| Strategy               | Description                        | Good For                   |
+| ---------------------- | ---------------------------------- | -------------------------- |
+| Cache First            | Check cache, then network          | Fonts, images              |
+| Network First          | Check network, fallback to cache   | API data                   |
 | Stale While Revalidate | Return cache, update in background | Frequently updated content |
 
 We use **Cache First** for fonts because they rarely change.
@@ -994,7 +1009,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("online", handler);  // Important!
+  window.removeEventListener("online", handler); // Important!
 });
 ```
 
@@ -1002,18 +1017,18 @@ onUnmounted(() => {
 
 ## Common Terms Explained
 
-| Term | Simple Explanation |
-|------|-------------------|
-| **PWA** | Progressive Web App - a website that can be installed like an app |
-| **Service Worker** | A script that runs in the background and handles caching |
-| **Manifest** | A JSON file that tells browsers about your app |
-| **Workbox** | A Google library that makes caching easier |
-| **Cache** | Stored files that load faster next time |
-| **Offline Guard** | Code that prevents actions when there's no internet |
-| **Composable** | A reusable function with reactive state (Vue/Nuxt) |
-| **Precache** | Files downloaded and stored before they're needed |
-| **Runtime Cache** | Files cached when they're first requested |
-| **Maskable Icon** | An icon designed to work in different shapes |
+| Term               | Simple Explanation                                                |
+| ------------------ | ----------------------------------------------------------------- |
+| **PWA**            | Progressive Web App - a website that can be installed like an app |
+| **Service Worker** | A script that runs in the background and handles caching          |
+| **Manifest**       | A JSON file that tells browsers about your app                    |
+| **Workbox**        | A Google library that makes caching easier                        |
+| **Cache**          | Stored files that load faster next time                           |
+| **Offline Guard**  | Code that prevents actions when there's no internet               |
+| **Composable**     | A reusable function with reactive state (Vue/Nuxt)                |
+| **Precache**       | Files downloaded and stored before they're needed                 |
+| **Runtime Cache**  | Files cached when they're first requested                         |
+| **Maskable Icon**  | An icon designed to work in different shapes                      |
 
 ---
 
@@ -1022,12 +1037,14 @@ onUnmounted(() => {
 ### Issue 1: Service Worker Not Registering
 
 **Symptoms:**
+
 - PWA install prompt doesn't appear
 - No service worker in DevTools
 
 **Cause:** Service workers only work on HTTPS or localhost
 
 **Solution:**
+
 ```typescript
 // Check in browser console
 console.log("Is secure context:", window.isSecureContext);
@@ -1040,12 +1057,14 @@ console.log("Is secure context:", window.isSecureContext);
 ### Issue 2: Icons Not Showing
 
 **Symptoms:**
+
 - Install prompt has generic icon
 - Home screen shows blank
 
 **Cause:** Icons not found or wrong size
 
 **Solution:**
+
 ```bash
 # Verify icons exist
 ls -la public/icon-*.png
@@ -1059,31 +1078,36 @@ curl http://localhost:3000/manifest.webmanifest | grep icon
 ### Issue 3: Offline Banner Not Appearing
 
 **Symptoms:**
+
 - Banner doesn't show when offline
 - Works in DevTools but not real offline
 
 **Cause:** Component not mounted or events not firing
 
 **Solution:**
+
 ```vue
 <!-- Make sure OfflineBanner is in app.vue, not just layout -->
 <template>
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
-  <OfflineBanner />  <!-- Must be here, at root level -->
+  <OfflineBanner />
+  <!-- Must be here, at root level -->
 </template>
 ```
 
 ### Issue 4: guardAction Not Blocking
 
 **Symptoms:**
+
 - Form submits even when offline
 - No warning toast shown
 
 **Cause:** Action not wrapped correctly
 
 **Solution:**
+
 ```typescript
 // Wrong - action runs immediately
 guardAction(submitForm());
@@ -1095,12 +1119,14 @@ guardAction(async () => await submitForm());
 ### Issue 5: Cache Not Updating
 
 **Symptoms:**
+
 - Old version of app after deploy
 - Changes not visible
 
 **Cause:** Service worker using old cache
 
 **Solution:**
+
 ```javascript
 // In browser DevTools → Application → Service Workers
 // Click "Update" or "Unregister" and reload
@@ -1116,27 +1142,32 @@ await caches.delete("workbox-precache-v2");
 ### Manual Testing Steps
 
 **1. Service Worker**
+
 - [ ] Open DevTools → Application → Service Workers
 - [ ] Verify service worker is "activated"
 - [ ] No errors in console
 
 **2. Manifest**
+
 - [ ] Open DevTools → Application → Manifest
 - [ ] All fields populated correctly
 - [ ] Icons showing with correct sizes
 - [ ] No manifest warnings
 
 **3. Installation (Desktop Chrome)**
+
 - [ ] Click install icon in address bar
 - [ ] App installs and opens in new window
 - [ ] Icon appears in dock/taskbar
 
 **4. Installation (Mobile)**
+
 - [ ] On Android: "Add to Home Screen" option appears
 - [ ] On iOS: Share → Add to Home Screen
 - [ ] App opens full screen (no browser bar)
 
 **5. Offline Detection**
+
 - [ ] Turn off WiFi/data
 - [ ] Red banner appears within 2 seconds
 - [ ] Turn on WiFi/data
@@ -1144,6 +1175,7 @@ await caches.delete("workbox-precache-v2");
 - [ ] Green banner disappears after 3 seconds
 
 **6. Offline Guards**
+
 - [ ] Go offline
 - [ ] Try to submit a delivery
 - [ ] Warning toast appears
@@ -1151,6 +1183,7 @@ await caches.delete("workbox-precache-v2");
 - [ ] Submit button is disabled/grayed
 
 **7. Cached Assets**
+
 - [ ] Turn off WiFi
 - [ ] Refresh page
 - [ ] Static content still loads (from cache)
@@ -1163,18 +1196,21 @@ await caches.delete("workbox-precache-v2");
 After completing PWA Implementation (Phase 4.1), the next phases are:
 
 **→ Phase 4.2: UI/UX Polish** (Pending)
+
 - Consistent styling across all pages
 - Loading states and skeleton loaders
 - Empty state designs
 - Accessibility improvements
 
 **→ Phase 4.3: Performance Optimization** (Pending)
+
 - Database query optimization
 - API response time improvements
 - Frontend bundle optimization
 - Data caching strategies
 
 **→ Phase 4.4: Testing** (Pending)
+
 - Unit tests for business logic
 - API endpoint tests
 - Integration tests

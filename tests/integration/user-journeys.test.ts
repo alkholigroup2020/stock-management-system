@@ -9,11 +9,7 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
-import {
-  loginUser,
-  authenticatedFetch,
-  type TestUser,
-} from "../api/helpers/test-server";
+import { loginUser, authenticatedFetch, type TestUser } from "../api/helpers/test-server";
 import {
   testUsers,
   getTestLocationIds,
@@ -33,10 +29,7 @@ describe("Integration: Complete User Journeys", () => {
   beforeAll(async () => {
     // Login users
     adminUser = await loginUser(testUsers.admin.username, testUsers.admin.password);
-    supervisorUser = await loginUser(
-      testUsers.supervisor.username,
-      testUsers.supervisor.password
-    );
+    supervisorUser = await loginUser(testUsers.supervisor.username, testUsers.supervisor.password);
 
     // Get test data IDs
     locationIds = await getTestLocationIds();
@@ -77,9 +70,7 @@ describe("Integration: Complete User Journeys", () => {
 
       expect(stockBefore.status).toBe(200);
 
-      const initialStock = stockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const initialStock = stockBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken);
       const initialOnHand = initialStock?.on_hand || 0;
 
       // Step 3: Create delivery with price variance (5 SAR above period price)
@@ -146,9 +137,7 @@ describe("Integration: Complete User Journeys", () => {
         user: adminUser,
       });
 
-      const updatedStock = stockAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const updatedStock = stockAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken);
 
       expect(updatedStock?.on_hand).toBe(initialOnHand + 10);
 
@@ -165,9 +154,7 @@ describe("Integration: Complete User Journeys", () => {
 
       expect(ncrListResult.status).toBe(200);
 
-      const createdNcr = ncrListResult.data?.ncrs?.find(
-        (n) => n.ncr_no === ncr?.ncr_no
-      );
+      const createdNcr = ncrListResult.data?.ncrs?.find((n) => n.ncr_no === ncr?.ncr_no);
       expect(createdNcr).toBeDefined();
       expect(createdNcr?.type).toBe("PRICE_VARIANCE");
       expect(createdNcr?.delivery_id).toBe(deliveryResult.data?.delivery.id);
@@ -188,9 +175,7 @@ describe("Integration: Complete User Journeys", () => {
         return;
       }
 
-      const initialStock = stockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
+      const initialStock = stockBefore.data?.stock?.find((s) => s.item_id === itemIds.rice);
 
       if (!initialStock || initialStock.on_hand < 5) {
         console.warn("Insufficient rice stock for issue test, skipping");
@@ -251,9 +236,7 @@ describe("Integration: Complete User Journeys", () => {
         user: adminUser,
       });
 
-      const updatedStock = stockAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.rice
-      );
+      const updatedStock = stockAfter.data?.stock?.find((s) => s.item_id === itemIds.rice);
 
       expect(updatedStock?.on_hand).toBe(initialOnHand - issueQuantity);
 
@@ -302,9 +285,7 @@ describe("Integration: Complete User Journeys", () => {
         user: adminUser,
       });
 
-      const destInitial = destStockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const destInitial = destStockBefore.data?.stock?.find((s) => s.item_id === itemIds.chicken);
 
       const destInitialOnHand = destInitial?.on_hand || 0;
       const destInitialWac = destInitial?.wac || 0;
@@ -350,8 +331,7 @@ describe("Integration: Complete User Journeys", () => {
       expect(createResult.data?.transfer.status).toBe("PENDING_APPROVAL");
 
       const transferId = createResult.data?.transfer.id;
-      const wacAtTransfer =
-        createResult.data?.transfer.lines?.[0]?.wac_at_transfer || 0;
+      const wacAtTransfer = createResult.data?.transfer.lines?.[0]?.wac_at_transfer || 0;
 
       // Step 4: Verify stock NOT moved yet (only pending)
       const sourceStockPending = await authenticatedFetch<{
@@ -394,9 +374,7 @@ describe("Integration: Complete User Journeys", () => {
         user: adminUser,
       });
 
-      const sourceAfter = sourceStockAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const sourceAfter = sourceStockAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken);
 
       expect(sourceAfter?.on_hand).toBe(sourceInitial.on_hand - transferQuantity);
 
@@ -407,9 +385,7 @@ describe("Integration: Complete User Journeys", () => {
         user: adminUser,
       });
 
-      const destAfter = destStockAfter.data?.stock?.find(
-        (s) => s.item_id === itemIds.chicken
-      );
+      const destAfter = destStockAfter.data?.stock?.find((s) => s.item_id === itemIds.chicken);
 
       expect(destAfter?.on_hand).toBe(destInitialOnHand + transferQuantity);
 
@@ -454,9 +430,7 @@ describe("Integration: Complete User Journeys", () => {
         user: adminUser,
       });
 
-      const currentStock = stockBefore.data?.stock?.find(
-        (s) => s.item_id === itemIds.oil
-      );
+      const currentStock = stockBefore.data?.stock?.find((s) => s.item_id === itemIds.oil);
 
       if (!currentStock || currentStock.on_hand < 2) {
         console.warn("Insufficient oil stock for test, skipping");
@@ -510,13 +484,10 @@ describe("Integration: Complete User Journeys", () => {
       }
 
       // Step 4: Try to approve transfer (should fail due to insufficient stock)
-      const approveResult = await authenticatedFetch(
-        `/api/transfers/${transferId}/approve`,
-        {
-          method: "PATCH",
-          user: supervisorUser,
-        }
-      );
+      const approveResult = await authenticatedFetch(`/api/transfers/${transferId}/approve`, {
+        method: "PATCH",
+        user: supervisorUser,
+      });
 
       // Should fail with insufficient stock
       expect(approveResult.status).toBe(400);
@@ -581,15 +552,12 @@ describe("Integration: Complete User Journeys", () => {
         });
 
         if (reconResult.status === 200 && reconResult.data?.reconciliations?.[0]) {
-          reconciliationStatus[location.id] =
-            reconResult.data.reconciliations[0].status;
+          reconciliationStatus[location.id] = reconResult.data.reconciliations[0].status;
         }
       }
 
       // Step 4: If all locations are ready, attempt period close
-      const allReady = Object.values(reconciliationStatus).every(
-        (status) => status === "APPROVED"
-      );
+      const allReady = Object.values(reconciliationStatus).every((status) => status === "APPROVED");
 
       if (allReady && currentPeriod?.status === "OPEN") {
         const closeResult = await authenticatedFetch<{
@@ -610,13 +578,10 @@ describe("Integration: Complete User Journeys", () => {
         }
       } else {
         // Just verify the period close endpoint exists and responds appropriately
-        const closeResult = await authenticatedFetch(
-          `/api/periods/${currentPeriod?.id}/close`,
-          {
-            method: "POST",
-            user: adminUser,
-          }
-        );
+        const closeResult = await authenticatedFetch(`/api/periods/${currentPeriod?.id}/close`, {
+          method: "POST",
+          user: adminUser,
+        });
 
         // Should get a meaningful response (either success or business rule rejection)
         expect([200, 400]).toContain(closeResult.status);
