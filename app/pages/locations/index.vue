@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
       <!-- Mobile: smaller icon and title -->
@@ -75,48 +75,29 @@
         </UDropdownMenu>
       </div>
 
-      <!-- Mobile: Stacked layout -->
-      <div class="flex flex-col gap-3 lg:hidden">
-        <!-- Row 1: Search and Status Dropdown -->
-        <div class="flex items-center gap-3">
-          <div class="flex-1 min-w-0">
-            <UInput
-              v-model="filters.search"
-              placeholder="Search locations..."
-              icon="i-lucide-search"
-              size="lg"
-              class="w-full"
-              @input="debouncedFetch"
-            />
-          </div>
-          <UDropdownMenu :items="statusDropdownItems" :ui="{ content: 'min-w-[140px]' }">
-            <UButton
-              color="neutral"
-              variant="outline"
-              size="lg"
-              class="cursor-pointer rounded-full px-3"
-              trailing-icon="i-lucide-chevron-down"
-            >
-              <UIcon :name="currentStatusIcon" class="w-4 h-4" />
-            </UButton>
-          </UDropdownMenu>
+      <!-- Mobile: Search and Status only -->
+      <div class="flex items-center gap-3 lg:hidden">
+        <div class="flex-1 min-w-0">
+          <UInput
+            v-model="filters.search"
+            placeholder="Search locations..."
+            icon="i-lucide-search"
+            size="lg"
+            class="w-full"
+            @input="debouncedFetch"
+          />
         </div>
-
-        <!-- Row 2: Type Filter Toggle Buttons (horizontally scrollable) -->
-        <div class="overflow-x-auto -mx-3 px-3">
-          <div class="flex items-center gap-1 p-1 bg-muted rounded-full w-fit">
-            <button
-              v-for="typeOpt in typeToggleOptions"
-              :key="typeOpt.value ?? 'all'"
-              type="button"
-              class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
-              :class="getTypeButtonClass(typeOpt.value)"
-              @click="selectType(typeOpt.value)"
-            >
-              {{ typeOpt.label }}
-            </button>
-          </div>
-        </div>
+        <UDropdownMenu :items="statusDropdownItems" :ui="{ content: 'min-w-[140px]' }">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-3"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="currentStatusIcon" class="w-4 h-4" />
+          </UButton>
+        </UDropdownMenu>
       </div>
     </UCard>
 

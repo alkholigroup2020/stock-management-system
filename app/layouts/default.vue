@@ -327,7 +327,7 @@ const handleLogout = async () => {
           <main
             id="main-content"
             aria-label="Main content"
-            class="py-2 px-4 sm:px-12 xl:py-4 xl:px-16"
+            class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16"
           >
             <slot />
           </main>

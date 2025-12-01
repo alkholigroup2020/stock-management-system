@@ -80,46 +80,6 @@ pnpm format:check  # Check formatting (CI)
 
 **If typecheck fails or formatting is inconsistent, the task is NOT complete.**
 
-### Page Layout Standards
-
-**CRITICAL:** All pages must follow consistent padding standards for a unified user experience.
-
-**Padding Rules:**
-
-- **All pages (except login):** Use `p-4 md:p-6` for responsive padding
-  - Mobile: `p-4` (1rem / 16px)
-  - Tablet/Desktop: `md:p-6` (1.5rem / 24px)
-- **Login page:** Special centered layout with `px-4 py-12 sm:px-6 lg:px-8`
-- **Wrapper element:** Apply padding to the outermost `<div>` in the `<template>`
-- **Full-height pages:** Combine with `min-h-screen bg-default` for consistent full-page layouts
-
-**Examples:**
-
-```vue
-<!-- Standard page layout -->
-<template>
-  <div class="p-4 md:p-6">
-    <!-- Page content -->
-  </div>
-</template>
-
-<!-- Full-height page layout -->
-<template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
-    <!-- Page content -->
-  </div>
-</template>
-
-<!-- Login page (exception) -->
-<template>
-  <div class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8">
-    <!-- Centered content -->
-  </div>
-</template>
-```
-
-**IMPORTANT:** Never use inconsistent padding values like `p-6`, `p-3`, or mixed values. Always use the unified `p-4 md:p-6` pattern for all pages except login.
-
 ## Development Commands
 
 **Package Manager:** pnpm (required)
@@ -283,7 +243,7 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 
 ## Key Documentation Files
 
-See `/project-docs/` for: **PRD**, **MVP**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **UI_DESIGN_GUIDE** (complete design system)
+See `/project-docs/` for: **PRD**, **MVP**, **TASK_COMPLETION_LOG**, **System_Design**, **API_Contract**, **Entities_ERD**, **development_stack**, **Workflow_Guide**, **Roles_Permissions**, **pwa-implementation-guide**, **UI_DESIGN_SYSTEM** (complete design system)
 
 See `project-docs/dev-phases/` for phased development plans.
 
@@ -298,30 +258,15 @@ See `project-docs/dev-phases/` for phased development plans.
 - **Language:** English (MVP), Arabic support planned
 - **Units:** KG (Kilograms), EA (Each), LTR (Liters), BOX, CASE, PACK
 
-## Theme Colors and Styling
+## UI Design System
 
-**Design System:** Navy Blue (#000046) = primary/brand, Emerald (#45cf7b) = success/secondary, Amber = warnings, Red = errors. All colors in `app/assets/css/main.css` using Tailwind v4 + CSS variables. **See `/project-docs/UI_DESIGN_GUIDE.md` for complete design system reference.**
+**See `/project-docs/UI_DESIGN_SYSTEM.md`** for the complete design system reference including:
 
-**Color Palettes:** `navy`, `emerald`, `zinc`, `amber`, `red`, `blue` (shades 50-950)
-
-**Semantic Tokens:** Use `var(--ui-bg)`, `var(--ui-bg-elevated)`, `var(--ui-text)`, `var(--ui-text-muted)`, `var(--ui-border)`, `var(--ui-success)`, `var(--ui-warning)`, `var(--ui-error)`, etc.
-
-**Business Tokens:** `var(--ui-stock-healthy)`, `var(--ui-stock-low)`, `var(--ui-stock-critical)`, `var(--ui-status-pending)`, `var(--ui-status-approved)`, etc.
-
-**Utility Classes:** `card-elevated`, `badge-primary`, `badge-stock-healthy`, `badge-pending`, `form-label`, `form-input`, `focus-ring`
-
-**Nuxt UI Components:** Use semantic names: `color="primary"`, `color="secondary"`, `color="success"`, `color="error"` (NOT `color="navy"`)
-
-**Critical Rules:**
-
-- ✅ Use semantic tokens `var(--ui-*)` or utility classes
-- ✅ Nuxt UI: `<UButton color="primary">` (semantic names only)
-- ❌ Never inline hex: `style="color: #000046"`
-- ❌ Never custom names in Nuxt UI: `color="navy"`
-- ❌ Tailwind v4: Cannot `@apply` custom classes, only built-in utilities
-- ❌ Tailwind v4: Cannot use `@utility` with pseudo-elements (::placeholder, ::before, etc.)
-
-**Quick Ref:** Page: `bg-[var(--ui-bg)]`, Card: `bg-[var(--ui-bg-elevated)] border-[var(--ui-border)]`, Button: `<UButton color="primary">`, Badge: `<span class="badge-stock-healthy">`
+- Color system and semantic tokens
+- Layout and spacing standards (padding architecture)
+- Component patterns (cards, buttons, badges, forms)
+- Typography and accessibility
+- Tailwind CSS v4 constraints
 
 ## Common Pitfalls to Avoid
 
@@ -333,9 +278,8 @@ See `project-docs/dev-phases/` for phased development plans.
 6. **Never bypass approvals** - PRF/PO, Transfers, Period Close need proper workflow
 7. **Never forget audit trail** - Log who/when/what for all mutations
 8. **Never expose Supabase service key** - Server-only, never in client code
-9. **Never use inline color styles** - Always use Tailwind color tokens (text-navy-500, bg-emerald-400) or Nuxt UI semantic color props (color="primary", color="secondary") instead of style="color: #000046"
-10. **Never use @apply with custom classes** - Tailwind CSS v4 only allows @apply with built-in utilities. Use direct CSS properties for custom classes instead.
-11. **Never use @utility with pseudo-elements** - Tailwind CSS v4's @utility directive requires alphanumeric names only. Use regular CSS classes for pseudo-elements like `.placeholder-muted::placeholder` instead of `@utility placeholder-muted::placeholder`.
+
+**For UI/styling pitfalls, see `/project-docs/UI_DESIGN_SYSTEM.md`**
 
 ## Performance Considerations
 

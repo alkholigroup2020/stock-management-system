@@ -160,18 +160,75 @@ Colors in this system map directly to business logic and user intent:
 
 ## Layout & Spacing Standards
 
-### Page Container
+### Padding Architecture (3 Sources)
+
+**CRITICAL:** The application uses a **layered padding system** with 3 distinct sources. Understanding this architecture is essential for consistent layouts.
+
+#### Source 1: Layout Body Padding (default.vue)
+
+The main content area in the layout applies the primary horizontal padding:
+
+```vue
+<!-- app/layouts/default.vue -->
+<main class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16">
+  <slot />
+</main>
+```
+
+| Breakpoint | X-axis (horizontal) | Y-axis (vertical) |
+|------------|---------------------|-------------------|
+| Mobile (<640px) | `px-0` (0) | `py-2` (8px) |
+| sm (≥640px) | `px-12` (48px) | `py-2` (8px) |
+| xl (≥1280px) | `px-16` (64px) | `py-4` (16px) |
+
+**Key:** Mobile screens have **zero horizontal padding** at the layout level, allowing pages to use full viewport width.
+
+#### Source 2: Page Container Padding
+
+Individual pages apply their own wrapper padding:
+
+```vue
+<div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+  <!-- Page content -->
+</div>
+```
+
+| Breakpoint | X-axis (horizontal) | Y-axis (vertical) |
+|------------|---------------------|-------------------|
+| Mobile (<768px) | `px-0` (0) | `py-0` (0) |
+| md (≥768px) | `px-4` (16px) | `py-1` (4px) |
+
+**Key:** Mobile screens have **zero padding** at the page level, relying on component-level padding (cards, etc.) for spacing.
+
+#### Source 3: Component Padding (Cards, etc.)
+
+Individual components like filter cards apply their own internal padding:
+
+```vue
+<UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+```
+
+### Combined Padding Summary
+
+| Viewport | Layout Body | Page Container | Total Before Components |
+|----------|-------------|----------------|------------------------|
+| Mobile (<640px) | 0 | 0 | **0** |
+| sm-md (640-767px) | 48px | 0 | **48px per side** |
+| md-xl (768-1279px) | 48px | 16px | **64px per side** |
+| xl (≥1280px) | 64px | 16px | **80px per side** |
+
+### Page Container Pattern
 
 **CRITICAL:** All pages must follow this consistent container pattern:
 
 ```vue
-<div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+<div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
   <!-- Page content -->
 </div>
 ```
 
 **Rules:**
-- **Horizontal padding:** `px-3` (mobile), `md:px-4` (desktop)
+- **Horizontal padding:** `px-0` (mobile), `md:px-4` (desktop)
 - **Vertical padding:** `py-0` (mobile), `md:py-1` (desktop) - minimal vertical padding
 - **Section spacing:** `space-y-3` between major sections
 
@@ -186,14 +243,14 @@ Colors in this system map directly to business logic and user intent:
 ```vue
 <!-- Standard page layout -->
 <template>
-  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page content -->
   </div>
 </template>
 
 <!-- Full-height page layout -->
 <template>
-  <div class="min-h-screen bg-default px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="min-h-screen bg-default px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page content -->
   </div>
 </template>
@@ -206,7 +263,7 @@ Colors in this system map directly to business logic and user intent:
 </template>
 ```
 
-**IMPORTANT:** Never use inconsistent padding values like `p-4 md:p-6`, `p-6`, `p-3`, or other mixed values. Always use the unified `px-3 py-0 md:px-4 md:py-1 space-y-3` pattern for all pages except login.
+**IMPORTANT:** Never use inconsistent padding values like `p-4 md:p-6`, `p-6`, `p-3`, or other mixed values. Always use the unified `px-0 py-0 md:px-4 md:py-1 space-y-3` pattern for all pages except login.
 
 ### Page Content Width
 
@@ -216,7 +273,7 @@ Colors in this system map directly to business logic and user intent:
 
 ```vue
 <template>
-  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header - direct child, full width -->
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 sm:gap-4">
@@ -449,6 +506,69 @@ const getButtonClass = (value: string | null) => {
 - Toggle container: `bg-muted rounded-full` with `gap-1 p-1`
 - Selected button: `bg-primary text-white shadow-sm`
 - Unselected button: `text-muted hover:text-default hover:bg-elevated`
+
+### Mobile-Only Simplified Filters (Design Rule)
+
+**IMPORTANT:** On small screens (below `lg` breakpoint), toggle button groups should be **hidden** to simplify the mobile experience. Users can still filter using the search input and status dropdown.
+
+**Rationale:**
+- Toggle buttons take up significant horizontal space on mobile
+- Scrollable toggle rows can feel cluttered on small screens
+- Search and status dropdown provide sufficient filtering for mobile users
+- Keeps the mobile UI clean and focused
+
+**Implementation Pattern:**
+
+```vue
+<UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+  <!-- Desktop: Full filter bar with toggle buttons (lg and above) -->
+  <div class="hidden lg:flex items-center gap-3">
+    <!-- Search -->
+    <div class="flex-1 min-w-0 max-w-md">
+      <UInput v-model="filters.search" placeholder="Search..." icon="i-lucide-search" size="lg" class="w-full" />
+    </div>
+
+    <!-- Toggle Button Group - ONLY visible on desktop -->
+    <div class="flex items-center gap-1 p-1 bg-muted rounded-full">
+      <button v-for="option in options" :key="option.value" type="button"
+        class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+        :class="getButtonClass(option.value)" @click="selectOption(option.value)">
+        {{ option.label }}
+      </button>
+    </div>
+
+    <!-- Status Dropdown -->
+    <UDropdownMenu :items="dropdownItems" class="ml-auto">
+      <UButton color="neutral" variant="outline" size="lg" class="cursor-pointer rounded-full px-5" trailing-icon="i-lucide-chevron-down">
+        <UIcon :name="statusIcon" class="w-4 h-4 mr-2" />
+        {{ statusLabel }}
+      </UButton>
+    </UDropdownMenu>
+  </div>
+
+  <!-- Mobile: Search and Status only - NO toggle buttons (below lg) -->
+  <div class="flex items-center gap-3 lg:hidden">
+    <div class="flex-1 min-w-0">
+      <UInput v-model="filters.search" placeholder="Search..." icon="i-lucide-search" size="lg" class="w-full" />
+    </div>
+    <UDropdownMenu :items="dropdownItems">
+      <UButton color="neutral" variant="outline" size="lg" class="cursor-pointer rounded-full px-3" trailing-icon="i-lucide-chevron-down">
+        <UIcon :name="statusIcon" class="w-4 h-4" />
+      </UButton>
+    </UDropdownMenu>
+  </div>
+</UCard>
+```
+
+**When to apply this rule:**
+- List pages with category/type toggle filters (Locations, Users, Items, etc.)
+- Pages where the toggle options are "nice to have" but not critical for basic filtering
+- When search + status dropdown provide sufficient filtering capability
+
+**When NOT to apply this rule:**
+- If toggle buttons are essential for the page's primary use case
+- Dashboard pages where quick category switching is critical
+- When user testing shows mobile users need the toggle options
 
 ---
 
@@ -1546,7 +1666,7 @@ When creating a new page, ensure:
 
 ### General
 
-- [ ] Page container uses `px-3 py-0 md:px-4 md:py-1 space-y-3`
+- [ ] Page container uses `px-0 py-0 md:px-4 md:py-1 space-y-3`
 - [ ] All icons have NO backgrounds or borders
 - [ ] Cards use `card-elevated` class without hover effects
 - [ ] All buttons have `cursor-pointer` class
@@ -1573,9 +1693,8 @@ When creating a new page, ensure:
 
 - [ ] Uses dual layout pattern: `hidden lg:flex` for desktop, `lg:hidden` for mobile
 - [ ] Desktop: Single row with dropdown at far right (`ml-auto`)
-- [ ] Mobile: Stacked rows with search + dropdown, then scrollable toggles
+- [ ] **Mobile: Toggle buttons HIDDEN** - only search + status dropdown visible
 - [ ] Mobile dropdown shows icon only (no label)
-- [ ] Toggle buttons scrollable on mobile: `overflow-x-auto -mx-3 px-3`
 - [ ] Toggle buttons use unified `bg-primary` when selected
 
 ### Visual Testing
@@ -1600,7 +1719,8 @@ When creating a new page, ensure:
 
 | Rule | Specification |
 |------|---------------|
-| **Page Container** | `px-3 py-0 md:px-4 md:py-1 space-y-3` |
+| **Page Container** | `px-0 py-0 md:px-4 md:py-1 space-y-3` |
+| **Layout Body** | `py-2 px-0 sm:px-12 xl:py-4 xl:px-16` (in default.vue) |
 | **Page Content Width** | Full width by default (no max-width), sections as direct children |
 | **Section Spacing** | `space-y-3` (automatic via container)
 | **Page Header Icon** | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background) |
@@ -1610,7 +1730,7 @@ When creating a new page, ensure:
 | **Buttons - Primary** | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6` |
 | **Buttons - Cancel** | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer` |
 | **Icons** | NO backgrounds, NO borders, NO rounded containers |
-| **Filter Layout** | Dual layout: desktop single row, mobile stacked rows |
+| **Filter Layout** | Dual layout: desktop full filters, mobile search + dropdown only (no toggles) |
 | **Dropdown Handler** | Use `onSelect` (not `click`) |
 | **Form Layout - Standard** | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full` |
 | **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2` |
