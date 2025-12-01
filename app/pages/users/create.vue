@@ -6,46 +6,49 @@ import type { UserRole } from "@prisma/client";
 definePageMeta({
   middleware: "role",
   roleRequired: "ADMIN",
+  layout: "default",
 });
 
-const toast = useToast();
-const router = useRouter();
+// Composables
+const toast = useAppToast();
 
-// Form state
-const loading = ref(false);
+// State
+const submitting = ref(false);
 const locations = ref<Array<{ id: string; code: string; name: string; type: string }>>([]);
 
 // Form schema
-const schema = z.object({
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(50, "Username must not exceed 50 characters")
-    .regex(
-      /^[a-zA-Z0-9_-]+$/,
-      "Username can only contain letters, numbers, hyphens, and underscores"
-    ),
-  email: z.string().email("Invalid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      "Password must contain uppercase, lowercase, number, and special character (@$!%*?&)"
-    ),
-  confirm_password: z.string(),
-  full_name: z.string().min(1, "Full name is required").max(100),
-  role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
-  default_location_id: z.string().uuid("Invalid location").optional(),
-}).refine((data) => data.password === data.confirm_password, {
-  message: "Passwords do not match",
-  path: ["confirm_password"],
-});
+const schema = z
+  .object({
+    username: z
+      .string()
+      .min(3, "Username must be at least 3 characters")
+      .max(50, "Username must not exceed 50 characters")
+      .regex(
+        /^[a-zA-Z0-9_-]+$/,
+        "Username can only contain letters, numbers, hyphens, and underscores"
+      ),
+    email: z.string().email("Invalid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+        "Password must contain uppercase, lowercase, number, and special character (@$!%*?&)"
+      ),
+    confirm_password: z.string(),
+    full_name: z.string().min(1, "Full name is required").max(100),
+    role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
+    default_location_id: z.string().uuid("Invalid location").optional(),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  });
 
 type Schema = z.output<typeof schema>;
 
 // Form data
-const state = reactive({
+const formData = reactive({
   username: "",
   email: "",
   password: "",
@@ -57,34 +60,57 @@ const state = reactive({
 
 // Role options
 const roleOptions = [
-  { value: "OPERATOR", label: "Operator", description: "Can post transactions and view stock" },
+  {
+    value: "OPERATOR",
+    label: "Operator",
+    description: "Can post transactions and view stock",
+  },
   {
     value: "SUPERVISOR",
     label: "Supervisor",
     description: "Can approve transfers and edit reconciliations",
   },
-  { value: "ADMIN", label: "Admin", description: "Full system access and management" },
+  {
+    value: "ADMIN",
+    label: "Admin",
+    description: "Full system access and management",
+  },
 ];
+
+// Location options
+const locationOptions = computed(() => [
+  { value: undefined, label: "None (Optional)" },
+  ...locations.value.map((l) => ({
+    value: l.id,
+    label: `${l.code} - ${l.name}`,
+  })),
+]);
 
 // Fetch locations
 const fetchLocations = async () => {
   try {
     const response = await $fetch<{ locations: typeof locations.value }>("/api/locations");
     locations.value = response.locations;
-  } catch (error: any) {
-    toast.add({
-      title: "Error",
-      description: error.data?.message || "Failed to load locations",
-      color: "error",
-    });
+  } catch (err: unknown) {
+    console.error("Error fetching locations:", err);
+    const message =
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
+        ? String(err.data.message)
+        : "Failed to load locations";
+    toast.error("Error", { description: message });
   }
 };
 
 // Submit handler
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-  try {
-    loading.value = true;
+  submitting.value = true;
 
+  try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirm_password, ...userData } = event.data;
 
@@ -93,167 +119,293 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       body: userData,
     });
 
-    toast.add({
-      title: "Success",
-      description: "User created successfully",
-      color: "success",
-    });
-
-    router.push("/users");
-  } catch (error: any) {
-    toast.add({
-      title: "Error",
-      description: error.data?.message || "Failed to create user",
-      color: "error",
-    });
+    toast.success("Success", { description: "User created successfully" });
+    await navigateTo("/users");
+  } catch (err: unknown) {
+    console.error("Error creating user:", err);
+    const message =
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
+        ? String(err.data.message)
+        : "Failed to create user";
+    toast.error("Error", { description: message });
   } finally {
-    loading.value = false;
+    submitting.value = false;
   }
+};
+
+// Handle cancel
+const handleCancel = () => {
+  const hasData =
+    formData.username ||
+    formData.email ||
+    formData.password ||
+    formData.confirm_password ||
+    formData.full_name ||
+    formData.role !== "OPERATOR" ||
+    formData.default_location_id;
+
+  if (hasData) {
+    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?");
+    if (!confirmed) return;
+  }
+  navigateTo("/users");
 };
 
 // Load locations on mount
 onMounted(() => {
   fetchLocations();
 });
+
+// Set page title
+useHead({
+  title: "Create User - Stock Management System",
+});
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
-    <!-- Header -->
-    <div class="flex items-center gap-4 mb-6">
-      <UButton
-        icon="i-heroicons-arrow-left"
-        color="neutral"
-        variant="ghost"
-        to="/users"
-        aria-label="Back to users"
-        class="cursor-pointer"
-      />
-      <div>
-        <h1 class="text-heading">Create New User</h1>
-        <p class="text-caption mt-1">Add a new user to the system</p>
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between gap-3">
+      <!-- Title with icon -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-user-plus" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Create User</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Add a new user account to the system
+          </p>
+        </div>
       </div>
+      <!-- Back button -->
+      <UButton
+        color="neutral"
+        variant="soft"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="handleCancel"
+      >
+        <span class="hidden sm:inline">Back</span>
+      </UButton>
     </div>
 
-    <!-- Form -->
-    <UCard>
-      <UForm :schema="schema" :state="state" @submit="onSubmit">
-        <div class="space-y-6">
-          <!-- Account Information -->
-          <div>
-            <h3 class="text-label mb-4">Account Information</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <UFormField name="username" label="Username" required>
-                <UInput
-                  v-model="state.username"
-                  placeholder="e.g., john.doe"
-                  icon="i-heroicons-at-symbol"
-                />
-              </UFormField>
-
-              <UFormField name="email" label="Email Address" required>
-                <UInput
-                  v-model="state.email"
-                  type="email"
-                  placeholder="e.g., john@example.com"
-                  icon="i-heroicons-envelope"
-                />
-              </UFormField>
-
-              <UFormField name="password" label="Password" required>
-                <UInput
-                  v-model="state.password"
-                  type="password"
-                  placeholder="••••••••"
-                  icon="i-heroicons-lock-closed"
-                />
-              </UFormField>
-
-              <UFormField name="confirm_password" label="Confirm Password" required>
-                <UInput
-                  v-model="state.confirm_password"
-                  type="password"
-                  placeholder="••••••••"
-                  icon="i-heroicons-lock-closed"
-                />
-              </UFormField>
+    <!-- Form Container -->
+    <div>
+      <UForm :schema="schema" :state="formData" @submit="onSubmit">
+        <!-- Account Information Section -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Account Information
+              </h2>
             </div>
-          </div>
+          </template>
 
-          <!-- Personal Information -->
-          <div>
-            <h3 class="text-label mb-4">Personal Information</h3>
-            <UFormField name="full_name" label="Full Name" required>
+          <!-- Responsive Grid: 1 column on mobile, 2 columns on lg+ screens -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Username -->
+            <UFormField
+              label="Username"
+              name="username"
+              required
+              help="Unique username for system login"
+            >
               <UInput
-                v-model="state.full_name"
-                placeholder="e.g., John Doe"
-                icon="i-heroicons-user"
+                v-model="formData.username"
+                placeholder="e.g., john.doe"
+                icon="i-lucide-at-sign"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Email -->
+            <UFormField label="Email Address" name="email" required help="User's email address">
+              <UInput
+                v-model="formData.email"
+                type="email"
+                placeholder="e.g., john@example.com"
+                icon="i-lucide-mail"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Password -->
+            <UFormField label="Password" name="password" required help="Must meet requirements below">
+              <UInput
+                v-model="formData.password"
+                type="password"
+                placeholder="••••••••"
+                icon="i-lucide-lock"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Confirm Password -->
+            <UFormField
+              label="Confirm Password"
+              name="confirm_password"
+              required
+              help="Re-enter password to confirm"
+            >
+              <UInput
+                v-model="formData.confirm_password"
+                type="password"
+                placeholder="••••••••"
+                icon="i-lucide-lock"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
               />
             </UFormField>
           </div>
+        </UCard>
 
-          <!-- Role & Permissions -->
-          <div>
-            <h3 class="text-label mb-4">Role & Permissions</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <UFormField name="role" label="User Role" required>
-                <USelect v-model="state.role" :items="roleOptions" />
-              </UFormField>
-
-              <UFormField
-                name="default_location_id"
-                label="Default Location"
-                description="Optional - User's default working location"
-              >
-                <USelect
-                  v-model="state.default_location_id"
-                  :items="[
-                    { value: undefined, label: 'None' },
-                    ...locations.map((l) => ({
-                      value: l.id,
-                      label: `${l.code} - ${l.name}`,
-                    })),
-                  ]"
-                  placeholder="Select location (optional)"
-                />
-              </UFormField>
+        <!-- Personal Information Section -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-user" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Personal Information
+              </h2>
             </div>
-          </div>
+          </template>
 
-          <!-- Actions -->
-          <div class="flex justify-end gap-3 pt-4 border-t border-default">
-            <UButton
-              label="Cancel"
-              color="neutral"
-              variant="ghost"
-              to="/users"
-              class="cursor-pointer"
-            />
-            <UButton
-              type="submit"
-              label="Create User"
-              color="primary"
-              :loading="loading"
-              :disabled="loading"
-              class="cursor-pointer"
-            />
+          <!-- Single field at 50% width on large screens -->
+          <div class="space-y-6">
+            <UFormField
+              label="Full Name"
+              name="full_name"
+              required
+              help="User's full display name"
+              class="w-full lg:w-1/2"
+            >
+              <UInput
+                v-model="formData.full_name"
+                placeholder="e.g., John Doe"
+                icon="i-lucide-user-circle"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
           </div>
+        </UCard>
+
+        <!-- Role & Permissions Section -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-shield" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Role & Permissions
+              </h2>
+            </div>
+          </template>
+
+          <!-- Responsive Grid: 1 column on mobile, 2 columns on lg+ screens -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- User Role -->
+            <UFormField label="User Role" name="role" required help="Determines system permissions">
+              <USelectMenu
+                v-model="formData.role"
+                :items="roleOptions"
+                value-key="value"
+                placeholder="Select role"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon name="i-lucide-user-cog" class="w-4 h-4" />
+                </template>
+              </USelectMenu>
+            </UFormField>
+
+            <!-- Default Location -->
+            <UFormField
+              label="Default Location"
+              name="default_location_id"
+              help="Optional: User's default working location"
+            >
+              <USelectMenu
+                v-model="formData.default_location_id"
+                :items="locationOptions"
+                value-key="value"
+                placeholder="Select default location (optional)"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
+                </template>
+              </USelectMenu>
+            </UFormField>
+          </div>
+        </UCard>
+
+        <!-- Password Requirements Help -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-info" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Password Requirements
+              </h2>
+            </div>
+          </template>
+
+          <div class="text-sm text-[var(--ui-text-muted)]">
+            <ul class="list-disc list-inside space-y-1">
+              <li>At least 8 characters long</li>
+              <li>At least one uppercase letter (A-Z)</li>
+              <li>At least one lowercase letter (a-z)</li>
+              <li>At least one number (0-9)</li>
+              <li>At least one special character (@$!%*?&)</li>
+            </ul>
+          </div>
+        </UCard>
+
+        <!-- Action Buttons -->
+        <div
+          class="flex flex-col sm:flex-row items-center justify-end gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
+        >
+          <UButton
+            color="error"
+            variant="soft"
+            size="lg"
+            class="cursor-pointer w-full sm:w-auto"
+            @click="handleCancel"
+            :disabled="submitting"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            type="submit"
+            color="primary"
+            icon="i-lucide-user-plus"
+            size="lg"
+            class="cursor-pointer w-full sm:w-auto"
+            :loading="submitting"
+          >
+            {{ submitting ? "Creating..." : "Create User" }}
+          </UButton>
         </div>
       </UForm>
-    </UCard>
-
-    <!-- Password Requirements Help -->
-    <UCard class="mt-4">
-      <div class="text-caption">
-        <h4 class="font-medium text-default mb-2">Password Requirements:</h4>
-        <ul class="list-disc list-inside space-y-1">
-          <li>At least 8 characters long</li>
-          <li>At least one uppercase letter (A-Z)</li>
-          <li>At least one lowercase letter (a-z)</li>
-          <li>At least one number (0-9)</li>
-          <li>At least one special character (@$!%*?&)</li>
-        </ul>
-      </div>
-    </UCard>
+    </div>
   </div>
 </template>
