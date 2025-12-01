@@ -147,6 +147,7 @@ const toggleUserStatus = async (user: User) => {
 // Delete confirmation modal
 const deleteModal = ref(false);
 const userToDelete = ref<User | null>(null);
+const deletingUser = ref(false);
 
 const confirmDelete = (user: User) => {
   userToDelete.value = user;
@@ -155,6 +156,8 @@ const confirmDelete = (user: User) => {
 
 const deleteUser = async () => {
   if (!userToDelete.value) return;
+
+  deletingUser.value = true;
 
   try {
     await $fetch(`/api/users/${userToDelete.value.id}`, {
@@ -168,15 +171,21 @@ const deleteUser = async () => {
       description: "User deleted successfully",
       color: "success",
     });
-  } catch (error: any) {
+
+    deleteModal.value = false;
+    userToDelete.value = null;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === "object" && "data" in error && error.data && typeof error.data === "object" && "message" in error.data
+        ? String(error.data.message)
+        : "Failed to delete user";
     toast.add({
       title: "Error",
-      description: error.data?.message || "Failed to delete user",
+      description: message,
       color: "error",
     });
   } finally {
-    deleteModal.value = false;
-    userToDelete.value = null;
+    deletingUser.value = false;
   }
 };
 
@@ -339,6 +348,7 @@ onMounted(() => {
       v-model:open="deleteModal"
       title="Delete User"
       description="This action cannot be undone. All user data and access permissions will be permanently removed."
+      :dismissible="!deletingUser"
       :ui="{ footer: 'justify-end' }"
     >
       <template #body>
@@ -354,12 +364,14 @@ onMounted(() => {
           color="neutral"
           variant="outline"
           class="cursor-pointer"
+          :disabled="deletingUser"
           @click="close"
         />
         <UButton
           label="Delete"
           color="error"
           class="cursor-pointer"
+          :loading="deletingUser"
           @click="deleteUser"
         />
       </template>

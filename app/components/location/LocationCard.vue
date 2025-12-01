@@ -1,29 +1,23 @@
 <template>
-  <UCard class="card-elevated hover:shadow-lg transition-shadow duration-200">
+  <UCard class="card-elevated">
     <!-- Card Header -->
     <template #header>
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-12 h-12 rounded-lg flex items-center justify-center"
-              :class="locationTypeClass"
-            >
-              <UIcon :name="locationIcon" class="w-6 h-6" />
-            </div>
-            <div>
-              <h3 class="text-subheading">
-                {{ location.name }}
-              </h3>
-              <p class="text-caption">
-                {{ location.code }}
-              </p>
-            </div>
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-center gap-4 min-w-0">
+          <UIcon :name="locationIcon" class="w-10 h-10" :class="locationIconColor" />
+          <div class="min-w-0">
+            <h3 class="text-subheading font-semibold truncate">
+              {{ location.name }}
+            </h3>
+            <p class="text-caption font-medium">
+              {{ location.code }}
+            </p>
           </div>
         </div>
         <UBadge
           :color="location.is_active ? 'success' : 'neutral'"
           variant="subtle"
+          class="flex-shrink-0"
         >
           {{ location.is_active ? "Active" : "Inactive" }}
         </UBadge>
@@ -31,7 +25,7 @@
     </template>
 
     <!-- Card Body -->
-    <div class="space-y-3">
+    <div class="space-y-4">
       <!-- Location Type -->
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-map-pin" class="w-4 h-4 text-muted" />
@@ -50,17 +44,17 @@
       <!-- Stats -->
       <div
         v-if="showStats"
-        class="flex items-center gap-4 pt-2 border-t border-default"
+        class="flex items-center gap-6 pt-3 border-t border-default"
       >
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-users" class="w-4 h-4 text-muted" />
-          <span class="text-caption">
+          <span class="text-caption font-medium">
             {{ location._count?.user_locations || 0 }} users
           </span>
         </div>
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-package" class="w-4 h-4 text-muted" />
-          <span class="text-caption">
+          <span class="text-caption font-medium">
             {{ location._count?.location_stock || 0 }} items
           </span>
         </div>
@@ -163,16 +157,14 @@ const locationIcon = computed(() => {
   return icons[props.location.type] || "i-lucide-map-pin";
 });
 
-const locationTypeClass = computed(() => {
-  const classes = {
-    KITCHEN:
-      "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
-    STORE:
-      "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400",
-    CENTRAL: "bg-navy-100 dark:bg-navy-900/20 text-navy-700 dark:text-navy-400",
-    WAREHOUSE: "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400",
+const locationIconColor = computed(() => {
+  const colors = {
+    KITCHEN: "text-amber-500 dark:text-amber-400",
+    STORE: "text-emerald-500 dark:text-emerald-400",
+    CENTRAL: "text-blue-500 dark:text-blue-400",
+    WAREHOUSE: "text-zinc-500 dark:text-zinc-400",
   };
-  return classes[props.location.type] || "bg-zinc-100 dark:bg-zinc-800";
+  return colors[props.location.type] || "text-zinc-500 dark:text-zinc-400";
 });
 
 const locationTypeBadgeColor = computed(

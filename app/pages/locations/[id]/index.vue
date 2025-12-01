@@ -172,7 +172,7 @@
     </div>
 
     <!-- Assign User Modal -->
-    <UModal v-model:open="isAssignModalOpen">
+    <UModal v-model:open="isAssignModalOpen" :dismissible="!submittingAssignment">
       <template #content>
         <UCard>
           <template #header>
@@ -243,7 +243,7 @@
     </UModal>
 
     <!-- Remove User Confirmation Modal -->
-    <UModal v-model:open="isRemoveModalOpen">
+    <UModal v-model:open="isRemoveModalOpen" :dismissible="removingUserId === null">
       <template #content>
         <UCard>
           <template #header>
@@ -284,7 +284,7 @@
     </UModal>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="isDeleteModalOpen">
+    <UModal v-model:open="isDeleteModalOpen" :dismissible="!deletingLocation">
       <template #content>
         <UCard>
           <template #header>

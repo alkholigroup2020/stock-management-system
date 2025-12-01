@@ -6,7 +6,7 @@
     ]"
   >
     <!-- Icon -->
-    <div :class="['rounded-full p-4 mb-4', iconBgClasses]">
+    <div class="mb-4">
       <UIcon :name="icon" :class="[iconSizeClasses, iconColorClasses]" />
     </div>
 
@@ -127,11 +127,6 @@ const iconSizeClasses = computed(() => {
 // Icon color classes
 const iconColorClasses = computed(() => {
   return "text-muted";
-});
-
-// Icon background classes
-const iconBgClasses = computed(() => {
-  return "bg-elevated border border-default";
 });
 
 // Title size classes

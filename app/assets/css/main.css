@@ -3,22 +3,23 @@
 
 /* Global font size scale - reduces all text by one step */
 html {
-  font-size: 95%; /* 14.08px base instead of 16px */
+  font-size: 100%; /* 14.08px base instead of 16px */
 }
 
 @theme {
   /* Navy Blue - Primary Brand Color (#000046) */
-  --color-navy-50: #e6e6f0;
-  --color-navy-100: #b3b3d9;
-  --color-navy-200: #8080c2;
-  --color-navy-300: #4d4dab;
-  --color-navy-400: #26269b;
+  /* Revised palette with better blue tones for dark mode readability */
+  --color-navy-50: #eef2ff;
+  --color-navy-100: #d8e0ff;
+  --color-navy-200: #a8b8ff;
+  --color-navy-300: #7890eb;
+  --color-navy-400: #4a64c9;
   --color-navy-500: #000046;
   --color-navy-600: #00003f;
   --color-navy-700: #000037;
   --color-navy-800: #00002f;
   --color-navy-900: #000020;
-  --color-navy-950: #000010;
+  --color-navy-950: #0a0a1a;
 
   /* Emerald Green - Secondary/Success Color (#45cf7b) */
   --color-emerald-50: #edfcf4;
@@ -107,26 +108,28 @@ html {
 :root {
   /* ===== Primary & Secondary Brand Colors ===== */
   --ui-primary: var(--color-navy-500);
-  --ui-secondary: var(--color-emerald-500);
+  --ui-secondary: var(--color-emerald-600);
 
   /* ===== Background Tokens ===== */
-  --ui-bg: var(--color-zinc-50); /* Page background */
+  /* Improved contrast: slightly darker page background for better card visibility */
+  --ui-bg: #f4f5f7; /* Warmer gray for page background - better than zinc-50 */
   --ui-bg-elevated: #ffffff; /* Cards, modals, elevated surfaces */
   --ui-bg-muted: var(--color-zinc-100); /* Subtle backgrounds, disabled states */
   --ui-bg-accented: var(--color-navy-50); /* Highlighted sections */
   --ui-bg-inverted: var(--color-zinc-900); /* Dark backgrounds in light mode */
 
   /* ===== Text Tokens ===== */
-  --ui-text: var(--color-zinc-900); /* Primary text */
-  --ui-text-muted: var(--color-zinc-600); /* Secondary/helper text */
+  --ui-text: var(--color-zinc-800); /* Primary text - slightly softer than 900 */
+  --ui-text-muted: var(--color-zinc-500); /* Secondary/helper text */
   --ui-text-dimmed: var(--color-zinc-400); /* Disabled/inactive text */
-  --ui-text-highlighted: var(--color-navy-700); /* Important/emphasized text */
+  --ui-text-highlighted: var(--color-navy-600); /* Important/emphasized text */
   --ui-text-inverted: #ffffff; /* Text on dark backgrounds */
 
   /* ===== Border Tokens ===== */
-  --ui-border: var(--color-zinc-300); /* Default borders (cards, inputs) */
-  --ui-border-muted: var(--color-zinc-200); /* Subtle dividers */
-  --ui-border-accented: var(--color-navy-300); /* Emphasized borders */
+  /* Stronger borders for better visibility */
+  --ui-border: var(--color-zinc-400); /* Default borders (cards, inputs) */
+  --ui-border-muted: var(--color-zinc-300); /* Subtle dividers */
+  --ui-border-accented: var(--color-navy-500); /* Emphasized borders */
   --ui-border-inverted: var(--color-zinc-700); /* Borders on dark backgrounds */
 
   /* ===== Interactive State Tokens ===== */
@@ -139,7 +142,7 @@ html {
   /* ===== Focus & Accessibility ===== */
   --ui-ring: var(--color-navy-500); /* Focus ring color */
   --ui-focus: var(--color-navy-500); /* Focus indicator */
-  --ui-shadow: rgba(0, 0, 0, 0.1); /* Shadow color */
+  --ui-shadow: rgba(0, 0, 70, 0.08); /* Shadow color - slight navy tint */
 
   /* ===== Feedback Tokens (Standard) ===== */
   --ui-success: var(--color-emerald-600); /* Success messages */
@@ -177,50 +180,53 @@ html {
    ============================================ */
 .dark {
   /* ===== Primary & Secondary Brand Colors ===== */
-  --ui-primary: var(--color-navy-200);
+  /* Using updated navy palette with proper blue tones */
+  --ui-primary: var(--color-navy-300);
   --ui-secondary: var(--color-emerald-400);
 
   /* ===== Background Tokens ===== */
-  --ui-bg: var(--color-zinc-950);
-  --ui-bg-elevated: var(--color-zinc-900);
-  --ui-bg-muted: var(--color-zinc-800);
+  /* Richer dark backgrounds with subtle warmth */
+  --ui-bg: #0f1117; /* Slightly warmer than pure zinc-950 */
+  --ui-bg-elevated: #1a1d24; /* Better contrast with page background */
+  --ui-bg-muted: #252830; /* For subtle backgrounds */
   --ui-bg-accented: var(--color-navy-950);
   --ui-bg-inverted: var(--color-zinc-50);
 
   /* ===== Text Tokens ===== */
-  --ui-text: var(--color-zinc-100);
-  --ui-text-muted: var(--color-zinc-400);
+  --ui-text: #e8eaed; /* Softer white for less eye strain */
+  --ui-text-muted: #9ca3af; /* Better readable muted text */
   --ui-text-dimmed: var(--color-zinc-600);
-  --ui-text-highlighted: var(--color-navy-100);
+  --ui-text-highlighted: var(--color-navy-200);
   --ui-text-inverted: var(--color-zinc-900);
 
   /* ===== Border Tokens ===== */
-  --ui-border: var(--color-zinc-700);
-  --ui-border-muted: var(--color-zinc-800);
-  --ui-border-accented: var(--color-navy-300);
+  /* More visible borders in dark mode */
+  --ui-border: #454a54; /* More visible border */
+  --ui-border-muted: #363b44;
+  --ui-border-accented: var(--color-navy-400);
   --ui-border-inverted: var(--color-zinc-300);
 
   /* ===== Interactive State Tokens ===== */
-  --ui-primary-hover: var(--color-navy-100);
-  --ui-primary-active: var(--color-navy-50);
-  --ui-primary-contrast: #000000;
-  --ui-bg-hover: var(--color-zinc-800);
-  --ui-bg-active: var(--color-zinc-700);
+  --ui-primary-hover: var(--color-navy-200);
+  --ui-primary-active: var(--color-navy-100);
+  --ui-primary-contrast: #0f1117;
+  --ui-bg-hover: #252830;
+  --ui-bg-active: #2d3139;
 
   /* ===== Focus & Accessibility ===== */
-  --ui-ring: var(--color-navy-300);
-  --ui-focus: var(--color-navy-300);
-  --ui-shadow: rgba(0, 0, 0, 0.4);
+  --ui-ring: var(--color-navy-400);
+  --ui-focus: var(--color-navy-400);
+  --ui-shadow: rgba(0, 0, 0, 0.5);
 
   /* ===== Feedback Tokens (Dark Mode Adjustments) ===== */
   --ui-success: var(--color-emerald-400);
-  --ui-warning: var(--color-amber-300);
+  --ui-warning: var(--color-amber-400);
   --ui-error: var(--color-red-400);
   --ui-info: var(--color-blue-400);
 
   /* ===== Business-Specific Tokens (Dark Mode) ===== */
   --ui-stock-healthy: var(--color-emerald-400);
-  --ui-stock-low: var(--color-amber-300);
+  --ui-stock-low: var(--color-amber-400);
   --ui-stock-critical: var(--color-red-400);
   --ui-stock-pending: var(--color-navy-300);
 
@@ -233,7 +239,7 @@ html {
   --ui-period-ready: var(--color-navy-300);
   --ui-period-closed: var(--color-zinc-400);
 
-  --ui-variance-detected: var(--color-amber-300);
+  --ui-variance-detected: var(--color-amber-400);
 }
 
 /* ============================================
@@ -321,6 +327,11 @@ html {
   --tw-ring-offset-color: var(--ui-bg-elevated);
 }
 
+/* Override ring-accented to use consistent border color */
+.ring-accented {
+  --tw-ring-color: var(--ui-border) !important;
+}
+
 /* Placeholder utilities */
 .placeholder-muted::placeholder {
   color: var(--ui-text-muted);
@@ -334,8 +345,18 @@ html {
 @layer components {
   .card-elevated {
     @apply bg-elevated border border-default;
-    @apply rounded-lg shadow-sm hover:shadow-md;
-    @apply transition-shadow duration-200;
+    @apply rounded-xl;
+    /* Enhanced shadows for better elevation effect */
+    box-shadow:
+      0 1px 3px rgba(0, 0, 70, 0.08),
+      0 4px 12px rgba(0, 0, 70, 0.06);
+  }
+
+  .dark .card-elevated {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
   .card-muted {
@@ -369,6 +390,66 @@ html {
     @apply text-xs mt-1;
     color: var(--ui-error);
   }
+}
+
+/* ===== Nuxt UI Form Component Border Overrides ===== */
+/* Ensure all form fields use the same border color as cards */
+
+/* Force all elements with border class to use our border color */
+*[class*="border-"] {
+  --tw-border-opacity: 1;
+}
+
+/* Input wrapper - the div containing the input */
+.relative.inline-flex.items-center {
+  border-color: var(--ui-border) !important;
+}
+
+/* All bordered elements in form context */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input:not([type]),
+textarea,
+select {
+  border-color: var(--ui-border) !important;
+}
+
+/* Nuxt UI specific - input wrapper with ring/border */
+.rounded-md.border,
+.rounded-lg.border,
+.rounded-full.border {
+  border-color: var(--ui-border) !important;
+}
+
+/* Button with outline variant */
+button.border {
+  border-color: var(--ui-border) !important;
+}
+
+/* Override any zinc border colors Nuxt UI might use */
+.border-zinc-200,
+.border-zinc-300,
+.border-gray-200,
+.border-gray-300,
+.border-neutral-200,
+.border-neutral-300,
+.dark .border-zinc-700,
+.dark .border-zinc-800,
+.dark .border-gray-700,
+.dark .border-gray-800,
+.dark .border-neutral-700,
+.dark .border-neutral-800 {
+  border-color: var(--ui-border) !important;
+}
+
+/* Dropdown menus and popovers */
+[data-radix-popper-content-wrapper] > div,
+[role="menu"],
+[role="listbox"] {
+  border-color: var(--ui-border) !important;
 }
 
 /* ===== Status Badge Classes ===== */

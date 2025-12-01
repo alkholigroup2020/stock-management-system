@@ -1,70 +1,116 @@
 <template>
-  <div class="space-y-6">
+  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Locations"
-      icon="i-lucide-store"
-      :show-location="true"
-      :show-period="true"
-      location-scope="all"
-    >
-      <template #actions>
-        <UButton
-          v-if="canManageLocations"
-          color="primary"
-          icon="i-lucide-plus"
-          @click="navigateTo('/locations/create')"
-        >
-          Create Location
-        </UButton>
-      </template>
-    </LayoutPageHeader>
+    <div class="flex items-center justify-between gap-3">
+      <!-- Mobile: smaller icon and title -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-map-pin" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <h1 class="text-xl sm:text-3xl font-bold text-primary">Locations</h1>
+      </div>
+      <!-- Mobile: shorter button text -->
+      <UButton
+        v-if="canManageLocations"
+        color="primary"
+        icon="i-lucide-plus"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="navigateTo('/locations/create')"
+      >
+        <span class="hidden sm:inline">Create Location</span>
+        <span class="sm:hidden">Create</span>
+      </UButton>
+    </div>
 
     <!-- Filters -->
-    <UCard>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <!-- Desktop: Single row layout -->
+      <div class="hidden lg:flex items-center gap-3">
         <!-- Search -->
-        <div>
-          <label class="form-label">Search</label>
+        <div class="flex-1 min-w-0 max-w-md">
           <UInput
             v-model="filters.search"
-            placeholder="Search by name or code..."
+            placeholder="Search locations by name or code..."
             icon="i-lucide-search"
+            size="lg"
+            class="w-full"
             @input="debouncedFetch"
           />
         </div>
 
-        <!-- Type Filter -->
-        <div>
-          <label class="form-label">Location Type</label>
-          <USelectMenu
-            v-model="filters.type"
-            :items="typeOptions"
-            value-key="value"
-            placeholder="All types"
-            @update:model-value="fetchLocations"
-          />
+        <!-- Type Filter Toggle Buttons -->
+        <div class="flex items-center gap-1 p-1 bg-muted rounded-full">
+          <button
+            v-for="typeOpt in typeToggleOptions"
+            :key="typeOpt.value ?? 'all'"
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+            :class="getTypeButtonClass(typeOpt.value)"
+            @click="selectType(typeOpt.value)"
+          >
+            {{ typeOpt.label }}
+          </button>
         </div>
 
-        <!-- Status Filter -->
-        <div>
-          <label class="form-label">Status</label>
-          <USelectMenu
-            v-model="filters.is_active"
-            :items="statusOptions"
-            value-key="value"
-            placeholder="All statuses"
-            @update:model-value="fetchLocations"
-          />
+        <!-- Status Filter Dropdown (Far Right) -->
+        <UDropdownMenu
+          :items="statusDropdownItems"
+          :ui="{ content: 'min-w-[140px]' }"
+          class="ml-auto"
+        >
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="currentStatusIcon" class="w-4 h-4 mr-2" />
+            {{ currentStatusLabel }}
+          </UButton>
+        </UDropdownMenu>
+      </div>
+
+      <!-- Mobile: Stacked layout -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Row 1: Search and Status Dropdown -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <UInput
+              v-model="filters.search"
+              placeholder="Search locations..."
+              icon="i-lucide-search"
+              size="lg"
+              class="w-full"
+              @input="debouncedFetch"
+            />
+          </div>
+          <UDropdownMenu :items="statusDropdownItems" :ui="{ content: 'min-w-[140px]' }">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-3"
+              trailing-icon="i-lucide-chevron-down"
+            >
+              <UIcon :name="currentStatusIcon" class="w-4 h-4" />
+            </UButton>
+          </UDropdownMenu>
         </div>
 
-        <!-- Include Inactive Toggle -->
-        <div>
-          <label class="form-label">Show Inactive</label>
-          <USwitch
-            v-model="filters.include_inactive"
-            @update:model-value="fetchLocations"
-          />
+        <!-- Row 2: Type Filter Toggle Buttons (horizontally scrollable) -->
+        <div class="overflow-x-auto -mx-3 px-3">
+          <div class="flex items-center gap-1 p-1 bg-muted rounded-full w-fit">
+            <button
+              v-for="typeOpt in typeToggleOptions"
+              :key="typeOpt.value ?? 'all'"
+              type="button"
+              class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+              :class="getTypeButtonClass(typeOpt.value)"
+              @click="selectType(typeOpt.value)"
+            >
+              {{ typeOpt.label }}
+            </button>
+          </div>
         </div>
       </div>
     </UCard>
@@ -85,14 +131,19 @@
       description="No locations match your search criteria. Try adjusting your filters or create a new location."
     >
       <template v-if="canManageLocations" #actions>
-        <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer" @click="navigateTo('/locations/create')">
+        <UButton
+          color="primary"
+          icon="i-lucide-plus"
+          class="cursor-pointer"
+          @click="navigateTo('/locations/create')"
+        >
           Create Location
         </UButton>
       </template>
     </EmptyState>
 
     <!-- Locations Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 py-2">
       <LocationCard
         v-for="location in locations"
         :key="location.id"
@@ -106,7 +157,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="isDeleteModalOpen">
+    <UModal v-model:open="isDeleteModalOpen" :dismissible="deletingLocationId === null">
       <template #content>
         <UCard>
           <template #header>
@@ -225,20 +276,77 @@ const filters = reactive({
   include_inactive: false,
 });
 
-// Filter options
-const typeOptions: TypeOption[] = [
-  { label: "All Types", value: null },
+// Filter options for toggle buttons
+const typeToggleOptions: TypeOption[] = [
+  { label: "All", value: null },
   { label: "Kitchen", value: "KITCHEN" },
   { label: "Store", value: "STORE" },
   { label: "Central", value: "CENTRAL" },
   { label: "Warehouse", value: "WAREHOUSE" },
 ];
 
-const statusOptions: StatusOption[] = [
-  { label: "All Statuses", value: null },
-  { label: "Active", value: true },
-  { label: "Inactive", value: false },
-];
+// Status dropdown items
+const statusDropdownItems = computed(() => [
+  [
+    {
+      label: "Active",
+      icon: "i-lucide-circle-check",
+      active: filters.is_active === true,
+      onSelect: () => selectStatus(true),
+    },
+    {
+      label: "Inactive",
+      icon: "i-lucide-archive",
+      active: filters.is_active === false,
+      onSelect: () => selectStatus(false),
+    },
+  ],
+]);
+
+// Current status label for dropdown button
+const currentStatusLabel = computed(() => {
+  if (filters.is_active === true) return "Active";
+  if (filters.is_active === false) return "Inactive";
+  return "Active";
+});
+
+// Current status icon for dropdown button
+const currentStatusIcon = computed(() => {
+  if (filters.is_active === false) return "i-lucide-archive";
+  return "i-lucide-circle-check";
+});
+
+// Get button class based on type selection
+const getTypeButtonClass = (typeValue: LocationType | null) => {
+  const isSelected = filters.type === typeValue;
+
+  if (!isSelected) {
+    return "text-muted hover:text-default hover:bg-elevated";
+  }
+
+  // All selected options use the same primary background
+  switch (typeValue) {
+    case "KITCHEN":
+    case "STORE":
+    case "CENTRAL":
+    case "WAREHOUSE":
+    default:
+      return "bg-primary text-white shadow-sm";
+  }
+};
+
+// Select type handler
+const selectType = (typeValue: LocationType | null) => {
+  filters.type = typeValue;
+  fetchLocations();
+};
+
+// Select status handler
+const selectStatus = (statusValue: boolean) => {
+  filters.is_active = statusValue;
+  filters.include_inactive = !statusValue;
+  fetchLocations();
+};
 
 // Fetch locations
 const fetchLocations = async () => {
@@ -329,7 +437,12 @@ const confirmDeleteLocation = async () => {
   } catch (err: unknown) {
     console.error("Error deleting location:", err);
     const message =
-      err && typeof err === "object" && "data" in err && err.data && typeof err.data === "object" && "message" in err.data
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
         ? String(err.data.message)
         : "Failed to delete location";
     toast.error("Error", { description: message });
@@ -353,4 +466,3 @@ useHead({
   title: "Locations - Stock Management System",
 });
 </script>
-
