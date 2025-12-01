@@ -4,8 +4,13 @@
     <div class="flex items-center justify-between gap-3">
       <!-- Mobile: smaller icon and title -->
       <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-map-pin" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
-        <h1 class="text-xl sm:text-3xl font-bold text-primary">Locations</h1>
+        <UIcon name="i-lucide-map-pin" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Locations</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Manage your inventory locations and warehouses
+          </p>
+        </div>
       </div>
       <!-- Mobile: shorter button text -->
       <UButton

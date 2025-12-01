@@ -208,6 +208,65 @@ Colors in this system map directly to business logic and user intent:
 
 **IMPORTANT:** Never use inconsistent padding values like `p-4 md:p-6`, `p-6`, `p-3`, or other mixed values. Always use the unified `px-3 py-0 md:px-4 md:py-1 space-y-3` pattern for all pages except login.
 
+### Page Content Width
+
+**DESIGN RULE:** By default, page content flows full-width within the page container. Content sections (header, loading, error, main content) are direct children of the container and benefit from the unified `space-y-3` spacing.
+
+**Standard Pattern (Full Width):**
+
+```vue
+<template>
+  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header - direct child, full width -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-icon" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <h1 class="text-xl sm:text-3xl font-bold text-primary">Page Title</h1>
+      </div>
+      <UButton color="primary" class="cursor-pointer">Action</UButton>
+    </div>
+
+    <!-- Loading State - direct child -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <LoadingSpinner />
+    </div>
+
+    <!-- Error State - direct child -->
+    <ErrorAlert v-else-if="error" :message="error" />
+
+    <!-- Main Content - direct child, full width -->
+    <div v-else>
+      <!-- Page content (cards, grids, forms, etc.) -->
+    </div>
+  </div>
+</template>
+```
+
+**Rules:**
+- **All pages use full-width content** by default
+- **Direct children** of the page container benefit from `space-y-3` spacing
+- **No max-width constraints** needed for standard pages (list pages, form pages, detail pages)
+- **Content flows naturally** within the responsive padding
+
+**Exception - Narrow Centered Content:**
+
+For special pages that need narrow, centered content (e.g., login, simple modals):
+
+```vue
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-default px-4 py-12 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+      <!-- Narrow centered content -->
+    </div>
+  </div>
+</template>
+```
+
+**When to use max-width constraints:**
+- `max-w-md`: Login page, authentication forms
+- `max-w-lg`: Simple modals, confirmation dialogs
+- Generally **avoid** max-width on standard pages - let content flow full width
+
 ---
 
 ## Page Header
@@ -218,9 +277,15 @@ Colors in this system map directly to business logic and user intent:
 <div class="flex items-center justify-between gap-3">
   <div class="flex items-center gap-2 sm:gap-4">
     <!-- Responsive icon size -->
-    <UIcon name="i-lucide-{icon-name}" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
-    <!-- Responsive title size -->
-    <h1 class="text-xl sm:text-3xl font-bold text-primary">Page Title</h1>
+    <UIcon name="i-lucide-{icon-name}" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+    <div>
+      <!-- Responsive title size -->
+      <h1 class="text-xl sm:text-3xl font-bold text-primary">Page Title</h1>
+      <!-- Description: hidden on mobile, visible on sm+ -->
+      <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+        Short description of the page purpose
+      </p>
+    </div>
   </div>
   <UButton
     v-if="hasPermission"
@@ -239,8 +304,9 @@ Colors in this system map directly to business logic and user intent:
 
 ### Rules
 
-- **Icon:** Responsive size (`w-8 h-8 sm:w-12 sm:h-12`), primary color, NO background or border
+- **Icon:** Responsive size (`w-6 h-6 sm:w-10 sm:h-10`), primary color, NO background or border
 - **Title:** Responsive size (`text-xl sm:text-3xl font-bold text-primary`)
+- **Description:** Hidden on mobile (`hidden sm:block`), muted text color, shown on `sm` screens and larger
 - **Action button:** Rounded (`rounded-full`), responsive padding (`px-3 sm:px-6`)
 - **Button text:** Short text on mobile, full text on larger screens
 
@@ -443,6 +509,159 @@ Inverted surface (dark in light mode, light in dark mode).
   border-radius: 0.5rem;
 }
 ```
+
+### Form Layout Standards
+
+**CRITICAL:** All forms must follow a responsive two-column layout pattern for optimal use of screen space and improved user experience.
+
+#### Responsive Grid Layout
+
+**Pattern:** Use Tailwind's responsive grid system to create forms that are:
+- **Single column on mobile and tablet** (default)
+- **Two columns side-by-side on large screens** (lg breakpoint and above)
+
+**Base Structure:**
+
+```vue
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Form fields here -->
+</div>
+```
+
+#### Full-Width Fields
+
+Some fields should span the entire width regardless of screen size:
+- **Textareas** (Description, Address, Notes)
+- **Special read-only fields** (like Location Code displays)
+- **Full-width select menus** (when contextually appropriate)
+
+**Implementation:** Use `lg:col-span-2` class:
+
+```vue
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Full-width field -->
+  <UFormField label="Description" name="description" class="lg:col-span-2">
+    <UTextarea v-model="form.description" class="w-full" />
+  </UFormField>
+
+  <!-- Two fields side-by-side on lg+ -->
+  <UFormField label="Name" name="name">
+    <UInput v-model="form.name" class="w-full" />
+  </UFormField>
+
+  <UFormField label="Type" name="type">
+    <USelectMenu v-model="form.type" class="w-full" />
+  </UFormField>
+</div>
+```
+
+#### Input Width Rule
+
+**IMPORTANT:** All inputs must have `class="w-full"` to ensure they consume 100% of their grid cell width.
+
+```vue
+<!-- ✅ CORRECT -->
+<UInput v-model="value" class="w-full" />
+<USelectMenu v-model="value" class="w-full" />
+<UTextarea v-model="value" class="w-full" />
+
+<!-- ❌ WRONG - Will not fill container properly -->
+<UInput v-model="value" />
+```
+
+#### Complete Form Example
+
+```vue
+<template>
+  <UCard class="card-elevated">
+    <template #header>
+      <h2 class="text-lg font-semibold">Basic Information</h2>
+    </template>
+
+    <!-- Responsive Grid: 1 column mobile, 2 columns lg+ -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Read-only field - Full width -->
+      <div class="lg:col-span-2 p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]">
+        <label class="form-label text-xs mb-2">Location Code</label>
+        <span class="text-lg font-mono font-semibold">LOC-001</span>
+      </div>
+
+      <!-- Two inputs side-by-side on large screens -->
+      <UFormField label="Location Name" name="name" required>
+        <UInput v-model="form.name" placeholder="Enter name" class="w-full" />
+      </UFormField>
+
+      <UFormField label="Location Type" name="type" required>
+        <USelectMenu v-model="form.type" :items="types" class="w-full" />
+      </UFormField>
+
+      <!-- Textarea - Full width -->
+      <UFormField label="Description" name="description" class="lg:col-span-2">
+        <UTextarea v-model="form.description" :rows="3" class="w-full" />
+      </UFormField>
+
+      <!-- Timezone and Status side-by-side -->
+      <UFormField label="Timezone" name="timezone">
+        <USelectMenu v-model="form.timezone" :items="timezones" class="w-full" />
+      </UFormField>
+
+      <div class="p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border)]">
+        <label class="font-semibold">Status</label>
+        <UToggle v-model="form.is_active" />
+      </div>
+    </div>
+  </UCard>
+</template>
+```
+
+#### Form Layout Rules Summary
+
+| Rule | Specification |
+|------|---------------|
+| **Grid Container** | `grid grid-cols-1 lg:grid-cols-2 gap-6` |
+| **Gap Between Fields** | `gap-6` (1.5rem / 24px) |
+| **Full-Width Fields** | Add `lg:col-span-2` class |
+| **Input Width** | Always include `class="w-full"` |
+| **Breakpoint** | Use `lg:` prefix (1024px and above) |
+| **Mobile Behavior** | Single column stack (grid-cols-1) |
+
+#### Single Column Section Layout (Exception)
+
+Some form sections work better with a single-column layout (e.g., Settings sections with just 2-3 fields). In these cases:
+
+**Rules:**
+- Use `space-y-6` for vertical spacing between fields
+- Apply `w-full lg:w-1/2` to individual fields for 50% width on large screens
+- Fields stack vertically on all screen sizes
+- Each field takes 100% width on mobile, 50% width on large screens
+
+**Example:**
+
+```vue
+<UCard class="card-elevated">
+  <template #header>
+    <h2 class="text-lg font-semibold">Settings</h2>
+  </template>
+
+  <!-- Single column layout with 50% width fields on large screens -->
+  <div class="space-y-6">
+    <UFormField label="Timezone" name="timezone" class="w-full lg:w-1/2">
+      <USelectMenu v-model="form.timezone" :items="timezones" class="w-full" />
+    </UFormField>
+
+    <div class="w-full lg:w-1/2 p-4 rounded-lg bg-[var(--ui-bg-muted)]">
+      <label class="font-semibold">Status</label>
+      <UToggle v-model="form.is_active" />
+    </div>
+  </div>
+</UCard>
+```
+
+**When to use:**
+- Settings sections with 2-3 fields
+- When fields don't naturally pair with each other
+- When visual balance is better with stacked layout
+- When fields have different UI patterns (input + toggle)
 
 ### Form Classes
 
@@ -775,6 +994,51 @@ const iconColor = computed(() => {
 <UButton color="success" class="cursor-pointer">Approve</UButton>
 ```
 
+### Cancel/Destructive Action Button
+
+**DESIGN RULE:** Cancel buttons and other destructive actions should use error/warning color styling to visually indicate caution and prevent accidental clicks.
+
+```vue
+<!-- Recommended: Soft error styling for cancel -->
+<UButton
+  color="error"
+  variant="soft"
+  size="lg"
+  class="cursor-pointer"
+  @click="handleCancel"
+>
+  Cancel
+</UButton>
+
+<!-- Alternative: Outline variant for less aggressive look -->
+<UButton
+  color="error"
+  variant="outline"
+  size="lg"
+  class="cursor-pointer"
+  @click="handleCancel"
+>
+  Cancel
+</UButton>
+
+<!-- For truly destructive actions (delete, remove) -->
+<UButton
+  color="error"
+  size="lg"
+  class="cursor-pointer"
+  @click="handleDelete"
+>
+  Delete Location
+</UButton>
+```
+
+**Rationale:**
+- Red/error color draws attention to potentially destructive actions
+- Helps prevent accidental cancellations or deletions
+- Clear visual distinction from primary action buttons
+- `variant="soft"` provides warning without being too aggressive
+- `variant="outline"` offers a lighter alternative
+
 ### Rules
 
 - **Always include `cursor-pointer` class**
@@ -782,6 +1046,8 @@ const iconColor = computed(() => {
 - Add horizontal padding (`px-5` or `px-6`) for better proportions
 - Use semantic color names: `color="primary"`, `color="secondary"`, `color="success"`, `color="error"`
 - **Never use custom color names** like `color="navy"` (won't work)
+- **Cancel buttons:** Use `color="error"` with `variant="soft"` or `variant="outline"`
+- **Delete buttons:** Use `color="error"` (solid variant) for maximum visual weight
 
 ---
 
@@ -1287,10 +1553,19 @@ When creating a new page, ensure:
 - [ ] Rounded buttons use `rounded-full` with appropriate padding
 - [ ] Dropdown menus use `onSelect` handler
 
+### Form Layout
+
+- [ ] Form fields use responsive grid: `grid grid-cols-1 lg:grid-cols-2 gap-6`
+- [ ] All inputs have `class="w-full"` to fill their container
+- [ ] Textareas and special fields use `lg:col-span-2` for full width
+- [ ] Form sections properly grouped within cards
+- [ ] Consistent gap spacing (`gap-6`) between fields
+
 ### Page Header (Responsive)
 
-- [ ] Icon uses responsive size: `w-8 h-8 sm:w-12 sm:h-12 text-primary`
+- [ ] Icon uses responsive size: `w-6 h-6 sm:w-10 sm:h-10 text-primary`
 - [ ] Title uses responsive size: `text-xl sm:text-3xl font-bold text-primary`
+- [ ] Description uses `hidden sm:block` to hide on mobile screens
 - [ ] Action button has responsive padding: `px-3 sm:px-6`
 - [ ] Button text switches between short/full: `<span class="hidden sm:inline">` pattern
 
@@ -1326,14 +1601,19 @@ When creating a new page, ensure:
 | Rule | Specification |
 |------|---------------|
 | **Page Container** | `px-3 py-0 md:px-4 md:py-1 space-y-3` |
-| **Section Spacing** | `space-y-3` |
-| **Page Header Icon** | `w-8 h-8 sm:w-12 sm:h-12 text-primary` (NO background) |
+| **Page Content Width** | Full width by default (no max-width), sections as direct children |
+| **Section Spacing** | `space-y-3` (automatic via container)
+| **Page Header Icon** | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background) |
 | **Page Title** | `text-xl sm:text-3xl font-bold text-primary` |
+| **Page Description** | `hidden sm:block` (hidden on mobile, visible on sm+) |
 | **Cards** | `card-elevated` (NO hover effects) |
-| **Buttons** | Always include `cursor-pointer`, use `rounded-full px-5` or `px-6` |
+| **Buttons - Primary** | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6` |
+| **Buttons - Cancel** | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer` |
 | **Icons** | NO backgrounds, NO borders, NO rounded containers |
 | **Filter Layout** | Dual layout: desktop single row, mobile stacked rows |
 | **Dropdown Handler** | Use `onSelect` (not `click`) |
+| **Form Layout - Standard** | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full` |
+| **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2` |
 
 ---
 

@@ -91,7 +91,8 @@
       "Bash(del users.ts)",
       "Bash(pkill:*)",
       "WebFetch(domain:ui.nuxt.com)",
-      "Bash(jq:*)"
+      "Bash(jq:*)",
+      "Bash(pnpm format:check:*)"
     ],
     "deny": [],
     "ask": []

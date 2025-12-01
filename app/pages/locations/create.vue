@@ -1,119 +1,205 @@
 <template>
-  <div class="space-y-6">
+  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Create Location"
-      icon="i-lucide-map-pin"
-      :show-location="true"
-      :show-period="true"
-      location-scope="all"
-    >
-      <template #actions>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-arrow-left"
-          @click="navigateTo('/locations')"
-        >
-          Back to Locations
-        </UButton>
-      </template>
-    </LayoutPageHeader>
+    <div class="flex items-center justify-between gap-3">
+      <!-- Title with icon matching the index page style -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-map-pin" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Create Location</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Add a new location to your inventory system
+          </p>
+        </div>
+      </div>
+      <!-- Back button -->
+      <UButton
+        color="neutral"
+        variant="soft"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="handleCancel"
+      >
+        <span class="hidden sm:inline">Back</span>
+      </UButton>
+    </div>
 
-    <!-- Form Card -->
-    <UCard class="max-w-3xl">
-      <UForm :schema="schema" :state="(formData as any)" @submit="onSubmit">
-        <div class="space-y-6">
-          <!-- Code -->
-          <UFormField
-            label="Location Code"
-            name="code"
-            required
-            help="Unique code for this location (e.g., MAIN-KIT, WH-01)"
-          >
-            <UInput
-              v-model="formData.code"
-              placeholder="Enter location code"
-              icon="i-lucide-hash"
-              :disabled="submitting"
-            />
-          </UFormField>
+    <!-- Form Container -->
+    <div>
+      <UForm :schema="schema" :state="formData" @submit="onSubmit">
+        <!-- Basic Information Section -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-info" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Basic Information
+              </h2>
+            </div>
+          </template>
 
-          <!-- Name -->
-          <UFormField label="Location Name" name="name" required>
-            <UInput
-              v-model="formData.name"
-              placeholder="Enter location name"
-              icon="i-lucide-map-pin"
-              :disabled="submitting"
-            />
-          </UFormField>
-
-          <!-- Type -->
-          <UFormField label="Location Type" name="type" required>
-            <USelectMenu
-              v-model="formData.type"
-              :items="typeOptions"
-              value-key="value"
-              placeholder="Select location type"
-              :disabled="submitting"
-            />
-          </UFormField>
-
-          <!-- Address -->
-          <UFormField
-            label="Address"
-            name="address"
-            help="Physical address of the location (optional)"
-          >
-            <UTextarea
-              v-model="formData.address"
-              placeholder="Enter address"
-              :rows="3"
-              :disabled="submitting"
-            />
-          </UFormField>
-
-          <!-- Timezone -->
-          <UFormField
-            label="Timezone"
-            name="timezone"
-            help="Timezone for this location"
-          >
-            <USelectMenu
-              v-model="formData.timezone"
-              :items="timezoneOptions"
-              value-key="value"
-              placeholder="Select timezone"
-              icon="i-lucide-clock"
-              :disabled="submitting"
-            />
-          </UFormField>
-
-          <!-- Submit Buttons -->
-          <div
-            class="flex items-center justify-end gap-3 pt-4 border-t border-default"
-          >
-            <UButton
-              color="neutral"
-              variant="ghost"
-              @click="navigateTo('/locations')"
-              :disabled="submitting"
+          <!-- Responsive Grid: 1 column on mobile, 2 columns on lg+ screens -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Location Code -->
+            <UFormField
+              label="Location Code"
+              name="code"
+              required
+              help="Unique identifier for this location (e.g., MAIN-KIT, WH-01)"
             >
-              Cancel
-            </UButton>
-            <UButton
-              type="submit"
-              color="primary"
-              icon="i-lucide-save"
-              :loading="submitting"
-            >
-              Create Location
-            </UButton>
+              <UInput
+                v-model="formData.code"
+                placeholder="Enter location code"
+                icon="i-lucide-hash"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Location Name -->
+            <UFormField label="Location Name" name="name" required>
+              <UInput
+                v-model="formData.name"
+                placeholder="Enter location name (e.g., Main Kitchen)"
+                icon="i-lucide-map-pin"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Location Type -->
+            <UFormField label="Location Type" name="type" required class="lg:col-span-2">
+              <USelectMenu
+                v-model="formData.type"
+                :items="typeOptions"
+                value-key="value"
+                placeholder="Select location type"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+              <template #help>
+                <div class="text-xs text-[var(--ui-text-muted)] mt-1">
+                  Type determines the location's role in your inventory system
+                </div>
+              </template>
+            </UFormField>
           </div>
+        </UCard>
+
+        <!-- Location Details Section -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Location Details
+              </h2>
+            </div>
+          </template>
+
+          <!-- Responsive Grid: 1 column on mobile, 2 columns on lg+ screens -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Description - Full width -->
+            <UFormField
+              label="Description"
+              name="description"
+              help="Optional: Provide additional details about this location"
+              class="lg:col-span-2"
+            >
+              <UTextarea
+                v-model="formData.description"
+                placeholder="Enter a brief description of this location..."
+                :rows="3"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Address - Full width -->
+            <UFormField
+              label="Physical Address"
+              name="address"
+              help="Optional: Physical address of the location"
+              class="lg:col-span-2"
+            >
+              <UTextarea
+                v-model="formData.address"
+                placeholder="Enter the street address, city, and postal code..."
+                :rows="3"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+        </UCard>
+
+        <!-- Settings Section -->
+        <UCard class="card-elevated mb-6">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-settings" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Settings</h2>
+            </div>
+          </template>
+
+          <!-- Single column layout with field at 50% width on large screens -->
+          <div class="space-y-6">
+            <!-- Timezone -->
+            <UFormField label="Timezone" name="timezone" class="w-full lg:w-1/2">
+              <USelectMenu
+                v-model="formData.timezone"
+                :items="timezoneOptions"
+                value-key="value"
+                placeholder="Select timezone"
+                size="lg"
+                :disabled="submitting"
+                searchable
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon name="i-lucide-clock" class="w-4 h-4" />
+                </template>
+              </USelectMenu>
+              <template #help>
+                <div class="text-xs text-[var(--ui-text-muted)] mt-1">
+                  Timezone used for timestamps and reporting at this location
+                </div>
+              </template>
+            </UFormField>
+          </div>
+        </UCard>
+
+        <!-- Action Buttons -->
+        <div
+          class="flex flex-col sm:flex-row items-center justify-end gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
+        >
+          <UButton
+            color="error"
+            variant="soft"
+            size="lg"
+            class="cursor-pointer w-full sm:w-auto"
+            @click="handleCancel"
+            :disabled="submitting"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            type="submit"
+            color="primary"
+            icon="i-lucide-save"
+            size="lg"
+            class="cursor-pointer w-full sm:w-auto"
+            :loading="submitting"
+          >
+            {{ submitting ? "Creating..." : "Create Location" }}
+          </UButton>
         </div>
       </UForm>
-    </UCard>
+    </div>
   </div>
 </template>
 
@@ -136,7 +222,8 @@ const submitting = ref(false);
 const formData = reactive({
   code: "",
   name: "",
-  type: undefined as string | undefined,
+  type: undefined as "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE" | undefined,
+  description: "",
   address: "",
   timezone: "Asia/Riyadh",
 });
@@ -154,7 +241,8 @@ const schema = z.object({
   type: z
     .enum(["KITCHEN", "STORE", "CENTRAL", "WAREHOUSE"])
     .describe("Location type is required"),
-  address: z.string().optional(),
+  description: z.string().max(500, "Description must be at most 500 characters").optional(),
+  address: z.string().max(500, "Address must be at most 500 characters").optional(),
   timezone: z.string().max(50).default("Asia/Riyadh"),
 });
 
@@ -244,6 +332,7 @@ const onSubmit = async () => {
       code: formData.code.toUpperCase(),
       name: formData.name,
       type: formData.type,
+      description: formData.description || undefined,
       address: formData.address || undefined,
       timezone: formData.timezone,
     };
@@ -254,14 +343,39 @@ const onSubmit = async () => {
     });
 
     toast.success("Success", { description: "Location created successfully" });
-    navigateTo("/locations");
-  } catch (err: any) {
+    await navigateTo("/locations");
+  } catch (err: unknown) {
     console.error("Error creating location:", err);
-    const message = err.data?.message || "Failed to create location";
+    const message =
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
+        ? String(err.data.message)
+        : "Failed to create location";
     toast.error("Error", { description: message });
   } finally {
     submitting.value = false;
   }
+};
+
+// Handle cancel
+const handleCancel = () => {
+  const hasData =
+    formData.code ||
+    formData.name ||
+    formData.type ||
+    formData.description ||
+    formData.address ||
+    formData.timezone !== "Asia/Riyadh";
+
+  if (hasData) {
+    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?");
+    if (!confirmed) return;
+  }
+  navigateTo("/locations");
 };
 
 // Set page title

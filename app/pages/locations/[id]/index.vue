@@ -1,81 +1,60 @@
 <template>
-  <div>
+  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <PageHeader
-      :title="location?.name || 'Location Details'"
-      icon="i-lucide-map-pin"
-    >
-      <template #actions>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-map-pin" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">
+            {{ location?.name || "Location Details" }}
+          </h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View and manage location information
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
         <UButton
           color="neutral"
-          variant="ghost"
+          variant="soft"
           icon="i-lucide-arrow-left"
-          class="cursor-pointer"
+          size="lg"
+          class="cursor-pointer rounded-full px-3 sm:px-6"
           @click="navigateTo('/locations')"
         >
-          Back to Locations
+          <span class="hidden sm:inline">Back</span>
         </UButton>
         <UButton
           v-if="canManageLocations()"
           color="primary"
           icon="i-lucide-edit"
-          class="cursor-pointer"
+          size="lg"
+          class="cursor-pointer rounded-full px-3 sm:px-6"
           @click="navigateTo(`/locations/${route.params.id}/edit`)"
         >
-          Edit Location
+          <span class="hidden sm:inline">Edit Location</span>
+          <span class="sm:hidden">Edit</span>
         </UButton>
-        <UButton
-          v-if="canManageLocations()"
-          color="error"
-          variant="outline"
-          icon="i-lucide-trash-2"
-          class="cursor-pointer"
-          @click="openDeleteModal"
-        >
-          Delete Location
-        </UButton>
-      </template>
-    </PageHeader>
+      </div>
+    </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
-      <LoadingSpinner
-        size="lg"
-        color="primary"
-        text="Loading location details..."
-      />
+      <LoadingSpinner size="lg" color="primary" text="Loading location details..." />
     </div>
 
     <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      :message="error"
-      @retry="fetchLocationDetails"
-    />
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchLocationDetails" />
 
     <!-- Location Details -->
     <div v-else class="space-y-6">
       <!-- Basic Info Card -->
-      <UCard>
+      <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
         <template #header>
-          <h2 class="text-subheading font-semibold">
-            Location Information
-          </h2>
-        </template>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="form-label">Code</label>
-            <p class="text-body font-mono">{{ location.code }}</p>
-          </div>
-          <div>
-            <label class="form-label">Type</label>
-            <UBadge :color="locationTypeColor" variant="subtle" size="lg">
-              {{ location.type }}
-            </UBadge>
-          </div>
-          <div>
-            <label class="form-label">Status</label>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Location Information
+            </h2>
             <UBadge
               :color="location.is_active ? 'success' : 'neutral'"
               variant="subtle"
@@ -84,61 +63,106 @@
               {{ location.is_active ? "Active" : "Inactive" }}
             </UBadge>
           </div>
+        </template>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Location Code (Read-only full-width) -->
+          <div
+            class="lg:col-span-2 p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]"
+          >
+            <label class="form-label text-xs mb-2">Location Code</label>
+            <span class="text-lg font-mono font-semibold text-[var(--ui-text)]">
+              {{ location.code }}
+            </span>
+          </div>
+
+          <!-- Location Type -->
+          <div>
+            <label class="form-label">Location Type</label>
+            <div class="mt-2">
+              <UBadge :color="locationTypeColor" variant="subtle" size="lg">
+                <UIcon :name="locationTypeIcon" class="w-4 h-4 mr-1.5" />
+                {{ location.type }}
+              </UBadge>
+            </div>
+          </div>
+
+          <!-- Timezone -->
           <div v-if="location.timezone">
             <label class="form-label">Timezone</label>
-            <p class="text-body">{{ location.timezone }}</p>
+            <p class="text-[var(--ui-text)] font-medium mt-2">
+              {{ location.timezone }}
+            </p>
           </div>
-          <div v-if="location.address" class="md:col-span-2">
+
+          <!-- Address (Full width) -->
+          <div v-if="location.address" class="lg:col-span-2">
             <label class="form-label">Address</label>
-            <p class="text-body">{{ location.address }}</p>
+            <p class="text-[var(--ui-text)] mt-2">{{ location.address }}</p>
           </div>
         </div>
       </UCard>
 
       <!-- User Assignments Card (Admin Only) -->
-      <UCard v-if="canManageLocations()">
+      <UCard v-if="canManageLocations()" class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-subheading font-semibold">User Assignments</h2>
+            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              User Assignments
+            </h2>
             <UButton
               color="primary"
               icon="i-lucide-user-plus"
-              size="sm"
+              size="lg"
+              class="cursor-pointer rounded-full px-3 sm:px-5"
               @click="openAssignUserModal"
             >
-              Assign User
+              <span class="hidden sm:inline">Assign User</span>
+              <span class="sm:hidden">Assign</span>
             </UButton>
           </div>
         </template>
 
-        <!-- Assigned Users List -->
+        <!-- Loading Users -->
         <div v-if="loadingUsers" class="flex justify-center py-8">
           <LoadingSpinner size="md" color="primary" text="Loading users..." />
         </div>
 
-        <div v-else-if="assignedUsers.length === 0" class="text-center py-8">
-          <p class="text-caption">No users assigned to this location</p>
-        </div>
+        <!-- No Users Assigned -->
+        <EmptyState
+          v-else-if="assignedUsers.length === 0"
+          icon="i-lucide-users"
+          title="No users assigned"
+          description="No users have been assigned to this location yet."
+        >
+          <template #actions>
+            <UButton
+              color="primary"
+              icon="i-lucide-user-plus"
+              class="cursor-pointer"
+              @click="openAssignUserModal"
+            >
+              Assign User
+            </UButton>
+          </template>
+        </EmptyState>
 
+        <!-- Assigned Users List -->
         <div v-else class="space-y-3">
           <div
             v-for="assignment in assignedUsers"
             :key="assignment.user_id"
-            class="flex items-center justify-between p-4 rounded-lg border border-default bg-default"
+            class="flex items-center justify-between p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] smooth-transition"
           >
-            <div v-if="assignment.user" class="flex-1">
-              <p class="font-medium">
+            <div v-if="assignment.user" class="flex-1 min-w-0">
+              <p class="font-semibold text-[var(--ui-text)]">
                 {{ assignment.user.full_name || assignment.user.username }}
               </p>
-              <div class="flex items-center gap-3 mt-1">
-                <p class="text-caption">
-                  {{ assignment.user.email }}
-                </p>
-                <UBadge
-                  :color="roleColor(assignment.user.role)"
-                  variant="subtle"
-                  size="sm"
-                >
+              <p class="text-caption text-[var(--ui-text-muted)] mt-0.5 truncate">
+                {{ assignment.user.email }}
+              </p>
+              <div class="flex items-center gap-2 mt-2">
+                <UBadge :color="roleColor(assignment.user.role)" variant="subtle" size="sm">
                   {{ assignment.user.role }}
                 </UBadge>
                 <UBadge
@@ -156,6 +180,7 @@
               variant="ghost"
               icon="i-lucide-x"
               size="sm"
+              class="cursor-pointer ml-3 flex-shrink-0"
               :loading="removingUserId === assignment.user_id"
               @click="
                 openRemoveModal(
@@ -164,7 +189,40 @@
                 )
               "
             >
-              Remove
+              <span class="hidden sm:inline">Remove</span>
+            </UButton>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Danger Zone Card (Admin Only) -->
+      <UCard
+        v-if="canManageLocations()"
+        class="card-elevated border-2 border-[var(--ui-error)]"
+        :ui="{ body: 'p-4 sm:p-6' }"
+      >
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-alert-triangle" class="w-5 h-5 text-error" />
+            <h2 class="text-lg font-semibold text-error">Danger Zone</h2>
+          </div>
+        </template>
+
+        <div class="space-y-4">
+          <div>
+            <p class="text-[var(--ui-text)] font-medium mb-2">Delete this location</p>
+            <p class="text-caption text-[var(--ui-text-muted)] mb-4">
+              Once you delete a location, there is no going back. If the location has
+              transaction history, it will be deactivated instead.
+            </p>
+            <UButton
+              color="error"
+              icon="i-lucide-trash-2"
+              size="lg"
+              class="cursor-pointer"
+              @click="openDeleteModal"
+            >
+              Delete Location
             </UButton>
           </div>
         </div>
@@ -174,9 +232,9 @@
     <!-- Assign User Modal -->
     <UModal v-model:open="isAssignModalOpen" :dismissible="!submittingAssignment">
       <template #content>
-        <UCard>
+        <UCard :ui="{ body: 'p-6' }">
           <template #header>
-            <h3 class="text-subheading font-semibold">
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
               Assign User to {{ location?.name }}
             </h3>
           </template>
@@ -186,7 +244,7 @@
             :state="(assignFormData as any)"
             @submit="submitUserAssignment"
           >
-            <div class="space-y-4">
+            <div class="space-y-6">
               <!-- User Selection -->
               <UFormField label="User" name="user_id" required>
                 <USelectMenu
@@ -196,6 +254,7 @@
                   placeholder="Select a user"
                   :loading="loadingAvailableUsers"
                   :disabled="submittingAssignment || loadingAvailableUsers"
+                  class="w-full"
                 />
               </UFormField>
 
@@ -212,16 +271,16 @@
                   value-key="value"
                   placeholder="Select access level"
                   :disabled="submittingAssignment"
+                  class="w-full"
                 />
               </UFormField>
 
               <!-- Actions -->
-              <div
-                class="flex items-center justify-end gap-3 pt-4 border-t border-default"
-              >
+              <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
                 <UButton
-                  color="neutral"
-                  variant="ghost"
+                  color="error"
+                  variant="soft"
+                  class="cursor-pointer"
                   @click="isAssignModalOpen = false"
                   :disabled="submittingAssignment"
                 >
@@ -231,6 +290,7 @@
                   type="submit"
                   color="primary"
                   icon="i-lucide-user-plus"
+                  class="cursor-pointer"
                   :loading="submittingAssignment"
                 >
                   Assign User
@@ -245,25 +305,28 @@
     <!-- Remove User Confirmation Modal -->
     <UModal v-model:open="isRemoveModalOpen" :dismissible="removingUserId === null">
       <template #content>
-        <UCard>
+        <UCard :ui="{ body: 'p-6' }">
           <template #header>
-            <h3 class="text-subheading font-semibold">Confirm Removal</h3>
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Confirm Removal
+            </h3>
           </template>
 
           <div class="space-y-4">
-            <p>
+            <p class="text-[var(--ui-text)]">
               Are you sure you want to remove
               <strong>{{ userToRemove?.name }}</strong> from this location?
             </p>
-            <p class="text-caption">This action cannot be undone.</p>
+            <p class="text-caption text-[var(--ui-text-muted)]">
+              This action cannot be undone.
+            </p>
 
             <!-- Actions -->
-            <div
-              class="flex items-center justify-end gap-3 pt-4 border-t border-default"
-            >
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
               <UButton
-                color="neutral"
-                variant="ghost"
+                color="error"
+                variant="soft"
+                class="cursor-pointer"
                 @click="isRemoveModalOpen = false"
                 :disabled="removingUserId !== null"
               >
@@ -272,6 +335,7 @@
               <UButton
                 color="error"
                 icon="i-lucide-trash-2"
+                class="cursor-pointer"
                 :loading="removingUserId !== null"
                 @click="confirmRemoveUser"
               >
@@ -286,25 +350,29 @@
     <!-- Delete Confirmation Modal -->
     <UModal v-model:open="isDeleteModalOpen" :dismissible="!deletingLocation">
       <template #content>
-        <UCard>
+        <UCard :ui="{ body: 'p-6' }">
           <template #header>
-            <h3 class="text-subheading font-semibold">Confirm Location Deletion</h3>
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Confirm Location Deletion
+            </h3>
           </template>
 
           <div class="space-y-4">
             <div
               v-if="location"
-              class="p-4 rounded-lg border-2 border-warning bg-warning/10"
+              class="p-4 rounded-lg border-2 border-[var(--ui-warning)] bg-[var(--ui-warning)]/10"
             >
-              <p class="font-semibold text-warning">
+              <p class="font-semibold text-[var(--ui-warning)]">
                 {{ location.name }}
               </p>
-              <p class="text-caption mt-1">{{ location.code }}</p>
+              <p class="text-caption text-[var(--ui-text-muted)] mt-1">{{ location.code }}</p>
             </div>
 
             <div class="space-y-2">
-              <p class="font-medium">Are you sure you want to delete this location?</p>
-              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+              <p class="font-medium text-[var(--ui-text)]">
+                Are you sure you want to delete this location?
+              </p>
+              <ul class="list-disc list-inside text-caption text-[var(--ui-text-muted)] space-y-1 pl-2">
                 <li>If the location has transaction history, it will be deactivated</li>
                 <li>If the location is empty, it will be permanently deleted</li>
                 <li>Users assigned to this location will remain assigned</li>
@@ -313,10 +381,10 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
               <UButton
-                color="neutral"
-                variant="ghost"
+                color="error"
+                variant="soft"
                 class="cursor-pointer"
                 @click="isDeleteModalOpen = false"
                 :disabled="deletingLocation"
@@ -384,9 +452,7 @@ const assignFormData = reactive({
 // Validation schema
 const assignUserSchema = z.object({
   user_id: z.string().uuid("Please select a user"),
-  access_level: z
-    .enum(["VIEW", "POST", "MANAGE"])
-    .describe("Please select an access level"),
+  access_level: z.enum(["VIEW", "POST", "MANAGE"]).describe("Please select an access level"),
 });
 
 // Access level options
@@ -424,6 +490,16 @@ const locationTypeColor = computed(
     return colors[location.value?.type] || "neutral";
   }
 );
+
+const locationTypeIcon = computed(() => {
+  const icons: Record<string, string> = {
+    KITCHEN: "i-lucide-chef-hat",
+    STORE: "i-lucide-store",
+    CENTRAL: "i-lucide-building-2",
+    WAREHOUSE: "i-lucide-warehouse",
+  };
+  return icons[location.value?.type] || "i-lucide-map-pin";
+});
 
 // Helper functions
 const roleColor = (
@@ -487,9 +563,7 @@ const fetchLocationDetails = async () => {
 
   try {
     const locationId = route.params.id as string;
-    const response = await $fetch<{ location: any }>(
-      `/api/locations/${locationId}`
-    );
+    const response = await $fetch<{ location: any }>(`/api/locations/${locationId}`);
 
     location.value = response.location;
   } catch (err: any) {
@@ -509,9 +583,7 @@ const fetchAssignedUsers = async () => {
 
   try {
     const locationId = route.params.id as string;
-    const response = await $fetch<{ users: any[] }>(
-      `/api/locations/${locationId}/users`
-    );
+    const response = await $fetch<{ users: any[] }>(`/api/locations/${locationId}/users`);
 
     assignedUsers.value = response.users || [];
   } catch (err: any) {
@@ -656,7 +728,12 @@ const confirmDeleteLocation = async () => {
   } catch (err: unknown) {
     console.error("Error deleting location:", err);
     const message =
-      err && typeof err === "object" && "data" in err && err.data && typeof err.data === "object" && "message" in err.data
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
         ? String(err.data.message)
         : "Failed to delete location";
     toast.error("Error", { description: message });
@@ -675,7 +752,6 @@ onMounted(async () => {
 
 // Set page title
 useHead({
-  title: () =>
-    `${location.value?.name || "Location"} - Stock Management System`,
+  title: () => `${location.value?.name || "Location"} - Stock Management System`,
 });
 </script>

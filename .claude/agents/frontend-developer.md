@@ -460,11 +460,22 @@ const getButtonClass = (value: string | null) => {
 | Element | Value |
 |---------|-------|
 | **Page Container** | `px-3 py-0 md:px-4 md:py-1 space-y-3` |
-| **Section Spacing** | `space-y-3` |
+| **Page Content Width** | Full width by default (no max-width), sections as direct children |
+| **Section Spacing** | `space-y-3` (automatic via container) |
 | **Card Padding** | `:ui="{ body: 'p-3 sm:p-4' }"` |
 | **Header Icon** | `w-8 h-8 sm:w-12 sm:h-12 text-primary` (NO background) |
 | **Header Title** | `text-xl sm:text-3xl font-bold text-primary` |
-| **Buttons** | Always `cursor-pointer`, use `rounded-full` |
+| **Buttons - Primary** | `color="primary"`, always `cursor-pointer`, use `rounded-full` |
+| **Buttons - Cancel** | `color="error" variant="soft"`, always `cursor-pointer` |
+
+### Form Layout Rules
+
+| Element | Value |
+|---------|-------|
+| **Form Grid** | `grid grid-cols-1 lg:grid-cols-2 gap-6` |
+| **Input Width** | Always `class="w-full"` |
+| **Full-Width Fields** | Add `lg:col-span-2` (textareas, descriptions) |
+| **Single Column Settings** | `space-y-6` with `w-full lg:w-1/2` per field |
 
 ### Colors (Tailwind Tokens)
 
