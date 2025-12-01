@@ -1,10 +1,10 @@
-# UI Design Guide - Stock Management System
+# UI Design System - Stock Management System
 
 **Unified Design Reference for All UI/UX Decisions**
 
-Version: 1.0
-Last Updated: January 2025
-Status: Consolidated from CLAUDE.md, DESIGN_SYSTEM.md, development_stack.md, Screen_List_Wireframe.md, and UX_Flow.md
+Version: 2.0
+Last Updated: December 2025
+Status: Consolidated from UI_DESIGN_GUIDE.md and UI_DESIGN_RULES.md
 
 ---
 
@@ -13,16 +13,23 @@ Status: Consolidated from CLAUDE.md, DESIGN_SYSTEM.md, development_stack.md, Scr
 1. [Design Philosophy](#design-philosophy)
 2. [Brand Colors & Color System](#brand-colors--color-system)
 3. [Layout & Spacing Standards](#layout--spacing-standards)
-4. [Page Structure & Navigation](#page-structure--navigation)
-5. [Component Library](#component-library)
-6. [Typography](#typography)
-7. [Semantic Design Tokens](#semantic-design-tokens)
-8. [Accessibility Standards](#accessibility-standards)
-9. [Tailwind CSS v4 Constraints](#tailwind-css-v4-constraints)
-10. [PWA Design Considerations](#pwa-design-considerations)
-11. [Code Formatting Standards](#code-formatting-standards)
-12. [Usage Guidelines & Best Practices](#usage-guidelines--best-practices)
-13. [Common Patterns & Examples](#common-patterns--examples)
+4. [Page Header](#page-header)
+5. [Filter Section](#filter-section)
+6. [Component Library](#component-library)
+7. [Typography](#typography)
+8. [Semantic Design Tokens](#semantic-design-tokens)
+9. [Icons](#icons)
+10. [Buttons](#buttons)
+11. [Cards](#cards)
+12. [Dropdown Menus](#dropdown-menus)
+13. [Empty State](#empty-state)
+14. [Accessibility Standards](#accessibility-standards)
+15. [Tailwind CSS v4 Constraints](#tailwind-css-v4-constraints)
+16. [PWA Design Considerations](#pwa-design-considerations)
+17. [Code Formatting Standards](#code-formatting-standards)
+18. [Usage Guidelines & Best Practices](#usage-guidelines--best-practices)
+19. [Common Patterns & Examples](#common-patterns--examples)
+20. [Component Checklist](#component-checklist)
 
 ---
 
@@ -66,11 +73,17 @@ Colors in this system map directly to business logic and user intent:
 **Full palette:**
 
 ```css
---color-navy-50: #e6e6f0 /* Lightest */ --color-navy-100: #b3b3d9 --color-navy-200: #8080c2
-  --color-navy-300: #4d4dab --color-navy-400: #26269b /* Dark mode primary */
-  --color-navy-500: #000046 /* Light mode primary, brand color */ --color-navy-600: #00003f
-  --color-navy-700: #000037 --color-navy-800: #00002f --color-navy-900: #000020
-  --color-navy-950: #000010 /* Darkest */;
+--color-navy-50: #e6e6f0;   /* Lightest */
+--color-navy-100: #b3b3d9;
+--color-navy-200: #8080c2;
+--color-navy-300: #4d4dab;
+--color-navy-400: #26269b;   /* Dark mode primary */
+--color-navy-500: #000046;   /* Light mode primary, brand color */
+--color-navy-600: #00003f;
+--color-navy-700: #000037;
+--color-navy-800: #00002f;
+--color-navy-900: #000020;
+--color-navy-950: #000010;   /* Darkest */
 ```
 
 ### Secondary Color - Emerald Green (#45cf7b)
@@ -84,8 +97,10 @@ Colors in this system map directly to business logic and user intent:
 **Full palette:**
 
 ```css
---color-emerald-50: #edfcf4 --color-emerald-400: #45cf7b /* Brand emerald green */
-  --color-emerald-600: #1f9a4c --color-emerald-950: #0a2916;
+--color-emerald-50: #edfcf4;
+--color-emerald-400: #45cf7b;  /* Brand emerald green */
+--color-emerald-600: #1f9a4c;
+--color-emerald-950: #0a2916;
 ```
 
 ### Supporting Colors
@@ -93,27 +108,35 @@ Colors in this system map directly to business logic and user intent:
 **Zinc (Neutral/Gray):**
 
 ```css
---color-zinc-50: #fafafa /* Very light gray backgrounds */ --color-zinc-300: #d4d4d8 /* Borders */
-  --color-zinc-600: #52525b /* Muted text */ --color-zinc-900: #18181b /* Primary text */
-  --color-zinc-950: #09090b /* Darkest gray */;
+--color-zinc-50: #fafafa;    /* Very light gray backgrounds */
+--color-zinc-300: #d4d4d8;   /* Borders */
+--color-zinc-600: #52525b;   /* Muted text */
+--color-zinc-900: #18181b;   /* Primary text */
+--color-zinc-950: #09090b;   /* Darkest gray */
 ```
 
 **Amber (Warning):**
 
 ```css
---color-amber-50: #fffbeb --color-amber-500: #f59e0b /* Warning color */ --color-amber-950: #451a03;
+--color-amber-50: #fffbeb;
+--color-amber-500: #f59e0b;  /* Warning color */
+--color-amber-950: #451a03;
 ```
 
 **Red (Error/Critical):**
 
 ```css
---color-red-50: #fef2f2 --color-red-600: #dc2626 /* Error color */ --color-red-950: #450a0a;
+--color-red-50: #fef2f2;
+--color-red-600: #dc2626;    /* Error color */
+--color-red-950: #450a0a;
 ```
 
 **Blue (Info):**
 
 ```css
---color-blue-50: #eff6ff --color-blue-600: #2563eb /* Info color */ --color-blue-950: #172554;
+--color-blue-50: #eff6ff;
+--color-blue-600: #2563eb;   /* Info color */
+--color-blue-950: #172554;
 ```
 
 ### Color Usage Rules
@@ -137,37 +160,40 @@ Colors in this system map directly to business logic and user intent:
 
 ## Layout & Spacing Standards
 
-### Page Padding Rules
+### Page Container
 
-**CRITICAL:** All pages must follow consistent padding standards for a unified user experience.
+**CRITICAL:** All pages must follow this consistent container pattern:
 
-**Standard Pages:**
+```vue
+<div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <!-- Page content -->
+</div>
+```
 
-- Use `p-4 md:p-6` for responsive padding
-  - Mobile: `p-4` (1rem / 16px)
-  - Tablet/Desktop: `md:p-6` (1.5rem / 24px)
+**Rules:**
+- **Horizontal padding:** `px-3` (mobile), `md:px-4` (desktop)
+- **Vertical padding:** `py-0` (mobile), `md:py-1` (desktop) - minimal vertical padding
+- **Section spacing:** `space-y-3` between major sections
 
 **Login Page Exception:**
-
 - Special centered layout with `px-4 py-12 sm:px-6 lg:px-8`
 
 **Full-Height Pages:**
-
-- Combine with `min-h-screen bg-default` for consistent full-page layouts
+- Combine with `min-h-screen bg-default`
 
 **Examples:**
 
 ```vue
 <!-- Standard page layout -->
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page content -->
   </div>
 </template>
 
 <!-- Full-height page layout -->
 <template>
-  <div class="min-h-screen bg-default p-4 md:p-6">
+  <div class="min-h-screen bg-default px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page content -->
   </div>
 </template>
@@ -180,80 +206,183 @@ Colors in this system map directly to business logic and user intent:
 </template>
 ```
 
-**IMPORTANT:** Never use inconsistent padding values like `p-6`, `p-3`, or mixed values. Always use the unified `p-4 md:p-6` pattern for all pages except login.
-
-### Spacing Between Sections
-
-- **Section spacing:** `space-y-6` between major sections
-- **Card spacing:** `gap-6` in grid layouts
-- **Form field spacing:** `space-y-4` for form elements
-- **Inline spacing:** `gap-2` or `gap-3` for inline elements
+**IMPORTANT:** Never use inconsistent padding values like `p-4 md:p-6`, `p-6`, `p-3`, or other mixed values. Always use the unified `px-3 py-0 md:px-4 md:py-1 space-y-3` pattern for all pages except login.
 
 ---
 
-## Page Structure & Navigation
+## Page Header
 
-### Unified Page Header Structure
-
-**All pages must follow this consistent header pattern using the `LayoutPageHeader` component.**
-
-**Section 1 - Page Header:**
-
-**Left side:** Page title with icon, location indicator, and period
-
-- Page title (e.g., "Dashboard", "Issues", "Items")
-- Icon representing the page
-- Location display: Current location name OR "All Locations" for global pages
-- Period display: Current period name (e.g., "November 2025")
-
-**Right side:** Action buttons (if applicable)
-
-- Primary actions (e.g., "New Delivery", "New Issue", "Create Item")
-- Secondary actions (e.g., "Export CSV", "Back", "Print")
-
-**NO subtitle descriptions** - Keep headers clean and minimal
-
-**Section 2 - Filters/Search (if applicable):**
-
-- Always in a separate card below the header
-- Consistent spacing: `space-y-6` between sections
-- Filter controls in grid layout
-- Active filter badges when filters are applied
-
-**Implementation:**
+### Structure (Responsive)
 
 ```vue
-<LayoutPageHeader
-  title="Deliveries & Goods Receipts"
-  icon="i-lucide-truck"
-  :show-location="true"
-  :show-period="true"
-  location-scope="current"
->
-  <template #actions>
-    <UButton color="primary" icon="i-lucide-plus">
-      New Delivery
-    </UButton>
-  </template>
-</LayoutPageHeader>
+<div class="flex items-center justify-between gap-3">
+  <div class="flex items-center gap-2 sm:gap-4">
+    <!-- Responsive icon size -->
+    <UIcon name="i-lucide-{icon-name}" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+    <!-- Responsive title size -->
+    <h1 class="text-xl sm:text-3xl font-bold text-primary">Page Title</h1>
+  </div>
+  <UButton
+    v-if="hasPermission"
+    color="primary"
+    icon="i-lucide-plus"
+    size="lg"
+    class="cursor-pointer rounded-full px-3 sm:px-6"
+    @click="handleAction"
+  >
+    <!-- Responsive button text -->
+    <span class="hidden sm:inline">Create Item</span>
+    <span class="sm:hidden">Create</span>
+  </UButton>
+</div>
 ```
 
-**Location Scope:**
+### Rules
 
-- `location-scope="current"` for location-specific pages (Dashboard, Stock Now, Deliveries, Issues)
-- `location-scope="all"` for global pages (Items, Locations)
+- **Icon:** Responsive size (`w-8 h-8 sm:w-12 sm:h-12`), primary color, NO background or border
+- **Title:** Responsive size (`text-xl sm:text-3xl font-bold text-primary`)
+- **Action button:** Rounded (`rounded-full`), responsive padding (`px-3 sm:px-6`)
+- **Button text:** Short text on mobile, full text on larger screens
 
-### Navigation Model
+### Location & Period Display
 
-**Top bar:** Shows period name/status (e.g., "October 2025 – OPEN")
+For pages that need location and period context:
+- **Location display:** Current location name OR "All Locations" for global pages
+- **Period display:** Current period name (e.g., "November 2025")
 
-**Nav buttons:** Dashboard · POB · Items & Prices · Orders · Deliveries · Issues · NCR · Stock Now · Reconciliations · Period Close
+---
 
-**Rules:**
+## Filter Section
 
-- Use simple words, same order as the daily flow
-- Keep navigation consistent across all pages
-- Highlight active page
+### Structure (Dual Layout: Desktop & Mobile)
+
+Use separate layouts for desktop and mobile to ensure optimal UX on all screen sizes.
+
+```vue
+<UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+  <!-- Desktop: Single row layout (lg and above) -->
+  <div class="hidden lg:flex items-center gap-3">
+    <!-- Search -->
+    <div class="flex-1 min-w-0 max-w-md">
+      <UInput
+        v-model="filters.search"
+        placeholder="Search by name or code..."
+        icon="i-lucide-search"
+        size="lg"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Toggle Button Group -->
+    <div class="flex items-center gap-1 p-1 bg-muted rounded-full">
+      <button
+        v-for="option in options"
+        :key="option.value"
+        type="button"
+        class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+        :class="getButtonClass(option.value)"
+        @click="selectOption(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    </div>
+
+    <!-- Status Dropdown (Far Right) -->
+    <UDropdownMenu :items="dropdownItems" class="ml-auto">
+      <UButton
+        color="neutral"
+        variant="outline"
+        size="lg"
+        class="cursor-pointer rounded-full px-5"
+        trailing-icon="i-lucide-chevron-down"
+      >
+        <UIcon :name="statusIcon" class="w-4 h-4 mr-2" />
+        {{ statusLabel }}
+      </UButton>
+    </UDropdownMenu>
+  </div>
+
+  <!-- Mobile: Stacked layout (below lg) -->
+  <div class="flex flex-col gap-3 lg:hidden">
+    <!-- Row 1: Search and Status Dropdown -->
+    <div class="flex items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <UInput
+          v-model="filters.search"
+          placeholder="Search..."
+          icon="i-lucide-search"
+          size="lg"
+          class="w-full"
+        />
+      </div>
+      <!-- Icon-only dropdown on mobile -->
+      <UDropdownMenu :items="dropdownItems">
+        <UButton
+          color="neutral"
+          variant="outline"
+          size="lg"
+          class="cursor-pointer rounded-full px-3"
+          trailing-icon="i-lucide-chevron-down"
+        >
+          <UIcon :name="statusIcon" class="w-4 h-4" />
+        </UButton>
+      </UDropdownMenu>
+    </div>
+
+    <!-- Row 2: Toggle Buttons (horizontally scrollable) -->
+    <div class="overflow-x-auto -mx-3 px-3">
+      <div class="flex items-center gap-1 p-1 bg-muted rounded-full w-fit">
+        <button
+          v-for="option in options"
+          :key="option.value"
+          type="button"
+          class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+          :class="getButtonClass(option.value)"
+          @click="selectOption(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+</UCard>
+```
+
+### Toggle Button Classes
+
+```typescript
+const getButtonClass = (value: string | null) => {
+  const isSelected = filters.value === value;
+
+  if (!isSelected) {
+    return "text-muted hover:text-default hover:bg-elevated";
+  }
+
+  // All selected options use the same primary background
+  return "bg-primary text-white shadow-sm";
+};
+```
+
+### Rules
+
+**Desktop (lg and above):**
+- Single row: Search | Toggle buttons | Status dropdown
+- Dropdown at far right using `ml-auto`
+- Full dropdown button with icon + label
+
+**Mobile (below lg):**
+- **Row 1:** Search input + Status dropdown (side by side)
+- **Row 2:** Toggle buttons (horizontally scrollable)
+- Dropdown shows icon only (no label) with `px-3`
+- Toggle container uses `overflow-x-auto` with negative margin trick (`-mx-3 px-3`)
+- Shorter search placeholder
+- Smaller button padding (`px-3` instead of `px-4`)
+
+**General:**
+- Card padding: `:ui="{ body: 'p-3 sm:p-4' }"`
+- Toggle container: `bg-muted rounded-full` with `gap-1 p-1`
+- Selected button: `bg-primary text-white shadow-sm`
+- Unselected button: `text-muted hover:text-default hover:bg-elevated`
 
 ---
 
@@ -263,7 +392,7 @@ Colors in this system map directly to business logic and user intent:
 
 #### .card-elevated
 
-Elevated card with border, shadow, and hover effect.
+Elevated card with border and shadow. **NO hover effects.**
 
 ```css
 .card-elevated {
@@ -271,10 +400,6 @@ Elevated card with border, shadow, and hover effect.
   border: 1px solid var(--ui-border);
   border-radius: 0.5rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 200ms;
-}
-.card-elevated:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 ```
 
@@ -285,7 +410,14 @@ Elevated card with border, shadow, and hover effect.
   <h3>Stock Summary</h3>
   <p>Content here</p>
 </div>
+
+<!-- Or with UCard -->
+<UCard class="card-elevated">
+  <!-- Card content -->
+</UCard>
 ```
+
+**IMPORTANT:** Cards should remain static - NO hover effects.
 
 #### .card-muted
 
@@ -387,16 +519,11 @@ All badge classes extend `.badge-base`:
 **Standard Badges:**
 
 ```vue
-<span class="badge-primary">Primary</span>
-<!-- Navy -->
-<span class="badge-success">Success</span>
-<!-- Emerald -->
-<span class="badge-warning">Warning</span>
-<!-- Amber -->
-<span class="badge-error">Error</span>
-<!-- Red -->
-<span class="badge-info">Info</span>
-<!-- Blue -->
+<span class="badge-primary">Primary</span>    <!-- Navy -->
+<span class="badge-success">Success</span>    <!-- Emerald -->
+<span class="badge-warning">Warning</span>    <!-- Amber -->
+<span class="badge-error">Error</span>        <!-- Red -->
+<span class="badge-info">Info</span>          <!-- Blue -->
 ```
 
 **Business-Specific Badges:**
@@ -419,34 +546,6 @@ All badge classes extend `.badge-base`:
 <span class="badge-rejected">Rejected</span>
 ```
 
-### Button Styles
-
-**Primary button:** Navy filled
-
-```vue
-<UButton color="primary">Primary Action</UButton>
-<!-- Renders as: bg-navy-500, white text, hover:bg-navy-600 -->
-```
-
-**Secondary button:** Emerald bordered
-
-```vue
-<UButton color="secondary" variant="outline">Secondary Action</UButton>
-<!-- Renders as: border-emerald-400, text-emerald-600 -->
-```
-
-**Success indicators:**
-
-```vue
-<UButton color="success">Approve</UButton>
-<!-- Renders as: bg-emerald-400, white text -->
-```
-
-**Status badges for buttons:**
-
-- Navy for active/pending states
-- Emerald for completed/approved states
-
 ### Interactive Classes
 
 #### .focus-ring
@@ -468,19 +567,6 @@ Standard transition timing for animations.
 ```css
 .smooth-transition {
   transition: all 200ms ease-in-out;
-}
-```
-
-#### .hover-lift
-
-Subtle lift effect on hover.
-
-```css
-.hover-lift {
-  transition: transform 200ms;
-}
-.hover-lift:hover {
-  transform: translateY(-2px);
 }
 ```
 
@@ -551,10 +637,13 @@ font-family:
 
 | Token                  | Light Mode         | Dark Mode          | Usage                             |
 | ---------------------- | ------------------ | ------------------ | --------------------------------- |
-| `--ui-border`          | zinc-300 (#d4d4d8) | zinc-700 (#3f3f46) | Default borders for cards, inputs |
-| `--ui-border-muted`    | zinc-200 (#e4e4e7) | zinc-800 (#27272a) | Subtle dividers, table borders    |
+| `--ui-border`          | zinc-400           | #454a54            | Default borders for cards, inputs |
+| `--ui-border-muted`    | zinc-300           | #363b44            | Subtle dividers, table borders    |
 | `--ui-border-accented` | navy-300 (#4d4dab) | navy-700 (#000037) | Emphasized borders, focus states  |
 | `--ui-border-inverted` | zinc-700 (#3f3f46) | zinc-300 (#d4d4d8) | Borders on inverted surfaces      |
+
+**Border Consistency Rule:**
+All form fields (inputs, dropdowns, buttons with outline variant) use the same border color as cards via the `--ui-border` CSS variable.
 
 ### Interactive State Tokens
 
@@ -612,6 +701,169 @@ font-family:
 | Token                    | Value                 | Usage                                              |
 | ------------------------ | --------------------- | -------------------------------------------------- |
 | `--ui-variance-detected` | amber-500 / amber-400 | Price on delivery differs from locked period price |
+
+---
+
+## Icons
+
+### General Rules
+
+- **NO backgrounds** on icons (remove `bg-*` classes)
+- **NO borders** on icons (remove `border`, `ring-*` wrapper classes)
+- **NO rounded containers** around icons
+- Icons should be displayed directly with just color classes
+
+### Page Header Icons
+
+```vue
+<UIcon name="i-lucide-map-pin" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+```
+
+### Card/List Item Icons
+
+```vue
+<UIcon :name="icon" class="w-10 h-10" :class="iconColor" />
+```
+
+### Icon Colors by Type (Example: Location Types)
+
+```typescript
+const iconColor = computed(() => {
+  const colors = {
+    KITCHEN: "text-amber-500 dark:text-amber-400",
+    STORE: "text-emerald-500 dark:text-emerald-400",
+    CENTRAL: "text-blue-500 dark:text-blue-400",
+    WAREHOUSE: "text-zinc-500 dark:text-zinc-400",
+  };
+  return colors[type] || "text-zinc-500 dark:text-zinc-400";
+});
+```
+
+---
+
+## Buttons
+
+### Primary Action Button
+
+```vue
+<UButton
+  color="primary"
+  icon="i-lucide-plus"
+  size="lg"
+  class="cursor-pointer rounded-full px-6"
+>
+  Action Text
+</UButton>
+```
+
+### Outline/Secondary Button
+
+```vue
+<UButton
+  color="neutral"
+  variant="outline"
+  size="lg"
+  class="cursor-pointer rounded-full px-5"
+>
+  Button Text
+</UButton>
+```
+
+### Success Button
+
+```vue
+<UButton color="success" class="cursor-pointer">Approve</UButton>
+```
+
+### Rules
+
+- **Always include `cursor-pointer` class**
+- Use `rounded-full` for pill-shaped buttons
+- Add horizontal padding (`px-5` or `px-6`) for better proportions
+- Use semantic color names: `color="primary"`, `color="secondary"`, `color="success"`, `color="error"`
+- **Never use custom color names** like `color="navy"` (won't work)
+
+---
+
+## Cards
+
+### Usage
+
+```vue
+<UCard class="card-elevated">
+  <!-- Card content -->
+</UCard>
+```
+
+### Rules
+
+- Use `card-elevated` class for elevated card styling
+- **NO hover effects** - cards should remain static
+- Cards have consistent border color matching other UI elements
+
+---
+
+## Dropdown Menus
+
+### Structure with Different State Icons
+
+```typescript
+const dropdownItems = computed(() => [
+  [
+    {
+      label: "Active",
+      icon: "i-lucide-circle-check",
+      active: filters.is_active === true,
+      onSelect: () => selectStatus(true),
+    },
+    {
+      label: "Inactive",
+      icon: "i-lucide-archive",
+      active: filters.is_active === false,
+      onSelect: () => selectStatus(false),
+    },
+  ],
+]);
+
+// Dynamic icon for dropdown button
+const statusIcon = computed(() => {
+  if (filters.is_active === false) return "i-lucide-archive";
+  return "i-lucide-circle-check";
+});
+```
+
+### Rules
+
+- Use `onSelect` (not `click`) for dropdown item handlers
+- Each option should have its own descriptive icon
+- Use `active` property to highlight the selected item
+- Dropdown button icon should change based on current selection
+
+---
+
+## Empty State
+
+### Structure
+
+```vue
+<EmptyState
+  icon="i-lucide-{icon-name}"
+  title="No items found"
+  description="Description text here."
+>
+  <template #actions>
+    <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer">
+      Create Item
+    </UButton>
+  </template>
+</EmptyState>
+```
+
+### Rules
+
+- Icon displayed without background or border
+- Icon uses `text-muted` color
+- Clean, minimal appearance
 
 ---
 
@@ -706,7 +958,7 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 ```css
 .card-elevated {
   @apply bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)];
-  @apply rounded-lg shadow-sm hover:shadow-md;
+  @apply rounded-lg shadow-sm;
   @apply transition-shadow duration-200;
 }
 ```
@@ -725,13 +977,6 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 @utility hover-primary:hover {
   color: var(--ui-primary);
 }
-```
-
-**Error message:**
-
-```
-@utility placeholder-muted::placeholder defines an invalid utility name.
-Utilities should be alphanumeric and start with a lowercase letter.
 ```
 
 **✅ CORRECT - Use regular CSS classes for pseudo-elements/classes:**
@@ -825,6 +1070,7 @@ Utilities should be alphanumeric and start with a lowercase letter.
 - **Use business tokens** for domain concepts: `--ui-stock-low`, not `--color-amber-500`
 - **Always use Tailwind color tokens** (e.g., `text-navy-500`)
 - **Always include dark mode variants** (e.g., `dark:text-navy-400`)
+- **Always include `cursor-pointer`** on buttons
 - **Show totals and clear buttons** ("Post delivery", "Post Issue")
 - **Prevent mistakes**: Block negative stock; confirm on close
 - **Keep forms short**: Remember last choices where helpful
@@ -834,6 +1080,8 @@ Utilities should be alphanumeric and start with a lowercase letter.
 - **Never use inline styles** with hex colors: `style="color: #000046"`
 - **Never use custom color names** in Nuxt UI props: `color="navy"` (won't work)
 - **Never hardcode colors** that should adapt to theme
+- **Never add hover effects to cards** - cards should remain static
+- **Never add backgrounds/borders to icons** - display icons directly
 - **Never mix systems**: Pick semantic tokens OR Tailwind classes, be consistent within a component
 - **Never use @apply with custom classes**: Tailwind CSS v4 only allows `@apply` with built-in utilities
 - **Never use @utility with pseudo-elements**: `@utility` directive requires alphanumeric names only
@@ -904,8 +1152,12 @@ Utilities should be alphanumeric and start with a lowercase letter.
 
       <!-- Actions -->
       <div class="flex gap-3 pt-4">
-        <UButton color="primary" type="submit" :loading="loading">Post Delivery</UButton>
-        <UButton color="neutral" variant="outline" @click="cancel">Cancel</UButton>
+        <UButton color="primary" type="submit" :loading="loading" class="cursor-pointer">
+          Post Delivery
+        </UButton>
+        <UButton color="neutral" variant="outline" @click="cancel" class="cursor-pointer">
+          Cancel
+        </UButton>
       </div>
     </form>
   </div>
@@ -926,7 +1178,7 @@ Utilities should be alphanumeric and start with a lowercase letter.
             SAR {{ totalReceipts.toLocaleString() }}
           </p>
         </div>
-        <div class="text-emerald-600 text-3xl">📦</div>
+        <UIcon name="i-lucide-package" class="w-10 h-10 text-emerald-600" />
       </div>
     </div>
 
@@ -939,7 +1191,7 @@ Utilities should be alphanumeric and start with a lowercase letter.
             SAR {{ totalIssues.toLocaleString() }}
           </p>
         </div>
-        <div class="text-navy-600 text-3xl">📤</div>
+        <UIcon name="i-lucide-send" class="w-10 h-10 text-navy-600" />
       </div>
     </div>
 
@@ -952,7 +1204,7 @@ Utilities should be alphanumeric and start with a lowercase letter.
             {{ daysLeft }}
           </p>
         </div>
-        <div class="text-amber-600 text-3xl">📅</div>
+        <UIcon name="i-lucide-calendar" class="w-10 h-10 text-amber-600" />
       </div>
     </div>
   </div>
@@ -1022,7 +1274,34 @@ Utilities should be alphanumeric and start with a lowercase letter.
 
 ---
 
-## Testing Checklist
+## Component Checklist
+
+When creating a new page, ensure:
+
+### General
+
+- [ ] Page container uses `px-3 py-0 md:px-4 md:py-1 space-y-3`
+- [ ] All icons have NO backgrounds or borders
+- [ ] Cards use `card-elevated` class without hover effects
+- [ ] All buttons have `cursor-pointer` class
+- [ ] Rounded buttons use `rounded-full` with appropriate padding
+- [ ] Dropdown menus use `onSelect` handler
+
+### Page Header (Responsive)
+
+- [ ] Icon uses responsive size: `w-8 h-8 sm:w-12 sm:h-12 text-primary`
+- [ ] Title uses responsive size: `text-xl sm:text-3xl font-bold text-primary`
+- [ ] Action button has responsive padding: `px-3 sm:px-6`
+- [ ] Button text switches between short/full: `<span class="hidden sm:inline">` pattern
+
+### Filter Section (Responsive)
+
+- [ ] Uses dual layout pattern: `hidden lg:flex` for desktop, `lg:hidden` for mobile
+- [ ] Desktop: Single row with dropdown at far right (`ml-auto`)
+- [ ] Mobile: Stacked rows with search + dropdown, then scrollable toggles
+- [ ] Mobile dropdown shows icon only (no label)
+- [ ] Toggle buttons scrollable on mobile: `overflow-x-auto -mx-3 px-3`
+- [ ] Toggle buttons use unified `bg-primary` when selected
 
 ### Visual Testing
 
@@ -1040,43 +1319,24 @@ Utilities should be alphanumeric and start with a lowercase letter.
 - [ ] Screen reader testing passes
 - [ ] Color contrast passes WCAG AA
 
-### Consistency Testing
-
-- [ ] All pages use `p-4 md:p-6` padding (except login)
-- [ ] All page headers use `LayoutPageHeader` component
-- [ ] All buttons use semantic color names (`color="primary"`)
-- [ ] All custom components use semantic tokens
-- [ ] All forms follow form class standards
-- [ ] All badges use predefined badge classes
-- [ ] Spacing is consistent across pages (`space-y-6`)
-
 ---
 
-## Summary of Key Conflicts Resolved
+## Summary of Key Design Rules
 
-**No major conflicts were found.** All source files were complementary:
-
-1. **Color Definitions:** Consistent across all files (Navy #000046, Emerald #45cf7b)
-2. **Padding Rules:** Unified in CLAUDE.md (`p-4 md:p-6` for all pages except login)
-3. **Page Header Structure:** Most detailed specification from UX_Flow.md integrated
-4. **Color Usage Rules:** Consistent - always use Tailwind tokens, never inline styles
-5. **Component Patterns:** DESIGN_SYSTEM.md provided most comprehensive patterns
-6. **Tailwind v4 Constraints:** Clearly documented in DESIGN_SYSTEM.md
+| Rule | Specification |
+|------|---------------|
+| **Page Container** | `px-3 py-0 md:px-4 md:py-1 space-y-3` |
+| **Section Spacing** | `space-y-3` |
+| **Page Header Icon** | `w-8 h-8 sm:w-12 sm:h-12 text-primary` (NO background) |
+| **Page Title** | `text-xl sm:text-3xl font-bold text-primary` |
+| **Cards** | `card-elevated` (NO hover effects) |
+| **Buttons** | Always include `cursor-pointer`, use `rounded-full px-5` or `px-6` |
+| **Icons** | NO backgrounds, NO borders, NO rounded containers |
+| **Filter Layout** | Dual layout: desktop single row, mobile stacked rows |
+| **Dropdown Handler** | Use `onSelect` (not `click`) |
 
 ---
-
-## Reference Files
-
-This guide consolidates information from:
-
-- `CLAUDE.md` - Project instructions and practical rules
-- `project-docs/DESIGN_SYSTEM.md` - Comprehensive design system reference
-- `project-docs/development_stack.md` - Technical stack and color configuration
-- `project-docs/Screen_List_Wireframe.md` - Screen wireframes and component styles
-- `project-docs/UX_Flow.md` - User experience and navigation guidelines
 
 **Single Source of Truth for Design:** `app/assets/css/main.css`
-
----
 
 **For questions or updates to this guide, consult the team lead or update this document directly.**
