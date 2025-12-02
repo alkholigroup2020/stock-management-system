@@ -43,6 +43,14 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
     });
   }
 
+  if (permissions.canManageSuppliers()) {
+    items.push({
+      label: "Suppliers",
+      icon: "i-heroicons-building-office-2",
+      to: "/suppliers",
+    });
+  }
+
   if (permissions.canViewStock()) {
     items.push({
       label: "Items & Prices",

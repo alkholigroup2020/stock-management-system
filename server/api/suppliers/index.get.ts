@@ -1,19 +1,43 @@
-import { defineEventHandler } from "h3";
+import { defineEventHandler, getQuery } from "h3";
 import prisma from "../../utils/prisma";
-import { setCacheHeaders } from "../../utils/performance";
 
 /**
  * GET /api/suppliers
  * Fetch all suppliers with optional filtering
- * Returns list of active suppliers
+ *
+ * Query Parameters:
+ * - search: Search by name or code (optional)
+ * - is_active: Filter by active status (optional, defaults to true if not provided)
  */
 export default defineEventHandler(async (event) => {
   try {
-    // Fetch all active suppliers
+    // Get query parameters
+    const query = getQuery(event);
+    const search = query.search as string | undefined;
+    const isActiveParam = query.is_active;
+
+    // Build where clause
+    const where: {
+      is_active?: boolean;
+      OR?: Array<{ name?: { contains: string; mode: "insensitive" }; code?: { contains: string; mode: "insensitive" } }>;
+    } = {};
+
+    // Handle is_active filter
+    if (isActiveParam !== undefined && isActiveParam !== "") {
+      where.is_active = isActiveParam === "true" || isActiveParam === true;
+    }
+
+    // Handle search filter
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { code: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Fetch suppliers
     const suppliers = await prisma.supplier.findMany({
-      where: {
-        is_active: true,
-      },
+      where,
       select: {
         id: true,
         code: true,
@@ -25,12 +49,6 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         name: "asc",
       },
-    });
-
-    // Set cache headers (5 minutes for suppliers list)
-    setCacheHeaders(event, {
-      maxAge: 300,
-      staleWhileRevalidate: 60,
     });
 
     return {

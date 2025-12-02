@@ -13,6 +13,11 @@ export default defineConfig({
       exclude: ["server/middleware/**", "tests/**"],
     },
   },
+  server: {
+    hmr: {
+      port: 24685,
+    },
+  },
   resolve: {
     alias: {
       "~": fileURLToPath(new URL("./", import.meta.url)),
