@@ -1,5 +1,6 @@
 import { defineEventHandler, getQuery } from "h3";
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 
 /**
  * GET /api/suppliers
@@ -49,6 +50,12 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         name: "asc",
       },
+    });
+
+    // Set cache headers (20 seconds for suppliers list)
+    setCacheHeaders(event, {
+      maxAge: 20,
+      staleWhileRevalidate: 10,
     });
 
     return {

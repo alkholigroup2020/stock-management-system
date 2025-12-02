@@ -14,6 +14,7 @@
 import { invalidateLocationsCache, invalidateLocationCache } from "./useLocations";
 import { invalidateItemsCache, invalidateItemCache } from "./useItems";
 import { invalidateCurrentPeriodCache } from "./useCurrentPeriod";
+import { invalidateSuppliersCache, invalidateSupplierCache } from "./useSuppliers";
 
 /**
  * Cache invalidation utilities
@@ -57,6 +58,22 @@ export function useCache() {
    */
   const invalidatePeriods = () => {
     invalidateCurrentPeriodCache();
+  };
+
+  /**
+   * Invalidate all supplier caches
+   * Use after: Create, update, or delete supplier
+   */
+  const invalidateSuppliers = () => {
+    invalidateSuppliersCache();
+  };
+
+  /**
+   * Invalidate a specific supplier cache
+   * Use after: Update or delete a specific supplier
+   */
+  const invalidateSupplier = (supplierId: string) => {
+    invalidateSupplierCache(supplierId);
   };
 
   /**
@@ -161,6 +178,8 @@ export function useCache() {
       periods: keys.filter(
         (k) => k.startsWith("periods:") || k.startsWith("period:") || k === "currentPeriod"
       ).length,
+      suppliers: keys.filter((k) => k.startsWith("suppliers:") || k.startsWith("supplier:"))
+        .length,
       stock: keys.filter((k) => k.startsWith("stock:")).length,
       transactions: keys.filter(
         (k) => k.startsWith("deliveries:") || k.startsWith("issues:") || k.startsWith("transfers:")
@@ -175,6 +194,8 @@ export function useCache() {
           !k.startsWith("periods:") &&
           !k.startsWith("period:") &&
           k !== "currentPeriod" &&
+          !k.startsWith("suppliers:") &&
+          !k.startsWith("supplier:") &&
           !k.startsWith("stock:") &&
           !k.startsWith("deliveries:") &&
           !k.startsWith("issues:") &&
@@ -197,6 +218,10 @@ export function useCache() {
 
     // Period caches
     invalidatePeriods,
+
+    // Supplier caches
+    invalidateSuppliers,
+    invalidateSupplier,
 
     // Stock caches
     invalidateStock,

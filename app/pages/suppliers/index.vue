@@ -32,12 +32,11 @@
         <!-- Search -->
         <div class="flex-1 min-w-0 max-w-md">
           <UInput
-            v-model="filters.search"
+            v-model="searchInput"
             placeholder="Search suppliers by name or code..."
             icon="i-lucide-search"
             size="lg"
             class="w-full"
-            @input="debouncedFetch"
           />
         </div>
 
@@ -67,7 +66,7 @@
     </div>
 
     <!-- Error State -->
-    <ErrorAlert v-else-if="error" :message="error" @retry="fetchSuppliers" />
+    <ErrorAlert v-else-if="error" :message="error?.message || 'Failed to fetch suppliers'" @retry="refresh" />
 
     <!-- Empty State -->
     <EmptyState
@@ -213,45 +212,40 @@
 </template>
 
 <script setup lang="ts">
-import { useDebounceFn } from "@vueuse/core";
+import { refDebounced } from "@vueuse/core";
+import type { SupplierItem } from "~/composables/useSuppliers";
 
 definePageMeta({
   layout: "default",
 });
 
-// Types
-interface SupplierItem {
-  id: string;
-  code: string;
-  name: string;
-  contact?: string | null;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface SuppliersResponse {
-  suppliers: SupplierItem[];
-  total: number;
-}
-
 // Composables
 const { canManageSuppliers } = usePermissions();
 const toast = useAppToast();
+const { invalidateSuppliers } = useCache();
 
-// State
-const loading = ref(false);
-const error = ref<string | null>(null);
-const suppliers = ref<SupplierItem[]>([]);
+// Raw search input (updated immediately)
+const searchInput = ref("");
+
+// Debounced search value (300ms delay for better UX)
+const debouncedSearch = refDebounced(searchInput, 300);
+
+// Status filter (updated immediately)
+const statusFilter = ref<boolean | undefined>(true);
+
+// Convert filters to ref for composable
+const filtersRef = computed(() => ({
+  search: debouncedSearch.value || undefined,
+  is_active: statusFilter.value,
+}));
+
+// Use the suppliers composable with caching
+const { suppliers, loading, error, refresh } = useSuppliers(filtersRef);
 
 // Delete modal state
 const isDeleteModalOpen = ref(false);
 const deletingSupplierId = ref<string | null>(null);
 const supplierToDelete = ref<SupplierItem | null>(null);
-
-const filters = reactive({
-  search: "",
-  is_active: true as boolean | null,
-});
 
 // Status dropdown items
 const statusDropdownItems = computed(() => [
@@ -259,91 +253,51 @@ const statusDropdownItems = computed(() => [
     {
       label: "Active",
       icon: "i-lucide-circle-check",
-      active: filters.is_active === true,
+      active: statusFilter.value === true,
       onSelect: () => selectStatus(true),
     },
     {
       label: "Inactive",
       icon: "i-lucide-archive",
-      active: filters.is_active === false,
+      active: statusFilter.value === false,
       onSelect: () => selectStatus(false),
     },
     {
       label: "All",
       icon: "i-lucide-list",
-      active: filters.is_active === null,
-      onSelect: () => selectStatus(null),
+      active: statusFilter.value === undefined,
+      onSelect: () => selectStatus(undefined),
     },
   ],
 ]);
 
 // Current status label for dropdown button
 const currentStatusLabel = computed(() => {
-  if (filters.is_active === true) return "Active";
-  if (filters.is_active === false) return "Inactive";
+  if (statusFilter.value === true) return "Active";
+  if (statusFilter.value === false) return "Inactive";
   return "All";
 });
 
 // Current status icon for dropdown button
 const currentStatusIcon = computed(() => {
-  if (filters.is_active === false) return "i-lucide-archive";
-  if (filters.is_active === null) return "i-lucide-list";
+  if (statusFilter.value === false) return "i-lucide-archive";
+  if (statusFilter.value === undefined) return "i-lucide-list";
   return "i-lucide-circle-check";
 });
 
-// Select status handler
-const selectStatus = (statusValue: boolean | null) => {
-  filters.is_active = statusValue;
-  fetchSuppliers();
+// Select status handler - composable auto-refreshes when filters change
+const selectStatus = (statusValue: boolean | undefined) => {
+  statusFilter.value = statusValue;
 };
 
 // Format date helper
-const formatDate = (date: string) => {
+const formatDate = (date: string | Date) => {
   return new Date(date).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 };
-
-// Fetch suppliers
-const fetchSuppliers = async () => {
-  loading.value = true;
-  error.value = null;
-
-  try {
-    const query: Record<string, string | boolean> = {};
-
-    if (filters.search) {
-      query.search = filters.search;
-    }
-    if (filters.is_active !== null) {
-      query.is_active = filters.is_active;
-    }
-
-    const response = await $fetch<SuppliersResponse>("/api/suppliers", {
-      query,
-      // Prevent browser caching for instant updates
-      headers: {
-        "Cache-Control": "no-cache",
-      },
-    });
-
-    suppliers.value = response.suppliers || [];
-  } catch (err) {
-    console.error("Error fetching suppliers:", err);
-    const errorMessage = err instanceof Error ? err.message : "Failed to fetch suppliers";
-    error.value = errorMessage;
-    toast.error("Error", { description: errorMessage });
-  } finally {
-    loading.value = false;
-  }
-};
-
-// Debounced search
-const debouncedFetch = useDebounceFn(() => {
-  fetchSuppliers();
-}, 500);
 
 // Handlers
 const handleEdit = (supplier: SupplierItem) => {
@@ -387,8 +341,9 @@ const confirmDeleteSupplier = async () => {
     isDeleteModalOpen.value = false;
     supplierToDelete.value = null;
 
-    // Refresh list
-    await fetchSuppliers();
+    // Invalidate cache and refresh list
+    invalidateSuppliers();
+    await refresh();
   } catch (err: unknown) {
     console.error("Error deleting supplier:", err);
     const message =
@@ -405,11 +360,6 @@ const confirmDeleteSupplier = async () => {
     deletingSupplierId.value = null;
   }
 };
-
-// Lifecycle
-onMounted(() => {
-  fetchSuppliers();
-});
 
 // Set page title
 useHead({

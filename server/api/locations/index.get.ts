@@ -16,6 +16,7 @@
 import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import { setCacheHeaders } from "../../utils/performance";
 
 // User session type
 interface UserLocation {
@@ -99,6 +100,12 @@ export default defineEventHandler(async (event) => {
         },
       });
 
+      // Set cache headers (20 seconds for locations list)
+      setCacheHeaders(event, {
+        maxAge: 20,
+        staleWhileRevalidate: 10,
+      });
+
       return {
         locations,
         count: locations.length,
@@ -131,6 +138,12 @@ export default defineEventHandler(async (event) => {
       orderBy: {
         name: "asc",
       },
+    });
+
+    // Set cache headers (20 seconds for locations list)
+    setCacheHeaders(event, {
+      maxAge: 20,
+      staleWhileRevalidate: 10,
     });
 
     return {

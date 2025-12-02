@@ -59,10 +59,10 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Set cache headers (1 minute for current period)
+    // Set cache headers (10 seconds for current period - critical data)
     setCacheHeaders(event, {
-      maxAge: 60,
-      staleWhileRevalidate: 30,
+      maxAge: 10,
+      staleWhileRevalidate: 10,
     });
 
     return {

@@ -129,6 +129,7 @@ definePageMeta({
 
 // Composables
 const toast = useAppToast();
+const { invalidateSuppliers } = useCache();
 
 // State
 const submitting = ref(false);
@@ -162,6 +163,9 @@ const onSubmit = async () => {
       method: "POST",
       body: payload,
     });
+
+    // Invalidate cache before navigation
+    invalidateSuppliers();
 
     toast.success("Success", { description: "Supplier created successfully" });
     await navigateTo("/suppliers");

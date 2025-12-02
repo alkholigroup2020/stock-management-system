@@ -70,15 +70,15 @@ export function useCurrentPeriod(
     "currentPeriod",
     () => $fetch<CurrentPeriodResponse>("/api/periods/current"),
     {
-      // Cache for 1 minute (matches server cache)
+      // Cache for 10 seconds (matches server cache - critical data)
       getCachedData: (key) => {
         const cached = useNuxtApp().payload.data[key];
         if (!cached) return;
 
-        // Check if cache is still valid (1 minute)
+        // Check if cache is still valid (10 seconds)
         const now = Date.now();
         const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
-        if (cacheTime && now - cacheTime < 60 * 1000) {
+        if (cacheTime && now - cacheTime < 10 * 1000) {
           return cached;
         }
 
@@ -217,14 +217,14 @@ export function usePeriods(
     "periods",
     () => $fetch<PeriodsResponse>("/api/periods"),
     {
-      // Cache for 5 minutes
+      // Cache for 20 seconds (matches server cache)
       getCachedData: (key) => {
         const cached = useNuxtApp().payload.data[key];
         if (!cached) return;
 
         const now = Date.now();
         const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
-        if (cacheTime && now - cacheTime < 5 * 60 * 1000) {
+        if (cacheTime && now - cacheTime < 20 * 1000) {
           return cached;
         }
 
@@ -269,14 +269,14 @@ export function usePeriod(periodId: Ref<string> | string) {
     `period:${id.value}`,
     () => $fetch<{ period: PeriodData }>(`/api/periods/${id.value}`),
     {
-      // Cache for 5 minutes
+      // Cache for 20 seconds (matches server cache)
       getCachedData: (key) => {
         const cached = useNuxtApp().payload.data[key];
         if (!cached) return;
 
         const now = Date.now();
         const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
-        if (cacheTime && now - cacheTime < 5 * 60 * 1000) {
+        if (cacheTime && now - cacheTime < 20 * 1000) {
           return cached;
         }
 

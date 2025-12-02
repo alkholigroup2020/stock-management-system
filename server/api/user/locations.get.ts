@@ -34,10 +34,10 @@ export default defineEventHandler(async (event) => {
         access_level: "MANAGE" as const,
       }));
 
-      // Set cache headers (5 minutes for user locations)
+      // Set cache headers (20 seconds for user locations)
       setCacheHeaders(event, {
-        maxAge: 300,
-        staleWhileRevalidate: 60,
+        maxAge: 20,
+        staleWhileRevalidate: 10,
       });
 
       return {
@@ -63,10 +63,10 @@ export default defineEventHandler(async (event) => {
         access_level: ul.access_level,
       }));
 
-    // Set cache headers (5 minutes for user locations)
+    // Set cache headers (20 seconds for user locations)
     setCacheHeaders(event, {
-      maxAge: 300,
-      staleWhileRevalidate: 60,
+      maxAge: 20,
+      staleWhileRevalidate: 10,
     });
 
     return {

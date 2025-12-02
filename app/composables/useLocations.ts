@@ -80,15 +80,15 @@ export function useLocations(
         query: query.value,
       }),
     {
-      // Cache for 5 minutes (matches server cache)
+      // Cache for 20 seconds (matches server cache)
       getCachedData: (key) => {
         const cached = useNuxtApp().payload.data[key];
         if (!cached) return;
 
-        // Check if cache is still valid (5 minutes)
+        // Check if cache is still valid (20 seconds)
         const now = Date.now();
         const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
-        if (cacheTime && now - cacheTime < 5 * 60 * 1000) {
+        if (cacheTime && now - cacheTime < 20 * 1000) {
           return cached;
         }
 
@@ -158,14 +158,14 @@ export function useLocation(locationId: Ref<string> | string) {
     `location:${id.value}`,
     () => $fetch<{ location: LocationItem }>(`/api/locations/${id.value}`),
     {
-      // Cache for 5 minutes
+      // Cache for 20 seconds
       getCachedData: (key) => {
         const cached = useNuxtApp().payload.data[key];
         if (!cached) return;
 
         const now = Date.now();
         const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
-        if (cacheTime && now - cacheTime < 5 * 60 * 1000) {
+        if (cacheTime && now - cacheTime < 20 * 1000) {
           return cached;
         }
 

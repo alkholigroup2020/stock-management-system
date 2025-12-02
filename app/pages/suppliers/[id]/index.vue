@@ -346,6 +346,7 @@ interface SupplierDetail {
 const route = useRoute();
 const toast = useAppToast();
 const { canManageSuppliers } = usePermissions();
+const { invalidateSuppliers } = useCache();
 
 // State
 const loading = ref(true);
@@ -444,6 +445,9 @@ const onSubmit = async () => {
       body: payload,
     });
 
+    // Invalidate cache
+    invalidateSuppliers();
+
     toast.success("Success", { description: "Supplier updated successfully" });
     isEditing.value = false;
 
@@ -497,7 +501,8 @@ const confirmDeleteSupplier = async () => {
 
     isDeleteModalOpen.value = false;
 
-    // Navigate back to suppliers list
+    // Invalidate cache and navigate back to suppliers list
+    invalidateSuppliers();
     navigateTo("/suppliers");
   } catch (err: unknown) {
     console.error("Error deleting supplier:", err);

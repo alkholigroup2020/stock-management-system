@@ -146,10 +146,10 @@ export default defineEventHandler(async (event) => {
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
-    // Set cache headers (5 minutes for items list)
+    // Set cache headers (20 seconds for items list)
     setCacheHeaders(event, {
-      maxAge: 300,
-      staleWhileRevalidate: 60,
+      maxAge: 20,
+      staleWhileRevalidate: 10,
     });
 
     return {
