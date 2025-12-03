@@ -173,7 +173,7 @@ useHead({
     <div class="flex items-center justify-between gap-3">
       <!-- Title with icon -->
       <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-user-plus" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <UIcon name="i-lucide-user-plus" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
         <div>
           <h1 class="text-xl sm:text-3xl font-bold text-primary">Create User</h1>
           <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
@@ -198,7 +198,7 @@ useHead({
     <div>
       <UForm :schema="schema" :state="formData" @submit="onSubmit">
         <!-- Account Information Section -->
-        <UCard class="card-elevated mb-6">
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-3 sm:p-4' }">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-primary" />
@@ -279,7 +279,7 @@ useHead({
         </UCard>
 
         <!-- Personal Information Section -->
-        <UCard class="card-elevated mb-6">
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-3 sm:p-4' }">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-user" class="w-5 h-5 text-primary" />
@@ -311,7 +311,7 @@ useHead({
         </UCard>
 
         <!-- Role & Permissions Section -->
-        <UCard class="card-elevated mb-6">
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-3 sm:p-4' }">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-shield" class="w-5 h-5 text-primary" />
@@ -364,7 +364,7 @@ useHead({
         </UCard>
 
         <!-- Password Requirements Help -->
-        <UCard class="card-elevated mb-6">
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-3 sm:p-4' }">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-info" class="w-5 h-5 text-primary" />

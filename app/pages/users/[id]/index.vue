@@ -117,7 +117,7 @@ useHead({
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-user-circle" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <UIcon name="i-lucide-user-circle" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
         <div>
           <h1 class="text-xl sm:text-3xl font-bold text-primary">
             {{ user?.full_name || "User Details" }}

@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between gap-3">
       <!-- Mobile: smaller icon and title -->
       <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-users" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <UIcon name="i-lucide-users" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
         <div>
           <h1 class="text-xl sm:text-3xl font-bold text-primary">Users</h1>
           <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
@@ -116,7 +116,7 @@
       title="No users found"
       description="No users match your search criteria. Try adjusting your filters or create a new user."
     >
-      <template v-if="canManageUsers()" #action>
+      <template v-if="canManageUsers()" #actions>
         <UButton
           color="primary"
           icon="i-lucide-plus"

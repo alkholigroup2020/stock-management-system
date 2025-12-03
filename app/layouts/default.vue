@@ -132,14 +132,62 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
   return items;
 });
 
+// Page title mappings for cleaner display
+const pageTitleMap: Record<string, string> = {
+  index: "Dashboard",
+  users: "Users",
+  "users-create": "Create User",
+  "users-id": "User Details",
+  "users-id-edit": "Edit User",
+  locations: "Locations",
+  "locations-create": "Create Location",
+  "locations-id": "Location Details",
+  "locations-id-edit": "Edit Location",
+  suppliers: "Suppliers",
+  "suppliers-create": "Create Supplier",
+  "suppliers-id": "Supplier Details",
+  "suppliers-id-edit": "Edit Supplier",
+  items: "Items & Prices",
+  "items-create": "Create Item",
+  "items-id": "Item Details",
+  "items-id-edit": "Edit Item",
+  deliveries: "Deliveries & Invoices",
+  "deliveries-create": "Create Delivery",
+  "deliveries-id": "Delivery Details",
+  "deliveries-id-edit": "Edit Delivery",
+  issues: "Issues",
+  "issues-create": "Create Issue",
+  "issues-id": "Issue Details",
+  transfers: "Transfers",
+  "transfers-create": "Create Transfer",
+  "transfers-id": "Transfer Details",
+  ncrs: "NCR",
+  "ncrs-create": "Create NCR",
+  "ncrs-id": "NCR Details",
+  "stock-now": "Stock Now",
+  reconciliations: "Reconciliations",
+  "reconciliations-id": "Reconciliation Details",
+  reports: "Reports",
+  periods: "Periods",
+  "periods-id": "Period Details",
+  "period-close": "Period Close",
+  pob: "POB",
+};
+
 // Get page title from route
 const pageTitle = computed(() => {
-  // Format route name to title (e.g., "dashboard" -> "Dashboard")
   const name = route.name as string;
   if (!name) return "Dashboard";
-  if (name === "index") return "Dashboard";
+
+  // Check for exact match first
+  if (pageTitleMap[name]) {
+    return pageTitleMap[name];
+  }
+
+  // Fallback: Format route name to title, filtering out 'id' segments
   return name
     .split("-")
+    .filter((word) => word !== "id")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 });
