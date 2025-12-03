@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 sm:gap-4">
@@ -40,7 +40,7 @@
       <!-- Edit Form -->
       <UForm v-if="isEditing" :schema="schema" :state="formData" @submit="onSubmit">
         <!-- Basic Info Card -->
-        <UCard class="card-elevated mb-6" :ui="{ body: 'p-4 sm:p-6' }">
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-6' }">
           <template #header>
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
@@ -139,7 +139,7 @@
       <!-- View Mode -->
       <template v-else>
         <!-- Basic Info Card -->
-        <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
+        <UCard class="card-elevated" :ui="{ body: 'p-6' }">
           <template #header>
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
@@ -204,7 +204,7 @@
         </UCard>
 
         <!-- Statistics Card -->
-        <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
+        <UCard class="card-elevated" :ui="{ body: 'p-6' }">
           <template #header>
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Statistics</h2>
@@ -255,7 +255,7 @@
         <UCard
           v-if="canManageSuppliers()"
           class="card-elevated border-2 border-[var(--ui-error)]"
-          :ui="{ body: 'p-4 sm:p-6' }"
+          :ui="{ body: 'p-6' }"
         >
           <template #header>
             <div class="flex items-center gap-2">

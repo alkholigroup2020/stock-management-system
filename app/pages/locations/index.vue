@@ -287,6 +287,12 @@ const typeToggleOptions: TypeOption[] = [
 const statusDropdownItems = computed(() => [
   [
     {
+      label: "All",
+      icon: "i-lucide-list",
+      active: filters.is_active === null,
+      onSelect: () => selectStatus(null),
+    },
+    {
       label: "Active",
       icon: "i-lucide-circle-check",
       active: filters.is_active === true,
@@ -305,13 +311,14 @@ const statusDropdownItems = computed(() => [
 const currentStatusLabel = computed(() => {
   if (filters.is_active === true) return "Active";
   if (filters.is_active === false) return "Inactive";
-  return "Active";
+  return "All";
 });
 
 // Current status icon for dropdown button
 const currentStatusIcon = computed(() => {
+  if (filters.is_active === true) return "i-lucide-circle-check";
   if (filters.is_active === false) return "i-lucide-archive";
-  return "i-lucide-circle-check";
+  return "i-lucide-list";
 });
 
 // Get button class based on type selection
@@ -340,9 +347,9 @@ const selectType = (typeValue: LocationType | null) => {
 };
 
 // Select status handler
-const selectStatus = (statusValue: boolean) => {
+const selectStatus = (statusValue: boolean | null) => {
   filters.is_active = statusValue;
-  filters.include_inactive = !statusValue;
+  filters.include_inactive = statusValue === null ? true : !statusValue;
   fetchLocations();
 };
 

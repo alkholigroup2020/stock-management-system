@@ -79,8 +79,8 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-between gap-2 pt-4 border-t border-[var(--ui-border)]">
-        <!-- Delete Button (Left) -->
+      <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-[var(--ui-border)]">
+        <!-- Delete Button -->
         <UButton
           v-if="showDelete && canDelete"
           color="error"
@@ -90,50 +90,52 @@
           class="cursor-pointer"
           @click.stop="$emit('delete', user)"
         >
-          <span class="hidden sm:inline">Delete</span>
+          <span class="hidden lg:inline">Delete</span>
         </UButton>
 
-        <!-- Spacer -->
-        <div class="flex-1" />
+        <!-- Spacer - hidden on small/medium screens to allow wrapping -->
+        <div class="hidden xl:flex flex-1" />
 
-        <!-- Toggle Status & View/Edit Buttons (Right) -->
-        <div class="flex items-center gap-2">
-          <UButton
-            v-if="showToggleStatus && canToggleStatus"
-            :color="user.is_active ? 'warning' : 'success'"
-            variant="ghost"
-            size="sm"
-            :icon="user.is_active ? 'i-lucide-user-x' : 'i-lucide-user-check'"
-            class="cursor-pointer"
-            @click.stop="$emit('toggle-status', user)"
-          >
-            <span class="hidden sm:inline">
-              {{ user.is_active ? "Deactivate" : "Activate" }}
-            </span>
-          </UButton>
-          <UButton
-            v-if="showView"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            icon="i-lucide-eye"
-            class="cursor-pointer"
-            @click.stop="$emit('view', user)"
-          >
-            <span class="hidden sm:inline">View</span>
-          </UButton>
-          <UButton
-            v-if="showEdit && canEdit"
-            color="primary"
-            variant="ghost"
-            size="sm"
-            icon="i-lucide-edit"
-            class="cursor-pointer"
-            @click.stop="$emit('edit', user)"
-          >
-            <span class="hidden sm:inline">Edit</span>
-          </UButton>
-        </div>
+        <!-- Toggle Status Button -->
+        <UButton
+          v-if="showToggleStatus && canToggleStatus"
+          :color="user.is_active ? 'warning' : 'success'"
+          variant="ghost"
+          size="sm"
+          :icon="user.is_active ? 'i-lucide-user-x' : 'i-lucide-user-check'"
+          class="cursor-pointer"
+          @click.stop="$emit('toggle-status', user)"
+        >
+          <span class="hidden lg:inline">
+            {{ user.is_active ? "Deactivate" : "Activate" }}
+          </span>
+        </UButton>
+
+        <!-- View Button -->
+        <UButton
+          v-if="showView"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          icon="i-lucide-eye"
+          class="cursor-pointer"
+          @click.stop="$emit('view', user)"
+        >
+          <span class="hidden lg:inline">View</span>
+        </UButton>
+
+        <!-- Edit Button -->
+        <UButton
+          v-if="showEdit && canEdit"
+          color="primary"
+          variant="ghost"
+          size="sm"
+          icon="i-lucide-edit"
+          class="cursor-pointer"
+          @click.stop="$emit('edit', user)"
+        >
+          <span class="hidden lg:inline">Edit</span>
+        </UButton>
       </div>
     </div>
   </div>

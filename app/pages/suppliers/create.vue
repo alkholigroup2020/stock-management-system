@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
       <!-- Title with icon matching the index page style -->
@@ -29,7 +29,7 @@
     <div>
       <UForm :schema="schema" :state="formData" @submit="onSubmit">
         <!-- Basic Information Section -->
-        <UCard class="card-elevated mb-6">
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-6' }">
           <template #header>
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-info" class="w-5 h-5 text-primary" />

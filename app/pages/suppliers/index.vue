@@ -96,32 +96,19 @@
       <UCard
         v-for="supplier in suppliers"
         :key="supplier.id"
-        class="card-elevated group hover:shadow-lg smooth-transition cursor-pointer hover:border-primary/30"
-        :ui="{ body: 'p-4 sm:p-5' }"
+        class="card-elevated cursor-pointer"
+        :ui="{ body: 'p-6' }"
         @click="handleViewDetails(supplier)"
       >
         <!-- Header Row -->
         <div class="flex items-start justify-between gap-3 mb-4">
-          <div class="flex items-center gap-3 min-w-0">
-            <div
-              class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 smooth-transition"
-            >
-              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2">
-                <h3 class="font-semibold text-[var(--ui-text)] truncate">
-                  {{ supplier.name }}
-                </h3>
-                <UIcon
-                  name="i-lucide-arrow-right"
-                  class="w-4 h-4 text-[var(--ui-text-muted)] opacity-0 group-hover:opacity-100 smooth-transition flex-shrink-0"
-                />
-              </div>
-              <p class="text-caption text-[var(--ui-text-muted)] font-mono">
-                {{ supplier.code }}
-              </p>
-            </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="font-semibold text-[var(--ui-text)] truncate">
+              {{ supplier.name }}
+            </h3>
+            <p class="text-caption text-[var(--ui-text-muted)] font-mono">
+              {{ supplier.code }}
+            </p>
           </div>
           <UBadge :color="supplier.is_active ? 'success' : 'neutral'" variant="subtle" size="sm">
             {{ supplier.is_active ? "Active" : "Inactive" }}
@@ -142,29 +129,27 @@
           <span class="text-xs text-[var(--ui-text-muted)]">
             Created {{ formatDate(supplier.created_at) }}
           </span>
-          <div v-if="canManageSuppliers" class="flex items-center gap-1">
-            <UTooltip text="Edit supplier" :shortcuts="['E']">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                icon="i-lucide-edit"
-                size="xs"
-                class="cursor-pointer"
-                aria-label="Edit supplier"
-                @click.stop="handleEdit(supplier)"
-              />
-            </UTooltip>
-            <UTooltip text="Delete supplier" :shortcuts="['D']">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                icon="i-lucide-trash-2"
-                size="xs"
-                class="cursor-pointer hover:text-error"
-                aria-label="Delete supplier"
-                @click.stop="openDeleteModal(supplier)"
-              />
-            </UTooltip>
+          <div v-if="canManageSuppliers" class="flex items-center gap-2">
+            <UButton
+              color="error"
+              variant="ghost"
+              size="sm"
+              icon="i-lucide-trash-2"
+              class="cursor-pointer"
+              @click.stop="openDeleteModal(supplier)"
+            >
+              <span class="hidden sm:inline">Delete</span>
+            </UButton>
+            <UButton
+              color="primary"
+              variant="ghost"
+              size="sm"
+              icon="i-lucide-edit"
+              class="cursor-pointer"
+              @click.stop="handleEdit(supplier)"
+            >
+              <span class="hidden sm:inline">Edit</span>
+            </UButton>
           </div>
         </div>
       </UCard>

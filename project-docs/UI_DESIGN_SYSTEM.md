@@ -1166,6 +1166,106 @@ const iconColor = computed(() => {
 - **Cancel buttons:** Use `color="error"` with `variant="soft"` or `variant="outline"`
 - **Delete buttons:** Use `color="error"` (solid variant) for maximum visual weight
 
+### Responsive Action Buttons (Card Actions Pattern)
+
+**DESIGN RULE:** Action buttons at the bottom of cards (e.g., user cards, item cards) must adapt to screen size to prevent truncation and ensure all buttons are visible.
+
+**Pattern:** Use flex-wrap with responsive text visibility to show:
+- **Small/Medium screens (< 1024px):** Icons only, buttons can wrap to two rows if needed
+- **Large screens (≥ 1024px):** Icons + text labels
+- **Extra-large screens (≥ 1280px):** Full layout with spacer between button groups
+
+**Implementation:**
+
+```vue
+<!-- Action Buttons Container -->
+<div class="flex flex-wrap items-center gap-2 pt-4 border-t border-[var(--ui-border)]">
+  <!-- Delete Button (Destructive action - typically on left) -->
+  <UButton
+    color="error"
+    variant="ghost"
+    size="sm"
+    icon="i-lucide-trash-2"
+    class="cursor-pointer"
+    @click.stop="handleDelete"
+  >
+    <span class="hidden lg:inline">Delete</span>
+  </UButton>
+
+  <!-- Spacer - only visible on extra-large screens -->
+  <div class="hidden xl:flex flex-1" />
+
+  <!-- Status Toggle Button -->
+  <UButton
+    color="warning"
+    variant="ghost"
+    size="sm"
+    icon="i-lucide-user-x"
+    class="cursor-pointer"
+    @click.stop="handleToggle"
+  >
+    <span class="hidden lg:inline">Deactivate</span>
+  </UButton>
+
+  <!-- View Button -->
+  <UButton
+    color="neutral"
+    variant="ghost"
+    size="sm"
+    icon="i-lucide-eye"
+    class="cursor-pointer"
+    @click.stop="handleView"
+  >
+    <span class="hidden lg:inline">View</span>
+  </UButton>
+
+  <!-- Edit Button -->
+  <UButton
+    color="primary"
+    variant="ghost"
+    size="sm"
+    icon="i-lucide-edit"
+    class="cursor-pointer"
+    @click.stop="handleEdit"
+  >
+    <span class="hidden lg:inline">Edit</span>
+  </UButton>
+</div>
+```
+
+**Key Features:**
+
+1. **`flex-wrap`**: Allows buttons to wrap to multiple rows when space is limited
+2. **Responsive text visibility**: `hidden lg:inline` hides text labels below 1024px
+3. **Conditional spacer**: `hidden xl:flex flex-1` provides spacing only on xl+ screens
+4. **Consistent sizing**: All buttons use `size="sm"` for compact appearance
+5. **Icon-only on mobile**: Ensures buttons fit without truncation on smaller screens
+
+**Rules:**
+
+- Use `flex-wrap` instead of nested flex containers
+- Text labels: `<span class="hidden lg:inline">Button Text</span>`
+- Spacer: `<div class="hidden xl:flex flex-1" />` (only for xl+ screens)
+- Buttons must have icons that are recognizable without text
+- Use standard icon conventions (trash for delete, eye for view, edit/pencil for edit)
+- Apply `@click.stop` to prevent parent click handlers (e.g., card click)
+
+**When to Use:**
+
+- User management cards
+- Item cards with multiple actions
+- Any card with 3+ action buttons
+- Dashboard cards with action buttons
+- List view items with inline actions
+
+**Benefits:**
+
+- Prevents button truncation at medium screen sizes
+- Maintains icon-only usability on mobile
+- Provides full labels on larger screens for clarity
+- Natural wrapping behavior when needed
+- Consistent pattern across the application
+
 ---
 
 ## Cards
@@ -1188,11 +1288,22 @@ const iconColor = computed(() => {
 
 ## Dropdown Menus
 
-### Structure with Different State Icons
+### Status Filter Pattern (All / Active / Inactive)
+
+**DESIGN RULE:** Status filters should include three options: "All", "Active", and "Inactive" to give users full control over filtering.
+
+**Implementation:**
 
 ```typescript
-const dropdownItems = computed(() => [
+// Status dropdown items with "All" option
+const statusDropdownItems = computed(() => [
   [
+    {
+      label: "All",
+      icon: "i-lucide-list",
+      active: filters.is_active === null,
+      onSelect: () => selectStatus(null),
+    },
     {
       label: "Active",
       icon: "i-lucide-circle-check",
@@ -1208,12 +1319,35 @@ const dropdownItems = computed(() => [
   ],
 ]);
 
-// Dynamic icon for dropdown button
-const statusIcon = computed(() => {
-  if (filters.is_active === false) return "i-lucide-archive";
-  return "i-lucide-circle-check";
+// Current status label for dropdown button
+const currentStatusLabel = computed(() => {
+  if (filters.is_active === true) return "Active";
+  if (filters.is_active === false) return "Inactive";
+  return "All";
 });
+
+// Current status icon for dropdown button
+const currentStatusIcon = computed(() => {
+  if (filters.is_active === true) return "i-lucide-circle-check";
+  if (filters.is_active === false) return "i-lucide-archive";
+  return "i-lucide-list";
+});
+
+// Select status handler
+const selectStatus = (statusValue: boolean | null) => {
+  filters.is_active = statusValue;
+  filters.include_inactive = statusValue === null ? true : !statusValue;
+  fetchData();
+};
 ```
+
+**Standard Icons for Status Options:**
+
+| Option     | Icon                    | Meaning                      |
+| ---------- | ----------------------- | ---------------------------- |
+| **All**    | `i-lucide-list`         | Show all items (no filter)   |
+| **Active** | `i-lucide-circle-check` | Show only active items       |
+| **Inactive** | `i-lucide-archive`    | Show only inactive/archived items |
 
 ### Rules
 
@@ -1221,6 +1355,8 @@ const statusIcon = computed(() => {
 - Each option should have its own descriptive icon
 - Use `active` property to highlight the selected item
 - Dropdown button icon should change based on current selection
+- **Always include "All" option** to allow users to view unfiltered data
+- Use `null` value for "All" option to indicate no filter applied
 
 ---
 
@@ -1690,6 +1826,15 @@ When creating a new page, ensure:
 - [ ] Mobile dropdown shows icon only (no label)
 - [ ] Toggle buttons use unified `bg-primary` when selected
 
+### Action Buttons (Card Actions Pattern)
+
+- [ ] Uses `flex-wrap` to allow button wrapping
+- [ ] Button text uses `hidden lg:inline` for responsive visibility
+- [ ] Spacer uses `hidden xl:flex flex-1` (only visible on xl+ screens)
+- [ ] All buttons have recognizable icons
+- [ ] Click handlers use `@click.stop` to prevent parent click propagation
+- [ ] Buttons use `size="sm"` for compact appearance
+
 ### Visual Testing
 
 - [ ] All pages work in light mode
@@ -1722,6 +1867,7 @@ When creating a new page, ensure:
 | **Cards**                       | `card-elevated` (NO hover effects)                                              |
 | **Buttons - Primary**           | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6`            |
 | **Buttons - Cancel**            | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer` |
+| **Buttons - Card Actions**      | `flex flex-wrap`, text `hidden lg:inline`, spacer `hidden xl:flex flex-1`       |
 | **Icons**                       | NO backgrounds, NO borders, NO rounded containers                               |
 | **Filter Layout**               | Dual layout: desktop full filters, mobile search + dropdown only (no toggles)   |
 | **Dropdown Handler**            | Use `onSelect` (not `click`)                                                    |
