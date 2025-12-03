@@ -47,3 +47,34 @@ This file tracks changes made during E2E testing that affect the system design o
 - Removed 5-minute HTTP cache from `server/api/locations/index.get.ts` to enable real-time updates
 
 **Impact:** Admins can now delete locations while preserving historical data integrity. Empty locations are permanently removed, while locations with transaction history are deactivated. UI updates immediately reflect database changes.
+
+---
+
+## 2025-12-02: App-Wide Caching Standardization
+
+**Reason:** CRUD operations (especially suppliers) were taking too long to reflect changes due to 5-minute cache durations. Reduced cache timers to provide near-instant updates while maintaining performance benefits.
+
+**Cache Duration Standards:**
+- **Master data** (Items, Suppliers, Locations, Users): 20s server + 10s SWR + 20s client
+- **Critical data** (Current Period): 10s server + 10s SWR + 10s client
+
+**Changes Made:**
+
+Server-side cache updates:
+- `server/api/items/index.get.ts`: 300s → 20s
+- `server/api/user/locations.get.ts`: 300s → 20s
+- `server/api/periods/current.get.ts`: 60s → 10s
+- `server/api/suppliers/index.get.ts`: Added 20s cache headers
+
+Client-side cache updates:
+- `app/composables/useItems.ts`: 5 min → 20s
+- `app/composables/useLocations.ts`: 5 min → 20s
+- `app/composables/useCurrentPeriod.ts`: 60s/5min → 10s/20s
+- Created `app/composables/useSuppliers.ts` with 20s cache
+
+Cache invalidation:
+- Added `invalidateSuppliers()` to `app/composables/useCache.ts`
+- Refactored `app/pages/suppliers/index.vue` to use `useSuppliers` composable
+- Added cache invalidation to supplier create/edit/delete operations
+
+**Impact:** Changes to master data now reflect within 20 seconds max, often instantly due to proactive cache invalidation on mutations.

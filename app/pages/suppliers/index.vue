@@ -66,7 +66,11 @@
     </div>
 
     <!-- Error State -->
-    <ErrorAlert v-else-if="error" :message="error?.message || 'Failed to fetch suppliers'" @retry="refresh" />
+    <ErrorAlert
+      v-else-if="error"
+      :message="error?.message || 'Failed to fetch suppliers'"
+      @retry="refresh"
+    />
 
     <!-- Empty State -->
     <EmptyState
@@ -88,7 +92,7 @@
     </EmptyState>
 
     <!-- Suppliers Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 py-2">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 py-2">
       <UCard
         v-for="supplier in suppliers"
         :key="supplier.id"

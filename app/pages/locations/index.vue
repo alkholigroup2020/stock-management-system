@@ -14,7 +14,7 @@
       </div>
       <!-- Mobile: shorter button text -->
       <UButton
-        v-if="canManageLocations"
+        v-if="canManageLocations()"
         color="primary"
         icon="i-lucide-plus"
         size="lg"
@@ -43,13 +43,18 @@
         </div>
 
         <!-- Type Filter Toggle Buttons -->
-        <div class="flex items-center gap-1 p-1 bg-muted rounded-full">
+        <div
+          class="flex items-center gap-1 p-1 bg-muted rounded-full"
+          role="group"
+          aria-label="Filter by location type"
+        >
           <button
             v-for="typeOpt in typeToggleOptions"
             :key="typeOpt.value ?? 'all'"
             type="button"
-            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
             :class="getTypeButtonClass(typeOpt.value)"
+            :aria-pressed="filters.type === typeOpt.value"
             @click="selectType(typeOpt.value)"
           >
             {{ typeOpt.label }}
@@ -116,7 +121,7 @@
       title="No locations found"
       description="No locations match your search criteria. Try adjusting your filters or create a new location."
     >
-      <template v-if="canManageLocations" #actions>
+      <template v-if="canManageLocations()" #actions>
         <UButton
           color="primary"
           icon="i-lucide-plus"
@@ -129,7 +134,7 @@
     </EmptyState>
 
     <!-- Locations Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 py-2">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 py-2">
       <LocationCard
         v-for="location in locations"
         :key="location.id"
@@ -143,11 +148,18 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="isDeleteModalOpen" :dismissible="deletingLocationId === null">
+    <UModal
+      v-model:open="isDeleteModalOpen"
+      :dismissible="deletingLocationId === null"
+      title="Confirm Location Deletion"
+      :description="locationToDelete ? `Delete ${locationToDelete.name}` : 'Confirm deletion'"
+    >
       <template #content>
         <UCard>
           <template #header>
-            <h3 class="text-subheading font-semibold">Confirm Location Deletion</h3>
+            <h3 class="text-subheading font-semibold" id="delete-modal-title">
+              Confirm Location Deletion
+            </h3>
           </template>
 
           <div class="space-y-4">
@@ -155,13 +167,13 @@
               v-if="locationToDelete"
               class="p-4 rounded-lg border-2 border-warning bg-warning/10"
             >
-              <p class="font-semibold text-warning">
+              <p class="font-semibold text-[var(--ui-text)]">
                 {{ locationToDelete.name }}
               </p>
               <p class="text-caption mt-1">{{ locationToDelete.code }}</p>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y-2" id="delete-modal-description">
               <p class="font-medium">Are you sure you want to delete this location?</p>
               <ul class="list-disc list-inside text-caption space-y-1 pl-2">
                 <li>If the location has transaction history, it will be deactivated</li>
@@ -174,8 +186,8 @@
             <!-- Actions -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
               <UButton
-                color="neutral"
-                variant="ghost"
+                color="error"
+                variant="soft"
                 class="cursor-pointer"
                 @click="isDeleteModalOpen = false"
                 :disabled="deletingLocationId !== null"

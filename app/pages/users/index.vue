@@ -129,7 +129,7 @@
     </EmptyState>
 
     <!-- Users Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 py-2">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 py-2">
       <UserCard
         v-for="user in filteredUsers"
         :key="user.id"

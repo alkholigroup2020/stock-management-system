@@ -93,7 +93,8 @@
       "WebFetch(domain:ui.nuxt.com)",
       "Bash(jq:*)",
       "Bash(pnpm format:check:*)",
-      "Bash(pnpm format:*)"
+      "Bash(pnpm format:*)",
+      "Skill(ux-review)"
     ],
     "deny": [],
     "ask": []

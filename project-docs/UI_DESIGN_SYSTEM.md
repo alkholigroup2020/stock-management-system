@@ -656,7 +656,7 @@ Inverted surface (dark in light mode, light in dark mode).
 **Base Structure:**
 
 ```vue
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
   <!-- Form fields here -->
 </div>
 ```
@@ -672,7 +672,7 @@ Some fields should span the entire width regardless of screen size:
 **Implementation:** Use `lg:col-span-2` class:
 
 ```vue
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
   <!-- Full-width field -->
   <UFormField label="Description" name="description" class="lg:col-span-2">
     <UTextarea v-model="form.description" class="w-full" />
@@ -713,7 +713,7 @@ Some fields should span the entire width regardless of screen size:
     </template>
 
     <!-- Responsive Grid: 1 column mobile, 2 columns lg+ -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
       <!-- Read-only field - Full width -->
       <div
         class="lg:col-span-2 p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]"
@@ -752,14 +752,14 @@ Some fields should span the entire width regardless of screen size:
 
 #### Form Layout Rules Summary
 
-| Rule                   | Specification                           |
-| ---------------------- | --------------------------------------- |
-| **Grid Container**     | `grid grid-cols-1 lg:grid-cols-2 gap-6` |
-| **Gap Between Fields** | `gap-6` (1.5rem / 24px)                 |
-| **Full-Width Fields**  | Add `lg:col-span-2` class               |
-| **Input Width**        | Always include `class="w-full"`         |
-| **Breakpoint**         | Use `lg:` prefix (1024px and above)     |
-| **Mobile Behavior**    | Single column stack (grid-cols-1)       |
+| Rule                   | Specification                                           |
+| ---------------------- | ------------------------------------------------------- |
+| **Grid Container**     | `grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6` |
+| **Gap Between Fields** | `gap-6` (1.5rem / 24px)                                 |
+| **Full-Width Fields**  | Add `lg:col-span-2` class                               |
+| **Input Width**        | Always include `class="w-full"`                         |
+| **Breakpoint**         | Use `lg:` prefix (1024px and above)                     |
+| **Mobile Behavior**    | Single column stack (grid-cols-1)                       |
 
 #### Single Column Section Layout (Exception)
 
