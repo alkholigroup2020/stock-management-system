@@ -223,6 +223,7 @@ const handleLogout = async () => {
       <UDashboardSidebar
         collapsible
         resizable
+        width="260"
         :toggle="{ color: 'neutral', variant: 'ghost', icon: 'i-heroicons-bars-3' }"
       >
         <!-- Logo Header -->
@@ -293,7 +294,7 @@ const handleLogout = async () => {
       </UDashboardSidebar>
 
       <!-- MAIN CONTENT PANEL -->
-      <UDashboardPanel>
+      <UDashboardPanel :width="null">
         <!-- Header/Navbar -->
         <template #header>
           <header
@@ -383,7 +384,7 @@ const handleLogout = async () => {
           <main
             id="main-content"
             aria-label="Main content"
-            class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16"
+            class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16 max-w-[1920px] mx-auto w-full"
           >
             <slot />
           </main>

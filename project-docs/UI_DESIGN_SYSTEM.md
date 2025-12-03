@@ -166,11 +166,11 @@ Colors in this system map directly to business logic and user intent:
 
 #### Source 1: Layout Body Padding (default.vue)
 
-The main content area in the layout applies the primary horizontal padding:
+The main content area in the layout applies the primary horizontal padding and max-width constraint:
 
 ```vue
 <!-- app/layouts/default.vue -->
-<main class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16">
+<main class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16 max-w-[1920px] mx-auto w-full">
   <slot />
 </main>
 ```
@@ -181,7 +181,12 @@ The main content area in the layout applies the primary horizontal padding:
 | sm (≥640px)     | `px-12` (48px)      | `py-2` (8px)      |
 | xl (≥1280px)    | `px-16` (64px)      | `py-4` (16px)     |
 
-**Key:** Mobile screens have **zero horizontal padding** at the layout level, allowing pages to use full viewport width.
+**Key Features:**
+- Mobile screens have **zero horizontal padding** at the layout level, allowing pages to use full viewport width
+- **Max-width constraint**: `max-w-[1920px]` prevents content from expanding indefinitely on very large screens (4K+ monitors)
+- **Centered layout**: `mx-auto` centers content horizontally when viewport exceeds content width (ultra-wide displays)
+- **Full width**: `w-full` ensures content takes full available width up to max-width
+- **Stable sidebar**: Default sidebar `width="260"` prevents layout shifts during hydration
 
 #### Source 2: Page Container Padding
 
@@ -1858,7 +1863,8 @@ When creating a new page, ensure:
 | Rule                            | Specification                                                                   |
 | ------------------------------- | ------------------------------------------------------------------------------- |
 | **Page Container**              | `px-0 py-0 md:px-4 md:py-1 space-y-3`                                           |
-| **Layout Body**                 | `py-2 px-0 sm:px-12 xl:py-4 xl:px-16` (in default.vue)                          |
+| **Layout Body**                 | `py-2 px-0 sm:px-12 xl:py-4 xl:px-16 max-w-[1920px] mx-auto w-full` (default.vue) |
+| **Max Content Width**           | `1920px` (centered on ultra-wide, stable sidebar width prevents shifts)         |
 | **Page Content Width**          | Full width by default (no max-width), sections as direct children               |
 | **Section Spacing**             | `space-y-3` (automatic via container)                                           |
 | **Page Header Icon**            | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background)                          |
