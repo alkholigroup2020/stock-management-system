@@ -1,5 +1,5 @@
 <template>
-  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="px-3 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
       <!-- Mobile: smaller icon and title -->
@@ -186,7 +186,7 @@
             <!-- Actions -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
               <UButton
-                color="error"
+                color="neutral"
                 variant="soft"
                 class="cursor-pointer"
                 @click="isDeleteModalOpen = false"

@@ -178,7 +178,7 @@
           class="flex flex-col sm:flex-row items-center justify-end gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
         >
           <UButton
-            color="error"
+            color="neutral"
             variant="soft"
             size="lg"
             class="cursor-pointer w-full sm:w-auto"
@@ -200,6 +200,53 @@
         </div>
       </UForm>
     </div>
+
+    <!-- Discard Changes Confirmation Modal -->
+    <UModal
+      v-model:open="isDiscardModalOpen"
+      :dismissible="true"
+      title="Discard Changes?"
+      description="Confirm you want to discard unsaved changes"
+    >
+      <template #content>
+        <UCard :ui="{ body: 'p-6' }">
+          <template #header>
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Discard Changes?
+            </h3>
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-[var(--ui-text)]">
+              You have unsaved data. Are you sure you want to leave this page?
+            </p>
+            <p class="text-caption text-[var(--ui-text-muted)]">
+              Your data will be lost if you don't save it.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+              <UButton
+                color="neutral"
+                variant="soft"
+                class="cursor-pointer"
+                @click="isDiscardModalOpen = false"
+              >
+                Keep Editing
+              </UButton>
+              <UButton
+                color="error"
+                icon="i-lucide-trash-2"
+                class="cursor-pointer"
+                @click="confirmDiscard"
+              >
+                Discard Changes
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -217,6 +264,7 @@ const toast = useAppToast();
 
 // State
 const submitting = ref(false);
+const isDiscardModalOpen = ref(false);
 
 // Form data
 const formData = reactive({
@@ -353,20 +401,30 @@ const onSubmit = async () => {
   }
 };
 
-// Handle cancel
-const handleCancel = () => {
-  const hasData =
+// Check if form has data
+const hasFormData = computed(() => {
+  return (
     formData.code ||
     formData.name ||
     formData.type ||
     formData.description ||
     formData.address ||
-    formData.timezone !== "Asia/Riyadh";
+    formData.timezone !== "Asia/Riyadh"
+  );
+});
 
-  if (hasData) {
-    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?");
-    if (!confirmed) return;
+// Handle cancel
+const handleCancel = () => {
+  if (hasFormData.value) {
+    isDiscardModalOpen.value = true;
+    return;
   }
+  navigateTo("/locations");
+};
+
+// Confirm discard changes
+const confirmDiscard = () => {
+  isDiscardModalOpen.value = false;
   navigateTo("/locations");
 };
 

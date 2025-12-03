@@ -276,7 +276,7 @@
                 class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
               >
                 <UButton
-                  color="error"
+                  color="neutral"
                   variant="soft"
                   class="cursor-pointer"
                   @click="isAssignModalOpen = false"
@@ -321,7 +321,7 @@
               class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
             >
               <UButton
-                color="error"
+                color="neutral"
                 variant="soft"
                 class="cursor-pointer"
                 @click="isRemoveModalOpen = false"
@@ -384,7 +384,7 @@
               class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
             >
               <UButton
-                color="error"
+                color="neutral"
                 variant="soft"
                 class="cursor-pointer"
                 @click="isDeleteModalOpen = false"
