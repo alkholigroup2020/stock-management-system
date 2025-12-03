@@ -194,6 +194,78 @@
         </UCard>
       </template>
     </UModal>
+
+    <!-- Toggle Status Confirmation Modal -->
+    <UModal v-model:open="isToggleStatusModalOpen" :dismissible="togglingUserId === null">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-subheading font-semibold">
+              {{ userToToggle?.is_active ? "Deactivate User" : "Activate User" }}
+            </h3>
+          </template>
+
+          <div class="space-y-4">
+            <div
+              v-if="userToToggle"
+              class="p-4 rounded-lg border-2"
+              :class="
+                userToToggle.is_active
+                  ? 'border-warning bg-warning/10'
+                  : 'border-success bg-success/10'
+              "
+            >
+              <p
+                class="font-semibold"
+                :class="userToToggle.is_active ? 'text-warning' : 'text-success'"
+              >
+                {{ userToToggle.full_name }}
+              </p>
+              <p class="text-caption mt-1">@{{ userToToggle.username }}</p>
+            </div>
+
+            <div v-if="userToToggle?.is_active" class="space-y-2">
+              <p class="font-medium">Are you sure you want to deactivate this user?</p>
+              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+                <li>The user will no longer be able to log in to the system</li>
+                <li>All their permissions will be temporarily suspended</li>
+                <li>You can reactivate the user at any time</li>
+              </ul>
+            </div>
+
+            <div v-else class="space-y-2">
+              <p class="font-medium">Are you sure you want to activate this user?</p>
+              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+                <li>The user will be able to log in to the system</li>
+                <li>Their previous permissions will be restored</li>
+              </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="isToggleStatusModalOpen = false"
+                :disabled="togglingUserId !== null"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                :color="userToToggle?.is_active ? 'warning' : 'success'"
+                :icon="userToToggle?.is_active ? 'i-lucide-user-x' : 'i-lucide-user-check'"
+                class="cursor-pointer"
+                :loading="togglingUserId !== null"
+                @click="confirmToggleStatus"
+              >
+                {{ userToToggle?.is_active ? "Deactivate" : "Activate" }}
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -251,6 +323,11 @@ const users = ref<User[]>([]);
 const isDeleteModalOpen = ref(false);
 const deletingUserId = ref<string | null>(null);
 const userToDelete = ref<User | null>(null);
+
+// Toggle status modal state
+const isToggleStatusModalOpen = ref(false);
+const togglingUserId = ref<string | null>(null);
+const userToToggle = ref<User | null>(null);
 
 const filters = reactive({
   search: "",
@@ -381,21 +458,35 @@ const handleEdit = (user: User) => {
   navigateTo(`/users/${user.id}/edit`);
 };
 
-// Toggle user active status
-const toggleUserStatus = async (user: User) => {
+// Toggle user active status - show confirmation modal
+const toggleUserStatus = (user: User) => {
+  userToToggle.value = user;
+  isToggleStatusModalOpen.value = true;
+};
+
+// Confirm and execute toggle status
+const confirmToggleStatus = async () => {
+  if (!userToToggle.value) return;
+
+  togglingUserId.value = userToToggle.value.id;
+
   try {
-    await $fetch(`/api/users/${user.id}`, {
+    await $fetch(`/api/users/${userToToggle.value.id}`, {
       method: "PATCH",
       body: {
-        is_active: !user.is_active,
+        is_active: !userToToggle.value.is_active,
       },
     });
 
-    user.is_active = !user.is_active;
+    userToToggle.value.is_active = !userToToggle.value.is_active;
 
+    const action = userToToggle.value.is_active ? "activated" : "deactivated";
     toast.success("Success", {
-      description: `User ${user.is_active ? "activated" : "deactivated"} successfully`,
+      description: `User ${action} successfully`,
     });
+
+    isToggleStatusModalOpen.value = false;
+    userToToggle.value = null;
   } catch (err: unknown) {
     console.error("Error toggling user status:", err);
     const message =
@@ -408,6 +499,8 @@ const toggleUserStatus = async (user: User) => {
         ? String(err.data.message)
         : "Failed to update user status";
     toast.error("Error", { description: message });
+  } finally {
+    togglingUserId.value = null;
   }
 };
 

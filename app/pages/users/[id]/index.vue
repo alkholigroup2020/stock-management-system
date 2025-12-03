@@ -51,10 +51,19 @@ const fetchUser = async () => {
     const userId = route.params.id as string;
     const response = await $fetch<{ user: User }>(`/api/users/${userId}`);
     user.value = response.user;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching user:", err);
-    error.value = err.data?.message || "Failed to fetch user details";
-    toast.error("Error", { description: error.value || undefined });
+    const message =
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
+        ? String(err.data.message)
+        : "Failed to fetch user details";
+    error.value = message;
+    toast.error("Error", { description: message });
   } finally {
     loading.value = false;
   }

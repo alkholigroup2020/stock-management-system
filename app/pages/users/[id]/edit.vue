@@ -123,6 +123,16 @@ const locationOptions = computed(() => [
 // Location access state
 const selectedLocationId = ref("");
 const selectedAccessLevel = ref("VIEW");
+const addingLocation = ref(false);
+const removingLocationId = ref<string | null>(null);
+
+// Remove location modal state
+const isRemoveLocationModalOpen = ref(false);
+const locationToRemove = ref<{
+  location_id: string;
+  location: { id: string; code: string; name: string; type: string };
+  access_level: string;
+} | null>(null);
 
 const accessLevelOptions = [
   { value: "VIEW", label: "View", description: "Can only view data" },
@@ -235,6 +245,8 @@ const addLocationAccess = async () => {
     return;
   }
 
+  addingLocation.value = true;
+
   try {
     const response = await $fetch<{ message?: string }>(
       `/api/locations/${selectedLocationId.value}/users`,
@@ -266,22 +278,41 @@ const addLocationAccess = async () => {
         ? String(err.data.message)
         : "Failed to add location access";
     toast.error("Error", { description: message });
+  } finally {
+    addingLocation.value = false;
   }
 };
 
-// Remove location access
-const removeLocationAccess = async (locationId: string) => {
-  if (!user.value) return;
+// Prompt remove location access - show confirmation modal
+const promptRemoveLocation = (loc: {
+  location_id: string;
+  location: { id: string; code: string; name: string; type: string };
+  access_level: string;
+}) => {
+  locationToRemove.value = loc;
+  isRemoveLocationModalOpen.value = true;
+};
+
+// Confirm and execute remove location access
+const confirmRemoveLocation = async () => {
+  if (!user.value || !locationToRemove.value) return;
+
+  removingLocationId.value = locationToRemove.value.location_id;
 
   try {
-    await $fetch(`/api/locations/${locationId}/users/${route.params.id as string}`, {
-      method: "DELETE",
-    });
+    await $fetch(
+      `/api/locations/${locationToRemove.value.location_id}/users/${route.params.id as string}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     toast.success("Success", {
       description: "Location access removed successfully",
     });
 
+    isRemoveLocationModalOpen.value = false;
+    locationToRemove.value = null;
     await fetchUser();
   } catch (err: unknown) {
     console.error("Error removing location access:", err);
@@ -295,6 +326,8 @@ const removeLocationAccess = async (locationId: string) => {
         ? String(err.data.message)
         : "Failed to remove location access";
     toast.error("Error", { description: message });
+  } finally {
+    removingLocationId.value = null;
   }
 };
 
@@ -642,7 +675,8 @@ useHead({
                 variant="ghost"
                 size="sm"
                 class="cursor-pointer"
-                @click="removeLocationAccess(loc.location_id)"
+                :loading="removingLocationId === loc.location_id"
+                @click="promptRemoveLocation(loc)"
               ></UButton>
             </div>
           </div>
@@ -696,7 +730,8 @@ useHead({
               icon="i-lucide-plus"
               color="primary"
               size="lg"
-              :disabled="!selectedLocationId"
+              :disabled="!selectedLocationId || addingLocation"
+              :loading="addingLocation"
               class="cursor-pointer w-full"
               @click="addLocationAccess"
             >
@@ -738,5 +773,63 @@ useHead({
         </UButton>
       </div>
     </div>
+
+    <!-- Remove Location Confirmation Modal -->
+    <UModal v-model:open="isRemoveLocationModalOpen" :dismissible="removingLocationId === null">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-subheading font-semibold">Remove Location Access</h3>
+          </template>
+
+          <div class="space-y-4">
+            <div
+              v-if="locationToRemove"
+              class="p-4 rounded-lg border-2 border-warning bg-warning/10"
+            >
+              <p class="font-semibold text-warning">
+                {{ locationToRemove.location.name }}
+              </p>
+              <p class="text-caption mt-1">
+                {{ locationToRemove.location.code }} - {{ locationToRemove.access_level }} access
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="font-medium">
+                Are you sure you want to remove this location access for {{ user?.full_name }}?
+              </p>
+              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+                <li>The user will lose access to this location</li>
+                <li>Any pending work at this location may be affected</li>
+                <li>You can add the location back at any time</li>
+              </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="isRemoveLocationModalOpen = false"
+                :disabled="removingLocationId !== null"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                icon="i-lucide-trash-2"
+                class="cursor-pointer"
+                :loading="removingLocationId !== null"
+                @click="confirmRemoveLocation"
+              >
+                Remove Access
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
