@@ -206,19 +206,47 @@
         <!-- Statistics Card -->
         <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
           <template #header>
-            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Statistics</h2>
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Statistics</h2>
+              <p class="text-xs text-[var(--ui-text-muted)]">Transaction summary</p>
+            </div>
           </template>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
-              <p class="text-2xl font-bold text-primary">{{ supplier._count?.deliveries || 0 }}</p>
-              <p class="text-sm text-[var(--ui-text-muted)]">Deliveries</p>
+              <div class="flex items-baseline gap-2">
+                <p class="text-2xl font-bold text-primary">
+                  {{ supplier._count?.deliveries || 0 }}
+                </p>
+                <UIcon
+                  v-if="!supplier._count?.deliveries"
+                  name="i-lucide-package"
+                  class="w-4 h-4 text-[var(--ui-text-muted)]"
+                />
+              </div>
+              <p class="text-sm text-[var(--ui-text-muted)] mt-1">Deliveries</p>
+              <p v-if="!supplier._count?.deliveries" class="text-xs text-[var(--ui-text-muted)] mt-1">
+                No deliveries yet
+              </p>
             </div>
             <div class="p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
-              <p class="text-2xl font-bold text-primary">
-                {{ supplier._count?.purchase_orders || 0 }}
+              <div class="flex items-baseline gap-2">
+                <p class="text-2xl font-bold text-primary">
+                  {{ supplier._count?.purchase_orders || 0 }}
+                </p>
+                <UIcon
+                  v-if="!supplier._count?.purchase_orders"
+                  name="i-lucide-file-text"
+                  class="w-4 h-4 text-[var(--ui-text-muted)]"
+                />
+              </div>
+              <p class="text-sm text-[var(--ui-text-muted)] mt-1">Purchase Orders</p>
+              <p
+                v-if="!supplier._count?.purchase_orders"
+                class="text-xs text-[var(--ui-text-muted)] mt-1"
+              >
+                No purchase orders yet
               </p>
-              <p class="text-sm text-[var(--ui-text-muted)]">Purchase Orders</p>
             </div>
           </div>
         </UCard>
@@ -257,6 +285,40 @@
         </UCard>
       </template>
     </div>
+
+    <!-- Cancel Edit Confirmation Modal -->
+    <UModal v-model:open="isCancelEditModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Discard Changes?
+            </h3>
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-[var(--ui-text)]">
+              You have unsaved changes. Are you sure you want to cancel? All changes will be lost.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="isCancelEditModalOpen = false"
+              >
+                Continue Editing
+              </UButton>
+              <UButton color="error" class="cursor-pointer" @click="confirmCancelEdit">
+                Discard Changes
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
 
     <!-- Delete Confirmation Modal -->
     <UModal v-model:open="isDeleteModalOpen" :dismissible="!deletingSupplier">
@@ -360,8 +422,18 @@ const submitting = ref(false);
 const isDeleteModalOpen = ref(false);
 const deletingSupplier = ref(false);
 
+// Cancel edit modal state
+const isCancelEditModalOpen = ref(false);
+
 // Form data
 const formData = reactive({
+  name: "",
+  contact: "",
+  is_active: true,
+});
+
+// Track original form data for comparison
+const originalFormData = ref({
   name: "",
   contact: "",
   is_active: true,
@@ -418,13 +490,46 @@ const startEdit = () => {
     formData.name = supplier.value.name;
     formData.contact = supplier.value.contact || "";
     formData.is_active = supplier.value.is_active;
+
+    // Store original values for comparison
+    originalFormData.value = {
+      name: supplier.value.name,
+      contact: supplier.value.contact || "",
+      is_active: supplier.value.is_active,
+    };
+
     isEditing.value = true;
   }
 };
 
+// Check if form has unsaved changes
+const hasUnsavedChanges = () => {
+  return (
+    formData.name !== originalFormData.value.name ||
+    formData.contact !== originalFormData.value.contact ||
+    formData.is_active !== originalFormData.value.is_active
+  );
+};
+
 // Cancel editing
 const cancelEdit = () => {
+  if (hasUnsavedChanges()) {
+    isCancelEditModalOpen.value = true;
+  } else {
+    isEditing.value = false;
+  }
+};
+
+// Confirm cancel edit (discard changes)
+const confirmCancelEdit = () => {
+  isCancelEditModalOpen.value = false;
   isEditing.value = false;
+  // Reset form data to original values
+  if (supplier.value) {
+    formData.name = supplier.value.name;
+    formData.contact = supplier.value.contact || "";
+    formData.is_active = supplier.value.is_active;
+  }
 };
 
 // Submit handler

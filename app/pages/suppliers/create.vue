@@ -115,6 +115,40 @@
         </div>
       </UForm>
     </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <UModal v-model:open="isCancelModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Discard Changes?
+            </h3>
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-[var(--ui-text)]">
+              You have unsaved changes. Are you sure you want to leave? All changes will be lost.
+            </p>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="isCancelModalOpen = false"
+              >
+                Continue Editing
+              </UButton>
+              <UButton color="error" class="cursor-pointer" @click="confirmCancel">
+                Discard Changes
+              </UButton>
+            </div>
+          </div>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -133,6 +167,7 @@ const { invalidateSuppliers } = useCache();
 
 // State
 const submitting = ref(false);
+const isCancelModalOpen = ref(false);
 
 // Form data
 const formData = reactive({
@@ -191,9 +226,15 @@ const handleCancel = () => {
   const hasData = formData.code || formData.name || formData.contact;
 
   if (hasData) {
-    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?");
-    if (!confirmed) return;
+    isCancelModalOpen.value = true;
+  } else {
+    navigateTo("/suppliers");
   }
+};
+
+// Confirm cancel (discard changes)
+const confirmCancel = () => {
+  isCancelModalOpen.value = false;
   navigateTo("/suppliers");
 };
 
