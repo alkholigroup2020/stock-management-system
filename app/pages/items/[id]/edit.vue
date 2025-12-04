@@ -192,11 +192,10 @@
               variant="soft"
               size="lg"
               class="w-full sm:w-auto cursor-pointer"
-              :loading="isActivating"
               :disabled="isSubmitting || isDeactivating || isActivating"
-              @click="handleActivate"
+              @click="showActivateModal = true"
             >
-              {{ isActivating ? "Activating..." : "Activate" }}
+              Activate
             </UButton>
 
             <!-- Deactivate Button -->
@@ -207,11 +206,10 @@
               variant="soft"
               size="lg"
               class="w-full sm:w-auto cursor-pointer"
-              :loading="isDeactivating"
               :disabled="isSubmitting || isDeactivating || isActivating"
-              @click="handleDeactivate"
+              @click="showDeactivateModal = true"
             >
-              {{ isDeactivating ? "Deactivating..." : "Deactivate" }}
+              Deactivate
             </UButton>
 
             <!-- Update Button -->
@@ -229,6 +227,38 @@
         </form>
       </UCard>
     </template>
+
+    <!-- Confirmation Modals -->
+    <UiConfirmModal
+      v-model="showActivateModal"
+      title="Activate Item"
+      :message="activateMessage"
+      confirm-text="Activate"
+      variant="success"
+      :loading="isActivating"
+      @confirm="handleActivate"
+    />
+
+    <UiConfirmModal
+      v-model="showDeactivateModal"
+      title="Deactivate Item"
+      :message="deactivateMessage"
+      confirm-text="Deactivate"
+      variant="danger"
+      :loading="isDeactivating"
+      @confirm="handleDeactivate"
+    />
+
+    <!-- Cancel Confirmation Modal -->
+    <UiConfirmModal
+      v-model="showCancelModal"
+      title="Discard Changes"
+      message="Are you sure you want to cancel? Any unsaved changes will be lost."
+      confirm-text="Discard"
+      cancel-text="Keep Editing"
+      variant="warning"
+      @confirm="confirmCancel"
+    />
   </div>
 </template>
 
@@ -272,6 +302,9 @@ const loadError = ref("");
 const isSubmitting = ref(false);
 const isDeactivating = ref(false);
 const isActivating = ref(false);
+const showActivateModal = ref(false);
+const showDeactivateModal = ref(false);
+const showCancelModal = ref(false);
 
 // Item data
 const item = ref<{
@@ -455,6 +488,21 @@ const hasChanges = computed(() => {
 });
 
 /**
+ * Computed properties for modal messages
+ */
+const activateMessage = computed(() =>
+  item.value
+    ? `Are you sure you want to activate "${item.value.name}"? This will allow the item to be used in new transactions.`
+    : ""
+);
+
+const deactivateMessage = computed(() =>
+  item.value
+    ? `Are you sure you want to deactivate "${item.value.name}"? This will prevent the item from being used in new transactions, but existing records will remain.`
+    : ""
+);
+
+/**
  * Handle form submission
  */
 async function handleSubmit() {
@@ -568,14 +616,6 @@ async function handleSubmit() {
  * Handle deactivate action
  */
 async function handleDeactivate() {
-  // Confirm deactivation
-  const confirmed = confirm(
-    `Are you sure you want to deactivate "${item.value?.name}"?\n\n` +
-      "This will prevent the item from being used in new transactions, but existing records will remain."
-  );
-
-  if (!confirmed) return;
-
   isDeactivating.value = true;
 
   try {
@@ -591,6 +631,9 @@ async function handleDeactivate() {
     toast.success("Success", {
       description: response.message || "Item deactivated successfully",
     });
+
+    // Close modal
+    showDeactivateModal.value = false;
 
     // Redirect to items list
     router.push("/items");
@@ -635,14 +678,6 @@ async function handleDeactivate() {
  * Handle activate action
  */
 async function handleActivate() {
-  // Confirm activation
-  const confirmed = confirm(
-    `Are you sure you want to activate "${item.value?.name}"?\n\n` +
-      "This will allow the item to be used in new transactions."
-  );
-
-  if (!confirmed) return;
-
   isActivating.value = true;
 
   try {
@@ -666,6 +701,9 @@ async function handleActivate() {
     toast.success("Success", {
       description: response.message || "Item activated successfully",
     });
+
+    // Close modal
+    showActivateModal.value = false;
   } catch (error: unknown) {
     console.error("Error activating item:", error);
 
@@ -713,12 +751,17 @@ async function handleActivate() {
 function handleCancel() {
   // Check if form has been modified
   if (hasChanges.value) {
-    const confirmed = confirm(
-      "Are you sure you want to cancel? Any unsaved changes will be lost."
-    );
-    if (!confirmed) return;
+    showCancelModal.value = true;
+  } else {
+    router.push("/items");
   }
+}
 
+/**
+ * Confirm cancel and navigate away
+ */
+function confirmCancel() {
+  showCancelModal.value = false;
   router.push("/items");
 }
 

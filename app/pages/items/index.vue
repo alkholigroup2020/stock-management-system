@@ -42,36 +42,7 @@
           />
         </div>
 
-        <!-- Category Filter Toggle Buttons -->
-        <div
-          v-if="categoryOptions.length > 0"
-          class="flex items-center gap-1 p-1 bg-muted rounded-full"
-          role="group"
-          aria-label="Filter by category"
-        >
-          <button
-            type="button"
-            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
-            :class="getCategoryButtonClass(null)"
-            :aria-pressed="filters.category === null"
-            @click="selectCategory(null)"
-          >
-            All Categories
-          </button>
-          <button
-            v-for="category in categoryOptions.slice(0, 3)"
-            :key="category"
-            type="button"
-            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
-            :class="getCategoryButtonClass(category)"
-            :aria-pressed="filters.category === category"
-            @click="selectCategory(category)"
-          >
-            {{ category }}
-          </button>
-        </div>
-
-        <!-- Status Filter Dropdown (Far Right) -->
+        <!-- Status Filter Dropdown -->
         <UDropdownMenu
           :items="statusDropdownItems"
           :ui="{ content: 'min-w-[140px]' }"
@@ -116,32 +87,6 @@
               <UIcon :name="currentStatusIcon" class="w-4 h-4" />
             </UButton>
           </UDropdownMenu>
-        </div>
-
-        <!-- Row 2: Category Toggle Buttons (horizontally scrollable) -->
-        <div v-if="categoryOptions.length > 0" class="overflow-x-auto -mx-3 px-3">
-          <div class="flex items-center gap-1 p-1 bg-muted rounded-full w-fit">
-            <button
-              type="button"
-              class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
-              :class="getCategoryButtonClass(null)"
-              :aria-pressed="filters.category === null"
-              @click="selectCategory(null)"
-            >
-              All
-            </button>
-            <button
-              v-for="category in categoryOptions"
-              :key="category"
-              type="button"
-              class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
-              :class="getCategoryButtonClass(category)"
-              :aria-pressed="filters.category === category"
-              @click="selectCategory(category)"
-            >
-              {{ category }}
-            </button>
-          </div>
         </div>
       </div>
     </UCard>
@@ -198,13 +143,18 @@
             <tr
               v-for="item in items"
               :key="item.id"
-              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
-              @click="navigateTo(`/items/${item.id}`)"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
             >
-              <td class="px-4 py-4 whitespace-nowrap font-mono text-[var(--ui-text)] text-sm">
+              <td
+                class="px-4 py-4 whitespace-nowrap font-mono text-[var(--ui-text)] text-sm cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 {{ item.code }}
               </td>
-              <td class="px-4 py-4 text-[var(--ui-text)]">
+              <td
+                class="px-4 py-4 text-[var(--ui-text)] cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 <div class="flex items-center gap-2">
                   {{ item.name }}
                   <UBadge v-if="!item.is_active" color="neutral" variant="subtle" size="xs">
@@ -212,19 +162,34 @@
                   </UBadge>
                 </div>
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-caption">
+              <td
+                class="px-4 py-4 whitespace-nowrap text-caption cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 {{ item.unit }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-caption">
+              <td
+                class="px-4 py-4 whitespace-nowrap text-caption cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 {{ item.category || "-" }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right">
+              <td
+                class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 {{ formatQuantity(getStockData(item).onHand) }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right">
+              <td
+                class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 {{ formatCurrency(getStockData(item).wac) }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right font-medium">
+              <td
+                class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right font-medium cursor-pointer"
+                @click="navigateTo(`/items/${item.id}`)"
+              >
                 {{ formatCurrency(getStockData(item).value) }}
               </td>
               <td v-if="canEditItems()" class="px-4 py-4 whitespace-nowrap text-sm text-right">
@@ -340,11 +305,9 @@ const toast = useAppToast();
 const items = ref<ItemWithStock[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
-const categoryOptions = ref<string[]>([]);
 
 const filters = reactive({
   search: "",
-  category: null as string | null,
   is_active: true as boolean | null,
 });
 
@@ -396,24 +359,6 @@ const currentStatusIcon = computed(() => {
   return "i-lucide-circle-check";
 });
 
-// Get button class based on category selection
-const getCategoryButtonClass = (categoryValue: string | null) => {
-  const isSelected = filters.category === categoryValue;
-
-  if (!isSelected) {
-    return "text-muted hover:text-default hover:bg-elevated";
-  }
-
-  return "bg-primary text-white shadow-sm";
-};
-
-// Select category handler
-const selectCategory = (categoryValue: string | null) => {
-  filters.category = categoryValue;
-  pagination.value.page = 1;
-  fetchItems();
-};
-
 // Select status handler
 const selectStatus = (statusValue: boolean | null) => {
   filters.is_active = statusValue;
@@ -450,11 +395,6 @@ async function fetchItems() {
       params.search = filters.search;
     }
 
-    // Add category filter if present
-    if (filters.category) {
-      params.category = filters.category;
-    }
-
     // Add status filter
     if (filters.is_active !== null) {
       params.is_active = String(filters.is_active);
@@ -470,9 +410,6 @@ async function fetchItems() {
 
     items.value = response.items;
     pagination.value = response.pagination;
-
-    // Extract unique categories from items for filter
-    extractCategories(response.items);
   } catch (err: unknown) {
     const errorMessage =
       err &&
@@ -489,21 +426,6 @@ async function fetchItems() {
   } finally {
     loading.value = false;
   }
-}
-
-/**
- * Extract unique categories from items
- */
-function extractCategories(itemsList: ItemWithStock[]) {
-  const categories = new Set<string>();
-
-  itemsList.forEach((item) => {
-    if (item.category) {
-      categories.add(item.category);
-    }
-  });
-
-  categoryOptions.value = Array.from(categories).sort();
 }
 
 /**

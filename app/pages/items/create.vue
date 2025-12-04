@@ -171,6 +171,17 @@
         </div>
       </form>
     </UCard>
+
+    <!-- Cancel Confirmation Modal -->
+    <UiConfirmModal
+      v-model="showCancelModal"
+      title="Discard Changes"
+      message="Are you sure you want to cancel? Any unsaved changes will be lost."
+      confirm-text="Discard"
+      cancel-text="Keep Editing"
+      variant="warning"
+      @confirm="confirmCancel"
+    />
   </div>
 </template>
 
@@ -222,6 +233,7 @@ const errors = reactive({
 });
 
 const isSubmitting = ref(false);
+const showCancelModal = ref(false);
 
 // Validation schema (matches API schema)
 const itemSchema = z.object({
@@ -414,13 +426,17 @@ function handleCancel() {
   );
 
   if (hasChanges) {
-    // Could add a confirmation modal here
-    const confirmed = confirm(
-      "Are you sure you want to cancel? Any unsaved changes will be lost."
-    );
-    if (!confirmed) return;
+    showCancelModal.value = true;
+  } else {
+    router.push("/items");
   }
+}
 
+/**
+ * Confirm cancel and navigate away
+ */
+function confirmCancel() {
+  showCancelModal.value = false;
   router.push("/items");
 }
 

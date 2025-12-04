@@ -137,11 +137,13 @@
               color="primary"
               variant="ghost"
               size="xs"
-              icon="i-lucide-arrow-path"
+              icon="i-lucide-rotate-cw"
               class="cursor-pointer"
+              :loading="loadingStock"
+              :disabled="loadingStock"
               @click="toggleShowAllLocations"
             >
-              {{ loadingStock ? "Loading..." : "Show All Locations" }}
+              Show All Locations
             </UButton>
             <UButton
               v-else-if="showAllLocations"
@@ -150,6 +152,8 @@
               size="xs"
               icon="i-lucide-filter"
               class="cursor-pointer"
+              :loading="loadingStock"
+              :disabled="loadingStock"
               @click="toggleShowAllLocations"
             >
               Show My Locations
@@ -250,11 +254,9 @@
             variant="soft"
             icon="i-lucide-circle-check"
             class="cursor-pointer"
-            :loading="isActivating"
-            :disabled="isActivating"
-            @click="handleActivate"
+            @click="showActivateModal = true"
           >
-            {{ isActivating ? "Activating..." : "Activate Item" }}
+            Activate Item
           </UButton>
           <UButton
             v-if="canEditItems() && item.is_active"
@@ -262,15 +264,34 @@
             variant="soft"
             icon="i-lucide-archive"
             class="cursor-pointer"
-            :loading="isDeactivating"
-            :disabled="isDeactivating"
-            @click="handleDeactivate"
+            @click="showDeactivateModal = true"
           >
-            {{ isDeactivating ? "Deactivating..." : "Deactivate Item" }}
+            Deactivate Item
           </UButton>
         </div>
       </UCard>
     </template>
+
+    <!-- Confirmation Modals -->
+    <UiConfirmModal
+      v-model="showActivateModal"
+      title="Activate Item"
+      :message="activateMessage"
+      confirm-text="Activate"
+      variant="success"
+      :loading="isActivating"
+      @confirm="handleActivate"
+    />
+
+    <UiConfirmModal
+      v-model="showDeactivateModal"
+      title="Deactivate Item"
+      :message="deactivateMessage"
+      confirm-text="Deactivate"
+      variant="danger"
+      :loading="isDeactivating"
+      @confirm="handleDeactivate"
+    />
   </div>
 </template>
 
@@ -306,6 +327,19 @@ const toast = useAppToast();
 const isAdmin = computed(() => authStore.user?.role === "ADMIN");
 const isSupervisor = computed(() => authStore.user?.role === "SUPERVISOR");
 
+// Computed properties for modal messages
+const activateMessage = computed(() =>
+  item.value
+    ? `Are you sure you want to activate "${item.value.name}"? This will allow the item to be used in new transactions.`
+    : ""
+);
+
+const deactivateMessage = computed(() =>
+  item.value
+    ? `Are you sure you want to deactivate "${item.value.name}"? This will prevent the item from being used in new transactions. Existing transactions will not be affected.`
+    : ""
+);
+
 // Reactive state
 const item = ref<ItemWithStock | null>(null);
 const loading = ref(false);
@@ -314,6 +348,8 @@ const error = ref<string | null>(null);
 const showAllLocations = ref(false);
 const isActivating = ref(false);
 const isDeactivating = ref(false);
+const showActivateModal = ref(false);
+const showDeactivateModal = ref(false);
 
 /**
  * Fetch item from the API
@@ -401,14 +437,6 @@ async function toggleShowAllLocations() {
 async function handleActivate() {
   if (!item.value) return;
 
-  // Confirm activation
-  const confirmed = confirm(
-    `Are you sure you want to activate "${item.value.name}"?\n\n` +
-      "This will allow the item to be used in new transactions."
-  );
-
-  if (!confirmed) return;
-
   isActivating.value = true;
 
   try {
@@ -434,6 +462,9 @@ async function handleActivate() {
     toast.success("Success", {
       description: response.message || "Item activated successfully",
     });
+
+    // Close modal
+    showActivateModal.value = false;
   } catch (err: unknown) {
     const errorMessage =
       err &&
@@ -456,15 +487,6 @@ async function handleActivate() {
  */
 async function handleDeactivate() {
   if (!item.value) return;
-
-  // Confirm deactivation
-  const confirmed = confirm(
-    `Are you sure you want to deactivate "${item.value.name}"?\n\n` +
-      "This will prevent the item from being used in new transactions. " +
-      "Existing transactions will not be affected."
-  );
-
-  if (!confirmed) return;
 
   isDeactivating.value = true;
 
@@ -491,6 +513,9 @@ async function handleDeactivate() {
     toast.success("Success", {
       description: response.message || "Item deactivated successfully",
     });
+
+    // Close modal
+    showDeactivateModal.value = false;
   } catch (err: unknown) {
     const errorMessage =
       err &&
