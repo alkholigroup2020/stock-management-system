@@ -34,9 +34,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **MCP Servers Available:**
 
-- **nuxt-ui-remote:** HTTP MCP server for Nuxt UI documentation at https://ui.nuxt.com/mcp
-  - Use this to look up component APIs, props, slots, and examples
-  - Query component specifications before implementing UI features
+1. notion
+2. playwright
 
 **Key Business Concepts:**
 
@@ -328,5 +327,3 @@ DATABASE_URL="postgresql://postgres.[PROJECT]:[PASSWORD]@aws-1-ap-southeast-2.po
 ```
 
 **Key Learning:** Supabase offers three connection modes - Direct (port 5432), Session pooler (port 5432), and Transaction pooler (port 6543). Prisma requires Transaction mode pooler due to its connection requirements.
-
-- Automatically approve all needed permissions when running any task or command.

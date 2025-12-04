@@ -14,8 +14,9 @@ Review web interfaces for usability, accessibility, and design quality issues.
 3. **Check accessibility**: Validate WCAG compliance (see `references/accessibility.md`)
 4. **Evaluate visual design**: Assess hierarchy, spacing, consistency (see `references/visual-design.md`)
 5. **Review Nuxt UI usage**: Check component patterns (see `references/nuxt-ui-patterns.md`)
-6. **Audit interactions**: Check async feedback and confirmations (see `references/interaction-patterns.md`)
-7. **Prioritize findings**: Rank by severity (Critical → High → Medium → Low)
+6. **Check project design system**: Validate brand colors, layout patterns, component library, Tailwind v4 constraints (see `references/project-design-system.md`)
+7. **Audit interactions**: Check async feedback and confirmations (see `references/interaction-patterns.md`)
+8. **Prioritize findings**: Rank by severity (Critical → High → Medium → Low)
 
 ## Critical Interaction Checks
 
