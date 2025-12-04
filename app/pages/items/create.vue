@@ -1,49 +1,57 @@
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Create New Item"
-      icon="i-lucide-package-2"
-      :show-location="true"
-      :show-period="true"
-      location-scope="all"
-    >
-      <template #actions>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-heroicons-arrow-left"
-          @click="handleCancel"
-        >
-          Back
-        </UButton>
-      </template>
-    </LayoutPageHeader>
+    <div class="flex items-center justify-between gap-3">
+      <!-- Mobile: smaller icon and title -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-package-2" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Create New Item</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Add a new inventory item to the system
+          </p>
+        </div>
+      </div>
+      <!-- Mobile: shorter button text -->
+      <UButton
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="handleCancel"
+      >
+        <span class="hidden sm:inline">Back</span>
+        <span class="sm:hidden">Back</span>
+      </UButton>
+    </div>
 
     <!-- Form Card -->
-    <UCard class="max-w-2xl">
+    <UCard class="card-elevated" :ui="{ body: 'p-6' }">
       <form @submit.prevent="handleSubmit">
-        <div class="space-y-6">
+        <!-- Responsive Grid: 1 column on mobile, 2 columns on large screens -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Item Code -->
           <div>
             <label for="code" class="form-label">
               Item Code
-              <span class="text-error">*</span>
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <UInput
               id="code"
               v-model="form.code"
               placeholder="e.g., RICE001"
               size="lg"
+              class="w-full"
               :disabled="isSubmitting"
               :error="!!errors.code"
               @blur="validateField('code')"
               @input="form.code = form.code.toUpperCase()"
             />
-            <p v-if="errors.code" class="mt-1 text-caption text-error">
+            <p v-if="errors.code" class="mt-1 text-caption text-[var(--ui-error)]">
               {{ errors.code }}
             </p>
-            <p class="mt-1 text-caption">
+            <p v-else class="mt-1 text-caption">
               Unique identifier for the item (automatically converted to uppercase)
             </p>
           </div>
@@ -52,18 +60,19 @@
           <div>
             <label for="name" class="form-label">
               Item Name
-              <span class="text-error">*</span>
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <UInput
               id="name"
               v-model="form.name"
               placeholder="e.g., Basmati Rice"
               size="lg"
+              class="w-full"
               :disabled="isSubmitting"
               :error="!!errors.name"
               @blur="validateField('name')"
             />
-            <p v-if="errors.name" class="mt-1 text-sm text-error">
+            <p v-if="errors.name" class="mt-1 text-caption text-[var(--ui-error)]">
               {{ errors.name }}
             </p>
           </div>
@@ -72,7 +81,7 @@
           <div>
             <label for="unit" class="form-label">
               Unit of Measure
-              <span class="text-error">*</span>
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <USelectMenu
               v-model="form.unit"
@@ -80,14 +89,15 @@
               value-key="value"
               placeholder="Select unit"
               size="lg"
+              class="w-full"
               :disabled="isSubmitting"
               :error="!!errors.unit"
               @update:model-value="validateField('unit')"
             />
-            <p v-if="errors.unit" class="mt-1 text-sm text-error">
+            <p v-if="errors.unit" class="mt-1 text-caption text-[var(--ui-error)]">
               {{ errors.unit }}
             </p>
-            <p class="mt-1 text-xs text-muted">
+            <p v-else class="mt-1 text-caption">
               How this item is measured (KG = Kilograms, EA = Each, LTR = Liters, etc.)
             </p>
           </div>
@@ -100,14 +110,15 @@
               v-model="form.category"
               placeholder="e.g., Dry Goods"
               size="lg"
+              class="w-full"
               :disabled="isSubmitting"
               :error="!!errors.category"
               @blur="validateField('category')"
             />
-            <p v-if="errors.category" class="mt-1 text-sm text-error">
+            <p v-if="errors.category" class="mt-1 text-caption text-[var(--ui-error)]">
               {{ errors.category }}
             </p>
-            <p class="mt-1 text-xs text-muted">Optional: Main category for organizing items</p>
+            <p v-else class="mt-1 text-caption">Optional: Main category for organizing items</p>
           </div>
 
           <!-- Sub-Category -->
@@ -118,40 +129,45 @@
               v-model="form.sub_category"
               placeholder="e.g., Rice"
               size="lg"
+              class="w-full"
               :disabled="isSubmitting"
               :error="!!errors.sub_category"
               @blur="validateField('sub_category')"
             />
-            <p v-if="errors.sub_category" class="mt-1 text-sm text-error">
+            <p v-if="errors.sub_category" class="mt-1 text-caption text-[var(--ui-error)]">
               {{ errors.sub_category }}
             </p>
-            <p class="mt-1 text-xs text-muted">Optional: Sub-category for further organization</p>
+            <p v-else class="mt-1 text-caption">
+              Optional: Sub-category for further organization
+            </p>
           </div>
+        </div>
 
-          <!-- Form Actions -->
-          <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default">
-            <UButton
-              type="button"
-              color="neutral"
-              variant="soft"
-              size="lg"
-              :disabled="isSubmitting"
-              @click="handleCancel"
-              class="w-full sm:w-auto"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              type="submit"
-              color="primary"
-              size="lg"
-              :loading="isSubmitting"
-              :disabled="isSubmitting || !isFormValid"
-              class="w-full sm:w-auto"
-            >
-              {{ isSubmitting ? "Creating..." : "Create Item" }}
-            </UButton>
-          </div>
+        <!-- Form Actions -->
+        <div
+          class="flex flex-col-reverse sm:flex-row gap-3 pt-6 mt-6 border-t border-[var(--ui-border)]"
+        >
+          <UButton
+            type="button"
+            color="neutral"
+            variant="soft"
+            size="lg"
+            class="w-full sm:w-auto cursor-pointer"
+            :disabled="isSubmitting"
+            @click="handleCancel"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            type="submit"
+            color="primary"
+            size="lg"
+            class="w-full sm:w-auto cursor-pointer"
+            :loading="isSubmitting"
+            :disabled="isSubmitting || !isFormValid"
+          >
+            {{ isSubmitting ? "Creating..." : "Create Item" }}
+          </UButton>
         </div>
       </form>
     </UCard>
@@ -170,7 +186,7 @@ definePageMeta({
 
 // Composables
 const { canEditItems } = usePermissions();
-const toast = useToast();
+const toast = useAppToast();
 const router = useRouter();
 
 // Check permission
@@ -297,10 +313,8 @@ const isFormValid = computed(() => {
 async function handleSubmit() {
   // Validate form first
   if (!validateForm()) {
-    toast.add({
-      title: "Validation Error",
+    toast.error("Validation Error", {
       description: "Please fix the errors in the form",
-      color: "error",
     });
     return;
   }
@@ -318,59 +332,67 @@ async function handleSubmit() {
     };
 
     // Call API to create item
-    const response = await $fetch<{ item: any; message: string }>("/api/items", {
+    const response = await $fetch<{ item: unknown; message: string }>("/api/items", {
       method: "POST",
       body: data,
     });
 
     // Show success message
-    toast.add({
-      title: "Success",
+    toast.success("Success", {
       description: response.message || "Item created successfully",
-      color: "success",
     });
 
     // Redirect to items list
     router.push("/items");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating item:", error);
 
     // Handle specific error cases
-    if (error?.data?.code === "DUPLICATE_CODE") {
-      errors.code = error.data.message || "Item code already exists";
-      toast.add({
-        title: "Duplicate Code",
-        description: errors.code,
-        color: "error",
-      });
-    } else if (error?.data?.code === "VALIDATION_ERROR") {
-      toast.add({
-        title: "Validation Error",
-        description: error.data.message || "Invalid item data",
-        color: "error",
-      });
+    if (
+      error &&
+      typeof error === "object" &&
+      "data" in error &&
+      error.data &&
+      typeof error.data === "object"
+    ) {
+      const errorData = error.data as {
+        code?: string;
+        message?: string;
+        details?: Array<{ path?: string[]; message: string }>;
+      };
 
-      // Set field-specific errors if available
-      if (error.data.details) {
-        error.data.details.forEach((err: any) => {
-          const field = err.path?.[0] as keyof typeof errors;
-          if (field) {
-            errors[field] = err.message;
-          }
+      if (errorData.code === "DUPLICATE_CODE") {
+        errors.code = errorData.message || "Item code already exists";
+        toast.error("Duplicate Code", {
+          description: errors.code,
+        });
+      } else if (errorData.code === "VALIDATION_ERROR") {
+        toast.error("Validation Error", {
+          description: errorData.message || "Invalid item data",
+        });
+
+        // Set field-specific errors if available
+        if (errorData.details) {
+          errorData.details.forEach((err) => {
+            const field = err.path?.[0] as keyof typeof errors;
+            if (field && field in errors) {
+              errors[field] = err.message;
+            }
+          });
+        }
+      } else if (errorData.code === "INSUFFICIENT_PERMISSIONS") {
+        toast.error("Access Denied", {
+          description: "You do not have permission to create items",
+        });
+        router.push("/items");
+      } else {
+        toast.error("Error", {
+          description: errorData.message || "Failed to create item",
         });
       }
-    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
-      toast.add({
-        title: "Access Denied",
-        description: "You do not have permission to create items",
-        color: "error",
-      });
-      router.push("/items");
     } else {
-      toast.add({
-        title: "Error",
-        description: error?.data?.message || "Failed to create item",
-        color: "error",
+      toast.error("Error", {
+        description: "Failed to create item",
       });
     }
   } finally {
@@ -383,14 +405,27 @@ async function handleSubmit() {
  */
 function handleCancel() {
   // Check if form has been modified
-  const hasChanges = !!(form.code || form.name || form.unit || form.category || form.sub_category);
+  const hasChanges = !!(
+    form.code ||
+    form.name ||
+    form.unit ||
+    form.category ||
+    form.sub_category
+  );
 
   if (hasChanges) {
     // Could add a confirmation modal here
-    const confirmed = confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
+    const confirmed = confirm(
+      "Are you sure you want to cancel? Any unsaved changes will be lost."
+    );
     if (!confirmed) return;
   }
 
   router.push("/items");
 }
+
+// Set page title
+useHead({
+  title: "Create Item - Stock Management System",
+});
 </script>

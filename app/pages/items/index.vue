@@ -1,124 +1,184 @@
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Items"
+    <div class="flex items-center justify-between gap-3">
+      <!-- Mobile: smaller icon and title -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-package-2" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Items</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Manage inventory items and stock levels
+          </p>
+        </div>
+      </div>
+      <!-- Mobile: shorter button text -->
+      <UButton
+        v-if="canEditItems()"
+        color="primary"
+        icon="i-lucide-plus"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="navigateTo('/items/create')"
+      >
+        <span class="hidden sm:inline">Create Item</span>
+        <span class="sm:hidden">Create</span>
+      </UButton>
+    </div>
+
+    <!-- Filters -->
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <!-- Desktop: Single row layout (lg and above) -->
+      <div class="hidden lg:flex items-center gap-3">
+        <!-- Search -->
+        <div class="flex-1 min-w-0 max-w-md">
+          <UInput
+            v-model="filters.search"
+            placeholder="Search items by name or code..."
+            icon="i-lucide-search"
+            size="lg"
+            class="w-full"
+            @input="debouncedSearch"
+          />
+        </div>
+
+        <!-- Category Filter Toggle Buttons -->
+        <div
+          v-if="categoryOptions.length > 0"
+          class="flex items-center gap-1 p-1 bg-muted rounded-full"
+          role="group"
+          aria-label="Filter by category"
+        >
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
+            :class="getCategoryButtonClass(null)"
+            :aria-pressed="filters.category === null"
+            @click="selectCategory(null)"
+          >
+            All Categories
+          </button>
+          <button
+            v-for="category in categoryOptions.slice(0, 3)"
+            :key="category"
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
+            :class="getCategoryButtonClass(category)"
+            :aria-pressed="filters.category === category"
+            @click="selectCategory(category)"
+          >
+            {{ category }}
+          </button>
+        </div>
+
+        <!-- Status Filter Dropdown (Far Right) -->
+        <UDropdownMenu
+          :items="statusDropdownItems"
+          :ui="{ content: 'min-w-[140px]' }"
+          class="ml-auto"
+        >
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="currentStatusIcon" class="w-4 h-4 mr-2" />
+            {{ currentStatusLabel }}
+          </UButton>
+        </UDropdownMenu>
+      </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Row 1: Search and Status Dropdown -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <UInput
+              v-model="filters.search"
+              placeholder="Search items..."
+              icon="i-lucide-search"
+              size="lg"
+              class="w-full"
+              @input="debouncedSearch"
+            />
+          </div>
+          <!-- Icon-only dropdown on mobile -->
+          <UDropdownMenu :items="statusDropdownItems" :ui="{ content: 'min-w-[140px]' }">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-3"
+              trailing-icon="i-lucide-chevron-down"
+            >
+              <UIcon :name="currentStatusIcon" class="w-4 h-4" />
+            </UButton>
+          </UDropdownMenu>
+        </div>
+
+        <!-- Row 2: Category Toggle Buttons (horizontally scrollable) -->
+        <div v-if="categoryOptions.length > 0" class="overflow-x-auto -mx-3 px-3">
+          <div class="flex items-center gap-1 p-1 bg-muted rounded-full w-fit">
+            <button
+              type="button"
+              class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
+              :class="getCategoryButtonClass(null)"
+              :aria-pressed="filters.category === null"
+              @click="selectCategory(null)"
+            >
+              All
+            </button>
+            <button
+              v-for="category in categoryOptions"
+              :key="category"
+              type="button"
+              class="px-3 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap focus-ring"
+              :class="getCategoryButtonClass(category)"
+              :aria-pressed="filters.category === category"
+              @click="selectCategory(category)"
+            >
+              {{ category }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading items..." />
+    </div>
+
+    <!-- Error State -->
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchItems" />
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else-if="!items.length"
       icon="i-lucide-package-2"
-      :show-location="true"
-      :show-period="true"
-      location-scope="all"
+      title="No items found"
+      description="No items match your search criteria. Try adjusting your filters or create a new item."
     >
-      <template #actions>
+      <template v-if="canEditItems()" #actions>
         <UButton
-          v-if="canEditItems()"
           color="primary"
-          icon="i-heroicons-plus"
+          icon="i-lucide-plus"
+          class="cursor-pointer"
           @click="navigateTo('/items/create')"
         >
           Create Item
         </UButton>
       </template>
-    </LayoutPageHeader>
-
-    <!-- Filters Card -->
-    <UCard>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Search Input -->
-        <div class="md:col-span-2">
-          <UInput
-            v-model="searchQuery"
-            icon="i-heroicons-magnifying-glass"
-            placeholder="Search by item name or code..."
-            size="lg"
-            @update:model-value="handleSearch"
-          />
-        </div>
-
-        <!-- Category Filter -->
-        <div>
-          <USelectMenu
-            v-model="selectedCategory"
-            :options="categoryOptions"
-            placeholder="All Categories"
-            size="lg"
-            @update:model-value="handleCategoryChange"
-          />
-        </div>
-      </div>
-
-      <!-- Active Filter Chips -->
-      <div v-if="searchQuery || selectedCategory" class="mt-4 flex flex-wrap gap-2">
-        <UBadge v-if="searchQuery" color="primary" variant="subtle" size="md">
-          Search: {{ searchQuery }}
-          <button class="ml-1 hover:text-error" @click="clearSearch">
-            <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
-          </button>
-        </UBadge>
-
-        <UBadge v-if="selectedCategory" color="primary" variant="subtle" size="md">
-          Category: {{ selectedCategory }}
-          <button class="ml-1 hover:text-error" @click="clearCategory">
-            <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
-          </button>
-        </UBadge>
-      </div>
-    </UCard>
-
-    <!-- Loading State -->
-    <TableSkeleton v-if="loading" :columns="8" :rows="10" />
-
-    <!-- Error State -->
-    <UAlert
-      v-else-if="error"
-      icon="i-heroicons-exclamation-triangle"
-      color="error"
-      variant="soft"
-      title="Error loading items"
-      :description="error || 'An error occurred'"
-      :actions="[
-        {
-          label: 'Retry',
-          onClick: () => fetchItems(),
-        },
-      ]"
-    />
-
-    <!-- Empty State -->
-    <EmptyState
-      v-else-if="items.length === 0 && !loading"
-      icon="i-lucide-package-2"
-      title="No Items Found"
-      :description="
-        searchQuery || selectedCategory
-          ? 'No items match your current filters. Try adjusting your search criteria.'
-          : 'No items have been created yet. Click the button above to create your first item.'
-      "
-    >
-      <template v-if="canEditItems() && !searchQuery && !selectedCategory" #action>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          label="Create First Item"
-          @click="navigateTo('/items/create')"
-        />
-      </template>
-      <template v-else-if="searchQuery || selectedCategory" #action>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-x"
-          label="Clear Filters"
-          @click="clearFilters"
-        />
-      </template>
     </EmptyState>
 
     <!-- Items Table -->
-    <UCard v-else>
+    <UCard v-else class="card-elevated" :ui="{ body: 'p-0' }">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-default">
+        <table class="min-w-full divide-y divide-[var(--ui-border)]">
           <thead>
-            <tr class="bg-elevated">
+            <tr class="bg-[var(--ui-bg-elevated)]">
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Code</th>
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Name</th>
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit</th>
@@ -134,17 +194,17 @@
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-default">
+          <tbody class="divide-y divide-[var(--ui-border)]">
             <tr
               v-for="item in items"
               :key="item.id"
-              class="hover:bg-elevated transition-colors cursor-pointer"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
               @click="navigateTo(`/items/${item.id}`)"
             >
-              <td class="px-4 py-4 whitespace-nowrap text-body font-medium">
+              <td class="px-4 py-4 whitespace-nowrap font-mono text-[var(--ui-text)] text-sm">
                 {{ item.code }}
               </td>
-              <td class="px-4 py-4 text-body">
+              <td class="px-4 py-4 text-[var(--ui-text)]">
                 <div class="flex items-center gap-2">
                   {{ item.name }}
                   <UBadge v-if="!item.is_active" color="neutral" variant="subtle" size="xs">
@@ -158,13 +218,13 @@
               <td class="px-4 py-4 whitespace-nowrap text-caption">
                 {{ item.category || "-" }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-body text-right">
+              <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right">
                 {{ formatQuantity(getStockData(item).onHand) }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-body text-right">
+              <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right">
                 {{ formatCurrency(getStockData(item).wac) }}
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-body text-right font-medium">
+              <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right font-medium">
                 {{ formatCurrency(getStockData(item).value) }}
               </td>
               <td v-if="canEditItems()" class="px-4 py-4 whitespace-nowrap text-sm text-right">
@@ -172,7 +232,8 @@
                   color="primary"
                   variant="ghost"
                   size="xs"
-                  icon="i-heroicons-pencil-square"
+                  icon="i-lucide-edit"
+                  class="cursor-pointer"
                   @click.stop="navigateTo(`/items/${item.id}/edit`)"
                 >
                   Edit
@@ -184,7 +245,7 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="pagination.totalPages > 1" class="mt-6 border-t border-default pt-4">
+      <div v-if="pagination.totalPages > 1" class="px-4 py-4 border-t border-[var(--ui-border)]">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <!-- Pagination Info -->
           <div class="text-caption">
@@ -208,7 +269,8 @@
             <UButton
               :disabled="!pagination.hasPrevPage"
               variant="soft"
-              icon="i-heroicons-chevron-left"
+              icon="i-lucide-chevron-left"
+              class="cursor-pointer"
               @click="goToPage(pagination.page - 1)"
             >
               Previous
@@ -222,19 +284,21 @@
                   :variant="pageNum === pagination.page ? 'solid' : 'soft'"
                   :color="pageNum === pagination.page ? 'primary' : 'neutral'"
                   size="sm"
+                  class="cursor-pointer"
                   @click="goToPage(pageNum)"
                 >
                   {{ pageNum }}
                 </UButton>
-                <span v-else class="px-2 text-muted">...</span>
+                <span v-else class="px-2 text-[var(--ui-text-muted)]">...</span>
               </template>
             </div>
 
             <UButton
               :disabled="!pagination.hasNextPage"
               variant="soft"
-              icon="i-heroicons-chevron-right"
+              icon="i-lucide-chevron-right"
               trailing
+              class="cursor-pointer"
               @click="goToPage(pagination.page + 1)"
             >
               Next
@@ -247,6 +311,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDebounceFn } from "@vueuse/core";
 import type { Item, LocationStock } from "@prisma/client";
 
 // Type for Item with optional location stock
@@ -262,19 +327,26 @@ interface ItemWithStock extends Item {
   >;
 }
 
+definePageMeta({
+  layout: "default",
+});
+
 // Composables
 const { canEditItems } = usePermissions();
 const locationStore = useLocationStore();
-const toast = useToast();
+const toast = useAppToast();
 
 // Reactive state
 const items = ref<ItemWithStock[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
-const searchQuery = ref("");
-const selectedCategory = ref<string | null>(null);
 const categoryOptions = ref<string[]>([]);
-const searchTimeout = ref<NodeJS.Timeout | null>(null);
+
+const filters = reactive({
+  search: "",
+  category: null as string | null,
+  is_active: true as boolean | null,
+});
 
 // Pagination state
 const pagination = ref({
@@ -285,6 +357,75 @@ const pagination = ref({
   hasNextPage: false,
   hasPrevPage: false,
 });
+
+// Status dropdown items
+const statusDropdownItems = computed(() => [
+  [
+    {
+      label: "Active",
+      icon: "i-lucide-circle-check",
+      active: filters.is_active === true,
+      onSelect: () => selectStatus(true),
+    },
+    {
+      label: "Inactive",
+      icon: "i-lucide-archive",
+      active: filters.is_active === false,
+      onSelect: () => selectStatus(false),
+    },
+    {
+      label: "All",
+      icon: "i-lucide-list",
+      active: filters.is_active === null,
+      onSelect: () => selectStatus(null),
+    },
+  ],
+]);
+
+// Current status label for dropdown button
+const currentStatusLabel = computed(() => {
+  if (filters.is_active === true) return "Active";
+  if (filters.is_active === false) return "Inactive";
+  return "All";
+});
+
+// Current status icon for dropdown button
+const currentStatusIcon = computed(() => {
+  if (filters.is_active === false) return "i-lucide-archive";
+  if (filters.is_active === null) return "i-lucide-list";
+  return "i-lucide-circle-check";
+});
+
+// Get button class based on category selection
+const getCategoryButtonClass = (categoryValue: string | null) => {
+  const isSelected = filters.category === categoryValue;
+
+  if (!isSelected) {
+    return "text-muted hover:text-default hover:bg-elevated";
+  }
+
+  return "bg-primary text-white shadow-sm";
+};
+
+// Select category handler
+const selectCategory = (categoryValue: string | null) => {
+  filters.category = categoryValue;
+  pagination.value.page = 1;
+  fetchItems();
+};
+
+// Select status handler
+const selectStatus = (statusValue: boolean | null) => {
+  filters.is_active = statusValue;
+  pagination.value.page = 1;
+  fetchItems();
+};
+
+// Debounced search
+const debouncedSearch = useDebounceFn(() => {
+  pagination.value.page = 1;
+  fetchItems();
+}, 500);
 
 /**
  * Fetch items from the API
@@ -297,7 +438,6 @@ async function fetchItems() {
     const params: Record<string, string> = {
       page: String(pagination.value.page),
       limit: String(pagination.value.limit),
-      is_active: "true", // Only show active items by default
     };
 
     // Add locationId if available to include stock data
@@ -306,13 +446,18 @@ async function fetchItems() {
     }
 
     // Add search query if present
-    if (searchQuery.value) {
-      params.search = searchQuery.value;
+    if (filters.search) {
+      params.search = filters.search;
     }
 
     // Add category filter if present
-    if (selectedCategory.value) {
-      params.category = selectedCategory.value;
+    if (filters.category) {
+      params.category = filters.category;
+    }
+
+    // Add status filter
+    if (filters.is_active !== null) {
+      params.is_active = String(filters.is_active);
     }
 
     const response = await $fetch<{
@@ -328,14 +473,19 @@ async function fetchItems() {
 
     // Extract unique categories from items for filter
     extractCategories(response.items);
-  } catch (err: any) {
-    error.value = err?.data?.message || "Failed to load items";
+  } catch (err: unknown) {
+    const errorMessage =
+      err &&
+      typeof err === "object" &&
+      "data" in err &&
+      err.data &&
+      typeof err.data === "object" &&
+      "message" in err.data
+        ? String(err.data.message)
+        : "Failed to load items";
+    error.value = errorMessage;
     console.error("Error fetching items:", err);
-    toast.add({
-      title: "Error",
-      description: error.value || undefined,
-      color: "error",
-    });
+    toast.error("Error", { description: errorMessage });
   } finally {
     loading.value = false;
   }
@@ -353,63 +503,7 @@ function extractCategories(itemsList: ItemWithStock[]) {
     }
   });
 
-  // Only update if we have new categories
-  const newCategories = Array.from(categories).sort();
-  if (newCategories.length > categoryOptions.value.length) {
-    categoryOptions.value = newCategories;
-  }
-}
-
-/**
- * Handle search with debounce
- */
-function handleSearch() {
-  // Clear existing timeout
-  if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value);
-  }
-
-  // Set new timeout
-  searchTimeout.value = setTimeout(() => {
-    pagination.value.page = 1; // Reset to first page
-    fetchItems();
-  }, 500); // 500ms debounce
-}
-
-/**
- * Handle category filter change
- */
-function handleCategoryChange() {
-  pagination.value.page = 1; // Reset to first page
-  fetchItems();
-}
-
-/**
- * Clear search filter
- */
-function clearSearch() {
-  searchQuery.value = "";
-  pagination.value.page = 1;
-  fetchItems();
-}
-
-/**
- * Clear category filter
- */
-function clearCategory() {
-  selectedCategory.value = null;
-  pagination.value.page = 1;
-  fetchItems();
-}
-
-/**
- * Clear all filters
- */
-function clearFilters() {
-  searchQuery.value = "";
-  selectedCategory.value = null;
-  pagination.value.page = 1;
-  fetchItems();
+  categoryOptions.value = Array.from(categories).sort();
 }
 
 /**
@@ -516,10 +610,8 @@ watch(
   }
 );
 
-// Cleanup timeout on unmount
-onUnmounted(() => {
-  if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value);
-  }
+// Set page title
+useHead({
+  title: "Items - Stock Management System",
 });
 </script>

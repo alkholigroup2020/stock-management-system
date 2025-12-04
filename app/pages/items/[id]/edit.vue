@@ -1,88 +1,110 @@
 <template>
-  <div class="bg-default">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex items-center justify-center min-h-[400px]">
-      <div class="text-center">
-        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />
-        <p class="mt-4 text-sm text-muted">Loading item...</p>
-      </div>
+    <div v-if="isLoading" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading item..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="loadError" class="flex items-center justify-center min-h-[400px]">
-      <UCard class="max-w-md">
-        <div class="text-center">
-          <UIcon
-            name="i-heroicons-exclamation-triangle"
-            class="w-12 h-12 text-error mx-auto mb-4"
-          />
-          <h2 class="text-xl font-semibold text-default mb-2">Error Loading Item</h2>
-          <p class="text-sm text-muted mb-4">{{ loadError }}</p>
-          <UButton color="primary" class="cursor-pointer" @click="router.push('/items')">
-            Back to Items
-          </UButton>
-        </div>
-      </UCard>
-    </div>
+    <ErrorAlert
+      v-else-if="loadError"
+      :message="loadError"
+      back-url="/items"
+      back-label="Back to Items"
+    />
 
     <!-- Edit Form -->
-    <div v-else class="space-y-6">
+    <template v-else>
       <!-- Page Header -->
-      <LayoutPageHeader
-        title="Edit Item"
-        icon="i-lucide-package-2"
-        :show-location="true"
-        :show-period="true"
-        location-scope="all"
-      >
-        <template #actions>
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-heroicons-arrow-left"
-            @click="handleCancel"
-          >
-            Back
-          </UButton>
-        </template>
-      </LayoutPageHeader>
+      <div class="flex items-center justify-between gap-3">
+        <!-- Mobile: smaller icon and title -->
+        <div class="flex items-center gap-2 sm:gap-4">
+          <UIcon name="i-lucide-package-2" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+          <div>
+            <h1 class="text-xl sm:text-3xl font-bold text-primary">Edit Item</h1>
+            <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+              Update item information
+            </p>
+          </div>
+        </div>
+        <!-- Mobile: shorter button text -->
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-arrow-left"
+          size="lg"
+          class="cursor-pointer rounded-full px-3 sm:px-6"
+          @click="handleCancel"
+        >
+          <span class="hidden sm:inline">Back</span>
+          <span class="sm:hidden">Back</span>
+        </UButton>
+      </div>
 
       <!-- Form Card -->
-      <UCard class="max-w-2xl">
+      <UCard class="card-elevated" :ui="{ body: 'p-6' }">
         <form @submit.prevent="handleSubmit">
-          <div class="space-y-6">
-            <!-- Item Code (Read-only) -->
+          <!-- Status Indicator (Full Width) -->
+          <div class="mb-6 flex items-center gap-3 p-4 rounded-lg bg-[var(--ui-bg-muted)]">
+            <UIcon
+              :name="item?.is_active ? 'i-lucide-circle-check' : 'i-lucide-archive'"
+              :class="[
+                'w-5 h-5',
+                item?.is_active ? 'text-[var(--ui-success)]' : 'text-[var(--ui-text-muted)]',
+              ]"
+            />
+            <div class="flex-1">
+              <p class="text-sm font-medium text-[var(--ui-text)]">Item Status</p>
+              <p class="text-caption">
+                This item is currently
+                <span :class="item?.is_active ? 'text-[var(--ui-success)]' : 'text-[var(--ui-text-muted)]'">
+                  {{ item?.is_active ? "active" : "inactive" }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Responsive Grid: 1 column on mobile, 2 columns on large screens -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Item Code (Read-only) - Left Column -->
             <div>
               <label for="code" class="form-label">Item Code</label>
-              <UInput id="code" v-model="form.code" size="lg" disabled class="opacity-60" />
-              <p class="mt-1 text-xs text-muted">Item code cannot be changed</p>
+              <UInput
+                id="code"
+                v-model="form.code"
+                size="lg"
+                class="w-full opacity-60"
+                disabled
+              />
+              <p class="mt-1 text-caption">Item code cannot be changed</p>
             </div>
 
-            <!-- Item Name -->
+            <!-- Item Name - Right Column -->
             <div>
               <label for="name" class="form-label">
                 Item Name
-                <span class="text-error">*</span>
+                <span class="text-[var(--ui-error)]">*</span>
               </label>
               <UInput
                 id="name"
                 v-model="form.name"
                 placeholder="e.g., Basmati Rice"
                 size="lg"
+                class="w-full"
                 :disabled="isSubmitting"
                 :error="!!errors.name"
                 @blur="validateField('name')"
               />
-              <p v-if="errors.name" class="mt-1 text-sm text-error">
+              <p v-if="errors.name" class="mt-1 text-caption text-[var(--ui-error)]">
                 {{ errors.name }}
               </p>
             </div>
 
-            <!-- Unit of Measure -->
+            <!-- Unit of Measure - Left Column -->
             <div>
               <label for="unit" class="form-label">
                 Unit of Measure
-                <span class="text-error">*</span>
+                <span class="text-[var(--ui-error)]">*</span>
               </label>
               <USelectMenu
                 v-model="form.unit"
@@ -90,19 +112,20 @@
                 value-key="value"
                 placeholder="Select unit"
                 size="lg"
+                class="w-full"
                 :disabled="isSubmitting"
                 :error="!!errors.unit"
                 @update:model-value="validateField('unit')"
               />
-              <p v-if="errors.unit" class="mt-1 text-sm text-error">
+              <p v-if="errors.unit" class="mt-1 text-caption text-[var(--ui-error)]">
                 {{ errors.unit }}
               </p>
-              <p class="mt-1 text-xs text-muted">
+              <p v-else class="mt-1 text-caption">
                 How this item is measured (KG = Kilograms, EA = Each, LTR = Liters, etc.)
               </p>
             </div>
 
-            <!-- Category -->
+            <!-- Category - Right Column -->
             <div>
               <label for="category" class="form-label">Category</label>
               <UInput
@@ -110,17 +133,18 @@
                 v-model="form.category"
                 placeholder="e.g., Dry Goods"
                 size="lg"
+                class="w-full"
                 :disabled="isSubmitting"
                 :error="!!errors.category"
                 @blur="validateField('category')"
               />
-              <p v-if="errors.category" class="mt-1 text-sm text-error">
+              <p v-if="errors.category" class="mt-1 text-caption text-[var(--ui-error)]">
                 {{ errors.category }}
               </p>
-              <p class="mt-1 text-xs text-muted">Optional: Main category for organizing items</p>
+              <p v-else class="mt-1 text-caption">Optional: Main category for organizing items</p>
             </div>
 
-            <!-- Sub-Category -->
+            <!-- Sub-Category - Left Column -->
             <div>
               <label for="sub_category" class="form-label">Sub-Category</label>
               <UInput
@@ -128,63 +152,83 @@
                 v-model="form.sub_category"
                 placeholder="e.g., Rice"
                 size="lg"
+                class="w-full"
                 :disabled="isSubmitting"
                 :error="!!errors.sub_category"
                 @blur="validateField('sub_category')"
               />
-              <p v-if="errors.sub_category" class="mt-1 text-sm text-error">
+              <p v-if="errors.sub_category" class="mt-1 text-caption text-[var(--ui-error)]">
                 {{ errors.sub_category }}
               </p>
-              <p class="mt-1 text-xs text-muted">Optional: Sub-category for further organization</p>
+              <p v-else class="mt-1 text-caption">
+                Optional: Sub-category for further organization
+              </p>
             </div>
+          </div>
 
-            <!-- Form Actions -->
-            <div class="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-default">
-              <UButton
-                type="button"
-                color="neutral"
-                variant="soft"
-                size="lg"
-                :disabled="isSubmitting || isDeactivating"
-                @click="handleCancel"
-                class="w-full sm:w-auto"
-              >
-                Cancel
-              </UButton>
+          <!-- Form Actions -->
+          <div
+            class="flex flex-col-reverse sm:flex-row gap-3 pt-6 mt-6 border-t border-[var(--ui-border)]"
+          >
+            <UButton
+              type="button"
+              color="neutral"
+              variant="soft"
+              size="lg"
+              class="w-full sm:w-auto cursor-pointer"
+              :disabled="isSubmitting || isDeactivating || isActivating"
+              @click="handleCancel"
+            >
+              Cancel
+            </UButton>
 
-              <div class="flex-1"></div>
+            <div class="flex-1"></div>
 
-              <!-- Deactivate Button -->
-              <UButton
-                v-if="item?.is_active"
-                type="button"
-                color="error"
-                variant="soft"
-                size="lg"
-                :loading="isDeactivating"
-                :disabled="isSubmitting || isDeactivating"
-                @click="handleDeactivate"
-                class="w-full sm:w-auto"
-              >
-                {{ isDeactivating ? "Deactivating..." : "Deactivate" }}
-              </UButton>
+            <!-- Activate Button -->
+            <UButton
+              v-if="!item?.is_active"
+              type="button"
+              color="success"
+              variant="soft"
+              size="lg"
+              class="w-full sm:w-auto cursor-pointer"
+              :loading="isActivating"
+              :disabled="isSubmitting || isDeactivating || isActivating"
+              @click="handleActivate"
+            >
+              {{ isActivating ? "Activating..." : "Activate" }}
+            </UButton>
 
-              <!-- Update Button -->
-              <UButton
-                type="submit"
-                color="primary"
-                size="lg"
-                :loading="isSubmitting"
-                :disabled="isSubmitting || isDeactivating || !isFormValid || !hasChanges"
-                class="w-full sm:w-auto"
-              >
-                {{ isSubmitting ? "Updating..." : "Update Item" }}
-              </UButton>
-            </div>
+            <!-- Deactivate Button -->
+            <UButton
+              v-if="item?.is_active"
+              type="button"
+              color="error"
+              variant="soft"
+              size="lg"
+              class="w-full sm:w-auto cursor-pointer"
+              :loading="isDeactivating"
+              :disabled="isSubmitting || isDeactivating || isActivating"
+              @click="handleDeactivate"
+            >
+              {{ isDeactivating ? "Deactivating..." : "Deactivate" }}
+            </UButton>
+
+            <!-- Update Button -->
+            <UButton
+              type="submit"
+              color="primary"
+              size="lg"
+              class="w-full sm:w-auto cursor-pointer"
+              :loading="isSubmitting"
+              :disabled="isSubmitting || isDeactivating || isActivating || !isFormValid || !hasChanges"
+            >
+              {{ isSubmitting ? "Updating..." : "Update Item" }}
+            </UButton>
           </div>
         </form>
       </UCard>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -200,7 +244,7 @@ definePageMeta({
 
 // Composables
 const { canEditItems } = usePermissions();
-const toast = useToast();
+const toast = useAppToast();
 const router = useRouter();
 const route = useRoute();
 
@@ -227,10 +271,24 @@ const isLoading = ref(true);
 const loadError = ref("");
 const isSubmitting = ref(false);
 const isDeactivating = ref(false);
+const isActivating = ref(false);
 
 // Item data
-const item = ref<any>(null);
-const originalData = ref<any>(null);
+const item = ref<{
+  id: string;
+  code: string;
+  name: string;
+  unit: string;
+  category: string | null;
+  sub_category: string | null;
+  is_active: boolean;
+} | null>(null);
+const originalData = ref<{
+  name: string;
+  unit: string;
+  category: string;
+  sub_category: string;
+} | null>(null);
 
 // Form state
 const form = reactive({
@@ -267,7 +325,12 @@ async function fetchItem() {
   loadError.value = "";
 
   try {
-    const response = await $fetch<{ item: any }>(`/api/items/${itemId}`);
+    const response = await $fetch<{ item: typeof item.value }>(`/api/items/${itemId}`);
+
+    if (!response.item) {
+      throw new Error("Item not found");
+    }
+
     item.value = response.item;
 
     // Populate form with existing data
@@ -284,15 +347,27 @@ async function fetchItem() {
       category: response.item.category || "",
       sub_category: response.item.sub_category || "",
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching item:", error);
 
-    if (error?.data?.code === "ITEM_NOT_FOUND") {
-      loadError.value = "Item not found";
-    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
-      loadError.value = "You do not have permission to edit this item";
+    if (
+      error &&
+      typeof error === "object" &&
+      "data" in error &&
+      error.data &&
+      typeof error.data === "object"
+    ) {
+      const errorData = error.data as { code?: string; message?: string };
+
+      if (errorData.code === "ITEM_NOT_FOUND") {
+        loadError.value = "Item not found";
+      } else if (errorData.code === "INSUFFICIENT_PERMISSIONS") {
+        loadError.value = "You do not have permission to edit this item";
+      } else {
+        loadError.value = errorData.message || "Failed to load item";
+      }
     } else {
-      loadError.value = error?.data?.message || "Failed to load item";
+      loadError.value = "Failed to load item";
     }
   } finally {
     isLoading.value = false;
@@ -385,20 +460,16 @@ const hasChanges = computed(() => {
 async function handleSubmit() {
   // Validate form first
   if (!validateForm()) {
-    toast.add({
-      title: "Validation Error",
+    toast.error("Validation Error", {
       description: "Please fix the errors in the form",
-      color: "error",
     });
     return;
   }
 
   // Check if there are changes
   if (!hasChanges.value) {
-    toast.add({
-      title: "No Changes",
+    toast.warning("No Changes", {
       description: "No changes were made to the item",
-      color: "warning",
     });
     return;
   }
@@ -407,67 +478,85 @@ async function handleSubmit() {
 
   try {
     // Prepare data for API (only send changed fields)
-    const data: any = {};
-    if (form.name !== originalData.value.name) data.name = form.name;
-    if (form.unit !== originalData.value.unit) data.unit = form.unit;
-    if (form.category !== originalData.value.category) data.category = form.category || null;
-    if (form.sub_category !== originalData.value.sub_category)
+    const data: {
+      name?: string;
+      unit?: string;
+      category?: string | null;
+      sub_category?: string | null;
+    } = {};
+
+    if (form.name !== originalData.value?.name) data.name = form.name;
+    if (form.unit !== originalData.value?.unit) data.unit = form.unit;
+    if (form.category !== originalData.value?.category)
+      data.category = form.category || null;
+    if (form.sub_category !== originalData.value?.sub_category)
       data.sub_category = form.sub_category || null;
 
     // Call API to update item
-    const response = await $fetch<{ item: any; message: string }>(`/api/items/${itemId}`, {
-      method: "PATCH",
-      body: data,
-    });
+    const response = await $fetch<{ item: unknown; message: string }>(
+      `/api/items/${itemId}`,
+      {
+        method: "PATCH",
+        body: data,
+      }
+    );
 
     // Show success message
-    toast.add({
-      title: "Success",
+    toast.success("Success", {
       description: response.message || "Item updated successfully",
-      color: "success",
     });
 
     // Redirect to items list
     router.push("/items");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating item:", error);
 
     // Handle specific error cases
-    if (error?.data?.code === "VALIDATION_ERROR") {
-      toast.add({
-        title: "Validation Error",
-        description: error.data.message || "Invalid item data",
-        color: "error",
-      });
+    if (
+      error &&
+      typeof error === "object" &&
+      "data" in error &&
+      error.data &&
+      typeof error.data === "object"
+    ) {
+      const errorData = error.data as {
+        code?: string;
+        message?: string;
+        details?: Array<{ path?: string[]; message: string }>;
+      };
 
-      // Set field-specific errors if available
-      if (error.data.details) {
-        error.data.details.forEach((err: any) => {
-          const field = err.path?.[0];
-          if (field && field in errors) {
-            errors[field as keyof typeof errors] = err.message;
-          }
+      if (errorData.code === "VALIDATION_ERROR") {
+        toast.error("Validation Error", {
+          description: errorData.message || "Invalid item data",
+        });
+
+        // Set field-specific errors if available
+        if (errorData.details) {
+          errorData.details.forEach((err) => {
+            const field = err.path?.[0];
+            if (field && field in errors) {
+              errors[field as keyof typeof errors] = err.message;
+            }
+          });
+        }
+      } else if (errorData.code === "ITEM_NOT_FOUND") {
+        toast.error("Item Not Found", {
+          description: "The item you are trying to edit does not exist",
+        });
+        router.push("/items");
+      } else if (errorData.code === "INSUFFICIENT_PERMISSIONS") {
+        toast.error("Access Denied", {
+          description: "You do not have permission to update items",
+        });
+        router.push("/items");
+      } else {
+        toast.error("Error", {
+          description: errorData.message || "Failed to update item",
         });
       }
-    } else if (error?.data?.code === "ITEM_NOT_FOUND") {
-      toast.add({
-        title: "Item Not Found",
-        description: "The item you are trying to edit does not exist",
-        color: "error",
-      });
-      router.push("/items");
-    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
-      toast.add({
-        title: "Access Denied",
-        description: "You do not have permission to update items",
-        color: "error",
-      });
-      router.push("/items");
     } else {
-      toast.add({
-        title: "Error",
-        description: error?.data?.message || "Failed to update item",
-        color: "error",
+      toast.error("Error", {
+        description: "Failed to update item",
       });
     }
   } finally {
@@ -491,7 +580,7 @@ async function handleDeactivate() {
 
   try {
     // Call API to deactivate item
-    const response = await $fetch<{ item: any; message: string; deactivated: boolean }>(
+    const response = await $fetch<{ item: unknown; message: string; deactivated: boolean }>(
       `/api/items/${itemId}`,
       {
         method: "DELETE",
@@ -499,40 +588,122 @@ async function handleDeactivate() {
     );
 
     // Show success message
-    toast.add({
-      title: "Success",
+    toast.success("Success", {
       description: response.message || "Item deactivated successfully",
-      color: "success",
     });
 
     // Redirect to items list
     router.push("/items");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deactivating item:", error);
 
     // Handle specific error cases
-    if (error?.data?.code === "ITEM_NOT_FOUND") {
-      toast.add({
-        title: "Item Not Found",
-        description: "The item you are trying to deactivate does not exist",
-        color: "error",
-      });
-      router.push("/items");
-    } else if (error?.data?.code === "INSUFFICIENT_PERMISSIONS") {
-      toast.add({
-        title: "Access Denied",
-        description: "You do not have permission to deactivate items",
-        color: "error",
-      });
+    if (
+      error &&
+      typeof error === "object" &&
+      "data" in error &&
+      error.data &&
+      typeof error.data === "object"
+    ) {
+      const errorData = error.data as { code?: string; message?: string };
+
+      if (errorData.code === "ITEM_NOT_FOUND") {
+        toast.error("Item Not Found", {
+          description: "The item you are trying to deactivate does not exist",
+        });
+        router.push("/items");
+      } else if (errorData.code === "INSUFFICIENT_PERMISSIONS") {
+        toast.error("Access Denied", {
+          description: "You do not have permission to deactivate items",
+        });
+      } else {
+        toast.error("Error", {
+          description: errorData.message || "Failed to deactivate item",
+        });
+      }
     } else {
-      toast.add({
-        title: "Error",
-        description: error?.data?.message || "Failed to deactivate item",
-        color: "error",
+      toast.error("Error", {
+        description: "Failed to deactivate item",
       });
     }
   } finally {
     isDeactivating.value = false;
+  }
+}
+
+/**
+ * Handle activate action
+ */
+async function handleActivate() {
+  // Confirm activation
+  const confirmed = confirm(
+    `Are you sure you want to activate "${item.value?.name}"?\n\n` +
+      "This will allow the item to be used in new transactions."
+  );
+
+  if (!confirmed) return;
+
+  isActivating.value = true;
+
+  try {
+    // Call API to activate item
+    const response = await $fetch<{ item: typeof item.value; message: string }>(
+      `/api/items/${itemId}`,
+      {
+        method: "PATCH",
+        body: {
+          is_active: true,
+        },
+      }
+    );
+
+    // Update local item state
+    if (item.value) {
+      item.value.is_active = true;
+    }
+
+    // Show success message
+    toast.success("Success", {
+      description: response.message || "Item activated successfully",
+    });
+  } catch (error: unknown) {
+    console.error("Error activating item:", error);
+
+    // Handle specific error cases
+    if (
+      error &&
+      typeof error === "object" &&
+      "data" in error &&
+      error.data &&
+      typeof error.data === "object"
+    ) {
+      const errorData = error.data as { code?: string; message?: string };
+
+      if (errorData.code === "ITEM_NOT_FOUND") {
+        toast.error("Item Not Found", {
+          description: "The item you are trying to activate does not exist",
+        });
+        router.push("/items");
+      } else if (errorData.code === "INSUFFICIENT_PERMISSIONS") {
+        toast.error("Access Denied", {
+          description: "You do not have permission to activate items",
+        });
+      } else if (errorData.code === "VALIDATION_ERROR") {
+        toast.error("Validation Error", {
+          description: errorData.message || "Invalid activation request",
+        });
+      } else {
+        toast.error("Error", {
+          description: errorData.message || "Failed to activate item",
+        });
+      }
+    } else {
+      toast.error("Error", {
+        description: "Failed to activate item",
+      });
+    }
+  } finally {
+    isActivating.value = false;
   }
 }
 
@@ -542,7 +713,9 @@ async function handleDeactivate() {
 function handleCancel() {
   // Check if form has been modified
   if (hasChanges.value) {
-    const confirmed = confirm("Are you sure you want to cancel? Any unsaved changes will be lost.");
+    const confirmed = confirm(
+      "Are you sure you want to cancel? Any unsaved changes will be lost."
+    );
     if (!confirmed) return;
   }
 
@@ -552,5 +725,10 @@ function handleCancel() {
 // Fetch item data on mount
 onMounted(() => {
   fetchItem();
+});
+
+// Set page title
+useHead({
+  title: computed(() => (item.value ? `Edit ${item.value.name}` : "Edit Item")),
 });
 </script>
