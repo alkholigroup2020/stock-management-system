@@ -1,24 +1,28 @@
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Period Management"
-      icon="i-lucide-calendar"
-      :show-location="false"
-      :show-period="false"
-    >
-      <template #actions>
-        <UButton
-          v-if="isAdmin"
-          color="primary"
-          icon="i-lucide-plus"
-          class="cursor-pointer"
-          @click="openCreateModal"
-        >
-          New Period
-        </UButton>
-      </template>
-    </LayoutPageHeader>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-calendar" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Periods</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Manage accounting periods and price locking
+          </p>
+        </div>
+      </div>
+      <UButton
+        v-if="isAdmin"
+        color="primary"
+        icon="i-lucide-plus"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="openCreateModal"
+      >
+        <span class="hidden sm:inline">New Period</span>
+        <span class="sm:hidden">New</span>
+      </UButton>
+    </div>
 
     <!-- Current Period Alert -->
     <UAlert
@@ -29,100 +33,94 @@
       :description="`${currentPeriod.name} (${formatDateRange(currentPeriod.start_date, currentPeriod.end_date)})`"
     />
 
-    <!-- Periods List -->
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="text-subheading font-semibold">All Periods</h2>
+    <!-- Search Filter -->
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <div class="flex items-center gap-3">
+        <div class="flex-1 min-w-0 max-w-md">
           <UInput
             v-model="searchQuery"
+            placeholder="Search periods by name..."
             icon="i-lucide-search"
-            placeholder="Search periods..."
-            class="w-64"
+            size="lg"
+            class="w-full"
           />
         </div>
-      </template>
-
-      <!-- Loading State -->
-      <div v-if="pending" class="flex justify-center py-12">
-        <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-primary" />
       </div>
+    </UCard>
 
-      <!-- Error State -->
-      <UAlert
-        v-else-if="error"
-        color="error"
-        icon="i-lucide-alert-circle"
-        title="Error Loading Periods"
-        :description="error.message"
-      />
+    <!-- Loading State -->
+    <div v-if="pending" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading periods..." />
+    </div>
 
-      <!-- Empty State -->
-      <div v-else-if="!filteredPeriods || filteredPeriods.length === 0" class="text-center py-12">
-        <UIcon name="i-lucide-calendar-x" class="w-16 h-16 mx-auto mb-4 text-muted" />
-        <h3 class="text-heading3 font-semibold mb-2">No Periods Found</h3>
-        <p class="text-body text-muted mb-6">
-          {{
-            searchQuery
-              ? "No periods match your search."
-              : "Get started by creating your first period."
-          }}
-        </p>
-        <UButton
-          v-if="isAdmin && !searchQuery"
-          color="primary"
-          icon="i-lucide-plus"
-          class="cursor-pointer"
-          @click="openCreateModal"
-        >
+    <!-- Error State -->
+    <ErrorAlert v-else-if="error" :message="error.message" @retry="refresh" />
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else-if="!filteredPeriods || filteredPeriods.length === 0"
+      icon="i-lucide-calendar-x"
+      :title="searchQuery ? 'No periods found' : 'No periods yet'"
+      :description="
+        searchQuery
+          ? 'No periods match your search. Try adjusting your search term.'
+          : 'Get started by creating your first accounting period.'
+      "
+    >
+      <template v-if="isAdmin && !searchQuery" #actions>
+        <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer" @click="openCreateModal">
           Create First Period
         </UButton>
-      </div>
+      </template>
+    </EmptyState>
 
-      <!-- Periods Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-default border-b border-default">
-            <tr>
-              <th class="text-left py-3 px-4 text-label font-medium">Period Name</th>
-              <th class="text-left py-3 px-4 text-label font-medium">Date Range</th>
-              <th class="text-left py-3 px-4 text-label font-medium">Status</th>
-              <th class="text-left py-3 px-4 text-label font-medium">Locations</th>
-              <th class="text-right py-3 px-4 text-label font-medium">Actions</th>
+    <!-- Periods Table -->
+    <UCard v-else class="card-elevated" :ui="{ body: 'p-0' }">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <thead>
+            <tr class="bg-[var(--ui-bg-elevated)]">
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Period Name</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Date Range</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Status</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Locations</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-default">
+          <tbody class="divide-y divide-[var(--ui-border)]">
             <tr
               v-for="period in filteredPeriods"
               :key="period.id"
-              class="hover:bg-elevated transition-colors"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
             >
               <!-- Period Name -->
-              <td class="py-4 px-4">
-                <div class="font-medium">{{ period.name }}</div>
+              <td class="px-4 py-4 text-[var(--ui-text)] font-medium">
+                {{ period.name }}
               </td>
 
               <!-- Date Range -->
-              <td class="py-4 px-4">
-                <div class="text-body">
-                  {{ formatDateRange(period.start_date, period.end_date) }}
-                </div>
+              <td class="px-4 py-4 text-caption">
+                {{ formatDateRange(period.start_date, period.end_date) }}
               </td>
 
               <!-- Status -->
-              <td class="py-4 px-4">
-                <UBadge :color="getStatusColor(period.status) as any" variant="subtle" size="md">
+              <td class="px-4 py-4">
+                <UBadge
+                  :color="getStatusColor(period.status)"
+                  variant="subtle"
+                  size="md"
+                >
                   {{ period.status }}
                 </UBadge>
               </td>
 
               <!-- Locations -->
-              <td class="py-4 px-4">
-                <div class="text-body">{{ period.period_locations?.length || 0 }} locations</div>
+              <td class="px-4 py-4 text-caption">
+                {{ period.period_locations?.length || 0 }} locations
               </td>
 
               <!-- Actions -->
-              <td class="py-4 px-4 text-right">
+              <td class="px-4 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <UButton
                     color="neutral"
@@ -132,7 +130,7 @@
                     class="cursor-pointer"
                     @click="goToPrices(period.id)"
                   >
-                    Prices
+                    <span class="hidden sm:inline">Prices</span>
                   </UButton>
                   <UButton
                     color="neutral"
@@ -142,7 +140,7 @@
                     class="cursor-pointer"
                     @click="viewDetails(period.id)"
                   >
-                    View
+                    <span class="hidden sm:inline">View</span>
                   </UButton>
                 </div>
               </td>
@@ -155,85 +153,70 @@
     <!-- Create Period Modal -->
     <UModal v-model:open="showCreateModal">
       <template #content>
-        <UCard>
+        <UCard class="card-elevated">
           <template #header>
             <div class="flex items-center justify-between">
-              <h3 class="text-heading3 font-semibold">Create New Period</h3>
+              <h3 class="text-lg font-semibold">Create New Period</h3>
               <UButton
                 color="neutral"
                 variant="ghost"
                 icon="i-lucide-x"
                 size="sm"
+                class="cursor-pointer"
                 @click="closeCreateModal"
               />
             </div>
           </template>
 
           <form @submit.prevent="handleCreatePeriod">
-            <div class="space-y-6">
-              <!-- Period Name -->
-              <div>
-                <label for="period-name" class="form-label">
-                  Period Name
-                  <span class="text-error">*</span>
-                </label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Period Name (Full Width) -->
+              <UFormField label="Period Name" name="name" required class="md:col-span-2">
                 <UInput
                   id="period-name"
                   v-model="createForm.name"
                   placeholder="e.g., January 2025"
                   size="lg"
                   :disabled="isCreating"
-                  :error="!!createErrors.name"
+                  class="w-full"
                 />
-                <p v-if="createErrors.name" class="mt-1 text-caption text-error">
-                  {{ createErrors.name }}
-                </p>
-              </div>
+                <template v-if="createErrors.name" #error>
+                  <span class="text-[var(--ui-error)]">{{ createErrors.name }}</span>
+                </template>
+              </UFormField>
 
               <!-- Start Date -->
-              <div>
-                <label for="start-date" class="form-label">
-                  Start Date
-                  <span class="text-error">*</span>
-                </label>
+              <UFormField label="Start Date" name="start_date" required>
                 <UInput
                   id="start-date"
                   v-model="createForm.start_date"
                   type="date"
                   size="lg"
                   :disabled="isCreating"
-                  :error="!!createErrors.start_date"
+                  class="w-full"
                 />
-                <p v-if="createErrors.start_date" class="mt-1 text-caption text-error">
-                  {{ createErrors.start_date }}
-                </p>
-              </div>
+                <template v-if="createErrors.start_date" #error>
+                  <span class="text-[var(--ui-error)]">{{ createErrors.start_date }}</span>
+                </template>
+              </UFormField>
 
               <!-- End Date -->
-              <div>
-                <label for="end-date" class="form-label">
-                  End Date
-                  <span class="text-error">*</span>
-                </label>
+              <UFormField label="End Date" name="end_date" required>
                 <UInput
                   id="end-date"
                   v-model="createForm.end_date"
                   type="date"
                   size="lg"
                   :disabled="isCreating"
-                  :error="!!createErrors.end_date"
+                  class="w-full"
                 />
-                <p v-if="createErrors.end_date" class="mt-1 text-caption text-error">
-                  {{ createErrors.end_date }}
-                </p>
-              </div>
+                <template v-if="createErrors.end_date" #error>
+                  <span class="text-[var(--ui-error)]">{{ createErrors.end_date }}</span>
+                </template>
+              </UFormField>
 
-              <!-- Status -->
-              <div>
-                <label for="status" class="form-label">
-                  Initial Status
-                  <span class="text-error">*</span>
-                </label>
+              <!-- Status (Full Width) -->
+              <UFormField label="Initial Status" name="status" required class="md:col-span-2">
                 <USelectMenu
                   v-model="createForm.status"
                   :items="statusOptions"
@@ -241,37 +224,43 @@
                   placeholder="Select status"
                   size="lg"
                   :disabled="isCreating"
+                  class="w-full"
                 />
-                <p class="mt-1 text-caption text-muted">
-                  DRAFT periods can be edited before opening. OPEN periods are immediately active.
-                </p>
-              </div>
+                <template #hint>
+                  <p class="text-caption text-[var(--ui-text-muted)]">
+                    DRAFT periods can be edited before opening. OPEN periods are immediately active.
+                  </p>
+                </template>
+              </UFormField>
 
-              <!-- Info Alert -->
-              <UAlert
-                v-if="previousPeriodInfo"
-                color="primary"
-                icon="i-lucide-info"
-                :title="previousPeriodInfo.title"
-                :description="previousPeriodInfo.description"
-              />
+              <!-- Info Alert (Full Width) -->
+              <div v-if="previousPeriodInfo" class="md:col-span-2">
+                <UAlert
+                  color="primary"
+                  icon="i-lucide-info"
+                  :title="previousPeriodInfo.title"
+                  :description="previousPeriodInfo.description"
+                />
+              </div>
             </div>
           </form>
 
           <template #footer>
             <div class="flex items-center justify-end gap-3">
               <UButton
-                color="neutral"
-                variant="ghost"
+                color="error"
+                variant="soft"
+                size="lg"
                 class="cursor-pointer"
-                @click="closeCreateModal"
                 :disabled="isCreating"
+                @click="closeCreateModal"
               >
                 Cancel
               </UButton>
               <UButton
                 color="primary"
                 icon="i-lucide-plus"
+                size="lg"
                 class="cursor-pointer"
                 :loading="isCreating"
                 @click="handleCreatePeriod"
@@ -484,7 +473,9 @@ function formatDateRange(startDate: string | Date, endDate: string | Date): stri
   return `${start} - ${end}`;
 }
 
-function getStatusColor(status: string): string {
+type BadgeColor = "error" | "info" | "success" | "primary" | "secondary" | "warning" | "neutral";
+
+function getStatusColor(status: string): BadgeColor {
   switch (status) {
     case "OPEN":
       return "success";
