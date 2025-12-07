@@ -139,22 +139,26 @@ export function invalidateSuppliersCache() {
 export function useSupplier(supplierId: Ref<string> | string) {
   const id = isRef(supplierId) ? supplierId : ref(supplierId);
 
-  const { data, error, status, refresh } = useAsyncData<{ supplier: SupplierItem }>(`supplier:${id.value}`, () => $fetch<{ supplier: SupplierItem }>(`/api/suppliers/${id.value}`), {
-    // Cache for 20 seconds
-    getCachedData: (key) => {
-      const cached = useNuxtApp().payload.data[key];
-      if (!cached) return;
+  const { data, error, status, refresh } = useAsyncData<{ supplier: SupplierItem }>(
+    `supplier:${id.value}`,
+    () => $fetch<{ supplier: SupplierItem }>(`/api/suppliers/${id.value}`),
+    {
+      // Cache for 20 seconds
+      getCachedData: (key) => {
+        const cached = useNuxtApp().payload.data[key];
+        if (!cached) return;
 
-      const now = Date.now();
-      const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
-      if (cacheTime && now - cacheTime < 20 * 1000) {
-        return cached;
-      }
+        const now = Date.now();
+        const cacheTime = useNuxtApp().payload.data[`${key}:time`] as number | undefined;
+        if (cacheTime && now - cacheTime < 20 * 1000) {
+          return cached;
+        }
 
-      return;
-    },
-    watch: [id],
-  });
+        return;
+      },
+      watch: [id],
+    }
+  );
 
   // Store cache time
   watch(

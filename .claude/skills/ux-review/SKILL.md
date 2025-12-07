@@ -54,12 +54,12 @@ Structure reviews as:
 
 ## Severity Criteria
 
-| Severity | Definition | Examples |
-|----------|------------|----------|
+| Severity | Definition                                                                 | Examples                                                          |
+| -------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | Critical | Prevents task completion, causes data loss, or major accessibility barrier | Delete without confirmation, no error handling on critical action |
-| High | Significant confusion, requires workaround, or excludes user groups | No loading state on async action, no success feedback |
-| Medium | Causes friction, slows users, or violates conventions | Inconsistent button styles, poor contrast on secondary text |
-| Low | Polish issues, minor inconsistencies, subjective improvements | Spacing tweaks, icon alignment |
+| High     | Significant confusion, requires workaround, or excludes user groups        | No loading state on async action, no success feedback             |
+| Medium   | Causes friction, slows users, or violates conventions                      | Inconsistent button styles, poor contrast on secondary text       |
+| Low      | Polish issues, minor inconsistencies, subjective improvements              | Spacing tweaks, icon alignment                                    |
 
 ## Review Principles
 

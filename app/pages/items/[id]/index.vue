@@ -172,12 +172,8 @@
             <table class="min-w-full divide-y divide-[var(--ui-border)]">
               <thead>
                 <tr class="bg-[var(--ui-bg-elevated)]">
-                  <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
-                    On Hand
-                  </th>
+                  <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Location</th>
+                  <th class="px-4 py-3 text-right text-label uppercase tracking-wider">On Hand</th>
                   <th class="px-4 py-3 text-right text-label uppercase tracking-wider">WAC</th>
                   <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Value</th>
                 </tr>
@@ -198,7 +194,9 @@
                   <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right">
                     {{ formatCurrency(Number(stock.wac)) }}
                   </td>
-                  <td class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right font-medium">
+                  <td
+                    class="px-4 py-4 whitespace-nowrap text-[var(--ui-text)] text-right font-medium"
+                  >
                     {{ formatCurrency(Number(stock.on_hand) * Number(stock.wac)) }}
                   </td>
                 </tr>

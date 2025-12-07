@@ -57,7 +57,11 @@
               <p class="text-sm font-medium text-[var(--ui-text)]">Item Status</p>
               <p class="text-caption">
                 This item is currently
-                <span :class="item?.is_active ? 'text-[var(--ui-success)]' : 'text-[var(--ui-text-muted)]'">
+                <span
+                  :class="
+                    item?.is_active ? 'text-[var(--ui-success)]' : 'text-[var(--ui-text-muted)]'
+                  "
+                >
                   {{ item?.is_active ? "active" : "inactive" }}
                 </span>
               </p>
@@ -69,13 +73,7 @@
             <!-- Item Code (Read-only) - Left Column -->
             <div>
               <label for="code" class="form-label">Item Code</label>
-              <UInput
-                id="code"
-                v-model="form.code"
-                size="lg"
-                class="w-full opacity-60"
-                disabled
-              />
+              <UInput id="code" v-model="form.code" size="lg" class="w-full opacity-60" disabled />
               <p class="mt-1 text-caption">Item code cannot be changed</p>
             </div>
 
@@ -219,7 +217,9 @@
               size="lg"
               class="w-full sm:w-auto cursor-pointer"
               :loading="isSubmitting"
-              :disabled="isSubmitting || isDeactivating || isActivating || !isFormValid || !hasChanges"
+              :disabled="
+                isSubmitting || isDeactivating || isActivating || !isFormValid || !hasChanges
+              "
             >
               {{ isSubmitting ? "Updating..." : "Update Item" }}
             </UButton>
@@ -535,19 +535,15 @@ async function handleSubmit() {
 
     if (form.name !== originalData.value?.name) data.name = form.name;
     if (form.unit !== originalData.value?.unit) data.unit = form.unit;
-    if (form.category !== originalData.value?.category)
-      data.category = form.category || null;
+    if (form.category !== originalData.value?.category) data.category = form.category || null;
     if (form.sub_category !== originalData.value?.sub_category)
       data.sub_category = form.sub_category || null;
 
     // Call API to update item
-    const response = await $fetch<{ item: unknown; message: string }>(
-      `/api/items/${itemId}`,
-      {
-        method: "PATCH",
-        body: data,
-      }
-    );
+    const response = await $fetch<{ item: unknown; message: string }>(`/api/items/${itemId}`, {
+      method: "PATCH",
+      body: data,
+    });
 
     // Show success message
     toast.success("Success", {

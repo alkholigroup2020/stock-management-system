@@ -119,7 +119,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       body: userData,
     });
 
-    toast.success("Success", { description: "User created successfully" });
+    const successMessage = formData.default_location_id
+      ? "User created successfully with access to default location"
+      : "User created successfully";
+    toast.success("Success", { description: successMessage });
     await navigateTo("/users");
   } catch (err: unknown) {
     console.error("Error creating user:", err);
@@ -344,7 +347,7 @@ useHead({
             <UFormField
               label="Default Location"
               name="default_location_id"
-              help="Optional: User's default working location"
+              help="User will automatically receive access to this location"
             >
               <USelectMenu
                 v-model="formData.default_location_id"

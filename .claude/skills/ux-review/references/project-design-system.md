@@ -9,11 +9,13 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 1. Brand Colors & Usage Rules
 
 ### Primary & Secondary Colors
+
 - **Primary:** Navy Blue (#000046) - brand, primary actions, headings, focus states
 - **Secondary:** Emerald Green (#45cf7b) - success, secondary actions, positive feedback
 - **Supporting:** Zinc (neutrals), Amber (warnings), Red (errors), Blue (info)
 
 ### Usage Rules
+
 - ✅ Use Tailwind tokens (text-navy-500, bg-emerald-400) with dark: variants
 - ✅ Use semantic color props for Nuxt UI (color="primary", color="secondary")
 - ❌ Never use inline hex colors or custom color names in Nuxt UI props
@@ -26,6 +28,7 @@ Quick reference for Stock Management System design patterns and conventions.
 **Location:** `app/assets/css/main.css` - Single source of truth for all tokens
 
 ### Background Tokens
+
 - `--ui-bg` - Page background
 - `--ui-bg-elevated` - Cards, modals, elevated surfaces
 - `--ui-bg-muted` - Subtle backgrounds, disabled fields
@@ -33,12 +36,14 @@ Quick reference for Stock Management System design patterns and conventions.
 - `--ui-bg-inverted` - Dark in light mode, light in dark
 
 ### Text Tokens
+
 - `--ui-text` - Primary body text
 - `--ui-text-muted` - Secondary text, descriptions, labels
 - `--ui-text-dimmed` - Disabled text, placeholders
 - `--ui-text-highlighted` - Important text, headings
 
 ### Border Tokens
+
 - `--ui-border` - Default borders (cards, inputs)
 - `--ui-border-muted` - Subtle dividers, table borders
 - `--ui-border-accented` - Emphasized borders, focus states
@@ -46,23 +51,27 @@ Quick reference for Stock Management System design patterns and conventions.
 ### Business Domain Tokens
 
 **Stock Status:**
+
 - `--ui-stock-healthy` - Normal stock levels
 - `--ui-stock-low` - Below minimum threshold
 - `--ui-stock-critical` - Out of stock or critically low
 - `--ui-stock-pending` - Stock in transfer
 
 **Approval Workflow:**
+
 - `--ui-status-draft` - Unsaved or draft state
 - `--ui-status-pending` - Awaiting approval
 - `--ui-status-approved` - Approved, completed
 - `--ui-status-rejected` - Rejected, failed
 
 **Period States:**
+
 - `--ui-period-open` - Period open, accepting transactions
 - `--ui-period-ready` - Ready for close, awaiting coordination
 - `--ui-period-closed` - Period locked
 
 **Price Variance:**
+
 - `--ui-variance-detected` - Price differs from locked period price
 
 **Rule:** Use business tokens for domain concepts, NOT raw color tokens
@@ -72,12 +81,13 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 3. Layout Architecture (3-Source Padding System)
 
 ### Layout Body (app/layouts/default.vue)
-| Viewport | X-axis (horizontal) | Y-axis (vertical) |
-|----------|---------------------|-------------------|
-| Mobile (<640px) | px-0 (0) | py-2 (8px) |
-| sm-md (640-767px) | px-12 (48px) | py-2 (8px) |
-| md-xl (768-1279px) | px-12 (48px) | py-2 (8px) |
-| xl (≥1280px) | px-16 (64px) | py-4 (16px) |
+
+| Viewport           | X-axis (horizontal) | Y-axis (vertical) |
+| ------------------ | ------------------- | ----------------- |
+| Mobile (<640px)    | px-0 (0)            | py-2 (8px)        |
+| sm-md (640-767px)  | px-12 (48px)        | py-2 (8px)        |
+| md-xl (768-1279px) | px-12 (48px)        | py-2 (8px)        |
+| xl (≥1280px)       | px-16 (64px)        | py-4 (16px)       |
 
 **Additional:** `max-w-[1920px] mx-auto w-full`
 
@@ -85,12 +95,13 @@ Quick reference for Stock Management System design patterns and conventions.
 
 **Pattern:** `<div class="px-0 py-0 md:px-4 md:py-1 space-y-3">`
 
-| Viewport | X-axis | Y-axis | Section Spacing |
-|----------|--------|--------|-----------------|
-| Mobile (<768px) | px-0 (0) | py-0 (0) | space-y-3 |
-| Desktop (≥768px) | px-4 (16px) | py-1 (4px) | space-y-3 |
+| Viewport         | X-axis      | Y-axis     | Section Spacing |
+| ---------------- | ----------- | ---------- | --------------- |
+| Mobile (<768px)  | px-0 (0)    | py-0 (0)   | space-y-3       |
+| Desktop (≥768px) | px-4 (16px) | py-1 (4px) | space-y-3       |
 
 ### Page Content Width
+
 - **Default:** Full-width (no max-width constraints)
 - **Exception:** Login page uses max-w-md for centered content
 
@@ -103,6 +114,7 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 4. Page Header Pattern
 
 ### Structure Checklist
+
 - [ ] Icon: `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background/border)
 - [ ] Title: `text-xl sm:text-3xl font-bold text-primary`
 - [ ] Description: `hidden sm:block` (mobile hidden)
@@ -110,6 +122,7 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Button text: Short on mobile, full on desktop
 
 ### Common Issues
+
 - ❌ Icons with backgrounds (`bg-*`) or borders (`ring-*`, `border`)
 - ❌ Non-responsive icon/title sizes
 - ❌ Description visible on mobile (should be hidden)
@@ -120,22 +133,26 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 5. Filter Section Pattern (Dual Layout)
 
 ### Desktop Layout (lg and above)
+
 - **Structure:** Single row with Search | Toggle buttons | Status dropdown
 - **Dropdown positioning:** Far right using `ml-auto`
 - **Toggle container:** `bg-muted rounded-full` with `gap-1 p-1`
 - **Dropdown:** Full button with icon + label
 
 ### Mobile Layout (below lg)
+
 - **Row 1:** Search + Status dropdown only
 - **Toggle buttons:** **HIDDEN** (use `lg:hidden` to hide on mobile)
 - **Dropdown:** Icon only with `px-3`
 - **Rationale:** Simplifies mobile UX, search + dropdown provide sufficient filtering
 
 ### Toggle Button Styling
+
 - **Selected:** `bg-primary text-white shadow-sm`
 - **Unselected:** `text-muted hover:text-default hover:bg-elevated`
 
 ### Card Padding
+
 - `:ui="{ body: 'p-3 sm:p-4' }"`
 
 **Critical Check:** Mobile filter sections must NOT show toggle buttons
@@ -145,17 +162,20 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 6. Form Layout Standards
 
 ### Responsive Grid Pattern
+
 - **Container:** `grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6`
 - **All inputs:** `class="w-full"` (MANDATORY)
 - **Full-width fields:** `lg:col-span-2` (textareas, read-only displays)
 - **Gap spacing:** `gap-6` (1.5rem / 24px)
 
 ### Alternative Single-Column Pattern
+
 - **Container:** `space-y-6`
 - **Fields:** `w-full lg:w-1/2`
 - **Use when:** Settings sections with 2-3 fields, stacked layout preferred
 
 ### Critical Checks
+
 - [ ] Grid container uses correct classes
 - [ ] Every input has `class="w-full"`
 - [ ] Textareas use `lg:col-span-2`
@@ -167,11 +187,13 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 7. Component Library
 
 ### Surface Classes
+
 - `.card-elevated` - Elevated card with border/shadow (NO hover effects)
 - `.card-muted` - Subtle background for secondary content
 - `.surface-inverted` - Dark in light mode, light in dark mode
 
 ### Form Classes
+
 - `.form-label` - Consistent label styling (0.875rem, 500 weight, muted color)
 - `.form-input` - Consistent input styling (full width, padding, border)
 - `.form-error` - Error message styling (0.875rem, error color)
@@ -179,21 +201,25 @@ Quick reference for Stock Management System design patterns and conventions.
 ### Badge Classes
 
 **Standard:**
+
 - `.badge-primary`, `.badge-success`, `.badge-warning`, `.badge-error`, `.badge-info`
 
 **Stock Status:**
+
 - `.badge-stock-healthy` (emerald)
 - `.badge-stock-low` (amber)
 - `.badge-stock-critical` (red)
 - `.badge-stock-pending` (navy)
 
 **Approval Workflow:**
+
 - `.badge-draft` (zinc)
 - `.badge-pending` (navy)
 - `.badge-approved` (emerald)
 - `.badge-rejected` (red)
 
 ### Interactive Classes
+
 - `.focus-ring` - Consistent focus ring (2px, `--ui-ring`)
 - `.smooth-transition` - Standard timing (200ms ease-in-out)
 
@@ -204,6 +230,7 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 8. Button & Icon Rules
 
 ### Button Rules
+
 - [ ] Always include `cursor-pointer` class
 - [ ] Use `rounded-full` for pill-shaped buttons
 - [ ] Semantic colors: `color="primary"`, `color="secondary"`, `color="success"`, `color="error"`
@@ -212,6 +239,7 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Never use custom color names (`color="navy"` won't work)
 
 ### Icon Rules
+
 - [ ] NO backgrounds (no `bg-*` classes)
 - [ ] NO borders (no `border`, `ring-*`)
 - [ ] NO rounded containers around icons
@@ -223,14 +251,17 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 9. Card Action Buttons Pattern (Responsive)
 
 ### Container
+
 - `flex flex-wrap items-center gap-2 pt-4 border-t border-[var(--ui-border)]`
 
 ### Button Text Visibility
+
 - **Mobile/Medium (<1024px):** Icons only
 - **Large (≥1024px):** Icons + text with `<span class="hidden lg:inline">Button Text</span>`
 - **Spacer:** `<div class="hidden xl:flex flex-1" />` (xl+ screens only)
 
 ### Requirements Checklist
+
 - [ ] Uses `flex-wrap` for wrapping when space limited
 - [ ] Text labels use `hidden lg:inline` for responsive visibility
 - [ ] All buttons have recognizable icons
@@ -238,6 +269,7 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Applies `@click.stop` to prevent parent click handlers
 
 ### Button Order (Typical)
+
 1. Destructive action (Delete) - left side
 2. Spacer (xl+ only)
 3. Status toggles (Deactivate, etc.)
@@ -250,16 +282,19 @@ Quick reference for Stock Management System design patterns and conventions.
 ### Status Filter (All / Active / Inactive)
 
 **Always include three options:**
+
 - **All** - Show all items (no filter)
 - **Active** - Show only active items
 - **Inactive** - Show only inactive/archived items
 
 **Standard Icons:**
+
 - All: `i-lucide-list`
 - Active: `i-lucide-circle-check`
 - Inactive: `i-lucide-archive`
 
 **Implementation:**
+
 - Use `onSelect` handler (not `click`)
 - Use `null` value for "All" option
 - Set `active` property to highlight selected item
@@ -274,6 +309,7 @@ Quick reference for Stock Management System design patterns and conventions.
 **Rule:** Cannot use `@apply` with custom class names, only built-in Tailwind utilities.
 
 ❌ **Wrong:**
+
 ```css
 .badge-base {
   @apply inline-flex items-center px-2.5;
@@ -284,6 +320,7 @@ Quick reference for Stock Management System design patterns and conventions.
 ```
 
 ✅ **Correct:**
+
 ```css
 .badge-primary {
   display: inline-flex;
@@ -303,12 +340,14 @@ Quick reference for Stock Management System design patterns and conventions.
 **Rule:** Cannot use `@utility` with pseudo-elements/classes in name. Names must be alphanumeric only.
 
 ❌ **Wrong:**
+
 ```css
 @utility placeholder-muted::placeholder { ... }
 @utility hover-primary:hover { ... }
 ```
 
 ✅ **Correct:**
+
 ```css
 .placeholder-muted::placeholder { ... }
 .hover-primary:hover { ... }
@@ -319,6 +358,7 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 12. Code Formatting Standards (Prettier)
 
 ### Critical Rules
+
 - **Semicolons:** Always use (`;`)
 - **Quotes:** Double (`"`) not single (`'`)
 - **Indentation:** 2 spaces (never tabs)
@@ -328,6 +368,7 @@ Quick reference for Stock Management System design patterns and conventions.
 - **Vue Files:** Do not indent `<script>` and `<style>` blocks
 
 ### Component Naming (Nuxt 4 Auto-Import)
+
 - `app/components/layout/AppNavbar.vue` → `<LayoutAppNavbar />`
 - `app/components/delivery/LineItem.vue` → `<DeliveryLineItem />`
 - Root: `Footer.vue` → `<Footer />` (no prefix needed)
@@ -339,6 +380,7 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 13. Common Issues to Flag
 
 ### Layout & Structure
+
 - ❌ Inconsistent page container (not using `px-0 py-0 md:px-4 md:py-1 space-y-3`)
 - ❌ Page content with unnecessary max-width constraints
 - ❌ Icons with backgrounds or borders
@@ -346,24 +388,28 @@ Quick reference for Stock Management System design patterns and conventions.
 - ❌ Mobile filter sections showing toggle buttons (should hide with `lg:hidden`)
 
 ### Forms & Inputs
+
 - ❌ Form inputs without `class="w-full"`
 - ❌ Textareas without `lg:col-span-2` for full width
 - ❌ Incorrect grid container classes (not using responsive pattern)
 - ❌ Missing `gap-6` spacing or using arbitrary gap values
 
 ### Buttons & Actions
+
 - ❌ Buttons without `cursor-pointer` class
 - ❌ Card action buttons without responsive text pattern
 - ❌ Cancel buttons without error color styling
 - ❌ Icon-only buttons without `aria-label` for accessibility
 
 ### Colors & Tokens
+
 - ❌ Inline hex colors instead of semantic tokens
 - ❌ Custom color names in Nuxt UI props (`color="navy"`)
 - ❌ Not using business tokens for domain concepts
 - ❌ Missing dark mode variants (`dark:`)
 
 ### Code Quality
+
 - ❌ Using `@apply` with custom class names
 - ❌ Single quotes or missing semicolons (Prettier violations)
 - ❌ Inconsistent indentation (not 2 spaces)
@@ -374,6 +420,7 @@ Quick reference for Stock Management System design patterns and conventions.
 ## 14. Quick Review Checklist
 
 ### Every Page
+
 - [ ] Container uses `px-0 py-0 md:px-4 md:py-1 space-y-3`
 - [ ] Icons have NO backgrounds or borders
 - [ ] Cards use `.card-elevated` class without hover effects
@@ -382,6 +429,7 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Follows Prettier formatting rules
 
 ### Page Header
+
 - [ ] Icon: Responsive sizing (`w-6 h-6 sm:w-10 sm:h-10`)
 - [ ] Title: Responsive sizing (`text-xl sm:text-3xl font-bold text-primary`)
 - [ ] Description: Hidden on mobile (`hidden sm:block`)
@@ -389,6 +437,7 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Button text: Responsive (short on mobile, full on desktop)
 
 ### Filter Section
+
 - [ ] Uses dual layout pattern (desktop full, mobile simplified)
 - [ ] Toggle buttons hidden on mobile (`lg:hidden`)
 - [ ] Card padding: `:ui="{ body: 'p-3 sm:p-4' }"`
@@ -396,12 +445,14 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Mobile dropdown icon-only with `px-3`
 
 ### Forms
+
 - [ ] Grid container: `grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6`
 - [ ] All inputs have `class="w-full"`
 - [ ] Textareas/full-width fields use `lg:col-span-2`
 - [ ] Gap spacing is `gap-6` (not arbitrary values)
 
 ### Card Action Buttons
+
 - [ ] Container uses `flex flex-wrap items-center gap-2`
 - [ ] Button text uses `hidden lg:inline` for responsive visibility
 - [ ] Spacer uses `hidden xl:flex flex-1` (xl+ only)
@@ -410,12 +461,14 @@ Quick reference for Stock Management System design patterns and conventions.
 - [ ] Applies `@click.stop` to prevent parent handlers
 
 ### Dropdown Menus
+
 - [ ] Status filters include All, Active, Inactive options
 - [ ] Uses `onSelect` handler (not `click`)
 - [ ] Uses `null` value for "All" option
 - [ ] Standard icons (list, circle-check, archive)
 
 ### Code Quality
+
 - [ ] No inline hex colors (use semantic tokens)
 - [ ] No custom color names in Nuxt UI props
 - [ ] Uses business tokens for domain concepts
@@ -433,6 +486,7 @@ Quick reference for Stock Management System design patterns and conventions.
 See `project-docs/UI_DESIGN_SYSTEM.md` (2000+ lines, complete design system)
 
 **Key sections in full documentation:**
+
 - Design Philosophy & Principles
 - Complete color palettes (50-950 shades)
 - Typography hierarchy and classes

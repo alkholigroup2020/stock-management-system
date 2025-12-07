@@ -50,12 +50,22 @@
         </div>
       </div>
 
-      <!-- Location Info -->
-      <div v-if="user.default_location" class="mb-4">
-        <div class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
-          <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
-          <span class="font-medium">Default Location:</span>
-          <span class="text-[var(--ui-text)]">{{ user.default_location.name }}</span>
+      <!-- Default Location Section (Always displayed) -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 text-sm">
+          <UIcon
+            name="i-lucide-map-pin"
+            class="w-4 h-4 flex-shrink-0"
+            :class="user.default_location ? 'text-primary' : 'text-[var(--ui-text-muted)]'"
+          />
+          <span class="font-medium text-[var(--ui-text-muted)]">Default Location:</span>
+          <span
+            :class="
+              user.default_location ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-muted)] italic'
+            "
+          >
+            {{ user.default_location ? user.default_location.name : "Not assigned" }}
+          </span>
         </div>
       </div>
 

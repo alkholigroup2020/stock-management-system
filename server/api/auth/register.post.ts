@@ -7,7 +7,7 @@
  */
 
 import { z } from "zod";
-import type { UserRole } from "@prisma/client";
+import type { UserRole, AccessLevel } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -141,27 +141,58 @@ export default defineEventHandler(async (event) => {
     // Hash the password
     const password_hash = await hashUserPassword(validatedData.password);
 
-    // Create user in database
-    const newUser = await prisma.user.create({
-      data: {
-        username: validatedData.username,
-        email: validatedData.email,
-        password_hash,
-        full_name: validatedData.full_name,
-        role: validatedData.role as UserRole,
-        default_location_id: validatedData.default_location_id || null,
-        is_active: true,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        full_name: true,
-        role: true,
-        default_location_id: true,
-        is_active: true,
-        created_at: true,
-      },
+    // Create user in database with automatic location access
+    const newUser = await prisma.$transaction(async (tx) => {
+      // Create user in database
+      const createdUser = await tx.user.create({
+        data: {
+          username: validatedData.username,
+          email: validatedData.email,
+          password_hash,
+          full_name: validatedData.full_name,
+          role: validatedData.role as UserRole,
+          default_location_id: validatedData.default_location_id || null,
+          is_active: true,
+        },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          full_name: true,
+          role: true,
+          default_location_id: true,
+          is_active: true,
+          created_at: true,
+        },
+      });
+
+      // Auto-create UserLocation if default location is assigned
+      if (validatedData.default_location_id) {
+        // Determine access level based on role
+        let accessLevel: AccessLevel | null = null;
+
+        if (validatedData.role === "OPERATOR") {
+          accessLevel = "POST"; // Can create deliveries/issues
+        } else if (validatedData.role === "SUPERVISOR") {
+          accessLevel = "MANAGE"; // Full control at location
+        }
+        // ADMIN gets no UserLocation (implicit all-location access)
+
+        if (accessLevel) {
+          // Create UserLocation record to grant access
+          await tx.userLocation.create({
+            data: {
+              user_id: createdUser.id,
+              location_id: validatedData.default_location_id,
+              access_level: accessLevel,
+              assigned_at: new Date(),
+              assigned_by: user.id, // Admin who created the user
+            },
+          });
+        }
+      }
+
+      return createdUser;
     });
 
     // Return success response with created user (password excluded)

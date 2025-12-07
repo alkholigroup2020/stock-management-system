@@ -137,9 +137,7 @@
             <p v-if="errors.sub_category" class="mt-1 text-caption text-[var(--ui-error)]">
               {{ errors.sub_category }}
             </p>
-            <p v-else class="mt-1 text-caption">
-              Optional: Sub-category for further organization
-            </p>
+            <p v-else class="mt-1 text-caption">Optional: Sub-category for further organization</p>
           </div>
         </div>
 
@@ -417,13 +415,7 @@ async function handleSubmit() {
  */
 function handleCancel() {
   // Check if form has been modified
-  const hasChanges = !!(
-    form.code ||
-    form.name ||
-    form.unit ||
-    form.category ||
-    form.sub_category
-  );
+  const hasChanges = !!(form.code || form.name || form.unit || form.category || form.sub_category);
 
   if (hasChanges) {
     showCancelModal.value = true;

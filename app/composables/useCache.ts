@@ -178,8 +178,7 @@ export function useCache() {
       periods: keys.filter(
         (k) => k.startsWith("periods:") || k.startsWith("period:") || k === "currentPeriod"
       ).length,
-      suppliers: keys.filter((k) => k.startsWith("suppliers:") || k.startsWith("supplier:"))
-        .length,
+      suppliers: keys.filter((k) => k.startsWith("suppliers:") || k.startsWith("supplier:")).length,
       stock: keys.filter((k) => k.startsWith("stock:")).length,
       transactions: keys.filter(
         (k) => k.startsWith("deliveries:") || k.startsWith("issues:") || k.startsWith("transfers:")

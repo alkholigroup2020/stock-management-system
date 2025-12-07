@@ -20,7 +20,10 @@ export default defineEventHandler(async (event) => {
     // Build where clause
     const where: {
       is_active?: boolean;
-      OR?: Array<{ name?: { contains: string; mode: "insensitive" }; code?: { contains: string; mode: "insensitive" } }>;
+      OR?: Array<{
+        name?: { contains: string; mode: "insensitive" };
+        code?: { contains: string; mode: "insensitive" };
+      }>;
     } = {};
 
     // Handle is_active filter

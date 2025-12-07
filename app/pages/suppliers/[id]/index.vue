@@ -46,7 +46,11 @@
               <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
                 Edit Supplier Information
               </h2>
-              <UBadge :color="supplier.is_active ? 'success' : 'neutral'" variant="subtle" size="lg">
+              <UBadge
+                :color="supplier.is_active ? 'success' : 'neutral'"
+                variant="subtle"
+                size="lg"
+              >
                 {{ supplier.is_active ? "Active" : "Inactive" }}
               </UBadge>
             </div>
@@ -225,7 +229,10 @@
                 />
               </div>
               <p class="text-sm text-[var(--ui-text-muted)] mt-1">Deliveries</p>
-              <p v-if="!supplier._count?.deliveries" class="text-xs text-[var(--ui-text-muted)] mt-1">
+              <p
+                v-if="!supplier._count?.deliveries"
+                class="text-xs text-[var(--ui-text-muted)] mt-1"
+              >
                 No deliveries yet
               </p>
             </div>
@@ -302,7 +309,9 @@
             </p>
 
             <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+            <div
+              class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
+            >
               <UButton
                 color="neutral"
                 variant="ghost"

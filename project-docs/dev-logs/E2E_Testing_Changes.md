@@ -55,26 +55,55 @@ This file tracks changes made during E2E testing that affect the system design o
 **Reason:** CRUD operations (especially suppliers) were taking too long to reflect changes due to 5-minute cache durations. Reduced cache timers to provide near-instant updates while maintaining performance benefits.
 
 **Cache Duration Standards:**
+
 - **Master data** (Items, Suppliers, Locations, Users): 20s server + 10s SWR + 20s client
 - **Critical data** (Current Period): 10s server + 10s SWR + 10s client
 
 **Changes Made:**
 
 Server-side cache updates:
+
 - `server/api/items/index.get.ts`: 300s → 20s
 - `server/api/user/locations.get.ts`: 300s → 20s
 - `server/api/periods/current.get.ts`: 60s → 10s
 - `server/api/suppliers/index.get.ts`: Added 20s cache headers
 
 Client-side cache updates:
+
 - `app/composables/useItems.ts`: 5 min → 20s
 - `app/composables/useLocations.ts`: 5 min → 20s
 - `app/composables/useCurrentPeriod.ts`: 60s/5min → 10s/20s
 - Created `app/composables/useSuppliers.ts` with 20s cache
 
 Cache invalidation:
+
 - Added `invalidateSuppliers()` to `app/composables/useCache.ts`
 - Refactored `app/pages/suppliers/index.vue` to use `useSuppliers` composable
 - Added cache invalidation to supplier create/edit/delete operations
 
 **Impact:** Changes to master data now reflect within 20 seconds max, often instantly due to proactive cache invalidation on mutations.
+
+---
+
+## 2025-12-07: Automatic Location Access on User Creation
+
+**Reason:** During E2E testing of user creation workflow, discovered that assigning a default location to a new user did not automatically grant them access to that location. Users needed a manual second step (editing the user and adding location access) to become functional, creating a confusing two-step process.
+
+**Changes Made:**
+
+- Modified `server/api/auth/register.post.ts`:
+  - Added `AccessLevel` type import from Prisma
+  - Wrapped user creation in `prisma.$transaction()` for atomicity
+  - Added automatic `UserLocation` record creation when `default_location_id` is provided
+  - Implemented role-based access level assignment:
+    - OPERATOR → POST access level (can create deliveries/issues)
+    - SUPERVISOR → MANAGE access level (full control at location)
+    - ADMIN → No UserLocation created (implicit all-location access via role)
+  - Transaction ensures rollback if UserLocation creation fails
+
+- Updated `app/pages/users/create.vue`:
+  - Changed default location help text from "Optional: User's default working location" to "User will automatically receive access to this location"
+  - Enhanced success toast to show "User created successfully with access to default location" when location is assigned
+  - Maintains generic "User created successfully" message when no location is assigned
+
+**Impact:** Users created with a default location now immediately have functional access to that location without requiring manual location access assignment. The two-step creation process is eliminated, improving admin efficiency and reducing setup errors. Transaction safety ensures data consistency if access grant fails.

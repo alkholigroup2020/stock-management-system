@@ -182,6 +182,7 @@ The main content area in the layout applies the primary horizontal padding and m
 | xl (≥1280px)    | `px-16` (64px)      | `py-4` (16px)     |
 
 **Key Features:**
+
 - Mobile screens have **zero horizontal padding** at the layout level, allowing pages to use full viewport width
 - **Max-width constraint**: `max-w-[1920px]` prevents content from expanding indefinitely on very large screens (4K+ monitors)
 - **Centered layout**: `mx-auto` centers content horizontally when viewport exceeds content width (ultra-wide displays)
@@ -1176,6 +1177,7 @@ const iconColor = computed(() => {
 **DESIGN RULE:** Action buttons at the bottom of cards (e.g., user cards, item cards) must adapt to screen size to prevent truncation and ensure all buttons are visible.
 
 **Pattern:** Use flex-wrap with responsive text visibility to show:
+
 - **Small/Medium screens (< 1024px):** Icons only, buttons can wrap to two rows if needed
 - **Large screens (≥ 1024px):** Icons + text labels
 - **Extra-large screens (≥ 1280px):** Full layout with spacer between button groups
@@ -1348,11 +1350,11 @@ const selectStatus = (statusValue: boolean | null) => {
 
 **Standard Icons for Status Options:**
 
-| Option     | Icon                    | Meaning                      |
-| ---------- | ----------------------- | ---------------------------- |
-| **All**    | `i-lucide-list`         | Show all items (no filter)   |
-| **Active** | `i-lucide-circle-check` | Show only active items       |
-| **Inactive** | `i-lucide-archive`    | Show only inactive/archived items |
+| Option       | Icon                    | Meaning                           |
+| ------------ | ----------------------- | --------------------------------- |
+| **All**      | `i-lucide-list`         | Show all items (no filter)        |
+| **Active**   | `i-lucide-circle-check` | Show only active items            |
+| **Inactive** | `i-lucide-archive`      | Show only inactive/archived items |
 
 ### Rules
 
@@ -1860,25 +1862,25 @@ When creating a new page, ensure:
 
 ## Summary of Key Design Rules
 
-| Rule                            | Specification                                                                   |
-| ------------------------------- | ------------------------------------------------------------------------------- |
-| **Page Container**              | `px-0 py-0 md:px-4 md:py-1 space-y-3`                                           |
+| Rule                            | Specification                                                                     |
+| ------------------------------- | --------------------------------------------------------------------------------- |
+| **Page Container**              | `px-0 py-0 md:px-4 md:py-1 space-y-3`                                             |
 | **Layout Body**                 | `py-2 px-0 sm:px-12 xl:py-4 xl:px-16 max-w-[1920px] mx-auto w-full` (default.vue) |
-| **Max Content Width**           | `1920px` (centered on ultra-wide, stable sidebar width prevents shifts)         |
-| **Page Content Width**          | Full width by default (no max-width), sections as direct children               |
-| **Section Spacing**             | `space-y-3` (automatic via container)                                           |
-| **Page Header Icon**            | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background)                          |
-| **Page Title**                  | `text-xl sm:text-3xl font-bold text-primary`                                    |
-| **Page Description**            | `hidden sm:block` (hidden on mobile, visible on sm+)                            |
-| **Cards**                       | `card-elevated` (NO hover effects)                                              |
-| **Buttons - Primary**           | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6`            |
-| **Buttons - Cancel**            | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer` |
-| **Buttons - Card Actions**      | `flex flex-wrap`, text `hidden lg:inline`, spacer `hidden xl:flex flex-1`       |
-| **Icons**                       | NO backgrounds, NO borders, NO rounded containers                               |
-| **Filter Layout**               | Dual layout: desktop full filters, mobile search + dropdown only (no toggles)   |
-| **Dropdown Handler**            | Use `onSelect` (not `click`)                                                    |
-| **Form Layout - Standard**      | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full`                    |
-| **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2`                                       |
+| **Max Content Width**           | `1920px` (centered on ultra-wide, stable sidebar width prevents shifts)           |
+| **Page Content Width**          | Full width by default (no max-width), sections as direct children                 |
+| **Section Spacing**             | `space-y-3` (automatic via container)                                             |
+| **Page Header Icon**            | `w-6 h-6 sm:w-10 sm:h-10 text-primary` (NO background)                            |
+| **Page Title**                  | `text-xl sm:text-3xl font-bold text-primary`                                      |
+| **Page Description**            | `hidden sm:block` (hidden on mobile, visible on sm+)                              |
+| **Cards**                       | `card-elevated` (NO hover effects)                                                |
+| **Buttons - Primary**           | `color="primary"`, include `cursor-pointer`, use `rounded-full px-6`              |
+| **Buttons - Cancel**            | `color="error" variant="soft"` or `variant="outline"`, include `cursor-pointer`   |
+| **Buttons - Card Actions**      | `flex flex-wrap`, text `hidden lg:inline`, spacer `hidden xl:flex flex-1`         |
+| **Icons**                       | NO backgrounds, NO borders, NO rounded containers                                 |
+| **Filter Layout**               | Dual layout: desktop full filters, mobile search + dropdown only (no toggles)     |
+| **Dropdown Handler**            | Use `onSelect` (not `click`)                                                      |
+| **Form Layout - Standard**      | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full`                      |
+| **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2`                                         |
 
 ---
 

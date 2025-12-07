@@ -4,25 +4,26 @@ Best practices and common issues for Nuxt UI (free version) components.
 
 ## Component Selection Guide
 
-| Need | Component | Notes |
-|------|-----------|-------|
-| Primary action | `UButton` | Use `color="primary"` |
-| Secondary action | `UButton` | Use `variant="outline"` or `variant="ghost"` |
-| Destructive action | `UButton` | Use `color="red"` |
-| Navigation link | `UButton` | Use `to="/path"` (renders as `<NuxtLink>`) |
-| Form input | `UInput` | Wrap in `UFormGroup` for labels |
-| Selection (few options) | `URadioGroup` / `UCheckbox` | Visible options |
-| Selection (many options) | `USelectMenu` | Dropdown with search |
-| Boolean toggle | `UToggle` | For on/off settings |
-| Data display | `UTable` | For tabular data |
-| Grouped content | `UCard` | For visual grouping |
-| Overlay content | `UModal` / `USlideover` | Modal for focus, slideover for detail panels |
-| User feedback | `UNotification` | Toast-style alerts |
-| Loading placeholder | `USkeleton` | Content loading states |
+| Need                     | Component                   | Notes                                        |
+| ------------------------ | --------------------------- | -------------------------------------------- |
+| Primary action           | `UButton`                   | Use `color="primary"`                        |
+| Secondary action         | `UButton`                   | Use `variant="outline"` or `variant="ghost"` |
+| Destructive action       | `UButton`                   | Use `color="red"`                            |
+| Navigation link          | `UButton`                   | Use `to="/path"` (renders as `<NuxtLink>`)   |
+| Form input               | `UInput`                    | Wrap in `UFormGroup` for labels              |
+| Selection (few options)  | `URadioGroup` / `UCheckbox` | Visible options                              |
+| Selection (many options) | `USelectMenu`               | Dropdown with search                         |
+| Boolean toggle           | `UToggle`                   | For on/off settings                          |
+| Data display             | `UTable`                    | For tabular data                             |
+| Grouped content          | `UCard`                     | For visual grouping                          |
+| Overlay content          | `UModal` / `USlideover`     | Modal for focus, slideover for detail panels |
+| User feedback            | `UNotification`             | Toast-style alerts                           |
+| Loading placeholder      | `USkeleton`                 | Content loading states                       |
 
 ## Forms
 
 ### Standard Form Pattern
+
 ```vue
 <UForm :state="state" :schema="schema" @submit="onSubmit">
   <UFormGroup label="Email" name="email" required>
@@ -41,6 +42,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ```
 
 ### Form Issues to Check
+
 - ❌ Missing `UFormGroup` wrapper (no label association)
 - ❌ Missing `name` prop (validation won't work)
 - ❌ Missing `type` on inputs (wrong keyboard on mobile)
@@ -52,6 +54,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ## Buttons
 
 ### Button Hierarchy
+
 ```vue
 <!-- Primary: main action, 1 per section -->
 <UButton color="primary">Save Changes</UButton>
@@ -70,6 +73,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ```
 
 ### Button Issues to Check
+
 - ❌ Multiple primary buttons competing
 - ❌ Icon-only without `aria-label`
 - ❌ Missing `loading` state on async actions
@@ -79,6 +83,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ## Modals and Overlays
 
 ### Modal Pattern
+
 ```vue
 <UModal v-model="isOpen" :ui="{ width: 'sm:max-w-md' }">
   <UCard>
@@ -99,6 +104,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ```
 
 ### Modal Issues to Check
+
 - ❌ No close button or escape route
 - ❌ Missing heading (screen readers need context)
 - ❌ Destructive action as primary (should be secondary visual weight)
@@ -108,6 +114,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ## Tables
 
 ### Table Pattern
+
 ```vue
 <UTable :rows="items" :columns="columns">
   <template #actions-data="{ row }">
@@ -126,6 +133,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ```
 
 ### Table Issues to Check
+
 - ❌ No empty state
 - ❌ No loading state (`loading` prop)
 - ❌ Actions column without accessible labels
@@ -135,6 +143,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ## Navigation
 
 ### Common Patterns
+
 ```vue
 <!-- Horizontal nav -->
 <UHorizontalNavigation :links="navLinks" />
@@ -150,6 +159,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ```
 
 ### Navigation Issues to Check
+
 - ❌ No active state indication
 - ❌ Current page as clickable link (should be span)
 - ❌ Too many top-level items (>7 causes cognitive load)
@@ -159,6 +169,7 @@ Best practices and common issues for Nuxt UI (free version) components.
 ## Feedback and States
 
 ### Loading States
+
 ```vue
 <!-- Button loading -->
 <UButton :loading="isLoading">Save</UButton>
@@ -172,30 +183,32 @@ Best practices and common issues for Nuxt UI (free version) components.
 ```
 
 ### Notifications
+
 ```vue
 <script setup>
-const toast = useToast()
+const toast = useToast();
 
 function onSuccess() {
   toast.add({
-    title: 'Saved successfully',
-    color: 'green',
-    icon: 'i-heroicons-check-circle'
-  })
+    title: "Saved successfully",
+    color: "green",
+    icon: "i-heroicons-check-circle",
+  });
 }
 
 function onError() {
   toast.add({
-    title: 'Failed to save',
-    description: 'Please try again or contact support.',
-    color: 'red',
-    icon: 'i-heroicons-exclamation-circle'
-  })
+    title: "Failed to save",
+    description: "Please try again or contact support.",
+    color: "red",
+    icon: "i-heroicons-exclamation-circle",
+  });
 }
 </script>
 ```
 
 ### Feedback Issues to Check
+
 - ❌ No feedback after form submission
 - ❌ Error without explanation or next step
 - ❌ Success message that disappears too fast
@@ -205,23 +218,25 @@ function onError() {
 ## Nuxt 4 Specific
 
 ### Composables
+
 ```vue
 <script setup>
 // Color mode
-const colorMode = useColorMode()
+const colorMode = useColorMode();
 
 // App config for theming
-const appConfig = useAppConfig()
+const appConfig = useAppConfig();
 
 // Toast notifications
-const toast = useToast()
+const toast = useToast();
 
 // Modal control
-const modal = useModal()
+const modal = useModal();
 </script>
 ```
 
 ### Dark Mode
+
 - Test both light and dark modes
 - Check contrast in both modes
 - Ensure custom colors work in dark mode

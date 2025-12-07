@@ -2,47 +2,47 @@
   <UModal v-model:open="isOpen" :dismissible="!loading">
     <template #content>
       <UCard :ui="{ body: 'p-6', header: 'p-6 pb-4' }">
-      <template #header>
-        <div class="flex items-start gap-3">
-          <div
-            class="flex items-center justify-center w-10 h-10 rounded-full"
-            :class="iconBgClass"
-          >
-            <UIcon :name="icon" :class="iconClass" class="w-5 h-5" />
+        <template #header>
+          <div class="flex items-start gap-3">
+            <div
+              class="flex items-center justify-center w-10 h-10 rounded-full"
+              :class="iconBgClass"
+            >
+              <UIcon :name="icon" :class="iconClass" class="w-5 h-5" />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-subheading font-semibold text-[var(--ui-text)]">
+                {{ title }}
+              </h3>
+              <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+                {{ message }}
+              </p>
+            </div>
           </div>
-          <div class="flex-1">
-            <h3 class="text-subheading font-semibold text-[var(--ui-text)]">
-              {{ title }}
-            </h3>
-            <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-              {{ message }}
-            </p>
-          </div>
-        </div>
-      </template>
+        </template>
 
-      <div class="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-        <UButton
-          color="neutral"
-          variant="soft"
-          size="lg"
-          class="cursor-pointer"
-          :disabled="loading"
-          @click="handleCancel"
-        >
-          {{ cancelText }}
-        </UButton>
-        <UButton
-          :color="confirmColor"
-          size="lg"
-          class="cursor-pointer"
-          :loading="loading"
-          :disabled="loading"
-          @click="handleConfirm"
-        >
-          {{ loading ? loadingText : confirmText }}
-        </UButton>
-      </div>
+        <div class="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+          <UButton
+            color="neutral"
+            variant="soft"
+            size="lg"
+            class="cursor-pointer"
+            :disabled="loading"
+            @click="handleCancel"
+          >
+            {{ cancelText }}
+          </UButton>
+          <UButton
+            :color="confirmColor"
+            size="lg"
+            class="cursor-pointer"
+            :loading="loading"
+            :disabled="loading"
+            @click="handleConfirm"
+          >
+            {{ loading ? loadingText : confirmText }}
+          </UButton>
+        </div>
       </UCard>
     </template>
   </UModal>

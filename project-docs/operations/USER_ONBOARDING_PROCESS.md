@@ -115,27 +115,27 @@ This document outlines the standardized process for onboarding new users to the 
 
 **Personal Information:**
 
-- [ ] Full Name: ******\_\_\_******
-- [ ] Email: ******\_\_\_******
-- [ ] Phone: ******\_\_\_****** (optional)
+- [ ] Full Name: **\*\***\_\_\_**\*\***
+- [ ] Email: **\*\***\_\_\_**\*\***
+- [ ] Phone: **\*\***\_\_\_**\*\*** (optional)
 
 **Job Information:**
 
-- [ ] Job Title: ******\_\_\_******
-- [ ] Department: ******\_\_\_******
-- [ ] Supervisor: ******\_\_\_******
+- [ ] Job Title: **\*\***\_\_\_**\*\***
+- [ ] Department: **\*\***\_\_\_**\*\***
+- [ ] Supervisor: **\*\***\_\_\_**\*\***
 - [ ] Start Date: YYYY-MM-DD
 
 **System Access:**
 
 - [ ] Role: ☐ Operator ☐ Supervisor ☐ Admin
 - [ ] Locations: ☐ Kitchen ☐ Store ☐ Central ☐ Warehouse
-- [ ] Special permissions: ******\_\_\_******
+- [ ] Special permissions: **\*\***\_\_\_**\*\***
 
 **Training:**
 
 - [ ] Training schedule: YYYY-MM-DD HH:MM
-- [ ] Trainer assigned: ******\_\_\_******
+- [ ] Trainer assigned: **\*\***\_\_\_**\*\***
 ```
 
 ### Step 2: Determine Role
