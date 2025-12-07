@@ -13,6 +13,15 @@
       <!-- Page Header -->
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-2 sm:gap-4">
+          <UIcon name="i-lucide-calendar" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+          <div>
+            <h1 class="text-xl sm:text-3xl font-bold text-primary">{{ period.name }}</h1>
+            <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+              {{ formatDateRange(period.start_date, period.end_date) }}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
           <UButton
             color="neutral"
             variant="ghost"
@@ -23,15 +32,6 @@
           >
             <span class="hidden sm:inline">Back</span>
           </UButton>
-          <UIcon name="i-lucide-calendar" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
-          <div>
-            <h1 class="text-xl sm:text-3xl font-bold text-primary">{{ period.name }}</h1>
-            <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
-              {{ formatDateRange(period.start_date, period.end_date) }}
-            </p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
           <UButton
             v-if="isAdmin && period.status === 'DRAFT'"
             color="primary"
@@ -87,7 +87,12 @@
           <div>
             <p class="text-label mb-2">Items Priced</p>
             <p class="text-[var(--ui-text)] font-medium">
-              {{ "_count" in period && period._count && "item_prices" in period._count ? period._count.item_prices : 0 }} items
+              {{
+                "_count" in period && period._count && "item_prices" in period._count
+                  ? period._count.item_prices
+                  : 0
+              }}
+              items
             </p>
           </div>
         </div>
@@ -163,9 +168,7 @@
           <table class="min-w-full divide-y divide-[var(--ui-border)]">
             <thead>
               <tr class="bg-[var(--ui-bg-elevated)]">
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                  Location
-                </th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Location</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Type</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Status</th>
                 <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
@@ -174,12 +177,8 @@
                 <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
                   Closing Value
                 </th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                  Ready At
-                </th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                  Closed At
-                </th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Ready At</th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Closed At</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[var(--ui-border)]">
@@ -208,19 +207,31 @@
 
                 <!-- Status -->
                 <td class="px-4 py-4">
-                  <UBadge :color="getLocationStatusColor(location.status)" variant="subtle" size="sm">
+                  <UBadge
+                    :color="getLocationStatusColor(location.status)"
+                    variant="subtle"
+                    size="sm"
+                  >
                     {{ location.status }}
                   </UBadge>
                 </td>
 
                 <!-- Opening Value -->
                 <td class="px-4 py-4 text-right text-[var(--ui-text)] font-medium">
-                  {{ location.opening_value !== null ? formatCurrency(Number(location.opening_value)) : "SAR 0.00" }}
+                  {{
+                    location.opening_value !== null
+                      ? formatCurrency(Number(location.opening_value))
+                      : "SAR 0.00"
+                  }}
                 </td>
 
                 <!-- Closing Value -->
                 <td class="px-4 py-4 text-right text-[var(--ui-text)] font-medium">
-                  {{ location.closing_value !== null ? formatCurrency(Number(location.closing_value)) : "-" }}
+                  {{
+                    location.closing_value !== null
+                      ? formatCurrency(Number(location.closing_value))
+                      : "-"
+                  }}
                 </td>
 
                 <!-- Ready At -->
@@ -238,6 +249,190 @@
         </div>
       </UCard>
     </template>
+
+    <!-- Edit Period Modal -->
+    <UModal v-model:open="showEditModal">
+      <template #content>
+        <UCard class="card-elevated">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold">Edit Period</h3>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                class="cursor-pointer"
+                @click="closeEditModal"
+              />
+            </div>
+          </template>
+
+          <form @submit.prevent="handleUpdatePeriod">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Period Name (Full Width) -->
+              <UFormField label="Period Name" name="name" required class="md:col-span-2">
+                <UInput
+                  id="period-name-edit"
+                  v-model="editForm.name"
+                  placeholder="e.g., January 2025"
+                  size="lg"
+                  :disabled="isUpdating"
+                  class="w-full"
+                />
+                <template v-if="editErrors.name" #error>
+                  <span class="text-[var(--ui-error)]">{{ editErrors.name }}</span>
+                </template>
+              </UFormField>
+
+              <!-- Start Date -->
+              <UFormField label="Start Date" name="start_date" required>
+                <UInput
+                  id="start-date-edit"
+                  v-model="editForm.start_date"
+                  type="date"
+                  size="lg"
+                  :disabled="isUpdating"
+                  class="w-full"
+                />
+                <template v-if="editErrors.start_date" #error>
+                  <span class="text-[var(--ui-error)]">{{ editErrors.start_date }}</span>
+                </template>
+              </UFormField>
+
+              <!-- End Date -->
+              <UFormField label="End Date" name="end_date" required>
+                <UInput
+                  id="end-date-edit"
+                  v-model="editForm.end_date"
+                  type="date"
+                  size="lg"
+                  :disabled="isUpdating"
+                  class="w-full"
+                />
+                <template v-if="editErrors.end_date" #error>
+                  <span class="text-[var(--ui-error)]">{{ editErrors.end_date }}</span>
+                </template>
+              </UFormField>
+
+              <!-- Info Alert (Full Width) -->
+              <div class="md:col-span-2">
+                <UAlert
+                  color="primary"
+                  icon="i-lucide-info"
+                  title="Period Status"
+                  description="Status cannot be changed here. Use the workflow buttons to change period status."
+                />
+              </div>
+            </div>
+          </form>
+
+          <template #footer>
+            <div class="flex items-center justify-end gap-3">
+              <UButton
+                color="error"
+                variant="soft"
+                size="lg"
+                class="cursor-pointer"
+                :disabled="isUpdating"
+                @click="closeEditModal"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="primary"
+                icon="i-lucide-save"
+                size="lg"
+                class="cursor-pointer"
+                :loading="isUpdating"
+                @click="handleUpdatePeriod"
+              >
+                Save Changes
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
+
+    <!-- Open Period Confirmation Modal -->
+    <UModal v-model:open="showOpenPeriodModal">
+      <template #content>
+        <UCard class="card-elevated">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="p-3 bg-[var(--ui-bg-elevated)] rounded-lg">
+                <UIcon name="i-lucide-unlock" class="w-6 h-6 text-success" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-[var(--ui-text)]">Open Period</h3>
+                <p class="text-sm text-[var(--ui-text-muted)]">Confirm period activation</p>
+              </div>
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <UAlert
+              color="warning"
+              icon="i-lucide-alert-triangle"
+              title="Important"
+              description="Once a period is opened, item prices will be locked and cannot be modified. Make sure all prices are set correctly before proceeding."
+            />
+
+            <div v-if="period" class="bg-[var(--ui-bg-elevated)] rounded-lg p-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-label">Period Name</p>
+                  <p class="text-[var(--ui-text)] font-medium">{{ period.name }}</p>
+                </div>
+                <div>
+                  <p class="text-label">Date Range</p>
+                  <p class="text-[var(--ui-text)] font-medium">
+                    {{ formatDateRange(period.start_date, period.end_date) }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-label">Current Status</p>
+                  <UBadge :color="getStatusColor(period.status)" variant="subtle" size="sm">
+                    {{ period.status }}
+                  </UBadge>
+                </div>
+                <div>
+                  <p class="text-label">Items Priced</p>
+                  <p class="text-[var(--ui-text)] font-medium">
+                    {{ "_count" in period && period._count && "item_prices" in period._count ? period._count.item_prices : 0 }} items
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="lg"
+                class="cursor-pointer"
+                @click="closeOpenPeriodModal"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="success"
+                icon="i-lucide-unlock"
+                size="lg"
+                class="cursor-pointer"
+                :loading="isOpeningPeriod"
+                @click="confirmOpenPeriod"
+              >
+                Open Period
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -339,21 +534,189 @@ function goBack() {
   router.push("/periods");
 }
 
+// Edit period modal
+const showEditModal = ref(false);
+const isUpdating = ref(false);
+const editForm = ref({
+  name: "",
+  start_date: "",
+  end_date: "",
+});
+const editErrors = ref({
+  name: "",
+  start_date: "",
+  end_date: "",
+});
+
+// Open edit modal
 function handleEdit() {
-  toast.add({
-    title: "Coming Soon",
-    description: "Period edit functionality will be implemented in the next phase",
-    color: "primary",
-    icon: "i-lucide-info",
-  });
+  if (!period.value) return;
+
+  // Populate form with current period data
+  editForm.value = {
+    name: period.value.name,
+    start_date: formatDateForInput(period.value.start_date),
+    end_date: formatDateForInput(period.value.end_date),
+  };
+
+  // Reset errors
+  editErrors.value = {
+    name: "",
+    start_date: "",
+    end_date: "",
+  };
+
+  // Open modal
+  showEditModal.value = true;
 }
 
+// Close edit modal
+function closeEditModal() {
+  showEditModal.value = false;
+}
+
+// Format date for input (YYYY-MM-DD)
+function formatDateForInput(date: string | Date): string {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Validate edit form
+function validateEditForm(): boolean {
+  let isValid = true;
+
+  // Reset errors
+  editErrors.value = {
+    name: "",
+    start_date: "",
+    end_date: "",
+  };
+
+  // Validate name
+  if (!editForm.value.name.trim()) {
+    editErrors.value.name = "Period name is required";
+    isValid = false;
+  }
+
+  // Validate start date
+  if (!editForm.value.start_date) {
+    editErrors.value.start_date = "Start date is required";
+    isValid = false;
+  }
+
+  // Validate end date
+  if (!editForm.value.end_date) {
+    editErrors.value.end_date = "End date is required";
+    isValid = false;
+  }
+
+  // Validate date range
+  if (editForm.value.start_date && editForm.value.end_date) {
+    const startDate = new Date(editForm.value.start_date);
+    const endDate = new Date(editForm.value.end_date);
+
+    if (endDate <= startDate) {
+      editErrors.value.end_date = "End date must be after start date";
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
+
+// Update period
+async function handleUpdatePeriod() {
+  if (!validateEditForm()) return;
+
+  isUpdating.value = true;
+
+  try {
+    await $fetch<{ period: unknown; message: string }>(`/api/periods/${periodId}`, {
+      method: "PATCH",
+      body: {
+        name: editForm.value.name.trim(),
+        start_date: editForm.value.start_date,
+        end_date: editForm.value.end_date,
+      },
+    });
+
+    toast.add({
+      title: "Success",
+      description: "Period updated successfully",
+      color: "success",
+      icon: "i-lucide-check",
+    });
+
+    // Refresh period data
+    await refresh();
+
+    // Close modal
+    closeEditModal();
+  } catch (err: any) {
+    console.error("Error updating period:", err);
+
+    toast.add({
+      title: "Error",
+      description: err.data?.message || "Failed to update period",
+      color: "error",
+      icon: "i-lucide-alert-circle",
+    });
+  } finally {
+    isUpdating.value = false;
+  }
+}
+
+// Open Period Modal State
+const showOpenPeriodModal = ref(false);
+const isOpeningPeriod = ref(false);
+
 function handleOpenPeriod() {
-  toast.add({
-    title: "Coming Soon",
-    description: "Period open functionality will be implemented in the next phase",
-    color: "primary",
-    icon: "i-lucide-info",
-  });
+  showOpenPeriodModal.value = true;
+}
+
+function closeOpenPeriodModal() {
+  showOpenPeriodModal.value = false;
+}
+
+async function confirmOpenPeriod() {
+  isOpeningPeriod.value = true;
+
+  try {
+    await $fetch<{ period: unknown; message: string }>(`/api/periods/${periodId}/open`, {
+      method: "POST",
+    });
+
+    toast.add({
+      title: "Success",
+      description: "Period opened successfully. Prices are now locked.",
+      color: "success",
+      icon: "i-lucide-check",
+    });
+
+    // Refresh period data
+    await refresh();
+
+    // Close modal
+    closeOpenPeriodModal();
+  } catch (err: unknown) {
+    console.error("Error opening period:", err);
+
+    // Extract error message from $fetch error structure
+    const errorData = err as { data?: { data?: { message?: string }; message?: string } };
+    const errorMessage =
+      errorData.data?.data?.message || errorData.data?.message || "Failed to open period";
+
+    toast.add({
+      title: "Error",
+      description: errorMessage,
+      color: "error",
+      icon: "i-lucide-alert-circle",
+    });
+  } finally {
+    isOpeningPeriod.value = false;
+  }
 }
 </script>

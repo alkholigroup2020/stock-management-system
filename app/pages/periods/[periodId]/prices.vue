@@ -52,11 +52,7 @@
             {{ formatDateRange(periodData.start_date, periodData.end_date) }}
           </p>
         </div>
-        <UBadge
-          :color="getStatusBadgeColor(periodData.status)"
-          variant="subtle"
-          size="lg"
-        >
+        <UBadge :color="getStatusBadgeColor(periodData.status)" variant="subtle" size="lg">
           {{ periodData.status }}
         </UBadge>
       </div>
@@ -232,7 +228,10 @@
                     v-if="item.hasPriceVariance"
                     text="Price differs significantly from current WAC"
                   >
-                    <UIcon name="i-lucide-alert-triangle" class="h-5 w-5 text-[var(--ui-warning)]" />
+                    <UIcon
+                      name="i-lucide-alert-triangle"
+                      class="h-5 w-5 text-[var(--ui-warning)]"
+                    />
                   </UTooltip>
 
                   <!-- Price Set Indicator -->
@@ -266,16 +265,13 @@
     </UCard>
 
     <!-- Footer Actions -->
-    <UCard
-      v-if="pricesData && pricesData.length > 0"
-      class="card-elevated"
-      :ui="{ body: 'p-4' }"
-    >
+    <UCard v-if="pricesData && pricesData.length > 0" class="card-elevated" :ui="{ body: 'p-4' }">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="text-caption text-[var(--ui-text-muted)]">
           <span v-if="hasChanges" class="flex items-center gap-2">
             <UIcon name="i-lucide-alert-circle" class="h-4 w-4 text-[var(--ui-warning)]" />
-            You have {{ changesCount }} unsaved change{{ changesCount > 1 ? 's' : '' }}. Click "Save All" to apply them.
+            You have {{ changesCount }} unsaved change{{ changesCount > 1 ? "s" : "" }}. Click "Save
+            All" to apply them.
           </span>
           <span v-else class="flex items-center gap-2">
             <UIcon name="i-lucide-check-circle" class="h-4 w-4 text-[var(--ui-success)]" />
@@ -324,7 +320,7 @@ const originalPrices = ref<Map<string, number | null>>(new Map());
 
 // Filters
 const searchQuery = ref("");
-const selectedCategory = ref("");
+const selectedCategory = ref<string | undefined>(undefined);
 
 // Fetch prices on mount
 onMounted(async () => {
@@ -408,12 +404,9 @@ const categoryOptions = computed(() => {
       categories.add(item.item_category);
     }
   });
-  return [
-    { label: "All Categories", value: "" },
-    ...Array.from(categories)
-      .sort()
-      .map((cat) => ({ label: cat, value: cat })),
-  ];
+  return Array.from(categories)
+    .sort()
+    .map((cat) => ({ label: cat, value: cat }));
 });
 
 const filteredPrices = computed(() => {
@@ -459,7 +452,7 @@ const canSave = computed(() => {
 // Clear filters
 function clearFilters() {
   searchQuery.value = "";
-  selectedCategory.value = "";
+  selectedCategory.value = undefined;
 }
 
 // Get status badge color

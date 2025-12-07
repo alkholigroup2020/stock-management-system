@@ -68,7 +68,12 @@
       "
     >
       <template v-if="isAdmin && !searchQuery" #actions>
-        <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer" @click="openCreateModal">
+        <UButton
+          color="primary"
+          icon="i-lucide-plus"
+          class="cursor-pointer"
+          @click="openCreateModal"
+        >
           Create First Period
         </UButton>
       </template>
@@ -105,11 +110,7 @@
 
               <!-- Status -->
               <td class="px-4 py-4">
-                <UBadge
-                  :color="getStatusColor(period.status)"
-                  variant="subtle"
-                  size="md"
-                >
+                <UBadge :color="getStatusColor(period.status)" variant="subtle" size="md">
                   {{ period.status }}
                 </UBadge>
               </td>
