@@ -497,11 +497,6 @@ function goToPrices(periodId: string) {
 }
 
 function viewDetails(periodId: string) {
-  // TODO: Implement period details page
-  toast.add({
-    title: "Coming Soon",
-    description: "Period details page will be implemented in the next phase",
-    color: "primary",
-  });
+  router.push(`/periods/${periodId}`);
 }
 </script>
