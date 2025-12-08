@@ -94,6 +94,28 @@ export default defineEventHandler(async (event) => {
       ];
     }
 
+    // Check if there's a previous closed period available for copying prices
+    const previousClosedPeriod = await prisma.period.findFirst({
+      where: {
+        end_date: {
+          lt: period.start_date,
+        },
+        status: "CLOSED",
+      },
+      orderBy: {
+        end_date: "desc",
+      },
+      select: {
+        id: true,
+        name: true,
+        _count: {
+          select: {
+            item_prices: true,
+          },
+        },
+      },
+    });
+
     // Fetch all active items with their prices for this period
     const items = await prisma.item.findMany({
       where: itemWhere,
@@ -137,6 +159,15 @@ export default defineEventHandler(async (event) => {
       },
       prices,
       count: prices.length,
+      canCopyFromPrevious:
+        previousClosedPeriod !== null && previousClosedPeriod._count.item_prices > 0,
+      previousPeriod: previousClosedPeriod
+        ? {
+            id: previousClosedPeriod.id,
+            name: previousClosedPeriod.name,
+            priceCount: previousClosedPeriod._count.item_prices,
+          }
+        : null,
     };
   } catch (error) {
     // Handle Zod validation errors

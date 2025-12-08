@@ -22,18 +22,26 @@
         >
           <span class="hidden sm:inline">Back</span>
         </UButton>
-        <UButton
+        <UTooltip
           v-if="!hasChanges && periodData?.status === 'DRAFT'"
-          color="secondary"
-          icon="i-lucide-copy"
-          :disabled="!permissions.canSetItemPrices"
-          size="lg"
-          class="cursor-pointer rounded-full px-3 sm:px-6"
-          @click="showCopyConfirmModal = true"
+          :text="
+            !canCopyFromPrevious
+              ? 'No previous closed period with prices available'
+              : 'Copy prices from previous period'
+          "
         >
-          <span class="hidden sm:inline">Copy Prices</span>
-          <span class="sm:hidden">Copy</span>
-        </UButton>
+          <UButton
+            color="secondary"
+            icon="i-lucide-copy"
+            :disabled="!permissions.canSetItemPrices || !canCopyFromPrevious"
+            size="lg"
+            class="cursor-pointer rounded-full px-3 sm:px-6"
+            @click="showCopyConfirmModal = true"
+          >
+            <span class="hidden sm:inline">Copy Prices</span>
+            <span class="sm:hidden">Copy</span>
+          </UButton>
+        </UTooltip>
         <UButton
           v-if="hasChanges"
           color="primary"
@@ -220,7 +228,7 @@
                   placeholder="0.00"
                   :disabled="periodData?.status !== 'DRAFT' || !permissions.canSetItemPrices"
                   class="w-32 ml-auto"
-                  @input="handlePriceChange(item)"
+                  @update:model-value="handlePriceChange(item)"
                 />
               </td>
 
@@ -248,10 +256,7 @@
                     v-else-if="item.has_price && !item.isModified"
                     text="Price is set for this period"
                   >
-                    <UIcon
-                      name="i-lucide-check-circle"
-                      class="h-5 w-5 text-[var(--ui-success)]"
-                    />
+                    <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-[var(--ui-success)]" />
                   </UTooltip>
 
                   <!-- Price Missing Indicator -->
@@ -331,18 +336,26 @@
               color="warning"
               icon="i-lucide-alert-triangle"
               title="This will overwrite existing prices"
-              description="Any prices you have already set for this period will be replaced with prices from the most recent closed period."
+              :description="`Any prices you have already set for this period will be replaced with prices from ${previousPeriod?.name || 'the previous period'}.`"
             />
 
             <div v-if="periodData" class="bg-[var(--ui-bg-elevated)] rounded-lg p-4">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <p class="text-label">Target Period</p>
-                  <p class="text-[var(--ui-text)] font-medium">{{ periodData.name }}</p>
+                  <p class="text-label">Source Period</p>
+                  <p class="text-[var(--ui-text)] font-medium">
+                    {{ previousPeriod?.name || "-" }}
+                  </p>
+                  <p v-if="previousPeriod" class="text-caption text-[var(--ui-text-muted)]">
+                    {{ previousPeriod.priceCount }} prices available
+                  </p>
                 </div>
                 <div>
-                  <p class="text-label">Current Prices Set</p>
-                  <p class="text-[var(--ui-text)] font-medium">{{ pricesSetCount }} items</p>
+                  <p class="text-label">Target Period</p>
+                  <p class="text-[var(--ui-text)] font-medium">{{ periodData.name }}</p>
+                  <p class="text-caption text-[var(--ui-text-muted)]">
+                    {{ pricesSetCount }} prices currently set
+                  </p>
                 </div>
               </div>
             </div>
@@ -406,6 +419,8 @@ const error = ref<string | null>(null);
 const periodData = ref<any>(null);
 const pricesData = ref<any[]>([]);
 const originalPrices = ref<Map<string, number | null>>(new Map());
+const canCopyFromPrevious = ref(false);
+const previousPeriod = ref<{ id: string; name: string; priceCount: number } | null>(null);
 
 // Filters
 const searchQuery = ref("");
@@ -425,15 +440,42 @@ async function fetchPrices() {
 
   try {
     // Fetch period prices
-    const response = await $fetch(`/api/periods/${periodId.value}/prices`);
+    const response = await $fetch<{
+      period: {
+        id: string;
+        name: string;
+        status: string;
+        start_date: string;
+        end_date: string;
+      };
+      prices: Array<{
+        item_id: string;
+        item_code: string;
+        item_name: string;
+        item_unit: string;
+        item_category: string | null;
+        item_sub_category: string | null;
+        price_id: string | null;
+        price: number | string | null;
+        currency: string;
+        set_by: string | null;
+        set_at: string | null;
+        has_price: boolean;
+      }>;
+      count: number;
+      canCopyFromPrevious: boolean;
+      previousPeriod: { id: string; name: string; priceCount: number } | null;
+    }>(`/api/periods/${periodId.value}/prices`);
     periodData.value = response.period;
+    canCopyFromPrevious.value = response.canCopyFromPrevious ?? false;
+    previousPeriod.value = response.previousPeriod ?? null;
 
     // Fetch location stock for current location to get WAC values
     const activeLocationId = locationStore.activeLocation?.id;
     if (activeLocationId) {
-      const stockResponse = (await $fetch(`/api/locations/${activeLocationId}/stock`)) as {
+      const stockResponse = await $fetch<{
         stock?: Array<{ item_id: string; wac: string | number }>;
-      };
+      }>(`/api/locations/${activeLocationId}/stock`);
       if (stockResponse.stock) {
         stockResponse.stock.forEach((s) => {
           locationStock.value.set(s.item_id, parseFloat(String(s.wac)) || 0);
