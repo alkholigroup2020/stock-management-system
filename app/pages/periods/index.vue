@@ -96,7 +96,8 @@
             <tr
               v-for="period in filteredPeriods"
               :key="period.id"
-              class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+              @click="viewDetails(period.id)"
             >
               <!-- Period Name -->
               <td class="px-4 py-4 text-[var(--ui-text)] font-medium">
@@ -129,7 +130,7 @@
                     icon="i-lucide-tag"
                     size="sm"
                     class="cursor-pointer"
-                    @click="goToPrices(period.id)"
+                    @click.stop="goToPrices(period.id)"
                   >
                     <span class="hidden sm:inline">Prices</span>
                   </UButton>
@@ -139,7 +140,7 @@
                     icon="i-lucide-eye"
                     size="sm"
                     class="cursor-pointer"
-                    @click="viewDetails(period.id)"
+                    @click.stop="viewDetails(period.id)"
                   >
                     <span class="hidden sm:inline">View</span>
                   </UButton>
@@ -156,103 +157,146 @@
       <template #content>
         <UCard class="card-elevated">
           <template #header>
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">Create New Period</h3>
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <UIcon name="i-lucide-calendar-plus" class="w-6 h-6 text-primary" />
+                <h3 class="text-xl font-bold text-[var(--ui-text-highlighted)]">
+                  Create New Period
+                </h3>
+              </div>
               <UButton
                 color="neutral"
                 variant="ghost"
                 icon="i-lucide-x"
                 size="sm"
                 class="cursor-pointer"
+                :disabled="isCreating"
                 @click="closeCreateModal"
               />
             </div>
           </template>
 
-          <form @submit.prevent="handleCreatePeriod">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Period Name (Full Width) -->
-              <UFormField label="Period Name" name="name" required class="md:col-span-2">
-                <UInput
-                  id="period-name"
-                  v-model="createForm.name"
-                  placeholder="e.g., January 2025"
-                  size="lg"
-                  :disabled="isCreating"
-                  class="w-full"
-                />
-                <template v-if="createErrors.name" #error>
-                  <span class="text-[var(--ui-error)]">{{ createErrors.name }}</span>
-                </template>
-              </UFormField>
+          <form class="space-y-6" @submit.prevent="handleCreatePeriod">
+            <!-- Period Name -->
+            <div>
+              <label for="period-name" class="form-label mb-2 block">
+                Period Name <span class="text-[var(--ui-error)]">*</span>
+              </label>
+              <UInput
+                id="period-name"
+                v-model="createForm.name"
+                placeholder="e.g., January 2025"
+                size="lg"
+                icon="i-lucide-calendar"
+                :disabled="isCreating"
+                :color="createErrors.name ? 'error' : undefined"
+                class="w-full"
+              />
+              <p v-if="createErrors.name" class="form-error mt-1">{{ createErrors.name }}</p>
+              <p v-else class="text-sm text-[var(--ui-text-muted)] mt-1">
+                Enter a descriptive name for this accounting period
+              </p>
+            </div>
 
+            <!-- Date Range -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Start Date -->
-              <UFormField label="Start Date" name="start_date" required>
+              <div>
+                <label for="start-date" class="form-label mb-2 block">
+                  Start Date <span class="text-[var(--ui-error)]">*</span>
+                </label>
                 <UInput
                   id="start-date"
                   v-model="createForm.start_date"
                   type="date"
                   size="lg"
+                  icon="i-lucide-calendar-check"
                   :disabled="isCreating"
+                  :color="createErrors.start_date ? 'error' : undefined"
                   class="w-full"
                 />
-                <template v-if="createErrors.start_date" #error>
-                  <span class="text-[var(--ui-error)]">{{ createErrors.start_date }}</span>
-                </template>
-              </UFormField>
+                <p v-if="createErrors.start_date" class="form-error mt-1">
+                  {{ createErrors.start_date }}
+                </p>
+              </div>
 
               <!-- End Date -->
-              <UFormField label="End Date" name="end_date" required>
+              <div>
+                <label for="end-date" class="form-label mb-2 block">
+                  End Date <span class="text-[var(--ui-error)]">*</span>
+                </label>
                 <UInput
                   id="end-date"
                   v-model="createForm.end_date"
                   type="date"
                   size="lg"
+                  icon="i-lucide-calendar-x"
                   :disabled="isCreating"
+                  :color="createErrors.end_date ? 'error' : undefined"
                   class="w-full"
                 />
-                <template v-if="createErrors.end_date" #error>
-                  <span class="text-[var(--ui-error)]">{{ createErrors.end_date }}</span>
-                </template>
-              </UFormField>
-
-              <!-- Status (Full Width) -->
-              <UFormField label="Initial Status" name="status" required class="md:col-span-2">
-                <USelectMenu
-                  v-model="createForm.status"
-                  :items="statusOptions"
-                  value-key="value"
-                  placeholder="Select status"
-                  size="lg"
-                  :disabled="isCreating"
-                  class="w-full"
-                />
-                <template #hint>
-                  <p class="text-caption text-[var(--ui-text-muted)]">
-                    DRAFT periods can be edited before opening. OPEN periods are immediately active.
-                  </p>
-                </template>
-              </UFormField>
-
-              <!-- Info Alert (Full Width) -->
-              <div v-if="previousPeriodInfo" class="md:col-span-2">
-                <UAlert
-                  color="primary"
-                  icon="i-lucide-info"
-                  :title="previousPeriodInfo.title"
-                  :description="previousPeriodInfo.description"
-                />
+                <p v-if="createErrors.end_date" class="form-error mt-1">
+                  {{ createErrors.end_date }}
+                </p>
               </div>
             </div>
+
+            <!-- Status Selection -->
+            <div>
+              <div class="space-y-2 mb-3">
+                <div class="flex items-start gap-2">
+                  <UIcon name="i-lucide-file-edit" class="w-4 h-4 text-warning mt-0.5" />
+                  <p class="text-sm text-[var(--ui-text-muted)]">
+                    <span class="font-medium">DRAFT:</span> Period can be edited before activation
+                  </p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <UIcon name="i-lucide-unlock" class="w-4 h-4 text-success mt-0.5" />
+                  <p class="text-sm text-[var(--ui-text-muted)]">
+                    <span class="font-medium">OPEN:</span> Period is immediately active and accepts
+                    transactions
+                  </p>
+                </div>
+              </div>
+              <USelectMenu
+                id="status"
+                v-model="createForm.status"
+                :items="statusOptions"
+                value-key="value"
+                placeholder="Select status"
+                size="lg"
+                :disabled="isCreating"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon
+                    :name="createForm.status === 'DRAFT' ? 'i-lucide-file-edit' : 'i-lucide-unlock'"
+                    class="w-5 h-5"
+                  />
+                </template>
+              </USelectMenu>
+            </div>
+
+            <!-- Previous Period Info -->
+            <UAlert
+              v-if="previousPeriodInfo"
+              color="primary"
+              icon="i-lucide-info"
+              :title="previousPeriodInfo.title"
+            >
+              <template #description>
+                <p class="text-sm">{{ previousPeriodInfo.description }}</p>
+              </template>
+            </UAlert>
           </form>
 
           <template #footer>
-            <div class="flex items-center justify-end gap-3">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
               <UButton
-                color="error"
-                variant="soft"
+                color="neutral"
+                variant="outline"
                 size="lg"
-                class="cursor-pointer"
+                class="cursor-pointer rounded-full px-6"
                 :disabled="isCreating"
                 @click="closeCreateModal"
               >
@@ -260,10 +304,11 @@
               </UButton>
               <UButton
                 color="primary"
-                icon="i-lucide-plus"
+                icon="i-lucide-check"
                 size="lg"
-                class="cursor-pointer"
+                class="cursor-pointer rounded-full px-6"
                 :loading="isCreating"
+                :disabled="isCreating"
                 @click="handleCreatePeriod"
               >
                 Create Period

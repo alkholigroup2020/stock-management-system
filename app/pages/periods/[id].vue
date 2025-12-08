@@ -33,6 +33,18 @@
             <span class="hidden sm:inline">Back</span>
           </UButton>
           <UButton
+            v-if="isAdmin"
+            color="neutral"
+            variant="soft"
+            icon="i-lucide-tag"
+            size="lg"
+            class="cursor-pointer rounded-full px-3 sm:px-6"
+            @click="goToPrices"
+          >
+            <span class="hidden sm:inline">Set Prices</span>
+            <span class="sm:hidden">Prices</span>
+          </UButton>
+          <UButton
             v-if="isAdmin && period.status === 'DRAFT'"
             color="primary"
             icon="i-lucide-edit"
@@ -532,6 +544,10 @@ function getLocationStatusColor(status: string): BadgeColor {
 
 function goBack() {
   router.push("/periods");
+}
+
+function goToPrices() {
+  router.push(`/periods/${periodId}/prices`);
 }
 
 // Edit period modal

@@ -13,14 +13,23 @@
       </div>
       <div class="flex items-center gap-2">
         <UButton
+          color="neutral"
+          variant="ghost"
+          icon="i-lucide-arrow-left"
+          size="lg"
+          class="cursor-pointer"
+          @click="goBack"
+        >
+          <span class="hidden sm:inline">Back</span>
+        </UButton>
+        <UButton
           v-if="!hasChanges && periodData?.status === 'DRAFT'"
           color="secondary"
           icon="i-lucide-copy"
-          :loading="copying"
-          :disabled="copying || !permissions.canSetItemPrices"
+          :disabled="!permissions.canSetItemPrices"
           size="lg"
           class="cursor-pointer rounded-full px-3 sm:px-6"
-          @click="handleCopyPrices"
+          @click="showCopyConfirmModal = true"
         >
           <span class="hidden sm:inline">Copy Prices</span>
           <span class="sm:hidden">Copy</span>
@@ -226,7 +235,7 @@
                   <!-- Price Variance Warning -->
                   <UTooltip
                     v-if="item.hasPriceVariance"
-                    text="Price differs significantly from current WAC"
+                    text="Price differs significantly from current WAC (>10%)"
                   >
                     <UIcon
                       name="i-lucide-alert-triangle"
@@ -235,18 +244,23 @@
                   </UTooltip>
 
                   <!-- Price Set Indicator -->
-                  <UIcon
+                  <UTooltip
                     v-else-if="item.has_price && !item.isModified"
-                    name="i-lucide-check-circle"
-                    class="h-5 w-5 text-[var(--ui-success)]"
-                  />
+                    text="Price is set for this period"
+                  >
+                    <UIcon
+                      name="i-lucide-check-circle"
+                      class="h-5 w-5 text-[var(--ui-success)]"
+                    />
+                  </UTooltip>
 
                   <!-- Price Missing Indicator -->
-                  <UIcon
-                    v-else-if="!item.editedPrice"
-                    name="i-lucide-circle-dashed"
-                    class="h-5 w-5 text-[var(--ui-text-muted)]"
-                  />
+                  <UTooltip v-else-if="!item.editedPrice" text="Price not set - enter a value">
+                    <UIcon
+                      name="i-lucide-circle-dashed"
+                      class="h-5 w-5 text-[var(--ui-text-muted)]"
+                    />
+                  </UTooltip>
                 </div>
               </td>
             </tr>
@@ -293,6 +307,74 @@
         </UButton>
       </div>
     </UCard>
+
+    <!-- Copy Prices Confirmation Modal -->
+    <UModal v-model:open="showCopyConfirmModal">
+      <template #content>
+        <UCard class="card-elevated">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="p-3 bg-[var(--ui-bg-elevated)] rounded-lg">
+                <UIcon name="i-lucide-copy" class="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-[var(--ui-text)]">Copy Prices</h3>
+                <p class="text-sm text-[var(--ui-text-muted)]">
+                  Import prices from previous period
+                </p>
+              </div>
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <UAlert
+              color="warning"
+              icon="i-lucide-alert-triangle"
+              title="This will overwrite existing prices"
+              description="Any prices you have already set for this period will be replaced with prices from the most recent closed period."
+            />
+
+            <div v-if="periodData" class="bg-[var(--ui-bg-elevated)] rounded-lg p-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-label">Target Period</p>
+                  <p class="text-[var(--ui-text)] font-medium">{{ periodData.name }}</p>
+                </div>
+                <div>
+                  <p class="text-label">Current Prices Set</p>
+                  <p class="text-[var(--ui-text)] font-medium">{{ pricesSetCount }} items</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="lg"
+                class="cursor-pointer"
+                :disabled="copying"
+                @click="showCopyConfirmModal = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="primary"
+                icon="i-lucide-copy"
+                size="lg"
+                class="cursor-pointer"
+                :loading="copying"
+                @click="handleCopyPrices"
+              >
+                Copy Prices
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -301,7 +383,13 @@ import { formatCurrency, formatDateRange } from "~/utils/format";
 
 // Props and route
 const route = useRoute();
+const router = useRouter();
 const periodId = computed(() => route.params.periodId as string);
+
+// Navigation
+function goBack() {
+  router.push(`/periods/${periodId.value}`);
+}
 
 // Composables
 const { canSetItemPrices } = usePermissions();
@@ -313,6 +401,7 @@ const locationStore = useLocationStore();
 const loading = ref(true);
 const saving = ref(false);
 const copying = ref(false);
+const showCopyConfirmModal = ref(false);
 const error = ref<string | null>(null);
 const periodData = ref<any>(null);
 const pricesData = ref<any[]>([]);
@@ -489,7 +578,8 @@ async function handleCopyPrices() {
       description: `Successfully copied ${response.copied_count} prices from ${response.source_period.name}`,
     });
 
-    // Refresh data
+    // Close modal and refresh data
+    showCopyConfirmModal.value = false;
     await fetchPrices();
   } catch (err: any) {
     console.error("Error copying prices:", err);
