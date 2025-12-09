@@ -1,3 +1,385 @@
+<template>
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading delivery details..." />
+    </div>
+
+    <!-- Error State -->
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchDelivery" />
+
+    <!-- Delivery Details -->
+    <template v-else-if="delivery">
+      <!-- Page Header -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 sm:gap-4">
+          <UIcon name="i-lucide-truck" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+          <div>
+            <h1 class="text-xl sm:text-3xl font-bold text-primary">
+              {{ delivery.delivery_no }}
+            </h1>
+            <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+              Posted by {{ delivery.poster.full_name }} on {{ formatDateTime(delivery.posted_at) }}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-arrow-left"
+            size="lg"
+            class="cursor-pointer"
+            @click="goBack"
+          >
+            <span class="hidden sm:inline">Back</span>
+          </UButton>
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-printer"
+            size="lg"
+            class="cursor-pointer rounded-full px-3 sm:px-6"
+            @click="printDelivery"
+          >
+            <span class="hidden sm:inline">Print</span>
+          </UButton>
+        </div>
+      </div>
+
+      <!-- Price Variance Alert -->
+      <UAlert
+        v-if="hasVarianceLines"
+        icon="i-lucide-alert-triangle"
+        color="warning"
+        variant="subtle"
+        title="Price Variance Detected"
+        :description="`${varianceLinesCount} item(s) have price variance totaling ${formatCurrency(totalVarianceAmount)}. ${delivery.summary.ncr_count} NCR(s) were automatically generated.`"
+      />
+
+      <!-- Delivery Header Card -->
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <template #header>
+          <div class="flex items-start justify-between p-3 sm:p-4">
+            <div>
+              <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Information</h2>
+              <p class="text-caption mt-1">
+                Posted on {{ formatDateTime(delivery.posted_at) }}
+              </p>
+            </div>
+            <UBadge
+              v-if="delivery.has_variance"
+              color="warning"
+              variant="subtle"
+              size="md"
+              class="inline-flex items-center gap-1"
+            >
+              <UIcon name="i-lucide-alert-triangle" class="h-4 w-4" />
+              Has Variance
+            </UBadge>
+          </div>
+        </template>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Delivery Information -->
+          <div>
+            <h3 class="text-label uppercase mb-3">Delivery Details</h3>
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-caption">Delivery Date</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ formatDate(delivery.delivery_date) }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-caption">Invoice Number</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.invoice_no || "—" }}
+                </dd>
+              </div>
+              <div v-if="delivery.po">
+                <dt class="text-caption">Purchase Order</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.po.po_no }}
+                  <UBadge
+                    :color="delivery.po.status === 'OPEN' ? 'success' : 'neutral'"
+                    variant="subtle"
+                    size="sm"
+                    class="ml-2"
+                  >
+                    {{ delivery.po.status }}
+                  </UBadge>
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Supplier Information -->
+          <div>
+            <h3 class="text-label uppercase mb-3">Supplier</h3>
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-caption">Name</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.supplier.name }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-caption">Code</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.supplier.code }}
+                </dd>
+              </div>
+              <div v-if="delivery.supplier.contact">
+                <dt class="text-caption">Contact</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.supplier.contact }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Location & Period -->
+          <div>
+            <h3 class="text-label uppercase mb-3">Location & Period</h3>
+            <dl class="space-y-2">
+              <div>
+                <dt class="text-caption">Location</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.location.name }}
+                  <span class="text-caption">({{ delivery.location.code }})</span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-caption">Period</dt>
+                <dd class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.period.name }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Delivery Note -->
+        <div
+          v-if="delivery.delivery_note"
+          class="mt-6 pt-6 border-t border-[var(--ui-border)]"
+        >
+          <h3 class="text-label uppercase mb-2">Delivery Note</h3>
+          <p class="text-[var(--ui-text)]">{{ delivery.delivery_note }}</p>
+        </div>
+      </UCard>
+
+      <!-- Delivery Lines Card -->
+      <UCard class="card-elevated" :ui="{ body: 'p-0' }">
+        <template #header>
+          <div class="flex items-center justify-between p-3 sm:p-4">
+            <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Items</h2>
+            <div class="text-caption">
+              {{ delivery.summary.total_lines }} item(s),
+              {{ delivery.summary.total_items.toFixed(2) }} total units
+            </div>
+          </div>
+        </template>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-[var(--ui-border)]">
+            <thead>
+              <tr class="bg-[var(--ui-bg-elevated)]">
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Quantity</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Unit Price</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
+                  Period Price
+                </th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Variance</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--ui-border)]">
+              <tr
+                v-for="line in delivery.lines"
+                :key="line.id"
+                :class="{
+                  'bg-amber-50 dark:bg-amber-950/20': line.has_variance,
+                }"
+                class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
+              >
+                <!-- Item -->
+                <td class="px-4 py-4">
+                  <div class="font-medium text-[var(--ui-text)]">
+                    {{ line.item.name }}
+                  </div>
+                  <div class="text-caption">
+                    {{ line.item.code }} · {{ line.item.unit }}
+                    <span v-if="line.item.category">· {{ line.item.category }}</span>
+                  </div>
+                </td>
+
+                <!-- Quantity -->
+                <td class="px-4 py-4 text-right text-[var(--ui-text)]">
+                  {{ line.quantity.toFixed(4) }}
+                </td>
+
+                <!-- Unit Price -->
+                <td class="px-4 py-4 text-right text-[var(--ui-text)] font-medium">
+                  {{ formatCurrency(line.unit_price) }}
+                </td>
+
+                <!-- Period Price -->
+                <td class="px-4 py-4 text-right text-caption">
+                  {{ line.period_price ? formatCurrency(line.period_price) : "—" }}
+                </td>
+
+                <!-- Variance -->
+                <td class="px-4 py-4 text-right">
+                  <div v-if="line.has_variance" class="flex items-center justify-end gap-2">
+                    <UIcon name="i-lucide-alert-triangle" class="text-amber-500 h-4 w-4" />
+                    <div class="text-right">
+                      <div
+                        :class="[
+                          'text-[var(--ui-text)] font-medium',
+                          line.price_variance > 0
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-emerald-600 dark:text-emerald-400',
+                        ]"
+                      >
+                        {{ formatCurrency(line.price_variance) }}
+                      </div>
+                      <div v-if="line.variance_percentage" class="text-caption">
+                        ({{ line.variance_percentage }}%)
+                      </div>
+                    </div>
+                  </div>
+                  <span v-else class="text-caption">—</span>
+                </td>
+
+                <!-- Line Value -->
+                <td class="px-4 py-4 text-right text-[var(--ui-text)] font-semibold">
+                  {{ formatCurrency(line.line_value) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Summary -->
+        <div class="px-4 py-6 border-t border-[var(--ui-border)]">
+          <div class="flex justify-end">
+            <div class="space-y-2 min-w-[300px]">
+              <div class="flex justify-between items-center">
+                <span class="text-caption">Total Items:</span>
+                <span class="text-[var(--ui-text)] font-medium">
+                  {{ delivery.summary.total_lines }}
+                </span>
+              </div>
+              <div v-if="hasVarianceLines" class="flex justify-between items-center">
+                <span class="text-caption">Items with Variance:</span>
+                <span class="text-[var(--ui-text)] font-medium text-amber-600 dark:text-amber-400">
+                  {{ varianceLinesCount }}
+                </span>
+              </div>
+              <div v-if="hasVarianceLines" class="flex justify-between items-center">
+                <span class="text-caption">Total Variance:</span>
+                <span
+                  :class="[
+                    'text-[var(--ui-text)] font-medium',
+                    totalVarianceAmount > 0
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-emerald-600 dark:text-emerald-400',
+                  ]"
+                >
+                  {{ formatCurrency(totalVarianceAmount) }}
+                </span>
+              </div>
+              <div
+                class="flex justify-between items-center pt-2 border-t border-[var(--ui-border)]"
+              >
+                <span class="text-[var(--ui-text)] font-semibold">Total Amount:</span>
+                <span class="text-2xl font-bold text-primary">
+                  {{ formatCurrency(delivery.total_amount) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Auto-Generated NCRs Card -->
+      <UCard v-if="delivery.ncrs.length > 0" class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <template #header>
+          <div class="flex items-center gap-2 p-3 sm:p-4">
+            <UIcon name="i-lucide-alert-octagon" class="h-5 w-5 text-amber-500" />
+            <h2 class="text-lg font-semibold text-[var(--ui-text)]">
+              Non-Conformance Reports (NCRs)
+            </h2>
+            <UBadge color="warning" variant="subtle">
+              {{ delivery.ncrs.length }}
+            </UBadge>
+          </div>
+        </template>
+
+        <div class="space-y-3">
+          <div
+            v-for="ncr in delivery.ncrs"
+            :key="ncr.id"
+            class="rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] p-4 hover:bg-[var(--ui-bg-hover)] transition-colors cursor-pointer"
+            @click="goToNcr(ncr.id)"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-semibold text-[var(--ui-text)]">{{ ncr.ncr_no }}</span>
+                  <UBadge :color="getNcrStatusColor(ncr.status)" variant="subtle" size="sm">
+                    {{ ncr.status }}
+                  </UBadge>
+                  <UBadge
+                    v-if="ncr.type === 'PRICE_VARIANCE'"
+                    color="warning"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    Auto-Generated
+                  </UBadge>
+                </div>
+                <p v-if="ncr.reason" class="text-caption mb-2">
+                  {{ ncr.reason }}
+                </p>
+                <div class="flex items-center gap-4 text-caption">
+                  <span>Created: {{ formatDate(ncr.created_at) }}</span>
+                  <span>By: {{ ncr.creator.full_name }}</span>
+                  <span v-if="ncr.quantity">Qty: {{ ncr.quantity }}</span>
+                  <span>Value: {{ formatCurrency(ncr.value) }}</span>
+                </div>
+              </div>
+              <UIcon name="i-lucide-chevron-right" class="h-5 w-5 text-[var(--ui-text-muted)]" />
+            </div>
+          </div>
+        </div>
+      </UCard>
+    </template>
+
+    <!-- Not Found State -->
+    <EmptyState
+      v-else
+      icon="i-lucide-package-x"
+      title="Delivery Not Found"
+      description="The delivery you're looking for doesn't exist or has been removed."
+    >
+      <template #actions>
+        <UButton
+          color="primary"
+          icon="i-lucide-arrow-left"
+          class="cursor-pointer"
+          @click="goBack"
+        >
+          Back to Deliveries
+        </UButton>
+      </template>
+    </EmptyState>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { formatCurrency, formatDate, formatDateTime } from "~/utils/format";
 
@@ -108,9 +490,11 @@ const delivery = ref<Delivery | null>(null);
 
 // Computed
 const deliveryId = computed(() => route.params.id as string);
-const hasVarianceLines = computed(() => delivery.value?.summary.variance_lines ?? 0 > 0);
+const hasVarianceLines = computed(() => (delivery.value?.summary.variance_lines ?? 0) > 0);
 const varianceLinesCount = computed(() => delivery.value?.summary.variance_lines ?? 0);
 const totalVarianceAmount = computed(() => delivery.value?.summary.total_variance_amount ?? 0);
+
+type BadgeColor = "error" | "info" | "success" | "primary" | "secondary" | "warning" | "neutral";
 
 // Fetch delivery details
 async function fetchDelivery() {
@@ -133,17 +517,8 @@ async function fetchDelivery() {
   }
 }
 
-// Get variance badge color
-function getVarianceBadgeColor(variance: number): string {
-  if (variance > 0) return "red";
-  if (variance < 0) return "emerald";
-  return "gray";
-}
-
 // Get NCR status color
-function getNcrStatusColor(
-  status: string
-): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
+function getNcrStatusColor(status: string): BadgeColor {
   switch (status) {
     case "OPEN":
       return "warning";
@@ -166,13 +541,12 @@ function goBack() {
 }
 
 function goToNcr(ncrId: string) {
-  router.push(`/ncr/${ncrId}`);
+  router.push(`/ncrs/${ncrId}`);
 }
 
-// Print (optional for MVP - placeholder)
+// Print
 function printDelivery() {
   toast.info("Print functionality coming soon");
-  // In future: window.print() or generate PDF
 }
 
 // Initial load
@@ -180,361 +554,3 @@ onMounted(async () => {
   await fetchDelivery();
 });
 </script>
-
-<template>
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <LayoutPageHeader
-      :title="`Delivery ${delivery?.delivery_no || ''}`"
-      icon="i-lucide-truck"
-      :show-location="true"
-      :show-period="true"
-      location-scope="current"
-    >
-      <template #actions>
-        <UButton icon="i-lucide-arrow-left" color="neutral" variant="outline" @click="goBack">
-          Back
-        </UButton>
-        <UButton color="neutral" variant="outline" icon="i-lucide-printer" @click="printDelivery">
-          Print
-        </UButton>
-      </template>
-    </LayoutPageHeader>
-
-    <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center py-12">
-      <LoadingSpinner size="lg" />
-    </div>
-
-    <!-- Error State -->
-    <ErrorAlert v-else-if="error" :message="error" @retry="fetchDelivery" class="mb-6" />
-
-    <!-- Delivery Details -->
-    <div v-else-if="delivery" class="space-y-6">
-      <!-- Price Variance Alert -->
-      <UAlert
-        v-if="hasVarianceLines"
-        icon="i-lucide-alert-triangle"
-        color="warning"
-        variant="subtle"
-        title="Price Variance Detected"
-        :description="`${varianceLinesCount} item(s) have price variance totaling ${formatCurrency(
-          totalVarianceAmount
-        )}. ${delivery.summary.ncr_count} NCR(s) were automatically generated.`"
-      />
-
-      <!-- Delivery Header Card -->
-      <UCard class="card-elevated">
-        <template #header>
-          <div class="flex items-start justify-between">
-            <div>
-              <h2 class="text-subheading font-bold">
-                {{ delivery.delivery_no }}
-              </h2>
-              <p class="text-caption mt-1">
-                Posted by {{ delivery.poster.full_name }} on
-                {{ formatDateTime(delivery.posted_at) }}
-              </p>
-            </div>
-            <UBadge
-              v-if="delivery.has_variance"
-              color="warning"
-              variant="soft"
-              size="lg"
-              class="inline-flex items-center gap-1"
-            >
-              <UIcon name="i-lucide-alert-triangle" class="h-4 w-4" />
-              Has Variance
-            </UBadge>
-          </div>
-        </template>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Delivery Information -->
-          <div>
-            <h3 class="text-label uppercase mb-3">Delivery Information</h3>
-            <dl class="space-y-2">
-              <div>
-                <dt class="text-caption">Delivery Date</dt>
-                <dd class="text-body font-medium">
-                  {{ formatDate(delivery.delivery_date) }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-caption">Invoice Number</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.invoice_no || "—" }}
-                </dd>
-              </div>
-              <div v-if="delivery.po">
-                <dt class="text-caption">Purchase Order</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.po.po_no }}
-                  <UBadge
-                    :color="delivery.po.status === 'OPEN' ? 'success' : 'neutral'"
-                    variant="soft"
-                    size="xs"
-                    class="ml-2"
-                  >
-                    {{ delivery.po.status }}
-                  </UBadge>
-                </dd>
-              </div>
-            </dl>
-          </div>
-
-          <!-- Supplier Information -->
-          <div>
-            <h3 class="text-label uppercase mb-3">Supplier</h3>
-            <dl class="space-y-2">
-              <div>
-                <dt class="text-caption">Name</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.supplier.name }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-caption">Code</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.supplier.code }}
-                </dd>
-              </div>
-              <div v-if="delivery.supplier.contact">
-                <dt class="text-caption">Contact</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.supplier.contact }}
-                </dd>
-              </div>
-            </dl>
-          </div>
-
-          <!-- Location & Period -->
-          <div>
-            <h3 class="text-label uppercase mb-3">Location & Period</h3>
-            <dl class="space-y-2">
-              <div>
-                <dt class="text-caption">Location</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.location.name }}
-                  <span class="text-caption">({{ delivery.location.code }})</span>
-                </dd>
-              </div>
-              <div>
-                <dt class="text-caption">Period</dt>
-                <dd class="text-body font-medium">
-                  {{ delivery.period.name }}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-
-        <!-- Delivery Note -->
-        <div v-if="delivery.delivery_note" class="mt-6 pt-6 border-t border-default">
-          <h3 class="text-label uppercase mb-2">Delivery Note</h3>
-          <p class="text-body">{{ delivery.delivery_note }}</p>
-        </div>
-      </UCard>
-
-      <!-- Delivery Lines Card -->
-      <UCard class="card-elevated">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="text-subheading font-semibold">Delivery Items</h2>
-            <div class="text-caption">
-              {{ delivery.summary.total_lines }} item(s),
-              {{ delivery.summary.total_items.toFixed(2) }} total units
-            </div>
-          </div>
-        </template>
-
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
-              <tr>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Quantity</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Unit Price</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
-                  Period Price
-                </th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Variance</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-default">
-              <tr
-                v-for="line in delivery.lines"
-                :key="line.id"
-                :class="{
-                  'bg-amber-50 dark:bg-amber-950/20': line.has_variance,
-                }"
-              >
-                <!-- Item -->
-                <td class="px-4 py-3">
-                  <div class="font-medium text-body">
-                    {{ line.item.name }}
-                  </div>
-                  <div class="text-caption">
-                    {{ line.item.code }} · {{ line.item.unit }}
-                    <span v-if="line.item.category">· {{ line.item.category }}</span>
-                  </div>
-                </td>
-
-                <!-- Quantity -->
-                <td class="px-4 py-3 text-right text-body">
-                  {{ line.quantity.toFixed(4) }}
-                </td>
-
-                <!-- Unit Price -->
-                <td class="px-4 py-3 text-right text-body font-medium">
-                  {{ formatCurrency(line.unit_price) }}
-                </td>
-
-                <!-- Period Price -->
-                <td class="px-4 py-3 text-right text-caption">
-                  {{ line.period_price ? formatCurrency(line.period_price) : "—" }}
-                </td>
-
-                <!-- Variance -->
-                <td class="px-4 py-3 text-right">
-                  <div v-if="line.has_variance" class="flex items-center justify-end gap-2">
-                    <UIcon name="i-lucide-alert-triangle" class="text-amber-500 h-4 w-4" />
-                    <div class="text-right">
-                      <div
-                        :class="[
-                          'text-body font-medium',
-                          line.price_variance > 0
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-emerald-600 dark:text-emerald-400',
-                        ]"
-                      >
-                        {{ formatCurrency(line.price_variance) }}
-                      </div>
-                      <div v-if="line.variance_percentage" class="text-caption">
-                        ({{ line.variance_percentage }}%)
-                      </div>
-                    </div>
-                  </div>
-                  <span v-else class="text-caption">—</span>
-                </td>
-
-                <!-- Line Value -->
-                <td class="px-4 py-3 text-right text-body font-semibold">
-                  {{ formatCurrency(line.line_value) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Summary -->
-        <div class="mt-6 pt-6 border-t border-default">
-          <div class="flex justify-end">
-            <div class="space-y-2 min-w-[300px]">
-              <div class="flex justify-between items-center">
-                <span class="text-caption">Total Items:</span>
-                <span class="text-body font-medium">
-                  {{ delivery.summary.total_lines }}
-                </span>
-              </div>
-              <div v-if="hasVarianceLines" class="flex justify-between items-center">
-                <span class="text-caption">Items with Variance:</span>
-                <span class="text-body font-medium text-amber-600 dark:text-amber-400">
-                  {{ varianceLinesCount }}
-                </span>
-              </div>
-              <div v-if="hasVarianceLines" class="flex justify-between items-center">
-                <span class="text-caption">Total Variance:</span>
-                <span
-                  :class="[
-                    'text-body font-medium',
-                    totalVarianceAmount > 0
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-emerald-600 dark:text-emerald-400',
-                  ]"
-                >
-                  {{ formatCurrency(totalVarianceAmount) }}
-                </span>
-              </div>
-              <div class="flex justify-between items-center pt-2 border-t border-default">
-                <span class="text-body font-semibold">Total Amount:</span>
-                <span class="text-subheading font-bold text-primary">
-                  {{ formatCurrency(delivery.total_amount) }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </UCard>
-
-      <!-- Auto-Generated NCRs Card -->
-      <UCard v-if="delivery.ncrs.length > 0" class="card-elevated">
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-alert-octagon" class="h-5 w-5 text-amber-500" />
-            <h2 class="text-subheading font-semibold">Non-Conformance Reports (NCRs)</h2>
-            <UBadge color="warning" variant="soft">
-              {{ delivery.ncrs.length }}
-            </UBadge>
-          </div>
-        </template>
-
-        <div class="space-y-4">
-          <div
-            v-for="ncr in delivery.ncrs"
-            :key="ncr.id"
-            class="rounded-lg border border-default bg-default p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
-            @click="goToNcr(ncr.id)"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2">
-                  <span class="font-semibold text-default">{{ ncr.ncr_no }}</span>
-                  <UBadge :color="getNcrStatusColor(ncr.status)" variant="soft" size="xs">
-                    {{ ncr.status }}
-                  </UBadge>
-                  <UBadge
-                    v-if="ncr.type === 'PRICE_VARIANCE'"
-                    color="warning"
-                    variant="soft"
-                    size="xs"
-                  >
-                    Auto-Generated
-                  </UBadge>
-                </div>
-                <p v-if="ncr.reason" class="text-caption mb-2">
-                  {{ ncr.reason }}
-                </p>
-                <div class="flex items-center gap-4 text-caption">
-                  <span>Created: {{ formatDate(ncr.created_at) }}</span>
-                  <span>By: {{ ncr.creator.full_name }}</span>
-                  <span v-if="ncr.quantity">Qty: {{ ncr.quantity }}</span>
-                  <span>Value: {{ formatCurrency(ncr.value) }}</span>
-                </div>
-              </div>
-              <UIcon name="i-lucide-chevron-right" class="h-5 w-5 text-muted" />
-            </div>
-          </div>
-        </div>
-      </UCard>
-    </div>
-
-    <!-- Not Found State -->
-    <EmptyState
-      v-else
-      icon="i-lucide-package-x"
-      title="Delivery Not Found"
-      description="The delivery you're looking for doesn't exist or has been removed."
-    >
-      <template #action>
-        <UButton
-          color="primary"
-          icon="i-lucide-arrow-left"
-          label="Back to Deliveries"
-          @click="goBack"
-        />
-      </template>
-    </EmptyState>
-  </div>
-</template>

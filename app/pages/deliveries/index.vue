@@ -1,3 +1,319 @@
+<template>
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-truck" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Deliveries</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View and manage goods receipts and supplier deliveries
+          </p>
+        </div>
+      </div>
+      <UButton
+        v-if="canPostDeliveries()"
+        color="primary"
+        icon="i-lucide-plus"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="goToNewDelivery"
+      >
+        <span class="hidden sm:inline">New Delivery</span>
+        <span class="sm:hidden">New</span>
+      </UButton>
+    </div>
+
+    <!-- Filter Section -->
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <!-- Desktop: Full filter bar (lg and above) -->
+      <div class="hidden lg:flex items-center gap-3">
+        <!-- Date Range Start -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <UInput
+            v-model="filters.startDate"
+            type="date"
+            icon="i-lucide-calendar"
+            size="lg"
+            class="w-full"
+            placeholder="Start date"
+          />
+        </div>
+
+        <!-- Date Range End -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <UInput
+            v-model="filters.endDate"
+            type="date"
+            icon="i-lucide-calendar"
+            size="lg"
+            class="w-full"
+            placeholder="End date"
+          />
+        </div>
+
+        <!-- Supplier Dropdown -->
+        <USelectMenu
+          v-model="filters.supplierId"
+          :items="supplierOptions"
+          value-key="value"
+          placeholder="All Suppliers"
+          size="lg"
+          class="min-w-[200px]"
+        >
+          <template #leading>
+            <UIcon name="i-lucide-building-2" class="w-5 h-5" />
+          </template>
+        </USelectMenu>
+
+        <!-- Price Variance Dropdown (Far Right) -->
+        <UDropdownMenu :items="varianceDropdownItems" class="ml-auto">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="currentVarianceIcon" class="w-4 h-4 mr-2" />
+            {{ currentVarianceLabel }}
+          </UButton>
+        </UDropdownMenu>
+      </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Row 1: Date Range -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <UInput
+              v-model="filters.startDate"
+              type="date"
+              icon="i-lucide-calendar"
+              size="lg"
+              class="w-full"
+              placeholder="Start"
+            />
+          </div>
+          <div class="flex-1 min-w-0">
+            <UInput
+              v-model="filters.endDate"
+              type="date"
+              icon="i-lucide-calendar"
+              size="lg"
+              class="w-full"
+              placeholder="End"
+            />
+          </div>
+        </div>
+
+        <!-- Row 2: Supplier and Variance Dropdown -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <USelectMenu
+              v-model="filters.supplierId"
+              :items="supplierOptions"
+              value-key="value"
+              placeholder="All Suppliers"
+              size="lg"
+              class="w-full"
+            >
+              <template #leading>
+                <UIcon name="i-lucide-building-2" class="w-5 h-5" />
+              </template>
+            </USelectMenu>
+          </div>
+
+          <!-- Icon-only variance dropdown on mobile -->
+          <UDropdownMenu :items="varianceDropdownItems">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-3"
+              trailing-icon="i-lucide-chevron-down"
+            >
+              <UIcon :name="currentVarianceIcon" class="w-4 h-4" />
+            </UButton>
+          </UDropdownMenu>
+        </div>
+      </div>
+
+      <!-- Active Filters -->
+      <div v-if="activeFilters.length > 0" class="mt-4 pt-4 border-t border-[var(--ui-border)]">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm text-[var(--ui-text-muted)]">Active filters:</span>
+          <UBadge
+            v-for="filter in activeFilters"
+            :key="filter.key"
+            color="primary"
+            variant="soft"
+            class="cursor-pointer"
+            @click="clearFilter(filter.key)"
+          >
+            {{ filter.label }}: {{ filter.value }}
+            <UIcon name="i-lucide-x" class="ml-1 h-3 w-3" />
+          </UBadge>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- Error State -->
+    <ErrorAlert v-if="error" :message="error" @retry="fetchDeliveries" />
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading deliveries..." />
+    </div>
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else-if="!hasDeliveries"
+      icon="i-lucide-package-x"
+      :title="activeFilters.length > 0 ? 'No deliveries found' : 'No deliveries yet'"
+      :description="
+        activeFilters.length > 0
+          ? 'No deliveries match your current filters. Try adjusting your search criteria.'
+          : 'Get started by creating your first delivery.'
+      "
+    >
+      <template v-if="canPostDeliveries() && activeFilters.length === 0" #actions>
+        <UButton
+          color="primary"
+          icon="i-lucide-plus"
+          class="cursor-pointer"
+          @click="goToNewDelivery"
+        >
+          Create First Delivery
+        </UButton>
+      </template>
+    </EmptyState>
+
+    <!-- Deliveries Table -->
+    <UCard v-else class="card-elevated" :ui="{ body: 'p-0' }">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <thead>
+            <tr class="bg-[var(--ui-bg-elevated)]">
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Delivery No</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Date</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Supplier</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Invoice No</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Total Amount</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
+                Price Variance
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--ui-border)]">
+            <tr
+              v-for="delivery in deliveries"
+              :key="delivery.id"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+              @click="handleRowClick(delivery)"
+            >
+              <!-- Delivery No -->
+              <td class="px-4 py-4 text-[var(--ui-text)] font-medium">
+                {{ delivery.delivery_no }}
+              </td>
+
+              <!-- Date -->
+              <td class="px-4 py-4 text-caption">
+                {{ formatDate(delivery.delivery_date) }}
+              </td>
+
+              <!-- Supplier -->
+              <td class="px-4 py-4">
+                <div class="font-medium text-[var(--ui-text)]">{{ delivery.supplier.name }}</div>
+                <div class="text-caption">{{ delivery.supplier.code }}</div>
+              </td>
+
+              <!-- Invoice No -->
+              <td class="px-4 py-4 text-caption">
+                {{ delivery.invoice_no || "—" }}
+              </td>
+
+              <!-- Total Amount -->
+              <td class="px-4 py-4 text-right text-[var(--ui-text)] font-medium">
+                {{ formatCurrency(delivery.total_amount) }}
+              </td>
+
+              <!-- Price Variance -->
+              <td class="px-4 py-4">
+                <UBadge
+                  v-if="delivery.has_variance"
+                  color="warning"
+                  variant="subtle"
+                  size="md"
+                  class="inline-flex items-center gap-1"
+                >
+                  <UIcon name="i-lucide-alert-triangle" class="h-3 w-3" />
+                  Yes
+                </UBadge>
+                <span v-else class="text-caption">No</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div
+        v-if="pagination.totalPages > 1"
+        class="flex items-center justify-between border-t border-[var(--ui-border)] px-4 py-3"
+      >
+        <div class="text-caption">
+          {{ paginationInfo }}
+        </div>
+        <div class="flex gap-1">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-chevron-left"
+            size="sm"
+            class="cursor-pointer"
+            :disabled="pagination.page === 1"
+            @click="previousPage"
+          />
+
+          <template v-for="page in pagination.totalPages" :key="page">
+            <UButton
+              v-if="
+                page === 1 ||
+                page === pagination.totalPages ||
+                Math.abs(page - pagination.page) <= 1
+              "
+              :color="page === pagination.page ? 'primary' : 'neutral'"
+              :variant="page === pagination.page ? 'solid' : 'outline'"
+              size="sm"
+              class="cursor-pointer"
+              @click="goToPage(page)"
+            >
+              {{ page }}
+            </UButton>
+            <span
+              v-else-if="page === 2 || page === pagination.totalPages - 1"
+              class="flex items-center px-2 text-[var(--ui-text-muted)]"
+            >
+              ...
+            </span>
+          </template>
+
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-chevron-right"
+            size="sm"
+            class="cursor-pointer"
+            :disabled="pagination.page === pagination.totalPages"
+            @click="nextPage"
+          />
+        </div>
+      </div>
+    </UCard>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { formatCurrency, formatDate } from "~/utils/format";
 
@@ -7,13 +323,10 @@ useSeoMeta({
   description: "View and manage deliveries and goods receipts",
 });
 
-// No middleware needed - auth.global will handle authentication automatically
-
 // Composables
 const router = useRouter();
 const locationStore = useLocationStore();
 const { canPostDeliveries } = usePermissions();
-const toast = useAppToast();
 
 // Types
 interface Delivery {
@@ -52,9 +365,8 @@ const suppliers = ref<Supplier[]>([]);
 
 // Filters
 const filters = reactive({
-  search: "",
-  supplierId: "",
-  hasVariance: false,
+  supplierId: "all",
+  hasVariance: null as boolean | null,
   startDate: "",
   endDate: "",
 });
@@ -70,16 +382,63 @@ const pagination = reactive({
 // Computed
 const activeLocationId = computed(() => locationStore.activeLocationId);
 const hasDeliveries = computed(() => deliveries.value.length > 0);
+
 const paginationInfo = computed(() => {
   const start = (pagination.page - 1) * pagination.limit + 1;
   const end = Math.min(pagination.page * pagination.limit, pagination.total);
   return `${start}-${end} of ${pagination.total}`;
 });
 
+// Supplier options for dropdown
+const supplierOptions = computed(() => [
+  { label: "All Suppliers", value: "all" },
+  ...suppliers.value.map((s) => ({
+    label: `${s.name} (${s.code})`,
+    value: s.id,
+  })),
+]);
+
+// Variance dropdown items
+const varianceDropdownItems = computed(() => [
+  [
+    {
+      label: "All",
+      icon: "i-lucide-list",
+      active: filters.hasVariance === null,
+      onSelect: () => selectVariance(null),
+    },
+    {
+      label: "With Variance",
+      icon: "i-lucide-alert-triangle",
+      active: filters.hasVariance === true,
+      onSelect: () => selectVariance(true),
+    },
+    {
+      label: "No Variance",
+      icon: "i-lucide-circle-check",
+      active: filters.hasVariance === false,
+      onSelect: () => selectVariance(false),
+    },
+  ],
+]);
+
+const currentVarianceLabel = computed(() => {
+  if (filters.hasVariance === true) return "With Variance";
+  if (filters.hasVariance === false) return "No Variance";
+  return "All";
+});
+
+const currentVarianceIcon = computed(() => {
+  if (filters.hasVariance === true) return "i-lucide-alert-triangle";
+  if (filters.hasVariance === false) return "i-lucide-circle-check";
+  return "i-lucide-list";
+});
+
 // Active filters
 const activeFilters = computed(() => {
-  const activeFiltersList: Array<{ key: string; label: string; value: any }> = [];
-  if (filters.supplierId) {
+  const activeFiltersList: Array<{ key: string; label: string; value: string }> = [];
+
+  if (filters.supplierId && filters.supplierId !== "all") {
     const supplier = suppliers.value.find((s) => s.id === filters.supplierId);
     if (supplier) {
       activeFiltersList.push({
@@ -89,13 +448,15 @@ const activeFilters = computed(() => {
       });
     }
   }
-  if (filters.hasVariance) {
+
+  if (filters.hasVariance !== null) {
     activeFiltersList.push({
       key: "hasVariance",
-      label: "Has Price Variance",
-      value: "Yes",
+      label: "Variance",
+      value: filters.hasVariance ? "With Variance" : "No Variance",
     });
   }
+
   if (filters.startDate) {
     activeFiltersList.push({
       key: "startDate",
@@ -103,6 +464,7 @@ const activeFilters = computed(() => {
       value: formatDate(filters.startDate),
     });
   }
+
   if (filters.endDate) {
     activeFiltersList.push({
       key: "endDate",
@@ -110,18 +472,15 @@ const activeFilters = computed(() => {
       value: formatDate(filters.endDate),
     });
   }
+
   return activeFiltersList;
 });
 
-// Table columns
-const columns = [
-  { key: "delivery_no", label: "Delivery No" },
-  { key: "delivery_date", label: "Date" },
-  { key: "supplier", label: "Supplier" },
-  { key: "invoice_no", label: "Invoice No" },
-  { key: "total_amount", label: "Total Amount" },
-  { key: "has_variance", label: "Price Variance" },
-];
+// Select variance handler
+function selectVariance(value: boolean | null) {
+  filters.hasVariance = value;
+  applyFilters();
+}
 
 // Fetch deliveries
 async function fetchDeliveries() {
@@ -134,31 +493,66 @@ async function fetchDeliveries() {
   error.value = null;
 
   try {
-    const params = new URLSearchParams({
-      page: pagination.page.toString(),
-      limit: pagination.limit.toString(),
-    });
+    const params = new URLSearchParams();
 
-    if (filters.supplierId) params.append("supplierId", filters.supplierId);
-    if (filters.hasVariance) params.append("hasVariance", "true");
+    // Add location filter
+    params.append("locationId", activeLocationId.value);
+
+    if (filters.supplierId && filters.supplierId !== "all") {
+      params.append("supplierId", filters.supplierId);
+    }
+    if (filters.hasVariance !== null) params.append("hasVariance", filters.hasVariance.toString());
     if (filters.startDate) params.append("startDate", filters.startDate);
     if (filters.endDate) params.append("endDate", filters.endDate);
 
     const response = await $fetch<{
-      deliveries: Delivery[];
-      pagination: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
+      deliveries: Array<{
+        id: string;
+        delivery_no: string;
+        delivery_date: string;
+        invoice_no: string | null;
+        total_amount: number;
+        has_variance: boolean;
+        supplier_code: string;
+        supplier_name: string;
+        poster_name: string;
+        posted_at: string;
+      }>;
+      grand_totals: {
+        total_deliveries: number;
       };
-    }>(`/api/locations/${activeLocationId.value}/deliveries?${params}`);
+    }>(`/api/reports/deliveries?${params}`);
 
-    deliveries.value = response.deliveries;
-    pagination.total = response.pagination.total;
-    pagination.totalPages = response.pagination.totalPages;
-  } catch (err: any) {
-    error.value = err?.data?.message || "Failed to fetch deliveries";
+    // Map the response to match our component's expected format
+    deliveries.value = response.deliveries.map((d) => ({
+      id: d.id,
+      delivery_no: d.delivery_no,
+      delivery_date: d.delivery_date,
+      invoice_no: d.invoice_no,
+      total_amount: d.total_amount,
+      has_variance: d.has_variance,
+      supplier: {
+        id: "", // Not available in report response
+        name: d.supplier_name,
+        code: d.supplier_code,
+      },
+      period: {
+        id: "",
+        name: "",
+      },
+      posted_at: d.posted_at,
+      posted_by_user: {
+        full_name: d.poster_name,
+      },
+    }));
+
+    // Calculate pagination from response
+    const total = response.grand_totals.total_deliveries;
+    pagination.total = total;
+    pagination.totalPages = Math.ceil(total / pagination.limit);
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    error.value = fetchError?.data?.message || "Failed to fetch deliveries";
     console.error("Error fetching deliveries:", err);
   } finally {
     loading.value = false;
@@ -170,14 +564,22 @@ async function fetchSuppliers() {
   try {
     const response = await $fetch<{ suppliers: Supplier[] }>("/api/suppliers");
     suppliers.value = response.suppliers;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching suppliers:", err);
   }
 }
 
 // Filter handlers
 function clearFilter(key: string) {
-  (filters as any)[key] = key === "hasVariance" ? false : "";
+  if (key === "hasVariance") {
+    filters.hasVariance = null;
+  } else if (key === "supplierId") {
+    filters.supplierId = "all";
+  } else if (key === "startDate") {
+    filters.startDate = "";
+  } else if (key === "endDate") {
+    filters.endDate = "";
+  }
   pagination.page = 1;
   fetchDeliveries();
 }
@@ -225,6 +627,17 @@ watch(activeLocationId, () => {
   }
 });
 
+// Watch filter changes and auto-apply
+watch(
+  () => [filters.supplierId, filters.startDate, filters.endDate],
+  () => {
+    if (activeLocationId.value) {
+      pagination.page = 1;
+      fetchDeliveries();
+    }
+  }
+);
+
 // Initial load
 onMounted(async () => {
   await fetchSuppliers();
@@ -233,249 +646,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<template>
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <LayoutPageHeader
-      title="Deliveries & Goods Receipts"
-      icon="i-lucide-truck"
-      :show-location="true"
-      :show-period="true"
-      location-scope="current"
-    >
-      <template #actions>
-        <UButton
-          v-if="canPostDeliveries()"
-          color="primary"
-          icon="i-lucide-plus"
-          label="New Delivery"
-          @click="goToNewDelivery"
-        />
-      </template>
-    </LayoutPageHeader>
-
-    <!-- Filters -->
-    <div class="card-elevated p-4">
-      <h2 class="mb-4 text-label font-semibold">Filters</h2>
-
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <!-- Date Range Start -->
-        <div>
-          <label class="form-label">Start Date</label>
-          <input
-            v-model="filters.startDate"
-            type="date"
-            class="form-input w-full"
-            placeholder="Start date"
-          />
-        </div>
-
-        <!-- Date Range End -->
-        <div>
-          <label class="form-label">End Date</label>
-          <input
-            v-model="filters.endDate"
-            type="date"
-            class="form-input w-full"
-            placeholder="End date"
-          />
-        </div>
-
-        <!-- Supplier Filter -->
-        <div>
-          <label class="form-label">Supplier</label>
-          <select v-model="filters.supplierId" class="form-input w-full">
-            <option value="">All Suppliers</option>
-            <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
-              {{ supplier.name }} ({{ supplier.code }})
-            </option>
-          </select>
-        </div>
-
-        <!-- Has Variance Filter -->
-        <div class="flex items-end">
-          <UCheckbox v-model="filters.hasVariance" label="Has Price Variance" class="text-body" />
-        </div>
-      </div>
-
-      <!-- Filter Actions -->
-      <div class="mt-4 flex gap-2">
-        <UButton
-          color="primary"
-          icon="i-lucide-filter"
-          label="Apply Filters"
-          @click="applyFilters"
-        />
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-x"
-          label="Clear All"
-          @click="
-            () => {
-              filters.search = '';
-              filters.supplierId = '';
-              filters.hasVariance = false;
-              filters.startDate = '';
-              filters.endDate = '';
-              applyFilters();
-            }
-          "
-        />
-      </div>
-
-      <!-- Active Filters -->
-      <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap gap-2">
-        <span class="text-caption">Active filters:</span>
-        <UBadge
-          v-for="filter in activeFilters"
-          :key="filter.key"
-          color="primary"
-          variant="soft"
-          class="cursor-pointer"
-          @click="clearFilter(filter.key)"
-        >
-          {{ filter.label }}: {{ filter.value }}
-          <UIcon name="i-lucide-x" class="ml-1 h-3 w-3" />
-        </UBadge>
-      </div>
-    </div>
-
-    <!-- Error State -->
-    <ErrorAlert v-if="error" :message="error" @retry="fetchDeliveries" class="mb-6" />
-
-    <!-- Loading State -->
-    <TableSkeleton v-if="loading" :columns="6" :rows="8" />
-
-    <!-- Deliveries Table -->
-    <div
-      v-else-if="hasDeliveries"
-      class="overflow-hidden rounded-lg border border-default bg-elevated"
-    >
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
-            <tr>
-              <th
-                v-for="col in columns"
-                :key="col.key"
-                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted"
-              >
-                {{ col.label }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-default">
-            <tr
-              v-for="delivery in deliveries"
-              :key="delivery.id"
-              class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
-              @click="handleRowClick(delivery)"
-            >
-              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                {{ delivery.delivery_no }}
-              </td>
-              <td class="whitespace-nowrap px-4 py-3 text-body">
-                {{ formatDate(delivery.delivery_date) }}
-              </td>
-              <td class="px-4 py-3 text-body">
-                <div class="font-medium">{{ delivery.supplier.name }}</div>
-                <div class="text-caption">
-                  {{ delivery.supplier.code }}
-                </div>
-              </td>
-              <td class="px-4 py-3 text-body">
-                {{ delivery.invoice_no || "—" }}
-              </td>
-              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                {{ formatCurrency(delivery.total_amount) }}
-              </td>
-              <td class="px-4 py-3 text-body">
-                <UBadge
-                  v-if="delivery.has_variance"
-                  color="warning"
-                  variant="soft"
-                  class="inline-flex items-center gap-1"
-                >
-                  <UIcon name="i-lucide-alert-triangle" class="h-3 w-3" />
-                  Yes
-                </UBadge>
-                <span v-else class="text-muted">No</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div
-        v-if="pagination.totalPages > 1"
-        class="flex items-center justify-between border-t border-default px-4 py-3"
-      >
-        <div class="text-caption">
-          {{ paginationInfo }}
-        </div>
-        <div class="flex gap-1">
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-chevron-left"
-            :disabled="pagination.page === 1"
-            @click="previousPage"
-          />
-
-          <template v-for="page in pagination.totalPages" :key="page">
-            <UButton
-              v-if="
-                page === 1 ||
-                page === pagination.totalPages ||
-                Math.abs(page - pagination.page) <= 1
-              "
-              :color="page === pagination.page ? 'primary' : 'neutral'"
-              :variant="page === pagination.page ? 'solid' : 'outline'"
-              @click="goToPage(page)"
-            >
-              {{ page }}
-            </UButton>
-            <span
-              v-else-if="page === 2 || page === pagination.totalPages - 1"
-              class="flex items-center px-2 text-muted"
-            >
-              ...
-            </span>
-          </template>
-
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-chevron-right"
-            :disabled="pagination.page === pagination.totalPages"
-            @click="nextPage"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Empty State -->
-    <EmptyState
-      v-else
-      icon="i-lucide-package"
-      title="No Deliveries Found"
-      :description="
-        activeFilters.length > 0
-          ? 'No deliveries match your current filters. Try adjusting your search criteria.'
-          : 'No deliveries have been recorded yet. Click the button above to create your first delivery.'
-      "
-    >
-      <template v-if="canPostDeliveries()" #action>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          label="New Delivery"
-          @click="goToNewDelivery"
-        />
-      </template>
-    </EmptyState>
-  </div>
-</template>
