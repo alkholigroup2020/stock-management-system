@@ -18,8 +18,34 @@
       <!-- Delivery Header Card -->
       <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <template #header>
-          <div class="p-3 sm:p-4">
+          <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Information</h2>
+
+            <!-- Location Indicator -->
+            <div
+              v-if="locationStore.activeLocation"
+              class="flex items-center gap-2 px-3 py-1.5 md:p-3 bg-[var(--ui-bg)] rounded-lg border border-[var(--ui-border)]"
+            >
+              <UIcon
+                :name="getLocationIcon(locationStore.activeLocation.type)"
+                class="w-4 md:w-6 h-4 md:h-6 text-primary p-3"
+              />
+              <div class="text-left">
+                <p class="text-sm font-medium text-[var(--ui-text)]">
+                  {{ locationStore.activeLocation.name }}
+                </p>
+                <p class="text-xs text-[var(--ui-text-muted)]">
+                  Delivery will be linked to this location
+                </p>
+              </div>
+            </div>
+            <div
+              v-else
+              class="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800"
+            >
+              <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-amber-500" />
+              <p class="text-sm text-amber-700 dark:text-amber-400">No location selected</p>
+            </div>
           </div>
         </template>
 
@@ -27,7 +53,8 @@
           <!-- Supplier -->
           <div>
             <label class="form-label mb-2 block">
-              Supplier <span class="text-[var(--ui-error)]">*</span>
+              Supplier
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <USelectMenu
               v-model="formData.supplier_id"
@@ -45,8 +72,9 @@
             </USelectMenu>
           </div>
 
-          <!-- PO (Optional) -->
-          <div>
+          <!-- PO (Optional) - Hidden until PO system is implemented -->
+          <!-- TODO: Replace with PO selector dropdown when PO module is ready -->
+          <div class="hidden">
             <label class="form-label mb-2 block">Purchase Order (Optional)</label>
             <UInput
               v-model="formData.po_id"
@@ -57,10 +85,24 @@
             />
           </div>
 
+          <!-- Placeholder for PO field - coming soon -->
+          <div>
+            <label class="form-label mb-2 block text-[var(--ui-text-muted)]">
+              Purchase Order (Optional)
+            </label>
+            <div
+              class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)] text-[var(--ui-text-muted)]"
+            >
+              <UIcon name="i-lucide-file-text" class="w-5 h-5" />
+              <span class="text-sm">PO linking coming soon</span>
+            </div>
+          </div>
+
           <!-- Invoice Number -->
           <div>
             <label class="form-label mb-2 block">
-              Invoice Number <span class="text-[var(--ui-error)]">*</span>
+              Invoice Number
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <UInput
               v-model="formData.invoice_no"
@@ -74,7 +116,8 @@
           <!-- Delivery Date -->
           <div>
             <label class="form-label mb-2 block">
-              Delivery Date <span class="text-[var(--ui-error)]">*</span>
+              Delivery Date
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <UInput
               v-model="formData.delivery_date"
@@ -140,9 +183,7 @@
                   Period Price
                 </th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Variance</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
-                  Line Value
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
                 <th class="px-4 py-3 text-center text-label uppercase tracking-wider">Action</th>
               </tr>
             </thead>
@@ -307,6 +348,18 @@ const { handleError, handleSuccess, handleWarning } = useErrorHandler();
 
 // State
 const loading = ref(false);
+
+// Helper function to get location-specific icon
+const getLocationIcon = (type: string): string => {
+  const icons: Record<string, string> = {
+    KITCHEN: "i-lucide-chef-hat",
+    STORE: "i-lucide-store",
+    CENTRAL: "i-lucide-warehouse",
+    WAREHOUSE: "i-lucide-package-2",
+  };
+  return icons[type] || "i-lucide-map-pin";
+};
+
 const suppliers = ref<any[]>([]);
 const items = ref<any[]>([]);
 const periodPrices = ref<Record<string, number>>({}); // Map of itemId -> period_price

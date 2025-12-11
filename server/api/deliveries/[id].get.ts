@@ -168,7 +168,9 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Format the response
+    // Format the response - convert Decimal types to numbers for JSON serialization
+    const totalAmount = parseFloat(delivery.total_amount.toString());
+
     return {
       delivery: {
         id: delivery.id,
@@ -176,40 +178,53 @@ export default defineEventHandler(async (event) => {
         delivery_date: delivery.delivery_date,
         invoice_no: delivery.invoice_no,
         delivery_note: delivery.delivery_note,
-        total_amount: delivery.total_amount,
+        total_amount: totalAmount,
         has_variance: delivery.has_variance,
         posted_at: delivery.posted_at,
         location: delivery.location,
         supplier: delivery.supplier,
         period: delivery.period,
-        po: delivery.po,
+        po: delivery.po
+          ? {
+              ...delivery.po,
+              total_amount: parseFloat(delivery.po.total_amount.toString()),
+            }
+          : null,
         poster: delivery.poster,
-        lines: delivery.delivery_lines.map((line) => ({
-          id: line.id,
-          item: line.item,
-          quantity: line.quantity,
-          unit_price: line.unit_price,
-          period_price: line.period_price,
-          price_variance: line.price_variance,
-          line_value: line.line_value,
-          has_variance: parseFloat(line.price_variance.toString()) !== 0,
-          variance_percentage:
-            line.period_price && parseFloat(line.period_price.toString()) > 0
-              ? (
-                  (parseFloat(line.price_variance.toString()) /
-                    parseFloat(line.period_price.toString())) *
-                  100
-                ).toFixed(2)
-              : null,
+        lines: delivery.delivery_lines.map((line) => {
+          const quantity = parseFloat(line.quantity.toString());
+          const unitPrice = parseFloat(line.unit_price.toString());
+          const periodPrice = line.period_price ? parseFloat(line.period_price.toString()) : null;
+          const priceVariance = parseFloat(line.price_variance.toString());
+          const lineValue = parseFloat(line.line_value.toString());
+
+          return {
+            id: line.id,
+            item: line.item,
+            quantity,
+            unit_price: unitPrice,
+            period_price: periodPrice,
+            price_variance: priceVariance,
+            line_value: lineValue,
+            has_variance: priceVariance !== 0,
+            variance_percentage:
+              periodPrice && periodPrice > 0
+                ? ((priceVariance / periodPrice) * 100).toFixed(2)
+                : null,
+          };
+        }),
+        ncrs: delivery.ncrs.map((ncr) => ({
+          ...ncr,
+          quantity: ncr.quantity ? parseFloat(ncr.quantity.toString()) : null,
+          value: parseFloat(ncr.value.toString()),
         })),
-        ncrs: delivery.ncrs,
         summary: {
           total_lines: delivery.delivery_lines.length,
           total_items: delivery.delivery_lines.reduce(
             (sum, line) => sum + parseFloat(line.quantity.toString()),
             0
           ),
-          total_amount: delivery.total_amount,
+          total_amount: totalAmount,
           variance_lines: delivery.delivery_lines.filter(
             (line) => parseFloat(line.price_variance.toString()) !== 0
           ).length,

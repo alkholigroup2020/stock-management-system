@@ -457,19 +457,12 @@ const activeFilters = computed(() => {
     });
   }
 
-  if (filters.startDate) {
+  // Only show date range filter when BOTH dates are specified
+  if (filters.startDate && filters.endDate) {
     activeFiltersList.push({
-      key: "startDate",
-      label: "Start Date",
-      value: formatDate(filters.startDate),
-    });
-  }
-
-  if (filters.endDate) {
-    activeFiltersList.push({
-      key: "endDate",
-      label: "End Date",
-      value: formatDate(filters.endDate),
+      key: "dateRange",
+      label: "Date Range",
+      value: `${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}`,
     });
   }
 
@@ -502,8 +495,12 @@ async function fetchDeliveries() {
       params.append("supplierId", filters.supplierId);
     }
     if (filters.hasVariance !== null) params.append("hasVariance", filters.hasVariance.toString());
-    if (filters.startDate) params.append("startDate", filters.startDate);
-    if (filters.endDate) params.append("endDate", filters.endDate);
+
+    // Only apply date filter when BOTH dates are specified
+    if (filters.startDate && filters.endDate) {
+      params.append("startDate", filters.startDate);
+      params.append("endDate", filters.endDate);
+    }
 
     const response = await $fetch<{
       deliveries: Array<{
@@ -575,9 +572,9 @@ function clearFilter(key: string) {
     filters.hasVariance = null;
   } else if (key === "supplierId") {
     filters.supplierId = "all";
-  } else if (key === "startDate") {
+  } else if (key === "dateRange") {
+    // Clear both dates when clearing the date range filter
     filters.startDate = "";
-  } else if (key === "endDate") {
     filters.endDate = "";
   }
   pagination.page = 1;
@@ -627,11 +624,36 @@ watch(activeLocationId, () => {
   }
 });
 
-// Watch filter changes and auto-apply
+// Computed: check if date range is complete (both dates specified)
+const isDateRangeComplete = computed(() => {
+  return filters.startDate !== "" && filters.endDate !== "";
+});
+
+// Watch supplier filter changes - apply immediately
 watch(
-  () => [filters.supplierId, filters.startDate, filters.endDate],
+  () => filters.supplierId,
   () => {
     if (activeLocationId.value) {
+      pagination.page = 1;
+      fetchDeliveries();
+    }
+  }
+);
+
+// Watch date range changes - only apply when BOTH dates are specified
+watch(
+  () => [filters.startDate, filters.endDate],
+  ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+    if (!activeLocationId.value) return;
+
+    // Only trigger fetch when:
+    // 1. Both dates are now specified (complete range)
+    // 2. OR a date was cleared (to remove the filter)
+    const bothDatesSet = newStartDate !== "" && newEndDate !== "";
+    const dateWasCleared =
+      (oldStartDate !== "" && newStartDate === "") || (oldEndDate !== "" && newEndDate === "");
+
+    if (bothDatesSet || dateWasCleared) {
       pagination.page = 1;
       fetchDeliveries();
     }
