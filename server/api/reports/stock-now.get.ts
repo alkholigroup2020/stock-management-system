@@ -20,6 +20,7 @@
  */
 
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 
@@ -147,6 +148,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Fetch all stock for accessible locations
+    // NOTE: Removed nested orderBy for performance - sorting done in JS below
     const allStock = await prisma.locationStock.findMany({
       where: {
         location_id: { in: accessibleLocationIds },
@@ -172,7 +174,13 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      orderBy: [{ location: { code: "asc" } }, { item: { name: "asc" } }],
+    });
+
+    // Sort in JavaScript (faster than nested SQL orderBy)
+    allStock.sort((a, b) => {
+      const locCompare = (a.location?.code || "").localeCompare(b.location?.code || "");
+      if (locCompare !== 0) return locCompare;
+      return (a.item?.name || "").localeCompare(b.item?.name || "");
     });
 
     // Process stock by location
@@ -250,6 +258,12 @@ export default defineEventHandler(async (event) => {
 
     // Get unique categories in the data
     const categories = [...new Set(allStock.map((s) => s.item.category).filter(Boolean))].sort();
+
+    // Set cache headers (30 seconds for report data)
+    setCacheHeaders(event, {
+      maxAge: 30,
+      staleWhileRevalidate: 15,
+    });
 
     return {
       report_type: "stock-now",

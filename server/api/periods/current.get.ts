@@ -18,6 +18,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Find the current OPEN period with location readiness status
+    // NOTE: Removed nested orderBy on location.name for performance
+    // Sorting is done in JavaScript below to avoid expensive JOIN operations
     const currentPeriod = await prisma.period.findFirst({
       where: {
         status: "OPEN",
@@ -40,11 +42,6 @@ export default defineEventHandler(async (event) => {
               },
             },
           },
-          orderBy: {
-            location: {
-              name: "asc",
-            },
-          },
         },
         _count: {
           select: {
@@ -59,6 +56,16 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Sort period_locations by location name in JavaScript (faster than nested SQL ordering)
+    const sortedPeriod = currentPeriod
+      ? {
+          ...currentPeriod,
+          period_locations: [...currentPeriod.period_locations].sort((a, b) =>
+            (a.location?.name || "").localeCompare(b.location?.name || "")
+          ),
+        }
+      : null;
+
     // Set cache headers (10 seconds for current period - critical data)
     setCacheHeaders(event, {
       maxAge: 10,
@@ -66,7 +73,7 @@ export default defineEventHandler(async (event) => {
     });
 
     return {
-      period: currentPeriod,
+      period: sortedPeriod,
     };
   } catch (error) {
     console.error("Error fetching current period:", error);

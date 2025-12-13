@@ -38,6 +38,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Fetch the period with location statuses
+    // NOTE: Removed nested orderBy on location.name for performance
+    // Sorting is done in JavaScript below
     const period = await prisma.period.findUnique({
       where: { id },
       include: {
@@ -56,11 +58,6 @@ export default defineEventHandler(async (event) => {
                 name: true,
                 type: true,
               },
-            },
-          },
-          orderBy: {
-            location: {
-              name: "asc",
             },
           },
         },
@@ -86,7 +83,15 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return { period };
+    // Sort period_locations by location name in JavaScript (faster than nested SQL ordering)
+    const sortedPeriod = {
+      ...period,
+      period_locations: [...period.period_locations].sort((a, b) =>
+        (a.location?.name || "").localeCompare(b.location?.name || "")
+      ),
+    };
+
+    return { period: sortedPeriod };
   } catch (error) {
     // Re-throw createError errors
     if (error && typeof error === "object" && "statusCode" in error) {

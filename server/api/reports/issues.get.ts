@@ -22,6 +22,7 @@
  */
 
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 import { z } from "zod";
 import type { UserRole, CostCentre } from "@prisma/client";
 
@@ -380,6 +381,12 @@ export default defineEventHandler(async (event) => {
       });
       periodInfo = period;
     }
+
+    // Set cache headers (30 seconds for report data)
+    setCacheHeaders(event, {
+      maxAge: 30,
+      staleWhileRevalidate: 15,
+    });
 
     return {
       report_type: "issues",

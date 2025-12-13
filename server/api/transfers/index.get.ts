@@ -17,6 +17,7 @@
  */
 
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 
@@ -183,6 +184,12 @@ export default defineEventHandler(async (event) => {
     const totalPages = Math.ceil(total / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
+
+    // Set cache headers (15 seconds for list data)
+    setCacheHeaders(event, {
+      maxAge: 15,
+      staleWhileRevalidate: 10,
+    });
 
     return {
       transfers: transfers.map((transfer) => ({

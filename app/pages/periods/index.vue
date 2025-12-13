@@ -336,7 +336,7 @@ const isAdmin = computed(() => user.value?.role === "ADMIN");
 // Search
 const searchQuery = ref("");
 
-// Fetch periods
+// Fetch periods (single API call - current period is derived from this)
 const {
   data: periods,
   pending,
@@ -346,12 +346,12 @@ const {
   method: "GET",
 });
 
-// Get current period
-const { data: currentPeriodData } = await useFetch("/api/periods/current", {
-  method: "GET",
+// Get current period from the periods list (avoid double API call)
+const currentPeriod = computed(() => {
+  if (!periods.value?.periods) return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return periods.value.periods.find((p: any) => p.status === "OPEN") || null;
 });
-
-const currentPeriod = computed(() => currentPeriodData.value?.period);
 
 // Filtered periods
 const filteredPeriods = computed(() => {

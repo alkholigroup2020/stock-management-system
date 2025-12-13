@@ -102,11 +102,8 @@ export default defineEventHandler(async (event) => {
               },
             },
           },
-          orderBy: {
-            item: {
-              name: "asc",
-            },
-          },
+          // NOTE: Removed nested orderBy on item.name for performance
+          // Sorting is done in JavaScript below
         },
         ncrs: {
           select: {
@@ -207,28 +204,33 @@ export default defineEventHandler(async (event) => {
             }
           : null,
         creator: delivery.creator,
-        lines: delivery.delivery_lines.map((line) => {
-          const quantity = parseFloat(line.quantity.toString());
-          const unitPrice = parseFloat(line.unit_price.toString());
-          const periodPrice = line.period_price ? parseFloat(line.period_price.toString()) : null;
-          const priceVariance = parseFloat(line.price_variance.toString());
-          const lineValue = parseFloat(line.line_value.toString());
+        // Sort delivery lines by item name in JavaScript (faster than nested SQL ordering)
+        lines: [...delivery.delivery_lines]
+          .sort((a, b) => (a.item?.name || "").localeCompare(b.item?.name || ""))
+          .map((line) => {
+            const quantity = parseFloat(line.quantity.toString());
+            const unitPrice = parseFloat(line.unit_price.toString());
+            const periodPrice = line.period_price
+              ? parseFloat(line.period_price.toString())
+              : null;
+            const priceVariance = parseFloat(line.price_variance.toString());
+            const lineValue = parseFloat(line.line_value.toString());
 
-          return {
-            id: line.id,
-            item: line.item,
-            quantity,
-            unit_price: unitPrice,
-            period_price: periodPrice,
-            price_variance: priceVariance,
-            line_value: lineValue,
-            has_variance: priceVariance !== 0,
-            variance_percentage:
-              periodPrice && periodPrice > 0
-                ? ((priceVariance / periodPrice) * 100).toFixed(2)
-                : null,
-          };
-        }),
+            return {
+              id: line.id,
+              item: line.item,
+              quantity,
+              unit_price: unitPrice,
+              period_price: periodPrice,
+              price_variance: priceVariance,
+              line_value: lineValue,
+              has_variance: priceVariance !== 0,
+              variance_percentage:
+                periodPrice && periodPrice > 0
+                  ? ((priceVariance / periodPrice) * 100).toFixed(2)
+                  : null,
+            };
+          }),
         ncrs: delivery.ncrs.map((ncr) => ({
           ...ncr,
           quantity: ncr.quantity ? parseFloat(ncr.quantity.toString()) : null,

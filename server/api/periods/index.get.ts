@@ -13,6 +13,7 @@
  */
 
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 
@@ -78,6 +79,8 @@ export default defineEventHandler(async (event) => {
     }
 
     // Fetch all periods with location statuses
+    // NOTE: Removed nested orderBy on location.name for performance
+    // Sorting is done in JavaScript below to avoid expensive JOIN operations
     const periods = await prisma.period.findMany({
       where,
       include: {
@@ -96,11 +99,6 @@ export default defineEventHandler(async (event) => {
               },
             },
           },
-          orderBy: {
-            location: {
-              name: "asc",
-            },
-          },
         },
         _count: {
           select: {
@@ -115,9 +113,23 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Sort period_locations by location name in JavaScript (faster than nested SQL ordering)
+    const sortedPeriods = periods.map((period) => ({
+      ...period,
+      period_locations: [...period.period_locations].sort((a, b) =>
+        (a.location?.name || "").localeCompare(b.location?.name || "")
+      ),
+    }));
+
+    // Set cache headers (20 seconds with 10 second stale-while-revalidate)
+    setCacheHeaders(event, {
+      maxAge: 20,
+      staleWhileRevalidate: 10,
+    });
+
     return {
-      periods,
-      count: periods.length,
+      periods: sortedPeriods,
+      count: sortedPeriods.length,
     };
   } catch (error) {
     // Handle Zod validation errors

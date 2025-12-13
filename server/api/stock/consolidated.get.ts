@@ -12,6 +12,7 @@
  */
 
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 import { z } from "zod";
 
 // Query schema for validation
@@ -73,6 +74,8 @@ export default defineEventHandler(async (event) => {
     });
 
     // Fetch all stock across all locations
+    // NOTE: Removed nested orderBy on item.name for performance
+    // Sorting is done in JavaScript after aggregation
     const allStock = await prisma.locationStock.findMany({
       where: {
         location: { is_active: true },
@@ -96,11 +99,6 @@ export default defineEventHandler(async (event) => {
             name: true,
             type: true,
           },
-        },
-      },
-      orderBy: {
-        item: {
-          name: "asc",
         },
       },
     });
@@ -162,8 +160,10 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Convert map to array
-    let consolidatedStock = Array.from(stockByItem.values());
+    // Convert map to array and sort by item name (JS sorting instead of SQL nested orderBy)
+    let consolidatedStock = Array.from(stockByItem.values()).sort((a, b) =>
+      (a.item?.name || "").localeCompare(b.item?.name || "")
+    );
 
     // Filter low stock if requested
     if (lowStock === "true") {
@@ -192,6 +192,12 @@ export default defineEventHandler(async (event) => {
         total_value: totalValue,
         item_count: locationStock.length,
       };
+    });
+
+    // Set cache headers (30 seconds for aggregated stock data)
+    setCacheHeaders(event, {
+      maxAge: 30,
+      staleWhileRevalidate: 15,
     });
 
     return {

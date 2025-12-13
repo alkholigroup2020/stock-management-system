@@ -84,11 +84,8 @@ export default defineEventHandler(async (event) => {
               },
             },
           },
-          orderBy: {
-            item: {
-              name: "asc",
-            },
-          },
+          // NOTE: Removed nested orderBy on item.name for performance
+          // Sorting is done in JavaScript below
         },
       },
     });
@@ -140,13 +137,16 @@ export default defineEventHandler(async (event) => {
         location: issue.location,
         period: issue.period,
         poster: issue.poster,
-        lines: issue.issue_lines.map((line) => ({
-          id: line.id,
-          item: line.item,
-          quantity: line.quantity,
-          wac_at_issue: line.wac_at_issue,
-          line_value: line.line_value,
-        })),
+        // Sort issue lines by item name in JavaScript (faster than nested SQL ordering)
+        lines: [...issue.issue_lines]
+          .sort((a, b) => (a.item?.name || "").localeCompare(b.item?.name || ""))
+          .map((line) => ({
+            id: line.id,
+            item: line.item,
+            quantity: line.quantity,
+            wac_at_issue: line.wac_at_issue,
+            line_value: line.line_value,
+          })),
         summary: {
           total_lines: issue.issue_lines.length,
           total_items: issue.issue_lines.reduce(

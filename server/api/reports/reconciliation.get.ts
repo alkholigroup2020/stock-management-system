@@ -19,6 +19,7 @@
  */
 
 import prisma from "../../utils/prisma";
+import { setCacheHeaders } from "../../utils/performance";
 import { calculateConsumption, calculateMandayCost } from "../../utils/reconciliation";
 import { z } from "zod";
 import type { UserRole, Period } from "@prisma/client";
@@ -441,6 +442,12 @@ export default defineEventHandler(async (event) => {
       grandTotals.total_mandays > 0
         ? Math.round((grandTotals.consumption / grandTotals.total_mandays) * 100) / 100
         : null;
+
+    // Set cache headers (60 seconds for reconciliation report - expensive to compute)
+    setCacheHeaders(event, {
+      maxAge: 60,
+      staleWhileRevalidate: 30,
+    });
 
     return {
       report_type: "reconciliation",
