@@ -10,6 +10,8 @@
  * - startDate: Filter by delivery date from (optional)
  * - endDate: Filter by delivery date to (optional)
  * - hasVariance: Filter by price variance (true/false, optional)
+ * - status: Filter by delivery status (DRAFT/POSTED, optional)
+ * - myDrafts: Filter to show only current user's drafts (true/false, optional)
  *
  * Features:
  * - Delivery totals by location, supplier, and period
@@ -20,6 +22,7 @@
  * Permissions:
  * - OPERATOR: Can only view assigned locations
  * - SUPERVISOR/ADMIN: Can view all locations
+ * - Drafts are only visible to their creator (unless ADMIN/SUPERVISOR)
  */
 
 import prisma from "../../utils/prisma";
@@ -43,6 +46,8 @@ const querySchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   hasVariance: z.enum(["true", "false"]).optional(),
+  status: z.enum(["DRAFT", "POSTED"]).optional(),
+  myDrafts: z.enum(["true", "false"]).optional(),
 });
 
 // Delivery line type
@@ -71,8 +76,11 @@ interface DeliveryReport {
   total_amount: number;
   has_variance: boolean;
   total_variance: number;
-  poster_name: string;
-  posted_at: Date;
+  status: string;
+  creator_id: string;
+  creator_name: string;
+  created_at: Date;
+  posted_at: Date | null;
   ncr_count: number;
   lines: DeliveryLineReport[];
 }
@@ -116,7 +124,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { periodId, locationId, supplierId, startDate, endDate, hasVariance } =
+    const { periodId, locationId, supplierId, startDate, endDate, hasVariance, status, myDrafts } =
       querySchema.parse(query);
 
     // Get user's accessible locations
@@ -181,6 +189,24 @@ export default defineEventHandler(async (event) => {
       where.has_variance = hasVariance === "true";
     }
 
+    // Filter by status
+    if (status) {
+      where.status = status;
+    }
+
+    // Filter for user's drafts only
+    if (myDrafts === "true") {
+      where.created_by = user.id;
+      where.status = "DRAFT";
+    } else if (status !== "DRAFT") {
+      // For non-draft queries, exclude drafts from other users (unless ADMIN/SUPERVISOR)
+      // If status is explicitly DRAFT, let it through (handled by my_drafts or ADMIN/SUPERVISOR)
+      if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
+        // Regular users can only see their own drafts or any posted delivery
+        where.OR = [{ status: "POSTED" }, { status: "DRAFT", created_by: user.id }];
+      }
+    }
+
     // Fetch deliveries with all related data
     const deliveries = await prisma.delivery.findMany({
       where,
@@ -205,7 +231,7 @@ export default defineEventHandler(async (event) => {
             name: true,
           },
         },
-        poster: {
+        creator: {
           select: {
             id: true,
             username: true,
@@ -272,7 +298,10 @@ export default defineEventHandler(async (event) => {
         total_amount: parseFloat(delivery.total_amount.toString()),
         has_variance: delivery.has_variance,
         total_variance: Math.round(totalVariance * 100) / 100,
-        poster_name: delivery.poster.full_name || delivery.poster.username,
+        status: delivery.status,
+        creator_id: delivery.created_by,
+        creator_name: delivery.creator.full_name || delivery.creator.username,
+        created_at: delivery.created_at,
         posted_at: delivery.posted_at,
         ncr_count: delivery.ncrs.length,
         lines,
@@ -377,6 +406,8 @@ export default defineEventHandler(async (event) => {
         start_date: startDate || null,
         end_date: endDate || null,
         has_variance_only: hasVariance === "true",
+        status: status || null,
+        my_drafts_only: myDrafts === "true",
       },
       period: periodInfo,
       deliveries: deliveryReports,

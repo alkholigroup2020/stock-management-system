@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ========================================
@@ -74,6 +75,12 @@ enum PRFStatus {
 enum POStatus {
   OPEN            // PO is active
   CLOSED          // PO is closed/completed
+}
+
+// Delivery status for draft/posted lifecycle
+enum DeliveryStatus {
+  DRAFT           // Delivery saved but not posted (no stock impact)
+  POSTED          // Delivery finalized (stock updated, immutable)
 }
 
 // Cost centre for issue transactions
@@ -145,7 +152,7 @@ model User {
   assigned_users      UserLocation[]  @relation("AssignedBy")
   requested_prfs      PRF[]           @relation("PRFRequester")
   approved_prfs       PRF[]           @relation("PRFApprover")
-  posted_deliveries   Delivery[]      @relation("DeliveryPoster")
+  created_deliveries  Delivery[]      @relation("DeliveryCreator")
   posted_issues       Issue[]         @relation("IssuePoster")
   requested_transfers Transfer[]      @relation("TransferRequester")
   approved_transfers  Transfer[]      @relation("TransferApprover")
@@ -417,15 +424,18 @@ model Delivery {
   delivery_date DateTime        @db.Date
   total_amount  Decimal         @default(0) @db.Decimal(15, 2)
   has_variance  Boolean         @default(false) // True if any line has price variance
-  posted_by     String          @db.Uuid // User who posted
-  posted_at     DateTime        @default(now()) @db.Timestamptz
+  status        DeliveryStatus  @default(DRAFT) // Draft or Posted status
+  created_by    String          @db.Uuid // User who created the delivery
+  posted_at     DateTime?       @db.Timestamptz // When status became POSTED (null for drafts)
+  created_at    DateTime        @default(now()) @db.Timestamptz // When draft was created
+  updated_at    DateTime        @updatedAt @db.Timestamptz // Last modification
 
   // Relations
   period        Period          @relation(fields: [period_id], references: [id], onDelete: Restrict)
   location      Location        @relation(fields: [location_id], references: [id], onDelete: Restrict)
   supplier      Supplier        @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
   po            PO?             @relation(fields: [po_id], references: [id], onDelete: SetNull)
-  poster        User            @relation("DeliveryPoster", fields: [posted_by], references: [id], onDelete: Restrict)
+  creator       User            @relation("DeliveryCreator", fields: [created_by], references: [id], onDelete: Restrict)
   delivery_lines DeliveryLine[]
   ncrs          NCR[]
 
@@ -436,9 +446,12 @@ model Delivery {
   @@index([delivery_date])
   @@index([has_variance]) // For price variance queries
   @@index([posted_at]) // For sorting by posted timestamp
+  @@index([status]) // For filtering by draft/posted status
   @@index([period_id, location_id]) // For location deliveries in period
   @@index([location_id, has_variance]) // For price variance filtering by location
   @@index([location_id, delivery_date]) // For date-based queries per location
+  @@index([location_id, status]) // For draft/posted filtering by location
+  @@index([created_by, status]) // For user's drafts (My Drafts filter)
   @@map("deliveries")
 }
 

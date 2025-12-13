@@ -15,11 +15,29 @@
         <div class="flex items-center gap-2 sm:gap-4">
           <UIcon name="i-lucide-truck" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
           <div>
-            <h1 class="text-xl sm:text-3xl font-bold text-primary">
-              {{ delivery.delivery_no }}
-            </h1>
-            <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
-              Posted by {{ delivery.poster.full_name }} on {{ formatDateTime(delivery.posted_at) }}
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl sm:text-3xl font-bold text-primary">
+                {{ delivery.delivery_no }}
+              </h1>
+              <UBadge
+                :color="isDraft ? 'neutral' : 'success'"
+                variant="subtle"
+                size="md"
+                class="inline-flex items-center gap-1"
+              >
+                <UIcon
+                  :name="isDraft ? 'i-lucide-file-edit' : 'i-lucide-check-circle'"
+                  class="h-3 w-3"
+                />
+                {{ isDraft ? "Draft" : "Posted" }}
+              </UBadge>
+            </div>
+            <p v-if="isPosted" class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+              Posted by {{ delivery.creator.full_name }} on {{ formatDateTime(delivery.posted_at) }}
+            </p>
+            <p v-else class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+              Created by {{ delivery.creator.full_name }} on
+              {{ formatDateTime(delivery.created_at) }}
             </p>
           </div>
         </div>
@@ -34,7 +52,43 @@
           >
             <span class="hidden sm:inline">Back</span>
           </UButton>
+
+          <!-- Draft Actions -->
+          <template v-if="isDraft">
+            <UButton
+              color="error"
+              variant="soft"
+              icon="i-lucide-trash-2"
+              size="lg"
+              class="cursor-pointer rounded-full px-3 sm:px-6"
+              @click="showDeleteConfirmation = true"
+            >
+              <span class="hidden sm:inline">Delete</span>
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              icon="i-lucide-pencil"
+              size="lg"
+              class="cursor-pointer rounded-full px-3 sm:px-6"
+              @click="editDraft"
+            >
+              <span class="hidden sm:inline">Edit</span>
+            </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-check"
+              size="lg"
+              class="cursor-pointer rounded-full px-3 sm:px-6"
+              @click="showPostConfirmation = true"
+            >
+              <span class="hidden sm:inline">Post</span>
+            </UButton>
+          </template>
+
+          <!-- Posted Actions -->
           <UButton
+            v-else
             color="neutral"
             variant="outline"
             icon="i-lucide-printer"
@@ -63,8 +117,11 @@
           <div class="flex items-start justify-between p-3 sm:p-4">
             <div>
               <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Information</h2>
-              <p class="text-caption mt-1">
+              <p v-if="isPosted" class="text-caption mt-1">
                 Posted on {{ formatDateTime(delivery.posted_at) }}
+              </p>
+              <p v-else class="text-caption mt-1">
+                Created on {{ formatDateTime(delivery.created_at) }}
               </p>
             </div>
             <UBadge
@@ -357,6 +414,30 @@
           </div>
         </div>
       </UCard>
+
+      <!-- Post Confirmation Modal -->
+      <UiConfirmModal
+        v-model="showPostConfirmation"
+        title="Post Delivery"
+        message="Once posted, this delivery cannot be edited. Stock levels will be updated and any price variances will generate NCRs automatically."
+        confirm-text="Post Delivery"
+        cancel-text="Continue Editing"
+        variant="warning"
+        :loading="posting"
+        @confirm="postDraft"
+      />
+
+      <!-- Delete Confirmation Modal -->
+      <UiConfirmModal
+        v-model="showDeleteConfirmation"
+        title="Delete Draft"
+        message="Are you sure you want to delete this draft? This action cannot be undone."
+        confirm-text="Delete Draft"
+        cancel-text="Cancel"
+        variant="danger"
+        :loading="deleting"
+        @confirm="deleteDraft"
+      />
     </template>
 
     <!-- Not Found State -->
@@ -431,6 +512,8 @@ interface NCR {
   };
 }
 
+type DeliveryStatus = "DRAFT" | "POSTED";
+
 interface Delivery {
   id: string;
   delivery_no: string;
@@ -439,7 +522,10 @@ interface Delivery {
   delivery_note: string | null;
   total_amount: number;
   has_variance: boolean;
-  posted_at: string;
+  status: DeliveryStatus;
+  created_at: string;
+  updated_at: string;
+  posted_at: string | null;
   location: {
     id: string;
     code: string;
@@ -465,7 +551,7 @@ interface Delivery {
     status: string;
     total_amount: number;
   } | null;
-  poster: {
+  creator: {
     id: string;
     username: string;
     full_name: string;
@@ -487,12 +573,18 @@ interface Delivery {
 const loading = ref(true);
 const error = ref<string | null>(null);
 const delivery = ref<Delivery | null>(null);
+const showPostConfirmation = ref(false);
+const showDeleteConfirmation = ref(false);
+const posting = ref(false);
+const deleting = ref(false);
 
 // Computed
 const deliveryId = computed(() => route.params.id as string);
 const hasVarianceLines = computed(() => (delivery.value?.summary.variance_lines ?? 0) > 0);
 const varianceLinesCount = computed(() => delivery.value?.summary.variance_lines ?? 0);
 const totalVarianceAmount = computed(() => delivery.value?.summary.total_variance_amount ?? 0);
+const isDraft = computed(() => delivery.value?.status === "DRAFT");
+const isPosted = computed(() => delivery.value?.status === "POSTED");
 
 type BadgeColor = "error" | "info" | "success" | "primary" | "secondary" | "warning" | "neutral";
 
@@ -547,6 +639,61 @@ function goToNcr(ncrId: string) {
 // Print
 function printDelivery() {
   toast.info("Print functionality coming soon");
+}
+
+// Edit draft
+function editDraft() {
+  router.push(`/deliveries/${deliveryId.value}/edit`);
+}
+
+// Delete draft
+async function deleteDraft() {
+  if (!deliveryId.value) return;
+
+  deleting.value = true;
+
+  try {
+    await $fetch(`/api/deliveries/${deliveryId.value}`, {
+      method: "DELETE",
+    });
+
+    toast.success("Draft deleted successfully");
+    router.push("/deliveries");
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    toast.error(fetchError?.data?.message || "Failed to delete draft");
+    console.error("Error deleting draft:", err);
+  } finally {
+    deleting.value = false;
+    showDeleteConfirmation.value = false;
+  }
+}
+
+// Post draft
+async function postDraft() {
+  if (!deliveryId.value) return;
+
+  posting.value = true;
+
+  try {
+    await $fetch(`/api/deliveries/${deliveryId.value}`, {
+      method: "PATCH",
+      body: {
+        status: "POSTED",
+      },
+    });
+
+    toast.success("Delivery posted successfully");
+    // Refresh the delivery details to show updated status
+    await fetchDelivery();
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    toast.error(fetchError?.data?.message || "Failed to post delivery");
+    console.error("Error posting delivery:", err);
+  } finally {
+    posting.value = false;
+    showPostConfirmation.value = false;
+  }
 }
 
 // Initial load

@@ -1,29 +1,28 @@
 /**
- * POST /api/locations/:id/deliveries
+ * PATCH /api/deliveries/:id
  *
- * Create a new delivery for a location (as DRAFT or POSTED)
+ * Update a draft delivery or post it
  *
  * This endpoint handles:
- * - Delivery creation with multiple line items
- * - Draft saving (no stock impact, can be edited later)
- * - Direct posting with WAC recalculation, stock updates, NCR generation
+ * - Updating draft delivery fields and lines
+ * - Posting a draft (transitioning from DRAFT to POSTED)
+ * - When posting: WAC recalculation, stock updates, NCR generation
  *
  * Business Rules:
- * - User must have POST or MANAGE access to the location
- * - For DRAFT: Period open not required, invoice_no optional
- * - For POSTED: Period must be open, invoice_no required, items must be active
- * - Price variance auto-creates NCR with type PRICE_VARIANCE (only on POSTED)
- * - Drafts are only visible to their creator
+ * - Only DRAFT deliveries can be updated
+ * - Only the creator can update their draft
+ * - When status changes to POSTED, full validation applies
+ * - Posted deliveries cannot be modified
  *
  * Permissions:
  * - User must have POST or MANAGE access to the location
- * - ADMIN and SUPERVISOR have implicit access
+ * - Only the creator can update their draft (unless ADMIN/SUPERVISOR)
  */
 
-import prisma from "../../../../utils/prisma";
+import prisma from "../../utils/prisma";
 import { z } from "zod";
-import { calculateWAC } from "../../../../utils/wac";
-import { checkPriceVariance } from "../../../../utils/priceVariance";
+import { calculateWAC } from "../../utils/wac";
+import { checkPriceVariance } from "../../utils/priceVariance";
 import type { UserRole } from "@prisma/client";
 
 // User session type
@@ -35,8 +34,9 @@ interface AuthUser {
   default_location_id: string | null;
 }
 
-// Delivery line schema
+// Delivery line schema for updates
 const deliveryLineSchema = z.object({
+  id: z.string().uuid().optional(), // Existing line ID (for updates)
   item_id: z.string().uuid(),
   quantity: z.number().positive(),
   unit_price: z.number().nonnegative(),
@@ -44,51 +44,14 @@ const deliveryLineSchema = z.object({
 
 // Request body schema
 const bodySchema = z.object({
-  supplier_id: z.string().uuid(),
+  supplier_id: z.string().uuid().optional(),
   po_id: z.string().uuid().nullable().optional(),
-  invoice_no: z.string().min(1).optional(), // Optional for drafts, required for posting
+  invoice_no: z.string().min(1).optional().nullable(),
   delivery_note: z.string().nullable().optional(),
-  delivery_date: z.string(), // ISO date string
-  lines: z.array(deliveryLineSchema).min(1),
-  status: z.enum(["DRAFT", "POSTED"]).optional().default("DRAFT"), // Draft or Post directly
+  delivery_date: z.string().optional(),
+  lines: z.array(deliveryLineSchema).min(1).optional(),
+  status: z.enum(["DRAFT", "POSTED"]).optional(),
 });
-
-/**
- * Generate next delivery number
- * Format: DEL-YYYY-NNN (e.g., DEL-2025-001)
- */
-async function generateDeliveryNumber(year?: number): Promise<string> {
-  const currentYear = year || new Date().getFullYear();
-  const prefix = `DEL-${currentYear}-`;
-
-  // Find the highest delivery number for this year
-  const lastDelivery = await prisma.delivery.findFirst({
-    where: {
-      delivery_no: {
-        startsWith: prefix,
-      },
-    },
-    orderBy: {
-      delivery_no: "desc",
-    },
-    select: {
-      delivery_no: true,
-    },
-  });
-
-  if (!lastDelivery) {
-    // First delivery of the year
-    return `${prefix}001`;
-  }
-
-  // Extract number from last delivery and increment
-  const parts = lastDelivery.delivery_no.split("-");
-  const lastNumber = parseInt(parts[2] || "0", 10);
-  const nextNumber = lastNumber + 1;
-
-  // Pad with zeros to 3 digits
-  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
-}
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user as AuthUser | undefined;
@@ -104,16 +67,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Get location ID from route params
-  const locationId = getRouterParam(event, "id");
+  // Get delivery ID from route params
+  const deliveryId = getRouterParam(event, "id");
 
-  if (!locationId) {
+  if (!deliveryId) {
     throw createError({
       statusCode: 400,
       statusMessage: "Bad Request",
       data: {
-        code: "MISSING_LOCATION_ID",
-        message: "Location ID is required",
+        code: "MISSING_DELIVERY_ID",
+        message: "Delivery ID is required",
       },
     });
   }
@@ -124,30 +87,46 @@ export default defineEventHandler(async (event) => {
     const data = bodySchema.parse(body);
     const isPosting = data.status === "POSTED";
 
-    // Additional validation for posting
-    if (isPosting && !data.invoice_no) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        data: {
-          code: "VALIDATION_ERROR",
-          message: "Invoice number is required when posting a delivery",
-        },
-      });
-    }
-
-    // Check if location exists
-    const location = await prisma.location.findUnique({
-      where: { id: locationId },
+    // Fetch the existing delivery
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: deliveryId },
+      include: {
+        delivery_lines: true,
+        location: true,
+      },
     });
 
-    if (!location) {
+    if (!delivery) {
       throw createError({
         statusCode: 404,
         statusMessage: "Not Found",
         data: {
-          code: "LOCATION_NOT_FOUND",
-          message: "Location not found",
+          code: "DELIVERY_NOT_FOUND",
+          message: "Delivery not found",
+        },
+      });
+    }
+
+    // Check if delivery is already posted
+    if (delivery.status === "POSTED") {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        data: {
+          code: "DELIVERY_ALREADY_POSTED",
+          message: "Posted deliveries cannot be edited",
+        },
+      });
+    }
+
+    // Check if user is the creator (or ADMIN/SUPERVISOR)
+    if (delivery.created_by !== user.id && user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        data: {
+          code: "NOT_DRAFT_OWNER",
+          message: "You can only edit drafts you created",
         },
       });
     }
@@ -157,7 +136,7 @@ export default defineEventHandler(async (event) => {
       where: {
         user_id_location_id: {
           user_id: user.id,
-          location_id: locationId,
+          location_id: delivery.location_id,
         },
       },
     });
@@ -179,46 +158,53 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Forbidden",
         data: {
           code: "INSUFFICIENT_PERMISSIONS",
-          message: "You do not have permission to create deliveries at this location",
+          message: "You do not have permission to edit deliveries at this location",
         },
       });
     }
 
-    // Get current open period (required for posting, optional for drafts)
-    const currentPeriod = await prisma.period.findFirst({
-      where: { status: "OPEN" },
-      orderBy: { start_date: "desc" },
-    });
-
-    if (isPosting && !currentPeriod) {
+    // Additional validation for posting
+    const finalInvoiceNo = data.invoice_no ?? delivery.invoice_no;
+    if (isPosting && !finalInvoiceNo) {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",
         data: {
-          code: "NO_OPEN_PERIOD",
-          message: "No open accounting period. Please open a period before posting deliveries.",
+          code: "VALIDATION_ERROR",
+          message: "Invoice number is required when posting a delivery",
         },
       });
     }
 
-    // Verify supplier exists
-    const supplier = await prisma.supplier.findUnique({
-      where: { id: data.supplier_id },
-    });
-
-    if (!supplier) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Not Found",
-        data: {
-          code: "SUPPLIER_NOT_FOUND",
-          message: "Supplier not found",
-        },
+    // Get current open period (required for posting)
+    let currentPeriod = null;
+    if (isPosting) {
+      currentPeriod = await prisma.period.findFirst({
+        where: { status: "OPEN" },
+        orderBy: { start_date: "desc" },
       });
+
+      if (!currentPeriod) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Bad Request",
+          data: {
+            code: "NO_OPEN_PERIOD",
+            message: "No open accounting period. Please open a period before posting deliveries.",
+          },
+        });
+      }
     }
 
-    // Verify all items exist (for drafts, just check they exist; for posting, check they're active)
-    const itemIds = data.lines.map((line) => line.item_id);
+    // Get items for validation
+    const linesToProcess = data.lines || delivery.delivery_lines.map((l) => ({
+      id: l.id,
+      item_id: l.item_id,
+      quantity: parseFloat(l.quantity.toString()),
+      unit_price: parseFloat(l.unit_price.toString()),
+    }));
+
+    const itemIds = linesToProcess.map((line) => line.item_id);
     const items = await prisma.item.findMany({
       where: {
         id: { in: itemIds },
@@ -239,8 +225,10 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Get period prices for variance detection (only needed if posting)
+    // Get period prices and stock levels (only for posting)
     const periodPriceMap = new Map<string, number>();
+    const stockMap = new Map<string, { quantity: number; wac: number }>();
+
     if (isPosting && currentPeriod) {
       const periodPrices = await prisma.itemPrice.findMany({
         where: {
@@ -252,14 +240,10 @@ export default defineEventHandler(async (event) => {
       periodPrices.forEach((pp) => {
         periodPriceMap.set(pp.item_id, parseFloat(pp.price.toString()));
       });
-    }
 
-    // Get current stock levels for WAC calculation (only needed if posting)
-    const stockMap = new Map<string, { quantity: number; wac: number }>();
-    if (isPosting) {
       const currentStocks = await prisma.locationStock.findMany({
         where: {
-          location_id: locationId,
+          location_id: delivery.location_id,
           item_id: { in: itemIds },
         },
       });
@@ -272,49 +256,14 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // For drafts without open period, use the most recent period
-    let periodIdForDelivery = currentPeriod?.id;
-    if (!periodIdForDelivery) {
-      const mostRecentPeriod = await prisma.period.findFirst({
-        orderBy: { start_date: "desc" },
-        select: { id: true },
-      });
-      if (!mostRecentPeriod) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Bad Request",
-          data: {
-            code: "NO_PERIOD_EXISTS",
-            message: "No accounting period exists. Please create a period first.",
-          },
-        });
-      }
-      periodIdForDelivery = mostRecentPeriod.id;
-    }
-
-    // Generate delivery number
-    const deliveryNo = await generateDeliveryNumber();
-
     // Use a transaction to ensure atomicity
     const result = await prisma.$transaction(async (tx) => {
-      // Create delivery record
-      const delivery = await tx.delivery.create({
-        data: {
-          delivery_no: deliveryNo,
-          location_id: locationId,
-          supplier_id: data.supplier_id,
-          period_id: periodIdForDelivery,
-          po_id: data.po_id || null,
-          invoice_no: data.invoice_no || null,
-          delivery_note: data.delivery_note || null,
-          delivery_date: new Date(data.delivery_date),
-          status: data.status,
-          created_by: user.id,
-          posted_at: isPosting ? new Date() : null,
-          total_amount: 0, // Will be calculated from lines
-          has_variance: false, // Will be updated if variance detected
-        },
-      });
+      // Delete existing lines if new lines provided
+      if (data.lines) {
+        await tx.deliveryLine.deleteMany({
+          where: { delivery_id: deliveryId },
+        });
+      }
 
       let totalAmount = 0;
       let hasVariance = false;
@@ -322,7 +271,7 @@ export default defineEventHandler(async (event) => {
       const createdNCRs: unknown[] = [];
 
       // Process each delivery line
-      for (const lineData of data.lines) {
+      for (const lineData of linesToProcess) {
         const item = items.find((i) => i.id === lineData.item_id)!;
         const periodPrice = periodPriceMap.get(lineData.item_id);
         const currentStock = stockMap.get(lineData.item_id) || { quantity: 0, wac: 0 };
@@ -363,10 +312,10 @@ export default defineEventHandler(async (event) => {
           }
         }
 
-        // Create delivery line
+        // Create delivery line (either new or recreated)
         const deliveryLine = await tx.deliveryLine.create({
           data: {
-            delivery_id: delivery.id,
+            delivery_id: deliveryId,
             item_id: lineData.item_id,
             quantity: lineData.quantity,
             unit_price: lineData.unit_price,
@@ -381,7 +330,7 @@ export default defineEventHandler(async (event) => {
           await tx.locationStock.upsert({
             where: {
               location_id_item_id: {
-                location_id: locationId,
+                location_id: delivery.location_id,
                 item_id: lineData.item_id,
               },
             },
@@ -390,61 +339,60 @@ export default defineEventHandler(async (event) => {
               wac: wacResult.newWAC,
             },
             create: {
-              location_id: locationId,
+              location_id: delivery.location_id,
               item_id: lineData.item_id,
               on_hand: lineData.quantity,
               wac: wacResult.newWAC,
             },
           });
-        }
 
-        // Create NCR if price variance detected
-        if (lineHasVariance && periodPrice !== undefined) {
-          // Generate NCR number
-          const ncrPrefix = `NCR-${new Date().getFullYear()}-`;
-          const lastNCR = await tx.nCR.findFirst({
-            where: { ncr_no: { startsWith: ncrPrefix } },
-            orderBy: { ncr_no: "desc" },
-            select: { ncr_no: true },
-          });
+          // Create NCR if price variance detected
+          if (lineHasVariance && periodPrice !== undefined) {
+            const ncrPrefix = `NCR-${new Date().getFullYear()}-`;
+            const lastNCR = await tx.nCR.findFirst({
+              where: { ncr_no: { startsWith: ncrPrefix } },
+              orderBy: { ncr_no: "desc" },
+              select: { ncr_no: true },
+            });
 
-          let ncrNumber = 1;
-          if (lastNCR) {
-            const parts = lastNCR.ncr_no.split("-");
-            ncrNumber = parseInt(parts[2] || "0", 10) + 1;
+            let ncrNumber = 1;
+            if (lastNCR) {
+              const parts = lastNCR.ncr_no.split("-");
+              ncrNumber = parseInt(parts[2] || "0", 10) + 1;
+            }
+            const ncrNo = `${ncrPrefix}${ncrNumber.toString().padStart(3, "0")}`;
+
+            const ncr = await tx.nCR.create({
+              data: {
+                ncr_no: ncrNo,
+                location_id: delivery.location_id,
+                delivery_id: deliveryId,
+                delivery_line_id: deliveryLine.id,
+                type: "PRICE_VARIANCE",
+                status: "OPEN",
+                reason: `Price variance detected: Expected ${periodPrice?.toFixed(2)}, Actual ${lineData.unit_price.toFixed(2)} (${variancePercent.toFixed(1)}% ${priceVariance > 0 ? "increase" : "decrease"})`,
+                quantity: lineData.quantity,
+                value: Math.abs(priceVariance * lineData.quantity),
+                auto_generated: true,
+                created_by: user.id,
+              },
+            });
+
+            createdNCRs.push({
+              id: ncr.id,
+              ncr_no: ncr.ncr_no,
+              type: ncr.type,
+              item: {
+                id: item.id,
+                code: item.code,
+                name: item.name,
+              },
+              expected_price: periodPrice,
+              actual_price: lineData.unit_price,
+              variance: priceVariance,
+              variance_percent: variancePercent,
+            });
           }
-          const ncrNo = `${ncrPrefix}${ncrNumber.toString().padStart(3, "0")}`;
-
-          const ncr = await tx.nCR.create({
-            data: {
-              ncr_no: ncrNo,
-              location_id: locationId,
-              delivery_id: delivery.id,
-              delivery_line_id: deliveryLine.id,
-              type: "PRICE_VARIANCE",
-              status: "OPEN",
-              reason: `Price variance detected: Expected ${periodPrice?.toFixed(2)}, Actual ${lineData.unit_price.toFixed(2)} (${variancePercent.toFixed(1)}% ${priceVariance > 0 ? "increase" : "decrease"})`,
-              quantity: lineData.quantity,
-              value: Math.abs(priceVariance * lineData.quantity),
-              auto_generated: true,
-              created_by: user.id,
-            },
-          });
-
-          createdNCRs.push({
-            id: ncr.id,
-            ncr_no: ncr.ncr_no,
-            type: ncr.type,
-            item: {
-              id: item.id,
-              code: item.code,
-              name: item.name,
-            },
-            expected_price: periodPrice,
-            actual_price: lineData.unit_price,
-            variance: priceVariance,
-            variance_percent: variancePercent,
-          });
         }
 
         createdLines.push({
@@ -465,10 +413,18 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      // Update delivery with calculated totals
+      // Update delivery record
       const updatedDelivery = await tx.delivery.update({
-        where: { id: delivery.id },
+        where: { id: deliveryId },
         data: {
+          supplier_id: data.supplier_id,
+          po_id: data.po_id,
+          invoice_no: data.invoice_no ?? delivery.invoice_no,
+          delivery_note: data.delivery_note ?? delivery.delivery_note,
+          delivery_date: data.delivery_date ? new Date(data.delivery_date) : undefined,
+          period_id: isPosting && currentPeriod ? currentPeriod.id : undefined,
+          status: data.status,
+          posted_at: isPosting ? new Date() : undefined,
           total_amount: totalAmount,
           has_variance: hasVariance,
         },
@@ -513,7 +469,7 @@ export default defineEventHandler(async (event) => {
           ? `Delivery posted. ${result.ncrs.length} price variance(s) detected and NCR(s) created automatically.`
           : "Delivery posted successfully.";
     } else {
-      message = "Delivery draft saved successfully.";
+      message = "Delivery draft updated successfully.";
     }
 
     return {
@@ -555,13 +511,13 @@ export default defineEventHandler(async (event) => {
       throw error;
     }
 
-    console.error("Error creating delivery:", error);
+    console.error("Error updating delivery:", error);
     throw createError({
       statusCode: 500,
       statusMessage: "Internal Server Error",
       data: {
         code: "INTERNAL_ERROR",
-        message: "Failed to create delivery",
+        message: "Failed to update delivery",
         details: error instanceof Error ? error.message : "Unknown error",
       },
     });

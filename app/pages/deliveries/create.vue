@@ -102,7 +102,7 @@
           <div>
             <label class="form-label mb-2 block">
               Invoice Number
-              <span class="text-[var(--ui-error)]">*</span>
+              <span class="text-xs text-[var(--ui-text-muted)] ml-1">(required for posting)</span>
             </label>
             <UInput
               v-model="formData.invoice_no"
@@ -313,24 +313,49 @@
           variant="soft"
           size="lg"
           class="cursor-pointer rounded-full px-6"
-          :disabled="loading"
+          :disabled="savingDraft || posting"
           @click="cancel"
         >
           Cancel
+        </UButton>
+        <UButton
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-save"
+          size="lg"
+          class="cursor-pointer rounded-full px-6"
+          :loading="savingDraft"
+          :disabled="!isDraftValid || savingDraft || posting || !isOnline"
+          @click="saveDraft"
+        >
+          Save Draft
         </UButton>
         <UButton
           color="primary"
           icon="i-lucide-check"
           size="lg"
           class="cursor-pointer rounded-full px-6"
-          :loading="loading"
-          :disabled="!isFormValid || loading || !isOnline"
-          @click="submitDelivery"
+          :loading="posting"
+          :disabled="!isFormValid || savingDraft || posting || !isOnline"
+          @click="showPostConfirmation = true"
         >
-          Create Delivery
+          Post Delivery
         </UButton>
       </div>
     </div>
+
+    <!-- Post Confirmation Modal -->
+    <UiConfirmModal
+      v-model="showPostConfirmation"
+      title="Post Delivery"
+      message="Once posted, this delivery cannot be edited. Stock levels will be updated and any price variances will generate NCRs automatically. Are you sure you want to post this delivery?"
+      confirm-text="Post Delivery"
+      cancel-text="Continue Editing"
+      loading-text="Posting..."
+      :loading="posting"
+      variant="warning"
+      @confirm="postDelivery"
+    />
   </div>
 </template>
 
@@ -347,7 +372,9 @@ const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess, handleWarning } = useErrorHandler();
 
 // State
-const loading = ref(false);
+const savingDraft = ref(false);
+const posting = ref(false);
+const showPostConfirmation = ref(false);
 
 // Helper function to get location-specific icon
 const getLocationIcon = (type: string): string => {
@@ -440,6 +467,17 @@ const varianceCount = computed(() => {
   return lines.value.filter((line) => line.has_variance).length;
 });
 
+// Draft validation (relaxed - for saving as draft)
+const isDraftValid = computed(() => {
+  return (
+    formData.value.supplier_id &&
+    formData.value.delivery_date &&
+    lines.value.length > 0 &&
+    lines.value.some((line) => line.item_id && line.quantity)
+  );
+});
+
+// Full validation (strict - for posting)
 const isFormValid = computed(() => {
   return (
     formData.value.supplier_id &&
@@ -492,16 +530,27 @@ const fetchPeriodPrices = async () => {
   }
 };
 
-// Submit form
-const submitDelivery = async () => {
-  if (!isFormValid.value) {
+// Prepare lines data for API
+const prepareLinesData = () => {
+  return lines.value
+    .filter((line) => line.item_id && line.quantity)
+    .map((line) => ({
+      item_id: line.item_id,
+      quantity: parseFloat(line.quantity) || 0,
+      unit_price: parseFloat(line.unit_price) || 0,
+    }));
+};
+
+// Save as draft
+const saveDraft = async () => {
+  if (!isDraftValid.value) {
     handleError("REQUIRED_FIELD");
     return;
   }
 
   if (!locationStore.activeLocation?.id) {
     handleError({
-      data: { message: "Please select a location before creating a delivery" },
+      data: { message: "Please select a location before saving a delivery" },
     });
     return;
   }
@@ -511,20 +560,74 @@ const submitDelivery = async () => {
     return;
   }
 
-  // Guard against offline state
   await guardAction(
     async () => {
-      loading.value = true;
+      savingDraft.value = true;
 
       try {
-        // Prepare lines data
-        const linesData = lines.value.map((line) => ({
-          item_id: line.item_id,
-          quantity: parseFloat(line.quantity),
-          unit_price: parseFloat(line.unit_price),
-        }));
+        const result: any = await $fetch(
+          `/api/locations/${locationStore.activeLocation!.id}/deliveries`,
+          {
+            method: "post",
+            body: {
+              supplier_id: formData.value.supplier_id,
+              po_id: formData.value.po_id || null,
+              invoice_no: formData.value.invoice_no || null,
+              delivery_note: formData.value.delivery_note || null,
+              delivery_date: formData.value.delivery_date
+                ? new Date(formData.value.delivery_date).toISOString()
+                : new Date().toISOString(),
+              lines: prepareLinesData(),
+              status: "DRAFT",
+            },
+          }
+        );
 
-        // Submit delivery
+        handleSuccess("Draft Saved", "Your delivery draft has been saved. You can edit it later.");
+
+        // Redirect to delivery detail page
+        router.push(`/deliveries/${result.id}`);
+      } catch (error: any) {
+        console.error("Draft save error:", error);
+        handleError(error, { context: "saving draft" });
+      } finally {
+        savingDraft.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot save draft",
+      offlineDescription: "You need an internet connection to save delivery drafts.",
+    }
+  );
+};
+
+// Post delivery (called from confirmation modal)
+const postDelivery = async () => {
+  if (!isFormValid.value) {
+    handleError("REQUIRED_FIELD");
+    showPostConfirmation.value = false;
+    return;
+  }
+
+  if (!locationStore.activeLocation?.id) {
+    handleError({
+      data: { message: "Please select a location before posting a delivery" },
+    });
+    showPostConfirmation.value = false;
+    return;
+  }
+
+  if (!hasDeliveryPermission.value) {
+    handleError("PERMISSION_DENIED");
+    showPostConfirmation.value = false;
+    return;
+  }
+
+  await guardAction(
+    async () => {
+      posting.value = true;
+
+      try {
         const result: any = await $fetch(
           `/api/locations/${locationStore.activeLocation!.id}/deliveries`,
           {
@@ -537,7 +640,8 @@ const submitDelivery = async () => {
               delivery_date: formData.value.delivery_date
                 ? new Date(formData.value.delivery_date).toISOString()
                 : new Date().toISOString(),
-              lines: linesData,
+              lines: prepareLinesData(),
+              status: "POSTED",
             },
           }
         );
@@ -546,12 +650,12 @@ const submitDelivery = async () => {
         const ncrCount = result.ncrs?.length || 0;
 
         if (ncrCount > 0) {
-          handleWarning("Delivery Created with Price Variances", {
+          handleWarning("Delivery Posted with Price Variances", {
             description: `${ncrCount} NCR(s) automatically generated for review. The delivery has been recorded successfully.`,
           });
         } else {
           handleSuccess(
-            "Delivery Created Successfully",
+            "Delivery Posted Successfully",
             "The delivery has been recorded and stock levels have been updated."
           );
         }
@@ -559,14 +663,15 @@ const submitDelivery = async () => {
         // Redirect to delivery detail page
         router.push(`/deliveries/${result.id}`);
       } catch (error: any) {
-        console.error("Delivery submission error:", error);
-        handleError(error, { context: "creating delivery" });
+        console.error("Delivery posting error:", error);
+        handleError(error, { context: "posting delivery" });
       } finally {
-        loading.value = false;
+        posting.value = false;
+        showPostConfirmation.value = false;
       }
     },
     {
-      offlineMessage: "Cannot create delivery",
+      offlineMessage: "Cannot post delivery",
       offlineDescription: "You need an internet connection to post deliveries.",
     }
   );

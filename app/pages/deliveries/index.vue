@@ -66,8 +66,22 @@
           </template>
         </USelectMenu>
 
-        <!-- Price Variance Dropdown (Far Right) -->
-        <UDropdownMenu :items="varianceDropdownItems" class="ml-auto">
+        <!-- Status Dropdown -->
+        <UDropdownMenu :items="statusDropdownItems" class="ml-auto">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="currentStatusIcon" class="w-4 h-4 mr-2" />
+            {{ currentStatusLabel }}
+          </UButton>
+        </UDropdownMenu>
+
+        <!-- Price Variance Dropdown -->
+        <UDropdownMenu :items="varianceDropdownItems">
           <UButton
             color="neutral"
             variant="outline"
@@ -107,7 +121,7 @@
           </div>
         </div>
 
-        <!-- Row 2: Supplier and Variance Dropdown -->
+        <!-- Row 2: Supplier and Dropdowns -->
         <div class="flex items-center gap-3">
           <div class="flex-1 min-w-0">
             <USelectMenu
@@ -123,6 +137,19 @@
               </template>
             </USelectMenu>
           </div>
+
+          <!-- Icon-only status dropdown on mobile -->
+          <UDropdownMenu :items="statusDropdownItems">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-3"
+              trailing-icon="i-lucide-chevron-down"
+            >
+              <UIcon :name="currentStatusIcon" class="w-4 h-4" />
+            </UButton>
+          </UDropdownMenu>
 
           <!-- Icon-only variance dropdown on mobile -->
           <UDropdownMenu :items="varianceDropdownItems">
@@ -196,6 +223,7 @@
           <thead>
             <tr class="bg-[var(--ui-bg-elevated)]">
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Delivery No</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Status</th>
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Date</th>
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Supplier</th>
               <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Invoice No</th>
@@ -215,6 +243,22 @@
               <!-- Delivery No -->
               <td class="px-4 py-4 text-[var(--ui-text)] font-medium">
                 {{ delivery.delivery_no }}
+              </td>
+
+              <!-- Status -->
+              <td class="px-4 py-4">
+                <UBadge
+                  :color="delivery.status === 'DRAFT' ? 'neutral' : 'success'"
+                  variant="subtle"
+                  size="md"
+                  class="inline-flex items-center gap-1"
+                >
+                  <UIcon
+                    :name="delivery.status === 'DRAFT' ? 'i-lucide-file-edit' : 'i-lucide-check-circle'"
+                    class="h-3 w-3"
+                  />
+                  {{ delivery.status === "DRAFT" ? "Draft" : "Posted" }}
+                </UBadge>
               </td>
 
               <!-- Date -->
@@ -329,6 +373,8 @@ const locationStore = useLocationStore();
 const { canPostDeliveries } = usePermissions();
 
 // Types
+type DeliveryStatus = "DRAFT" | "POSTED";
+
 interface Delivery {
   id: string;
   delivery_no: string;
@@ -336,6 +382,7 @@ interface Delivery {
   invoice_no: string | null;
   total_amount: number;
   has_variance: boolean;
+  status: DeliveryStatus;
   supplier: {
     id: string;
     name: string;
@@ -345,8 +392,10 @@ interface Delivery {
     id: string;
     name: string;
   };
-  posted_at: string;
-  posted_by_user: {
+  created_at: string;
+  posted_at: string | null;
+  creator: {
+    id: string;
     full_name: string;
   };
 }
@@ -369,6 +418,7 @@ const filters = reactive({
   hasVariance: null as boolean | null,
   startDate: "",
   endDate: "",
+  status: "all" as "all" | "my_drafts" | "posted",
 });
 
 // Pagination
@@ -434,6 +484,42 @@ const currentVarianceIcon = computed(() => {
   return "i-lucide-list";
 });
 
+// Status dropdown items
+const statusDropdownItems = computed(() => [
+  [
+    {
+      label: "All Deliveries",
+      icon: "i-lucide-list",
+      active: filters.status === "all",
+      onSelect: () => selectStatus("all"),
+    },
+    {
+      label: "My Drafts",
+      icon: "i-lucide-file-edit",
+      active: filters.status === "my_drafts",
+      onSelect: () => selectStatus("my_drafts"),
+    },
+    {
+      label: "Posted",
+      icon: "i-lucide-check-circle",
+      active: filters.status === "posted",
+      onSelect: () => selectStatus("posted"),
+    },
+  ],
+]);
+
+const currentStatusLabel = computed(() => {
+  if (filters.status === "my_drafts") return "My Drafts";
+  if (filters.status === "posted") return "Posted";
+  return "All";
+});
+
+const currentStatusIcon = computed(() => {
+  if (filters.status === "my_drafts") return "i-lucide-file-edit";
+  if (filters.status === "posted") return "i-lucide-check-circle";
+  return "i-lucide-list";
+});
+
 // Active filters
 const activeFilters = computed(() => {
   const activeFiltersList: Array<{ key: string; label: string; value: string }> = [];
@@ -466,12 +552,26 @@ const activeFilters = computed(() => {
     });
   }
 
+  if (filters.status !== "all") {
+    activeFiltersList.push({
+      key: "status",
+      label: "Status",
+      value: filters.status === "my_drafts" ? "My Drafts" : "Posted",
+    });
+  }
+
   return activeFiltersList;
 });
 
 // Select variance handler
 function selectVariance(value: boolean | null) {
   filters.hasVariance = value;
+  applyFilters();
+}
+
+// Select status handler
+function selectStatus(value: "all" | "my_drafts" | "posted") {
+  filters.status = value;
   applyFilters();
 }
 
@@ -502,6 +602,14 @@ async function fetchDeliveries() {
       params.append("endDate", filters.endDate);
     }
 
+    // Add status filter
+    if (filters.status === "my_drafts") {
+      params.append("status", "DRAFT");
+      params.append("myDrafts", "true");
+    } else if (filters.status === "posted") {
+      params.append("status", "POSTED");
+    }
+
     const response = await $fetch<{
       deliveries: Array<{
         id: string;
@@ -510,10 +618,13 @@ async function fetchDeliveries() {
         invoice_no: string | null;
         total_amount: number;
         has_variance: boolean;
+        status: DeliveryStatus;
         supplier_code: string;
         supplier_name: string;
-        poster_name: string;
-        posted_at: string;
+        creator_id: string;
+        creator_name: string;
+        created_at: string;
+        posted_at: string | null;
       }>;
       grand_totals: {
         total_deliveries: number;
@@ -528,6 +639,7 @@ async function fetchDeliveries() {
       invoice_no: d.invoice_no,
       total_amount: d.total_amount,
       has_variance: d.has_variance,
+      status: d.status || "POSTED", // Default to POSTED for backwards compatibility
       supplier: {
         id: "", // Not available in report response
         name: d.supplier_name,
@@ -537,9 +649,11 @@ async function fetchDeliveries() {
         id: "",
         name: "",
       },
+      created_at: d.created_at || d.posted_at || "",
       posted_at: d.posted_at,
-      posted_by_user: {
-        full_name: d.poster_name,
+      creator: {
+        id: d.creator_id || "",
+        full_name: d.creator_name || "",
       },
     }));
 
@@ -576,6 +690,8 @@ function clearFilter(key: string) {
     // Clear both dates when clearing the date range filter
     filters.startDate = "";
     filters.endDate = "";
+  } else if (key === "status") {
+    filters.status = "all";
   }
   pagination.page = 1;
   fetchDeliveries();

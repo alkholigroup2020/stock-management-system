@@ -4,13 +4,14 @@
  * Fetch a single delivery by ID with full details
  *
  * Includes:
- * - Delivery header information
+ * - Delivery header information (including status)
  * - All delivery lines with item details
  * - Associated NCRs (price variance reports)
- * - Supplier, period, PO, and poster information
+ * - Supplier, period, PO, and creator information
  *
  * Permissions:
  * - User must have access to the delivery's location
+ * - DRAFT deliveries are only visible to their creator (unless ADMIN/SUPERVISOR)
  */
 
 import prisma from "../../utils/prisma";
@@ -72,7 +73,7 @@ export default defineEventHandler(async (event) => {
             end_date: true,
           },
         },
-        poster: {
+        creator: {
           select: {
             id: true,
             username: true,
@@ -166,6 +167,18 @@ export default defineEventHandler(async (event) => {
           },
         });
       }
+
+      // Draft deliveries are only visible to their creator
+      if (delivery.status === "DRAFT" && delivery.created_by !== user.id) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+          data: {
+            code: "NOT_DRAFT_OWNER",
+            message: "You can only view drafts you created",
+          },
+        });
+      }
     }
 
     // Format the response - convert Decimal types to numbers for JSON serialization
@@ -180,6 +193,9 @@ export default defineEventHandler(async (event) => {
         delivery_note: delivery.delivery_note,
         total_amount: totalAmount,
         has_variance: delivery.has_variance,
+        status: delivery.status,
+        created_at: delivery.created_at,
+        updated_at: delivery.updated_at,
         posted_at: delivery.posted_at,
         location: delivery.location,
         supplier: delivery.supplier,
@@ -190,7 +206,7 @@ export default defineEventHandler(async (event) => {
               total_amount: parseFloat(delivery.po.total_amount.toString()),
             }
           : null,
-        poster: delivery.poster,
+        creator: delivery.creator,
         lines: delivery.delivery_lines.map((line) => {
           const quantity = parseFloat(line.quantity.toString());
           const unitPrice = parseFloat(line.unit_price.toString());
