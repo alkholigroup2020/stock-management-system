@@ -28,7 +28,7 @@
             >
               <UIcon
                 :name="getLocationIcon(locationStore.activeLocation.type)"
-                class="w-4 md:w-6 h-4 md:h-6 text-primary p-3"
+                class="w-4 md:w-6 h-4 md:h-6 text-primary flex-shrink-0"
               />
               <div class="text-left">
                 <p class="text-sm font-medium text-[var(--ui-text)]">
@@ -277,6 +277,8 @@
                     size="sm"
                     class="cursor-pointer"
                     :disabled="lines.length === 1"
+                    aria-label="Remove line item"
+                    title="Remove this item"
                     @click="removeLine(line.id)"
                   />
                 </td>

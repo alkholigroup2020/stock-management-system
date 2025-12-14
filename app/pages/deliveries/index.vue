@@ -5,10 +5,33 @@
       <div class="flex items-center gap-2 sm:gap-4">
         <UIcon name="i-lucide-truck" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
         <div>
-          <h1 class="text-xl sm:text-3xl font-bold text-primary">Deliveries</h1>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-xl sm:text-3xl font-bold text-primary">Deliveries</h1>
+            <UBadge
+              v-if="activeLocation"
+              color="primary"
+              variant="soft"
+              size="md"
+              class="hidden sm:inline-flex items-center gap-1"
+            >
+              <UIcon name="i-lucide-map-pin" class="h-3 w-3" />
+              {{ activeLocation.name }}
+            </UBadge>
+          </div>
           <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
             View and manage goods receipts and supplier deliveries
           </p>
+          <!-- Mobile location badge (smaller, below title) -->
+          <UBadge
+            v-if="activeLocation"
+            color="primary"
+            variant="soft"
+            size="sm"
+            class="sm:hidden inline-flex items-center gap-1 mt-1"
+          >
+            <UIcon name="i-lucide-map-pin" class="h-3 w-3" />
+            {{ activeLocation.name }}
+          </UBadge>
         </div>
       </div>
       <UButton
@@ -30,7 +53,9 @@
       <div class="hidden lg:flex items-center gap-3">
         <!-- Date Range Start -->
         <div class="flex-1 min-w-0 max-w-xs">
+          <label class="sr-only" for="filter-start-date">Start date</label>
           <UInput
+            id="filter-start-date"
             v-model="filters.startDate"
             type="date"
             icon="i-lucide-calendar"
@@ -42,7 +67,9 @@
 
         <!-- Date Range End -->
         <div class="flex-1 min-w-0 max-w-xs">
+          <label class="sr-only" for="filter-end-date">End date</label>
           <UInput
+            id="filter-end-date"
             v-model="filters.endDate"
             type="date"
             icon="i-lucide-calendar"
@@ -74,9 +101,10 @@
             size="lg"
             class="cursor-pointer rounded-full px-5"
             trailing-icon="i-lucide-chevron-down"
+            aria-label="Filter by status"
           >
             <UIcon :name="currentStatusIcon" class="w-4 h-4 mr-2" />
-            {{ currentStatusLabel }}
+            Status: {{ currentStatusLabel }}
           </UButton>
         </UDropdownMenu>
 
@@ -88,9 +116,10 @@
             size="lg"
             class="cursor-pointer rounded-full px-5"
             trailing-icon="i-lucide-chevron-down"
+            aria-label="Filter by price variance"
           >
             <UIcon :name="currentVarianceIcon" class="w-4 h-4 mr-2" />
-            {{ currentVarianceLabel }}
+            Variance: {{ currentVarianceLabel }}
           </UButton>
         </UDropdownMenu>
       </div>
@@ -100,7 +129,9 @@
         <!-- Row 1: Date Range -->
         <div class="flex items-center gap-3">
           <div class="flex-1 min-w-0">
+            <label class="sr-only" for="filter-start-date-mobile">Start date</label>
             <UInput
+              id="filter-start-date-mobile"
               v-model="filters.startDate"
               type="date"
               icon="i-lucide-calendar"
@@ -110,7 +141,9 @@
             />
           </div>
           <div class="flex-1 min-w-0">
+            <label class="sr-only" for="filter-end-date-mobile">End date</label>
             <UInput
+              id="filter-end-date-mobile"
               v-model="filters.endDate"
               type="date"
               icon="i-lucide-calendar"
@@ -146,6 +179,8 @@
               size="lg"
               class="cursor-pointer rounded-full px-3"
               trailing-icon="i-lucide-chevron-down"
+              aria-label="Filter by status"
+              :title="`Status: ${currentStatusLabel}`"
             >
               <UIcon :name="currentStatusIcon" class="w-4 h-4" />
             </UButton>
@@ -159,6 +194,8 @@
               size="lg"
               class="cursor-pointer rounded-full px-3"
               trailing-icon="i-lucide-chevron-down"
+              aria-label="Filter by price variance"
+              :title="`Variance: ${currentVarianceLabel}`"
             >
               <UIcon :name="currentVarianceIcon" class="w-4 h-4" />
             </UButton>
@@ -431,6 +468,7 @@ const pagination = reactive({
 
 // Computed
 const activeLocationId = computed(() => locationStore.activeLocationId);
+const activeLocation = computed(() => locationStore.activeLocation);
 const hasDeliveries = computed(() => deliveries.value.length > 0);
 
 const paginationInfo = computed(() => {

@@ -48,6 +48,7 @@
             icon="i-lucide-arrow-left"
             size="lg"
             class="cursor-pointer"
+            aria-label="Back to deliveries list"
             @click="goBack"
           >
             <span class="hidden sm:inline">Back</span>
@@ -61,6 +62,7 @@
               icon="i-lucide-trash-2"
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
+              aria-label="Delete draft"
               @click="showDeleteConfirmation = true"
             >
               <span class="hidden sm:inline">Delete</span>
@@ -71,6 +73,7 @@
               icon="i-lucide-pencil"
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
+              aria-label="Edit draft"
               @click="editDraft"
             >
               <span class="hidden sm:inline">Edit</span>
@@ -80,6 +83,7 @@
               icon="i-lucide-check"
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
+              aria-label="Post delivery"
               @click="showPostConfirmation = true"
             >
               <span class="hidden sm:inline">Post</span>
@@ -94,6 +98,7 @@
             icon="i-lucide-printer"
             size="lg"
             class="cursor-pointer rounded-full px-3 sm:px-6"
+            aria-label="Print delivery"
             @click="printDelivery"
           >
             <span class="hidden sm:inline">Print</span>
