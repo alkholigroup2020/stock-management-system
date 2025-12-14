@@ -296,8 +296,10 @@ export default defineEventHandler(async (event) => {
     const deliveryNo = await generateDeliveryNumber();
 
     // Use a transaction to ensure atomicity
-    const result = await prisma.$transaction(async (tx) => {
-      // Create delivery record
+    // Increase timeout to 30 seconds to handle multiple line items and stock updates
+    const result = await prisma.$transaction(
+      async (tx) => {
+        // Create delivery record
       const delivery = await tx.delivery.create({
         data: {
           delivery_no: deliveryNo,
@@ -503,7 +505,12 @@ export default defineEventHandler(async (event) => {
         lines: createdLines,
         ncrs: createdNCRs,
       };
-    });
+      },
+      {
+        maxWait: 10000, // Max time to wait for a transaction slot (10 seconds)
+        timeout: 30000, // Max time the transaction can run (30 seconds)
+      }
+    );
 
     // Build response message based on status
     let message: string;

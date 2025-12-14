@@ -98,7 +98,7 @@ watch(
 
 // Computed: Metric cards data
 const metricCards = computed(() => {
-  if (!dashboardData.value) return [];
+  if (!dashboardData.value?.totals) return [];
 
   const { totals } = dashboardData.value;
 

@@ -257,13 +257,15 @@ export default defineEventHandler(async (event) => {
     }
 
     // Use a transaction to ensure atomicity
-    const result = await prisma.$transaction(async (tx) => {
-      // Delete existing lines if new lines provided
-      if (data.lines) {
-        await tx.deliveryLine.deleteMany({
-          where: { delivery_id: deliveryId },
-        });
-      }
+    // Increase timeout to 30 seconds to handle multiple line items and stock updates
+    const result = await prisma.$transaction(
+      async (tx) => {
+        // Delete existing lines if new lines provided
+        if (data.lines) {
+          await tx.deliveryLine.deleteMany({
+            where: { delivery_id: deliveryId },
+          });
+        }
 
       let totalAmount = 0;
       let hasVariance = false;
@@ -459,7 +461,12 @@ export default defineEventHandler(async (event) => {
         lines: createdLines,
         ncrs: createdNCRs,
       };
-    });
+      },
+      {
+        maxWait: 10000, // Max time to wait for a transaction slot (10 seconds)
+        timeout: 30000, // Max time the transaction can run (30 seconds)
+      }
+    );
 
     // Build response message based on status
     let message: string;

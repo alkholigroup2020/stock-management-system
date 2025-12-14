@@ -42,22 +42,41 @@ interface StockItem {
   item_sub_category: string | null;
   on_hand: number;
   wac: number;
-  value: number;
+  stock_value: number;
+  value?: number; // Alias for compatibility
   min_stock?: number | null;
   max_stock?: number | null;
   is_low_stock?: boolean;
 }
 
-interface StockResponse {
-  location?: {
-    id: string;
-    code: string;
-    name: string;
-    type: LocationType;
-  };
-  stock: StockItem[];
+interface LocationStockSummary {
+  location_id: string;
+  location_code: string;
+  location_name: string;
+  location_type: string;
+  total_items: number;
   total_value: number;
-  count: number;
+  low_stock_items: number;
+  items: StockItem[];
+}
+
+interface StockNowResponse {
+  report_type: string;
+  generated_at: string;
+  generated_by: { id: string; username: string };
+  filters: {
+    location_id: string | null;
+    category: string | null;
+    low_stock_only: boolean;
+  };
+  locations: LocationStockSummary[];
+  grand_totals: {
+    total_locations: number;
+    total_items: number;
+    total_value: number;
+    low_stock_items: number;
+  };
+  available_categories: string[];
 }
 
 interface ConsolidatedStockItem {
@@ -98,9 +117,10 @@ interface ConsolidatedStockResponse {
   total_locations: number;
 }
 
-const stockData = ref<StockResponse | null>(null);
+const stockData = ref<StockNowResponse | null>(null);
 const consolidatedData = ref<ConsolidatedStockResponse | null>(null);
 const categories = ref<string[]>([]);
+const currentLocationData = ref<LocationStockSummary | null>(null);
 
 // Computed properties
 const activeLocationId = computed(() => {
@@ -137,8 +157,8 @@ const filteredStock = computed(() => {
     }
 
     return items;
-  } else if (stockData.value) {
-    let items = stockData.value.stock;
+  } else if (currentLocationData.value) {
+    let items = currentLocationData.value.items;
 
     // Apply search filter
     if (searchQuery.value) {
@@ -169,19 +189,14 @@ const filteredStock = computed(() => {
 const totalInventoryValue = computed(() => {
   if (viewMode.value === "consolidated" && consolidatedData.value) {
     return consolidatedData.value.grand_total_value;
-  } else if (stockData.value) {
-    return stockData.value.total_value;
+  } else if (currentLocationData.value) {
+    return currentLocationData.value.total_value;
   }
   return 0;
 });
 
 const totalItems = computed(() => {
-  if (viewMode.value === "consolidated" && consolidatedData.value) {
-    return filteredStock.value.length;
-  } else if (stockData.value) {
-    return filteredStock.value.length;
-  }
-  return 0;
+  return filteredStock.value.length;
 });
 
 // Table columns for single location view
@@ -275,15 +290,20 @@ const fetchStockData = async () => {
 
       // Extract categories from consolidated data
       const categorySet = new Set<string>();
-      data.consolidated_stock.forEach((item) => {
-        if (item.item_category) {
-          categorySet.add(item.item_category);
-        }
-      });
+      if (data.consolidated_stock) {
+        data.consolidated_stock.forEach((item) => {
+          if (item.item_category) {
+            categorySet.add(item.item_category);
+          }
+        });
+      }
       categories.value = Array.from(categorySet).sort();
     } else {
-      // Fetch single location stock
+      // Fetch single location stock using the stock-now report endpoint
       const params = new URLSearchParams();
+      if (activeLocationId.value) {
+        params.append("locationId", activeLocationId.value);
+      }
       if (selectedCategory.value) {
         params.append("category", selectedCategory.value);
       }
@@ -291,23 +311,25 @@ const fetchStockData = async () => {
         params.append("lowStock", "true");
       }
 
-      const data = await $fetch<StockResponse>(
-        `/api/locations/${activeLocationId.value}/stock?${params.toString()}`
+      const data = await $fetch<StockNowResponse>(
+        `/api/reports/stock-now?${params.toString()}`
       );
       stockData.value = data;
 
-      // Extract categories from stock data
-      const categorySet = new Set<string>();
-      data.stock.forEach((item) => {
-        if (item.item_category) {
-          categorySet.add(item.item_category);
-        }
-      });
-      categories.value = Array.from(categorySet).sort();
+      // Find the current location's data from the response
+      if (data.locations && data.locations.length > 0) {
+        currentLocationData.value = data.locations[0] ?? null;
+      } else {
+        currentLocationData.value = null;
+      }
+
+      // Use categories from the API response
+      categories.value = data.available_categories || [];
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching stock data:", err);
-    error.value = err.data?.message || "Failed to fetch stock data";
+    const errorData = err as { data?: { message?: string } };
+    error.value = errorData.data?.message || "Failed to fetch stock data";
     toast.error("Error", { description: error.value || undefined });
   } finally {
     loading.value = false;
@@ -531,15 +553,15 @@ watch(
       </div>
 
       <!-- Current Location (single view only) -->
-      <div v-else-if="stockData?.location" class="card-elevated p-6">
+      <div v-else-if="currentLocationData" class="card-elevated p-6">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-caption">Current Location</p>
             <p class="text-subheading text-default mt-1">
-              {{ stockData.location.name }}
+              {{ currentLocationData.location_name }}
             </p>
             <p class="text-caption">
-              {{ stockData.location.code }}
+              {{ currentLocationData.location_code }}
             </p>
           </div>
           <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
@@ -661,7 +683,7 @@ watch(
 
           <!-- Value -->
           <template #value-data="{ row }">
-            <span class="font-semibold">{{ formatCurrency((row as any).value) }}</span>
+            <span class="font-semibold">{{ formatCurrency((row as any).stock_value || (row as any).value || 0) }}</span>
           </template>
         </UTable>
       </div>
