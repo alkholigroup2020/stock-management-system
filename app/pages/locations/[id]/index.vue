@@ -414,6 +414,8 @@ import { z } from "zod";
 import type { LocationDeleteResponse } from "../../../../shared/types/api";
 
 definePageMeta({
+  middleware: "role",
+  roleRequired: "ADMIN",
   layout: "default",
 });
 

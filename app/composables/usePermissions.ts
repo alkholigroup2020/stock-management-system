@@ -204,6 +204,29 @@ export function usePermissions() {
   // ==================== RECONCILIATION PERMISSIONS ====================
 
   /**
+   * Check if user can view reconciliations (totals only for operators)
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - User must have access to the location
+   * - All roles can VIEW reconciliations (operators see totals only)
+   *
+   * @param locationId - Location ID to check
+   * @returns true if user can view reconciliations
+   */
+  const canViewReconciliations = (locationId?: string): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Admins and Supervisors have access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
+    const targetLocationId = locationId || user.value.default_location_id;
+    if (!targetLocationId) return false;
+
+    return hasLocationAccess(targetLocationId);
+  };
+
+  /**
    * Check if user can edit reconciliations (adjustments)
    *
    * Requirements:
@@ -434,6 +457,7 @@ export function usePermissions() {
     canApproveTransfers,
 
     // Reconciliations
+    canViewReconciliations,
     canEditReconciliations,
     canViewConsolidatedReconciliations,
 

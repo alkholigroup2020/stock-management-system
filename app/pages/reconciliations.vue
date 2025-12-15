@@ -12,11 +12,12 @@ const authStore = useAuthStore();
 const toast = useAppToast();
 
 // Types
-interface ReconciliationData {
+interface LocationReconciliation {
+  location_id: string;
+  location_code: string;
+  location_name: string;
+  location_type: string;
   reconciliation: {
-    id: string;
-    period_id: string;
-    location_id: string;
     opening_stock: number;
     receipts: number;
     transfers_in: number;
@@ -27,7 +28,41 @@ interface ReconciliationData {
     back_charges: number;
     credits: number;
     condemnations: number;
-    last_updated: string;
+  };
+  calculations: {
+    consumption: number;
+    total_adjustments: number;
+    total_mandays: number;
+    manday_cost: number | null;
+  };
+  is_saved: boolean;
+}
+
+interface ReconciliationReportResponse {
+  report_type: string;
+  generated_at: string;
+  period: {
+    id: string;
+    name: string;
+    start_date: string;
+    end_date: string;
+    status: string;
+  };
+  locations: LocationReconciliation[];
+}
+
+interface ReconciliationData {
+  reconciliation: {
+    opening_stock: number;
+    receipts: number;
+    transfers_in: number;
+    transfers_out: number;
+    issues: number;
+    closing_stock: number;
+    adjustments: number;
+    back_charges: number;
+    credits: number;
+    condemnations: number;
   };
   location: {
     id: string;
@@ -46,12 +81,6 @@ interface ReconciliationData {
     total_adjustments: number;
     total_mandays: number;
     manday_cost: number | null;
-    breakdown: {
-      receipts_and_transfers: number;
-      issues_and_stock_change: number;
-      stock_change: number;
-      variance_before_adjustments: number;
-    };
   };
   is_auto_calculated: boolean;
 }
@@ -66,7 +95,6 @@ interface Location {
 const loading = ref(false);
 const error = ref<string | null>(null);
 const reconciliationData = ref<ReconciliationData | null>(null);
-const saving = ref(false);
 
 // Editable adjustments
 const adjustments = ref({
@@ -155,25 +183,49 @@ async function fetchReconciliation() {
   error.value = null;
 
   try {
-    const response = await $fetch<ReconciliationData>(
-      `/api/locations/${activeLocationId.value}/reconciliations/${currentPeriod.value.id}`,
+    const response = await $fetch<ReconciliationReportResponse>(
+      `/api/reports/reconciliation`,
       {
         method: "GET",
+        query: {
+          periodId: currentPeriod.value.id,
+          locationId: activeLocationId.value,
+        },
       }
     );
 
-    reconciliationData.value = response;
+    // Extract the location data from the response
+    const locationData = response.locations.find(
+      (loc) => loc.location_id === activeLocationId.value
+    );
 
-    // Initialize editable adjustments with fetched values (default to 0 if undefined)
-    adjustments.value = {
-      back_charges: response.reconciliation.back_charges || 0,
-      credits: response.reconciliation.credits || 0,
-      condemnations: response.reconciliation.condemnations || 0,
-      adjustments: response.reconciliation.adjustments || 0,
-    };
-  } catch (err: any) {
+    if (locationData) {
+      reconciliationData.value = {
+        reconciliation: locationData.reconciliation,
+        location: {
+          id: locationData.location_id,
+          code: locationData.location_code,
+          name: locationData.location_name,
+        },
+        period: response.period,
+        calculations: locationData.calculations,
+        is_auto_calculated: !locationData.is_saved,
+      };
+
+      // Initialize editable adjustments with fetched values (default to 0 if undefined)
+      adjustments.value = {
+        back_charges: locationData.reconciliation.back_charges || 0,
+        credits: locationData.reconciliation.credits || 0,
+        condemnations: locationData.reconciliation.condemnations || 0,
+        adjustments: locationData.reconciliation.adjustments || 0,
+      };
+    } else {
+      error.value = "No reconciliation data found for this location";
+    }
+  } catch (err: unknown) {
     console.error("Error fetching reconciliation:", err);
-    const errorMessage = err?.data?.message || "Failed to fetch reconciliation";
+    const apiError = err as { data?: { message?: string } };
+    const errorMessage = apiError?.data?.message || "Failed to fetch reconciliation";
     error.value = errorMessage;
     toast.error(errorMessage);
   } finally {
@@ -183,6 +235,7 @@ async function fetchReconciliation() {
 
 /**
  * Save adjustments
+ * Note: Save functionality requires API endpoint implementation
  */
 async function saveAdjustments() {
   if (!activeLocationId.value || !currentPeriod.value) {
@@ -201,27 +254,9 @@ async function saveAdjustments() {
     return;
   }
 
-  saving.value = true;
-
-  try {
-    const response = await $fetch<ReconciliationData>(
-      `/api/locations/${activeLocationId.value}/reconciliations/${currentPeriod.value.id}`,
-      {
-        method: "PATCH",
-        body: adjustments.value,
-      }
-    );
-
-    reconciliationData.value = response;
-
-    toast.success("Adjustments saved successfully");
-  } catch (err: any) {
-    console.error("Error saving adjustments:", err);
-    const errorMessage = err?.data?.message || "Failed to save adjustments";
-    toast.error(errorMessage);
-  } finally {
-    saving.value = false;
-  }
+  // Note: Save functionality requires API endpoint implementation
+  // For now, show a message that this feature is coming soon
+  toast.info("Reconciliation adjustment saving will be available in a future update.");
 }
 
 /**
@@ -459,8 +494,6 @@ const formattedDateRange = computed(() => {
           <UButton
             color="primary"
             class="cursor-pointer"
-            :loading="saving"
-            :disabled="saving"
             @click="saveAdjustments"
           >
             Save Adjustments
@@ -507,57 +540,16 @@ const formattedDateRange = computed(() => {
           </div>
         </div>
 
-        <!-- Breakdown Details -->
+        <!-- Total Adjustments Summary -->
         <div class="mt-6 pt-6 border-t border-default">
-          <h3 class="text-caption text-muted mb-4">Calculation Breakdown</h3>
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-muted">Stock Change:</span>
-              <span class="text-body font-medium">
-                {{ formatCurrency(reconciliationData.calculations.breakdown.stock_change) }}
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted">Receipts + Transfers In:</span>
-              <span class="text-body font-medium">
-                {{
-                  formatCurrency(reconciliationData.calculations.breakdown.receipts_and_transfers)
-                }}
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted">Issues + Stock Change:</span>
-              <span class="text-body font-medium">
-                {{
-                  formatCurrency(reconciliationData.calculations.breakdown.issues_and_stock_change)
-                }}
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted">Total Adjustments:</span>
-              <span class="text-body font-medium">
-                {{ formatCurrency(reconciliationData.calculations.total_adjustments) }}
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted">Variance Before Adjustments:</span>
-              <span class="text-body font-medium">
-                {{
-                  formatCurrency(
-                    reconciliationData.calculations.breakdown.variance_before_adjustments
-                  )
-                }}
-              </span>
-            </div>
+          <div class="flex justify-between">
+            <span class="text-muted">Total Adjustments:</span>
+            <span class="text-body font-medium">
+              {{ formatCurrency(reconciliationData.calculations.total_adjustments) }}
+            </span>
           </div>
         </div>
       </UCard>
-
-      <!-- Last Updated Info -->
-      <div v-if="reconciliationData.reconciliation.last_updated" class="text-center text-caption">
-        Last updated:
-        {{ new Date(reconciliationData.reconciliation.last_updated).toLocaleString() }}
-      </div>
     </div>
   </div>
 </template>

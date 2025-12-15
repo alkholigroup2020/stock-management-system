@@ -396,6 +396,8 @@
 import { z } from "zod";
 
 definePageMeta({
+  middleware: "role",
+  roleRequired: "ADMIN",
   layout: "default",
 });
 

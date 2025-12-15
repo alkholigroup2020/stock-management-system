@@ -217,6 +217,8 @@ import type { LocationType } from "@prisma/client";
 import type { LocationDeleteResponse } from "../../../shared/types/api";
 
 definePageMeta({
+  middleware: "role",
+  roleRequired: "ADMIN",
   layout: "default",
 });
 

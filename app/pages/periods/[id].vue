@@ -453,6 +453,7 @@ import { Decimal } from "@prisma/client/runtime/library";
 
 definePageMeta({
   middleware: "role",
+  roleRequired: "ADMIN",
 });
 
 const router = useRouter();

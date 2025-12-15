@@ -97,7 +97,7 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
     });
   }
 
-  if (permissions.canEditReconciliations()) {
+  if (permissions.canViewReconciliations()) {
     items.push({
       label: "Reconciliations",
       icon: "i-heroicons-calculator",

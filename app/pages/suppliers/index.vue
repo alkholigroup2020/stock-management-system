@@ -215,6 +215,8 @@ import { refDebounced } from "@vueuse/core";
 import type { SupplierItem } from "~/composables/useSuppliers";
 
 definePageMeta({
+  middleware: "role",
+  roleRequired: "ADMIN",
   layout: "default",
 });
 

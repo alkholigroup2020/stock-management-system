@@ -324,6 +324,7 @@
 <script setup lang="ts">
 definePageMeta({
   middleware: "role",
+  roleRequired: "ADMIN",
 });
 
 const router = useRouter();
