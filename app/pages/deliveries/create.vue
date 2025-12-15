@@ -358,6 +358,20 @@
       variant="warning"
       @confirm="postDelivery"
     />
+
+    <!-- Loading Overlay for Draft Save -->
+    <LoadingOverlay
+      v-if="savingDraft"
+      title="Saving Draft..."
+      message="Please wait while we save your delivery draft"
+    />
+
+    <!-- Loading Overlay for Posting -->
+    <LoadingOverlay
+      v-if="posting"
+      title="Posting Delivery..."
+      message="Please wait while we process your delivery"
+    />
   </div>
 </template>
 

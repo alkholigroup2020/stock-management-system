@@ -26,10 +26,11 @@ Status: Consolidated from UI_DESIGN_GUIDE.md and UI_DESIGN_RULES.md
 14. [Accessibility Standards](#accessibility-standards)
 15. [Tailwind CSS v4 Constraints](#tailwind-css-v4-constraints)
 16. [PWA Design Considerations](#pwa-design-considerations)
-17. [Code Formatting Standards](#code-formatting-standards)
-18. [Usage Guidelines & Best Practices](#usage-guidelines--best-practices)
-19. [Common Patterns & Examples](#common-patterns--examples)
-20. [Component Checklist](#component-checklist)
+17. [Async Operations & Loading States](#async-operations--loading-states)
+18. [Code Formatting Standards](#code-formatting-standards)
+19. [Usage Guidelines & Best Practices](#usage-guidelines--best-practices)
+20. [Common Patterns & Examples](#common-patterns--examples)
+21. [Component Checklist](#component-checklist)
 
 ---
 
@@ -1556,6 +1557,130 @@ All text/background token combinations meet WCAG AA standards (4.5:1 for normal 
 
 ---
 
+## Async Operations & Loading States
+
+### Full-Page Loading Overlay (Critical UX Rule)
+
+**DESIGN RULE:** When performing save, post, or other critical async operations, the entire UI must be blocked with a full-page loading overlay to prevent user interaction.
+
+**Problem this solves:**
+
+- Button shows loading state, but rest of page remains interactive
+- Users can click around, edit fields, or navigate away during API calls
+- Leads to confusion, accidental actions, and potential data inconsistency
+
+**Required behavior:**
+
+- Full viewport coverage blocks all interaction
+- Semi-transparent backdrop with blur effect
+- Clear loading message indicating what's happening
+- Prevents clicks, keyboard input, and navigation
+
+### LoadingOverlay Component
+
+The `LoadingOverlay` component (at `app/components/LoadingOverlay.vue`) provides:
+
+- **Full viewport coverage** with `fixed inset-0 z-50`
+- **Semi-transparent backdrop** (`bg-black/50 backdrop-blur-sm`)
+- **Centered loading card** with spinner and message
+- **Event blocking** - prevents all clicks and interactions
+- **Accessible** - proper ARIA labels and semantic structure
+
+### Implementation Pattern
+
+**Basic Usage:**
+
+```vue
+<template>
+  <div>
+    <!-- Loading Overlay for Save Operations -->
+    <LoadingOverlay
+      v-if="saving"
+      title="Saving..."
+      message="Please wait while we save your changes"
+    />
+
+    <!-- Loading Overlay for Post Operations -->
+    <LoadingOverlay
+      v-if="posting"
+      title="Posting..."
+      message="Please wait while we process your request"
+    />
+
+    <!-- Page Content -->
+    <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+      <!-- ... -->
+    </div>
+  </div>
+</template>
+```
+
+**With Progress Steps (for multi-step operations):**
+
+```vue
+<LoadingOverlay
+  v-if="processing"
+  title="Processing..."
+  :current-step="2"
+  :total-steps="5"
+  step-description="Validating data..."
+/>
+```
+
+### When to Use Full-Page Loading Overlay
+
+**Always use for:**
+
+- Saving draft documents (deliveries, issues, transfers)
+- Posting/submitting transactions
+- Approval actions (approve, reject)
+- Period close operations
+- Any operation that modifies data and should prevent concurrent edits
+
+**Do NOT use for:**
+
+- Initial page data loading (use skeleton loaders or inline spinners)
+- Background refreshes that don't require user attention
+- Quick operations that complete in < 500ms
+
+### Common Loading State Variables
+
+Use descriptive boolean state variables tied to specific operations:
+
+```typescript
+const savingDraft = ref(false);   // For draft save operations
+const saving = ref(false);        // For update/save operations
+const posting = ref(false);       // For post/submit operations
+const approving = ref(false);     // For approval actions
+const deleting = ref(false);      // For delete operations
+```
+
+### Loading Messages by Operation Type
+
+| Operation       | Title                   | Message                                            |
+| --------------- | ----------------------- | -------------------------------------------------- |
+| **Save Draft**  | "Saving Draft..."       | "Please wait while we save your delivery draft"    |
+| **Save**        | "Saving Changes..."     | "Please wait while we save your changes"           |
+| **Post**        | "Posting Delivery..."   | "Please wait while we process your delivery"       |
+| **Approve**     | "Approving..."          | "Please wait while we process your approval"       |
+| **Reject**      | "Rejecting..."          | "Please wait while we process your rejection"      |
+| **Delete**      | "Deleting..."           | "Please wait while we remove the item"             |
+| **Period Close**| "Closing Period..."     | "Please wait while we close the accounting period" |
+
+### Implementation Checklist
+
+When adding async operations to a page:
+
+- [ ] Add appropriate loading state variable (`saving`, `posting`, etc.)
+- [ ] Set loading state to `true` before API call
+- [ ] Set loading state to `false` in both success and error handlers (use `finally`)
+- [ ] Add `<LoadingOverlay>` component with `v-if` bound to loading state
+- [ ] Use descriptive title and message for the operation
+- [ ] Test that UI is properly blocked during operation
+- [ ] Test that overlay dismisses on both success and error
+
+---
+
 ## Code Formatting Standards
 
 **CRITICAL:** All code must follow the project's Prettier configuration to ensure consistency with VS Code's format-on-save.
@@ -1809,6 +1934,13 @@ When creating a new page, ensure:
 - [ ] Rounded buttons use `rounded-full` with appropriate padding
 - [ ] Dropdown menus use `onSelect` handler
 
+### Async Operations
+
+- [ ] All save/post operations use `<LoadingOverlay>` to block UI
+- [ ] Loading state variables are descriptive (`savingDraft`, `posting`, etc.)
+- [ ] Loading overlay has appropriate title and message
+- [ ] Loading state resets in both success and error handlers
+
 ### Form Layout
 
 - [ ] Form fields use responsive grid: `grid grid-cols-1 lg:grid-cols-2 gap-6`
@@ -1881,6 +2013,7 @@ When creating a new page, ensure:
 | **Dropdown Handler**            | Use `onSelect` (not `click`)                                                      |
 | **Form Layout - Standard**      | `grid grid-cols-1 lg:grid-cols-2 gap-6`, all inputs `w-full`                      |
 | **Form Layout - Single Column** | `space-y-6`, fields use `w-full lg:w-1/2`                                         |
+| **Async Operations**            | Use `<LoadingOverlay>` for all save/post operations to block entire UI            |
 
 ---
 

@@ -391,6 +391,20 @@
         </UButton>
       </template>
     </EmptyState>
+
+    <!-- Loading Overlay for Save -->
+    <LoadingOverlay
+      v-if="saving"
+      title="Saving Changes..."
+      message="Please wait while we save your delivery draft"
+    />
+
+    <!-- Loading Overlay for Posting -->
+    <LoadingOverlay
+      v-if="posting"
+      title="Posting Delivery..."
+      message="Please wait while we process your delivery"
+    />
   </div>
 </template>
 
