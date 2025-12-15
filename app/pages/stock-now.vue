@@ -263,6 +263,36 @@ const consolidatedColumns = [
   },
 ];
 
+// Status filter dropdown items
+const statusFilterItems = computed(() => [
+  [
+    {
+      label: "All Items",
+      icon: "i-lucide-list",
+      active: !showLowStockOnly.value,
+      onSelect: () => {
+        showLowStockOnly.value = false;
+      },
+    },
+    {
+      label: "Low Stock Only",
+      icon: "i-lucide-alert-triangle",
+      active: showLowStockOnly.value,
+      onSelect: () => {
+        showLowStockOnly.value = true;
+      },
+    },
+  ],
+]);
+
+const statusFilterIcon = computed(() => {
+  return showLowStockOnly.value ? "i-lucide-alert-triangle" : "i-lucide-list";
+});
+
+const statusFilterLabel = computed(() => {
+  return showLowStockOnly.value ? "Low Stock" : "All Items";
+});
+
 // Methods
 const fetchStockData = async () => {
   if (!activeLocationId.value && viewMode.value === "single") {
@@ -352,11 +382,6 @@ const handleViewModeChange = (mode: "single" | "consolidated") => {
   fetchStockData();
 };
 
-const applyFilters = () => {
-  // Filters are reactive, so just refetch
-  // fetchStockData() // Not needed since filters are applied in computed
-};
-
 const clearFilters = () => {
   searchQuery.value = "";
   selectedCategory.value = "";
@@ -399,7 +424,7 @@ const exportToCSV = () => {
         item.item_category || "",
         item.on_hand.toFixed(4),
         item.wac.toFixed(4),
-        item.value.toFixed(2),
+        item.value?.toFixed(2) || item.stock_value?.toFixed(2) || "0.00",
       ].join(",");
       csvContent += row + "\n";
     });
@@ -446,49 +471,63 @@ watch(
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Stock Now"
-      icon="i-lucide-package"
-      :show-location="true"
-      :show-period="true"
-      :location-scope="viewMode === 'consolidated' ? 'all' : 'current'"
-    >
-      <template #actions>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Responsive icon size - NO background, NO border -->
+        <UIcon name="i-lucide-package" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <div>
+          <!-- Responsive title size -->
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Stock Now</h1>
+          <!-- Description: hidden on mobile, visible on sm+ -->
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Real-time inventory levels across locations
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
         <!-- View Mode Toggle (Supervisor/Admin only) -->
-        <UFieldGroup v-if="isAtLeastSupervisor" size="sm">
-          <UButton
-            :color="viewMode === 'single' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'single' ? 'solid' : 'outline'"
+        <div v-if="isAtLeastSupervisor" class="hidden lg:flex items-center gap-1 p-1 bg-muted rounded-full">
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+            :class="viewMode === 'single' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-default hover:bg-elevated'"
             @click="handleViewModeChange('single')"
           >
             Single Location
-          </UButton>
-          <UButton
-            :color="viewMode === 'consolidated' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'consolidated' ? 'solid' : 'outline'"
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
+            :class="viewMode === 'consolidated' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-default hover:bg-elevated'"
             @click="handleViewModeChange('consolidated')"
           >
             All Locations
-          </UButton>
-        </UFieldGroup>
+          </button>
+        </div>
 
         <!-- Export Button -->
         <UButton
           icon="i-lucide-download"
           color="neutral"
           variant="outline"
-          @click="exportToCSV"
+          size="lg"
+          class="cursor-pointer rounded-full px-3 sm:px-5"
           :disabled="loading || totalItems === 0"
+          @click="exportToCSV"
         >
-          Export CSV
+          <span class="hidden sm:inline">Export CSV</span>
         </UButton>
-      </template>
-    </LayoutPageHeader>
+      </div>
+    </div>
 
     <!-- Location Selector (when in single location mode and supervisor/admin) -->
-    <div v-if="isAtLeastSupervisor && viewMode === 'single'" class="card-elevated p-4">
+    <UCard
+      v-if="isAtLeastSupervisor && viewMode === 'single'"
+      class="card-elevated"
+      :ui="{ body: 'p-3 sm:p-4' }"
+    >
       <UFormField label="Select Location">
         <USelectMenu
           v-model="selectedLocationId"
@@ -500,125 +539,177 @@ watch(
           "
           placeholder="Select a location"
           value-attribute="value"
+          class="w-full"
           @update:model-value="handleLocationChange"
         />
       </UFormField>
-    </div>
+    </UCard>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <!-- Total Inventory Value -->
-      <div class="card-elevated p-6">
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-caption">Total Inventory Value</p>
-            <p class="text-heading font-bold text-primary mt-1">
+            <p class="text-sm text-[var(--ui-text-muted)]">Total Inventory Value</p>
+            <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
               {{ formatCurrency(totalInventoryValue) }}
             </p>
           </div>
-          <div class="w-12 h-12 rounded-lg bg-(--ui-primary)/10 flex items-center justify-center">
-            <UIcon name="i-lucide-coins" class="text-2xl text-primary" />
-          </div>
+          <UIcon name="i-lucide-coins" class="w-10 h-10 text-emerald-500" />
         </div>
-      </div>
+      </UCard>
 
       <!-- Total Items -->
-      <div class="card-elevated p-6">
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-caption">Total Items</p>
-            <p class="text-heading font-bold text-default mt-1">
+            <p class="text-sm text-[var(--ui-text-muted)]">Total Items</p>
+            <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
               {{ totalItems }}
             </p>
           </div>
-          <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-            <UIcon name="i-lucide-boxes" class="text-2xl text-emerald-500" />
-          </div>
+          <UIcon name="i-lucide-boxes" class="w-10 h-10 text-blue-500" />
         </div>
-      </div>
+      </UCard>
 
       <!-- Locations (consolidated view only) -->
-      <div v-if="viewMode === 'consolidated' && consolidatedData" class="card-elevated p-6">
+      <UCard
+        v-if="viewMode === 'consolidated' && consolidatedData"
+        class="card-elevated"
+        :ui="{ body: 'p-3 sm:p-4' }"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-caption">Active Locations</p>
-            <p class="text-heading font-bold text-default mt-1">
+            <p class="text-sm text-[var(--ui-text-muted)]">Active Locations</p>
+            <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
               {{ consolidatedData.total_locations }}
             </p>
           </div>
-          <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-            <UIcon name="i-lucide-map-pin" class="text-2xl text-blue-500" />
-          </div>
+          <UIcon name="i-lucide-map-pin" class="w-10 h-10 text-blue-500" />
         </div>
-      </div>
+      </UCard>
 
       <!-- Current Location (single view only) -->
-      <div v-else-if="currentLocationData" class="card-elevated p-6">
+      <UCard
+        v-else-if="currentLocationData"
+        class="card-elevated"
+        :ui="{ body: 'p-3 sm:p-4' }"
+      >
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-caption">Current Location</p>
-            <p class="text-subheading text-default mt-1">
+            <p class="text-sm text-[var(--ui-text-muted)]">Current Location</p>
+            <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
               {{ currentLocationData.location_name }}
             </p>
-            <p class="text-caption">
+            <p class="text-sm text-[var(--ui-text-muted)]">
               {{ currentLocationData.location_code }}
             </p>
           </div>
-          <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-            <UIcon name="i-lucide-warehouse" class="text-2xl text-blue-500" />
-          </div>
+          <UIcon name="i-lucide-warehouse" class="w-10 h-10 text-blue-500" />
         </div>
-      </div>
+      </UCard>
     </div>
 
     <!-- Filters Section -->
-    <div class="card-elevated p-6 mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <!-- Desktop: Single row layout (lg and above) -->
+      <div class="hidden lg:flex items-center gap-3">
         <!-- Search -->
-        <UFormField label="Search">
+        <div class="flex-1 min-w-0 max-w-md">
           <UInput
             v-model="searchQuery"
+            placeholder="Search by name or code..."
             icon="i-lucide-search"
-            placeholder="Search by item name or code..."
+            size="lg"
+            class="w-full"
           />
-        </UFormField>
+        </div>
 
         <!-- Category Filter -->
-        <UFormField label="Category">
-          <USelectMenu
-            v-model="selectedCategory"
-            :options="[
-              { label: 'All Categories', value: '' },
-              ...categories.map((cat) => ({ label: cat, value: cat })),
-            ]"
-            placeholder="Filter by category"
-            value-attribute="value"
-          />
-        </UFormField>
+        <USelectMenu
+          v-model="selectedCategory"
+          :options="[
+            { label: 'All Categories', value: '' },
+            ...categories.map((cat) => ({ label: cat, value: cat })),
+          ]"
+          placeholder="Category"
+          value-attribute="value"
+          size="lg"
+          class="w-48"
+        />
 
-        <!-- Low Stock Toggle -->
-        <UFormField label="Stock Status">
-          <UCheckbox v-model="showLowStockOnly" label="Show low stock only" />
-        </UFormField>
+        <!-- Status Dropdown (Far Right) -->
+        <UDropdownMenu :items="statusFilterItems" class="ml-auto">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="statusFilterIcon" class="w-4 h-4 mr-2" />
+            {{ statusFilterLabel }}
+          </UButton>
+        </UDropdownMenu>
 
-        <!-- Filter Actions -->
-        <UFormField label="Actions">
-          <div class="flex gap-2">
-            <UButton color="neutral" variant="outline" @click="clearFilters" block>Clear</UButton>
-          </div>
-        </UFormField>
+        <!-- Clear Filters Button -->
+        <UButton
+          v-if="searchQuery || selectedCategory || showLowStockOnly"
+          color="neutral"
+          variant="ghost"
+          size="lg"
+          icon="i-lucide-x"
+          class="cursor-pointer"
+          @click="clearFilters"
+        >
+          Clear
+        </UButton>
       </div>
-    </div>
+
+      <!-- Mobile: Search and Status only - NO category filter (below lg) -->
+      <div class="flex items-center gap-3 lg:hidden">
+        <div class="flex-1 min-w-0">
+          <UInput
+            v-model="searchQuery"
+            placeholder="Search..."
+            icon="i-lucide-search"
+            size="lg"
+            class="w-full"
+          />
+        </div>
+        <UDropdownMenu :items="statusFilterItems">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-3"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="statusFilterIcon" class="w-4 h-4" />
+          </UButton>
+        </UDropdownMenu>
+        <UButton
+          v-if="searchQuery || selectedCategory || showLowStockOnly"
+          color="neutral"
+          variant="ghost"
+          size="lg"
+          icon="i-lucide-x"
+          class="cursor-pointer px-3"
+          @click="clearFilters"
+        />
+      </div>
+    </UCard>
 
     <!-- Stock Table -->
-    <div class="card-elevated">
+    <UCard class="card-elevated">
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-16">
         <LoadingSpinner size="lg" text="Loading stock data..." />
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error">
+      <div v-else-if="error" class="p-6">
         <ErrorAlert :message="error" :retry="fetchStockData" />
       </div>
 
@@ -636,18 +727,18 @@ watch(
       </div>
 
       <!-- Stock Table - Single Location View -->
-      <div v-else-if="viewMode === 'single'" class="p-6">
+      <div v-else-if="viewMode === 'single'" class="overflow-x-auto">
         <UTable :columns="stockColumns" :data="filteredStock as StockItem[]" class="w-full">
           <!-- Item Code -->
           <template #item_code-data="{ row }">
-            <span class="font-mono text-body">{{ (row as any).item_code }}</span>
+            <span class="font-mono text-sm">{{ (row as any).item_code }}</span>
           </template>
 
           <!-- Item Name -->
           <template #item_name-data="{ row }">
             <div>
-              <p class="font-medium">{{ (row as any).item_name }}</p>
-              <p v-if="(row as any).item_sub_category" class="text-caption">
+              <p class="font-medium text-[var(--ui-text)]">{{ (row as any).item_name }}</p>
+              <p v-if="(row as any).item_sub_category" class="text-sm text-[var(--ui-text-muted)]">
                 {{ (row as any).item_sub_category }}
               </p>
             </div>
@@ -655,7 +746,7 @@ watch(
 
           <!-- Unit -->
           <template #item_unit-data="{ row }">
-            <span class="text-body">{{ (row as any).item_unit }}</span>
+            <span class="text-sm">{{ (row as any).item_unit }}</span>
           </template>
 
           <!-- Category -->
@@ -663,7 +754,7 @@ watch(
             <UBadge v-if="(row as any).item_category" color="neutral" variant="subtle">
               {{ (row as any).item_category }}
             </UBadge>
-            <span v-else class="text-muted">-</span>
+            <span v-else class="text-[var(--ui-text-muted)]">-</span>
           </template>
 
           <!-- On Hand -->
@@ -678,18 +769,20 @@ watch(
 
           <!-- WAC -->
           <template #wac-data="{ row }">
-            <span class="text-body">{{ formatCurrency((row as any).wac) }}</span>
+            <span class="text-sm">{{ formatCurrency((row as any).wac) }}</span>
           </template>
 
           <!-- Value -->
           <template #value-data="{ row }">
-            <span class="font-semibold">{{ formatCurrency((row as any).stock_value || (row as any).value || 0) }}</span>
+            <span class="font-semibold">{{
+              formatCurrency((row as any).stock_value || (row as any).value || 0)
+            }}</span>
           </template>
         </UTable>
       </div>
 
       <!-- Stock Table - Consolidated View -->
-      <div v-else-if="viewMode === 'consolidated'" class="p-6">
+      <div v-else-if="viewMode === 'consolidated'" class="overflow-x-auto">
         <UTable
           :columns="consolidatedColumns"
           :data="filteredStock as ConsolidatedStockItem[]"
@@ -697,14 +790,14 @@ watch(
         >
           <!-- Item Code -->
           <template #item_code-data="{ row }">
-            <span class="font-mono text-body">{{ (row as any).item_code }}</span>
+            <span class="font-mono text-sm">{{ (row as any).item_code }}</span>
           </template>
 
           <!-- Item Name -->
           <template #item_name-data="{ row }">
             <div>
-              <p class="font-medium">{{ (row as any).item_name }}</p>
-              <p v-if="(row as any).item_sub_category" class="text-caption">
+              <p class="font-medium text-[var(--ui-text)]">{{ (row as any).item_name }}</p>
+              <p v-if="(row as any).item_sub_category" class="text-sm text-[var(--ui-text-muted)]">
                 {{ (row as any).item_sub_category }}
               </p>
             </div>
@@ -712,7 +805,7 @@ watch(
 
           <!-- Unit -->
           <template #item_unit-data="{ row }">
-            <span class="text-body">{{ (row as any).item_unit }}</span>
+            <span class="text-sm">{{ (row as any).item_unit }}</span>
           </template>
 
           <!-- Category -->
@@ -720,7 +813,7 @@ watch(
             <UBadge v-if="(row as any).item_category" color="neutral" variant="subtle">
               {{ (row as any).item_category }}
             </UBadge>
-            <span v-else class="text-muted">-</span>
+            <span v-else class="text-[var(--ui-text-muted)]">-</span>
           </template>
 
           <!-- Total On Hand -->
@@ -752,6 +845,6 @@ watch(
           </template>
         </UTable>
       </div>
-    </div>
+    </UCard>
   </div>
 </template>

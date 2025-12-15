@@ -92,6 +92,36 @@ const hasData = computed(() => {
   return reportData.value && reportData.value.locations.length > 0;
 });
 
+// Status filter dropdown items
+const statusFilterItems = computed(() => [
+  [
+    {
+      label: "All Items",
+      icon: "i-lucide-list",
+      active: !showLowStockOnly.value,
+      onSelect: () => {
+        showLowStockOnly.value = false;
+      },
+    },
+    {
+      label: "Low Stock Only",
+      icon: "i-lucide-alert-triangle",
+      active: showLowStockOnly.value,
+      onSelect: () => {
+        showLowStockOnly.value = true;
+      },
+    },
+  ],
+]);
+
+const statusFilterIcon = computed(() => {
+  return showLowStockOnly.value ? "i-lucide-alert-triangle" : "i-lucide-list";
+});
+
+const statusFilterLabel = computed(() => {
+  return showLowStockOnly.value ? "Low Stock" : "All Items";
+});
+
 // Table columns
 const columns = [
   { accessorKey: "item_code", header: "Code" },
@@ -201,44 +231,118 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Stock Now Report"
-      subtitle="Current inventory levels across locations"
-      icon="i-lucide-package"
-      :show-location="false"
-      :show-period="false"
-    >
-      <template #actions>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Responsive icon size - NO background, NO border -->
+        <UIcon name="i-lucide-package" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <div>
+          <!-- Responsive title size -->
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Stock Now Report</h1>
+          <!-- Description: hidden on mobile, visible on sm+ -->
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Current inventory levels across locations
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Back Button -->
         <UButton
           icon="i-lucide-arrow-left"
           color="neutral"
           variant="ghost"
+          size="lg"
           to="/reports"
-          class="cursor-pointer"
+          class="cursor-pointer px-3 sm:px-5"
         >
-          Back to Reports
+          <span class="hidden sm:inline">Back</span>
         </UButton>
+        <!-- Export Button -->
         <UButton
           icon="i-lucide-download"
           color="primary"
+          size="lg"
           :disabled="loading || !hasData"
-          class="cursor-pointer"
+          class="cursor-pointer rounded-full px-3 sm:px-5"
           @click="exportToCSV"
         >
-          Export CSV
+          <span class="hidden sm:inline">Export CSV</span>
         </UButton>
-      </template>
-    </LayoutPageHeader>
+      </div>
+    </div>
 
     <!-- Filters -->
-    <div class="card-elevated p-6 mb-6">
-      <h3 class="text-subheading font-semibold mb-4">Filters</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-4">Filters</h3>
+
+      <!-- Desktop: Single row layout (lg and above) -->
+      <div class="hidden lg:flex items-center gap-3">
         <!-- Location Filter -->
-        <UFormField v-if="isAtLeastSupervisor" label="Location">
+        <USelectMenu
+          v-if="isAtLeastSupervisor"
+          v-model="selectedLocationId"
+          :options="[
+            { label: 'All Locations', value: '' },
+            ...locationStore.userLocations.map((loc) => ({
+              label: `${loc.name} (${loc.code})`,
+              value: loc.id,
+            })),
+          ]"
+          placeholder="Select location"
+          value-attribute="value"
+          size="lg"
+          class="w-64"
+        />
+
+        <!-- Category Filter -->
+        <USelectMenu
+          v-model="selectedCategory"
+          :options="[
+            { label: 'All Categories', value: '' },
+            ...categories.map((cat) => ({ label: cat, value: cat })),
+          ]"
+          placeholder="Select category"
+          value-attribute="value"
+          size="lg"
+          class="w-48"
+        />
+
+        <!-- Status Dropdown (Far Right) -->
+        <UDropdownMenu :items="statusFilterItems" class="ml-auto">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+          >
+            <UIcon :name="statusFilterIcon" class="w-4 h-4 mr-2" />
+            {{ statusFilterLabel }}
+          </UButton>
+        </UDropdownMenu>
+
+        <!-- Generate and Clear Buttons -->
+        <UButton color="primary" size="lg" class="cursor-pointer rounded-full" @click="fetchReport">
+          Generate
+        </UButton>
+        <UButton
+          color="neutral"
+          variant="outline"
+          size="lg"
+          class="cursor-pointer rounded-full"
+          @click="clearFilters"
+        >
+          Clear
+        </UButton>
+      </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Location and Category Filters -->
+        <div class="grid grid-cols-1 gap-3">
           <USelectMenu
+            v-if="isAtLeastSupervisor"
             v-model="selectedLocationId"
             :options="[
               { label: 'All Locations', value: '' },
@@ -247,159 +351,179 @@ onMounted(async () => {
                 value: loc.id,
               })),
             ]"
-            placeholder="Select location"
+            placeholder="Location"
             value-attribute="value"
+            size="lg"
+            class="w-full"
           />
-        </UFormField>
-
-        <!-- Category Filter -->
-        <UFormField label="Category">
           <USelectMenu
             v-model="selectedCategory"
             :options="[
               { label: 'All Categories', value: '' },
               ...categories.map((cat) => ({ label: cat, value: cat })),
             ]"
-            placeholder="Select category"
+            placeholder="Category"
             value-attribute="value"
+            size="lg"
+            class="w-full"
           />
-        </UFormField>
+        </div>
 
-        <!-- Low Stock Filter -->
-        <UFormField label="Stock Status">
-          <UCheckbox v-model="showLowStockOnly" label="Low stock items only" />
-        </UFormField>
-
-        <!-- Actions -->
-        <UFormField label="Actions">
-          <div class="flex gap-2">
-            <UButton color="primary" class="cursor-pointer" @click="fetchReport">Generate</UButton>
-            <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
-              Clear
+        <!-- Status and Action Buttons -->
+        <div class="flex items-center gap-2">
+          <UDropdownMenu :items="statusFilterItems" class="flex-1">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer w-full"
+              trailing-icon="i-lucide-chevron-down"
+            >
+              <UIcon :name="statusFilterIcon" class="w-4 h-4 mr-2" />
+              {{ statusFilterLabel }}
             </UButton>
-          </div>
-        </UFormField>
+          </UDropdownMenu>
+          <UButton
+            color="primary"
+            size="lg"
+            class="cursor-pointer"
+            icon="i-lucide-refresh-cw"
+            @click="fetchReport"
+          />
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer"
+            icon="i-lucide-x"
+            @click="clearFilters"
+          />
+        </div>
       </div>
-    </div>
+    </UCard>
 
     <!-- Loading State -->
-    <div v-if="loading" class="card-elevated p-12">
+    <div v-if="loading" class="flex items-center justify-center py-16">
       <LoadingSpinner size="lg" text="Generating report..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="card-elevated p-6">
+    <div v-else-if="error">
       <ErrorAlert :message="error" :retry="fetchReport" />
     </div>
 
     <!-- Report Content -->
     <template v-else-if="reportData">
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Locations</p>
-          <p class="text-heading font-bold text-primary">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Locations</p>
+          <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
             {{ reportData.grand_totals.total_locations }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Items</p>
-          <p class="text-heading font-bold">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Items</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
             {{ reportData.grand_totals.total_items.toLocaleString() }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Value</p>
-          <p class="text-heading font-bold text-emerald-500">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Value</p>
+          <p class="text-2xl sm:text-3xl font-bold text-emerald-500 mt-1">
             {{ formatCurrency(reportData.grand_totals.total_value) }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Low Stock Items</p>
-          <p class="text-heading font-bold text-red-500">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Low Stock</p>
+          <p class="text-2xl sm:text-3xl font-bold text-red-500 mt-1">
             {{ reportData.grand_totals.low_stock_items }}
           </p>
-        </div>
+        </UCard>
       </div>
 
       <!-- Report Info -->
-      <div class="card-elevated p-4 mb-6">
-        <div class="flex flex-wrap gap-4 text-caption">
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="flex flex-wrap gap-4 text-sm text-[var(--ui-text-muted)]">
           <span>
-            <strong>Generated:</strong>
+            <strong class="text-[var(--ui-text)]">Generated:</strong>
             {{ formatDateTime(reportData.generated_at) }}
           </span>
           <span>
-            <strong>Generated By:</strong>
+            <strong class="text-[var(--ui-text)]">Generated By:</strong>
             {{ reportData.generated_by.username }}
           </span>
           <span v-if="reportData.filters.location_id">
-            <strong>Location:</strong>
+            <strong class="text-[var(--ui-text)]">Location:</strong>
             {{
               locationStore.userLocations.find((l) => l.id === reportData?.filters.location_id)
                 ?.name
             }}
           </span>
           <span v-if="reportData.filters.category">
-            <strong>Category:</strong>
+            <strong class="text-[var(--ui-text)]">Category:</strong>
             {{ reportData.filters.category }}
           </span>
           <span v-if="reportData.filters.low_stock_only">
             <UBadge color="warning" variant="subtle" size="xs">Low Stock Only</UBadge>
           </span>
         </div>
-      </div>
+      </UCard>
 
       <!-- Location Tables -->
-      <div v-if="hasData" class="space-y-6">
-        <div
+      <div v-if="hasData" class="space-y-3">
+        <UCard
           v-for="location in reportData.locations"
           :key="location.location_id"
           class="card-elevated"
         >
           <!-- Location Header -->
-          <div class="p-4 border-b border-[var(--ui-border)]">
+          <template #header>
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-subheading font-semibold">{{ location.location_name }}</h3>
-                <p class="text-caption">
+                <h3 class="text-lg font-semibold text-[var(--ui-text)]">
+                  {{ location.location_name }}
+                </h3>
+                <p class="text-sm text-[var(--ui-text-muted)]">
                   {{ location.location_code }} - {{ location.location_type }}
                 </p>
               </div>
               <div class="flex gap-4 text-right">
                 <div>
-                  <p class="text-caption">Items</p>
-                  <p class="font-semibold">{{ location.total_items }}</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">Items</p>
+                  <p class="font-semibold text-[var(--ui-text)]">{{ location.total_items }}</p>
                 </div>
                 <div>
-                  <p class="text-caption">Value</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">Value</p>
                   <p class="font-semibold text-emerald-500">
                     {{ formatCurrency(location.total_value) }}
                   </p>
                 </div>
                 <div v-if="location.low_stock_items > 0">
-                  <p class="text-caption">Low Stock</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">Low Stock</p>
                   <p class="font-semibold text-red-500">{{ location.low_stock_items }}</p>
                 </div>
               </div>
             </div>
-          </div>
+          </template>
 
           <!-- Items Table -->
-          <div class="p-4 overflow-x-auto">
+          <div class="overflow-x-auto">
             <UTable :columns="columns" :data="location.items" class="w-full">
               <template #item_code-data="{ row }">
-                <span class="font-mono text-body">
+                <span class="font-mono text-sm">
                   {{ (row as unknown as StockReportItem).item_code }}
                 </span>
               </template>
 
               <template #item_name-data="{ row }">
                 <div>
-                  <p class="font-medium">{{ (row as unknown as StockReportItem).item_name }}</p>
+                  <p class="font-medium text-[var(--ui-text)]">
+                    {{ (row as unknown as StockReportItem).item_name }}
+                  </p>
                   <p
                     v-if="(row as unknown as StockReportItem).item_sub_category"
-                    class="text-caption"
+                    class="text-sm text-[var(--ui-text-muted)]"
                   >
                     {{ (row as unknown as StockReportItem).item_sub_category }}
                   </p>
@@ -415,7 +539,7 @@ onMounted(async () => {
                 >
                   {{ (row as unknown as StockReportItem).item_category }}
                 </UBadge>
-                <span v-else class="text-muted">-</span>
+                <span v-else class="text-[var(--ui-text-muted)]">-</span>
               </template>
 
               <template #on_hand-data="{ row }">
@@ -425,7 +549,9 @@ onMounted(async () => {
               </template>
 
               <template #wac-data="{ row }">
-                <span>{{ formatCurrency((row as unknown as StockReportItem).wac) }}</span>
+                <span class="text-sm">{{
+                  formatCurrency((row as unknown as StockReportItem).wac)
+                }}</span>
               </template>
 
               <template #stock_value-data="{ row }">
@@ -457,7 +583,7 @@ onMounted(async () => {
                       !(row as unknown as StockReportItem).is_low_stock &&
                       !(row as unknown as StockReportItem).is_over_stock
                     "
-                    class="text-muted"
+                    class="text-[var(--ui-text-muted)]"
                   >
                     -
                   </span>
@@ -465,11 +591,11 @@ onMounted(async () => {
               </template>
             </UTable>
           </div>
-        </div>
+        </UCard>
       </div>
 
       <!-- Empty State -->
-      <div v-else class="card-elevated p-12">
+      <div v-else class="py-16">
         <EmptyState
           icon="i-lucide-package-x"
           title="No stock data"
