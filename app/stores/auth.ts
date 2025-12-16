@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import { useLocationStore } from "~/stores/location";
+import { usePeriodStore } from "~/stores/period";
 
 // Type definition for the user object in the session
 export interface SessionUser {
@@ -143,6 +145,13 @@ export const useAuthStore = defineStore("auth", {
 
         if (response.success) {
           this.user = null;
+
+          // Reset related stores to clear cached data from previous user
+          const locationStore = useLocationStore();
+          const periodStore = usePeriodStore();
+          locationStore.reset();
+          periodStore.reset();
+
           return { success: true };
         }
 

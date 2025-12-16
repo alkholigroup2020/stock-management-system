@@ -58,24 +58,27 @@ const formData = reactive({
   default_location_id: undefined as string | undefined,
 });
 
-// Role options
+// Role options - with location access info
 const roleOptions = [
   {
     value: "OPERATOR",
     label: "Operator",
-    description: "Can post transactions and view stock",
+    description: "Post transactions at assigned locations only",
   },
   {
     value: "SUPERVISOR",
     label: "Supervisor",
-    description: "Can approve transfers and edit reconciliations",
+    description: "All locations access - approve transfers & reconciliations",
   },
   {
     value: "ADMIN",
     label: "Admin",
-    description: "Full system access and management",
+    description: "Full system access - all locations with complete control",
   },
 ];
+
+// Check if selected role is OPERATOR
+const isOperatorRole = computed(() => formData.role === "OPERATOR");
 
 // Location options
 const locationOptions = computed(() => [
@@ -347,7 +350,11 @@ useHead({
             <UFormField
               label="Default Location"
               name="default_location_id"
-              help="User will automatically receive access to this location"
+              :help="
+                isOperatorRole
+                  ? 'User will automatically receive access to this location'
+                  : 'Optional: User\'s default working location (preference only)'
+              "
             >
               <USelectMenu
                 v-model="formData.default_location_id"
@@ -363,6 +370,64 @@ useHead({
                 </template>
               </USelectMenu>
             </UFormField>
+          </div>
+
+          <!-- Role-based Location Access Info -->
+          <div class="mt-6">
+            <!-- OPERATOR: Needs location assignment -->
+            <div
+              v-if="isOperatorRole"
+              class="p-4 rounded-lg bg-primary/10 border border-primary"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon name="i-lucide-info" class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p class="font-semibold text-primary mb-1">Location Assignment Required</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">
+                    <strong>Operators</strong> can only access their assigned locations. After
+                    creating this user, you will need to assign specific locations on the user's
+                    edit page. If you select a Default Location above, it will be automatically
+                    assigned with POST access.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUPERVISOR: All locations automatically -->
+            <div
+              v-else-if="formData.role === 'SUPERVISOR'"
+              class="p-4 rounded-lg bg-success/10 border border-success"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon name="i-lucide-globe" class="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                <div>
+                  <p class="font-semibold text-success mb-1">All Locations Access</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">
+                    <strong>Supervisors</strong> automatically have access to all locations in
+                    the system. No manual location assignment is required. The Default Location
+                    is only used as a preference for which location to display first on login.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADMIN: Full system access -->
+            <div
+              v-else
+              class="p-4 rounded-lg bg-success/10 border border-success"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                <div>
+                  <p class="font-semibold text-success mb-1">Full System Access</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">
+                    <strong>Admins</strong> automatically have full access to all locations
+                    with complete control (MANAGE level). They can manage users, items, prices,
+                    and close periods. No manual location assignment is required.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </UCard>
 

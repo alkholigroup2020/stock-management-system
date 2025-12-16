@@ -46,7 +46,7 @@ const deliveryLineSchema = z.object({
 const bodySchema = z.object({
   supplier_id: z.string().uuid(),
   po_id: z.string().uuid().nullable().optional(),
-  invoice_no: z.string().min(1).optional(), // Optional for drafts, required for posting
+  invoice_no: z.string().min(1).nullable().optional(), // Optional for drafts, required for posting
   delivery_note: z.string().nullable().optional(),
   delivery_date: z.string(), // ISO date string
   lines: z.array(deliveryLineSchema).min(1),

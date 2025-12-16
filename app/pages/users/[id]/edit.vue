@@ -92,24 +92,48 @@ const formData = reactive({
   password: "",
 });
 
-// Role options
+// Role options - with location access info
 const roleOptions = [
   {
     value: "OPERATOR",
     label: "Operator",
-    description: "Can post transactions and view stock",
+    description: "Post transactions at assigned locations only",
   },
   {
     value: "SUPERVISOR",
     label: "Supervisor",
-    description: "Can approve transfers and edit reconciliations",
+    description: "All locations access - approve transfers & reconciliations",
   },
   {
     value: "ADMIN",
     label: "Admin",
-    description: "Full system access and management",
+    description: "Full system access - all locations with complete control",
   },
 ];
+
+// Check if the FORM role is OPERATOR (for showing location management)
+const isOperatorRole = computed(() => formData.role === "OPERATOR");
+
+// Check if the ORIGINAL role was OPERATOR (for role change warnings)
+const wasOperatorRole = computed(() => user.value?.role === "OPERATOR");
+
+// Show warning when changing role that affects location access
+const showRoleChangeWarning = computed(() => {
+  if (!user.value) return false;
+  const originalRole = user.value.role;
+  const newRole = formData.role;
+  if (originalRole === newRole) return false;
+
+  // Warn when changing from OPERATOR to SUPERVISOR/ADMIN (locations become irrelevant)
+  if (originalRole === "OPERATOR" && (newRole === "SUPERVISOR" || newRole === "ADMIN")) {
+    return "upgrading";
+  }
+  // Warn when changing from SUPERVISOR/ADMIN to OPERATOR (needs location assignment)
+  if ((originalRole === "SUPERVISOR" || originalRole === "ADMIN") && newRole === "OPERATOR") {
+    return "downgrading";
+  }
+  return false;
+});
 
 // Location options
 const locationOptions = computed(() => [
@@ -582,6 +606,41 @@ useHead({
               />
             </div>
           </div>
+
+          <!-- Role Change Warning - Location Access Impact -->
+          <div
+            v-if="showRoleChangeWarning === 'upgrading'"
+            class="mt-6 p-4 rounded-lg bg-primary/10 border border-primary"
+          >
+            <div class="flex items-start gap-3">
+              <UIcon name="i-lucide-info" class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p class="font-semibold text-primary mb-1">Role Upgrade - Location Access Change</p>
+                <p class="text-sm text-[var(--ui-text-muted)]">
+                  Changing to <strong>{{ formData.role }}</strong> will grant this user automatic
+                  access to <strong>all locations</strong>. The current location assignments will no
+                  longer be enforced.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-if="showRoleChangeWarning === 'downgrading'"
+            class="mt-6 p-4 rounded-lg bg-warning/10 border border-warning"
+          >
+            <div class="flex items-start gap-3">
+              <UIcon name="i-lucide-alert-triangle" class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+              <div>
+                <p class="font-semibold text-warning mb-1">Role Downgrade - Location Access Required</p>
+                <p class="text-sm text-[var(--ui-text-muted)]">
+                  Changing to <strong>Operator</strong> will restrict this user to only their
+                  assigned locations. After saving, you must assign at least one location for
+                  this user to work effectively.
+                </p>
+              </div>
+            </div>
+          </div>
         </UCard>
 
         <!-- Change Password Section (Optional) -->
@@ -636,113 +695,185 @@ useHead({
         </UCard>
       </UForm>
 
-      <!-- Location Access Management Section -->
+      <!-- Location Access Section - Different display based on role -->
       <UCard class="card-elevated mb-6" :ui="{ body: 'p-3 sm:p-4' }">
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary" />
             <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
-              Location Access Management
+              Location Access
             </h2>
           </div>
         </template>
 
-        <!-- Current Locations -->
-        <div v-if="user.locations.length > 0" class="space-y-3 mb-6">
-          <div
-            v-for="loc in user.locations"
-            :key="loc.location_id"
-            class="flex items-center justify-between p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] smooth-transition"
-          >
-            <div class="flex items-center gap-3 flex-1 min-w-0">
-              <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary flex-shrink-0" />
-              <div class="flex-1 min-w-0">
-                <p class="font-semibold text-[var(--ui-text)]">
-                  {{ loc.location.name }}
+        <!-- SUPERVISOR/ADMIN: Show automatic access info -->
+        <div v-if="!isOperatorRole">
+          <!-- All Locations Access Info Card -->
+          <div class="p-4 rounded-lg bg-success/10 border border-success">
+            <div class="flex items-start gap-3">
+              <UIcon name="i-lucide-globe" class="w-6 h-6 text-success flex-shrink-0 mt-0.5" />
+              <div>
+                <p class="font-semibold text-success mb-2">
+                  {{ formData.role === "ADMIN" ? "Full System Access" : "All Locations Access" }}
                 </p>
-                <p class="text-caption text-[var(--ui-text-muted)] mt-0.5 truncate">
-                  {{ loc.location.code }} • {{ loc.location.type }}
+                <p class="text-sm text-[var(--ui-text-muted)] mb-3">
+                  <template v-if="formData.role === 'ADMIN'">
+                    As an <strong>Admin</strong>, this user automatically has <strong>full access</strong>
+                    to all locations in the system with complete control (MANAGE level). No manual
+                    location assignment is required.
+                  </template>
+                  <template v-else>
+                    As a <strong>Supervisor</strong>, this user automatically has <strong>access to
+                    all locations</strong> in the system. They can view, post transactions, and manage
+                    reconciliations at any location. No manual location assignment is required.
+                  </template>
                 </p>
+                <div class="flex flex-wrap gap-2">
+                  <UBadge color="success" variant="subtle" size="sm">
+                    <UIcon name="i-lucide-check" class="w-3 h-3 mr-1" />
+                    All Locations
+                  </UBadge>
+                  <UBadge color="success" variant="subtle" size="sm">
+                    <UIcon name="i-lucide-check" class="w-3 h-3 mr-1" />
+                    Automatic Access
+                  </UBadge>
+                  <UBadge v-if="formData.role === 'ADMIN'" color="success" variant="subtle" size="sm">
+                    <UIcon name="i-lucide-check" class="w-3 h-3 mr-1" />
+                    Full Control
+                  </UBadge>
+                </div>
               </div>
             </div>
-            <div class="flex items-center gap-3 flex-shrink-0">
-              <UBadge :color="getAccessLevelColor(loc.access_level)" variant="subtle" size="sm">
-                {{ loc.access_level }}
-              </UBadge>
-              <UButton
-                icon="i-lucide-trash-2"
-                color="error"
-                variant="ghost"
-                size="sm"
-                class="cursor-pointer"
-                :loading="removingLocationId === loc.location_id"
-                @click="promptRemoveLocation(loc)"
-              ></UButton>
+          </div>
+
+          <!-- Note about Default Location -->
+          <div class="mt-4 p-3 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-info" class="w-4 h-4 text-[var(--ui-text-muted)]" />
+              <p class="text-sm text-[var(--ui-text-muted)]">
+                The <strong>Default Location</strong> above is only used as a preference for which
+                location to display first when the user logs in. It does not restrict access.
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- No Locations Assigned -->
-        <div
-          v-else
-          class="text-center py-8 px-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)] mb-6"
-        >
-          <UIcon
-            name="i-lucide-map-pin-off"
-            class="w-12 h-12 text-[var(--ui-text-muted)] mx-auto mb-3"
-          />
-          <p class="text-[var(--ui-text-muted)]">No locations assigned yet</p>
-        </div>
-
-        <!-- Add New Location -->
-        <div v-if="availableLocations.length > 0" class="pt-4 border-t border-[var(--ui-border)]">
-          <h3 class="text-base font-semibold text-[var(--ui-text)] mb-4">Add Location Access</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <USelectMenu
-              v-model="selectedLocationId"
-              :items="
-                availableLocations.map((l) => ({
-                  value: l.id,
-                  label: `${l.code} - ${l.name}`,
-                }))
-              "
-              value-key="value"
-              placeholder="Select location"
-              size="lg"
-              class="w-full"
-            >
-              <template #leading>
-                <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
-              </template>
-            </USelectMenu>
-            <USelectMenu
-              v-model="selectedAccessLevel"
-              :items="accessLevelOptions"
-              value-key="value"
-              size="lg"
-              class="w-full"
-            >
-              <template #leading>
-                <UIcon name="i-lucide-key" class="w-4 h-4" />
-              </template>
-            </USelectMenu>
-            <UButton
-              icon="i-lucide-plus"
-              color="primary"
-              size="lg"
-              :disabled="!selectedLocationId || addingLocation"
-              :loading="addingLocation"
-              class="cursor-pointer w-full"
-              @click="addLocationAccess"
-            >
-              Add Location
-            </UButton>
+        <!-- OPERATOR: Show location management UI -->
+        <div v-else>
+          <!-- Operator Info Alert -->
+          <div class="p-3 rounded-lg bg-primary/10 border border-primary mb-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-info" class="w-4 h-4 text-primary" />
+              <p class="text-sm text-[var(--ui-text-muted)]">
+                <strong>Operators</strong> can only access their assigned locations. Add at least
+                one location with POST or MANAGE access for this user to post transactions.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <!-- All Locations Assigned -->
-        <div v-else class="pt-4 border-t border-[var(--ui-border)] text-center pt-4">
-          <p class="text-[var(--ui-text-muted)]">All locations have been assigned</p>
+          <!-- Current Locations -->
+          <div v-if="user.locations.length > 0" class="space-y-3 mb-6">
+            <div
+              v-for="loc in user.locations"
+              :key="loc.location_id"
+              class="flex items-center justify-between p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] smooth-transition"
+            >
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary flex-shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-[var(--ui-text)]">
+                    {{ loc.location.name }}
+                  </p>
+                  <p class="text-caption text-[var(--ui-text-muted)] mt-0.5 truncate">
+                    {{ loc.location.code }} • {{ loc.location.type }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 flex-shrink-0">
+                <UBadge :color="getAccessLevelColor(loc.access_level)" variant="subtle" size="sm">
+                  {{ loc.access_level }}
+                </UBadge>
+                <UButton
+                  icon="i-lucide-trash-2"
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  class="cursor-pointer"
+                  :loading="removingLocationId === loc.location_id"
+                  @click="promptRemoveLocation(loc)"
+                ></UButton>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Locations Assigned -->
+          <div
+            v-else
+            class="text-center py-8 px-4 rounded-lg bg-warning/10 border border-warning mb-6"
+          >
+            <UIcon
+              name="i-lucide-alert-triangle"
+              class="w-12 h-12 text-warning mx-auto mb-3"
+            />
+            <p class="font-semibold text-warning mb-1">No Locations Assigned</p>
+            <p class="text-sm text-[var(--ui-text-muted)]">
+              This operator cannot access any locations. Add at least one location below.
+            </p>
+          </div>
+
+          <!-- Add New Location -->
+          <div v-if="availableLocations.length > 0" class="pt-4 border-t border-[var(--ui-border)]">
+            <h3 class="text-base font-semibold text-[var(--ui-text)] mb-4">Add Location Access</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <USelectMenu
+                v-model="selectedLocationId"
+                :items="
+                  availableLocations.map((l) => ({
+                    value: l.id,
+                    label: `${l.code} - ${l.name}`,
+                  }))
+                "
+                value-key="value"
+                placeholder="Select location"
+                size="lg"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
+                </template>
+              </USelectMenu>
+              <USelectMenu
+                v-model="selectedAccessLevel"
+                :items="accessLevelOptions"
+                value-key="value"
+                size="lg"
+                class="w-full"
+              >
+                <template #leading>
+                  <UIcon name="i-lucide-key" class="w-4 h-4" />
+                </template>
+              </USelectMenu>
+              <UButton
+                icon="i-lucide-plus"
+                color="primary"
+                size="lg"
+                :disabled="!selectedLocationId || addingLocation"
+                :loading="addingLocation"
+                class="cursor-pointer w-full"
+                @click="addLocationAccess"
+              >
+                Add Location
+              </UButton>
+            </div>
+          </div>
+
+          <!-- All Locations Assigned -->
+          <div
+            v-else-if="user.locations.length > 0"
+            class="pt-4 border-t border-[var(--ui-border)] text-center"
+          >
+            <p class="text-[var(--ui-text-muted)]">All locations have been assigned</p>
+          </div>
         </div>
       </UCard>
 

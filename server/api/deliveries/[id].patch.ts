@@ -260,8 +260,10 @@ export default defineEventHandler(async (event) => {
     // Increase timeout to 30 seconds to handle multiple line items and stock updates
     const result = await prisma.$transaction(
       async (tx) => {
-        // Delete existing lines if new lines provided
-        if (data.lines) {
+        // Delete existing lines if new lines provided OR if we're posting
+        // When posting without explicit lines, we use existing lines as fallback (line 200),
+        // but we still need to delete them first to avoid duplication
+        if (data.lines || isPosting) {
           await tx.deliveryLine.deleteMany({
             where: { delivery_id: deliveryId },
           });
