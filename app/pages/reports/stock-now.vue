@@ -282,7 +282,7 @@ onMounted(async () => {
         <USelectMenu
           v-if="isAtLeastSupervisor"
           v-model="selectedLocationId"
-          :options="[
+          :items="[
             { label: 'All Locations', value: '' },
             ...locationStore.userLocations.map((loc) => ({
               label: `${loc.name} (${loc.code})`,
@@ -290,7 +290,7 @@ onMounted(async () => {
             })),
           ]"
           placeholder="Select location"
-          value-attribute="value"
+          value-key="value"
           size="lg"
           class="w-64"
         />
@@ -298,12 +298,12 @@ onMounted(async () => {
         <!-- Category Filter -->
         <USelectMenu
           v-model="selectedCategory"
-          :options="[
+          :items="[
             { label: 'All Categories', value: '' },
             ...categories.map((cat) => ({ label: cat, value: cat })),
           ]"
           placeholder="Select category"
-          value-attribute="value"
+          value-key="value"
           size="lg"
           class="w-48"
         />
@@ -344,7 +344,7 @@ onMounted(async () => {
           <USelectMenu
             v-if="isAtLeastSupervisor"
             v-model="selectedLocationId"
-            :options="[
+            :items="[
               { label: 'All Locations', value: '' },
               ...locationStore.userLocations.map((loc) => ({
                 label: `${loc.name} (${loc.code})`,
@@ -352,18 +352,18 @@ onMounted(async () => {
               })),
             ]"
             placeholder="Location"
-            value-attribute="value"
+            value-key="value"
             size="lg"
             class="w-full"
           />
           <USelectMenu
             v-model="selectedCategory"
-            :options="[
+            :items="[
               { label: 'All Categories', value: '' },
               ...categories.map((cat) => ({ label: cat, value: cat })),
             ]"
             placeholder="Category"
-            value-attribute="value"
+            value-key="value"
             size="lg"
             class="w-full"
           />

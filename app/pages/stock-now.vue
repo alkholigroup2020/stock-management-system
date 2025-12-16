@@ -8,9 +8,9 @@
  * Features:
  * - Display stock table with item details, quantities, WAC, and values
  * - Filter by category, low stock, and search
- * - Location selector for supervisors/admins
- * - Export to CSV (optional)
+ * - Export to CSV
  * - Total inventory value display
+ * - Uses active location from nav location switcher
  */
 
 import type { LocationType } from "@prisma/client";
@@ -27,9 +27,8 @@ const toast = useAppToast();
 const loading = ref(false);
 const error = ref<string | null>(null);
 const searchQuery = ref("");
-const selectedCategory = ref<string>("");
+const selectedCategory = ref<string | null>(null);
 const showLowStockOnly = ref(false);
-const selectedLocationId = ref<string>("");
 const viewMode = ref<"single" | "consolidated">("single");
 
 // Stock data
@@ -124,11 +123,6 @@ const currentLocationData = ref<LocationStockSummary | null>(null);
 
 // Computed properties
 const activeLocationId = computed(() => {
-  // If supervisor/admin selects a specific location
-  if (selectedLocationId.value) {
-    return selectedLocationId.value;
-  }
-  // Otherwise use active location from store
   return locationStore.activeLocation?.id || "";
 });
 
@@ -233,34 +227,13 @@ const stockColumns = [
 
 // Table columns for consolidated view
 const consolidatedColumns = [
-  {
-    accessorKey: "item_code",
-    header: "Code",
-  },
-  {
-    accessorKey: "item_name",
-    header: "Item Name",
-  },
-  {
-    accessorKey: "item_unit",
-    header: "Unit",
-  },
-  {
-    accessorKey: "item_category",
-    header: "Category",
-  },
-  {
-    accessorKey: "total_on_hand",
-    header: "Total On Hand",
-  },
-  {
-    accessorKey: "total_value",
-    header: "Total Value",
-  },
-  {
-    accessorKey: "locations",
-    header: "Locations",
-  },
+  { accessorKey: "item_code", header: "Code" },
+  { accessorKey: "item_name", header: "Item Name" },
+  { accessorKey: "item_unit", header: "Unit" },
+  { accessorKey: "item_category", header: "Category" },
+  { accessorKey: "total_on_hand", header: "Total On Hand" },
+  { accessorKey: "total_value", header: "Total Value" },
+  { accessorKey: "locations", header: "Locations" },
 ];
 
 // Status filter dropdown items
@@ -366,25 +339,14 @@ const fetchStockData = async () => {
   }
 };
 
-const handleLocationChange = (locationId: any) => {
-  if (locationId && typeof locationId === "string") {
-    selectedLocationId.value = locationId;
-    viewMode.value = "single";
-    fetchStockData();
-  }
-};
-
 const handleViewModeChange = (mode: "single" | "consolidated") => {
   viewMode.value = mode;
-  if (mode === "single") {
-    selectedLocationId.value = locationStore.activeLocation?.id || "";
-  }
   fetchStockData();
 };
 
 const clearFilters = () => {
   searchQuery.value = "";
-  selectedCategory.value = "";
+  selectedCategory.value = null;
   showLowStockOnly.value = false;
 };
 
@@ -463,7 +425,7 @@ onMounted(() => {
 watch(
   () => locationStore.activeLocation,
   () => {
-    if (viewMode.value === "single" && !selectedLocationId.value) {
+    if (viewMode.value === "single") {
       fetchStockData();
     }
   }
@@ -521,29 +483,6 @@ watch(
         </UButton>
       </div>
     </div>
-
-    <!-- Location Selector (when in single location mode and supervisor/admin) -->
-    <UCard
-      v-if="isAtLeastSupervisor && viewMode === 'single'"
-      class="card-elevated"
-      :ui="{ body: 'p-3 sm:p-4' }"
-    >
-      <UFormField label="Select Location">
-        <USelectMenu
-          v-model="selectedLocationId"
-          :options="
-            locationStore.userLocations.map((loc) => ({
-              label: `${loc.name} (${loc.code})`,
-              value: loc.id,
-            }))
-          "
-          placeholder="Select a location"
-          value-attribute="value"
-          class="w-full"
-          @update:model-value="handleLocationChange"
-        />
-      </UFormField>
-    </UCard>
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -629,12 +568,12 @@ watch(
         <!-- Category Filter -->
         <USelectMenu
           v-model="selectedCategory"
-          :options="[
-            { label: 'All Categories', value: '' },
+          :items="[
+            { label: 'All Categories', value: null },
             ...categories.map((cat) => ({ label: cat, value: cat })),
           ]"
           placeholder="Category"
-          value-attribute="value"
+          value-key="value"
           size="lg"
           class="w-48"
         />
@@ -730,52 +669,52 @@ watch(
       <div v-else-if="viewMode === 'single'" class="overflow-x-auto">
         <UTable :columns="stockColumns" :data="filteredStock as StockItem[]" class="w-full">
           <!-- Item Code -->
-          <template #item_code-data="{ row }">
-            <span class="font-mono text-sm">{{ (row as any).item_code }}</span>
+          <template #item_code-cell="{ row }">
+            <span class="font-mono text-sm">{{ row.original.item_code }}</span>
           </template>
 
           <!-- Item Name -->
-          <template #item_name-data="{ row }">
+          <template #item_name-cell="{ row }">
             <div>
-              <p class="font-medium text-[var(--ui-text)]">{{ (row as any).item_name }}</p>
-              <p v-if="(row as any).item_sub_category" class="text-sm text-[var(--ui-text-muted)]">
-                {{ (row as any).item_sub_category }}
+              <p class="font-medium text-[var(--ui-text)]">{{ row.original.item_name }}</p>
+              <p v-if="row.original.item_sub_category" class="text-sm text-[var(--ui-text-muted)]">
+                {{ row.original.item_sub_category }}
               </p>
             </div>
           </template>
 
           <!-- Unit -->
-          <template #item_unit-data="{ row }">
-            <span class="text-sm">{{ (row as any).item_unit }}</span>
+          <template #item_unit-cell="{ row }">
+            <span class="text-sm">{{ row.original.item_unit }}</span>
           </template>
 
           <!-- Category -->
-          <template #item_category-data="{ row }">
-            <UBadge v-if="(row as any).item_category" color="neutral" variant="subtle">
-              {{ (row as any).item_category }}
+          <template #item_category-cell="{ row }">
+            <UBadge v-if="row.original.item_category" color="neutral" variant="subtle">
+              {{ row.original.item_category }}
             </UBadge>
             <span v-else class="text-[var(--ui-text-muted)]">-</span>
           </template>
 
           <!-- On Hand -->
-          <template #on_hand-data="{ row }">
+          <template #on_hand-cell="{ row }">
             <div class="flex items-center gap-2">
-              <span class="font-semibold">{{ formatQuantity((row as any).on_hand) }}</span>
-              <UBadge v-if="(row as any).is_low_stock" color="error" variant="subtle" size="xs">
+              <span class="font-semibold">{{ formatQuantity(row.original.on_hand) }}</span>
+              <UBadge v-if="row.original.is_low_stock" color="error" variant="subtle" size="xs">
                 Low
               </UBadge>
             </div>
           </template>
 
           <!-- WAC -->
-          <template #wac-data="{ row }">
-            <span class="text-sm">{{ formatCurrency((row as any).wac) }}</span>
+          <template #wac-cell="{ row }">
+            <span class="text-sm">{{ formatCurrency(row.original.wac) }}</span>
           </template>
 
           <!-- Value -->
-          <template #value-data="{ row }">
+          <template #value-cell="{ row }">
             <span class="font-semibold">{{
-              formatCurrency((row as any).stock_value || (row as any).value || 0)
+              formatCurrency(row.original.stock_value || row.original.value || 0)
             }}</span>
           </template>
         </UTable>
@@ -789,58 +728,55 @@ watch(
           class="w-full"
         >
           <!-- Item Code -->
-          <template #item_code-data="{ row }">
-            <span class="font-mono text-sm">{{ (row as any).item_code }}</span>
+          <template #item_code-cell="{ row }">
+            <span class="font-mono text-sm">{{ row.original.item_code }}</span>
           </template>
 
           <!-- Item Name -->
-          <template #item_name-data="{ row }">
+          <template #item_name-cell="{ row }">
             <div>
-              <p class="font-medium text-[var(--ui-text)]">{{ (row as any).item_name }}</p>
-              <p v-if="(row as any).item_sub_category" class="text-sm text-[var(--ui-text-muted)]">
-                {{ (row as any).item_sub_category }}
+              <p class="font-medium text-[var(--ui-text)]">{{ row.original.item_name }}</p>
+              <p v-if="row.original.item_sub_category" class="text-sm text-[var(--ui-text-muted)]">
+                {{ row.original.item_sub_category }}
               </p>
             </div>
           </template>
 
           <!-- Unit -->
-          <template #item_unit-data="{ row }">
-            <span class="text-sm">{{ (row as any).item_unit }}</span>
+          <template #item_unit-cell="{ row }">
+            <span class="text-sm">{{ row.original.item_unit }}</span>
           </template>
 
           <!-- Category -->
-          <template #item_category-data="{ row }">
-            <UBadge v-if="(row as any).item_category" color="neutral" variant="subtle">
-              {{ (row as any).item_category }}
+          <template #item_category-cell="{ row }">
+            <UBadge v-if="row.original.item_category" color="neutral" variant="subtle">
+              {{ row.original.item_category }}
             </UBadge>
             <span v-else class="text-[var(--ui-text-muted)]">-</span>
           </template>
 
           <!-- Total On Hand -->
-          <template #total_on_hand-data="{ row }">
-            <span class="font-semibold">{{ formatQuantity((row as any).total_on_hand) }}</span>
+          <template #total_on_hand-cell="{ row }">
+            <span class="font-semibold">{{ formatQuantity(row.original.total_on_hand) }}</span>
           </template>
 
           <!-- Total Value -->
-          <template #total_value-data="{ row }">
-            <span class="font-semibold">{{ formatCurrency((row as any).total_value) }}</span>
+          <template #total_value-cell="{ row }">
+            <span class="font-semibold">{{ formatCurrency(row.original.total_value) }}</span>
           </template>
 
           <!-- Locations -->
-          <template #locations-data="{ row }">
-            <div class="flex flex-wrap gap-1">
-              <UBadge
-                v-for="loc in (row as any).locations"
+          <template #locations-cell="{ row }">
+            <div class="flex flex-wrap gap-1.5">
+              <span
+                v-for="(loc, index) in row.original.locations"
                 :key="loc.location_id"
-                :color="loc.is_low_stock ? 'error' : 'neutral'"
-                variant="subtle"
-                size="xs"
-                :title="`${loc.location_name}: ${formatQuantity(
-                  loc.on_hand
-                )} @ ${formatCurrency(loc.wac)}`"
+                class="text-sm"
+                :class="loc.is_low_stock ? 'text-red-500' : 'text-[var(--ui-text)]'"
+                :title="`${formatQuantity(loc.on_hand)} @ ${formatCurrency(loc.wac)}`"
               >
-                {{ loc.location_code }}
-              </UBadge>
+                {{ loc.location_name }}<span v-if="index < row.original.locations.length - 1">,</span>
+              </span>
             </div>
           </template>
         </UTable>
