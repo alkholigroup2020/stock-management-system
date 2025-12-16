@@ -162,12 +162,13 @@ async function fetchNCR() {
     // Initialize status update form
     statusUpdateForm.value.status = response.ncr.status;
     statusUpdateForm.value.resolution_notes = response.ncr.resolution_notes || "";
-  } catch (err: any) {
-    error.value = err?.data?.message || "Failed to fetch NCR details";
+  } catch (err: unknown) {
+    const fetchError = err as { statusCode?: number; data?: { message?: string } };
+    error.value = fetchError?.data?.message || "Failed to fetch NCR details";
     console.error("Error fetching NCR:", err);
 
     // If NCR not found, show error briefly then redirect
-    if (err?.statusCode === 404) {
+    if (fetchError?.statusCode === 404) {
       toast.error("NCR not found");
       setTimeout(() => {
         router.push("/ncrs");
@@ -210,29 +211,31 @@ async function handleUpdateStatus() {
 
     // Close modal
     showUpdateModal.value = false;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error updating NCR:", err);
 
+    const updateError = err as { data?: { code?: string; message?: string } };
+
     // Handle specific errors
-    if (err.data?.code === "NCR_NOT_FOUND") {
+    if (updateError.data?.code === "NCR_NOT_FOUND") {
       toast.error("NCR Not Found", {
         description: "The NCR could not be found",
       });
-    } else if (err.data?.code === "LOCATION_ACCESS_DENIED") {
+    } else if (updateError.data?.code === "LOCATION_ACCESS_DENIED") {
       toast.error("Access Denied", {
         description: "You do not have access to this NCR",
       });
-    } else if (err.data?.code === "INSUFFICIENT_PERMISSIONS") {
+    } else if (updateError.data?.code === "INSUFFICIENT_PERMISSIONS") {
       toast.error("Permission Denied", {
         description: "You do not have permission to update this NCR",
       });
-    } else if (err.data?.code === "VALIDATION_ERROR") {
+    } else if (updateError.data?.code === "VALIDATION_ERROR") {
       toast.error("Validation Error", {
-        description: err.data?.message || "Invalid data provided",
+        description: updateError.data?.message || "Invalid data provided",
       });
     } else {
       toast.error("Update Failed", {
-        description: err.data?.message || "Failed to update NCR. Please try again.",
+        description: updateError.data?.message || "Failed to update NCR. Please try again.",
       });
     }
   } finally {
@@ -268,281 +271,277 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
-    <div class="space-y-6">
-      <!-- Page Header -->
-      <LayoutPageHeader
-        :title="ncr ? `NCR ${ncr.ncr_no}` : 'NCR Details'"
-        icon="i-lucide-alert-circle"
-        :show-location="false"
-        :show-period="false"
-        location-scope="none"
-      >
-        <template #actions>
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-arrow-left"
-            label="Back to NCRs"
-            @click="goBack"
-          />
-        </template>
-      </LayoutPageHeader>
-
-      <!-- Error State -->
-      <ErrorAlert v-if="error" :message="error" @retry="fetchNCR" />
-
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <LoadingSpinner size="lg" />
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-alert-circle" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">
+            {{ ncr ? `NCR ${ncr.ncr_no}` : "NCR Details" }}
+          </h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View and manage non-conformance report details
+          </p>
+        </div>
       </div>
+      <UButton
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="goBack"
+      >
+        <span class="hidden sm:inline">Back to NCRs</span>
+        <span class="sm:hidden">Back</span>
+      </UButton>
+    </div>
 
-      <!-- NCR Details -->
-      <div v-else-if="ncr" class="space-y-6">
-        <!-- NCR Header Card -->
-        <UCard class="card-elevated">
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h2 class="text-subheading font-semibold">NCR Information</h2>
-              <div class="flex items-center gap-2">
-                <UBadge :color="getTypeBadgeColor(ncr.type)" variant="soft">
-                  {{ getTypeLabel(ncr.type) }}
-                </UBadge>
-                <UBadge
-                  v-if="ncr.auto_generated"
-                  color="neutral"
-                  variant="soft"
-                  icon="i-lucide-zap"
-                >
-                  Auto-Generated
-                </UBadge>
-                <UBadge :color="getStatusColor(ncr.status)" variant="soft" size="lg">
-                  {{ getStatusLabel(ncr.status) }}
-                </UBadge>
-              </div>
-            </div>
-          </template>
+    <!-- Error State -->
+    <ErrorAlert v-if="error" :message="error" @retry="fetchNCR" />
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- NCR No -->
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading NCR details..." />
+    </div>
+
+    <!-- NCR Details -->
+    <div v-else-if="ncr" class="space-y-3">
+      <!-- NCR Header Card -->
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">NCR Information</h2>
+          <div class="flex items-center gap-2">
+            <UBadge :color="getTypeBadgeColor(ncr.type)" variant="soft">
+              {{ getTypeLabel(ncr.type) }}
+            </UBadge>
+            <UBadge
+              v-if="ncr.auto_generated"
+              color="neutral"
+              variant="soft"
+              class="inline-flex items-center gap-1"
+            >
+              <UIcon name="i-lucide-zap" class="h-3 w-3" />
+              Auto
+            </UBadge>
+            <UBadge :color="getStatusColor(ncr.status)" variant="soft" size="lg">
+              {{ getStatusLabel(ncr.status) }}
+            </UBadge>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+          <!-- NCR No -->
+          <div>
+            <label class="form-label">NCR No</label>
+            <p class="text-body font-semibold">{{ ncr.ncr_no }}</p>
+          </div>
+
+          <!-- Date -->
+          <div>
+            <label class="form-label">Date</label>
+            <p class="text-body">{{ formatDate(ncr.created_at) }}</p>
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label class="form-label">Location</label>
+            <p class="text-body font-medium">{{ ncr.location.name }}</p>
+            <p class="text-caption">{{ ncr.location.code }}</p>
+          </div>
+
+          <!-- Type -->
+          <div>
+            <label class="form-label">Type</label>
+            <p class="text-body">{{ getTypeLabel(ncr.type) }}</p>
+          </div>
+
+          <!-- Created By -->
+          <div>
+            <label class="form-label">Created By</label>
+            <p class="text-body font-medium">{{ ncr.creator.full_name }}</p>
+            <p class="text-caption">{{ ncr.creator.username }}</p>
+          </div>
+
+          <!-- Resolved Date (if resolved) -->
+          <div v-if="ncr.resolved_at">
+            <label class="form-label">Resolved On</label>
+            <p class="text-body">{{ formatDate(ncr.resolved_at) }}</p>
+          </div>
+
+          <!-- Value -->
+          <div>
+            <label class="form-label">NCR Value</label>
+            <p class="text-2xl font-bold text-error">{{ formatCurrency(ncr.value) }}</p>
+          </div>
+
+          <!-- Quantity (if available) -->
+          <div v-if="ncr.quantity !== null">
+            <label class="form-label">Quantity</label>
+            <p class="text-body font-medium">{{ Number(ncr.quantity).toFixed(4) }}</p>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Related Delivery Card (if auto-generated) -->
+      <UCard
+        v-if="ncr.delivery && ncr.delivery_line"
+        class="card-elevated"
+        :ui="{ body: 'p-3 sm:p-4' }"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-truck" class="h-5 w-5 text-warning" />
+            <h2 class="text-lg font-semibold">Related Delivery</h2>
+          </div>
+          <UButton
+            color="primary"
+            variant="outline"
+            size="sm"
+            icon="i-lucide-external-link"
+            class="cursor-pointer"
+            @click="goToDelivery"
+          >
+            View Delivery
+          </UButton>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Delivery Info -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="form-label">NCR No</label>
-              <p class="text-body font-semibold">{{ ncr.ncr_no }}</p>
+              <label class="form-label">Delivery No</label>
+              <p class="text-body font-semibold">{{ ncr.delivery.delivery_no }}</p>
             </div>
-
-            <!-- Date -->
             <div>
-              <label class="form-label">Date</label>
-              <p class="text-body">{{ formatDate(ncr.created_at) }}</p>
+              <label class="form-label">Delivery Date</label>
+              <p class="text-body">{{ formatDate(ncr.delivery.delivery_date) }}</p>
             </div>
-
-            <!-- Location -->
-            <div>
-              <label class="form-label">Location</label>
-              <p class="text-body font-medium">{{ ncr.location.name }}</p>
-              <p class="text-caption">{{ ncr.location.code }}</p>
-            </div>
-
-            <!-- Type -->
-            <div>
-              <label class="form-label">Type</label>
-              <p class="text-body">{{ getTypeLabel(ncr.type) }}</p>
-            </div>
-
-            <!-- Created By -->
-            <div>
-              <label class="form-label">Created By</label>
-              <p class="text-body font-medium">{{ ncr.creator.full_name }}</p>
-              <p class="text-caption">{{ ncr.creator.username }}</p>
-            </div>
-
-            <!-- Resolved Date (if resolved) -->
-            <div v-if="ncr.resolved_at">
-              <label class="form-label">Resolved On</label>
-              <p class="text-body">{{ formatDate(ncr.resolved_at) }}</p>
-            </div>
-
-            <!-- Value -->
-            <div>
-              <label class="form-label">NCR Value</label>
-              <p class="text-heading font-bold text-error">{{ formatCurrency(ncr.value) }}</p>
-            </div>
-
-            <!-- Quantity (if available) -->
-            <div v-if="ncr.quantity !== null">
-              <label class="form-label">Quantity</label>
-              <p class="text-body font-medium">{{ Number(ncr.quantity).toFixed(4) }}</p>
+            <div class="md:col-span-2">
+              <label class="form-label">Supplier</label>
+              <p class="text-body font-medium">{{ ncr.delivery.supplier.name }}</p>
+              <p class="text-caption">{{ ncr.delivery.supplier.code }}</p>
             </div>
           </div>
-        </UCard>
 
-        <!-- Related Delivery Card (if auto-generated) -->
-        <UCard v-if="ncr.delivery && ncr.delivery_line" class="card-elevated border-warning">
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-truck" class="h-5 w-5 text-warning" />
-                <h2 class="text-subheading font-semibold">Related Delivery</h2>
-              </div>
-              <UButton
-                color="primary"
-                variant="outline"
-                size="sm"
-                icon="i-lucide-external-link"
-                @click="goToDelivery"
-              >
-                View Delivery
-              </UButton>
-            </div>
-          </template>
-
-          <div class="space-y-4">
-            <!-- Delivery Info -->
+          <!-- Price Variance Details -->
+          <div class="p-4 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border)]">
+            <h3 class="text-sm font-semibold mb-3 text-warning">Price Variance Details</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="form-label">Delivery No</label>
-                <p class="text-body font-semibold">{{ ncr.delivery.delivery_no }}</p>
+                <label class="form-label">Item</label>
+                <p class="text-body font-medium">{{ ncr.delivery_line.item.name }}</p>
+                <p class="text-caption">{{ ncr.delivery_line.item.code }}</p>
               </div>
               <div>
-                <label class="form-label">Delivery Date</label>
-                <p class="text-body">{{ formatDate(ncr.delivery.delivery_date) }}</p>
+                <label class="form-label">Quantity</label>
+                <p class="text-body">
+                  {{ Number(ncr.delivery_line.quantity).toFixed(4) }}
+                  {{ ncr.delivery_line.item.unit }}
+                </p>
               </div>
-              <div class="md:col-span-2">
-                <label class="form-label">Supplier</label>
-                <p class="text-body font-medium">{{ ncr.delivery.supplier.name }}</p>
-                <p class="text-caption">{{ ncr.delivery.supplier.code }}</p>
+              <div>
+                <label class="form-label">Period Price (Expected)</label>
+                <p class="text-body font-semibold text-success">
+                  {{ formatCurrency(ncr.delivery_line.period_price) }}
+                </p>
               </div>
-            </div>
-
-            <!-- Price Variance Details -->
-            <div
-              class="mt-4 p-4 rounded-lg bg-warning-50 dark:bg-warning-950 border border-warning"
-            >
-              <h3 class="text-label font-semibold mb-3 text-warning-700 dark:text-warning-300">
-                Price Variance Details
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="form-label">Item</label>
-                  <p class="text-body font-medium">{{ ncr.delivery_line.item.name }}</p>
-                  <p class="text-caption">{{ ncr.delivery_line.item.code }}</p>
-                </div>
-                <div>
-                  <label class="form-label">Quantity</label>
-                  <p class="text-body">
-                    {{ Number(ncr.delivery_line.quantity).toFixed(4) }}
-                    {{ ncr.delivery_line.item.unit }}
-                  </p>
-                </div>
-                <div>
-                  <label class="form-label">Period Price (Expected)</label>
-                  <p class="text-body font-semibold text-success">
-                    {{ formatCurrency(ncr.delivery_line.period_price) }}
-                  </p>
-                </div>
-                <div>
-                  <label class="form-label">Delivery Price (Actual)</label>
-                  <p class="text-body font-semibold text-error">
-                    {{ formatCurrency(ncr.delivery_line.unit_price) }}
-                  </p>
-                </div>
-                <div>
-                  <label class="form-label">Price Difference</label>
-                  <p class="text-body font-bold text-error">
-                    {{
-                      formatCurrency(
-                        Math.abs(ncr.delivery_line.unit_price - ncr.delivery_line.period_price)
-                      )
-                    }}
-                    ({{
-                      ncr.delivery_line.unit_price > ncr.delivery_line.period_price
-                        ? "Higher"
-                        : "Lower"
-                    }})
-                  </p>
-                </div>
-                <div>
-                  <label class="form-label">Total Variance Value</label>
-                  <p class="text-heading font-bold text-error">{{ formatCurrency(ncr.value) }}</p>
-                </div>
+              <div>
+                <label class="form-label">Delivery Price (Actual)</label>
+                <p class="text-body font-semibold text-error">
+                  {{ formatCurrency(ncr.delivery_line.unit_price) }}
+                </p>
+              </div>
+              <div>
+                <label class="form-label">Price Difference</label>
+                <p class="text-body font-bold text-error">
+                  {{
+                    formatCurrency(
+                      Math.abs(ncr.delivery_line.unit_price - ncr.delivery_line.period_price)
+                    )
+                  }}
+                  ({{
+                    ncr.delivery_line.unit_price > ncr.delivery_line.period_price
+                      ? "Higher"
+                      : "Lower"
+                  }})
+                </p>
+              </div>
+              <div>
+                <label class="form-label">Total Variance Value</label>
+                <p class="text-2xl font-bold text-error">{{ formatCurrency(ncr.value) }}</p>
               </div>
             </div>
           </div>
-        </UCard>
+        </div>
+      </UCard>
 
-        <!-- Reason Card -->
-        <UCard class="card-elevated">
-          <template #header>
-            <h2 class="text-subheading font-semibold">Reason for Non-Conformance</h2>
-          </template>
+      <!-- Reason Card -->
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <h2 class="text-lg font-semibold mb-4">Reason for Non-Conformance</h2>
+        <div class="text-body whitespace-pre-wrap">{{ ncr.reason }}</div>
+      </UCard>
 
-          <div class="text-body whitespace-pre-wrap">{{ ncr.reason }}</div>
-        </UCard>
+      <!-- Resolution Notes Card (if available) -->
+      <UCard v-if="ncr.resolution_notes" class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <h2 class="text-lg font-semibold mb-4">Resolution Notes</h2>
+        <div class="text-body whitespace-pre-wrap">{{ ncr.resolution_notes }}</div>
+      </UCard>
 
-        <!-- Resolution Notes Card (if available) -->
-        <UCard v-if="ncr.resolution_notes" class="card-elevated">
-          <template #header>
-            <h2 class="text-subheading font-semibold">Resolution Notes</h2>
-          </template>
+      <!-- Status Update Card (if user can update) -->
+      <UCard v-if="canUserUpdate" class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="flex items-center gap-2 mb-4">
+          <UIcon name="i-lucide-edit" class="h-5 w-5 text-primary" />
+          <h2 class="text-lg font-semibold">Update NCR Status</h2>
+        </div>
 
-          <div class="text-body whitespace-pre-wrap">{{ ncr.resolution_notes }}</div>
-        </UCard>
+        <div class="space-y-4">
+          <p class="text-body">
+            Update the status of this NCR as it progresses through the resolution process.
+          </p>
 
-        <!-- Status Update Card (if user can update) -->
-        <UCard v-if="canUserUpdate" class="card-elevated border-primary">
-          <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-edit" class="h-5 w-5 text-primary" />
-              <h2 class="text-subheading font-semibold">Update NCR Status</h2>
-            </div>
-          </template>
-
-          <div class="space-y-4">
-            <p class="text-body">
-              Update the status of this NCR as it progresses through the resolution process.
-            </p>
-
-            <div class="flex gap-3">
-              <UButton
-                color="primary"
-                icon="i-lucide-edit"
-                size="lg"
-                @click="openUpdateModal"
-                :disabled="isNCRResolved"
-              >
-                Update Status
-              </UButton>
-            </div>
-
-            <UAlert
-              v-if="!isNCRResolved"
-              icon="i-lucide-info"
+          <div class="flex gap-3">
+            <UButton
               color="primary"
-              variant="subtle"
-              title="Status Flow"
-              description="NCR Status: OPEN → SENT → CREDITED/REJECTED/RESOLVED. You can also mark as RESOLVED directly if the issue is resolved internally."
-            />
-
-            <UAlert
-              v-else
-              icon="i-lucide-check-circle"
-              color="success"
-              variant="subtle"
-              title="NCR Resolved"
-              description="This NCR has been resolved and can no longer be updated."
-            />
+              icon="i-lucide-edit"
+              size="lg"
+              class="cursor-pointer"
+              @click="openUpdateModal"
+              :disabled="isNCRResolved"
+            >
+              Update Status
+            </UButton>
           </div>
-        </UCard>
-      </div>
+
+          <UAlert
+            v-if="!isNCRResolved"
+            icon="i-lucide-info"
+            color="primary"
+            variant="subtle"
+            title="Status Flow"
+            description="NCR Status: OPEN → SENT → CREDITED/REJECTED/RESOLVED. You can also mark as RESOLVED directly if the issue is resolved internally."
+          />
+
+          <UAlert
+            v-else
+            icon="i-lucide-check-circle"
+            color="success"
+            variant="subtle"
+            title="NCR Resolved"
+            description="This NCR has been resolved and can no longer be updated."
+          />
+        </div>
+      </UCard>
     </div>
 
     <!-- Status Update Modal -->
-    <UModal v-model="showUpdateModal">
+    <UModal v-model="showUpdateModal" aria-labelledby="update-ncr-modal-title">
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-edit" class="h-5 w-5 text-primary" />
-            <h3 class="text-subheading font-semibold">Update NCR Status</h3>
+            <h3 id="update-ncr-modal-title" class="text-lg font-semibold">Update NCR Status</h3>
           </div>
         </template>
 
@@ -550,12 +549,14 @@ onMounted(async () => {
           <!-- Status Dropdown -->
           <div>
             <label class="form-label">Status *</label>
-            <select v-model="statusUpdateForm.status" class="form-input w-full">
-              <option value="">Select status</option>
-              <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            <USelectMenu
+              v-model="statusUpdateForm.status"
+              :items="statusOptions"
+              value-key="value"
+              placeholder="Select status"
+              size="lg"
+              class="w-full"
+            />
           </div>
 
           <!-- Resolution Notes -->
@@ -565,6 +566,7 @@ onMounted(async () => {
               v-model="statusUpdateForm.resolution_notes"
               placeholder="Add any notes about the resolution (optional)"
               :rows="4"
+              class="w-full"
             />
             <p class="mt-1 text-caption text-muted">
               Provide details about how this NCR is being resolved or any relevant updates
@@ -583,7 +585,8 @@ onMounted(async () => {
           <div class="flex justify-end gap-3">
             <UButton
               color="neutral"
-              variant="outline"
+              variant="ghost"
+              class="cursor-pointer"
               @click="showUpdateModal = false"
               :disabled="updateLoading"
             >
@@ -592,6 +595,7 @@ onMounted(async () => {
             <UButton
               color="primary"
               icon="i-lucide-save"
+              class="cursor-pointer"
               @click="handleUpdateStatus"
               :loading="updateLoading"
               :disabled="!statusUpdateForm.status"
@@ -602,5 +606,8 @@ onMounted(async () => {
         </template>
       </UCard>
     </UModal>
+
+    <!-- Loading Overlay -->
+    <LoadingOverlay v-if="updateLoading" title="Updating NCR..." message="Please wait..." />
   </div>
 </template>
