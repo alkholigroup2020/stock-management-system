@@ -1,3 +1,308 @@
+<template>
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-arrow-left-right" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Stock Transfers</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View and manage stock transfers between locations
+          </p>
+        </div>
+      </div>
+      <UButton
+        v-if="canRequestTransfer"
+        color="primary"
+        icon="i-lucide-plus"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="goToNewTransfer"
+      >
+        <span class="hidden sm:inline">New Transfer</span>
+        <span class="sm:hidden">New</span>
+      </UButton>
+    </div>
+
+    <!-- Filter Section -->
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <!-- Desktop: Full filter bar (lg and above) -->
+      <div class="hidden lg:flex items-center gap-3">
+        <!-- From Location -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <USelectMenu
+            v-model="filters.fromLocationId"
+            :items="fromLocationOptions"
+            value-key="value"
+            placeholder="From Location"
+            size="lg"
+            class="w-full"
+          >
+            <template #leading>
+              <UIcon name="i-lucide-map-pin" class="w-5 h-5" />
+            </template>
+          </USelectMenu>
+        </div>
+
+        <!-- To Location -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <USelectMenu
+            v-model="filters.toLocationId"
+            :items="toLocationOptions"
+            value-key="value"
+            placeholder="To Location"
+            size="lg"
+            class="w-full"
+          >
+            <template #leading>
+              <UIcon name="i-lucide-map-pin-off" class="w-5 h-5" />
+            </template>
+          </USelectMenu>
+        </div>
+
+        <!-- Date Range Start -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <label class="sr-only" for="filter-start-date">Start date</label>
+          <UInput
+            id="filter-start-date"
+            v-model="filters.startDate"
+            type="date"
+            icon="i-lucide-calendar"
+            size="lg"
+            class="w-full"
+            placeholder="Start date"
+          />
+        </div>
+
+        <!-- Date Range End -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <label class="sr-only" for="filter-end-date">End date</label>
+          <UInput
+            id="filter-end-date"
+            v-model="filters.endDate"
+            type="date"
+            icon="i-lucide-calendar"
+            size="lg"
+            class="w-full"
+            placeholder="End date"
+          />
+        </div>
+
+        <!-- Status Dropdown (Far Right) -->
+        <UDropdownMenu :items="statusDropdownItems" class="ml-auto">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+            aria-label="Filter by status"
+          >
+            <UIcon :name="currentStatusIcon" class="w-4 h-4 mr-2" />
+            Status: {{ currentStatusLabel }}
+          </UButton>
+        </UDropdownMenu>
+      </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Row 1: From and To Location -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <USelectMenu
+              v-model="filters.fromLocationId"
+              :items="fromLocationOptions"
+              value-key="value"
+              placeholder="From"
+              size="lg"
+              class="w-full"
+            >
+              <template #leading>
+                <UIcon name="i-lucide-map-pin" class="w-5 h-5" />
+              </template>
+            </USelectMenu>
+          </div>
+          <div class="flex-1 min-w-0">
+            <USelectMenu
+              v-model="filters.toLocationId"
+              :items="toLocationOptions"
+              value-key="value"
+              placeholder="To"
+              size="lg"
+              class="w-full"
+            >
+              <template #leading>
+                <UIcon name="i-lucide-map-pin-off" class="w-5 h-5" />
+              </template>
+            </USelectMenu>
+          </div>
+        </div>
+
+        <!-- Row 2: Date Range -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <label class="sr-only" for="filter-start-date-mobile">Start date</label>
+            <UInput
+              id="filter-start-date-mobile"
+              v-model="filters.startDate"
+              type="date"
+              icon="i-lucide-calendar"
+              size="lg"
+              class="w-full"
+              placeholder="Start"
+            />
+          </div>
+          <div class="flex-1 min-w-0">
+            <label class="sr-only" for="filter-end-date-mobile">End date</label>
+            <UInput
+              id="filter-end-date-mobile"
+              v-model="filters.endDate"
+              type="date"
+              icon="i-lucide-calendar"
+              size="lg"
+              class="w-full"
+              placeholder="End"
+            />
+          </div>
+        </div>
+
+        <!-- Row 3: Status Dropdown -->
+        <div class="flex items-center gap-3">
+          <UDropdownMenu :items="statusDropdownItems" class="flex-1">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full w-full"
+              trailing-icon="i-lucide-chevron-down"
+              aria-label="Filter by status"
+              :title="`Status: ${currentStatusLabel}`"
+            >
+              <UIcon :name="currentStatusIcon" class="w-4 h-4 mr-2" />
+              <span class="truncate">{{ currentStatusLabel }}</span>
+            </UButton>
+          </UDropdownMenu>
+        </div>
+      </div>
+
+      <!-- Active Filters -->
+      <div v-if="activeFilters.length > 0" class="mt-4 pt-4 border-t border-[var(--ui-border)]">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm text-[var(--ui-text-muted)]">Active filters:</span>
+          <UBadge
+            v-for="filter in activeFilters"
+            :key="filter.key"
+            color="primary"
+            variant="soft"
+            class="cursor-pointer"
+            @click="clearFilter(filter.key)"
+          >
+            {{ filter.label }}: {{ filter.value }}
+            <UIcon name="i-lucide-x" class="ml-1 h-3 w-3" />
+          </UBadge>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- Error State -->
+    <ErrorAlert v-if="error" :message="error" @retry="fetchTransfers" />
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading transfers..." />
+    </div>
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else-if="!hasTransfers"
+      icon="i-lucide-arrow-left-right"
+      :title="activeFilters.length > 0 ? 'No transfers found' : 'No transfers yet'"
+      :description="
+        activeFilters.length > 0
+          ? 'No transfers match your current filters. Try adjusting your search criteria.'
+          : 'Get started by creating your first transfer.'
+      "
+    >
+      <template v-if="canRequestTransfer && activeFilters.length === 0" #action>
+        <UButton
+          color="primary"
+          icon="i-lucide-plus"
+          class="cursor-pointer rounded-full"
+          @click="goToNewTransfer"
+        >
+          Create First Transfer
+        </UButton>
+      </template>
+    </EmptyState>
+
+    <!-- Transfers Table -->
+    <UCard v-else class="card-elevated" :ui="{ body: 'p-0' }">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <thead>
+            <tr class="bg-[var(--ui-bg-elevated)]">
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Transfer No</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Status</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Date</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">From Location</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">To Location</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Total Value</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--ui-border)]">
+            <tr
+              v-for="transfer in transfers"
+              :key="transfer.id"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+              @click="handleRowClick(transfer)"
+            >
+              <!-- Transfer No -->
+              <td class="px-4 py-4 text-[var(--ui-text)] font-medium">
+                {{ transfer.transfer_no }}
+              </td>
+
+              <!-- Status -->
+              <td class="px-4 py-4">
+                <UBadge :color="getStatusColor(transfer.status)" variant="subtle" size="md">
+                  {{ getStatusLabel(transfer.status) }}
+                </UBadge>
+              </td>
+
+              <!-- Date -->
+              <td class="px-4 py-4 text-caption">
+                {{ formatDate(transfer.request_date) }}
+              </td>
+
+              <!-- From Location -->
+              <td class="px-4 py-4">
+                <div class="font-medium text-[var(--ui-text)]">
+                  {{ transfer.from_location.name }}
+                </div>
+                <div class="text-caption">
+                  {{ transfer.from_location.code }}
+                </div>
+              </td>
+
+              <!-- To Location -->
+              <td class="px-4 py-4">
+                <div class="font-medium text-[var(--ui-text)]">{{ transfer.to_location.name }}</div>
+                <div class="text-caption">
+                  {{ transfer.to_location.code }}
+                </div>
+              </td>
+
+              <!-- Total Value -->
+              <td class="px-4 py-4 text-right text-[var(--ui-text)] font-medium">
+                {{ formatCurrency(transfer.total_value) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </UCard>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { formatCurrency, formatDate } from "~/utils/format";
 
@@ -56,9 +361,9 @@ const locations = ref<Location[]>([]);
 
 // Filters
 const filters = reactive({
-  fromLocationId: "",
-  toLocationId: "",
-  status: "",
+  fromLocationId: "all",
+  toLocationId: "all",
+  status: "all" as "all" | "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "COMPLETED",
   startDate: "",
   endDate: "",
 });
@@ -66,88 +371,144 @@ const filters = reactive({
 // Computed
 const hasTransfers = computed(() => transfers.value.length > 0);
 const canRequestTransfer = computed(() => {
-  // User can create transfer if they have at least one location
   const defaultLocationId = authStore.user?.default_location_id;
   return defaultLocationId ? canCreateTransfer(defaultLocationId) : false;
 });
 
+// Location options for dropdowns
+const fromLocationOptions = computed(() => [
+  { label: "All Locations", value: "all" },
+  ...locations.value.map((loc) => ({
+    label: `${loc.name} (${loc.code})`,
+    value: loc.id,
+  })),
+]);
+
+const toLocationOptions = computed(() => [
+  { label: "All Locations", value: "all" },
+  ...locations.value.map((loc) => ({
+    label: `${loc.name} (${loc.code})`,
+    value: loc.id,
+  })),
+]);
+
+// Status dropdown items
+const statusDropdownItems = computed(() => [
+  [
+    {
+      label: "All Status",
+      icon: "i-lucide-list",
+      active: filters.status === "all",
+      onSelect: () => selectStatus("all"),
+    },
+    {
+      label: "Draft",
+      icon: "i-lucide-file-edit",
+      active: filters.status === "DRAFT",
+      onSelect: () => selectStatus("DRAFT"),
+    },
+    {
+      label: "Pending",
+      icon: "i-lucide-clock",
+      active: filters.status === "PENDING_APPROVAL",
+      onSelect: () => selectStatus("PENDING_APPROVAL"),
+    },
+    {
+      label: "Approved",
+      icon: "i-lucide-check-circle",
+      active: filters.status === "APPROVED",
+      onSelect: () => selectStatus("APPROVED"),
+    },
+    {
+      label: "Rejected",
+      icon: "i-lucide-x-circle",
+      active: filters.status === "REJECTED",
+      onSelect: () => selectStatus("REJECTED"),
+    },
+    {
+      label: "Completed",
+      icon: "i-lucide-check-square",
+      active: filters.status === "COMPLETED",
+      onSelect: () => selectStatus("COMPLETED"),
+    },
+  ],
+]);
+
+const currentStatusLabel = computed(() => {
+  if (filters.status === "all") return "All";
+  if (filters.status === "PENDING_APPROVAL") return "Pending";
+  return filters.status.charAt(0) + filters.status.slice(1).toLowerCase();
+});
+
+const currentStatusIcon = computed(() => {
+  const icons = {
+    all: "i-lucide-list",
+    DRAFT: "i-lucide-file-edit",
+    PENDING_APPROVAL: "i-lucide-clock",
+    APPROVED: "i-lucide-check-circle",
+    REJECTED: "i-lucide-x-circle",
+    COMPLETED: "i-lucide-check-square",
+  };
+  return icons[filters.status] || "i-lucide-list";
+});
+
 // Active filters
 const activeFilters = computed(() => {
-  const activeFiltersList: Array<{ key: string; label: string; value: any }> = [];
-  if (filters.fromLocationId) {
+  const activeFiltersList: Array<{ key: string; label: string; value: string }> = [];
+
+  if (filters.fromLocationId && filters.fromLocationId !== "all") {
     const location = locations.value.find((l) => l.id === filters.fromLocationId);
     if (location) {
       activeFiltersList.push({
         key: "fromLocationId",
-        label: "From Location",
+        label: "From",
         value: location.name,
       });
     }
   }
-  if (filters.toLocationId) {
+
+  if (filters.toLocationId && filters.toLocationId !== "all") {
     const location = locations.value.find((l) => l.id === filters.toLocationId);
     if (location) {
       activeFiltersList.push({
         key: "toLocationId",
-        label: "To Location",
+        label: "To",
         value: location.name,
       });
     }
   }
-  if (filters.status) {
+
+  if (filters.status !== "all") {
     activeFiltersList.push({
       key: "status",
       label: "Status",
-      value: filters.status.replace(/_/g, " "),
+      value: currentStatusLabel.value,
     });
   }
-  if (filters.startDate) {
+
+  // Only show date range filter when BOTH dates are specified
+  if (filters.startDate && filters.endDate) {
     activeFiltersList.push({
-      key: "startDate",
-      label: "Start Date",
-      value: formatDate(filters.startDate),
+      key: "dateRange",
+      label: "Date Range",
+      value: `${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}`,
     });
   }
-  if (filters.endDate) {
-    activeFiltersList.push({
-      key: "endDate",
-      label: "End Date",
-      value: formatDate(filters.endDate),
-    });
-  }
+
   return activeFiltersList;
 });
 
-// Table columns
-const columns = [
-  { key: "transfer_no", label: "Transfer No" },
-  { key: "request_date", label: "Date" },
-  { key: "from_location", label: "From Location" },
-  { key: "to_location", label: "To Location" },
-  { key: "status", label: "Status" },
-  { key: "total_value", label: "Total Value" },
-];
-
-// Status badge helper
-function getStatusBadgeClass(status: Transfer["status"]) {
-  const badgeClasses = {
-    DRAFT: "badge-draft",
-    PENDING_APPROVAL: "badge-pending",
-    APPROVED: "badge-approved",
-    REJECTED: "badge-rejected",
-    COMPLETED: "badge-approved",
-  };
-  return badgeClasses[status] || "badge-draft";
-}
-
-function getStatusColor(status: Transfer["status"]) {
+// Status badge helpers
+function getStatusColor(
+  status: Transfer["status"]
+): "success" | "warning" | "error" | "neutral" | "primary" {
   const statusColors = {
-    DRAFT: "neutral",
-    PENDING_APPROVAL: "primary",
-    APPROVED: "success",
-    REJECTED: "error",
-    COMPLETED: "success",
-  } as const;
+    DRAFT: "neutral" as const,
+    PENDING_APPROVAL: "primary" as const,
+    APPROVED: "success" as const,
+    REJECTED: "error" as const,
+    COMPLETED: "success" as const,
+  };
   return statusColors[status] || "neutral";
 }
 
@@ -162,6 +523,14 @@ function getStatusLabel(status: Transfer["status"]) {
   return statusLabels[status] || status;
 }
 
+// Select status handler
+function selectStatus(
+  value: "all" | "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "COMPLETED"
+) {
+  filters.status = value;
+  applyFilters();
+}
+
 // Fetch transfers
 async function fetchTransfers() {
   loading.value = true;
@@ -170,11 +539,19 @@ async function fetchTransfers() {
   try {
     const params = new URLSearchParams();
 
-    if (filters.fromLocationId) params.append("fromLocationId", filters.fromLocationId);
-    if (filters.toLocationId) params.append("toLocationId", filters.toLocationId);
-    if (filters.status) params.append("status", filters.status);
-    if (filters.startDate) params.append("startDate", filters.startDate);
-    if (filters.endDate) params.append("endDate", filters.endDate);
+    if (filters.fromLocationId && filters.fromLocationId !== "all") {
+      params.append("fromLocationId", filters.fromLocationId);
+    }
+    if (filters.toLocationId && filters.toLocationId !== "all") {
+      params.append("toLocationId", filters.toLocationId);
+    }
+    if (filters.status !== "all") params.append("status", filters.status);
+
+    // Only apply date filter when BOTH dates are specified
+    if (filters.startDate && filters.endDate) {
+      params.append("startDate", filters.startDate);
+      params.append("endDate", filters.endDate);
+    }
 
     const response = await $fetch<{
       transfers: Transfer[];
@@ -182,8 +559,9 @@ async function fetchTransfers() {
     }>(`/api/transfers?${params}`);
 
     transfers.value = response.transfers;
-  } catch (err: any) {
-    error.value = err?.data?.message || "Failed to fetch transfers";
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    error.value = fetchError?.data?.message || "Failed to fetch transfers";
     console.error("Error fetching transfers:", err);
   } finally {
     loading.value = false;
@@ -195,28 +573,28 @@ async function fetchLocations() {
   try {
     const response = await $fetch<{ locations: Location[] }>("/api/locations");
     locations.value = response.locations;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error fetching locations:", err);
   }
 }
 
 // Filter handlers
 function clearFilter(key: string) {
-  (filters as any)[key] = "";
+  if (key === "fromLocationId") {
+    filters.fromLocationId = "all";
+  } else if (key === "toLocationId") {
+    filters.toLocationId = "all";
+  } else if (key === "status") {
+    filters.status = "all";
+  } else if (key === "dateRange") {
+    filters.startDate = "";
+    filters.endDate = "";
+  }
   fetchTransfers();
 }
 
 function applyFilters() {
   fetchTransfers();
-}
-
-function clearAllFilters() {
-  filters.fromLocationId = "";
-  filters.toLocationId = "";
-  filters.status = "";
-  filters.startDate = "";
-  filters.endDate = "";
-  applyFilters();
 }
 
 // Row click handler
@@ -229,215 +607,41 @@ function goToNewTransfer() {
   router.push("/transfers/create");
 }
 
+// Watch location filter changes - apply immediately
+watch(
+  () => filters.fromLocationId,
+  () => {
+    applyFilters();
+  }
+);
+
+watch(
+  () => filters.toLocationId,
+  () => {
+    applyFilters();
+  }
+);
+
+// Watch date range changes - only apply when BOTH dates are specified
+watch(
+  () => [filters.startDate, filters.endDate],
+  ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+    // Only trigger fetch when:
+    // 1. Both dates are now specified (complete range)
+    // 2. OR a date was cleared (to remove the filter)
+    const bothDatesSet = newStartDate !== "" && newEndDate !== "";
+    const dateWasCleared =
+      (oldStartDate !== "" && newStartDate === "") || (oldEndDate !== "" && newEndDate === "");
+
+    if (bothDatesSet || dateWasCleared) {
+      applyFilters();
+    }
+  }
+);
+
 // Initial load
 onMounted(async () => {
   await fetchLocations();
   await fetchTransfers();
 });
 </script>
-
-<template>
-  <div class="p-4 md:p-6">
-    <div class="space-y-6">
-      <!-- Page Header -->
-      <LayoutPageHeader
-        title="Stock Transfers"
-        icon="i-lucide-arrow-left-right"
-        :show-location="true"
-        :show-period="true"
-        location-scope="current"
-      >
-        <template #actions>
-          <UButton
-            v-if="canRequestTransfer"
-            color="primary"
-            icon="i-lucide-plus"
-            label="New Transfer"
-            @click="goToNewTransfer"
-          />
-        </template>
-      </LayoutPageHeader>
-
-      <!-- Filters -->
-      <div class="card-elevated p-4">
-        <h2 class="mb-4 text-label font-semibold">Filters</h2>
-
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <!-- From Location Filter -->
-          <div>
-            <label class="form-label">From Location</label>
-            <select v-model="filters.fromLocationId" class="form-input w-full">
-              <option value="">All Locations</option>
-              <option v-for="location in locations" :key="location.id" :value="location.id">
-                {{ location.name }} ({{ location.code }})
-              </option>
-            </select>
-          </div>
-
-          <!-- To Location Filter -->
-          <div>
-            <label class="form-label">To Location</label>
-            <select v-model="filters.toLocationId" class="form-input w-full">
-              <option value="">All Locations</option>
-              <option v-for="location in locations" :key="location.id" :value="location.id">
-                {{ location.name }} ({{ location.code }})
-              </option>
-            </select>
-          </div>
-
-          <!-- Status Filter -->
-          <div>
-            <label class="form-label">Status</label>
-            <select v-model="filters.status" class="form-input w-full">
-              <option value="">All Status</option>
-              <option value="DRAFT">Draft</option>
-              <option value="PENDING_APPROVAL">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
-          </div>
-
-          <!-- Date Range Start -->
-          <div>
-            <label class="form-label">Start Date</label>
-            <input
-              v-model="filters.startDate"
-              type="date"
-              class="form-input w-full"
-              placeholder="Start date"
-            />
-          </div>
-        </div>
-
-        <!-- Date Range End (Second Row) -->
-        <div class="mt-4">
-          <label class="form-label">End Date</label>
-          <input
-            v-model="filters.endDate"
-            type="date"
-            class="form-input w-full md:w-1/4"
-            placeholder="End date"
-          />
-        </div>
-
-        <!-- Filter Actions -->
-        <div class="mt-4 flex gap-2">
-          <UButton
-            color="primary"
-            icon="i-lucide-filter"
-            label="Apply Filters"
-            @click="applyFilters"
-          />
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-x"
-            label="Clear All"
-            @click="clearAllFilters"
-          />
-        </div>
-
-        <!-- Active Filters -->
-        <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap gap-2">
-          <span class="text-caption">Active filters:</span>
-          <UBadge
-            v-for="filter in activeFilters"
-            :key="filter.key"
-            color="primary"
-            variant="soft"
-            class="cursor-pointer"
-            @click="clearFilter(filter.key)"
-          >
-            {{ filter.label }}: {{ filter.value }}
-            <UIcon name="i-lucide-x" class="ml-1 h-3 w-3" />
-          </UBadge>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <ErrorAlert v-if="error" :message="error" @retry="fetchTransfers" class="mb-6" />
-
-      <!-- Loading State -->
-      <TableSkeleton v-if="loading" :columns="6" :rows="8" />
-
-      <!-- Transfers Table -->
-      <div
-        v-else-if="hasTransfers"
-        class="overflow-hidden rounded-lg border border-default bg-elevated"
-      >
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
-              <tr>
-                <th
-                  v-for="col in columns"
-                  :key="col.key"
-                  class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted"
-                >
-                  {{ col.label }}
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-default">
-              <tr
-                v-for="transfer in transfers"
-                :key="transfer.id"
-                class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                @click="handleRowClick(transfer)"
-              >
-                <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                  {{ transfer.transfer_no }}
-                </td>
-                <td class="whitespace-nowrap px-4 py-3 text-body">
-                  {{ formatDate(transfer.request_date) }}
-                </td>
-                <td class="px-4 py-3 text-body">
-                  <div class="font-medium">{{ transfer.from_location.name }}</div>
-                  <div class="text-caption">
-                    {{ transfer.from_location.code }}
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-body">
-                  <div class="font-medium">{{ transfer.to_location.name }}</div>
-                  <div class="text-caption">
-                    {{ transfer.to_location.code }}
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-body">
-                  <UBadge :color="getStatusColor(transfer.status)" variant="soft">
-                    {{ getStatusLabel(transfer.status) }}
-                  </UBadge>
-                </td>
-                <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                  {{ formatCurrency(transfer.total_value) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <EmptyState
-        v-else
-        icon="i-lucide-arrow-left-right"
-        title="No Transfers Found"
-        :description="
-          activeFilters.length > 0
-            ? 'No transfers match your current filters. Try adjusting your search criteria.'
-            : 'No transfers have been recorded yet. Click the button above to create your first transfer.'
-        "
-      >
-        <template v-if="canRequestTransfer" #action>
-          <UButton
-            color="primary"
-            icon="i-lucide-plus"
-            label="New Transfer"
-            @click="goToNewTransfer"
-          />
-        </template>
-      </EmptyState>
-    </div>
-  </div>
-</template>

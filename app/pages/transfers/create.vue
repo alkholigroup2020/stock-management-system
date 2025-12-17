@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { z } from "zod";
 import { formatCurrency } from "~/utils/format";
 
 // SEO
@@ -10,8 +9,6 @@ useSeoMeta({
 
 // Composables
 const router = useRouter();
-const locationStore = useLocationStore();
-const periodStore = usePeriodStore();
 const authStore = useAuthStore();
 const toast = useAppToast();
 const permissions = usePermissions();
@@ -148,14 +145,14 @@ const fetchItemsForLocation = async (locationId: string) => {
     });
     items.value = data.items || [];
 
-    // Build stock levels map
+    // Build stock levels map (convert Prisma Decimals to Numbers)
     stockLevels.value = {};
     items.value.forEach((item: any) => {
       if (item.location_stock && item.location_stock.length > 0) {
         const stock = item.location_stock[0];
         stockLevels.value[item.id] = {
-          on_hand: stock.on_hand,
-          wac: stock.wac,
+          on_hand: Number(stock.on_hand) || 0,
+          wac: Number(stock.wac) || 0,
         };
       }
     });
@@ -276,25 +273,29 @@ watch(
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="New Transfer"
-      icon="i-lucide-arrow-left-right"
-      :show-location="false"
-      :show-period="true"
-      location-scope="none"
-    />
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-arrow-left-right" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">New Transfer</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Create a new stock transfer between locations
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Main Form -->
-    <div class="space-y-6">
+    <div class="space-y-3">
       <!-- Transfer Header Card -->
-      <UCard class="card-elevated">
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <template #header>
           <h2 class="text-subheading font-semibold">Transfer Information</h2>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- From Location -->
           <div>
             <label class="form-label">From Location *</label>
@@ -304,7 +305,9 @@ watch(
               label-key="name"
               value-key="id"
               placeholder="Select source location"
+              size="lg"
               searchable
+              class="w-full"
             />
           </div>
 
@@ -317,7 +320,9 @@ watch(
               label-key="name"
               value-key="id"
               placeholder="Select destination location"
+              size="lg"
               searchable
+              class="w-full"
               :disabled="!formData.from_location_id"
             />
             <p v-if="!formData.from_location_id" class="text-caption mt-1">
@@ -328,23 +333,24 @@ watch(
           <!-- Transfer Date -->
           <div>
             <label class="form-label">Transfer Date *</label>
-            <UInput v-model="formData.transfer_date" type="date" />
+            <UInput v-model="formData.transfer_date" type="date" size="lg" class="w-full" />
           </div>
 
           <!-- Notes -->
-          <div class="md:col-span-2">
+          <div class="lg:col-span-2">
             <label class="form-label">Notes</label>
             <UTextarea
               v-model="formData.notes"
               placeholder="Add any notes about this transfer"
               :rows="3"
+              class="w-full"
             />
           </div>
         </div>
       </UCard>
 
       <!-- Transfer Lines Card -->
-      <UCard class="card-elevated">
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-subheading font-semibold">Transfer Items</h2>
@@ -353,6 +359,7 @@ watch(
               color="primary"
               variant="soft"
               size="sm"
+              class="cursor-pointer"
               @click="addLine"
               :disabled="!formData.from_location_id"
             >
@@ -385,9 +392,9 @@ watch(
 
         <!-- Lines Table -->
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-default">
+          <table class="min-w-full divide-y divide-[var(--ui-border)]">
             <thead>
-              <tr class="bg-default">
+              <tr class="bg-[var(--ui-bg-elevated)]">
                 <th class="px-4 py-3 text-left text-label uppercase">Item</th>
                 <th class="px-4 py-3 text-left text-label uppercase">On Hand (Source)</th>
                 <th class="px-4 py-3 text-left text-label uppercase">Quantity</th>
@@ -396,7 +403,7 @@ watch(
                 <th class="px-4 py-3 text-center text-label uppercase">Action</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-default">
+            <tbody class="divide-y divide-[var(--ui-border)]">
               <tr
                 v-for="line in lines"
                 :key="line.id"
@@ -422,7 +429,7 @@ watch(
                 <td class="px-4 py-3">
                   <div v-if="line.item_id" class="flex items-center space-x-2">
                     <span class="text-body font-medium">
-                      {{ line.on_hand.toFixed(4) }}
+                      {{ Number(line.on_hand).toFixed(4) }}
                     </span>
                     <UIcon
                       v-if="line.has_insufficient_stock"
@@ -441,6 +448,7 @@ watch(
                     step="0.0001"
                     min="0"
                     placeholder="0.00"
+                    size="lg"
                     class="w-32"
                   />
                 </td>
@@ -467,6 +475,7 @@ watch(
                     color="error"
                     variant="ghost"
                     size="sm"
+                    class="cursor-pointer"
                     :disabled="lines.length === 1"
                     @click="removeLine(line.id)"
                   />
@@ -484,7 +493,7 @@ watch(
         </div>
 
         <!-- Summary -->
-        <div class="mt-4 pt-4 border-t border-default">
+        <div class="mt-4 pt-4 border-t border-[var(--ui-border)]">
           <div class="flex justify-between items-center">
             <div class="text-caption">{{ lines.length }} item(s)</div>
             <div class="text-right">

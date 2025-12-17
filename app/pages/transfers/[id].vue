@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatCurrency, formatDate, formatDateTime } from "~/utils/format";
+import { formatCurrency, formatDate } from "~/utils/format";
 
 // SEO
 useSeoMeta({
@@ -271,257 +271,262 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
-    <div class="space-y-6">
-      <!-- Page Header -->
-      <LayoutPageHeader
-        :title="transfer ? `Transfer ${transfer.transfer_no}` : 'Transfer Details'"
-        icon="i-lucide-arrow-left-right"
-        :show-location="false"
-        :show-period="false"
-        location-scope="none"
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-arrow-left-right" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">
+            {{ transfer ? `Transfer ${transfer.transfer_no}` : "Transfer Details" }}
+          </h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View transfer details and approval actions
+          </p>
+        </div>
+      </div>
+      <UButton
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="goBack"
       >
-        <template #actions>
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-arrow-left"
-            label="Back to Transfers"
-            @click="goBack"
-          />
+        <span class="hidden sm:inline">Back to Transfers</span>
+        <span class="sm:hidden">Back</span>
+      </UButton>
+    </div>
+
+    <!-- Error State -->
+    <ErrorAlert v-if="error" :message="error" @retry="fetchTransfer" />
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-12">
+      <LoadingSpinner size="lg" />
+    </div>
+
+    <!-- Transfer Details -->
+    <div v-else-if="transfer" class="space-y-3">
+      <!-- Transfer Header Card -->
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 class="text-subheading font-semibold">Transfer Information</h2>
+            <UBadge :color="getStatusColor(transfer.status)" variant="soft" size="lg">
+              {{ getStatusLabel(transfer.status) }}
+            </UBadge>
+          </div>
         </template>
-      </LayoutPageHeader>
 
-      <!-- Error State -->
-      <ErrorAlert v-if="error" :message="error" @retry="fetchTransfer" />
-
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <LoadingSpinner size="lg" />
-      </div>
-
-      <!-- Transfer Details -->
-      <div v-else-if="transfer" class="space-y-6">
-        <!-- Transfer Header Card -->
-        <UCard class="card-elevated">
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h2 class="text-subheading font-semibold">Transfer Information</h2>
-              <UBadge :color="getStatusColor(transfer.status)" variant="soft" size="lg">
-                {{ getStatusLabel(transfer.status) }}
-              </UBadge>
-            </div>
-          </template>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Transfer No -->
-            <div>
-              <label class="form-label">Transfer No</label>
-              <p class="text-body font-semibold">{{ transfer.transfer_no }}</p>
-            </div>
-
-            <!-- Request Date -->
-            <div>
-              <label class="form-label">Request Date</label>
-              <p class="text-body">{{ formatDate(transfer.request_date) }}</p>
-            </div>
-
-            <!-- From Location -->
-            <div>
-              <label class="form-label">From Location</label>
-              <p class="text-body font-medium">{{ transfer.from_location.name }}</p>
-              <p class="text-caption">{{ transfer.from_location.code }}</p>
-            </div>
-
-            <!-- To Location -->
-            <div>
-              <label class="form-label">To Location</label>
-              <p class="text-body font-medium">{{ transfer.to_location.name }}</p>
-              <p class="text-caption">{{ transfer.to_location.code }}</p>
-            </div>
-
-            <!-- Requested By -->
-            <div>
-              <label class="form-label">Requested By</label>
-              <p class="text-body font-medium">{{ transfer.requester.full_name }}</p>
-              <p class="text-caption">{{ transfer.requester.username }}</p>
-            </div>
-
-            <!-- Approval Date (if approved/rejected) -->
-            <div v-if="transfer.approval_date">
-              <label class="form-label">
-                {{ isTransferRejected ? "Rejected On" : "Approved On" }}
-              </label>
-              <p class="text-body">{{ formatDate(transfer.approval_date) }}</p>
-            </div>
-
-            <!-- Approved/Rejected By -->
-            <div v-if="transfer.approver">
-              <label class="form-label">
-                {{ isTransferRejected ? "Rejected By" : "Approved By" }}
-              </label>
-              <p class="text-body font-medium">{{ transfer.approver.full_name }}</p>
-              <p class="text-caption">{{ transfer.approver.username }}</p>
-            </div>
-
-            <!-- Transfer Date (if completed) -->
-            <div v-if="transfer.transfer_date && isTransferCompleted">
-              <label class="form-label">Transfer Date</label>
-              <p class="text-body">{{ formatDate(transfer.transfer_date) }}</p>
-            </div>
-
-            <!-- Notes -->
-            <div v-if="transfer.notes" class="md:col-span-2">
-              <label class="form-label">Notes</label>
-              <p class="text-body whitespace-pre-wrap">{{ transfer.notes }}</p>
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Transfer No -->
+          <div>
+            <label class="form-label">Transfer No</label>
+            <p class="text-body font-semibold">{{ transfer.transfer_no }}</p>
           </div>
-        </UCard>
 
-        <!-- Transfer Lines Card -->
-        <UCard class="card-elevated">
-          <template #header>
+          <!-- Request Date -->
+          <div>
+            <label class="form-label">Request Date</label>
+            <p class="text-body">{{ formatDate(transfer.request_date) }}</p>
+          </div>
+
+          <!-- From Location -->
+          <div>
+            <label class="form-label">From Location</label>
+            <p class="text-body font-medium">{{ transfer.from_location.name }}</p>
+            <p class="text-caption">{{ transfer.from_location.code }}</p>
+          </div>
+
+          <!-- To Location -->
+          <div>
+            <label class="form-label">To Location</label>
+            <p class="text-body font-medium">{{ transfer.to_location.name }}</p>
+            <p class="text-caption">{{ transfer.to_location.code }}</p>
+          </div>
+
+          <!-- Requested By -->
+          <div>
+            <label class="form-label">Requested By</label>
+            <p class="text-body font-medium">{{ transfer.requester.full_name }}</p>
+            <p class="text-caption">{{ transfer.requester.username }}</p>
+          </div>
+
+          <!-- Approval Date (if approved/rejected) -->
+          <div v-if="transfer.approval_date">
+            <label class="form-label">
+              {{ isTransferRejected ? "Rejected On" : "Approved On" }}
+            </label>
+            <p class="text-body">{{ formatDate(transfer.approval_date) }}</p>
+          </div>
+
+          <!-- Approved/Rejected By -->
+          <div v-if="transfer.approver">
+            <label class="form-label">
+              {{ isTransferRejected ? "Rejected By" : "Approved By" }}
+            </label>
+            <p class="text-body font-medium">{{ transfer.approver.full_name }}</p>
+            <p class="text-caption">{{ transfer.approver.username }}</p>
+          </div>
+
+          <!-- Transfer Date (if completed) -->
+          <div v-if="transfer.transfer_date && isTransferCompleted">
+            <label class="form-label">Transfer Date</label>
+            <p class="text-body">{{ formatDate(transfer.transfer_date) }}</p>
+          </div>
+
+          <!-- Notes -->
+          <div v-if="transfer.notes" class="lg:col-span-2">
+            <label class="form-label">Notes</label>
+            <p class="text-body whitespace-pre-wrap">{{ transfer.notes }}</p>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Transfer Lines Card -->
+      <UCard class="card-elevated" :ui="{ body: 'p-0' }">
+        <template #header>
+          <div class="px-3 py-3 sm:px-4 sm:py-4">
             <h2 class="text-subheading font-semibold">Transfer Items</h2>
-          </template>
-
-          <!-- Lines Table -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-default">
-              <thead>
-                <tr class="bg-default">
-                  <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-muted">
-                    Item Code
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-muted">
-                    Item Name
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-muted">
-                    Unit
-                  </th>
-                  <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-muted">
-                    Quantity
-                  </th>
-                  <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-muted">
-                    WAC
-                  </th>
-                  <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-muted">
-                    Line Value
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-default">
-                <tr v-for="line in transfer.lines" :key="line.id">
-                  <!-- Item Code -->
-                  <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                    {{ line.item.code }}
-                  </td>
-
-                  <!-- Item Name -->
-                  <td class="px-4 py-3 text-body">
-                    <div class="font-medium">{{ line.item.name }}</div>
-                    <div v-if="line.item.category" class="text-caption">
-                      {{ line.item.category }}
-                      <span v-if="line.item.sub_category">/ {{ line.item.sub_category }}</span>
-                    </div>
-                  </td>
-
-                  <!-- Unit -->
-                  <td class="whitespace-nowrap px-4 py-3 text-body">
-                    {{ line.item.unit }}
-                  </td>
-
-                  <!-- Quantity -->
-                  <td class="whitespace-nowrap px-4 py-3 text-right text-body font-medium">
-                    {{ Number(line.quantity).toFixed(4) }}
-                  </td>
-
-                  <!-- WAC -->
-                  <td class="whitespace-nowrap px-4 py-3 text-right text-body">
-                    {{ formatCurrency(line.wac_at_transfer) }}
-                  </td>
-
-                  <!-- Line Value -->
-                  <td class="whitespace-nowrap px-4 py-3 text-right text-body font-semibold">
-                    {{ formatCurrency(line.line_value) }}
-                  </td>
-                </tr>
-              </tbody>
-
-              <!-- Summary Row -->
-              <tfoot class="border-t-2 border-default bg-zinc-50 dark:bg-zinc-900">
-                <tr>
-                  <td colspan="3" class="px-4 py-3 text-body font-semibold">Total</td>
-                  <td class="whitespace-nowrap px-4 py-3 text-right text-body font-semibold">
-                    {{
-                      transfer.lines
-                        .reduce((sum, line) => sum + Number(line.quantity), 0)
-                        .toFixed(4)
-                    }}
-                  </td>
-                  <td></td>
-                  <td class="whitespace-nowrap px-4 py-3 text-right text-heading font-bold">
-                    {{ formatCurrency(transfer.total_value) }}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
           </div>
-        </UCard>
+        </template>
 
-        <!-- Approval Actions Card (Supervisor/Admin only, Pending status only) -->
-        <UCard v-if="canUserApprove" class="card-elevated border-primary">
-          <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-user-check" class="h-5 w-5 text-primary" />
-              <h2 class="text-subheading font-semibold">Approval Actions</h2>
-            </div>
-          </template>
+        <!-- Lines Table -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-[var(--ui-border)]">
+            <thead>
+              <tr class="bg-[var(--ui-bg-elevated)]">
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
+                  Item Code
+                </th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
+                  Item Name
+                </th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
+                  Quantity
+                </th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">WAC</th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
+                  Line Value
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--ui-border)]">
+              <tr v-for="line in transfer.lines" :key="line.id">
+                <!-- Item Code -->
+                <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
+                  {{ line.item.code }}
+                </td>
 
-          <div class="space-y-4">
-            <p class="text-body">
-              This transfer is pending your approval. Please review the details above and choose an
-              action:
-            </p>
+                <!-- Item Name -->
+                <td class="px-4 py-3 text-body">
+                  <div class="font-medium">{{ line.item.name }}</div>
+                  <div v-if="line.item.category" class="text-caption">
+                    {{ line.item.category }}
+                    <span v-if="line.item.sub_category">/ {{ line.item.sub_category }}</span>
+                  </div>
+                </td>
 
-            <div class="flex gap-3">
-              <!-- Approve Button -->
-              <UButton
-                color="success"
-                icon="i-lucide-check-circle"
-                size="lg"
-                @click="showApproveModal = true"
-              >
-                Approve Transfer
-              </UButton>
+                <!-- Unit -->
+                <td class="whitespace-nowrap px-4 py-3 text-body">
+                  {{ line.item.unit }}
+                </td>
 
-              <!-- Reject Button -->
-              <UButton
-                color="error"
-                variant="outline"
-                icon="i-lucide-x-circle"
-                size="lg"
-                @click="showRejectModal = true"
-              >
-                Reject Transfer
-              </UButton>
-            </div>
+                <!-- Quantity -->
+                <td class="whitespace-nowrap px-4 py-3 text-right text-body font-medium">
+                  {{ Number(line.quantity).toFixed(4) }}
+                </td>
 
-            <!-- Warning Alert -->
-            <UAlert
-              icon="i-lucide-info"
-              color="primary"
-              variant="subtle"
-              title="Important"
-              description="Approving this transfer will immediately move stock from the source location to the destination location. This action cannot be undone."
-            />
+                <!-- WAC -->
+                <td class="whitespace-nowrap px-4 py-3 text-right text-body">
+                  {{ formatCurrency(line.wac_at_transfer) }}
+                </td>
+
+                <!-- Line Value -->
+                <td class="whitespace-nowrap px-4 py-3 text-right text-body font-semibold">
+                  {{ formatCurrency(line.line_value) }}
+                </td>
+              </tr>
+            </tbody>
+
+            <!-- Summary Row -->
+            <tfoot class="border-t-2 border-[var(--ui-border)] bg-[var(--ui-bg-muted)]">
+              <tr>
+                <td colspan="3" class="px-4 py-3 text-body font-semibold">Total</td>
+                <td class="whitespace-nowrap px-4 py-3 text-right text-body font-semibold">
+                  {{
+                    transfer.lines
+                      .reduce((sum, line) => sum + Number(line.quantity), 0)
+                      .toFixed(4)
+                  }}
+                </td>
+                <td></td>
+                <td class="whitespace-nowrap px-4 py-3 text-right text-heading font-bold">
+                  {{ formatCurrency(transfer.total_value) }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </UCard>
+
+      <!-- Approval Actions Card (Supervisor/Admin only, Pending status only) -->
+      <UCard v-if="canUserApprove" class="card-elevated border-primary" :ui="{ body: 'p-3 sm:p-4' }">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-user-check" class="h-5 w-5 text-primary" />
+            <h2 class="text-subheading font-semibold">Approval Actions</h2>
           </div>
-        </UCard>
-      </div>
+        </template>
+
+        <div class="space-y-4">
+          <p class="text-body">
+            This transfer is pending your approval. Please review the details above and choose an
+            action:
+          </p>
+
+          <div class="flex gap-3">
+            <!-- Approve Button -->
+            <UButton
+              color="success"
+              icon="i-lucide-check-circle"
+              size="lg"
+              class="cursor-pointer"
+              @click="showApproveModal = true"
+            >
+              Approve Transfer
+            </UButton>
+
+            <!-- Reject Button -->
+            <UButton
+              color="error"
+              variant="outline"
+              icon="i-lucide-x-circle"
+              size="lg"
+              class="cursor-pointer"
+              @click="showRejectModal = true"
+            >
+              Reject Transfer
+            </UButton>
+          </div>
+
+          <!-- Warning Alert -->
+          <UAlert
+            icon="i-lucide-info"
+            color="primary"
+            variant="subtle"
+            title="Important"
+            description="Approving this transfer will immediately move stock from the source location to the destination location. This action cannot be undone."
+          />
+        </div>
+      </UCard>
     </div>
 
     <!-- Approve Confirmation Modal -->
     <UModal v-model="showApproveModal">
-      <UCard>
+      <UCard :ui="{ body: 'p-3 sm:p-4' }">
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-success" />
@@ -553,6 +558,7 @@ onMounted(async () => {
             <UButton
               color="neutral"
               variant="outline"
+              class="cursor-pointer"
               @click="showApproveModal = false"
               :disabled="actionLoading"
             >
@@ -561,6 +567,7 @@ onMounted(async () => {
             <UButton
               color="success"
               icon="i-lucide-check"
+              class="cursor-pointer"
               @click="handleApprove"
               :loading="actionLoading"
             >
@@ -573,7 +580,7 @@ onMounted(async () => {
 
     <!-- Reject Confirmation Modal -->
     <UModal v-model="showRejectModal">
-      <UCard>
+      <UCard :ui="{ body: 'p-3 sm:p-4' }">
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-x-circle" class="h-5 w-5 text-error" />
@@ -595,6 +602,7 @@ onMounted(async () => {
               placeholder="Enter the reason for rejecting this transfer"
               :rows="4"
               autofocus
+              class="w-full"
             />
           </div>
 
@@ -611,6 +619,7 @@ onMounted(async () => {
             <UButton
               color="neutral"
               variant="outline"
+              class="cursor-pointer"
               @click="
                 showRejectModal = false;
                 rejectComment = '';
@@ -622,6 +631,7 @@ onMounted(async () => {
             <UButton
               color="error"
               icon="i-lucide-x"
+              class="cursor-pointer"
               @click="handleReject"
               :loading="actionLoading"
               :disabled="!rejectComment.trim()"
