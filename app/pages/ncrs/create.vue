@@ -260,7 +260,7 @@ const fetchItems = async () => {
       }>;
     }>("/api/items", {
       params: {
-        limit: 500,
+        limit: 200,
         is_active: "true",
       },
     });

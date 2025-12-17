@@ -1,3 +1,313 @@
+<template>
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-arrow-up-from-line" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-xl sm:text-3xl font-bold text-primary">Issues</h1>
+            <UBadge
+              v-if="activeLocation"
+              color="primary"
+              variant="soft"
+              size="md"
+              class="hidden sm:inline-flex items-center gap-1"
+            >
+              <UIcon name="i-lucide-map-pin" class="h-3 w-3" />
+              {{ activeLocation.name }}
+            </UBadge>
+          </div>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View and manage stock issues to cost centres
+          </p>
+          <!-- Mobile location badge (smaller, below title) -->
+          <UBadge
+            v-if="activeLocation"
+            color="primary"
+            variant="soft"
+            size="sm"
+            class="sm:hidden inline-flex items-center gap-1 mt-1"
+          >
+            <UIcon name="i-lucide-map-pin" class="h-3 w-3" />
+            {{ activeLocation.name }}
+          </UBadge>
+        </div>
+      </div>
+      <UButton
+        v-if="canPostIssues()"
+        color="primary"
+        icon="i-lucide-plus"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="goToNewIssue"
+      >
+        <span class="hidden sm:inline">New Issue</span>
+        <span class="sm:hidden">New</span>
+      </UButton>
+    </div>
+
+    <!-- Filter Section -->
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <!-- Desktop: Full filter bar (lg and above) -->
+      <div class="hidden lg:flex items-center gap-3">
+        <!-- Date Range Start -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <label class="sr-only" for="filter-start-date">Start date</label>
+          <UInput
+            id="filter-start-date"
+            v-model="filters.startDate"
+            type="date"
+            icon="i-lucide-calendar"
+            size="lg"
+            class="w-full"
+            placeholder="Start date"
+          />
+        </div>
+
+        <!-- Date Range End -->
+        <div class="flex-1 min-w-0 max-w-xs">
+          <label class="sr-only" for="filter-end-date">End date</label>
+          <UInput
+            id="filter-end-date"
+            v-model="filters.endDate"
+            type="date"
+            icon="i-lucide-calendar"
+            size="lg"
+            class="w-full"
+            placeholder="End date"
+          />
+        </div>
+
+        <!-- Cost Centre Dropdown (Far Right) -->
+        <UDropdownMenu :items="costCentreDropdownItems" class="ml-auto">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer rounded-full px-5"
+            trailing-icon="i-lucide-chevron-down"
+            aria-label="Filter by cost centre"
+          >
+            <UIcon :name="currentCostCentreIcon" class="w-4 h-4 mr-2" />
+            Cost Centre: {{ currentCostCentreLabel }}
+          </UButton>
+        </UDropdownMenu>
+      </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Row 1: Date Range -->
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <label class="sr-only" for="filter-start-date-mobile">Start date</label>
+            <UInput
+              id="filter-start-date-mobile"
+              v-model="filters.startDate"
+              type="date"
+              icon="i-lucide-calendar"
+              size="lg"
+              class="w-full"
+              placeholder="Start"
+            />
+          </div>
+          <div class="flex-1 min-w-0">
+            <label class="sr-only" for="filter-end-date-mobile">End date</label>
+            <UInput
+              id="filter-end-date-mobile"
+              v-model="filters.endDate"
+              type="date"
+              icon="i-lucide-calendar"
+              size="lg"
+              class="w-full"
+              placeholder="End"
+            />
+          </div>
+        </div>
+
+        <!-- Row 2: Cost Centre Dropdown -->
+        <div class="flex items-center gap-3">
+          <!-- Icon-only dropdown on mobile -->
+          <UDropdownMenu :items="costCentreDropdownItems" class="flex-1">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full w-full"
+              trailing-icon="i-lucide-chevron-down"
+              aria-label="Filter by cost centre"
+              :title="`Cost Centre: ${currentCostCentreLabel}`"
+            >
+              <UIcon :name="currentCostCentreIcon" class="w-4 h-4 mr-2" />
+              <span class="truncate">{{ currentCostCentreLabel }}</span>
+            </UButton>
+          </UDropdownMenu>
+        </div>
+      </div>
+
+      <!-- Active Filters -->
+      <div v-if="activeFilters.length > 0" class="mt-4 pt-4 border-t border-[var(--ui-border)]">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm text-[var(--ui-text-muted)]">Active filters:</span>
+          <UBadge
+            v-for="filter in activeFilters"
+            :key="filter.key"
+            color="primary"
+            variant="soft"
+            class="cursor-pointer"
+            @click="clearFilter(filter.key)"
+          >
+            {{ filter.label }}: {{ filter.value }}
+            <UIcon name="i-lucide-x" class="ml-1 h-3 w-3" />
+          </UBadge>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- Error State -->
+    <ErrorAlert v-if="error" :message="error" @retry="fetchIssues" />
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <LoadingSpinner size="lg" color="primary" text="Loading issues..." />
+    </div>
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else-if="!hasIssues"
+      icon="i-lucide-file-minus"
+      :title="activeFilters.length > 0 ? 'No issues found' : 'No issues yet'"
+      :description="
+        activeFilters.length > 0
+          ? 'No issues match your current filters. Try adjusting your search criteria.'
+          : 'Get started by creating your first issue.'
+      "
+    >
+      <template v-if="canPostIssues() && activeFilters.length === 0" #actions>
+        <UButton
+          color="primary"
+          icon="i-lucide-plus"
+          class="cursor-pointer"
+          @click="goToNewIssue"
+        >
+          Create First Issue
+        </UButton>
+      </template>
+    </EmptyState>
+
+    <!-- Issues Table -->
+    <UCard v-else class="card-elevated" :ui="{ body: 'p-0' }">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <thead>
+            <tr class="bg-[var(--ui-bg-elevated)]">
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Issue No</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Date</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Cost Centre</th>
+              <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Total Value</th>
+              <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Posted By</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--ui-border)]">
+            <tr
+              v-for="issue in issues"
+              :key="issue.id"
+              class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+              @click="handleRowClick(issue)"
+            >
+              <!-- Issue No -->
+              <td class="px-4 py-4 text-[var(--ui-text)] font-medium">
+                {{ issue.issue_no }}
+              </td>
+
+              <!-- Date -->
+              <td class="px-4 py-4 text-caption">
+                {{ formatDate(issue.issue_date) }}
+              </td>
+
+              <!-- Cost Centre -->
+              <td class="px-4 py-4">
+                <UBadge :color="getCostCentreColor(issue.cost_centre)" variant="subtle" size="md">
+                  {{ issue.cost_centre }}
+                </UBadge>
+              </td>
+
+              <!-- Total Value -->
+              <td class="px-4 py-4 text-right text-[var(--ui-text)] font-medium">
+                {{ formatCurrency(issue.total_value) }}
+              </td>
+
+              <!-- Posted By -->
+              <td class="px-4 py-4">
+                <div class="font-medium text-[var(--ui-text)]">
+                  {{ issue.posted_by_user.full_name }}
+                </div>
+                <div class="text-caption">
+                  {{ formatDate(issue.posted_at) }}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div
+        v-if="pagination.totalPages > 1"
+        class="flex items-center justify-between border-t border-[var(--ui-border)] px-4 py-3"
+      >
+        <div class="text-caption">
+          {{ paginationInfo }}
+        </div>
+        <div class="flex gap-1">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-chevron-left"
+            size="sm"
+            class="cursor-pointer"
+            :disabled="pagination.page === 1"
+            @click="previousPage"
+          />
+
+          <template v-for="page in pagination.totalPages" :key="page">
+            <UButton
+              v-if="
+                page === 1 ||
+                page === pagination.totalPages ||
+                Math.abs(page - pagination.page) <= 1
+              "
+              :color="page === pagination.page ? 'primary' : 'neutral'"
+              :variant="page === pagination.page ? 'solid' : 'outline'"
+              size="sm"
+              class="cursor-pointer"
+              @click="goToPage(page)"
+            >
+              {{ page }}
+            </UButton>
+            <span
+              v-else-if="page === 2 || page === pagination.totalPages - 1"
+              class="flex items-center px-2 text-[var(--ui-text-muted)]"
+            >
+              ...
+            </span>
+          </template>
+
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-chevron-right"
+            size="sm"
+            class="cursor-pointer"
+            :disabled="pagination.page === pagination.totalPages"
+            @click="nextPage"
+          />
+        </div>
+      </div>
+    </UCard>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { formatCurrency, formatDate } from "~/utils/format";
 
@@ -11,7 +321,6 @@ useSeoMeta({
 const router = useRouter();
 const locationStore = useLocationStore();
 const { canPostIssues } = usePermissions();
-const toast = useAppToast();
 
 // Types
 interface Issue {
@@ -37,7 +346,7 @@ const issues = ref<Issue[]>([]);
 
 // Filters
 const filters = reactive({
-  costCentre: "",
+  costCentre: "all",
   startDate: "",
   endDate: "",
 });
@@ -52,6 +361,7 @@ const pagination = reactive({
 
 // Computed
 const activeLocationId = computed(() => locationStore.activeLocationId);
+const activeLocation = computed(() => locationStore.activeLocation);
 const hasIssues = computed(() => issues.value.length > 0);
 const paginationInfo = computed(() => {
   const start = (pagination.page - 1) * pagination.limit + 1;
@@ -59,48 +369,95 @@ const paginationInfo = computed(() => {
   return `${start}-${end} of ${pagination.total}`;
 });
 
-// Active filters
-const activeFilters = computed(() => {
-  const activeFilters: Array<{ key: string; label: string; value: any }> = [];
-  if (filters.costCentre) {
-    activeFilters.push({
-      key: "costCentre",
-      label: "Cost Centre",
-      value: filters.costCentre,
-    });
-  }
-  if (filters.startDate) {
-    activeFilters.push({
-      key: "startDate",
-      label: "Start Date",
-      value: formatDate(filters.startDate),
-    });
-  }
-  if (filters.endDate) {
-    activeFilters.push({
-      key: "endDate",
-      label: "End Date",
-      value: formatDate(filters.endDate),
-    });
-  }
-  return activeFilters;
+// Cost centre dropdown items
+const costCentreDropdownItems = computed(() => [
+  [
+    {
+      label: "All Cost Centres",
+      icon: "i-lucide-list",
+      active: filters.costCentre === "all",
+      onSelect: () => selectCostCentre("all"),
+    },
+    {
+      label: "Food",
+      icon: "i-lucide-utensils",
+      active: filters.costCentre === "FOOD",
+      onSelect: () => selectCostCentre("FOOD"),
+    },
+    {
+      label: "Cleaning",
+      icon: "i-lucide-spray-can",
+      active: filters.costCentre === "CLEAN",
+      onSelect: () => selectCostCentre("CLEAN"),
+    },
+    {
+      label: "Other",
+      icon: "i-lucide-package",
+      active: filters.costCentre === "OTHER",
+      onSelect: () => selectCostCentre("OTHER"),
+    },
+  ],
+]);
+
+const currentCostCentreLabel = computed(() => {
+  if (filters.costCentre === "FOOD") return "Food";
+  if (filters.costCentre === "CLEAN") return "Cleaning";
+  if (filters.costCentre === "OTHER") return "Other";
+  return "All";
 });
 
-// Cost centre options
-const costCentreOptions = [
-  { value: "", label: "All Cost Centres" },
-  { value: "FOOD", label: "Food" },
-  { value: "CLEAN", label: "Cleaning" },
-  { value: "OTHER", label: "Other" },
-];
+const currentCostCentreIcon = computed(() => {
+  if (filters.costCentre === "FOOD") return "i-lucide-utensils";
+  if (filters.costCentre === "CLEAN") return "i-lucide-spray-can";
+  if (filters.costCentre === "OTHER") return "i-lucide-package";
+  return "i-lucide-list";
+});
 
-// Table columns
-const columns = [
-  { key: "issue_no", label: "Issue No" },
-  { key: "issue_date", label: "Date" },
-  { key: "cost_centre", label: "Cost Centre" },
-  { key: "total_value", label: "Total Value" },
-];
+// Active filters
+const activeFilters = computed(() => {
+  const activeFiltersList: Array<{ key: string; label: string; value: string }> = [];
+
+  if (filters.costCentre && filters.costCentre !== "all") {
+    activeFiltersList.push({
+      key: "costCentre",
+      label: "Cost Centre",
+      value: currentCostCentreLabel.value,
+    });
+  }
+
+  // Only show date range filter when BOTH dates are specified
+  if (filters.startDate && filters.endDate) {
+    activeFiltersList.push({
+      key: "dateRange",
+      label: "Date Range",
+      value: `${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}`,
+    });
+  }
+
+  return activeFiltersList;
+});
+
+// Cost centre color helper
+function getCostCentreColor(
+  costCentre: string
+): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
+  switch (costCentre) {
+    case "FOOD":
+      return "success";
+    case "CLEAN":
+      return "info";
+    case "OTHER":
+      return "neutral";
+    default:
+      return "neutral";
+  }
+}
+
+// Select cost centre handler
+function selectCostCentre(value: string) {
+  filters.costCentre = value;
+  applyFilters();
+}
 
 // Fetch issues
 async function fetchIssues() {
@@ -118,9 +475,15 @@ async function fetchIssues() {
       limit: pagination.limit.toString(),
     });
 
-    if (filters.costCentre) params.append("costCentre", filters.costCentre);
-    if (filters.startDate) params.append("startDate", filters.startDate);
-    if (filters.endDate) params.append("endDate", filters.endDate);
+    if (filters.costCentre && filters.costCentre !== "all") {
+      params.append("costCentre", filters.costCentre);
+    }
+
+    // Only apply date filter when BOTH dates are specified
+    if (filters.startDate && filters.endDate) {
+      params.append("startDate", filters.startDate);
+      params.append("endDate", filters.endDate);
+    }
 
     const response = await $fetch<{
       issues: Issue[];
@@ -132,11 +495,13 @@ async function fetchIssues() {
       };
     }>(`/api/locations/${activeLocationId.value}/issues?${params}`);
 
-    issues.value = response.issues;
-    pagination.total = response.pagination.total;
-    pagination.totalPages = response.pagination.totalPages;
-  } catch (err: any) {
-    error.value = err?.data?.message || "Failed to fetch issues";
+    // Safely handle response with defensive checks
+    issues.value = response?.issues ?? [];
+    pagination.total = response?.pagination?.total ?? 0;
+    pagination.totalPages = response?.pagination?.totalPages ?? 0;
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    error.value = fetchError?.data?.message || "Failed to fetch issues";
     console.error("Error fetching issues:", err);
   } finally {
     loading.value = false;
@@ -145,7 +510,12 @@ async function fetchIssues() {
 
 // Filter handlers
 function clearFilter(key: string) {
-  (filters as any)[key] = "";
+  if (key === "costCentre") {
+    filters.costCentre = "all";
+  } else if (key === "dateRange") {
+    filters.startDate = "";
+    filters.endDate = "";
+  }
   pagination.page = 1;
   fetchIssues();
 }
@@ -185,22 +555,6 @@ function goToNewIssue() {
   router.push("/issues/create");
 }
 
-// Badge color for cost centre
-function getCostCentreColor(
-  costCentre: string
-): "primary" | "secondary" | "success" | "error" | "warning" | "info" | "neutral" {
-  switch (costCentre) {
-    case "FOOD":
-      return "success";
-    case "CLEAN":
-      return "info";
-    case "OTHER":
-      return "neutral";
-    default:
-      return "neutral";
-  }
-}
-
 // Watch location changes
 watch(activeLocationId, () => {
   if (activeLocationId.value) {
@@ -209,6 +563,26 @@ watch(activeLocationId, () => {
   }
 });
 
+// Watch date range changes - only apply when BOTH dates are specified
+watch(
+  () => [filters.startDate, filters.endDate],
+  ([newStartDate, newEndDate], [oldStartDate, oldEndDate]) => {
+    if (!activeLocationId.value) return;
+
+    // Only trigger fetch when:
+    // 1. Both dates are now specified (complete range)
+    // 2. OR a date was cleared (to remove the filter)
+    const bothDatesSet = newStartDate !== "" && newEndDate !== "";
+    const dateWasCleared =
+      (oldStartDate !== "" && newStartDate === "") || (oldEndDate !== "" && newEndDate === "");
+
+    if (bothDatesSet || dateWasCleared) {
+      pagination.page = 1;
+      fetchIssues();
+    }
+  }
+);
+
 // Initial load
 onMounted(async () => {
   if (activeLocationId.value) {
@@ -216,223 +590,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<template>
-  <div class="space-y-6">
-    <!-- Page Header -->
-    <LayoutPageHeader
-      title="Issues"
-      icon="i-lucide-arrow-up-from-line"
-      :show-location="true"
-      :show-period="true"
-      location-scope="current"
-    >
-      <template #actions>
-        <UButton
-          v-if="canPostIssues()"
-          color="primary"
-          icon="i-lucide-plus"
-          label="New Issue"
-          @click="goToNewIssue"
-        />
-      </template>
-    </LayoutPageHeader>
-
-    <!-- Filters -->
-    <div class="card-elevated p-4">
-      <h2 class="mb-4 text-label font-semibold">Filters</h2>
-
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Date Range Start -->
-        <div>
-          <label class="form-label">Start Date</label>
-          <input
-            v-model="filters.startDate"
-            type="date"
-            class="form-input w-full"
-            placeholder="Start date"
-          />
-        </div>
-
-        <!-- Date Range End -->
-        <div>
-          <label class="form-label">End Date</label>
-          <input
-            v-model="filters.endDate"
-            type="date"
-            class="form-input w-full"
-            placeholder="End date"
-          />
-        </div>
-
-        <!-- Cost Centre Filter -->
-        <div>
-          <label class="form-label">Cost Centre</label>
-          <select v-model="filters.costCentre" class="form-input w-full">
-            <option v-for="option in costCentreOptions" :key="option.value" :value="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Filter Actions -->
-      <div class="mt-4 flex gap-2">
-        <UButton
-          color="primary"
-          icon="i-lucide-filter"
-          label="Apply Filters"
-          @click="applyFilters"
-        />
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-x"
-          label="Clear All"
-          @click="
-            () => {
-              filters.costCentre = '';
-              filters.startDate = '';
-              filters.endDate = '';
-              applyFilters();
-            }
-          "
-        />
-      </div>
-
-      <!-- Active Filters -->
-      <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap gap-2">
-        <span class="text-caption">Active filters:</span>
-        <UBadge
-          v-for="filter in activeFilters"
-          :key="filter.key"
-          color="primary"
-          variant="soft"
-          class="cursor-pointer"
-          @click="clearFilter(filter.key)"
-        >
-          {{ filter.label }}: {{ filter.value }}
-          <UIcon name="i-lucide-x" class="ml-1 h-3 w-3" />
-        </UBadge>
-      </div>
-    </div>
-
-    <!-- Error State -->
-    <ErrorAlert v-if="error" :message="error" @retry="fetchIssues" class="mb-6" />
-
-    <!-- Loading State -->
-    <TableSkeleton v-if="loading" :columns="4" :rows="8" />
-
-    <!-- Issues Table -->
-    <div v-else-if="hasIssues" class="overflow-hidden rounded-lg border border-default bg-elevated">
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="border-b border-default bg-zinc-50 dark:bg-zinc-900">
-            <tr>
-              <th
-                v-for="col in columns"
-                :key="col.key"
-                class="px-4 py-3 text-left text-label uppercase tracking-wider"
-              >
-                {{ col.label }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-default">
-            <tr
-              v-for="issue in issues"
-              :key="issue.id"
-              class="cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
-              @click="handleRowClick(issue)"
-            >
-              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                {{ issue.issue_no }}
-              </td>
-              <td class="whitespace-nowrap px-4 py-3 text-body">
-                {{ formatDate(issue.issue_date) }}
-              </td>
-              <td class="px-4 py-3">
-                <UBadge :color="getCostCentreColor(issue.cost_centre)" variant="soft">
-                  {{ issue.cost_centre }}
-                </UBadge>
-              </td>
-              <td class="whitespace-nowrap px-4 py-3 text-body font-medium">
-                {{ formatCurrency(issue.total_value) }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div
-        v-if="pagination.totalPages > 1"
-        class="flex items-center justify-between border-t border-default px-4 py-3"
-      >
-        <div class="text-caption">
-          {{ paginationInfo }}
-        </div>
-        <div class="flex gap-1">
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-chevron-left"
-            :disabled="pagination.page === 1"
-            @click="previousPage"
-          />
-
-          <template v-for="page in pagination.totalPages" :key="page">
-            <UButton
-              v-if="
-                page === 1 ||
-                page === pagination.totalPages ||
-                Math.abs(page - pagination.page) <= 1
-              "
-              :color="page === pagination.page ? 'primary' : 'neutral'"
-              :variant="page === pagination.page ? 'solid' : 'outline'"
-              @click="goToPage(page)"
-            >
-              {{ page }}
-            </UButton>
-            <span
-              v-else-if="page === 2 || page === pagination.totalPages - 1"
-              class="flex items-center px-2 text-muted"
-            >
-              ...
-            </span>
-          </template>
-
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-chevron-right"
-            :disabled="pagination.page === pagination.totalPages"
-            @click="nextPage"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Empty State -->
-    <EmptyState
-      v-else
-      icon="i-lucide-file-minus"
-      title="No Issues Found"
-      :description="
-        activeFilters.length > 0
-          ? 'No issues match your current filters. Try adjusting your search criteria.'
-          : 'No issues have been recorded yet. Click the button above to create your first issue.'
-      "
-    >
-      <template v-if="canPostIssues()" #action>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          label="New Issue"
-          class="cursor-pointer"
-          @click="goToNewIssue"
-        />
-      </template>
-    </EmptyState>
-  </div>
-</template>
