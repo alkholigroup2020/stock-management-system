@@ -373,7 +373,8 @@ const updateLineCalculations = (line: {
     line.wac = 0;
     line.on_hand = 0;
     line.line_value = 0;
-    line.has_insufficient_stock = false;
+    // If item has no stock record and quantity > 0, that's insufficient stock
+    line.has_insufficient_stock = quantity > 0;
   }
 };
 
@@ -434,15 +435,15 @@ const fetchItems = async () => {
     });
     items.value = data.items || [];
 
-    // Build stock levels map
+    // Build stock levels map (convert Decimal strings to numbers)
     stockLevels.value = {};
     items.value.forEach((item) => {
       if (item.location_stock && item.location_stock.length > 0) {
         const stock = item.location_stock[0];
         if (stock) {
           stockLevels.value[item.id] = {
-            on_hand: stock.on_hand,
-            wac: stock.wac,
+            on_hand: Number(stock.on_hand) || 0,
+            wac: Number(stock.wac) || 0,
           };
         }
       }
@@ -481,6 +482,14 @@ const submitIssue = async () => {
           quantity: parseFloat(line.quantity),
         }));
 
+        // Extract cost_centre value (handle both string and object formats)
+        const costCentreValue =
+          typeof formData.value.cost_centre === "object" &&
+          formData.value.cost_centre !== null &&
+          "value" in formData.value.cost_centre
+            ? (formData.value.cost_centre as { value: string }).value
+            : formData.value.cost_centre;
+
         // Submit issue
         const result = await $fetch<{ id: string }>(
           `/api/locations/${locationStore.activeLocation!.id}/issues`,
@@ -490,7 +499,7 @@ const submitIssue = async () => {
               issue_date: formData.value.issue_date
                 ? new Date(formData.value.issue_date).toISOString()
                 : new Date().toISOString(),
-              cost_centre: formData.value.cost_centre,
+              cost_centre: costCentreValue,
               lines: linesData,
             },
           }
@@ -548,6 +557,11 @@ onMounted(async () => {
     return;
   }
 
+  // Wait for location store to be ready
+  if (!locationStore.activeLocation?.id) {
+    await locationStore.fetchUserLocations();
+  }
+
   // Fetch required data
   await fetchItems();
 
@@ -562,5 +576,22 @@ watch(
     lines.value.forEach((line) => updateLineCalculations(line));
   },
   { deep: true }
+);
+
+// Watch for location changes - refresh stock data
+watch(
+  () => locationStore.activeLocation?.id,
+  async (newLocationId, oldLocationId) => {
+    if (newLocationId && newLocationId !== oldLocationId) {
+      // Reset lines to prevent stale stock data
+      lines.value = [];
+
+      // Re-fetch items with stock for the new location
+      await fetchItems();
+
+      // Add initial empty line
+      addLine();
+    }
+  }
 );
 </script>
