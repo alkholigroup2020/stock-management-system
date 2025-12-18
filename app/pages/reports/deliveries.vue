@@ -28,6 +28,8 @@ const toast = useAppToast();
 // State
 const loading = ref(false);
 const loadingPeriods = ref(false);
+const exporting = ref(false);
+const exportingDetailed = ref(false);
 const error = ref<string | null>(null);
 const selectedPeriodId = ref<string>("");
 const selectedLocationId = ref<string>("");
@@ -201,47 +203,53 @@ const exportToCSV = () => {
     return;
   }
 
-  // Build CSV headers
-  const headers = [
-    "Delivery No",
-    "Date",
-    "Invoice No",
-    "Supplier",
-    "Location",
-    "Period",
-    "Total Amount",
-    "Has Variance",
-    "Total Variance",
-    "NCR Count",
-    "Posted By",
-    "Posted At",
-  ];
+  exporting.value = true;
 
-  // Build rows
-  const rows: (string | number | null)[][] = [];
+  try {
+    // Build CSV headers
+    const headers = [
+      "Delivery No",
+      "Date",
+      "Invoice No",
+      "Supplier",
+      "Location",
+      "Period",
+      "Total Amount",
+      "Has Variance",
+      "Total Variance",
+      "NCR Count",
+      "Posted By",
+      "Posted At",
+    ];
 
-  for (const delivery of reportData.value.deliveries) {
-    rows.push([
-      delivery.delivery_no,
-      formatDateForCSV(delivery.delivery_date),
-      delivery.invoice_no || "",
-      delivery.supplier_name,
-      delivery.location_name,
-      delivery.period_name,
-      formatCurrencyForCSV(delivery.total_amount),
-      delivery.has_variance ? "Yes" : "No",
-      formatCurrencyForCSV(delivery.total_variance),
-      delivery.ncr_count,
-      delivery.poster_name,
-      formatDateForCSV(delivery.posted_at),
-    ]);
+    // Build rows
+    const rows: (string | number | null)[][] = [];
+
+    for (const delivery of reportData.value.deliveries) {
+      rows.push([
+        delivery.delivery_no,
+        formatDateForCSV(delivery.delivery_date),
+        delivery.invoice_no || "",
+        delivery.supplier_name,
+        delivery.location_name,
+        delivery.period_name,
+        formatCurrencyForCSV(delivery.total_amount),
+        delivery.has_variance ? "Yes" : "No",
+        formatCurrencyForCSV(delivery.total_variance),
+        delivery.ncr_count,
+        delivery.poster_name,
+        formatDateForCSV(delivery.posted_at),
+      ]);
+    }
+
+    const csvContent = generateSimpleCSV(headers, rows);
+    const filename = `deliveries-report-${new Date().toISOString().split("T")[0]}`;
+    downloadCSV(csvContent, filename);
+
+    toast.success("Exported", { description: "Deliveries report exported to CSV" });
+  } finally {
+    exporting.value = false;
   }
-
-  const csvContent = generateSimpleCSV(headers, rows);
-  const filename = `deliveries-report-${new Date().toISOString().split("T")[0]}`;
-  downloadCSV(csvContent, filename);
-
-  toast.success("Exported", { description: "Deliveries report exported to CSV" });
 };
 
 const exportDetailedCSV = () => {
@@ -250,49 +258,55 @@ const exportDetailedCSV = () => {
     return;
   }
 
-  // Build CSV headers for detailed line items
-  const headers = [
-    "Delivery No",
-    "Date",
-    "Supplier",
-    "Location",
-    "Item Code",
-    "Item Name",
-    "Unit",
-    "Quantity",
-    "Unit Price",
-    "Period Price",
-    "Variance",
-    "Line Value",
-  ];
+  exportingDetailed.value = true;
 
-  // Build rows
-  const rows: (string | number | null)[][] = [];
+  try {
+    // Build CSV headers for detailed line items
+    const headers = [
+      "Delivery No",
+      "Date",
+      "Supplier",
+      "Location",
+      "Item Code",
+      "Item Name",
+      "Unit",
+      "Quantity",
+      "Unit Price",
+      "Period Price",
+      "Variance",
+      "Line Value",
+    ];
 
-  for (const delivery of reportData.value.deliveries) {
-    for (const line of delivery.lines) {
-      rows.push([
-        delivery.delivery_no,
-        formatDateForCSV(delivery.delivery_date),
-        delivery.supplier_name,
-        delivery.location_name,
-        line.item_code,
-        line.item_name,
-        line.item_unit,
-        formatNumberForCSV(line.quantity, 4),
-        formatCurrencyForCSV(line.unit_price),
-        formatCurrencyForCSV(line.period_price),
-        formatCurrencyForCSV(line.price_variance),
-        formatCurrencyForCSV(line.line_value),
-      ]);
+    // Build rows
+    const rows: (string | number | null)[][] = [];
+
+    for (const delivery of reportData.value.deliveries) {
+      for (const line of delivery.lines) {
+        rows.push([
+          delivery.delivery_no,
+          formatDateForCSV(delivery.delivery_date),
+          delivery.supplier_name,
+          delivery.location_name,
+          line.item_code,
+          line.item_name,
+          line.item_unit,
+          formatNumberForCSV(line.quantity, 4),
+          formatCurrencyForCSV(line.unit_price),
+          formatCurrencyForCSV(line.period_price),
+          formatCurrencyForCSV(line.price_variance),
+          formatCurrencyForCSV(line.line_value),
+        ]);
+      }
     }
+
+    const csvContent = generateSimpleCSV(headers, rows);
+    const filename = `deliveries-detailed-${new Date().toISOString().split("T")[0]}`;
+    downloadCSV(csvContent, filename);
+
+    toast.success("Exported", { description: "Detailed deliveries exported to CSV" });
+  } finally {
+    exportingDetailed.value = false;
   }
-
-  const csvContent = generateSimpleCSV(headers, rows);
-  const filename = `deliveries-detailed-${new Date().toISOString().split("T")[0]}`;
-  downloadCSV(csvContent, filename);
-
-  toast.success("Exported", { description: "Detailed deliveries exported to CSV" });
 };
 
 // Lifecycle
@@ -306,70 +320,85 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Deliveries Report"
-      subtitle="Delivery history with supplier and variance analysis"
-      icon="i-lucide-truck"
-      :show-location="false"
-      :show-period="false"
-    >
-      <template #actions>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Responsive icon size - NO background, NO border -->
+        <UIcon name="i-lucide-truck" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <div>
+          <!-- Responsive title size -->
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Deliveries Report</h1>
+          <!-- Description: hidden on mobile, visible on sm+ -->
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Delivery history with supplier and variance analysis
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
         <UButton
           icon="i-lucide-arrow-left"
           color="neutral"
           variant="ghost"
+          size="lg"
           to="/reports"
-          class="cursor-pointer"
+          class="cursor-pointer px-3 sm:px-5"
         >
-          Back to Reports
+          <span class="hidden sm:inline">Back</span>
         </UButton>
         <UButton
           icon="i-lucide-download"
           color="primary"
-          :disabled="loading || !hasData"
-          class="cursor-pointer"
+          size="lg"
+          :loading="exporting"
+          :disabled="loading || !hasData || exporting"
+          class="cursor-pointer rounded-full px-3 sm:px-5"
           @click="exportToCSV"
         >
-          Export Summary
+          <span class="hidden sm:inline">Export</span>
         </UButton>
         <UButton
           icon="i-lucide-file-spreadsheet"
           color="neutral"
           variant="outline"
-          :disabled="loading || !hasData"
-          class="cursor-pointer"
+          size="lg"
+          :loading="exportingDetailed"
+          :disabled="loading || !hasData || exportingDetailed"
+          class="cursor-pointer rounded-full px-3"
           @click="exportDetailedCSV"
         >
-          Export Detail
+          <span class="hidden lg:inline">Detail</span>
         </UButton>
-      </template>
-    </LayoutPageHeader>
+      </div>
+    </div>
 
     <!-- Filters -->
-    <div class="card-elevated p-6 mb-6">
-      <h3 class="text-subheading font-semibold mb-4">Filters</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-4">Filters</h3>
+
+      <!-- Desktop: Grid layout (lg and above) -->
+      <div class="hidden lg:grid lg:grid-cols-6 gap-3">
         <!-- Period Filter -->
-        <UFormField label="Period">
+        <UFormField label="Period" class="w-full">
           <USelectMenu
             v-model="selectedPeriodId"
-            :options="[
+            :items="[
               { label: 'All Periods', value: '' },
               ...periods.map((p) => ({ label: p.name, value: p.id })),
             ]"
             :loading="loadingPeriods"
             placeholder="Select period"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
         <!-- Location Filter -->
-        <UFormField v-if="isAtLeastSupervisor" label="Location">
+        <UFormField v-if="isAtLeastSupervisor" label="Location" class="w-full">
           <USelectMenu
             v-model="selectedLocationId"
-            :options="[
+            :items="[
               { label: 'All Locations', value: '' },
               ...locationStore.userLocations.map((loc) => ({
                 label: `${loc.name} (${loc.code})`,
@@ -377,91 +406,181 @@ onMounted(async () => {
               })),
             ]"
             placeholder="Select location"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
         <!-- Start Date -->
-        <UFormField label="From Date">
-          <UInput v-model="startDate" type="date" />
+        <UFormField label="From Date" class="w-full">
+          <UInput v-model="startDate" type="date" size="lg" class="w-full" />
         </UFormField>
 
         <!-- End Date -->
-        <UFormField label="To Date">
-          <UInput v-model="endDate" type="date" />
+        <UFormField label="To Date" class="w-full">
+          <UInput v-model="endDate" type="date" size="lg" class="w-full" />
         </UFormField>
 
         <!-- Variance Filter -->
-        <UFormField label="Variance">
-          <UCheckbox v-model="showVarianceOnly" label="With variance only" />
+        <UFormField label="Variance" class="w-full">
+          <div class="flex items-center h-10">
+            <UCheckbox v-model="showVarianceOnly" label="With variance only" />
+          </div>
         </UFormField>
 
         <!-- Actions -->
-        <UFormField label="Actions">
+        <UFormField label="Actions" class="w-full">
           <div class="flex gap-2">
-            <UButton color="primary" class="cursor-pointer" @click="fetchReport">Generate</UButton>
-            <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
+            <UButton
+              color="primary"
+              size="lg"
+              :loading="loading"
+              :disabled="loading"
+              class="cursor-pointer rounded-full"
+              @click="fetchReport"
+            >
+              Generate
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full"
+              @click="clearFilters"
+            >
               Clear
             </UButton>
           </div>
         </UFormField>
       </div>
-    </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Period and Location -->
+        <div class="grid grid-cols-1 gap-3">
+          <UFormField label="Period">
+            <USelectMenu
+              v-model="selectedPeriodId"
+              :items="[
+                { label: 'All Periods', value: '' },
+                ...periods.map((p) => ({ label: p.name, value: p.id })),
+              ]"
+              :loading="loadingPeriods"
+              placeholder="Period"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField v-if="isAtLeastSupervisor" label="Location">
+            <USelectMenu
+              v-model="selectedLocationId"
+              :items="[
+                { label: 'All Locations', value: '' },
+                ...locationStore.userLocations.map((loc) => ({
+                  label: `${loc.name} (${loc.code})`,
+                  value: loc.id,
+                })),
+              ]"
+              placeholder="Location"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Date Range -->
+        <div class="grid grid-cols-2 gap-3">
+          <UFormField label="From">
+            <UInput v-model="startDate" type="date" size="lg" class="w-full" />
+          </UFormField>
+          <UFormField label="To">
+            <UInput v-model="endDate" type="date" size="lg" class="w-full" />
+          </UFormField>
+        </div>
+
+        <!-- Variance and Actions -->
+        <div class="flex items-center gap-2">
+          <div class="flex-1">
+            <UCheckbox v-model="showVarianceOnly" label="With variance only" />
+          </div>
+          <UButton
+            color="primary"
+            size="lg"
+            :loading="loading"
+            :disabled="loading"
+            class="cursor-pointer"
+            icon="i-lucide-refresh-cw"
+            @click="fetchReport"
+          />
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer"
+            icon="i-lucide-x"
+            @click="clearFilters"
+          />
+        </div>
+      </div>
+    </UCard>
 
     <!-- Loading State -->
-    <div v-if="loading" class="card-elevated p-12">
+    <div v-if="loading" class="flex items-center justify-center py-16">
       <LoadingSpinner size="lg" text="Generating report..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="card-elevated p-6">
+    <div v-else-if="error">
       <ErrorAlert :message="error" :retry="fetchReport" />
     </div>
 
     <!-- Report Content -->
     <template v-else-if="reportData">
       <!-- Summary Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-        <div class="card-elevated p-4">
-          <p class="text-caption">Deliveries</p>
-          <p class="text-heading font-bold">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Deliveries</p>
+          <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
             {{ reportData.grand_totals.total_deliveries }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Value</p>
-          <p class="text-heading font-bold text-emerald-500">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Value</p>
+          <p class="text-2xl sm:text-3xl font-bold text-emerald-500 dark:text-emerald-400 mt-1">
             {{ formatCurrency(reportData.grand_totals.total_value) }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Line Items</p>
-          <p class="text-heading font-bold">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Line Items</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
             {{ reportData.grand_totals.total_line_items }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">With Variance</p>
-          <p class="text-heading font-bold text-amber-500">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">With Variance</p>
+          <p class="text-2xl sm:text-3xl font-bold text-amber-500 dark:text-amber-400 mt-1">
             {{ reportData.grand_totals.deliveries_with_variance }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Variance</p>
-          <p class="text-heading font-bold text-red-500">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Variance</p>
+          <p class="text-2xl sm:text-3xl font-bold text-red-500 dark:text-red-400 mt-1">
             {{ formatCurrency(reportData.grand_totals.total_variance) }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">NCRs</p>
-          <p class="text-heading font-bold">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">NCRs</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
             {{ reportData.grand_totals.total_ncrs }}
           </p>
-        </div>
+        </UCard>
       </div>
 
       <!-- By Location Summary -->
-      <div v-if="reportData.by_location.length > 0" class="card-elevated mb-6">
+      <UCard v-if="reportData.by_location.length > 0" class="card-elevated">
         <div class="p-4 border-b border-[var(--ui-border)]">
           <h3 class="text-subheading font-semibold">By Location</h3>
         </div>
@@ -479,31 +598,33 @@ onMounted(async () => {
             </p>
           </div>
         </div>
-      </div>
+      </UCard>
 
       <!-- By Supplier Summary -->
-      <div v-if="reportData.by_supplier.length > 0" class="card-elevated mb-6">
-        <div class="p-4 border-b border-[var(--ui-border)]">
-          <h3 class="text-subheading font-semibold">Top Suppliers</h3>
-        </div>
-        <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <UCard v-if="reportData?.by_supplier && reportData.by_supplier.length > 0" class="card-elevated">
+        <template #header>
+          <h3 class="text-lg font-semibold text-[var(--ui-text)]">Top Suppliers</h3>
+        </template>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div
             v-for="sup in reportData.by_supplier.slice(0, 8)"
             :key="sup.supplier_id"
-            class="p-3 rounded-lg bg-[var(--ui-bg)]"
+            class="p-3 rounded-lg bg-[var(--ui-bg-muted)]"
           >
-            <p class="font-medium">{{ sup.supplier_name }}</p>
-            <p class="text-caption">{{ sup.delivery_count }} deliveries</p>
-            <p class="text-emerald-500 font-semibold">{{ formatCurrency(sup.total_value) }}</p>
+            <p class="font-medium text-[var(--ui-text)]">{{ sup.supplier_name }}</p>
+            <p class="text-sm text-[var(--ui-text-muted)]">{{ sup.delivery_count }} deliveries</p>
+            <p class="text-emerald-500 dark:text-emerald-400 font-semibold">
+              {{ formatCurrency(sup.total_value) }}
+            </p>
           </div>
         </div>
-      </div>
+      </UCard>
 
       <!-- Deliveries Table -->
-      <div v-if="hasData" class="card-elevated overflow-hidden">
-        <div class="p-4 border-b border-[var(--ui-border)]">
-          <h3 class="text-subheading font-semibold">Delivery List</h3>
-        </div>
+      <UCard v-if="hasData" class="card-elevated">
+        <template #header>
+          <h3 class="text-lg font-semibold text-[var(--ui-text)]">Delivery List</h3>
+        </template>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="bg-[var(--ui-bg-elevated)]">
@@ -519,7 +640,7 @@ onMounted(async () => {
             </thead>
             <tbody>
               <tr
-                v-for="delivery in reportData.deliveries"
+                v-for="delivery in reportData?.deliveries ?? []"
                 :key="delivery.id"
                 class="border-b border-[var(--ui-border)] hover:bg-[var(--ui-bg-elevated)]/50"
               >
@@ -562,16 +683,18 @@ onMounted(async () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </UCard>
 
       <!-- Empty State -->
-      <div v-else class="card-elevated p-12">
-        <EmptyState
-          icon="i-lucide-truck"
-          title="No deliveries"
-          description="No deliveries found matching the selected filters."
-        />
-      </div>
+      <UCard v-else class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="py-16">
+          <EmptyState
+            icon="i-lucide-truck"
+            title="No deliveries"
+            description="No deliveries found matching the selected filters."
+          />
+        </div>
+      </UCard>
     </template>
   </div>
 </template>

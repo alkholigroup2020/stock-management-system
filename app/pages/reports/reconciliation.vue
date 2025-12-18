@@ -23,6 +23,7 @@ const toast = useAppToast();
 // State
 const loading = ref(false);
 const loadingPeriods = ref(false);
+const exporting = ref(false);
 const error = ref<string | null>(null);
 const selectedPeriodId = ref<string>("");
 const selectedLocationId = ref<string>("");
@@ -188,80 +189,86 @@ const exportToCSV = () => {
     return;
   }
 
-  // Build CSV headers
-  const headers = [
-    "Location",
-    "Location Code",
-    "Opening Stock",
-    "Receipts",
-    "Transfers In",
-    "Transfers Out",
-    "Issues",
-    "Closing Stock",
-    "Adjustments",
-    "Back Charges",
-    "Credits",
-    "Condemnations",
-    "Consumption",
-    "Total Mandays",
-    "Manday Cost",
-    "Data Status",
-  ];
+  exporting.value = true;
 
-  // Build rows
-  const rows: (string | number | null)[][] = [];
+  try {
+    // Build CSV headers
+    const headers = [
+      "Location",
+      "Location Code",
+      "Opening Stock",
+      "Receipts",
+      "Transfers In",
+      "Transfers Out",
+      "Issues",
+      "Closing Stock",
+      "Adjustments",
+      "Back Charges",
+      "Credits",
+      "Condemnations",
+      "Consumption",
+      "Total Mandays",
+      "Manday Cost",
+      "Data Status",
+    ];
 
-  for (const location of reportData.value.locations) {
+    // Build rows
+    const rows: (string | number | null)[][] = [];
+
+    for (const location of reportData.value.locations) {
+      rows.push([
+        location.location_name,
+        location.location_code,
+        formatCurrencyForCSV(location.reconciliation.opening_stock),
+        formatCurrencyForCSV(location.reconciliation.receipts),
+        formatCurrencyForCSV(location.reconciliation.transfers_in),
+        formatCurrencyForCSV(location.reconciliation.transfers_out),
+        formatCurrencyForCSV(location.reconciliation.issues),
+        formatCurrencyForCSV(location.reconciliation.closing_stock),
+        formatCurrencyForCSV(location.reconciliation.adjustments),
+        formatCurrencyForCSV(location.reconciliation.back_charges),
+        formatCurrencyForCSV(location.reconciliation.credits),
+        formatCurrencyForCSV(location.reconciliation.condemnations),
+        formatCurrencyForCSV(location.calculations.consumption),
+        location.calculations.total_mandays,
+        location.calculations.manday_cost
+          ? formatCurrencyForCSV(location.calculations.manday_cost)
+          : "",
+        location.is_saved ? "Saved" : "Calculated",
+      ]);
+    }
+
+    // Add totals row
     rows.push([
-      location.location_name,
-      location.location_code,
-      formatCurrencyForCSV(location.reconciliation.opening_stock),
-      formatCurrencyForCSV(location.reconciliation.receipts),
-      formatCurrencyForCSV(location.reconciliation.transfers_in),
-      formatCurrencyForCSV(location.reconciliation.transfers_out),
-      formatCurrencyForCSV(location.reconciliation.issues),
-      formatCurrencyForCSV(location.reconciliation.closing_stock),
-      formatCurrencyForCSV(location.reconciliation.adjustments),
-      formatCurrencyForCSV(location.reconciliation.back_charges),
-      formatCurrencyForCSV(location.reconciliation.credits),
-      formatCurrencyForCSV(location.reconciliation.condemnations),
-      formatCurrencyForCSV(location.calculations.consumption),
-      location.calculations.total_mandays,
-      location.calculations.manday_cost
-        ? formatCurrencyForCSV(location.calculations.manday_cost)
+      "GRAND TOTAL",
+      "",
+      formatCurrencyForCSV(reportData.value.grand_totals.opening_stock),
+      formatCurrencyForCSV(reportData.value.grand_totals.receipts),
+      formatCurrencyForCSV(reportData.value.grand_totals.transfers_in),
+      formatCurrencyForCSV(reportData.value.grand_totals.transfers_out),
+      formatCurrencyForCSV(reportData.value.grand_totals.issues),
+      formatCurrencyForCSV(reportData.value.grand_totals.closing_stock),
+      formatCurrencyForCSV(reportData.value.grand_totals.adjustments),
+      formatCurrencyForCSV(reportData.value.grand_totals.back_charges),
+      formatCurrencyForCSV(reportData.value.grand_totals.credits),
+      formatCurrencyForCSV(reportData.value.grand_totals.condemnations),
+      formatCurrencyForCSV(reportData.value.grand_totals.consumption),
+      reportData.value.grand_totals.total_mandays,
+      reportData.value.grand_totals.average_manday_cost
+        ? formatCurrencyForCSV(reportData.value.grand_totals.average_manday_cost)
         : "",
-      location.is_saved ? "Saved" : "Calculated",
+      "",
     ]);
+
+    const csvContent = generateSimpleCSV(headers, rows);
+    const periodName = reportData.value.period.name.replace(/\s+/g, "-");
+    const filename = `reconciliation-report-${periodName}-${new Date().toISOString().split("T")[0]}`;
+    downloadCSV(csvContent, filename);
+
+    toast.success("Exported", { description: "Reconciliation report exported to CSV" });
+  } finally {
+    exporting.value = false;
   }
-
-  // Add totals row
-  rows.push([
-    "GRAND TOTAL",
-    "",
-    formatCurrencyForCSV(reportData.value.grand_totals.opening_stock),
-    formatCurrencyForCSV(reportData.value.grand_totals.receipts),
-    formatCurrencyForCSV(reportData.value.grand_totals.transfers_in),
-    formatCurrencyForCSV(reportData.value.grand_totals.transfers_out),
-    formatCurrencyForCSV(reportData.value.grand_totals.issues),
-    formatCurrencyForCSV(reportData.value.grand_totals.closing_stock),
-    formatCurrencyForCSV(reportData.value.grand_totals.adjustments),
-    formatCurrencyForCSV(reportData.value.grand_totals.back_charges),
-    formatCurrencyForCSV(reportData.value.grand_totals.credits),
-    formatCurrencyForCSV(reportData.value.grand_totals.condemnations),
-    formatCurrencyForCSV(reportData.value.grand_totals.consumption),
-    reportData.value.grand_totals.total_mandays,
-    reportData.value.grand_totals.average_manday_cost
-      ? formatCurrencyForCSV(reportData.value.grand_totals.average_manday_cost)
-      : "",
-    "",
-  ]);
-
-  const csvContent = generateSimpleCSV(headers, rows);
-  const periodName = reportData.value.period.name.replace(/\s+/g, "-");
-  const filename = `reconciliation-report-${periodName}-${new Date().toISOString().split("T")[0]}`;
-  downloadCSV(csvContent, filename);
-
-  toast.success("Exported", { description: "Reconciliation report exported to CSV" });
 };
 
 // Lifecycle
@@ -281,57 +288,70 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Reconciliation Report"
-      subtitle="Period-based stock reconciliation analysis"
-      icon="i-lucide-calculator"
-      :show-location="false"
-      :show-period="false"
-    >
-      <template #actions>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Responsive icon size - NO background, NO border -->
+        <UIcon name="i-lucide-calculator" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <div>
+          <!-- Responsive title size -->
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Reconciliation Report</h1>
+          <!-- Description: hidden on mobile, visible on sm+ -->
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Period-based stock reconciliation analysis
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
         <UButton
           icon="i-lucide-arrow-left"
           color="neutral"
           variant="ghost"
+          size="lg"
           to="/reports"
-          class="cursor-pointer"
+          class="cursor-pointer px-3 sm:px-5"
         >
-          Back to Reports
+          <span class="hidden sm:inline">Back</span>
         </UButton>
         <UButton
           icon="i-lucide-download"
           color="primary"
-          :disabled="loading || !hasData"
-          class="cursor-pointer"
+          size="lg"
+          :loading="exporting"
+          :disabled="loading || !hasData || exporting"
+          class="cursor-pointer rounded-full px-3 sm:px-5"
           @click="exportToCSV"
         >
-          Export CSV
+          <span class="hidden sm:inline">Export</span>
         </UButton>
-      </template>
-    </LayoutPageHeader>
+      </div>
+    </div>
 
     <!-- Filters -->
-    <div class="card-elevated p-6 mb-6">
-      <h3 class="text-subheading font-semibold mb-4">Filters</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-4">Filters</h3>
+
+      <!-- Desktop: Grid layout (lg and above) -->
+      <div class="hidden lg:grid lg:grid-cols-4 gap-3">
         <!-- Period Filter (Required) -->
-        <UFormField label="Period" required>
+        <UFormField label="Period" required class="w-full">
           <USelectMenu
             v-model="selectedPeriodId"
-            :options="periodOptions"
+            :items="periodOptions"
             :loading="loadingPeriods"
             placeholder="Select period"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
         <!-- Location Filter -->
-        <UFormField v-if="isAtLeastSupervisor" label="Location">
+        <UFormField v-if="isAtLeastSupervisor" label="Location" class="w-full">
           <USelectMenu
             v-model="selectedLocationId"
-            :options="[
+            :items="[
               { label: 'All Locations', value: '' },
               ...locationStore.userLocations.map((loc) => ({
                 label: `${loc.name} (${loc.code})`,
@@ -339,49 +359,115 @@ onMounted(async () => {
               })),
             ]"
             placeholder="Select location"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
-        <!-- Spacer -->
+        <!-- Spacer (when not supervisor) -->
         <div v-if="!isAtLeastSupervisor" />
 
         <!-- Spacer -->
         <div />
 
         <!-- Actions -->
-        <UFormField label="Actions">
+        <UFormField label="Actions" class="w-full">
           <div class="flex gap-2">
             <UButton
               color="primary"
-              :disabled="!selectedPeriodId"
-              class="cursor-pointer"
+              size="lg"
+              :loading="loading"
+              :disabled="!selectedPeriodId || loading"
+              class="cursor-pointer rounded-full"
               @click="fetchReport"
             >
               Generate
             </UButton>
-            <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full"
+              @click="clearFilters"
+            >
               Clear
             </UButton>
           </div>
         </UFormField>
       </div>
-    </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Period and Location -->
+        <div class="grid grid-cols-1 gap-3">
+          <UFormField label="Period" required>
+            <USelectMenu
+              v-model="selectedPeriodId"
+              :items="periodOptions"
+              :loading="loadingPeriods"
+              placeholder="Period"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField v-if="isAtLeastSupervisor" label="Location">
+            <USelectMenu
+              v-model="selectedLocationId"
+              :items="[
+                { label: 'All Locations', value: '' },
+                ...locationStore.userLocations.map((loc) => ({
+                  label: `${loc.name} (${loc.code})`,
+                  value: loc.id,
+                })),
+              ]"
+              placeholder="Location"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2">
+          <UButton
+            color="primary"
+            size="lg"
+            :loading="loading"
+            :disabled="!selectedPeriodId || loading"
+            class="cursor-pointer flex-1"
+            @click="fetchReport"
+          >
+            Generate
+          </UButton>
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer"
+            icon="i-lucide-x"
+            @click="clearFilters"
+          />
+        </div>
+      </div>
+    </UCard>
 
     <!-- Loading State -->
-    <div v-if="loading" class="card-elevated p-12">
+    <div v-if="loading" class="flex items-center justify-center py-16">
       <LoadingSpinner size="lg" text="Generating report..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="card-elevated p-6">
+    <div v-else-if="error">
       <ErrorAlert :message="error" :retry="fetchReport" />
     </div>
 
     <!-- Report Content -->
     <template v-else-if="reportData">
       <!-- Period Info -->
-      <div class="card-elevated p-4 mb-6">
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <div class="flex flex-wrap items-center gap-4">
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-calendar" class="text-primary" />
@@ -400,84 +486,92 @@ onMounted(async () => {
             Generated: {{ formatDateTime(reportData.generated_at) }}
           </span>
         </div>
-      </div>
+      </UCard>
 
       <!-- Grand Totals Summary -->
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-        <div class="card-elevated p-4">
-          <p class="text-caption">Opening Stock</p>
-          <p class="text-subheading font-bold">
-            {{ formatCurrency(reportData.grand_totals.opening_stock) }}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Opening Stock</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
+            {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Receipts</p>
-          <p class="text-subheading font-bold text-emerald-500">
-            + {{ formatCurrency(reportData.grand_totals.receipts) }}
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Receipts</p>
+          <p class="text-2xl sm:text-3xl font-bold text-emerald-500 dark:text-emerald-400 mt-1">
+            + {{ reportData ? formatCurrency(reportData.grand_totals.receipts) : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Transfers In</p>
-          <p class="text-subheading font-bold text-blue-500">
-            + {{ formatCurrency(reportData.grand_totals.transfers_in) }}
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Transfers In</p>
+          <p class="text-2xl sm:text-3xl font-bold text-blue-500 dark:text-blue-400 mt-1">
+            + {{ reportData ? formatCurrency(reportData.grand_totals.transfers_in) : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Transfers Out</p>
-          <p class="text-subheading font-bold text-amber-500">
-            - {{ formatCurrency(reportData.grand_totals.transfers_out) }}
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Transfers Out</p>
+          <p class="text-2xl sm:text-3xl font-bold text-amber-500 dark:text-amber-400 mt-1">
+            - {{ reportData ? formatCurrency(reportData.grand_totals.transfers_out) : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Issues</p>
-          <p class="text-subheading font-bold text-red-500">
-            - {{ formatCurrency(reportData.grand_totals.issues) }}
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Issues</p>
+          <p class="text-2xl sm:text-3xl font-bold text-red-500 dark:text-red-400 mt-1">
+            - {{ reportData ? formatCurrency(reportData.grand_totals.issues) : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Closing Stock</p>
-          <p class="text-subheading font-bold text-primary">
-            {{ formatCurrency(reportData.grand_totals.closing_stock) }}
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Closing Stock</p>
+          <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
+            {{ reportData ? formatCurrency(reportData.grand_totals.closing_stock) : '' }}
           </p>
-        </div>
+        </UCard>
       </div>
 
       <!-- Consumption Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="card-elevated p-4 border-l-4 border-l-[var(--ui-primary)]">
-          <p class="text-caption">Total Consumption</p>
-          <p class="text-heading font-bold text-primary">
-            {{ formatCurrency(reportData.grand_totals.consumption) }}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <UCard class="card-elevated border-l-4 border-l-primary" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Consumption</p>
+          <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
+            {{ reportData ? formatCurrency(reportData.grand_totals.consumption) : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4 border-l-4 border-l-emerald-500">
-          <p class="text-caption">Total Mandays</p>
-          <p class="text-heading font-bold">
-            {{ reportData.grand_totals.total_mandays.toLocaleString() }}
+        </UCard>
+        <UCard
+          class="card-elevated border-l-4 border-l-emerald-500 dark:border-l-emerald-400"
+          :ui="{ body: 'p-3 sm:p-4' }"
+        >
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Mandays</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
+            {{ reportData ? reportData.grand_totals.total_mandays.toLocaleString() : '' }}
           </p>
-        </div>
-        <div class="card-elevated p-4 border-l-4 border-l-blue-500">
-          <p class="text-caption">Average Manday Cost</p>
-          <p class="text-heading font-bold">
+        </UCard>
+        <UCard
+          class="card-elevated border-l-4 border-l-blue-500 dark:border-l-blue-400"
+          :ui="{ body: 'p-3 sm:p-4' }"
+        >
+          <p class="text-sm text-[var(--ui-text-muted)]">Average Manday Cost</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
             {{
-              reportData.grand_totals.average_manday_cost
+              reportData && reportData.grand_totals.average_manday_cost
                 ? formatCurrency(reportData.grand_totals.average_manday_cost)
                 : "N/A"
             }}
           </p>
-        </div>
+        </UCard>
       </div>
 
       <!-- Location Details Table -->
-      <div v-if="hasData" class="card-elevated overflow-hidden">
-        <div class="p-4 border-b border-[var(--ui-border)]">
-          <h3 class="text-subheading font-semibold">Location Breakdown</h3>
-          <p class="text-caption">
-            {{ reportData.summary.total_locations }} locations |
-            {{ reportData.summary.locations_with_saved_data }} with saved data |
-            {{ reportData.summary.locations_with_calculated_data }} calculated
-          </p>
-        </div>
+      <UCard v-if="hasData" class="card-elevated">
+        <template #header>
+          <div>
+            <h3 class="text-lg font-semibold text-[var(--ui-text)]">Location Breakdown</h3>
+            <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+              {{ reportData?.summary.total_locations ?? 0 }} locations |
+              {{ reportData?.summary.locations_with_saved_data ?? 0 }} with saved data |
+              {{ reportData?.summary.locations_with_calculated_data ?? 0 }} calculated
+            </p>
+          </div>
+        </template>
 
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
@@ -498,7 +592,7 @@ onMounted(async () => {
             </thead>
             <tbody>
               <tr
-                v-for="location in reportData.locations"
+                v-for="location in reportData?.locations ?? []"
                 :key="location.location_id"
                 class="border-b border-[var(--ui-border)] hover:bg-[var(--ui-bg-elevated)]/50"
               >
@@ -554,32 +648,32 @@ onMounted(async () => {
               <tr>
                 <td class="px-4 py-3">TOTAL</td>
                 <td class="px-4 py-3 text-right font-mono">
-                  {{ formatCurrency(reportData.grand_totals.opening_stock) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-emerald-500">
-                  {{ formatCurrency(reportData.grand_totals.receipts) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.receipts) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-blue-500">
-                  {{ formatCurrency(reportData.grand_totals.transfers_in) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.transfers_in) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-amber-500">
-                  {{ formatCurrency(reportData.grand_totals.transfers_out) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.transfers_out) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-red-500">
-                  {{ formatCurrency(reportData.grand_totals.issues) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.issues) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono">
-                  {{ formatCurrency(reportData.grand_totals.closing_stock) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.closing_stock) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-primary">
-                  {{ formatCurrency(reportData.grand_totals.consumption) }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.consumption) : '' }}
                 </td>
                 <td class="px-4 py-3 text-right">
-                  {{ reportData.grand_totals.total_mandays.toLocaleString() }}
+                  {{ reportData ? reportData.grand_totals.total_mandays.toLocaleString() : '' }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono">
                   {{
-                    reportData.grand_totals.average_manday_cost
+                    reportData && reportData.grand_totals.average_manday_cost
                       ? formatCurrency(reportData.grand_totals.average_manday_cost)
                       : "-"
                   }}
@@ -589,20 +683,22 @@ onMounted(async () => {
             </tfoot>
           </table>
         </div>
-      </div>
+      </UCard>
 
       <!-- Empty State -->
-      <div v-else class="card-elevated p-12">
-        <EmptyState
-          icon="i-lucide-calculator"
-          title="No reconciliation data"
-          description="No reconciliation data found for the selected period."
-        />
-      </div>
+      <UCard v-else class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="py-16">
+          <EmptyState
+            icon="i-lucide-calculator"
+            title="No reconciliation data"
+            description="No reconciliation data found for the selected period."
+          />
+        </div>
+      </UCard>
     </template>
 
     <!-- No Period Selected -->
-    <div v-else class="card-elevated p-12">
+    <div v-else class="py-16">
       <EmptyState
         icon="i-lucide-calendar"
         title="Select a Period"

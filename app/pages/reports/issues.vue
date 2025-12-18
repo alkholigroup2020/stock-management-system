@@ -28,6 +28,8 @@ const toast = useAppToast();
 // State
 const loading = ref(false);
 const loadingPeriods = ref(false);
+const exporting = ref(false);
+const exportingDetailed = ref(false);
 const error = ref<string | null>(null);
 const selectedPeriodId = ref<string>("");
 const selectedLocationId = ref<string>("");
@@ -210,41 +212,47 @@ const exportToCSV = () => {
     return;
   }
 
-  // Build CSV headers
-  const headers = [
-    "Issue No",
-    "Date",
-    "Location",
-    "Cost Centre",
-    "Period",
-    "Total Value",
-    "Line Items",
-    "Posted By",
-    "Notes",
-  ];
+  exporting.value = true;
 
-  // Build rows
-  const rows: (string | number | null)[][] = [];
+  try {
+    // Build CSV headers
+    const headers = [
+      "Issue No",
+      "Date",
+      "Location",
+      "Cost Centre",
+      "Period",
+      "Total Value",
+      "Line Items",
+      "Posted By",
+      "Notes",
+    ];
 
-  for (const issue of reportData.value.issues) {
-    rows.push([
-      issue.issue_no,
-      formatDateForCSV(issue.issue_date),
-      issue.location_name,
-      issue.cost_centre,
-      issue.period_name,
-      formatCurrencyForCSV(issue.total_value),
-      issue.line_count,
-      issue.poster_name,
-      issue.notes || "",
-    ]);
+    // Build rows
+    const rows: (string | number | null)[][] = [];
+
+    for (const issue of reportData.value.issues) {
+      rows.push([
+        issue.issue_no,
+        formatDateForCSV(issue.issue_date),
+        issue.location_name,
+        issue.cost_centre,
+        issue.period_name,
+        formatCurrencyForCSV(issue.total_value),
+        issue.line_count,
+        issue.poster_name,
+        issue.notes || "",
+      ]);
+    }
+
+    const csvContent = generateSimpleCSV(headers, rows);
+    const filename = `issues-report-${new Date().toISOString().split("T")[0]}`;
+    downloadCSV(csvContent, filename);
+
+    toast.success("Exported", { description: "Issues report exported to CSV" });
+  } finally {
+    exporting.value = false;
   }
-
-  const csvContent = generateSimpleCSV(headers, rows);
-  const filename = `issues-report-${new Date().toISOString().split("T")[0]}`;
-  downloadCSV(csvContent, filename);
-
-  toast.success("Exported", { description: "Issues report exported to CSV" });
 };
 
 const exportDetailedCSV = () => {
@@ -253,55 +261,61 @@ const exportDetailedCSV = () => {
     return;
   }
 
-  // Build CSV headers for detailed line items
-  const headers = [
-    "Issue No",
-    "Date",
-    "Location",
-    "Cost Centre",
-    "Item Code",
-    "Item Name",
-    "Unit",
-    "Quantity",
-    "WAC at Issue",
-    "Line Value",
-  ];
+  exportingDetailed.value = true;
 
-  // Build rows
-  const rows: (string | number | null)[][] = [];
+  try {
+    // Build CSV headers for detailed line items
+    const headers = [
+      "Issue No",
+      "Date",
+      "Location",
+      "Cost Centre",
+      "Item Code",
+      "Item Name",
+      "Unit",
+      "Quantity",
+      "WAC at Issue",
+      "Line Value",
+    ];
 
-  for (const issue of reportData.value.issues) {
-    for (const line of issue.lines) {
-      rows.push([
-        issue.issue_no,
-        formatDateForCSV(issue.issue_date),
-        issue.location_name,
-        issue.cost_centre,
-        line.item_code,
-        line.item_name,
-        line.item_unit,
-        formatNumberForCSV(line.quantity, 4),
-        formatCurrencyForCSV(line.wac_at_issue),
-        formatCurrencyForCSV(line.line_value),
-      ]);
+    // Build rows
+    const rows: (string | number | null)[][] = [];
+
+    for (const issue of reportData.value.issues) {
+      for (const line of issue.lines) {
+        rows.push([
+          issue.issue_no,
+          formatDateForCSV(issue.issue_date),
+          issue.location_name,
+          issue.cost_centre,
+          line.item_code,
+          line.item_name,
+          line.item_unit,
+          formatNumberForCSV(line.quantity, 4),
+          formatCurrencyForCSV(line.wac_at_issue),
+          formatCurrencyForCSV(line.line_value),
+        ]);
+      }
     }
+
+    const csvContent = generateSimpleCSV(headers, rows);
+    const filename = `issues-detailed-${new Date().toISOString().split("T")[0]}`;
+    downloadCSV(csvContent, filename);
+
+    toast.success("Exported", { description: "Detailed issues exported to CSV" });
+  } finally {
+    exportingDetailed.value = false;
   }
-
-  const csvContent = generateSimpleCSV(headers, rows);
-  const filename = `issues-detailed-${new Date().toISOString().split("T")[0]}`;
-  downloadCSV(csvContent, filename);
-
-  toast.success("Exported", { description: "Detailed issues exported to CSV" });
 };
 
 const getCostCentreColor = (cc: CostCentre) => {
   switch (cc) {
     case "FOOD":
-      return "text-emerald-500";
+      return "text-emerald-500 dark:text-emerald-400";
     case "CLEAN":
-      return "text-blue-500";
+      return "text-blue-500 dark:text-blue-400";
     case "OTHER":
-      return "text-amber-500";
+      return "text-amber-500 dark:text-amber-400";
     default:
       return "";
   }
@@ -331,70 +345,85 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Issues Report"
-      subtitle="Stock consumption by location and cost centre"
-      icon="i-lucide-package-minus"
-      :show-location="false"
-      :show-period="false"
-    >
-      <template #actions>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Responsive icon size - NO background, NO border -->
+        <UIcon name="i-lucide-package-minus" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <div>
+          <!-- Responsive title size -->
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Issues Report</h1>
+          <!-- Description: hidden on mobile, visible on sm+ -->
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Stock consumption by location and cost centre
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
         <UButton
           icon="i-lucide-arrow-left"
           color="neutral"
           variant="ghost"
+          size="lg"
           to="/reports"
-          class="cursor-pointer"
+          class="cursor-pointer px-3 sm:px-5"
         >
-          Back to Reports
+          <span class="hidden sm:inline">Back</span>
         </UButton>
         <UButton
           icon="i-lucide-download"
           color="primary"
-          :disabled="loading || !hasData"
-          class="cursor-pointer"
+          size="lg"
+          :loading="exporting"
+          :disabled="loading || !hasData || exporting"
+          class="cursor-pointer rounded-full px-3 sm:px-5"
           @click="exportToCSV"
         >
-          Export Summary
+          <span class="hidden sm:inline">Export</span>
         </UButton>
         <UButton
           icon="i-lucide-file-spreadsheet"
           color="neutral"
           variant="outline"
-          :disabled="loading || !hasData"
-          class="cursor-pointer"
+          size="lg"
+          :loading="exportingDetailed"
+          :disabled="loading || !hasData || exportingDetailed"
+          class="cursor-pointer rounded-full px-3"
           @click="exportDetailedCSV"
         >
-          Export Detail
+          <span class="hidden lg:inline">Detail</span>
         </UButton>
-      </template>
-    </LayoutPageHeader>
+      </div>
+    </div>
 
     <!-- Filters -->
-    <div class="card-elevated p-6 mb-6">
-      <h3 class="text-subheading font-semibold mb-4">Filters</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+      <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-4">Filters</h3>
+
+      <!-- Desktop: Grid layout (lg and above) -->
+      <div class="hidden lg:grid lg:grid-cols-6 gap-3">
         <!-- Period Filter -->
-        <UFormField label="Period">
+        <UFormField label="Period" class="w-full">
           <USelectMenu
             v-model="selectedPeriodId"
-            :options="[
+            :items="[
               { label: 'All Periods', value: '' },
               ...periods.map((p) => ({ label: p.name, value: p.id })),
             ]"
             :loading="loadingPeriods"
             placeholder="Select period"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
         <!-- Location Filter -->
-        <UFormField v-if="isAtLeastSupervisor" label="Location">
+        <UFormField v-if="isAtLeastSupervisor" label="Location" class="w-full">
           <USelectMenu
             v-model="selectedLocationId"
-            :options="[
+            :items="[
               { label: 'All Locations', value: '' },
               ...locationStore.userLocations.map((loc) => ({
                 label: `${loc.name} (${loc.code})`,
@@ -402,76 +431,174 @@ onMounted(async () => {
               })),
             ]"
             placeholder="Select location"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
         <!-- Cost Centre Filter -->
-        <UFormField label="Cost Centre">
+        <UFormField label="Cost Centre" class="w-full">
           <USelectMenu
             v-model="selectedCostCentre"
-            :options="costCentreOptions"
+            :items="costCentreOptions"
             placeholder="Select cost centre"
-            value-attribute="value"
+            value-key="value"
+            size="lg"
+            class="w-full"
           />
         </UFormField>
 
         <!-- Start Date -->
-        <UFormField label="From Date">
-          <UInput v-model="startDate" type="date" />
+        <UFormField label="From Date" class="w-full">
+          <UInput v-model="startDate" type="date" size="lg" class="w-full" />
         </UFormField>
 
         <!-- End Date -->
-        <UFormField label="To Date">
-          <UInput v-model="endDate" type="date" />
+        <UFormField label="To Date" class="w-full">
+          <UInput v-model="endDate" type="date" size="lg" class="w-full" />
         </UFormField>
 
         <!-- Actions -->
-        <UFormField label="Actions">
+        <UFormField label="Actions" class="w-full">
           <div class="flex gap-2">
-            <UButton color="primary" class="cursor-pointer" @click="fetchReport">Generate</UButton>
-            <UButton color="neutral" variant="outline" class="cursor-pointer" @click="clearFilters">
+            <UButton
+              color="primary"
+              size="lg"
+              :loading="loading"
+              :disabled="loading"
+              class="cursor-pointer rounded-full"
+              @click="fetchReport"
+            >
+              Generate
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full"
+              @click="clearFilters"
+            >
               Clear
             </UButton>
           </div>
         </UFormField>
       </div>
-    </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Period, Location, Cost Centre -->
+        <div class="grid grid-cols-1 gap-3">
+          <UFormField label="Period">
+            <USelectMenu
+              v-model="selectedPeriodId"
+              :items="[
+                { label: 'All Periods', value: '' },
+                ...periods.map((p) => ({ label: p.name, value: p.id })),
+              ]"
+              :loading="loadingPeriods"
+              placeholder="Period"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField v-if="isAtLeastSupervisor" label="Location">
+            <USelectMenu
+              v-model="selectedLocationId"
+              :items="[
+                { label: 'All Locations', value: '' },
+                ...locationStore.userLocations.map((loc) => ({
+                  label: `${loc.name} (${loc.code})`,
+                  value: loc.id,
+                })),
+              ]"
+              placeholder="Location"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField label="Cost Centre">
+            <USelectMenu
+              v-model="selectedCostCentre"
+              :items="costCentreOptions"
+              placeholder="Cost Centre"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+
+        <!-- Date Range -->
+        <div class="grid grid-cols-2 gap-3">
+          <UFormField label="From">
+            <UInput v-model="startDate" type="date" size="lg" class="w-full" />
+          </UFormField>
+          <UFormField label="To">
+            <UInput v-model="endDate" type="date" size="lg" class="w-full" />
+          </UFormField>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2">
+          <UButton
+            color="primary"
+            size="lg"
+            :loading="loading"
+            :disabled="loading"
+            class="cursor-pointer flex-1"
+            @click="fetchReport"
+          >
+            Generate
+          </UButton>
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="cursor-pointer"
+            icon="i-lucide-x"
+            @click="clearFilters"
+          />
+        </div>
+      </div>
+    </UCard>
 
     <!-- Loading State -->
-    <div v-if="loading" class="card-elevated p-12">
+    <div v-if="loading" class="flex items-center justify-center py-16">
       <LoadingSpinner size="lg" text="Generating report..." />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="card-elevated p-6">
+    <div v-else-if="error">
       <ErrorAlert :message="error" :retry="fetchReport" />
     </div>
 
     <!-- Report Content -->
     <template v-else-if="reportData">
       <!-- Summary Cards -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Issues</p>
-          <p class="text-heading font-bold">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Issues</p>
+          <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
             {{ reportData.grand_totals.total_issues }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Total Value</p>
-          <p class="text-heading font-bold text-red-500">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Total Value</p>
+          <p class="text-2xl sm:text-3xl font-bold text-red-500 dark:text-red-400 mt-1">
             {{ formatCurrency(reportData.grand_totals.total_value) }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Line Items</p>
-          <p class="text-heading font-bold">
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Line Items</p>
+          <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
             {{ reportData.grand_totals.total_line_items }}
           </p>
-        </div>
-        <div class="card-elevated p-4">
-          <p class="text-caption">Cost Centres</p>
+        </UCard>
+        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+          <p class="text-sm text-[var(--ui-text-muted)]">Cost Centres</p>
           <div class="flex gap-2 mt-1">
             <UBadge color="success" variant="subtle" size="xs">
               FOOD: {{ reportData.grand_totals.by_cost_centre.FOOD.count }}
@@ -480,71 +607,82 @@ onMounted(async () => {
               CLEAN: {{ reportData.grand_totals.by_cost_centre.CLEAN.count }}
             </UBadge>
           </div>
-        </div>
+        </UCard>
       </div>
 
       <!-- Cost Centre Breakdown -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <UCard
           v-for="cc in reportData.by_cost_centre"
           :key="cc.cost_centre"
-          class="card-elevated p-4"
+          class="card-elevated"
+          :ui="{ body: 'p-3 sm:p-4' }"
         >
           <div class="flex items-center justify-between mb-3">
             <UBadge :color="getCostCentreBadgeColor(cc.cost_centre)" variant="subtle">
               {{ cc.cost_centre }}
             </UBadge>
-            <span class="text-caption">{{ cc.issue_count }} issues</span>
+            <span class="text-sm text-[var(--ui-text-muted)]">{{ cc.issue_count }} issues</span>
           </div>
-          <p class="text-subheading font-bold" :class="getCostCentreColor(cc.cost_centre)">
+          <p class="text-2xl font-bold" :class="getCostCentreColor(cc.cost_centre)">
             {{ formatCurrency(cc.total_value) }}
           </p>
 
           <!-- Top Items -->
           <div v-if="cc.top_items.length > 0" class="mt-4">
-            <p class="text-caption font-medium mb-2">Top Consumed Items</p>
+            <p class="text-sm font-medium text-[var(--ui-text-muted)] mb-2">Top Consumed Items</p>
             <div class="space-y-1">
               <div
                 v-for="(item, idx) in cc.top_items.slice(0, 5)"
                 :key="item.item_code"
                 class="flex justify-between text-sm"
               >
-                <span class="truncate">{{ idx + 1 }}. {{ item.item_name }}</span>
-                <span class="font-mono text-muted">{{ formatCurrency(item.total_value) }}</span>
+                <span class="truncate text-[var(--ui-text)]">{{ idx + 1 }}. {{ item.item_name }}</span>
+                <span class="font-mono text-[var(--ui-text-muted)]">
+                  {{ formatCurrency(item.total_value) }}
+                </span>
               </div>
             </div>
           </div>
-        </div>
+        </UCard>
       </div>
 
       <!-- By Location Summary -->
-      <div v-if="reportData.by_location.length > 0" class="card-elevated mb-6">
-        <div class="p-4 border-b border-[var(--ui-border)]">
-          <h3 class="text-subheading font-semibold">By Location</h3>
-        </div>
-        <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <UCard v-if="reportData.by_location.length > 0" class="card-elevated">
+        <template #header>
+          <h3 class="text-lg font-semibold text-[var(--ui-text)]">By Location</h3>
+        </template>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div
             v-for="loc in reportData.by_location"
             :key="loc.location_id"
-            class="p-3 rounded-lg bg-[var(--ui-bg)]"
+            class="p-3 rounded-lg bg-[var(--ui-bg-muted)]"
           >
-            <p class="font-medium">{{ loc.location_name }}</p>
-            <p class="text-caption">{{ loc.issue_count }} issues</p>
-            <p class="text-red-500 font-semibold">{{ formatCurrency(loc.total_value) }}</p>
+            <p class="font-medium text-[var(--ui-text)]">{{ loc.location_name }}</p>
+            <p class="text-sm text-[var(--ui-text-muted)]">{{ loc.issue_count }} issues</p>
+            <p class="text-red-500 dark:text-red-400 font-semibold">
+              {{ formatCurrency(loc.total_value) }}
+            </p>
             <div class="flex gap-2 mt-2 text-xs">
-              <span class="text-emerald-500">F: {{ formatCurrency(loc.by_cost_centre.FOOD) }}</span>
-              <span class="text-blue-500">C: {{ formatCurrency(loc.by_cost_centre.CLEAN) }}</span>
-              <span class="text-amber-500">O: {{ formatCurrency(loc.by_cost_centre.OTHER) }}</span>
+              <span class="text-emerald-500 dark:text-emerald-400">
+                F: {{ formatCurrency(loc.by_cost_centre.FOOD) }}
+              </span>
+              <span class="text-blue-500 dark:text-blue-400">
+                C: {{ formatCurrency(loc.by_cost_centre.CLEAN) }}
+              </span>
+              <span class="text-amber-500 dark:text-amber-400">
+                O: {{ formatCurrency(loc.by_cost_centre.OTHER) }}
+              </span>
             </div>
           </div>
         </div>
-      </div>
+      </UCard>
 
       <!-- Issues Table -->
-      <div v-if="hasData" class="card-elevated overflow-hidden">
-        <div class="p-4 border-b border-[var(--ui-border)]">
-          <h3 class="text-subheading font-semibold">Issue List</h3>
-        </div>
+      <UCard v-if="hasData" class="card-elevated">
+        <template #header>
+          <h3 class="text-lg font-semibold text-[var(--ui-text)]">Issue List</h3>
+        </template>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="bg-[var(--ui-bg-elevated)]">
@@ -571,7 +709,7 @@ onMounted(async () => {
                 <td class="px-4 py-3">
                   <div>
                     <p class="font-medium">{{ issue.location_name }}</p>
-                    <p class="text-caption">{{ issue.location_code }}</p>
+                    <p class="text-sm text-[var(--ui-text-muted)]">{{ issue.location_code }}</p>
                   </div>
                 </td>
                 <td class="px-4 py-3 text-center">
@@ -583,7 +721,7 @@ onMounted(async () => {
                     {{ issue.cost_centre }}
                   </UBadge>
                 </td>
-                <td class="px-4 py-3 text-right font-mono font-semibold text-red-500">
+                <td class="px-4 py-3 text-right font-mono font-semibold text-red-500 dark:text-red-400">
                   {{ formatCurrency(issue.total_value) }}
                 </td>
                 <td class="px-4 py-3 text-right">{{ issue.line_count }}</td>
@@ -592,10 +730,10 @@ onMounted(async () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </UCard>
 
       <!-- Empty State -->
-      <div v-else class="card-elevated p-12">
+      <div v-else class="py-16">
         <EmptyState
           icon="i-lucide-package-minus"
           title="No issues"

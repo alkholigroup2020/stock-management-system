@@ -56,108 +56,102 @@ const reports = [
 </script>
 
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Reports"
-      subtitle="Generate and export various inventory reports"
-      icon="i-lucide-file-bar-chart"
-      :show-location="false"
-      :show-period="false"
-    />
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Responsive icon size - NO background, NO border -->
+        <UIcon name="i-lucide-file-bar-chart" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
+        <div>
+          <!-- Responsive title size -->
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Reports</h1>
+          <!-- Description: hidden on mobile, visible on sm+ -->
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Generate and export various inventory reports
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Reports Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <NuxtLink
         v-for="report in reports"
         :key="report.id"
         :to="report.href"
-        class="card-elevated p-6 hover:border-[var(--ui-primary)] transition-colors group cursor-pointer"
+        class="card-elevated"
+        :class="{ body: 'p-4 sm:p-6' }"
       >
-        <div class="flex items-start gap-4">
-          <!-- Icon -->
-          <div
-            class="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
-            :class="{
-              'bg-(--ui-primary)/10': report.color === 'primary',
-              'bg-emerald-500/10': report.color === 'secondary',
-              'bg-blue-500/10': report.color === 'info',
-              'bg-amber-500/10': report.color === 'warning',
-            }"
-          >
+        <UCard class="h-full" :ui="{ body: 'p-4 sm:p-6' }">
+          <div class="flex items-start gap-4">
+            <!-- Icon - NO background -->
             <UIcon
               :name="report.icon"
-              class="text-2xl"
+              class="w-10 h-10 shrink-0"
               :class="{
                 'text-primary': report.color === 'primary',
-                'text-emerald-500': report.color === 'secondary',
-                'text-blue-500': report.color === 'info',
-                'text-amber-500': report.color === 'warning',
+                'text-emerald-500 dark:text-emerald-400': report.color === 'secondary',
+                'text-blue-500 dark:text-blue-400': report.color === 'info',
+                'text-amber-500 dark:text-amber-400': report.color === 'warning',
               }"
             />
-          </div>
 
-          <!-- Content -->
-          <div class="flex-1 min-w-0">
-            <h3
-              class="text-subheading font-semibold group-hover:text-[var(--ui-primary)] transition-colors"
-            >
-              {{ report.title }}
-            </h3>
-            <p class="text-caption mt-1">{{ report.description }}</p>
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                {{ report.title }}
+              </h3>
+              <p class="text-sm text-[var(--ui-text-muted)] mt-1">{{ report.description }}</p>
 
-            <!-- Features -->
-            <div class="flex flex-wrap gap-2 mt-3">
-              <UBadge
-                v-for="feature in report.features"
-                :key="feature"
-                color="neutral"
-                variant="subtle"
-                size="xs"
-              >
-                {{ feature }}
-              </UBadge>
+              <!-- Features -->
+              <div class="flex flex-wrap gap-2 mt-3">
+                <UBadge
+                  v-for="feature in report.features"
+                  :key="feature"
+                  color="neutral"
+                  variant="subtle"
+                  size="xs"
+                >
+                  {{ feature }}
+                </UBadge>
+              </div>
             </div>
-          </div>
 
-          <!-- Arrow -->
-          <UIcon
-            name="i-lucide-chevron-right"
-            class="text-muted group-hover:text-[var(--ui-primary)] transition-colors shrink-0"
-          />
-        </div>
+            <!-- Arrow -->
+            <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-muted shrink-0" />
+          </div>
+        </UCard>
       </NuxtLink>
     </div>
 
     <!-- Quick Info -->
-    <div class="mt-8 card-elevated p-6">
+    <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
       <div class="flex items-start gap-4">
-        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-          <UIcon name="i-lucide-info" class="text-xl text-blue-500" />
-        </div>
+        <!-- Info icon - NO background -->
+        <UIcon name="i-lucide-info" class="w-10 h-10 text-blue-500 dark:text-blue-400 shrink-0" />
         <div>
-          <h4 class="font-medium text-default">About Reports</h4>
-          <p class="text-caption mt-1">
+          <h4 class="font-semibold text-[var(--ui-text)]">About Reports</h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-1">
             All reports support filtering by location, period, and other criteria. Data can be
             exported to CSV format for further analysis in spreadsheet applications. Reports are
             generated in real-time based on current database values.
           </p>
-          <ul class="mt-3 space-y-1 text-caption">
+          <ul class="mt-3 space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
-              <UIcon name="i-lucide-check" class="text-emerald-500" />
+              <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               <span>Real-time data from the database</span>
             </li>
             <li class="flex items-center gap-2">
-              <UIcon name="i-lucide-check" class="text-emerald-500" />
+              <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               <span>Export to CSV with proper formatting</span>
             </li>
             <li class="flex items-center gap-2">
-              <UIcon name="i-lucide-check" class="text-emerald-500" />
+              <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               <span>Role-based access (only see your locations)</span>
             </li>
           </ul>
         </div>
       </div>
-    </div>
+    </UCard>
   </div>
 </template>

@@ -25,6 +25,7 @@ const toast = useAppToast();
 
 // State
 const loading = ref(false);
+const exporting = ref(false);
 const error = ref<string | null>(null);
 const selectedLocationId = ref<string>("");
 const selectedCategory = ref<string>("");
@@ -176,49 +177,55 @@ const exportToCSV = () => {
     return;
   }
 
-  // Build CSV headers
-  const headers = [
-    "Location",
-    "Item Code",
-    "Item Name",
-    "Unit",
-    "Category",
-    "On Hand",
-    "WAC",
-    "Stock Value",
-    "Min Stock",
-    "Max Stock",
-    "Low Stock",
-    "Over Stock",
-  ];
+  exporting.value = true;
 
-  // Build rows
-  const rows: (string | number | null)[][] = [];
+  try {
+    // Build CSV headers
+    const headers = [
+      "Location",
+      "Item Code",
+      "Item Name",
+      "Unit",
+      "Category",
+      "On Hand",
+      "WAC",
+      "Stock Value",
+      "Min Stock",
+      "Max Stock",
+      "Low Stock",
+      "Over Stock",
+    ];
 
-  for (const location of reportData.value.locations) {
-    for (const item of location.items) {
-      rows.push([
-        location.location_name,
-        item.item_code,
-        item.item_name,
-        item.item_unit,
-        item.item_category || "",
-        formatNumberForCSV(item.on_hand, 4),
-        formatCurrencyForCSV(item.wac),
-        formatCurrencyForCSV(item.stock_value),
-        item.min_stock ? formatNumberForCSV(item.min_stock, 4) : "",
-        item.max_stock ? formatNumberForCSV(item.max_stock, 4) : "",
-        item.is_low_stock ? "Yes" : "No",
-        item.is_over_stock ? "Yes" : "No",
-      ]);
+    // Build rows
+    const rows: (string | number | null)[][] = [];
+
+    for (const location of reportData.value.locations) {
+      for (const item of location.items) {
+        rows.push([
+          location.location_name,
+          item.item_code,
+          item.item_name,
+          item.item_unit,
+          item.item_category || "",
+          formatNumberForCSV(item.on_hand, 4),
+          formatCurrencyForCSV(item.wac),
+          formatCurrencyForCSV(item.stock_value),
+          item.min_stock ? formatNumberForCSV(item.min_stock, 4) : "",
+          item.max_stock ? formatNumberForCSV(item.max_stock, 4) : "",
+          item.is_low_stock ? "Yes" : "No",
+          item.is_over_stock ? "Yes" : "No",
+        ]);
+      }
     }
+
+    const csvContent = generateSimpleCSV(headers, rows);
+    const filename = `stock-now-report-${new Date().toISOString().split("T")[0]}`;
+    downloadCSV(csvContent, filename);
+
+    toast.success("Exported", { description: "Stock report exported to CSV" });
+  } finally {
+    exporting.value = false;
   }
-
-  const csvContent = generateSimpleCSV(headers, rows);
-  const filename = `stock-now-report-${new Date().toISOString().split("T")[0]}`;
-  downloadCSV(csvContent, filename);
-
-  toast.success("Exported", { description: "Stock report exported to CSV" });
 };
 
 // Lifecycle
@@ -263,7 +270,8 @@ onMounted(async () => {
           icon="i-lucide-download"
           color="primary"
           size="lg"
-          :disabled="loading || !hasData"
+          :loading="exporting"
+          :disabled="loading || !hasData || exporting"
           class="cursor-pointer rounded-full px-3 sm:px-5"
           @click="exportToCSV"
         >
@@ -277,72 +285,10 @@ onMounted(async () => {
       <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-4">Filters</h3>
 
       <!-- Desktop: Single row layout (lg and above) -->
-      <div class="hidden lg:flex items-center gap-3">
+      <div class="hidden lg:grid lg:grid-cols-5 gap-3 items-end">
         <!-- Location Filter -->
-        <USelectMenu
-          v-if="isAtLeastSupervisor"
-          v-model="selectedLocationId"
-          :items="[
-            { label: 'All Locations', value: '' },
-            ...locationStore.userLocations.map((loc) => ({
-              label: `${loc.name} (${loc.code})`,
-              value: loc.id,
-            })),
-          ]"
-          placeholder="Select location"
-          value-key="value"
-          size="lg"
-          class="w-64"
-        />
-
-        <!-- Category Filter -->
-        <USelectMenu
-          v-model="selectedCategory"
-          :items="[
-            { label: 'All Categories', value: '' },
-            ...categories.map((cat) => ({ label: cat, value: cat })),
-          ]"
-          placeholder="Select category"
-          value-key="value"
-          size="lg"
-          class="w-48"
-        />
-
-        <!-- Status Dropdown (Far Right) -->
-        <UDropdownMenu :items="statusFilterItems" class="ml-auto">
-          <UButton
-            color="neutral"
-            variant="outline"
-            size="lg"
-            class="cursor-pointer rounded-full px-5"
-            trailing-icon="i-lucide-chevron-down"
-          >
-            <UIcon :name="statusFilterIcon" class="w-4 h-4 mr-2" />
-            {{ statusFilterLabel }}
-          </UButton>
-        </UDropdownMenu>
-
-        <!-- Generate and Clear Buttons -->
-        <UButton color="primary" size="lg" class="cursor-pointer rounded-full" @click="fetchReport">
-          Generate
-        </UButton>
-        <UButton
-          color="neutral"
-          variant="outline"
-          size="lg"
-          class="cursor-pointer rounded-full"
-          @click="clearFilters"
-        >
-          Clear
-        </UButton>
-      </div>
-
-      <!-- Mobile: Stacked layout (below lg) -->
-      <div class="flex flex-col gap-3 lg:hidden">
-        <!-- Location and Category Filters -->
-        <div class="grid grid-cols-1 gap-3">
+        <UFormField v-if="isAtLeastSupervisor" label="Location" class="w-full">
           <USelectMenu
-            v-if="isAtLeastSupervisor"
             v-model="selectedLocationId"
             :items="[
               { label: 'All Locations', value: '' },
@@ -351,22 +297,106 @@ onMounted(async () => {
                 value: loc.id,
               })),
             ]"
-            placeholder="Location"
+            placeholder="Select location"
             value-key="value"
             size="lg"
             class="w-full"
           />
+        </UFormField>
+
+        <!-- Category Filter -->
+        <UFormField label="Category" class="w-full">
           <USelectMenu
             v-model="selectedCategory"
             :items="[
               { label: 'All Categories', value: '' },
               ...categories.map((cat) => ({ label: cat, value: cat })),
             ]"
-            placeholder="Category"
+            placeholder="Select category"
             value-key="value"
             size="lg"
             class="w-full"
           />
+        </UFormField>
+
+        <!-- Status Dropdown -->
+        <UFormField label="Status" class="w-full">
+          <UDropdownMenu :items="statusFilterItems" class="w-full">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full w-full"
+              trailing-icon="i-lucide-chevron-down"
+            >
+              <UIcon :name="statusFilterIcon" class="w-4 h-4 mr-2" />
+              {{ statusFilterLabel }}
+            </UButton>
+          </UDropdownMenu>
+        </UFormField>
+
+        <!-- Spacer (when not supervisor) -->
+        <div v-if="!isAtLeastSupervisor" />
+
+        <!-- Actions -->
+        <UFormField label="Actions" class="w-full">
+          <div class="flex gap-2">
+            <UButton
+              color="primary"
+              size="lg"
+              :loading="loading"
+              :disabled="loading"
+              class="cursor-pointer rounded-full"
+              @click="fetchReport"
+            >
+              Generate
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full"
+              @click="clearFilters"
+            >
+              Clear
+            </UButton>
+          </div>
+        </UFormField>
+      </div>
+
+      <!-- Mobile: Stacked layout (below lg) -->
+      <div class="flex flex-col gap-3 lg:hidden">
+        <!-- Location and Category Filters -->
+        <div class="grid grid-cols-1 gap-3">
+          <UFormField v-if="isAtLeastSupervisor" label="Location">
+            <USelectMenu
+              v-model="selectedLocationId"
+              :items="[
+                { label: 'All Locations', value: '' },
+                ...locationStore.userLocations.map((loc) => ({
+                  label: `${loc.name} (${loc.code})`,
+                  value: loc.id,
+                })),
+              ]"
+              placeholder="Location"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField label="Category">
+            <USelectMenu
+              v-model="selectedCategory"
+              :items="[
+                { label: 'All Categories', value: '' },
+                ...categories.map((cat) => ({ label: cat, value: cat })),
+              ]"
+              placeholder="Category"
+              value-key="value"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
         </div>
 
         <!-- Status and Action Buttons -->
@@ -386,6 +416,8 @@ onMounted(async () => {
           <UButton
             color="primary"
             size="lg"
+            :loading="loading"
+            :disabled="loading"
             class="cursor-pointer"
             icon="i-lucide-refresh-cw"
             @click="fetchReport"
