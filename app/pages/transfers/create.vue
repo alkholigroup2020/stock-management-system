@@ -197,7 +197,7 @@ const submitTransfer = async () => {
             request_date: formData.value.transfer_date
               ? new Date(formData.value.transfer_date).toISOString()
               : new Date().toISOString(),
-            notes: formData.value.notes || null,
+            notes: formData.value.notes || undefined,
             lines: linesData,
           },
         });
