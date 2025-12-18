@@ -525,122 +525,126 @@ onMounted(async () => {
     </div>
 
     <!-- Approve Confirmation Modal -->
-    <UModal v-model="showApproveModal">
-      <UCard :ui="{ body: 'p-3 sm:p-4' }">
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-success" />
-            <h3 class="text-subheading font-semibold">Approve Transfer</h3>
-          </div>
-        </template>
+    <UModal v-model:open="showApproveModal">
+      <template #content>
+        <UCard :ui="{ body: 'p-3 sm:p-4' }">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-success" />
+              <h3 class="text-subheading font-semibold">Approve Transfer</h3>
+            </div>
+          </template>
 
-        <div class="space-y-4">
-          <p class="text-body">
-            Are you sure you want to approve this transfer? This will immediately:
-          </p>
+          <div class="space-y-4">
+            <p class="text-body">
+              Are you sure you want to approve this transfer? This will immediately:
+            </p>
 
-          <ul class="list-disc list-inside space-y-1 text-body ml-2">
-            <li>Deduct stock from {{ transfer?.from_location.name }}</li>
-            <li>Add stock to {{ transfer?.to_location.name }}</li>
-            <li>Mark the transfer as COMPLETED</li>
-          </ul>
+            <ul class="list-disc list-inside space-y-1 text-body ml-2">
+              <li>Deduct stock from {{ transfer?.from_location.name }}</li>
+              <li>Add stock to {{ transfer?.to_location.name }}</li>
+              <li>Mark the transfer as COMPLETED</li>
+            </ul>
 
-          <UAlert
-            icon="i-lucide-alert-triangle"
-            color="warning"
-            variant="subtle"
-            description="This action cannot be undone. Please ensure you have verified the stock availability."
-          />
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              class="cursor-pointer"
-              @click="showApproveModal = false"
-              :disabled="actionLoading"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              color="success"
-              icon="i-lucide-check"
-              class="cursor-pointer"
-              @click="handleApprove"
-              :loading="actionLoading"
-            >
-              Confirm Approval
-            </UButton>
-          </div>
-        </template>
-      </UCard>
-    </UModal>
-
-    <!-- Reject Confirmation Modal -->
-    <UModal v-model="showRejectModal">
-      <UCard :ui="{ body: 'p-3 sm:p-4' }">
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-x-circle" class="h-5 w-5 text-error" />
-            <h3 class="text-subheading font-semibold">Reject Transfer</h3>
-          </div>
-        </template>
-
-        <div class="space-y-4">
-          <p class="text-body">
-            Please provide a reason for rejecting this transfer. This will help the requester
-            understand why the transfer was not approved.
-          </p>
-
-          <!-- Rejection Comment -->
-          <div>
-            <label class="form-label">Reason for Rejection *</label>
-            <UTextarea
-              v-model="rejectComment"
-              placeholder="Enter the reason for rejecting this transfer"
-              :rows="4"
-              autofocus
-              class="w-full"
+            <UAlert
+              icon="i-lucide-alert-triangle"
+              color="warning"
+              variant="subtle"
+              description="This action cannot be undone. Please ensure you have verified the stock availability."
             />
           </div>
 
-          <UAlert
-            icon="i-lucide-info"
-            color="primary"
-            variant="subtle"
-            description="The transfer will be marked as REJECTED and no stock movement will occur."
-          />
-        </div>
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                class="cursor-pointer"
+                @click="showApproveModal = false"
+                :disabled="actionLoading"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="success"
+                icon="i-lucide-check"
+                class="cursor-pointer"
+                @click="handleApprove"
+                :loading="actionLoading"
+              >
+                Confirm Approval
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
 
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              class="cursor-pointer"
-              @click="
-                showRejectModal = false;
-                rejectComment = '';
-              "
-              :disabled="actionLoading"
-            >
-              Cancel
-            </UButton>
-            <UButton
-              color="error"
-              icon="i-lucide-x"
-              class="cursor-pointer"
-              @click="handleReject"
-              :loading="actionLoading"
-              :disabled="!rejectComment.trim()"
-            >
-              Confirm Rejection
-            </UButton>
+    <!-- Reject Confirmation Modal -->
+    <UModal v-model:open="showRejectModal">
+      <template #content>
+        <UCard :ui="{ body: 'p-3 sm:p-4' }">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-x-circle" class="h-5 w-5 text-error" />
+              <h3 class="text-subheading font-semibold">Reject Transfer</h3>
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-body">
+              Please provide a reason for rejecting this transfer. This will help the requester
+              understand why the transfer was not approved.
+            </p>
+
+            <!-- Rejection Comment -->
+            <div>
+              <label class="form-label">Reason for Rejection *</label>
+              <UTextarea
+                v-model="rejectComment"
+                placeholder="Enter the reason for rejecting this transfer"
+                :rows="4"
+                autofocus
+                class="w-full"
+              />
+            </div>
+
+            <UAlert
+              icon="i-lucide-info"
+              color="primary"
+              variant="subtle"
+              description="The transfer will be marked as REJECTED and no stock movement will occur."
+            />
           </div>
-        </template>
-      </UCard>
+
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="outline"
+                class="cursor-pointer"
+                @click="
+                  showRejectModal = false;
+                  rejectComment = '';
+                "
+                :disabled="actionLoading"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                icon="i-lucide-x"
+                class="cursor-pointer"
+                @click="handleReject"
+                :loading="actionLoading"
+                :disabled="!rejectComment.trim()"
+              >
+                Confirm Rejection
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
     </UModal>
   </div>
 </template>

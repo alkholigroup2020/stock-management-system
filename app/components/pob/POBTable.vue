@@ -81,6 +81,19 @@ function formatDateDisplay(dateStr: string): string {
 }
 
 /**
+ * Format date for accessibility label
+ */
+function formatDateForLabel(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/**
  * Handle input blur
  */
 function handleBlur(dateStr: string) {
@@ -96,14 +109,15 @@ function handleChange(dateStr: string) {
 </script>
 
 <template>
-  <UCard>
+  <UCard class="card-elevated" :ui="{ body: 'p-0' }">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-[var(--ui-border)]">
+      <table class="min-w-full divide-y divide-[var(--ui-border)]" role="grid">
         <thead>
-          <tr class="bg-[var(--ui-bg-elevated)]">
+          <tr class="bg-[var(--ui-bg-muted)]">
             <th
               v-for="column in columns"
               :key="column.key"
+              scope="col"
               :class="[
                 'px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider',
                 column.class,
@@ -113,29 +127,44 @@ function handleChange(dateStr: string) {
             </th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[var(--ui-border)]">
+        <tbody class="divide-y divide-[var(--ui-border-muted)]">
           <tr
             v-for="dateStr in sortedDates"
             :key="dateStr"
             :class="[
-              'hover:bg-[var(--ui-bg-elevated)] transition-colors',
+              'hover:bg-[var(--ui-bg-hover)] smooth-transition',
               isSaving(dateStr) ? 'opacity-50' : '',
             ]"
           >
             <!-- Date -->
-            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-[var(--ui-text)]">
-              {{ formatDateDisplay(dateStr) }}
+            <td class="px-4 py-3 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <UIcon
+                  name="i-lucide-calendar-days"
+                  class="w-4 h-4 text-primary shrink-0"
+                  aria-hidden="true"
+                />
+                <span class="text-sm font-medium text-[var(--ui-text)]">
+                  {{ formatDateDisplay(dateStr) }}
+                </span>
+              </div>
             </td>
 
             <!-- Crew Count -->
             <td class="px-4 py-3 whitespace-nowrap text-center">
+              <label :for="`crew-${dateStr}`" class="sr-only">
+                Crew count for {{ formatDateForLabel(dateStr) }}
+              </label>
               <UInput
+                :id="`crew-${dateStr}`"
                 v-model.number="entries.get(dateStr)!.crew_count"
                 type="number"
                 min="0"
                 step="1"
                 :disabled="disabled || isSaving(dateStr)"
+                :aria-busy="isSaving(dateStr)"
                 class="w-24 mx-auto"
+                size="md"
                 @blur="handleBlur(dateStr)"
                 @input="handleChange(dateStr)"
               />
@@ -143,28 +172,43 @@ function handleChange(dateStr: string) {
 
             <!-- Extra Count -->
             <td class="px-4 py-3 whitespace-nowrap text-center">
+              <label :for="`extra-${dateStr}`" class="sr-only">
+                Extra count for {{ formatDateForLabel(dateStr) }}
+              </label>
               <UInput
+                :id="`extra-${dateStr}`"
                 v-model.number="entries.get(dateStr)!.extra_count"
                 type="number"
                 min="0"
                 step="1"
                 :disabled="disabled || isSaving(dateStr)"
+                :aria-busy="isSaving(dateStr)"
                 class="w-24 mx-auto"
+                size="md"
                 @blur="handleBlur(dateStr)"
                 @input="handleChange(dateStr)"
               />
             </td>
 
             <!-- Total -->
-            <td
-              class="px-4 py-3 whitespace-nowrap text-center text-sm font-semibold text-[var(--ui-text)]"
-            >
+            <td class="px-4 py-3 whitespace-nowrap text-center">
               <div class="flex items-center justify-center gap-2">
-                <span>{{ entries.get(dateStr)!.total_count }}</span>
+                <span
+                  class="text-sm font-semibold"
+                  :class="
+                    entries.get(dateStr)!.total_count > 0
+                      ? 'text-emerald-600 dark:text-emerald-500'
+                      : 'text-[var(--ui-text-muted)]'
+                  "
+                  :aria-label="`Total for ${formatDateForLabel(dateStr)}: ${entries.get(dateStr)!.total_count}`"
+                >
+                  {{ entries.get(dateStr)!.total_count }}
+                </span>
                 <UIcon
                   v-if="isSaving(dateStr)"
-                  name="i-heroicons-arrow-path"
-                  class="w-4 h-4 animate-spin text-[var(--ui-primary)]"
+                  name="i-lucide-loader-2"
+                  class="w-4 h-4 animate-spin text-primary"
+                  aria-label="Saving..."
                 />
               </div>
             </td>

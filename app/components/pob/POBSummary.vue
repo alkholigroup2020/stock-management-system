@@ -44,29 +44,43 @@ const formattedDateRange = computed(() => {
 </script>
 
 <template>
-  <UCard>
-    <div class="flex items-center justify-between">
+  <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Period Info -->
-      <div>
-        <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Current Period</h3>
-        <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
-          {{ period.name }}
-        </p>
-        <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-          {{ formattedDateRange }}
-        </p>
+      <div class="flex items-center gap-4">
+        <UIcon
+          name="i-lucide-calendar"
+          class="w-10 h-10 text-primary shrink-0"
+          aria-hidden="true"
+        />
+        <div>
+          <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Current Period</h3>
+          <p class="text-lg font-semibold text-[var(--ui-text)] mt-1">
+            {{ period.name }}
+          </p>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+            {{ formattedDateRange }}
+          </p>
+        </div>
       </div>
 
       <!-- Total Mandays Summary -->
-      <div class="text-right">
-        <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Mandays</h3>
-        <p class="text-3xl font-bold text-[var(--ui-primary)] mt-1">
-          {{ summary.total_mandays.toLocaleString() }}
-        </p>
-        <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-          {{ summary.total_crew_count.toLocaleString() }} crew +
-          {{ summary.total_extra_count.toLocaleString() }} extra
-        </p>
+      <div class="flex items-center gap-4">
+        <UIcon
+          name="i-lucide-users"
+          class="w-10 h-10 text-emerald-500 dark:text-emerald-400 shrink-0"
+          aria-hidden="true"
+        />
+        <div>
+          <h3 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Mandays</h3>
+          <p class="text-3xl font-bold text-primary mt-1">
+            {{ summary.total_mandays.toLocaleString() }}
+          </p>
+          <p class="text-xs text-[var(--ui-text-muted)] mt-1">
+            {{ summary.total_crew_count.toLocaleString() }} crew +
+            {{ summary.total_extra_count.toLocaleString() }} extra
+          </p>
+        </div>
       </div>
     </div>
   </UCard>

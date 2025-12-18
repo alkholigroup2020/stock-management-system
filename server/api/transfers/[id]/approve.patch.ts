@@ -139,8 +139,10 @@ export default defineEventHandler(async (event) => {
       }))
     );
 
-    // Execute transfer in a transaction
-    const result = await prisma.$transaction(async (tx) => {
+    // Execute transfer in a transaction with extended timeout
+    // Default 5s timeout may not be enough for multiple stock updates + network latency
+    const result = await prisma.$transaction(
+      async (tx) => {
       // Process each transfer line
       for (const line of transfer.transfer_lines) {
         const itemId = line.item_id;
@@ -282,7 +284,12 @@ export default defineEventHandler(async (event) => {
       });
 
       return updatedTransfer;
-    });
+      },
+      {
+        timeout: 30000, // 30 seconds for stock movement operations
+        maxWait: 10000, // Max 10 seconds to acquire transaction
+      }
+    );
 
     return {
       message: "Transfer approved and completed successfully. Stock has been moved.",

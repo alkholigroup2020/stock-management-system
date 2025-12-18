@@ -29,12 +29,12 @@ interface POBEntry {
 }
 
 interface POBData {
-  location: {
+  location?: {
     id: string;
     code: string;
     name: string;
   };
-  period: {
+  period?: {
     id: string;
     name: string;
     start_date: string;
@@ -42,7 +42,7 @@ interface POBData {
     status: string;
   };
   entries: POBEntry[];
-  summary: {
+  summary?: {
     total_crew_count: number;
     total_extra_count: number;
     total_mandays: number;
@@ -56,6 +56,7 @@ const error = ref<string | null>(null);
 const pobData = ref<POBData | null>(null);
 const editableEntries = ref<Map<string, POBEntry>>(new Map());
 const savingDates = ref<Set<string>>(new Set());
+const apiNotReady = ref(false);
 
 // Computed
 const activeLocationId = computed(() => locationStore.activeLocationId);
@@ -90,6 +91,7 @@ async function fetchPOBData() {
 
   loading.value = true;
   error.value = null;
+  apiNotReady.value = false;
 
   try {
     const response = await $fetch<POBData>(`/api/locations/${activeLocationId.value}/pob`, {
@@ -99,12 +101,22 @@ async function fetchPOBData() {
     pobData.value = response;
 
     // Initialize editable entries with all dates in period
-    initializeEditableEntries(response);
-  } catch (err: any) {
+    if (response?.period) {
+      initializeEditableEntries(response);
+    }
+  } catch (err: unknown) {
     console.error("Error fetching POB data:", err);
-    const errorMessage = err?.data?.message || "Failed to fetch POB data";
-    error.value = errorMessage;
-    toast.error(errorMessage);
+
+    // Check if API endpoint doesn't exist (404)
+    const errorObj = err as { statusCode?: number; data?: { message?: string } };
+    if (errorObj?.statusCode === 404) {
+      apiNotReady.value = true;
+      error.value = null; // Don't show as error, show as info
+    } else {
+      const errorMessage = errorObj?.data?.message || "Failed to fetch POB data";
+      error.value = errorMessage;
+      toast.error(errorMessage);
+    }
   } finally {
     loading.value = false;
   }
@@ -116,6 +128,13 @@ async function fetchPOBData() {
 function initializeEditableEntries(data: POBData) {
   const entries = new Map<string, POBEntry>();
 
+  // Ensure period data exists
+  if (!data.period?.start_date || !data.period?.end_date) {
+    console.warn("Period data missing, cannot initialize entries");
+    editableEntries.value = entries;
+    return;
+  }
+
   // Generate all dates in period
   const startDate = new Date(data.period.start_date);
   const endDate = new Date(data.period.end_date);
@@ -125,7 +144,7 @@ function initializeEditableEntries(data: POBData) {
     const dateStr = currentDate.toISOString().split("T")[0]!;
 
     // Check if we have an existing entry for this date
-    const existingEntry = data.entries.find((e) => {
+    const existingEntry = data.entries?.find((e) => {
       const entryDate = new Date(e.date).toISOString().split("T")[0]!;
       return entryDate === dateStr;
     });
@@ -186,8 +205,8 @@ async function saveEntry(dateStr: string) {
   savingDates.value.add(dateStr);
 
   try {
-    const response = await $fetch(`/api/locations/${activeLocationId.value}/pob`, {
-      method: "POST",
+    const response = await $fetch<POBData>(`/api/locations/${activeLocationId.value}/pob`, {
+      method: "post",
       body: {
         entries: [
           {
@@ -200,7 +219,7 @@ async function saveEntry(dateStr: string) {
     });
 
     // Update POB data with new summary
-    if (pobData.value && response.summary) {
+    if (pobData.value && response?.summary) {
       pobData.value.summary = response.summary;
     }
 
@@ -231,23 +250,19 @@ function handleChange(dateStr: string) {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="POB Entry"
-      icon="i-lucide-users"
-      :show-location="true"
-      :show-period="true"
-      location-scope="current"
-    />
-
-    <!-- Period Info with Summary -->
-    <div v-if="currentPeriod && pobData?.summary">
-      <POBSummary
-        :period="currentPeriod"
-        :summary="pobData.summary"
-        :period-date-range="periodStore.periodDateRange"
-      />
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-users" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">POB Entry</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Personnel On Board daily entry for
+            {{ pobData?.location?.name || locationStore.activeLocation?.name || "current location" }}
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -255,30 +270,69 @@ function handleChange(dateStr: string) {
       <LoadingSpinner size="lg" text="Loading POB data..." />
     </div>
 
+    <!-- API Not Ready State -->
+    <UCard v-else-if="apiNotReady" class="card-elevated">
+      <div class="flex flex-col items-center justify-center py-8 text-center">
+        <UIcon name="i-lucide-construction" class="w-12 h-12 text-amber-500 mb-4" />
+        <h3 class="text-lg font-semibold text-[var(--ui-text)]">Feature Coming Soon</h3>
+        <p class="text-sm text-[var(--ui-text-muted)] mt-2 max-w-md">
+          The POB (Personnel On Board) tracking feature is not yet available. This feature will
+          allow you to record daily crew and extra personnel counts for mandays calculation.
+        </p>
+        <UButton
+          to="/"
+          color="primary"
+          variant="soft"
+          class="mt-4 cursor-pointer"
+          icon="i-lucide-arrow-left"
+        >
+          Back to Dashboard
+        </UButton>
+      </div>
+    </UCard>
+
     <!-- Error State -->
     <ErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
 
+    <!-- No Location Selected State -->
+    <EmptyState
+      v-else-if="!activeLocationId"
+      icon="i-lucide-map-pin-off"
+      title="No Location Selected"
+      description="Please select a location from the header to view POB data."
+    />
+
     <!-- No Period State -->
-    <div v-else-if="!currentPeriod" class="text-center py-12">
-      <EmptyState
-        icon="i-lucide-calendar-x"
-        title="No Active Period"
-        description="There is no active period to enter POB data."
-      />
-    </div>
+    <EmptyState
+      v-else-if="!currentPeriod"
+      icon="i-lucide-calendar-x"
+      title="No Active Period"
+      description="There is no active period to enter POB data."
+    />
 
     <!-- Period Closed State -->
     <UAlert
       v-else-if="!isPeriodOpen"
       color="warning"
       variant="soft"
+      icon="i-lucide-lock"
       title="Period is not open"
       description="You cannot edit POB entries for a closed period."
     />
 
-    <!-- POB Entry Table -->
-    <div v-else-if="pobData && editableEntries.size > 0">
+    <!-- POB Entry Content -->
+    <template v-else-if="pobData">
+      <!-- Period Info with Summary -->
+      <POBSummary
+        v-if="currentPeriod && pobData.summary"
+        :period="currentPeriod"
+        :summary="pobData.summary"
+        :period-date-range="periodStore.periodDateRange"
+      />
+
+      <!-- POB Entry Table -->
       <POBTable
+        v-if="editableEntries.size > 0"
         :entries="editableEntries"
         :disabled="!isPeriodOpen"
         :saving-dates="savingDates"
@@ -286,14 +340,23 @@ function handleChange(dateStr: string) {
         @change="handleChange"
       />
 
-      <!-- Instructions -->
+      <!-- No Entries State - when data loaded but no entries available -->
+      <EmptyState
+        v-else-if="!editableEntries.size"
+        icon="i-lucide-calendar-x"
+        title="No Entries Available"
+        description="No POB entries are available for the current period. Please check if the period is configured correctly."
+      />
+
+      <!-- Instructions - only show when there are entries to edit -->
       <UAlert
-        class="mt-4"
+        v-if="editableEntries.size > 0"
         color="primary"
         variant="soft"
+        icon="i-lucide-info"
         title="Auto-save enabled"
         description="POB entries are automatically saved when you move to the next field. Ensure all counts are non-negative whole numbers."
       />
-    </div>
+    </template>
   </div>
 </template>

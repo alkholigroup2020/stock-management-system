@@ -194,7 +194,7 @@ const submitTransfer = async () => {
           body: {
             from_location_id: formData.value.from_location_id,
             to_location_id: formData.value.to_location_id,
-            transfer_date: formData.value.transfer_date
+            request_date: formData.value.transfer_date
               ? new Date(formData.value.transfer_date).toISOString()
               : new Date().toISOString(),
             notes: formData.value.notes || null,
@@ -208,7 +208,7 @@ const submitTransfer = async () => {
         );
 
         // Redirect to transfer detail page
-        router.push(`/transfers/${result.id}`);
+        router.push(`/transfers/${result.transfer.id}`);
       } catch (error: any) {
         console.error("Transfer submission error:", error);
         handleError(error, { context: "creating transfer" });
