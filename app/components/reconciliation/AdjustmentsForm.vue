@@ -114,7 +114,7 @@ function formatCurrency(value: number): string {
 </script>
 
 <template>
-  <UCard>
+  <UCard class="card-elevated">
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold text-[var(--ui-text)]">Adjustments</h3>
@@ -122,7 +122,7 @@ function formatCurrency(value: number): string {
       </div>
     </template>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
       <!-- Back-charges -->
       <div>
         <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
@@ -136,6 +136,7 @@ function formatCurrency(value: number): string {
           min="0"
           placeholder="0.00"
           :disabled="readOnly || loading"
+          class="w-full"
         />
         <p class="text-xs text-[var(--ui-text-muted)] mt-1">Amounts charged back to suppliers</p>
       </div>
@@ -153,6 +154,7 @@ function formatCurrency(value: number): string {
           min="0"
           placeholder="0.00"
           :disabled="readOnly || loading"
+          class="w-full"
         />
         <p class="text-xs text-[var(--ui-text-muted)] mt-1">Credits expected from suppliers</p>
       </div>
@@ -170,6 +172,7 @@ function formatCurrency(value: number): string {
           min="0"
           placeholder="0.00"
           :disabled="readOnly || loading"
+          class="w-full"
         />
         <p class="text-xs text-[var(--ui-text-muted)] mt-1">Value of condemned/discarded stock</p>
       </div>
@@ -187,6 +190,7 @@ function formatCurrency(value: number): string {
           min="0"
           placeholder="0.00"
           :disabled="readOnly || loading"
+          class="w-full"
         />
         <p class="text-xs text-[var(--ui-text-muted)] mt-1">Miscellaneous adjustments</p>
       </div>
@@ -209,6 +213,7 @@ function formatCurrency(value: number): string {
         color="primary"
         :disabled="!isValid || !hasChanges || loading"
         :loading="loading"
+        class="cursor-pointer"
         @click="handleSave"
       >
         Save Adjustments
@@ -220,7 +225,7 @@ function formatCurrency(value: number): string {
       <UAlert
         color="error"
         variant="soft"
-        icon="i-heroicons-exclamation-triangle"
+        icon="i-lucide-alert-triangle"
         title="Invalid Values"
         description="All adjustment values must be non-negative numbers"
       />

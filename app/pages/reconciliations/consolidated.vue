@@ -1,13 +1,316 @@
+<script setup lang="ts">
+import { formatCurrency, formatDate } from "~/utils/format";
+
+// SEO
+useSeoMeta({
+  title: "Consolidated Reconciliation - Stock Management System",
+  description: "View reconciliation data across all locations",
+});
+
+// Types
+interface LocationReconciliation {
+  location: {
+    id: string;
+    code: string;
+    name: string;
+    type: string;
+  };
+  reconciliation: {
+    id: string;
+    period_id: string;
+    location_id: string;
+    opening_stock: number;
+    receipts: number;
+    transfers_in: number;
+    transfers_out: number;
+    issues: number;
+    closing_stock: number;
+    adjustments: number;
+    back_charges: number;
+    credits: number;
+    condemnations: number;
+    last_updated: Date | string;
+  };
+  calculations: {
+    consumption: number;
+    total_adjustments: number;
+    total_mandays: number;
+    manday_cost: number | null;
+  };
+  is_auto_calculated: boolean;
+}
+
+interface ConsolidatedData {
+  period: {
+    id: string;
+    name: string;
+    start_date: Date | string;
+    end_date: Date | string;
+    status: string;
+  };
+  locations: LocationReconciliation[];
+  grand_totals: {
+    opening_stock: number;
+    receipts: number;
+    transfers_in: number;
+    transfers_out: number;
+    issues: number;
+    closing_stock: number;
+    adjustments: number;
+    back_charges: number;
+    credits: number;
+    condemnations: number;
+    consumption: number;
+    total_mandays: number;
+    average_manday_cost: number | null;
+  };
+  summary: {
+    total_locations: number;
+    locations_with_saved_reconciliations: number;
+    locations_with_auto_calculated: number;
+  };
+}
+
+// Stores & Composables
+const periodStore = usePeriodStore();
+const authStore = useAuthStore();
+const router = useRouter();
+const toast = useAppToast();
+
+// State
+const loading = ref(false);
+const error = ref<string | null>(null);
+const consolidatedData = ref<ConsolidatedData | null>(null);
+
+// Computed
+const currentPeriod = computed(() => periodStore.currentPeriod);
+
+// Methods
+async function fetchData() {
+  if (!currentPeriod.value) {
+    return;
+  }
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const response = await $fetch("/api/reconciliations/consolidated", {
+      method: "GET",
+      query: {
+        periodId: currentPeriod.value.id,
+      },
+    });
+
+    consolidatedData.value = response as ConsolidatedData;
+  } catch (err: unknown) {
+    console.error("Error fetching consolidated reconciliations:", err);
+    const apiError = err as { data?: { code?: string; message?: string } };
+
+    // Handle specific error codes
+    if (apiError.data?.code === "INSUFFICIENT_PERMISSIONS") {
+      error.value = "You do not have permission to view consolidated reconciliations";
+      toast.error("Access Denied", { description: error.value });
+      router.push("/reconciliations");
+    } else if (apiError.data?.code === "PERIOD_NOT_FOUND") {
+      error.value = "Period not found";
+    } else {
+      error.value = apiError.data?.message || "Failed to load consolidated reconciliations";
+    }
+  } finally {
+    loading.value = false;
+  }
+}
+
+function viewLocationDetails(locationId: string) {
+  router.push(`/reconciliations?locationId=${locationId}`);
+}
+
+function exportToCSV() {
+  if (!consolidatedData.value) {
+    return;
+  }
+
+  try {
+    // Build CSV header
+    const headers = [
+      "Location Code",
+      "Location Name",
+      "Opening Stock",
+      "Receipts",
+      "Transfers In",
+      "Transfers Out",
+      "Issues",
+      "Closing Stock",
+      "Adjustments",
+      "Consumption",
+      "Mandays",
+      "Cost per Manday",
+      "Status",
+    ];
+
+    // Build CSV rows
+    const rows = consolidatedData.value.locations.map((item: LocationReconciliation) => {
+      return [
+        item.location.code,
+        item.location.name,
+        item.reconciliation.opening_stock.toFixed(2),
+        item.reconciliation.receipts.toFixed(2),
+        item.reconciliation.transfers_in.toFixed(2),
+        item.reconciliation.transfers_out.toFixed(2),
+        item.reconciliation.issues.toFixed(2),
+        item.reconciliation.closing_stock.toFixed(2),
+        item.calculations.total_adjustments.toFixed(2),
+        item.calculations.consumption.toFixed(2),
+        item.calculations.total_mandays,
+        item.calculations.manday_cost !== null ? item.calculations.manday_cost.toFixed(2) : "N/A",
+        item.is_auto_calculated ? "Auto-calculated" : "Saved",
+      ];
+    });
+
+    // Add grand totals row
+    const grandTotalsRow = [
+      "GRAND TOTAL",
+      "",
+      consolidatedData.value.grand_totals.opening_stock.toFixed(2),
+      consolidatedData.value.grand_totals.receipts.toFixed(2),
+      consolidatedData.value.grand_totals.transfers_in.toFixed(2),
+      consolidatedData.value.grand_totals.transfers_out.toFixed(2),
+      consolidatedData.value.grand_totals.issues.toFixed(2),
+      consolidatedData.value.grand_totals.closing_stock.toFixed(2),
+      (
+        consolidatedData.value.grand_totals.adjustments +
+        consolidatedData.value.grand_totals.back_charges +
+        consolidatedData.value.grand_totals.credits +
+        consolidatedData.value.grand_totals.condemnations
+      ).toFixed(2),
+      consolidatedData.value.grand_totals.consumption.toFixed(2),
+      consolidatedData.value.grand_totals.total_mandays,
+      consolidatedData.value.grand_totals.average_manday_cost !== null
+        ? consolidatedData.value.grand_totals.average_manday_cost.toFixed(2)
+        : "N/A",
+      `${consolidatedData.value.summary.locations_with_saved_reconciliations}/${consolidatedData.value.summary.total_locations}`,
+    ];
+
+    rows.push(grandTotalsRow);
+
+    // Convert to CSV string
+    const csvContent = [
+      // Title
+      [`Consolidated Reconciliation Report - ${consolidatedData.value.period.name}`],
+      [
+        `Period: ${formatDate(consolidatedData.value.period.start_date)} - ${formatDate(consolidatedData.value.period.end_date)}`,
+      ],
+      [`Generated: ${formatDate(new Date())}`],
+      [], // Empty row
+      headers,
+      ...rows,
+    ]
+      .map((row) => row.map((cell: string | number) => `"${cell}"`).join(","))
+      .join("\n");
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `consolidated-reconciliation-${consolidatedData.value.period.name.replace(/\s+/g, "-")}-${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("Export Successful", {
+      description: "Consolidated reconciliation exported to CSV",
+    });
+  } catch (err) {
+    console.error("Error exporting to CSV:", err);
+    toast.error("Export Failed", {
+      description: "Failed to export consolidated reconciliation to CSV",
+    });
+  }
+}
+
+// Watch for period changes
+watch(currentPeriod, (newPeriod) => {
+  if (newPeriod) {
+    fetchData();
+  }
+});
+
+// Initial data load with permission check
+onMounted(() => {
+  // Check permissions
+  if (
+    !authStore.user ||
+    (authStore.user.role !== "SUPERVISOR" && authStore.user.role !== "ADMIN")
+  ) {
+    toast.error("Access Denied", {
+      description: "Only Supervisors and Admins can view consolidated reconciliations",
+    });
+    router.push("/reconciliations");
+    return;
+  }
+
+  // Fetch data if period is available
+  if (currentPeriod.value) {
+    fetchData();
+  }
+});
+</script>
+
 <template>
-  <div class="p-4 md:p-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Consolidated Reconciliation"
-      subtitle="View reconciliation data across all locations"
-      icon="building-office-2"
-      :location-scope="'none'"
-      :show-period="true"
-    />
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-building-2" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-xl sm:text-3xl font-bold text-primary">Consolidated Reconciliation</h1>
+            <UBadge
+              v-if="currentPeriod"
+              color="success"
+              variant="soft"
+              size="md"
+              class="hidden sm:inline-flex items-center gap-1"
+            >
+              <UIcon name="i-lucide-calendar" class="h-3 w-3" />
+              {{ currentPeriod.name }}
+            </UBadge>
+          </div>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            View reconciliation data across all locations
+          </p>
+          <!-- Mobile period badge -->
+          <UBadge
+            v-if="currentPeriod"
+            color="success"
+            variant="soft"
+            size="sm"
+            class="sm:hidden inline-flex items-center gap-1 mt-1"
+          >
+            <UIcon name="i-lucide-calendar" class="h-3 w-3" />
+            {{ currentPeriod.name }}
+          </UBadge>
+        </div>
+      </div>
+      <UButton
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-arrow-left"
+        size="lg"
+        class="cursor-pointer rounded-full px-3 sm:px-6"
+        @click="router.push('/reconciliations')"
+      >
+        <span class="hidden sm:inline">Back</span>
+      </UButton>
+    </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
@@ -15,26 +318,24 @@
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="mt-6">
-      <ErrorAlert :message="error" @retry="fetchData" />
-    </div>
+    <ErrorAlert v-else-if="error" :message="error" @retry="fetchData" />
 
     <!-- No Period Selected -->
-    <div v-else-if="!currentPeriod" class="mt-6">
+    <div v-else-if="!currentPeriod">
       <UAlert
         color="warning"
         variant="soft"
-        icon="i-heroicons-exclamation-triangle"
+        icon="i-lucide-calendar-x"
         title="No Active Period"
         description="There is no active period selected. Please ensure a period is set."
       />
     </div>
 
     <!-- Consolidated Reconciliation Data -->
-    <div v-else-if="consolidatedData" class="mt-6 space-y-6">
+    <template v-else-if="consolidatedData">
       <!-- Period Information & Summary -->
-      <UCard>
-        <div class="flex items-center justify-between">
+      <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-lg font-semibold text-[var(--ui-text)]">
               {{ consolidatedData.period.name }}
@@ -44,7 +345,7 @@
               {{ formatDate(consolidatedData.period.end_date) }}
             </p>
           </div>
-          <div class="text-right">
+          <div class="text-left sm:text-right">
             <div class="text-sm text-[var(--ui-text-muted)]">Total Locations</div>
             <div class="text-2xl font-bold text-[var(--ui-text)]">
               {{ consolidatedData.summary.total_locations }}
@@ -53,9 +354,7 @@
         </div>
 
         <!-- Summary Stats -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-[var(--ui-border)]"
-        >
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-[var(--ui-border)]">
           <div>
             <div class="text-sm text-[var(--ui-text-muted)]">Total Consumption</div>
             <div class="text-xl font-semibold text-[var(--ui-primary)]">
@@ -85,7 +384,7 @@
           <UAlert
             color="warning"
             variant="soft"
-            icon="i-heroicons-information-circle"
+            icon="i-lucide-info"
             :title="`${consolidatedData.summary.locations_with_auto_calculated} location(s) with auto-calculated data`"
             description="Some reconciliations are auto-calculated from current transactions and have not been saved by supervisors yet."
           />
@@ -97,7 +396,8 @@
         <UButton
           color="primary"
           variant="outline"
-          icon="i-heroicons-arrow-down-tray"
+          icon="i-lucide-download"
+          class="cursor-pointer"
           @click="exportToCSV"
         >
           Export to CSV
@@ -105,7 +405,7 @@
       </div>
 
       <!-- Location Reconciliations Table -->
-      <UCard>
+      <UCard class="card-elevated">
         <template #header>
           <h3 class="text-lg font-semibold text-[var(--ui-text)]">Reconciliations by Location</h3>
         </template>
@@ -300,283 +600,6 @@
           </table>
         </div>
       </UCard>
-    </div>
+    </template>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
-import { usePeriodStore } from "~/stores/period";
-import { useAuthStore } from "~/stores/auth";
-import { formatCurrency, formatDate } from "~/utils/format";
-
-// Types
-interface LocationReconciliation {
-  location: {
-    id: string;
-    code: string;
-    name: string;
-    type: string;
-  };
-  reconciliation: {
-    id: string;
-    period_id: string;
-    location_id: string;
-    opening_stock: number;
-    receipts: number;
-    transfers_in: number;
-    transfers_out: number;
-    issues: number;
-    closing_stock: number;
-    adjustments: number;
-    back_charges: number;
-    credits: number;
-    condemnations: number;
-    last_updated: Date | string;
-  };
-  calculations: {
-    consumption: number;
-    total_adjustments: number;
-    total_mandays: number;
-    manday_cost: number | null;
-  };
-  is_auto_calculated: boolean;
-}
-
-interface ConsolidatedData {
-  period: {
-    id: string;
-    name: string;
-    start_date: Date | string;
-    end_date: Date | string;
-    status: string;
-  };
-  locations: LocationReconciliation[];
-  grand_totals: {
-    opening_stock: number;
-    receipts: number;
-    transfers_in: number;
-    transfers_out: number;
-    issues: number;
-    closing_stock: number;
-    adjustments: number;
-    back_charges: number;
-    credits: number;
-    condemnations: number;
-    consumption: number;
-    total_mandays: number;
-    average_manday_cost: number | null;
-  };
-  summary: {
-    total_locations: number;
-    locations_with_saved_reconciliations: number;
-    locations_with_auto_calculated: number;
-  };
-}
-
-// Stores
-const periodStore = usePeriodStore();
-const authStore = useAuthStore();
-const router = useRouter();
-const toast = useToast();
-
-// Check permissions on mount
-onMounted(() => {
-  if (
-    !authStore.user ||
-    (authStore.user.role !== "SUPERVISOR" && authStore.user.role !== "ADMIN")
-  ) {
-    toast.add({
-      title: "Access Denied",
-      description: "Only Supervisors and Admins can view consolidated reconciliations",
-      color: "error",
-      icon: "i-heroicons-exclamation-circle",
-    });
-    router.push("/reconciliations");
-  }
-});
-
-// State
-const loading = ref(false);
-const error = ref<string | null>(null);
-const consolidatedData = ref<ConsolidatedData | null>(null);
-
-// Computed
-const currentPeriod = computed(() => periodStore.currentPeriod);
-
-// Methods
-async function fetchData() {
-  if (!currentPeriod.value) {
-    return;
-  }
-
-  loading.value = true;
-  error.value = null;
-
-  try {
-    const response = await $fetch(`/api/reconciliations/consolidated`, {
-      method: "GET",
-      query: {
-        periodId: currentPeriod.value.id,
-      },
-    });
-
-    consolidatedData.value = response as ConsolidatedData;
-  } catch (err: unknown) {
-    console.error("Error fetching consolidated reconciliations:", err);
-    const apiError = err as { data?: { code?: string; message?: string } };
-
-    // Handle specific error codes
-    if (apiError.data?.code === "INSUFFICIENT_PERMISSIONS") {
-      error.value = "You do not have permission to view consolidated reconciliations";
-      toast.add({
-        title: "Access Denied",
-        description: error.value,
-        color: "error",
-        icon: "i-heroicons-exclamation-circle",
-      });
-      router.push("/reconciliations");
-    } else if (apiError.data?.code === "PERIOD_NOT_FOUND") {
-      error.value = "Period not found";
-    } else {
-      error.value = apiError.data?.message || "Failed to load consolidated reconciliations";
-    }
-  } finally {
-    loading.value = false;
-  }
-}
-
-function viewLocationDetails(locationId: string) {
-  router.push(`/reconciliations?locationId=${locationId}`);
-}
-
-function exportToCSV() {
-  if (!consolidatedData.value) {
-    return;
-  }
-
-  try {
-    // Build CSV header
-    const headers = [
-      "Location Code",
-      "Location Name",
-      "Opening Stock",
-      "Receipts",
-      "Transfers In",
-      "Transfers Out",
-      "Issues",
-      "Closing Stock",
-      "Adjustments",
-      "Consumption",
-      "Mandays",
-      "Cost per Manday",
-      "Status",
-    ];
-
-    // Build CSV rows
-    const rows = consolidatedData.value.locations.map((item: LocationReconciliation) => {
-      return [
-        item.location.code,
-        item.location.name,
-        item.reconciliation.opening_stock.toFixed(2),
-        item.reconciliation.receipts.toFixed(2),
-        item.reconciliation.transfers_in.toFixed(2),
-        item.reconciliation.transfers_out.toFixed(2),
-        item.reconciliation.issues.toFixed(2),
-        item.reconciliation.closing_stock.toFixed(2),
-        item.calculations.total_adjustments.toFixed(2),
-        item.calculations.consumption.toFixed(2),
-        item.calculations.total_mandays,
-        item.calculations.manday_cost !== null ? item.calculations.manday_cost.toFixed(2) : "N/A",
-        item.is_auto_calculated ? "Auto-calculated" : "Saved",
-      ];
-    });
-
-    // Add grand totals row
-    const grandTotalsRow = [
-      "GRAND TOTAL",
-      "",
-      consolidatedData.value.grand_totals.opening_stock.toFixed(2),
-      consolidatedData.value.grand_totals.receipts.toFixed(2),
-      consolidatedData.value.grand_totals.transfers_in.toFixed(2),
-      consolidatedData.value.grand_totals.transfers_out.toFixed(2),
-      consolidatedData.value.grand_totals.issues.toFixed(2),
-      consolidatedData.value.grand_totals.closing_stock.toFixed(2),
-      (
-        consolidatedData.value.grand_totals.adjustments +
-        consolidatedData.value.grand_totals.back_charges +
-        consolidatedData.value.grand_totals.credits +
-        consolidatedData.value.grand_totals.condemnations
-      ).toFixed(2),
-      consolidatedData.value.grand_totals.consumption.toFixed(2),
-      consolidatedData.value.grand_totals.total_mandays,
-      consolidatedData.value.grand_totals.average_manday_cost !== null
-        ? consolidatedData.value.grand_totals.average_manday_cost.toFixed(2)
-        : "N/A",
-      `${consolidatedData.value.summary.locations_with_saved_reconciliations}/${consolidatedData.value.summary.total_locations}`,
-    ];
-
-    rows.push(grandTotalsRow);
-
-    // Convert to CSV string
-    const csvContent = [
-      // Title
-      [`Consolidated Reconciliation Report - ${consolidatedData.value.period.name}`],
-      [
-        `Period: ${formatDate(consolidatedData.value.period.start_date)} - ${formatDate(consolidatedData.value.period.end_date)}`,
-      ],
-      [`Generated: ${formatDate(new Date())}`],
-      [], // Empty row
-      headers,
-      ...rows,
-    ]
-      .map((row) => row.map((cell: string | number) => `"${cell}"`).join(","))
-      .join("\n");
-
-    // Create blob and download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `consolidated-reconciliation-${consolidatedData.value.period.name.replace(/\s+/g, "-")}-${new Date().toISOString().split("T")[0]}.csv`
-    );
-    link.style.visibility = "hidden";
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast.add({
-      title: "Export Successful",
-      description: "Consolidated reconciliation exported to CSV",
-      color: "success",
-      icon: "i-heroicons-check-circle",
-    });
-  } catch (err) {
-    console.error("Error exporting to CSV:", err);
-    toast.add({
-      title: "Export Failed",
-      description: "Failed to export consolidated reconciliation to CSV",
-      color: "error",
-      icon: "i-heroicons-exclamation-circle",
-    });
-  }
-}
-
-// Watch for period changes
-watch(currentPeriod, (newPeriod) => {
-  if (newPeriod) {
-    fetchData();
-  }
-});
-
-// Initial data load
-onMounted(() => {
-  if (currentPeriod.value) {
-    fetchData();
-  }
-});
-</script>

@@ -23,7 +23,7 @@ interface Props {
     total_adjustments: number;
     total_mandays: number;
     manday_cost: number | null;
-    breakdown: {
+    breakdown?: {
       receipts_and_transfers: number;
       issues_and_stock_change: number;
       stock_change: number;
@@ -52,18 +52,18 @@ function formatCurrency(value: number | null): string {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-3">
     <!-- Stock Movement Summary -->
-    <UCard>
+    <UCard class="card-elevated">
       <template #header>
         <h3 class="text-lg font-semibold text-[var(--ui-text)]">Stock Movement</h3>
       </template>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
         <!-- Opening Stock -->
         <div>
           <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Opening Stock</h4>
-          <p class="text-xl font-semibold text-[var(--ui-text)] mt-1">
+          <p class="text-xl font-bold text-[var(--ui-text)] mt-1">
             {{ formatCurrency(reconciliation.opening_stock) }}
           </p>
         </div>
@@ -71,7 +71,7 @@ function formatCurrency(value: number | null): string {
         <!-- Receipts -->
         <div>
           <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Receipts</h4>
-          <p class="text-xl font-semibold text-[var(--ui-success)] mt-1">
+          <p class="text-xl font-bold text-[var(--ui-success)] mt-1">
             {{ formatCurrency(reconciliation.receipts) }}
           </p>
         </div>
@@ -79,7 +79,7 @@ function formatCurrency(value: number | null): string {
         <!-- Transfers In -->
         <div>
           <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Transfers In</h4>
-          <p class="text-xl font-semibold text-[var(--ui-success)] mt-1">
+          <p class="text-xl font-bold text-[var(--ui-success)] mt-1">
             {{ formatCurrency(reconciliation.transfers_in) }}
           </p>
         </div>
@@ -87,7 +87,7 @@ function formatCurrency(value: number | null): string {
         <!-- Transfers Out -->
         <div>
           <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Transfers Out</h4>
-          <p class="text-xl font-semibold text-[var(--ui-error)] mt-1">
+          <p class="text-xl font-bold text-[var(--ui-error)] mt-1">
             {{ formatCurrency(reconciliation.transfers_out) }}
           </p>
         </div>
@@ -95,7 +95,7 @@ function formatCurrency(value: number | null): string {
         <!-- Issues -->
         <div>
           <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Issues</h4>
-          <p class="text-xl font-semibold text-[var(--ui-error)] mt-1">
+          <p class="text-xl font-bold text-[var(--ui-error)] mt-1">
             {{ formatCurrency(reconciliation.issues) }}
           </p>
         </div>
@@ -103,7 +103,7 @@ function formatCurrency(value: number | null): string {
         <!-- Closing Stock -->
         <div>
           <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Closing Stock</h4>
-          <p class="text-xl font-semibold text-[var(--ui-text)] mt-1">
+          <p class="text-xl font-bold text-[var(--ui-text)] mt-1">
             {{ formatCurrency(reconciliation.closing_stock) }}
           </p>
         </div>
@@ -111,7 +111,7 @@ function formatCurrency(value: number | null): string {
     </UCard>
 
     <!-- Consumption Analysis -->
-    <UCard>
+    <UCard class="card-elevated">
       <template #header>
         <h3 class="text-lg font-semibold text-[var(--ui-text)]">Consumption Analysis</h3>
       </template>
@@ -149,7 +149,10 @@ function formatCurrency(value: number | null): string {
       </div>
 
       <!-- Breakdown Details -->
-      <div v-if="showBreakdown" class="mt-6 pt-6 border-t border-[var(--ui-border)]">
+      <div
+        v-if="showBreakdown && calculations.breakdown"
+        class="mt-6 pt-6 border-t border-[var(--ui-border)]"
+      >
         <h4 class="text-sm font-medium text-[var(--ui-text-muted)] mb-4">Calculation Breakdown</h4>
         <div class="space-y-3 text-sm">
           <div class="flex justify-between">
