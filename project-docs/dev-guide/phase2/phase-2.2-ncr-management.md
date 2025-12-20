@@ -291,14 +291,14 @@ stateDiagram-v2
     [*] --> OPEN: NCR Created
 
     OPEN --> SENT: Send to Supplier
+    OPEN --> RESOLVED: Resolved Directly
+
     SENT --> CREDITED: Supplier Accepts
     SENT --> REJECTED: Supplier Rejects
-
-    OPEN --> RESOLVED: Resolved Directly
     SENT --> RESOLVED: Resolved Otherwise
-    CREDITED --> RESOLVED: Finalize
-    REJECTED --> RESOLVED: Finalize
 
+    CREDITED --> [*]
+    REJECTED --> [*]
     RESOLVED --> [*]
 
     note right of OPEN
@@ -312,22 +312,39 @@ stateDiagram-v2
     end note
 
     note right of CREDITED
-        Success!
+        Final state - Success!
         Money recovered
     end note
 
     note right of REJECTED
-        Claim denied
+        Final state - Claim denied
         Document for records
     end note
 
     note right of RESOLVED
         Final state
-        resolved_at timestamp set
+        Issue handled internally
     end note
 ```
 
-**Final Statuses (set resolved_at):**
+**Valid Status Transitions (Enforced by API):**
+
+The system enforces strict status transition rules to maintain data integrity and proper workflow:
+
+| Current Status | Allowed Next Statuses | Notes |
+|----------------|----------------------|-------|
+| `OPEN` | `SENT`, `RESOLVED` | Can send to supplier or resolve directly if handled internally |
+| `SENT` | `CREDITED`, `REJECTED`, `RESOLVED` | Awaiting supplier response - can be credited, rejected, or resolved |
+| `CREDITED` | _(none - final state)_ | NCR successfully credited by supplier |
+| `REJECTED` | _(none - final state)_ | Supplier rejected the claim |
+| `RESOLVED` | _(none - final state)_ | Issue resolved (internally or otherwise) |
+
+**Important:**
+- Backwards transitions are NOT allowed (e.g., cannot go from `SENT` back to `OPEN`)
+- The API returns `INVALID_STATUS_TRANSITION` error if an invalid transition is attempted
+- The frontend only shows valid next status options in the dropdown
+
+**Final Statuses (set resolved_at timestamp):**
 
 - CREDITED
 - REJECTED

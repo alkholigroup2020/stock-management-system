@@ -443,7 +443,7 @@ onMounted(async () => {
                       placeholder="0.00"
                       size="lg"
                       class="w-28"
-                      @input="updateLineValue(line)"
+                      @update:model-value="updateLineValue(line)"
                     />
                   </td>
 
@@ -457,7 +457,7 @@ onMounted(async () => {
                       placeholder="0.00"
                       size="lg"
                       class="w-28"
-                      @input="updateLineValue(line)"
+                      @update:model-value="updateLineValue(line)"
                     />
                   </td>
 

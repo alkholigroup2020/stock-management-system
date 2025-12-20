@@ -132,6 +132,36 @@ export default defineEventHandler(async (event) => {
     const updateData: Record<string, unknown> = {};
 
     if (data.status) {
+      // Validate status transition
+      const currentStatus = ncr.status;
+      const newStatus = data.status;
+
+      // Define valid status transitions
+      // OPEN → SENT, RESOLVED (can skip SENT and resolve directly)
+      // SENT → CREDITED, REJECTED, RESOLVED
+      // CREDITED, REJECTED, RESOLVED → (no further transitions - final states)
+      const validTransitions: Record<string, string[]> = {
+        OPEN: ["SENT", "RESOLVED"],
+        SENT: ["CREDITED", "REJECTED", "RESOLVED"],
+        CREDITED: [], // Final state
+        REJECTED: [], // Final state
+        RESOLVED: [], // Final state
+      };
+
+      const allowedNextStatuses = validTransitions[currentStatus] || [];
+
+      // Check if transition is valid (allow same status for no-op)
+      if (newStatus !== currentStatus && !allowedNextStatuses.includes(newStatus)) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Bad Request",
+          data: {
+            code: "INVALID_STATUS_TRANSITION",
+            message: `Cannot change status from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedNextStatuses.length > 0 ? allowedNextStatuses.join(", ") : "none (final state)"}`,
+          },
+        });
+      }
+
       updateData.status = data.status;
 
       // Set resolved_at timestamp when status changes to a final state

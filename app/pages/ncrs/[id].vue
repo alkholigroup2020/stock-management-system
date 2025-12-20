@@ -107,14 +107,37 @@ const isNCRResolved = computed(() => {
   );
 });
 
-// Status options
-const statusOptions = [
+// All status options (for reference)
+const allStatusOptions = [
   { value: "OPEN", label: "Open" },
   { value: "SENT", label: "Sent to Supplier" },
   { value: "CREDITED", label: "Credited" },
   { value: "REJECTED", label: "Rejected by Supplier" },
   { value: "RESOLVED", label: "Resolved" },
 ];
+
+// Valid status transitions
+// OPEN → SENT, RESOLVED (can skip SENT and resolve directly)
+// SENT → CREDITED, REJECTED, RESOLVED
+// CREDITED, REJECTED, RESOLVED → (no further transitions - final states)
+const validTransitions: Record<string, string[]> = {
+  OPEN: ["SENT", "RESOLVED"],
+  SENT: ["CREDITED", "REJECTED", "RESOLVED"],
+  CREDITED: [], // Final state
+  REJECTED: [], // Final state
+  RESOLVED: [], // Final state
+};
+
+// Computed: Available status options based on current NCR status
+const availableStatusOptions = computed(() => {
+  if (!ncr.value) return [];
+
+  const currentStatus = ncr.value.status;
+  const allowedNextStatuses = validTransitions[currentStatus] || [];
+
+  // Filter to only show valid next statuses
+  return allStatusOptions.filter((option) => allowedNextStatuses.includes(option.value));
+});
 
 // Status badge helper
 function getStatusColor(
@@ -193,6 +216,9 @@ async function handleUpdateStatus() {
 
   updateLoading.value = true;
 
+  // Close modal immediately when save starts - loading overlay will show progress
+  showUpdateModal.value = false;
+
   try {
     const response = await $fetch<{ message: string; ncr: NCR }>(`/api/ncrs/${ncrId.value}`, {
       method: "PATCH",
@@ -208,9 +234,6 @@ async function handleUpdateStatus() {
 
     // Refresh NCR data
     await fetchNCR();
-
-    // Close modal
-    showUpdateModal.value = false;
   } catch (err: unknown) {
     console.error("Error updating NCR:", err);
 
@@ -245,10 +268,10 @@ async function handleUpdateStatus() {
 
 // Open update modal
 function openUpdateModal() {
-  // Reset form to current values
+  // Reset form - user must select a new status and enter fresh notes
   if (ncr.value) {
-    statusUpdateForm.value.status = ncr.value.status;
-    statusUpdateForm.value.resolution_notes = ncr.value.resolution_notes || "";
+    statusUpdateForm.value.status = ""; // Force user to select a valid next status
+    statusUpdateForm.value.resolution_notes = ""; // Clear notes - each update should have fresh notes
   }
   showUpdateModal.value = true;
 }
@@ -536,75 +559,77 @@ onMounted(async () => {
     </div>
 
     <!-- Status Update Modal -->
-    <UModal v-model="showUpdateModal" aria-labelledby="update-ncr-modal-title">
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-edit" class="h-5 w-5 text-primary" />
-            <h3 id="update-ncr-modal-title" class="text-lg font-semibold">Update NCR Status</h3>
-          </div>
-        </template>
+    <UModal v-model:open="showUpdateModal" aria-labelledby="update-ncr-modal-title">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-edit" class="h-5 w-5 text-primary" />
+              <h3 id="update-ncr-modal-title" class="text-lg font-semibold">Update NCR Status</h3>
+            </div>
+          </template>
 
-        <div class="space-y-4">
-          <!-- Status Dropdown -->
-          <div>
-            <label class="form-label">Status *</label>
-            <USelectMenu
-              v-model="statusUpdateForm.status"
-              :items="statusOptions"
-              value-key="value"
-              placeholder="Select status"
-              size="lg"
-              class="w-full"
-            />
-          </div>
+          <div class="space-y-4">
+            <!-- Status Dropdown -->
+            <div>
+              <label class="form-label">Status *</label>
+              <USelectMenu
+                v-model="statusUpdateForm.status"
+                :items="availableStatusOptions"
+                value-key="value"
+                placeholder="Select new status"
+                size="lg"
+                class="w-full"
+              />
+            </div>
 
-          <!-- Resolution Notes -->
-          <div>
-            <label class="form-label">Resolution Notes</label>
-            <UTextarea
-              v-model="statusUpdateForm.resolution_notes"
-              placeholder="Add any notes about the resolution (optional)"
-              :rows="4"
-              class="w-full"
-            />
-            <p class="mt-1 text-caption text-muted">
-              Provide details about how this NCR is being resolved or any relevant updates
-            </p>
-          </div>
+            <!-- Resolution Notes -->
+            <div>
+              <label class="form-label">Resolution Notes</label>
+              <UTextarea
+                v-model="statusUpdateForm.resolution_notes"
+                placeholder="Add any notes about the resolution (optional)"
+                :rows="4"
+                class="w-full"
+              />
+              <p class="mt-1 text-caption text-muted">
+                Provide details about how this NCR is being resolved or any relevant updates
+              </p>
+            </div>
 
-          <UAlert
-            icon="i-lucide-info"
-            color="primary"
-            variant="subtle"
-            description="Updating to CREDITED, REJECTED, or RESOLVED will mark the NCR as resolved and record the resolution timestamp."
-          />
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              class="cursor-pointer"
-              @click="showUpdateModal = false"
-              :disabled="updateLoading"
-            >
-              Cancel
-            </UButton>
-            <UButton
+            <UAlert
+              icon="i-lucide-info"
               color="primary"
-              icon="i-lucide-save"
-              class="cursor-pointer"
-              @click="handleUpdateStatus"
-              :loading="updateLoading"
-              :disabled="!statusUpdateForm.status"
-            >
-              Update NCR
-            </UButton>
+              variant="subtle"
+              description="Updating to CREDITED, REJECTED, or RESOLVED will mark the NCR as resolved and record the resolution timestamp."
+            />
           </div>
-        </template>
-      </UCard>
+
+          <template #footer>
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="showUpdateModal = false"
+                :disabled="updateLoading"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="primary"
+                icon="i-lucide-save"
+                class="cursor-pointer"
+                @click="handleUpdateStatus"
+                :loading="updateLoading"
+                :disabled="!statusUpdateForm.status"
+              >
+                Update NCR
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
     </UModal>
 
     <!-- Loading Overlay -->
