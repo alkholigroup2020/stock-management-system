@@ -288,10 +288,19 @@ async function saveAdjustments(values: {
   saving.value = true;
 
   try {
-    // TODO: Implement save API endpoint
-    // For now, show a message that this feature is coming soon
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.info("Reconciliation adjustment saving will be available in a future update.");
+    await $fetch("/api/reconciliations", {
+      method: "POST",
+      body: {
+        periodId: currentPeriod.value.id,
+        locationId: activeLocationId.value,
+        back_charges: values.back_charges,
+        credits: values.credits,
+        condemnations: values.condemnations,
+        adjustments: values.adjustments,
+      },
+    });
+
+    toast.success("Reconciliation adjustments saved successfully");
 
     // Refresh data after save
     await fetchReconciliation();
