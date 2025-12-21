@@ -1,7 +1,11 @@
 /**
- * PATCH /api/periods/:periodId/locations/:locationId/ready
+ * PATCH /api/period-locations/ready
  *
  * Mark a location as ready for period close
+ *
+ * Body:
+ * - periodId: The period ID
+ * - locationId: The location ID
  *
  * Permissions:
  * - SUPERVISOR or ADMIN
@@ -12,7 +16,7 @@
  * - Records ready_at timestamp
  */
 
-import prisma from "../../../../../utils/prisma";
+import prisma from "../../utils/prisma";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -41,8 +45,9 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const periodId = getRouterParam(event, "periodId");
-    const locationId = getRouterParam(event, "locationId");
+    const body = await readBody(event);
+    const periodId = body?.periodId;
+    const locationId = body?.locationId;
 
     if (!periodId || !locationId) {
       throw createError({
@@ -50,7 +55,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "MISSING_PARAMETERS",
-          message: "Period ID and Location ID are required",
+          message: "Period ID and Location ID are required in request body",
         },
       });
     }

@@ -32,6 +32,8 @@ const updatePeriodSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  console.log("===== [id].patch.ts HANDLER CALLED =====");
+  console.log("[id].patch URL:", event.path);
   const user = event.context.user;
 
   if (!user) {
