@@ -172,6 +172,7 @@ const pageTitleMap: Record<string, string> = {
   "periods-id": "Period Details",
   "period-close": "Period Close",
   pob: "POB",
+  profile: "My Profile",
 };
 
 // Get page title from route
@@ -267,7 +268,7 @@ const handleLogout = async () => {
                 {
                   label: 'Profile',
                   icon: 'i-heroicons-user',
-                  onSelect: () => {},
+                  onSelect: () => navigateTo('/profile'),
                 },
               ],
               [
@@ -355,6 +356,13 @@ const handleLogout = async () => {
                       label: user.role,
                       icon: 'i-heroicons-shield-check',
                       type: 'label',
+                    },
+                  ],
+                  [
+                    {
+                      label: 'Profile',
+                      icon: 'i-heroicons-user',
+                      onSelect: () => navigateTo('/profile'),
                     },
                   ],
                   [
