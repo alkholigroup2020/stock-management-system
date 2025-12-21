@@ -340,17 +340,17 @@
             />
             <h3 class="text-xl font-semibold text-[var(--ui-text)] mb-2">Ready to Close</h3>
             <p class="text-base text-[var(--ui-text-muted)] mb-6">
-              All locations are ready. You can now close the period.
+              All locations are ready. Submit a period close request for approval.
             </p>
             <UButton
               color="primary"
-              icon="i-lucide-lock"
+              icon="i-lucide-send"
               size="lg"
               :disabled="closingPeriod || !isOnline"
               class="cursor-pointer rounded-full px-6"
               @click="showConfirmModal = true"
             >
-              Close Period
+              Request Period Close
             </UButton>
           </template>
         </div>
@@ -370,7 +370,7 @@
       </UCard>
     </div>
 
-    <!-- Confirmation Modal -->
+    <!-- Request Period Close Confirmation Modal -->
     <UModal v-model:open="showConfirmModal">
       <template #content>
         <UCard class="card-elevated">
@@ -378,11 +378,11 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <UIcon
-                  name="i-lucide-alert-triangle"
+                  name="i-lucide-send"
                   class="w-5 h-5"
-                  style="color: var(--ui-warning)"
+                  style="color: var(--ui-primary)"
                 />
-                <h3 class="text-lg font-semibold text-[var(--ui-text)]">Confirm Period Close</h3>
+                <h3 class="text-lg font-semibold text-[var(--ui-text)]">Request Period Close</h3>
               </div>
               <UButton
                 color="neutral"
@@ -398,24 +398,28 @@
 
           <div class="space-y-4">
             <p class="text-base text-[var(--ui-text)]">
-              You are about to close the period
+              You are about to request period close for
               <strong>{{ currentPeriod?.name }}</strong>
-              . This action will:
+              .
             </p>
-            <ul class="list-disc list-inside text-base text-[var(--ui-text-muted)] space-y-2">
+
+            <UAlert
+              color="info"
+              variant="soft"
+              icon="i-lucide-info"
+              title="Approval Required"
+              description="This will create a period close request that requires admin approval before the period is closed."
+            />
+
+            <p class="text-sm text-[var(--ui-text-muted)]">
+              Once approved, the following will happen:
+            </p>
+            <ul class="list-disc list-inside text-sm text-[var(--ui-text-muted)] space-y-1">
               <li>Create a snapshot of all stock levels for each location</li>
               <li>Lock all transactions for this period</li>
               <li>Prevent any further changes to deliveries, issues, or transfers</li>
               <li>Create a new period for the next accounting cycle</li>
             </ul>
-
-            <UAlert
-              color="warning"
-              variant="soft"
-              icon="i-lucide-alert-triangle"
-              title="This action cannot be undone"
-              description="Once closed, the period cannot be reopened. Make sure all transactions are complete and reconciliations are accurate."
-            />
           </div>
 
           <template #footer>
@@ -431,13 +435,13 @@
               </UButton>
               <UButton
                 color="primary"
-                icon="i-lucide-lock"
+                icon="i-lucide-send"
                 :loading="closingPeriod"
                 :disabled="!isOnline"
                 class="cursor-pointer rounded-full px-6"
                 @click="handleClosePeriod"
               >
-                Confirm & Close Period
+                Submit Request
               </UButton>
             </div>
           </template>
@@ -445,13 +449,13 @@
       </template>
     </UModal>
 
-    <!-- Loading Overlay for Period Close -->
+    <!-- Loading Overlay for Period Close Approval -->
     <LoadingOverlay
       v-if="closingPeriod && currentStep > 0"
-      title="Closing Period..."
-      message="Please wait while we process your request"
+      title="Approving Period Close..."
+      message="Please wait while we execute the period close"
       :current-step="currentStep"
-      :total-steps="2"
+      :total-steps="1"
       :step-description="currentStepDescription"
     />
 
@@ -973,7 +977,8 @@ async function handleUnmarkReady(locationId: string) {
 }
 
 /**
- * Handle period close - creates approval request and immediately approves it
+ * Handle period close request - creates approval request only (does NOT auto-approve)
+ * The period will go to PENDING_CLOSE status and wait for admin approval
  */
 async function handleClosePeriod() {
   if (!currentPeriod.value) return;
@@ -982,46 +987,38 @@ async function handleClosePeriod() {
   await guardAction(
     async () => {
       closingPeriod.value = true;
-      currentStep.value = 0;
 
       try {
-        // Step 1: Request period close (creates approval)
-        currentStep.value = 1;
-        currentStepDescription.value = "Creating period close request...";
-        const closeResponse = await $fetch<{ approval: { id: string } }>(
+        // Request period close (creates approval, sets status to PENDING_CLOSE)
+        await $fetch<{ approval: { id: string } }>(
           `/api/periods/${currentPeriod.value!.id}/close`,
           {
             method: "POST",
           }
         );
 
-        // Step 2: Approve and execute the close
-        currentStep.value = 2;
-        currentStepDescription.value = "Executing period close and creating snapshots...";
-        const approvalResponse = await $fetch<{
-          summary: { totalLocations: number; totalClosingValue: number };
-        }>(`/api/approvals/${closeResponse.approval.id}/approve`, {
-          method: "PATCH",
+        // Hide confirm modal
+        showConfirmModal.value = false;
+
+        toast.add({
+          title: "Period Close Requested",
+          description: "The period close request has been submitted for approval.",
+          color: "success",
+          icon: "i-lucide-clock",
         });
 
-        // Store summary for success modal
-        closeSummary.value = approvalResponse.summary;
-
-        // Hide confirm modal and show success modal
-        showConfirmModal.value = false;
-        showSuccessModal.value = true;
-
         // Refresh period data (bypass cache to get fresh data)
+        // The period will now show PENDING_CLOSE status
         await fetchCurrentPeriod(true);
       } catch (err: any) {
-        console.error("Error closing period:", err);
+        console.error("Error requesting period close:", err);
 
         // Extract error message from H3/Nuxt error structure
         const errorMessage =
           err?.data?.data?.message ||
           err?.data?.message ||
           err?.statusMessage ||
-          "Failed to close period";
+          "Failed to request period close";
 
         toast.add({
           title: "Error",
@@ -1031,13 +1028,11 @@ async function handleClosePeriod() {
         });
       } finally {
         closingPeriod.value = false;
-        currentStep.value = 0;
-        currentStepDescription.value = "";
       }
     },
     {
-      offlineMessage: "Cannot close period",
-      offlineDescription: "You need an internet connection to close periods.",
+      offlineMessage: "Cannot request period close",
+      offlineDescription: "You need an internet connection to request period close.",
     }
   );
 }
@@ -1060,6 +1055,8 @@ async function handleApprovePeriodClose() {
   await guardAction(
     async () => {
       closingPeriod.value = true;
+      currentStep.value = 1;
+      currentStepDescription.value = "Executing period close and creating snapshots...";
 
       try {
         const approvalResponse = await $fetch<{
@@ -1091,6 +1088,8 @@ async function handleApprovePeriodClose() {
         });
       } finally {
         closingPeriod.value = false;
+        currentStep.value = 0;
+        currentStepDescription.value = "";
       }
     },
     {

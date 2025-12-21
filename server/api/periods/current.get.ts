@@ -17,12 +17,12 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Find the current OPEN period with location readiness status
-    // NOTE: Removed nested orderBy on location.name for performance
-    // Sorting is done in JavaScript below to avoid expensive JOIN operations
+    // Find the current working period (OPEN or PENDING_CLOSE)
+    // PENDING_CLOSE periods still need to be accessible for approval workflow
+    // NOTE: Sorting by location name is done in JavaScript below for performance
     const currentPeriod = await prisma.period.findFirst({
       where: {
-        status: "OPEN",
+        status: { in: ["OPEN", "PENDING_CLOSE"] },
       },
       include: {
         period_locations: {
