@@ -1,8 +1,9 @@
 # Period Close Feature - End-to-End Report
 
-**Document Version:** 1.0
-**Date:** December 20, 2025
+**Document Version:** 1.1
+**Date:** December 21, 2025
 **System:** Stock Management System - Multi-Location
+**Last Updated By:** E2E Testing Session
 
 ---
 
@@ -59,22 +60,33 @@ Before Period Close can be executed, ALL of the following must be complete:
 The period follows a strict state progression:
 
 ```
-┌─────────┐     All Locations     ┌────────────────┐     Admin      ┌──────────┐     System     ┌────────┐
-│  OPEN   │ ─────── Ready ──────► │ PENDING_CLOSE  │ ── Approves ──► │ APPROVED │ ── Executes ──► │ CLOSED │
-└─────────┘                       └────────────────┘                 └──────────┘                 └────────┘
-     │                                    │
-     │                                    │ Supervisor
-     │◄─────── Issues Found ──────────────┘ Reverts
+┌─────────┐     Request Close     ┌────────────────┐     Admin      ┌────────┐
+│  OPEN   │ ─────────────────────► │ PENDING_CLOSE  │ ── Approves ──► │ CLOSED │
+└─────────┘  (All Locations Ready) └────────────────┘                 └────────┘
+     ▲                                    │
+     │                                    │ Admin
+     └─────────── Rejects ────────────────┘
+              (Period reverts to OPEN,
+               Locations remain READY)
 ```
+
+**Note:** The APPROVED state was simplified - approval and execution now happen atomically in a single transaction.
 
 ### State Descriptions
 
 | State | Description | Allowed Operations |
 |-------|-------------|-------------------|
-| **OPEN** | Normal operations | Post deliveries, issues, transfers, update POB, edit reconciliations |
-| **PENDING_CLOSE** | Awaiting approval | View only, no new transactions, Admin can approve or Supervisor can revert |
-| **APPROVED** | System executing | No user operations, system processing close |
-| **CLOSED** | Locked | Read-only access, historical reference only |
+| **OPEN** | Normal operations | Post deliveries, issues, transfers, update POB, edit reconciliations, mark locations ready |
+| **PENDING_CLOSE** | Awaiting admin approval | View only, Admin can approve (execute close) or reject (revert to OPEN) |
+| **CLOSED** | Locked permanently | Read-only access, historical reference only |
+
+### Rejection Flow
+
+When an admin **rejects** a period close request:
+- Period status reverts from `PENDING_CLOSE` → `OPEN`
+- All location statuses **remain READY** (not reset)
+- Operators/Supervisors can make corrections
+- A new close request can be submitted once issues are resolved
 
 ---
 
@@ -214,40 +226,34 @@ Supervisor (each location)           Admin
 
 ---
 
-## 7. API Endpoints
+## 7. API Endpoints (Implemented)
 
 ### Period Management
 
 ```http
-# Get current period status
+# Get current period (includes OPEN and PENDING_CLOSE)
 GET /api/periods/current
 
 Response:
 {
-  "id": "period_202511",
-  "name": "2025-11",
-  "status": "OPEN",
-  "start_date": "2025-11-01",
-  "end_date": "2025-11-30",
-  "locations_ready": 3,
-  "locations_total": 5
-}
-```
-
-```http
-# Get location status for period
-GET /api/periods/{periodId}/locations
-
-Response:
-{
-  "locations": [
-    {
-      "id": "loc_123",
-      "name": "Riyadh Kitchen",
-      "status": "READY",
-      "reconciliation_complete": true
-    }
-  ]
+  "period": {
+    "id": "clxx...",
+    "name": "February 2026",
+    "status": "OPEN",  // or "PENDING_CLOSE"
+    "start_date": "2026-02-01",
+    "end_date": "2026-02-28",
+    "approval_id": null,  // Set when PENDING_CLOSE
+    "period_locations": [
+      {
+        "location_id": "loc_123",
+        "status": "OPEN",  // or "READY"
+        "ready_at": null,
+        "location": { "id": "...", "code": "KIT", "name": "Kitchen", "type": "KITCHEN" },
+        "_count": { "deliveries": 5, "issues": 3, "transfers": 2, "reconciliations": 1 }
+      }
+    ],
+    "_count": { "deliveries": 20, "issues": 15, "reconciliations": 4 }
+  }
 }
 ```
 
@@ -255,80 +261,110 @@ Response:
 
 ```http
 # Mark location as ready for close
-PATCH /api/periods/{periodId}/locations/{locationId}/ready
-
-Body: { "ready": true }
-
-Response:
-{
-  "location_id": "loc_123",
-  "status": "READY",
-  "period_ready_count": 4,
-  "period_total_count": 4
-}
-```
-
-### Approval Workflow
-
-```http
-# Request period close approval
-POST /api/approvals
+PATCH /api/period-locations/ready
 
 Body:
 {
-  "entity_type": "PERIOD_CLOSE",
-  "entity_id": "period_202511",
-  "notes": "All locations reconciled, ready for close"
+  "periodId": "period_uuid",
+  "locationId": "location_uuid"
 }
 
 Response:
 {
-  "approval_id": "appr_001",
-  "status": "PENDING",
-  "requested_by": "supervisor_name",
-  "requested_at": "2025-11-30T18:00:00Z"
+  "periodLocation": {
+    "location_id": "...",
+    "status": "READY",
+    "ready_at": "2025-12-21T13:24:00Z",
+    "location": { "id": "...", "code": "KIT", "name": "Kitchen", "type": "KITCHEN" },
+    "period": { "id": "...", "name": "February 2026", "status": "OPEN" }
+  },
+  "message": "Location marked as ready for period close"
 }
+
+# Prerequisite: Reconciliation must be completed for this location
+# Error if not: 400 RECONCILIATION_NOT_COMPLETED
 ```
 
-```http
-# Admin approves close
-PATCH /api/approvals/{id}
-
-Body:
-{
-  "action": "APPROVE",
-  "comments": "Verified all reconciliations"
-}
-```
-
-### Execute Period Close
+### Request Period Close
 
 ```http
-# Close the period (after approval)
-POST /api/periods/{id}/close
+# Request period close (creates approval, changes status to PENDING_CLOSE)
+POST /api/periods/{periodId}/close
 
-Body:
-{
-  "approval_token": "approval_xyz",
-  "closing_notes": "November 2025 closed successfully"
-}
+# No body required - validates all locations are READY
 
 Response:
 {
+  "approval": {
+    "id": "appr_uuid",
+    "status": "PENDING",
+    "requestedAt": "2025-12-21T14:00:00Z",
+    "entityType": "PERIOD_CLOSE"
+  },
   "period": {
-    "id": "period_202511",
-    "status": "CLOSED",
-    "closed_at": "2025-11-30T23:59:59Z",
-    "closed_by": "admin_name"
+    "id": "...",
+    "name": "February 2026",
+    "status": "PENDING_CLOSE",
+    "period_locations": [...]
   },
-  "next_period": {
-    "id": "period_202512",
-    "name": "2025-12",
+  "message": "Period close approval request created successfully"
+}
+
+# Errors:
+# - 400 LOCATIONS_NOT_READY: Not all locations are ready
+# - 400 INVALID_PERIOD_STATUS: Period is not OPEN
+# - 409 APPROVAL_ALREADY_EXISTS: Pending approval already exists
+```
+
+### Approve Period Close
+
+```http
+# Approve and execute period close
+PATCH /api/approvals/{id}/approve
+
+Body:
+{
+  "comments": "Verified all reconciliations"  // Optional
+}
+
+Response:
+{
+  "approval": { "id": "...", "status": "APPROVED", "reviewedAt": "..." },
+  "period": { "id": "...", "status": "CLOSED", "closedAt": "..." },
+  "nextPeriod": { "id": "...", "name": "March 2026", "status": "OPEN" },
+  "message": "Period closed successfully. March 2026 is now open."
+}
+```
+
+### Reject Period Close
+
+```http
+# Reject period close (reverts to OPEN, keeps locations READY)
+PATCH /api/approvals/{id}/reject
+
+Body:
+{
+  "comments": "Discrepancy found in Kitchen reconciliation"  // Optional
+}
+
+Response:
+{
+  "approval": {
+    "id": "...",
+    "status": "REJECTED",
+    "reviewedAt": "2025-12-21T15:00:00Z",
+    "comments": "Discrepancy found in Kitchen reconciliation"
+  },
+  "period": {
+    "id": "...",
+    "name": "February 2026",
     "status": "OPEN",
-    "start_date": "2025-12-01"
+    "locations": [
+      { "locationId": "...", "locationCode": "KIT", "status": "READY" },
+      { "locationId": "...", "locationCode": "STR", "status": "READY" }
+    ]
   },
-  "snapshots_created": 5,
-  "message": "Period closed successfully. December 2025 is now open."
+  "message": "Period close request rejected - period reverted to OPEN status"
 }
 ```
 
@@ -620,6 +656,59 @@ The Period Close feature is the cornerstone of the accounting cycle in the Stock
 5. **Complete Audit Trail** - Every action logged permanently
 
 Following the checklist and best practices ensures smooth month-end operations across all locations.
+
+---
+
+## 18. Implementation Changelog
+
+### Version 1.1 (December 21, 2025)
+
+**E2E Testing Session - Bug Fixes and Enhancements**
+
+#### Bug Fixes
+
+1. **Fixed: Auto-approval Issue**
+   - **Problem:** Clicking "Request Period Close" was auto-approving and closing the period immediately, bypassing the approval workflow.
+   - **Root Cause:** `handleClosePeriod()` in `period-close.vue` was calling the approve endpoint after creating the approval request.
+   - **Fix:** Modified `handleClosePeriod()` to only create the approval request (`POST /api/periods/:id/close`). The period now correctly transitions to `PENDING_CLOSE` status and waits for admin approval.
+   - **Files Changed:** `app/pages/period-close.vue`
+
+2. **Fixed: PENDING_CLOSE Periods Not Displaying**
+   - **Problem:** When a period was in `PENDING_CLOSE` status, the Period Close page showed "No Active Period" because the API returned null.
+   - **Root Cause:** `/api/periods/current` was only querying for `status: "OPEN"` periods.
+   - **Fix:** Changed the Prisma query to `status: { in: ["OPEN", "PENDING_CLOSE"] }` so pending periods are also returned.
+   - **Files Changed:** `server/api/periods/current.get.ts`
+
+#### New Features
+
+3. **Added: Period Close Rejection UI**
+   - **Problem:** When a period close request was pending, the admin could only approve it. There was no way to reject if corrections were needed.
+   - **Backend:** The rejection API already existed (`PATCH /api/approvals/:id/reject`).
+   - **Solution:** Added frontend UI for rejection:
+     - **Reject Button:** Added next to "Approve & Execute Close" button (red, soft variant)
+     - **Rejection Modal:** Confirmation dialog with optional comments field explaining why the close is being rejected
+     - **Handler Function:** `handleRejectPeriodClose()` calls the reject API and refreshes the page
+   - **Behavior:** When rejected, the period reverts to `OPEN` status but all locations remain `READY`, allowing corrections before resubmitting.
+   - **Files Changed:** `app/pages/period-close.vue`
+
+#### API Endpoints Updated
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/periods/current` | GET | Now returns both OPEN and PENDING_CLOSE periods |
+| `/api/period-locations/ready` | PATCH | Mark location as ready (body: periodId, locationId) |
+| `/api/periods/:id/close` | POST | Request period close (creates approval) |
+| `/api/approvals/:id/approve` | PATCH | Approve and execute close |
+| `/api/approvals/:id/reject` | PATCH | Reject and revert to OPEN |
+
+#### E2E Testing Performed
+
+- Created new period (February 2026)
+- Created reconciliations for all 4 locations
+- Marked all 4 locations as READY
+- Tested "Request Period Close" → Period correctly moved to PENDING_CLOSE
+- Tested "Reject" → Period correctly reverted to OPEN with locations still READY
+- Tested "Approve & Execute Close" → Period correctly closed
 
 ---
 

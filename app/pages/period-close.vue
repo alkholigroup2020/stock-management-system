@@ -301,17 +301,31 @@
           <p class="text-base text-[var(--ui-text-muted)] mb-6">
             A period close request has been submitted and is awaiting approval.
           </p>
-          <UButton
-            color="primary"
-            icon="i-lucide-check-circle"
-            size="lg"
-            :loading="closingPeriod"
-            :disabled="!isOnline"
-            class="cursor-pointer rounded-full px-6"
-            @click="showApproveCloseModal = true"
-          >
-            Approve & Execute Close
-          </UButton>
+          <div class="flex items-center justify-center gap-3">
+            <UButton
+              color="error"
+              variant="soft"
+              icon="i-lucide-x-circle"
+              size="lg"
+              :loading="rejectingPeriod"
+              :disabled="closingPeriod || !isOnline"
+              class="cursor-pointer rounded-full px-6"
+              @click="showRejectModal = true"
+            >
+              Reject
+            </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-check-circle"
+              size="lg"
+              :loading="closingPeriod"
+              :disabled="rejectingPeriod || !isOnline"
+              class="cursor-pointer rounded-full px-6"
+              @click="showApproveCloseModal = true"
+            >
+              Approve & Execute Close
+            </UButton>
+          </div>
         </div>
 
         <!-- Period is ready to close -->
@@ -669,6 +683,83 @@
         </UCard>
       </template>
     </UModal>
+
+    <!-- Reject Period Close Modal -->
+    <UModal v-model:open="showRejectModal">
+      <template #content>
+        <UCard class="card-elevated">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <UIcon
+                  name="i-lucide-x-circle"
+                  class="w-5 h-5"
+                  style="color: var(--ui-error)"
+                />
+                <h3 class="text-lg font-semibold text-[var(--ui-text)]">Reject Period Close</h3>
+              </div>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                aria-label="Close dialog"
+                class="cursor-pointer"
+                @click="showRejectModal = false"
+              />
+            </div>
+          </template>
+
+          <div class="space-y-4">
+            <p class="text-base text-[var(--ui-text)]">
+              You are about to reject the period close request for
+              <strong>{{ currentPeriod?.name }}</strong
+              >.
+            </p>
+
+            <UAlert
+              color="warning"
+              variant="soft"
+              icon="i-lucide-alert-triangle"
+              title="Period Will Revert to Open"
+              description="The period will return to OPEN status. All locations will remain ready, allowing corrections before submitting another close request."
+            />
+
+            <UFormField label="Rejection Reason (Optional)">
+              <UTextarea
+                v-model="rejectionComments"
+                placeholder="Explain why the period close is being rejected..."
+                :rows="3"
+              />
+            </UFormField>
+          </div>
+
+          <template #footer>
+            <div class="flex items-center justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="soft"
+                :disabled="rejectingPeriod"
+                class="cursor-pointer"
+                @click="showRejectModal = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                icon="i-lucide-x-circle"
+                :loading="rejectingPeriod"
+                :disabled="!isOnline"
+                class="cursor-pointer"
+                @click="handleRejectPeriodClose"
+              >
+                Reject Period Close
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -704,6 +795,9 @@ const showMarkReadyModal = ref(false);
 const showApproveCloseModal = ref(false);
 const locationToMark = ref<{ id: string; name: string; action: "mark" | "unmark" } | null>(null);
 const closeSummary = ref<{ totalLocations: number; totalClosingValue: number } | null>(null);
+const showRejectModal = ref(false);
+const rejectionComments = ref("");
+const rejectingPeriod = ref(false);
 
 // Computed
 const periodLocations = computed(() => {
@@ -1105,6 +1199,69 @@ async function handleApprovePeriodClose() {
 async function executeApproveClose() {
   showApproveCloseModal.value = false;
   await handleApprovePeriodClose();
+}
+
+/**
+ * Handle reject period close (for PENDING_CLOSE status)
+ */
+async function handleRejectPeriodClose() {
+  if (!currentPeriod.value || !currentPeriod.value.approval_id) {
+    toast.add({
+      title: "Error",
+      description: "No pending approval found",
+      color: "error",
+      icon: "i-lucide-alert-circle",
+    });
+    return;
+  }
+
+  await guardAction(
+    async () => {
+      rejectingPeriod.value = true;
+
+      try {
+        await $fetch(`/api/approvals/${currentPeriod.value!.approval_id}/reject`, {
+          method: "PATCH",
+          body: {
+            comments: rejectionComments.value || undefined,
+          },
+        });
+
+        showRejectModal.value = false;
+        rejectionComments.value = "";
+
+        toast.add({
+          title: "Period Close Rejected",
+          description: "The period has been reverted to OPEN status.",
+          color: "warning",
+          icon: "i-lucide-undo-2",
+        });
+
+        await fetchCurrentPeriod(true);
+      } catch (err: any) {
+        console.error("Error rejecting period close:", err);
+
+        const errorMessage =
+          err?.data?.data?.message ||
+          err?.data?.message ||
+          err?.statusMessage ||
+          "Failed to reject period close";
+
+        toast.add({
+          title: "Error",
+          description: errorMessage,
+          color: "error",
+          icon: "i-lucide-alert-circle",
+        });
+      } finally {
+        rejectingPeriod.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot reject period close",
+      offlineDescription: "You need an internet connection to reject period close.",
+    }
+  );
 }
 
 /**
