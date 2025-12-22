@@ -612,7 +612,7 @@ async function handleCopyPrices() {
     const response = await $fetch<{
       copied_count: number;
       source_period: { name: string };
-    }>(`/api/periods/${periodId.value}/prices/copy`, {
+    }>(`/api/periods/${periodId.value}/prices-copy`, {
       method: "POST",
     });
 

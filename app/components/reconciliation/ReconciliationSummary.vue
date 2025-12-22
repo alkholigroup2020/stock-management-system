@@ -102,10 +102,18 @@ function formatCurrency(value: number | null): string {
 
         <!-- Closing Stock -->
         <div>
-          <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Closing Stock</h4>
+          <div class="flex items-center gap-1">
+            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Closing Stock</h4>
+            <UTooltip
+              text="Calculated from current inventory levels (on-hand × WAC for all items)"
+            >
+              <UIcon name="i-lucide-info" class="w-3.5 h-3.5 text-[var(--ui-text-muted)]" />
+            </UTooltip>
+          </div>
           <p class="text-xl font-bold text-[var(--ui-text)] mt-1">
             {{ formatCurrency(reconciliation.closing_stock) }}
           </p>
+          <p class="text-xs text-[var(--ui-text-muted)] mt-1">System-calculated</p>
         </div>
       </div>
     </UCard>

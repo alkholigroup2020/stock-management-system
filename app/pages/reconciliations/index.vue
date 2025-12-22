@@ -469,8 +469,8 @@ const formattedDateRange = computed(() => {
         color="primary"
         variant="soft"
         icon="i-lucide-info"
-        title="Auto-calculated"
-        description="This reconciliation has been automatically calculated based on current transactions. Save adjustments to create a permanent record."
+        title="Not Yet Confirmed"
+        description="This reconciliation has been automatically calculated. Click 'Confirm Reconciliation' below to save it and enable period close for this location."
       />
 
       <!-- Period and Location Info -->
@@ -515,6 +515,7 @@ const formattedDateRange = computed(() => {
         :adjustments="adjustments.adjustments"
         :read-only="!isSupervisorOrAdmin"
         :loading="saving"
+        :is-auto-calculated="reconciliationData.is_auto_calculated"
         @save="saveAdjustments"
       />
     </template>

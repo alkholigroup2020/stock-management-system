@@ -19,6 +19,7 @@ interface Props {
   adjustments?: number;
   readOnly?: boolean;
   loading?: boolean;
+  isAutoCalculated?: boolean; // When true, shows "Confirm" button even without changes
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   adjustments: 0,
   readOnly: false,
   loading: false,
+  isAutoCalculated: false,
 });
 
 // Emits
@@ -89,6 +91,22 @@ const totalAdjustments = computed(() => {
     formValues.value.condemnations +
     formValues.value.adjustments
   );
+});
+
+// Can save if: valid AND (has changes OR is auto-calculated and needs confirmation)
+const canSave = computed(() => {
+  return isValid.value && (hasChanges.value || props.isAutoCalculated);
+});
+
+// Button text changes based on state
+const saveButtonText = computed(() => {
+  if (hasChanges.value) {
+    return "Save Adjustments";
+  }
+  if (props.isAutoCalculated) {
+    return "Confirm Reconciliation";
+  }
+  return "Save Adjustments";
 });
 
 /**
@@ -211,14 +229,23 @@ function formatCurrency(value: number): string {
     <div v-if="!readOnly" class="mt-6 flex justify-end gap-3">
       <UButton
         color="primary"
-        :disabled="!isValid || !hasChanges || loading"
+        :disabled="!canSave || loading"
         :loading="loading"
         class="cursor-pointer"
         @click="handleSave"
       >
-        Save Adjustments
+        {{ saveButtonText }}
       </UButton>
     </div>
+
+    <!-- Help text for confirm button -->
+    <p
+      v-if="!readOnly && isAutoCalculated && !hasChanges"
+      class="mt-2 text-sm text-[var(--ui-text-muted)] text-right"
+    >
+      Click "Confirm Reconciliation" to save current values and enable period close for this
+      location.
+    </p>
 
     <!-- Validation Error -->
     <div v-if="!isValid" class="mt-4">

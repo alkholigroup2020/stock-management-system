@@ -11,7 +11,7 @@
  * - All authenticated users can view prices
  */
 
-import prisma from "../../../utils/prisma";
+import prisma from "../../../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 

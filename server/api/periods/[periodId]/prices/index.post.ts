@@ -15,7 +15,7 @@
  * - Creates new price records or updates existing ones
  */
 
-import prisma from "../../../utils/prisma";
+import prisma from "../../../../utils/prisma";
 import { z } from "zod";
 import { Decimal } from "@prisma/client/runtime/library";
 

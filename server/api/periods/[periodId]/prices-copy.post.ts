@@ -1,5 +1,5 @@
 /**
- * POST /api/periods/:periodId/prices/copy
+ * POST /api/periods/:periodId/prices-copy
  *
  * Copy all item prices from the most recent previous period
  *
@@ -13,8 +13,7 @@
  * - Overwrites existing prices if any
  */
 
-import prisma from "../../../../utils/prisma";
-import { Decimal } from "@prisma/client/runtime/library";
+import prisma from "../../../utils/prisma";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
