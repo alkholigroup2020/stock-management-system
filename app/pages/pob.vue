@@ -56,7 +56,6 @@ const error = ref<string | null>(null);
 const pobData = ref<POBData | null>(null);
 const editableEntries = ref<Map<string, POBEntry>>(new Map());
 const savingDates = ref<Set<string>>(new Set());
-const apiNotReady = ref(false);
 
 // Computed
 const activeLocationId = computed(() => locationStore.activeLocationId);
@@ -91,7 +90,6 @@ async function fetchPOBData() {
 
   loading.value = true;
   error.value = null;
-  apiNotReady.value = false;
 
   try {
     const response = await $fetch<POBData>(`/api/locations/${activeLocationId.value}/pob`, {
@@ -106,17 +104,10 @@ async function fetchPOBData() {
     }
   } catch (err: unknown) {
     console.error("Error fetching POB data:", err);
-
-    // Check if API endpoint doesn't exist (404)
     const errorObj = err as { statusCode?: number; data?: { message?: string } };
-    if (errorObj?.statusCode === 404) {
-      apiNotReady.value = true;
-      error.value = null; // Don't show as error, show as info
-    } else {
-      const errorMessage = errorObj?.data?.message || "Failed to fetch POB data";
-      error.value = errorMessage;
-      toast.error(errorMessage);
-    }
+    const errorMessage = errorObj?.data?.message || "Failed to fetch POB data";
+    error.value = errorMessage;
+    toast.error(errorMessage);
   } finally {
     loading.value = false;
   }
@@ -273,6 +264,38 @@ function handleChange(dateStr: string) {
     <!-- Error State -->
     <ErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
 
+    <!-- Combined State: No Location AND No Period -->
+    <UCard v-else-if="!activeLocationId && !currentPeriod" class="card-elevated">
+      <div class="flex flex-col items-center justify-center py-8 text-center">
+        <UIcon name="i-lucide-alert-circle" class="w-12 h-12 text-amber-500 mb-4" />
+        <h3 class="text-lg font-semibold text-[var(--ui-text)]">Setup Required</h3>
+        <p class="text-sm text-[var(--ui-text-muted)] mt-2 max-w-md">
+          To record POB entries, you need both an active location and an open period. Please select
+          a location from the header and ensure there is an open period.
+        </p>
+        <div class="flex gap-3 mt-4">
+          <UButton
+            to="/locations"
+            color="primary"
+            variant="soft"
+            class="cursor-pointer"
+            icon="i-lucide-map-pin"
+          >
+            View Locations
+          </UButton>
+          <UButton
+            to="/periods"
+            color="primary"
+            variant="outline"
+            class="cursor-pointer"
+            icon="i-lucide-calendar"
+          >
+            View Periods
+          </UButton>
+        </div>
+      </div>
+    </UCard>
+
     <!-- No Location Selected State -->
     <EmptyState
       v-else-if="!activeLocationId"
@@ -298,27 +321,6 @@ function handleChange(dateStr: string) {
           icon="i-lucide-calendar"
         >
           Go to Periods
-        </UButton>
-      </div>
-    </UCard>
-
-    <!-- API Not Ready State (only shown after period check passes) -->
-    <UCard v-else-if="apiNotReady" class="card-elevated">
-      <div class="flex flex-col items-center justify-center py-8 text-center">
-        <UIcon name="i-lucide-construction" class="w-12 h-12 text-amber-500 mb-4" />
-        <h3 class="text-lg font-semibold text-[var(--ui-text)]">Feature Coming Soon</h3>
-        <p class="text-sm text-[var(--ui-text-muted)] mt-2 max-w-md">
-          The POB (Personnel On Board) tracking feature is not yet available. This feature will
-          allow you to record daily crew and extra personnel counts for mandays calculation.
-        </p>
-        <UButton
-          to="/"
-          color="primary"
-          variant="soft"
-          class="mt-4 cursor-pointer"
-          icon="i-lucide-arrow-left"
-        >
-          Back to Dashboard
         </UButton>
       </div>
     </UCard>
