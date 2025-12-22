@@ -17,11 +17,12 @@ import prisma from "../../utils/prisma";
 import { z } from "zod";
 
 // Request body schema
+// Note: Periods can only be created as DRAFT. To open a period, use the /open endpoint
+// after setting all item prices. This ensures price validation is enforced.
 const periodSchema = z.object({
   name: z.string().min(1).max(100),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  status: z.enum(["DRAFT", "OPEN"]).optional().default("DRAFT"),
 });
 
 export default defineEventHandler(async (event) => {
@@ -108,6 +109,18 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Check if there are any active locations
+    if (activeLocations.length === 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "NO_LOCATIONS",
+          message: "Cannot create a period without any active locations. Please create at least one location first.",
+        },
+      });
+    }
+
     // Find the most recent closed period to copy closing stock
     const previousPeriod = await prisma.period.findFirst({
       where: {
@@ -138,12 +151,13 @@ export default defineEventHandler(async (event) => {
     }
 
     // Create the period with PeriodLocation entries
+    // Always create as DRAFT - must use /open endpoint to activate after setting prices
     const period = await prisma.period.create({
       data: {
         name: data.name,
         start_date: startDate,
         end_date: endDate,
-        status: data.status,
+        status: "DRAFT",
         period_locations: {
           create: activeLocations.map((location) => ({
             location_id: location.id,

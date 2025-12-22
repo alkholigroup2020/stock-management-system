@@ -135,6 +135,39 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Check if all active items have prices set
+    const totalActiveItems = await prisma.item.count({
+      where: { is_active: true },
+    });
+
+    if (totalActiveItems === 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "NO_ACTIVE_ITEMS",
+          message: "No active items found in the system",
+        },
+      });
+    }
+
+    const itemsWithPrices = period._count.item_prices;
+
+    if (itemsWithPrices < totalActiveItems) {
+      const missingCount = totalActiveItems - itemsWithPrices;
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "MISSING_PRICES",
+          message: `Cannot open period - ${missingCount} item(s) do not have prices set. Please set prices for all ${totalActiveItems} active items before opening.`,
+          totalActiveItems,
+          itemsWithPrices,
+          missingCount,
+        },
+      });
+    }
+
     // Update period status to OPEN
     const updatedPeriod = await prisma.period.update({
       where: { id: periodId },

@@ -60,6 +60,7 @@
             icon="i-lucide-unlock"
             size="lg"
             class="cursor-pointer rounded-full px-3 sm:px-6"
+            :disabled="!pricesCoverageComplete"
             @click="handleOpenPeriod"
           >
             <span class="hidden sm:inline">Open Period</span>
@@ -67,6 +68,27 @@
           </UButton>
         </div>
       </div>
+
+      <!-- Missing Prices Warning -->
+      <UAlert
+        v-if="period.status === 'DRAFT' && !pricesCoverageComplete && totalActiveItems > 0"
+        color="warning"
+        icon="i-lucide-alert-triangle"
+        title="Prices Incomplete"
+        :description="`${totalActiveItems - itemsPriced} of ${totalActiveItems} items are missing prices. Set all prices before opening this period.`"
+      >
+        <template #actions>
+          <UButton
+            color="warning"
+            variant="soft"
+            size="sm"
+            class="cursor-pointer"
+            @click="goToPrices"
+          >
+            Set Prices
+          </UButton>
+        </template>
+      </UAlert>
 
       <!-- Period Info Card -->
       <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
@@ -98,14 +120,19 @@
           <!-- Items Priced -->
           <div>
             <p class="text-label mb-2">Items Priced</p>
-            <p class="text-[var(--ui-text)] font-medium">
-              {{
-                "_count" in period && period._count && "item_prices" in period._count
-                  ? period._count.item_prices
-                  : 0
-              }}
-              items
-            </p>
+            <div class="flex items-center gap-2">
+              <p class="text-[var(--ui-text)] font-medium">
+                {{ itemsPriced }} / {{ totalActiveItems }}
+              </p>
+              <UBadge
+                v-if="totalActiveItems > 0"
+                :color="pricesCoverageComplete ? 'success' : 'warning'"
+                variant="subtle"
+                size="xs"
+              >
+                {{ pricesCoverageComplete ? "Complete" : "Incomplete" }}
+              </UBadge>
+            </div>
           </div>
         </div>
       </UCard>
@@ -411,9 +438,12 @@
                 </div>
                 <div>
                   <p class="text-label">Items Priced</p>
-                  <p class="text-[var(--ui-text)] font-medium">
-                    {{ "_count" in period && period._count && "item_prices" in period._count ? period._count.item_prices : 0 }} items
-                  </p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-[var(--ui-text)] font-medium">
+                      {{ itemsPriced }} / {{ totalActiveItems }}
+                    </p>
+                    <UBadge color="success" variant="subtle" size="xs">Complete</UBadge>
+                  </div>
                 </div>
               </div>
             </div>
@@ -477,6 +507,23 @@ const {
 });
 
 const period = computed(() => periodData.value?.period);
+const totalActiveItems = computed(() => {
+  const data = periodData.value;
+  if (data && "totalActiveItems" in data) {
+    return data.totalActiveItems;
+  }
+  return 0;
+});
+const itemsPriced = computed(() => {
+  const p = period.value;
+  if (!p || !("_count" in p) || !p._count || !("item_prices" in p._count)) {
+    return 0;
+  }
+  return p._count.item_prices;
+});
+const pricesCoverageComplete = computed(() => {
+  return totalActiveItems.value > 0 && itemsPriced.value >= totalActiveItems.value;
+});
 
 // Helper functions
 function formatDateRange(startDate: string | Date, endDate: string | Date): string {

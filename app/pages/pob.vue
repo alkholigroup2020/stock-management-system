@@ -270,7 +270,39 @@ function handleChange(dateStr: string) {
       <LoadingSpinner size="lg" text="Loading POB data..." />
     </div>
 
-    <!-- API Not Ready State -->
+    <!-- Error State -->
+    <ErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
+
+    <!-- No Location Selected State -->
+    <EmptyState
+      v-else-if="!activeLocationId"
+      icon="i-lucide-map-pin-off"
+      title="No Location Selected"
+      description="Please select a location from the header to view POB data."
+    />
+
+    <!-- No Period State -->
+    <UCard v-else-if="!currentPeriod" class="card-elevated">
+      <div class="flex flex-col items-center justify-center py-8 text-center">
+        <UIcon name="i-lucide-calendar-x" class="w-12 h-12 text-amber-500 mb-4" />
+        <h3 class="text-lg font-semibold text-[var(--ui-text)]">No Open Period</h3>
+        <p class="text-sm text-[var(--ui-text-muted)] mt-2 max-w-md">
+          There is no active period available. POB entries can only be recorded when a period is
+          open.
+        </p>
+        <UButton
+          to="/periods"
+          color="primary"
+          variant="soft"
+          class="mt-4 cursor-pointer"
+          icon="i-lucide-calendar"
+        >
+          Go to Periods
+        </UButton>
+      </div>
+    </UCard>
+
+    <!-- API Not Ready State (only shown after period check passes) -->
     <UCard v-else-if="apiNotReady" class="card-elevated">
       <div class="flex flex-col items-center justify-center py-8 text-center">
         <UIcon name="i-lucide-construction" class="w-12 h-12 text-amber-500 mb-4" />
@@ -290,25 +322,6 @@ function handleChange(dateStr: string) {
         </UButton>
       </div>
     </UCard>
-
-    <!-- Error State -->
-    <ErrorAlert v-else-if="error" :message="error" :retry="fetchPOBData" />
-
-    <!-- No Location Selected State -->
-    <EmptyState
-      v-else-if="!activeLocationId"
-      icon="i-lucide-map-pin-off"
-      title="No Location Selected"
-      description="Please select a location from the header to view POB data."
-    />
-
-    <!-- No Period State -->
-    <EmptyState
-      v-else-if="!currentPeriod"
-      icon="i-lucide-calendar-x"
-      title="No Active Period"
-      description="There is no active period to enter POB data."
-    />
 
     <!-- Period Closed State -->
     <UAlert

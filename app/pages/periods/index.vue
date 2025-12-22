@@ -17,12 +17,34 @@
         icon="i-lucide-plus"
         size="lg"
         class="cursor-pointer rounded-full px-3 sm:px-6"
+        :disabled="!hasActiveLocations"
         @click="openCreateModal"
       >
         <span class="hidden sm:inline">New Period</span>
         <span class="sm:hidden">New</span>
       </UButton>
     </div>
+
+    <!-- No Locations Warning -->
+    <UAlert
+      v-if="isAdmin && !hasActiveLocations"
+      color="warning"
+      icon="i-lucide-alert-triangle"
+      title="No Locations Available"
+      description="You need to create at least one location before creating a period."
+    >
+      <template #actions>
+        <UButton
+          color="warning"
+          variant="soft"
+          size="sm"
+          class="cursor-pointer"
+          @click="$router.push('/locations')"
+        >
+          Go to Locations
+        </UButton>
+      </template>
+    </UAlert>
 
     <!-- Current Period Alert -->
     <UAlert
@@ -64,17 +86,29 @@
       :description="
         searchQuery
           ? 'No periods match your search. Try adjusting your search term.'
-          : 'Get started by creating your first accounting period.'
+          : hasActiveLocations
+            ? 'Get started by creating your first accounting period.'
+            : 'Create at least one location before creating a period.'
       "
     >
       <template v-if="isAdmin && !searchQuery" #actions>
         <UButton
+          v-if="hasActiveLocations"
           color="primary"
           icon="i-lucide-plus"
           class="cursor-pointer"
           @click="openCreateModal"
         >
           Create First Period
+        </UButton>
+        <UButton
+          v-else
+          color="warning"
+          icon="i-lucide-map-pin"
+          class="cursor-pointer"
+          @click="$router.push('/locations')"
+        >
+          Create Location First
         </UButton>
       </template>
     </EmptyState>
@@ -241,41 +275,20 @@
               </div>
             </div>
 
-            <!-- Status Selection -->
-            <div>
-              <div class="space-y-2 mb-3">
-                <div class="flex items-start gap-2">
-                  <UIcon name="i-lucide-file-edit" class="w-4 h-4 text-warning mt-0.5" />
-                  <p class="text-sm text-[var(--ui-text-muted)]">
-                    <span class="font-medium">DRAFT:</span> Period can be edited before activation
-                  </p>
-                </div>
-                <div class="flex items-start gap-2">
-                  <UIcon name="i-lucide-unlock" class="w-4 h-4 text-success mt-0.5" />
-                  <p class="text-sm text-[var(--ui-text-muted)]">
-                    <span class="font-medium">OPEN:</span> Period is immediately active and accepts
-                    transactions
-                  </p>
-                </div>
-              </div>
-              <USelectMenu
-                id="status"
-                v-model="createForm.status"
-                :items="statusOptions"
-                value-key="value"
-                placeholder="Select status"
-                size="lg"
-                :disabled="isCreating"
-                class="w-full"
-              >
-                <template #leading>
-                  <UIcon
-                    :name="createForm.status === 'DRAFT' ? 'i-lucide-file-edit' : 'i-lucide-unlock'"
-                    class="w-5 h-5"
-                  />
-                </template>
-              </USelectMenu>
-            </div>
+            <!-- Workflow Info -->
+            <UAlert
+              color="info"
+              icon="i-lucide-info"
+              title="Period Workflow"
+            >
+              <template #description>
+                <ol class="list-decimal list-inside text-sm space-y-1 mt-1">
+                  <li>Period will be created as <strong>DRAFT</strong></li>
+                  <li>Set prices for all items on the Prices page</li>
+                  <li>Open the period to start accepting transactions</li>
+                </ol>
+              </template>
+            </UAlert>
 
             <!-- Previous Period Info -->
             <UAlert
@@ -347,6 +360,22 @@ const {
   method: "GET",
 });
 
+// Fetch locations count to check if we can create periods
+const { data: locationsData } = await useFetch("/api/locations", {
+  method: "GET",
+});
+
+// Check if there are any active locations
+const hasActiveLocations = computed(() => {
+  if (!locationsData.value?.locations) return false;
+  return locationsData.value.locations.some((loc: { is_active: boolean }) => loc.is_active);
+});
+
+const activeLocationsCount = computed(() => {
+  if (!locationsData.value?.locations) return 0;
+  return locationsData.value.locations.filter((loc: { is_active: boolean }) => loc.is_active).length;
+});
+
 // Get current period from the periods list (avoid double API call)
 const currentPeriod = computed(() => {
   if (!periods.value?.periods) return null;
@@ -373,18 +402,12 @@ const createForm = ref({
   name: "",
   start_date: "",
   end_date: "",
-  status: "DRAFT" as "DRAFT" | "OPEN",
 });
 const createErrors = ref({
   name: "",
   start_date: "",
   end_date: "",
 });
-
-const statusOptions = [
-  { label: "Draft", value: "DRAFT" },
-  { label: "Open", value: "OPEN" },
-];
 
 // Previous period info
 const previousPeriodInfo = computed(() => {
@@ -413,7 +436,6 @@ function openCreateModal() {
     name: "",
     start_date: "",
     end_date: "",
-    status: "DRAFT",
   };
   createErrors.value = {
     name: "",
@@ -483,7 +505,6 @@ async function handleCreatePeriod() {
         name: createForm.value.name.trim(),
         start_date: createForm.value.start_date,
         end_date: createForm.value.end_date,
-        status: createForm.value.status,
       },
     });
 

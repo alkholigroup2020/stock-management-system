@@ -91,7 +91,15 @@ export default defineEventHandler(async (event) => {
       ),
     };
 
-    return { period: sortedPeriod };
+    // Get total active items count for price coverage display
+    const totalActiveItems = await prisma.item.count({
+      where: { is_active: true },
+    });
+
+    return {
+      period: sortedPeriod,
+      totalActiveItems,
+    };
   } catch (error) {
     // Re-throw createError errors
     if (error && typeof error === "object" && "statusCode" in error) {
