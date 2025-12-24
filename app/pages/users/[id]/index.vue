@@ -207,8 +207,8 @@ useHead({
             </div>
           </div>
 
-          <!-- Default Location -->
-          <div>
+          <!-- Default Location (Only for Operators) -->
+          <div v-if="user.role === 'OPERATOR'">
             <label class="form-label">Default Location</label>
             <p v-if="user.default_location" class="text-[var(--ui-text)] mt-2">
               {{ user.default_location.code }} - {{ user.default_location.name }}
@@ -230,37 +230,67 @@ useHead({
           <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Location Access</h2>
         </template>
 
-        <!-- No Locations Assigned -->
-        <EmptyState
-          v-if="user.locations.length === 0"
-          icon="i-lucide-map-pin"
-          title="No location access"
-          description="This user has not been assigned to any locations yet."
-        />
-
-        <!-- Assigned Locations List -->
-        <div v-else class="space-y-3">
-          <div
-            v-for="loc in user.locations"
-            :key="loc.location_id"
-            class="flex items-center justify-between p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] smooth-transition"
-          >
-            <div class="flex items-center gap-3 flex-1 min-w-0">
-              <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary flex-shrink-0" />
-              <div class="flex-1 min-w-0">
-                <p class="font-semibold text-[var(--ui-text)]">
-                  {{ loc.location.name }}
-                </p>
-                <p class="text-caption text-[var(--ui-text-muted)] mt-0.5 truncate">
-                  {{ loc.location.code }} • {{ loc.location.type }}
-                </p>
-              </div>
+        <!-- Admin/Supervisor: All Locations Access -->
+        <div
+          v-if="user.role === 'ADMIN' || user.role === 'SUPERVISOR'"
+          class="flex items-start gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
+        >
+          <UIcon name="i-lucide-globe" class="w-6 h-6 flex-shrink-0 mt-0.5 text-success" />
+          <div>
+            <p class="text-[var(--ui-text)] font-medium">All Locations Access</p>
+            <p class="text-caption text-[var(--ui-text-muted)] mt-1">
+              {{
+                user.role === "ADMIN"
+                  ? "As an Admin, this user has implicit access to all locations in the system."
+                  : "As a Supervisor, this user has implicit access to all locations in the system."
+              }}
+            </p>
+            <div v-if="user.default_location" class="mt-3 pt-3 border-t border-[var(--ui-border)]">
+              <p class="text-xs text-[var(--ui-text-muted)]">Default Location</p>
+              <p class="text-[var(--ui-text)] font-medium mt-1">
+                {{ user.default_location.code }} - {{ user.default_location.name }}
+              </p>
             </div>
-            <UBadge color="success" variant="subtle" size="sm" class="ml-3 flex-shrink-0">
-              Assigned
-            </UBadge>
           </div>
         </div>
+
+        <!-- Operator: Specific Location Access -->
+        <template v-else>
+          <!-- No Locations Assigned -->
+          <EmptyState
+            v-if="user.locations.length === 0"
+            icon="i-lucide-map-pin"
+            title="No location access"
+            description="This user has not been assigned to any locations yet."
+          />
+
+          <!-- Assigned Locations List -->
+          <div v-else class="space-y-3">
+            <p class="text-caption text-[var(--ui-text-muted)] mb-4">
+              Operators can only access and post transactions at their assigned locations.
+            </p>
+            <div
+              v-for="loc in user.locations"
+              :key="loc.location_id"
+              class="flex items-center justify-between p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] smooth-transition"
+            >
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary flex-shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-[var(--ui-text)]">
+                    {{ loc.location.name }}
+                  </p>
+                  <p class="text-caption text-[var(--ui-text-muted)] mt-0.5 truncate">
+                    {{ loc.location.code }} • {{ loc.location.type }}
+                  </p>
+                </div>
+              </div>
+              <UBadge color="success" variant="subtle" size="sm" class="ml-3 flex-shrink-0">
+                Assigned
+              </UBadge>
+            </div>
+          </div>
+        </template>
       </UCard>
 
       <!-- Permissions Summary Card -->
@@ -276,7 +306,7 @@ useHead({
           <div
             class="flex items-start gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
           >
-            <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
+            <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
             <div>
               <p class="text-[var(--ui-text)] font-medium">Full System Access</p>
               <p class="text-caption text-[var(--ui-text-muted)] mt-1">

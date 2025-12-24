@@ -155,6 +155,9 @@ const locationToRemove = ref<{
   location: { id: string; code: string; name: string; type: string };
 } | null>(null);
 
+// Cancel confirmation modal state
+const isCancelModalOpen = ref(false);
+
 // Available locations (not already assigned)
 const availableLocations = computed(() => {
   if (!user.value) return [];
@@ -380,12 +383,18 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   }
 };
 
-// Handle cancel
+// Handle cancel - show modal if there are unsaved changes
 const handleCancel = () => {
   if (hasChanges.value) {
-    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?");
-    if (!confirmed) return;
+    isCancelModalOpen.value = true;
+  } else {
+    navigateTo(`/users/${route.params.id as string}`);
   }
+};
+
+// Confirm cancel and navigate away
+const confirmCancel = () => {
+  isCancelModalOpen.value = false;
   navigateTo(`/users/${route.params.id as string}`);
 };
 
@@ -867,61 +876,97 @@ useHead({
       </div>
     </div>
 
+    <!-- Cancel Confirmation Modal -->
+    <UModal
+      v-model:open="isCancelModalOpen"
+      title="Discard Changes?"
+      description="You have unsaved changes that will be lost."
+    >
+      <template #body>
+        <div class="space-y-3">
+          <p class="text-[var(--ui-text)]">
+            Are you sure you want to leave? All unsaved changes will be discarded.
+          </p>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+            @click="isCancelModalOpen = false"
+          >
+            Continue Editing
+          </UButton>
+          <UButton
+            color="error"
+            icon="i-lucide-x"
+            class="cursor-pointer"
+            @click="confirmCancel"
+          >
+            Discard Changes
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
     <!-- Remove Location Confirmation Modal -->
-    <UModal v-model:open="isRemoveLocationModalOpen" :dismissible="removingLocationId === null">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-subheading font-semibold">Remove Location Access</h3>
-          </template>
-
-          <div class="space-y-4">
-            <div
-              v-if="locationToRemove"
-              class="p-4 rounded-lg border-2 border-warning bg-warning/10"
-            >
-              <p class="font-semibold text-warning">
-                {{ locationToRemove.location.name }}
-              </p>
-              <p class="text-caption mt-1">
-                {{ locationToRemove.location.code }} • {{ locationToRemove.location.type }}
-              </p>
-            </div>
-
-            <div class="space-y-2">
-              <p class="font-medium">
-                Are you sure you want to remove this location access for {{ user?.full_name }}?
-              </p>
-              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
-                <li>The user will lose access to this location</li>
-                <li>Any pending work at this location may be affected</li>
-                <li>You can add the location back at any time</li>
-              </ul>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                class="cursor-pointer"
-                @click="isRemoveLocationModalOpen = false"
-                :disabled="removingLocationId !== null"
-              >
-                Cancel
-              </UButton>
-              <UButton
-                color="error"
-                icon="i-lucide-trash-2"
-                class="cursor-pointer"
-                :loading="removingLocationId !== null"
-                @click="confirmRemoveLocation"
-              >
-                Remove Access
-              </UButton>
-            </div>
+    <UModal
+      v-model:open="isRemoveLocationModalOpen"
+      title="Remove Location Access"
+      description="The user will no longer be able to access this location."
+      :dismissible="removingLocationId === null"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <div
+            v-if="locationToRemove"
+            class="p-4 rounded-lg border-2 border-warning bg-warning/10"
+          >
+            <p class="font-semibold text-warning">
+              {{ locationToRemove.location.name }}
+            </p>
+            <p class="text-caption mt-1">
+              {{ locationToRemove.location.code }} • {{ locationToRemove.location.type }}
+            </p>
           </div>
-        </UCard>
+
+          <div class="space-y-2">
+            <p class="font-medium">
+              Are you sure you want to remove this location access for {{ user?.full_name }}?
+            </p>
+            <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+              <li>The user will lose access to this location</li>
+              <li>Any pending work at this location may be affected</li>
+              <li>You can add the location back at any time</li>
+            </ul>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+            :disabled="removingLocationId !== null"
+            @click="isRemoveLocationModalOpen = false"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            color="error"
+            icon="i-lucide-trash-2"
+            class="cursor-pointer"
+            :loading="removingLocationId !== null"
+            @click="confirmRemoveLocation"
+          >
+            Remove Access
+          </UButton>
+        </div>
       </template>
     </UModal>
   </div>

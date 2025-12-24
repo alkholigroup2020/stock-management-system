@@ -69,9 +69,27 @@
         </div>
       </div>
 
-      <!-- Stats Section -->
-      <div v-if="showStats && user.locations" class="mb-4">
+      <!-- Location Access Section -->
+      <div v-if="showStats" class="mb-4">
+        <!-- Admin/Supervisor: All Locations Access -->
         <div
+          v-if="user.role === 'ADMIN' || user.role === 'SUPERVISOR'"
+          class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-br from-[var(--ui-bg-muted)] to-transparent border border-[var(--ui-border-muted)]"
+        >
+          <div
+            class="w-10 h-10 rounded-lg bg-[var(--ui-bg-elevated)] flex items-center justify-center"
+          >
+            <UIcon name="i-lucide-globe" class="w-5 h-5 text-success" />
+          </div>
+          <div>
+            <p class="text-xs text-[var(--ui-text-muted)] mb-0.5">Location Access</p>
+            <p class="text-sm font-semibold text-success">All Locations</p>
+          </div>
+        </div>
+
+        <!-- Operator: Assigned Locations Count -->
+        <div
+          v-else-if="user.locations"
           class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-br from-[var(--ui-bg-muted)] to-transparent border border-[var(--ui-border-muted)]"
         >
           <div

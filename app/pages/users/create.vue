@@ -15,6 +15,7 @@ const toast = useAppToast();
 // State
 const submitting = ref(false);
 const locations = ref<Array<{ id: string; code: string; name: string; type: string }>>([]);
+const isCancelModalOpen = ref(false);
 
 // Form schema
 const schema = z
@@ -144,21 +145,31 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   }
 };
 
-// Handle cancel
-const handleCancel = () => {
-  const hasData =
+// Check if form has any data
+const hasFormData = computed(() => {
+  return (
     formData.username ||
     formData.email ||
     formData.password ||
     formData.confirm_password ||
     formData.full_name ||
     formData.role !== "OPERATOR" ||
-    formData.default_location_id;
+    formData.default_location_id
+  );
+});
 
-  if (hasData) {
-    const confirmed = confirm("You have unsaved changes. Are you sure you want to leave?");
-    if (!confirmed) return;
+// Handle cancel - show modal if there's unsaved data
+const handleCancel = () => {
+  if (hasFormData.value) {
+    isCancelModalOpen.value = true;
+  } else {
+    navigateTo("/users");
   }
+};
+
+// Confirm cancel and navigate away
+const confirmCancel = () => {
+  isCancelModalOpen.value = false;
   navigateTo("/users");
 };
 
@@ -480,5 +491,41 @@ useHead({
         </div>
       </UForm>
     </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <UModal
+      v-model:open="isCancelModalOpen"
+      title="Discard Changes?"
+      description="You have unsaved changes that will be lost."
+    >
+      <template #body>
+        <div class="space-y-3">
+          <p class="text-[var(--ui-text)]">
+            Are you sure you want to leave? All entered data will be discarded.
+          </p>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+            @click="isCancelModalOpen = false"
+          >
+            Continue Editing
+          </UButton>
+          <UButton
+            color="error"
+            icon="i-lucide-x"
+            class="cursor-pointer"
+            @click="confirmCancel"
+          >
+            Discard Changes
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

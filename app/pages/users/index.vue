@@ -145,125 +145,127 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="isDeleteModalOpen" :dismissible="deletingUserId === null">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-subheading font-semibold">Confirm User Deletion</h3>
-          </template>
-
-          <div class="space-y-4">
-            <div v-if="userToDelete" class="p-4 rounded-lg border-2 border-warning bg-warning/10">
-              <p class="font-semibold text-warning">
-                {{ userToDelete.full_name }}
-              </p>
-              <p class="text-caption mt-1">@{{ userToDelete.username }}</p>
-            </div>
-
-            <div class="space-y-2">
-              <p class="font-medium">Are you sure you want to delete this user?</p>
-              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
-                <li>All user data and access permissions will be permanently removed</li>
-                <li>This action cannot be undone</li>
-                <li>Consider deactivating the user instead if you may need the data later</li>
-              </ul>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                class="cursor-pointer"
-                @click="isDeleteModalOpen = false"
-                :disabled="deletingUserId !== null"
-              >
-                Cancel
-              </UButton>
-              <UButton
-                color="error"
-                icon="i-lucide-trash-2"
-                class="cursor-pointer"
-                :loading="deletingUserId !== null"
-                @click="deleteUser"
-              >
-                Delete User
-              </UButton>
-            </div>
+    <UModal
+      v-model:open="isDeleteModalOpen"
+      title="Confirm User Deletion"
+      description="This action cannot be undone. The user will be permanently removed."
+      :dismissible="deletingUserId === null"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <div v-if="userToDelete" class="p-4 rounded-lg border-2 border-warning bg-warning/10">
+            <p class="font-semibold text-warning">
+              {{ userToDelete.full_name }}
+            </p>
+            <p class="text-caption mt-1">@{{ userToDelete.username }}</p>
           </div>
-        </UCard>
+
+          <div class="space-y-2">
+            <p class="font-medium">Are you sure you want to delete this user?</p>
+            <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+              <li>All user data and access permissions will be permanently removed</li>
+              <li>This action cannot be undone</li>
+              <li>Consider deactivating the user instead if you may need the data later</li>
+            </ul>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+            :disabled="deletingUserId !== null"
+            @click="isDeleteModalOpen = false"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            color="error"
+            icon="i-lucide-trash-2"
+            class="cursor-pointer"
+            :loading="deletingUserId !== null"
+            @click="deleteUser"
+          >
+            Delete User
+          </UButton>
+        </div>
       </template>
     </UModal>
 
     <!-- Toggle Status Confirmation Modal -->
-    <UModal v-model:open="isToggleStatusModalOpen" :dismissible="togglingUserId === null">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="text-subheading font-semibold">
-              {{ userToToggle?.is_active ? "Deactivate User" : "Activate User" }}
-            </h3>
-          </template>
-
-          <div class="space-y-4">
-            <div
-              v-if="userToToggle"
-              class="p-4 rounded-lg border-2"
-              :class="
-                userToToggle.is_active
-                  ? 'border-warning bg-warning/10'
-                  : 'border-success bg-success/10'
-              "
+    <UModal
+      v-model:open="isToggleStatusModalOpen"
+      :title="userToToggle?.is_active ? 'Deactivate User' : 'Activate User'"
+      :description="
+        userToToggle?.is_active
+          ? 'The user will be unable to access the system until reactivated.'
+          : 'The user will regain access to the system with their previous permissions.'
+      "
+      :dismissible="togglingUserId === null"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <div
+            v-if="userToToggle"
+            class="p-4 rounded-lg border-2"
+            :class="
+              userToToggle.is_active
+                ? 'border-warning bg-warning/10'
+                : 'border-success bg-success/10'
+            "
+          >
+            <p
+              class="font-semibold"
+              :class="userToToggle.is_active ? 'text-warning' : 'text-success'"
             >
-              <p
-                class="font-semibold"
-                :class="userToToggle.is_active ? 'text-warning' : 'text-success'"
-              >
-                {{ userToToggle.full_name }}
-              </p>
-              <p class="text-caption mt-1">@{{ userToToggle.username }}</p>
-            </div>
-
-            <div v-if="userToToggle?.is_active" class="space-y-2">
-              <p class="font-medium">Are you sure you want to deactivate this user?</p>
-              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
-                <li>The user will no longer be able to log in to the system</li>
-                <li>All their permissions will be temporarily suspended</li>
-                <li>You can reactivate the user at any time</li>
-              </ul>
-            </div>
-
-            <div v-else class="space-y-2">
-              <p class="font-medium">Are you sure you want to activate this user?</p>
-              <ul class="list-disc list-inside text-caption space-y-1 pl-2">
-                <li>The user will be able to log in to the system</li>
-                <li>Their previous permissions will be restored</li>
-              </ul>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-default">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                class="cursor-pointer"
-                @click="isToggleStatusModalOpen = false"
-                :disabled="togglingUserId !== null"
-              >
-                Cancel
-              </UButton>
-              <UButton
-                :color="userToToggle?.is_active ? 'warning' : 'success'"
-                :icon="userToToggle?.is_active ? 'i-lucide-user-x' : 'i-lucide-user-check'"
-                class="cursor-pointer"
-                :loading="togglingUserId !== null"
-                @click="confirmToggleStatus"
-              >
-                {{ userToToggle?.is_active ? "Deactivate" : "Activate" }}
-              </UButton>
-            </div>
+              {{ userToToggle.full_name }}
+            </p>
+            <p class="text-caption mt-1">@{{ userToToggle.username }}</p>
           </div>
-        </UCard>
+
+          <div v-if="userToToggle?.is_active" class="space-y-2">
+            <p class="font-medium">Are you sure you want to deactivate this user?</p>
+            <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+              <li>The user will no longer be able to log in to the system</li>
+              <li>All their permissions will be temporarily suspended</li>
+              <li>You can reactivate the user at any time</li>
+            </ul>
+          </div>
+
+          <div v-else class="space-y-2">
+            <p class="font-medium">Are you sure you want to activate this user?</p>
+            <ul class="list-disc list-inside text-caption space-y-1 pl-2">
+              <li>The user will be able to log in to the system</li>
+              <li>Their previous permissions will be restored</li>
+            </ul>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-3">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+            :disabled="togglingUserId !== null"
+            @click="isToggleStatusModalOpen = false"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            :color="userToToggle?.is_active ? 'warning' : 'success'"
+            :icon="userToToggle?.is_active ? 'i-lucide-user-x' : 'i-lucide-user-check'"
+            class="cursor-pointer"
+            :loading="togglingUserId !== null"
+            @click="confirmToggleStatus"
+          >
+            {{ userToToggle?.is_active ? "Deactivate" : "Activate" }}
+          </UButton>
+        </div>
       </template>
     </UModal>
   </div>
