@@ -67,10 +67,6 @@
       "Bash(npx:*)",
       "Bash(nul)",
       "Bash(claude mcp:*)",
-      "mcp__notion__notion-create-pages",
-      "mcp__notion__notion-update-page",
-      "mcp__notion__notion-search",
-      "mcp__notion__notion-fetch",
       "Bash(pnpm approve-builds:*)",
       "Bash(npm rebuild:*)",
       "Bash(cd:*)",
@@ -95,7 +91,6 @@
       "Bash(pnpm format:check:*)",
       "Bash(pnpm format:*)",
       "Skill(ux-review)",
-      "WebFetch(domain:sparkly-crab-9d1.notion.site)",
       "Bash(tree:*)",
       "Bash(for file in \"useCache\" \"useAppToast\" \"useErrorHandler\" \"useOfflineGuard\" \"useSuppliers\")",
       "Bash(do echo \"=== $file ===\")"
