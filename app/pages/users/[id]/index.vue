@@ -33,7 +33,6 @@ interface User {
       name: string;
       type: string;
     };
-    access_level: string;
   }>;
 }
 
@@ -82,21 +81,6 @@ const getRoleBadgeColor = (
     OPERATOR: "success",
   };
   return colors[role];
-};
-
-// Access level badge color
-const getAccessLevelColor = (
-  level: string
-): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
-  const colors: Record<
-    string,
-    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
-  > = {
-    MANAGE: "success",
-    POST: "primary",
-    VIEW: "neutral",
-  };
-  return colors[level] || "neutral";
 };
 
 // Format date
@@ -272,13 +256,8 @@ useHead({
                 </p>
               </div>
             </div>
-            <UBadge
-              :color="getAccessLevelColor(loc.access_level)"
-              variant="subtle"
-              size="sm"
-              class="ml-3 flex-shrink-0"
-            >
-              {{ loc.access_level }}
+            <UBadge color="success" variant="subtle" size="sm" class="ml-3 flex-shrink-0">
+              Assigned
             </UBadge>
           </div>
         </div>

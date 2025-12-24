@@ -370,10 +370,8 @@ const filters = reactive({
 
 // Computed
 const hasTransfers = computed(() => transfers.value.length > 0);
-const canRequestTransfer = computed(() => {
-  const defaultLocationId = authStore.user?.default_location_id;
-  return defaultLocationId ? canCreateTransfer(defaultLocationId) : false;
-});
+// Check if user can request a transfer - call without locationId to check general permission
+const canRequestTransfer = computed(() => canCreateTransfer());
 
 // Location options for dropdowns
 const fromLocationOptions = computed(() => [

@@ -1,3 +1,11 @@
+/**
+ * GET /api/user/locations
+ *
+ * Get locations accessible by the current user
+ * - Admins and Supervisors: All active locations
+ * - Operators: Only assigned locations
+ */
+
 import prisma from "../../utils/prisma";
 import { setCacheHeaders } from "../../utils/performance";
 
@@ -17,7 +25,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // For ADMIN and SUPERVISOR, return all active locations
+    // For ADMIN and SUPERVISOR, return all active locations (implicit access)
     if (user.role === "ADMIN" || user.role === "SUPERVISOR") {
       const locations = await prisma.location.findMany({
         where: {
@@ -28,12 +36,6 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Add MANAGE access level for all locations
-      const locationsWithAccess = locations.map((loc) => ({
-        ...loc,
-        access_level: "MANAGE" as const,
-      }));
-
       // Set cache headers (20 seconds for user locations)
       setCacheHeaders(event, {
         maxAge: 20,
@@ -41,7 +43,7 @@ export default defineEventHandler(async (event) => {
       });
 
       return {
-        locations: locationsWithAccess,
+        locations,
       };
     }
 
@@ -55,13 +57,10 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Filter active locations and map to include access level
-    const locationsWithAccess = userLocations
+    // Filter active locations
+    const locations = userLocations
       .filter((ul) => ul.location.is_active)
-      .map((ul) => ({
-        ...ul.location,
-        access_level: ul.access_level,
-      }));
+      .map((ul) => ul.location);
 
     // Set cache headers (20 seconds for user locations)
     setCacheHeaders(event, {
@@ -70,7 +69,7 @@ export default defineEventHandler(async (event) => {
     });
 
     return {
-      locations: locationsWithAccess,
+      locations,
     };
   } catch (error) {
     console.error("Error fetching user locations:", error);

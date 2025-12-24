@@ -94,7 +94,8 @@
       "Bash(jq:*)",
       "Bash(pnpm format:check:*)",
       "Bash(pnpm format:*)",
-      "Skill(ux-review)"
+      "Skill(ux-review)",
+      "WebFetch(domain:sparkly-crab-9d1.notion.site)"
     ],
     "deny": [],
     "ask": []

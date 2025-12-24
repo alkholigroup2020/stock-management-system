@@ -12,18 +12,13 @@ import type { UserRole } from "@prisma/client";
 console.log("✓ DELETE [id]/users/[userId].delete.ts HANDLER LOADED");
 
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[]; // Array of location IDs (for Operators)
 }
 
 export default defineEventHandler(async (event) => {
@@ -119,32 +114,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Prevent removing the last admin's access to prevent lockout
-    // Check if user is an admin
-    const targetUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
-    });
-
-    if (targetUser?.role === "ADMIN") {
-      // Count how many locations this admin has access to
-      const adminLocationCount = await prisma.userLocation.count({
-        where: { user_id: userId },
-      });
-
-      // If this is their last location, prevent removal
-      if (adminLocationCount === 1) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Bad Request",
-          data: {
-            code: "CANNOT_REMOVE_LAST_ADMIN_LOCATION",
-            message:
-              "Cannot remove the last location from an admin user. Admins must have at least one location assigned.",
-          },
-        });
-      }
-    }
+    // Note: Only Operators have location assignments
+    // Admins and Supervisors have implicit access to all locations
 
     // Delete the assignment
     await prisma.userLocation.delete({

@@ -16,10 +16,9 @@ export interface SessionUser {
     name: string;
     type: string;
   } | null;
-  locations: Array<{
-    location_id: string;
-    access_level: "VIEW" | "POST" | "MANAGE";
-  }>;
+  // Array of location IDs (for Operators only)
+  // Admins and Supervisors have implicit access to all locations
+  locations: string[];
 }
 
 // Auth store state interface
@@ -54,9 +53,10 @@ export const useAuthStore = defineStore("auth", {
     },
 
     /**
-     * Get the user's accessible locations
+     * Get the user's accessible location IDs (for Operators)
+     * Note: Admins and Supervisors have implicit access to all locations
      */
-    locations: (state: AuthState): Array<{ location_id: string; access_level: string }> => {
+    locations: (state: AuthState): string[] => {
       return state.user?.locations || [];
     },
 
@@ -207,70 +207,51 @@ export const useAuthStore = defineStore("auth", {
     hasLocationAccess(locationId: string): boolean {
       if (!this.user) return false;
 
-      // Admins and Supervisors have access to all locations
+      // Admins and Supervisors have implicit access to all locations
       if (this.user.role === "ADMIN" || this.user.role === "SUPERVISOR") {
         return true;
       }
 
       // Operators only have access to assigned locations
-      return this.user.locations.some(
-        (loc: { location_id: string; access_level: string }) => loc.location_id === locationId
-      );
-    },
-
-    /**
-     * Get access level for a specific location
-     * @param locationId - Location ID to check
-     * @returns Access level or null
-     */
-    getLocationAccessLevel(locationId: string): "VIEW" | "POST" | "MANAGE" | null {
-      if (!this.user) return null;
-
-      // Admins and Supervisors have MANAGE access to all locations
-      if (this.user.role === "ADMIN" || this.user.role === "SUPERVISOR") {
-        return "MANAGE";
-      }
-
-      // Find the location in user's assigned locations
-      const userLocation = this.user.locations.find(
-        (loc: { location_id: string; access_level: string }) => loc.location_id === locationId
-      );
-      return userLocation ? (userLocation.access_level as "VIEW" | "POST" | "MANAGE") : null;
+      return this.user.locations.includes(locationId);
     },
 
     /**
      * Check if user can post transactions at a location
+     * Based on the simplified role model:
+     * - Operators can POST at their assigned locations
+     * - Supervisors can POST at all locations
+     * - Admins can POST at all locations
      * @param locationId - Location ID to check
      * @returns boolean
      */
     canPostAtLocation(locationId: string): boolean {
-      const accessLevel = this.getLocationAccessLevel(locationId);
-      return accessLevel === "POST" || accessLevel === "MANAGE";
+      return this.hasLocationAccess(locationId);
     },
 
     /**
-     * Check if user can manage a location
+     * Check if user can manage a location (approve, review, etc.)
+     * Based on the simplified role model:
+     * - Operators cannot manage
+     * - Supervisors can manage (approve transfers, review reconciliations)
+     * - Admins can manage (full control)
      * @param locationId - Location ID to check
      * @returns boolean
      */
     canManageLocation(locationId: string): boolean {
-      const accessLevel = this.getLocationAccessLevel(locationId);
-      return accessLevel === "MANAGE";
+      if (!this.user) return false;
+      return this.user.role === "ADMIN" || this.user.role === "SUPERVISOR";
     },
 
     /**
      * Get all location IDs the user has access to
+     * Note: For Admins and Supervisors, this returns their assigned locations
+     * but they have implicit access to ALL locations
      * @returns Array of location IDs
      */
     getAccessibleLocationIds(): string[] {
       if (!this.user) return [];
-
-      // Admins and Supervisors have access to all locations
-      // For now, we return their assigned locations or all if they're admin/supervisor
-      // In practice, you'd fetch all locations for admin/supervisor
-      return this.user.locations.map(
-        (loc: { location_id: string; access_level: string }) => loc.location_id
-      );
+      return this.user.locations;
     },
 
     /**

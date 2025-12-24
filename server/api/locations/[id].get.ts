@@ -17,18 +17,13 @@ import prisma from "../../utils/prisma";
 import type { UserRole } from "@prisma/client";
 
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[]; // Array of location IDs (for Operators)
 }
 
 export default defineEventHandler(async (event) => {
@@ -62,7 +57,7 @@ export default defineEventHandler(async (event) => {
 
     // Check access permissions for OPERATOR role
     if (user.role === "OPERATOR") {
-      const userLocationIds = user.locations?.map((loc) => loc.location_id) || [];
+      const userLocationIds = user.locations || [];
 
       if (!userLocationIds.includes(locationId)) {
         throw createError({

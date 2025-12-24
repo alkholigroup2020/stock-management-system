@@ -1,42 +1,30 @@
 /**
  * POST /api/locations/:id/users
  *
- * Assign a user to a location with a specific access level
+ * Assign an Operator to a location
+ * Note: Supervisors and Admins have implicit access to all locations
  */
 
 import prisma from "../../../../utils/prisma";
 import type { UserRole } from "@prisma/client";
 import { z } from "zod";
 
-console.log("✓ POST [id]/users/index.post.ts HANDLER LOADED");
-
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[];
 }
 
-// Validation schema
+// Validation schema - simplified, no access_level needed
 const assignUserSchema = z.object({
   user_id: z.string().uuid("Invalid user ID format"),
-  access_level: z.enum(["VIEW", "POST", "MANAGE"], {
-    errorMap: () => ({ message: "Access level must be VIEW, POST, or MANAGE" }),
-  }),
 });
 
 export default defineEventHandler(async (event) => {
-  console.log("[POST /api/locations/:id/users] Handler called");
-  console.log("[POST] URL:", event.node.req.url);
-
   const user = event.context.user as AuthUser | undefined;
 
   if (!user) {
@@ -82,9 +70,9 @@ export default defineEventHandler(async (event) => {
     const validationResult = assignUserSchema.safeParse(body);
 
     if (!validationResult.success) {
-      const errors = validationResult.error.errors.map((err) => ({
-        field: err.path.join("."),
-        message: err.message,
+      const errors = validationResult.error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
       }));
 
       throw createError({
@@ -98,7 +86,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const { user_id, access_level } = validationResult.data;
+    const { user_id } = validationResult.data;
 
     // Check if location exists
     const location = await prisma.location.findUnique({
@@ -125,6 +113,7 @@ export default defineEventHandler(async (event) => {
         username: true,
         full_name: true,
         email: true,
+        role: true,
         is_active: true,
       },
     });
@@ -147,6 +136,19 @@ export default defineEventHandler(async (event) => {
         data: {
           code: "USER_INACTIVE",
           message: "Cannot assign inactive users to locations",
+        },
+      });
+    }
+
+    // Only Operators need location assignments
+    // Supervisors and Admins have implicit access to all locations
+    if (targetUser.role !== "OPERATOR") {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "INVALID_USER_ROLE",
+          message: `${targetUser.role}s have implicit access to all locations and don't need location assignments`,
         },
       });
     }
@@ -177,7 +179,6 @@ export default defineEventHandler(async (event) => {
       data: {
         user_id: user_id,
         location_id: locationId,
-        access_level: access_level,
         assigned_by: user.id,
         assigned_at: new Date(),
       },
@@ -201,12 +202,8 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    console.log(
-      `[SUCCESS] User ${targetUser.username} assigned to location ${location.code} with access level ${access_level}`
-    );
-
     return {
-      message: `${targetUser.full_name || targetUser.username} has been assigned to ${location.name} with ${access_level} access`,
+      message: `${targetUser.full_name || targetUser.username} has been assigned to ${location.name}`,
       user_location: {
         user_id: userLocation.user.id,
         user: {
@@ -221,7 +218,6 @@ export default defineEventHandler(async (event) => {
           code: userLocation.location.code,
           name: userLocation.location.name,
         },
-        access_level: userLocation.access_level,
         assigned_at: userLocation.assigned_at,
       },
     };

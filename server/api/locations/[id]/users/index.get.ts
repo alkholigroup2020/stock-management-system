@@ -1,33 +1,24 @@
 /**
  * GET /api/locations/:id/users
  *
- * Fetch all users assigned to a location
+ * Fetch all Operators assigned to a location
+ * Note: This returns UserLocation assignments (Operators only)
  */
 
 import prisma from "../../../../utils/prisma";
 import type { UserRole } from "@prisma/client";
 
-console.log("✓ GET [id]/users/index.get.ts HANDLER LOADED");
-
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[];
 }
 
 export default defineEventHandler(async (event) => {
-  console.log("[GET /api/locations/:id/users] Handler called");
-  console.log("[GET] URL:", event.node.req.url);
-
   const user = event.context.user as AuthUser | undefined;
 
   if (!user) {
@@ -58,9 +49,7 @@ export default defineEventHandler(async (event) => {
 
     // Check access permissions for OPERATOR role
     if (user.role === "OPERATOR") {
-      const userLocationIds = user.locations?.map((loc) => loc.location_id) || [];
-
-      if (!userLocationIds.includes(locationId)) {
+      if (!user.locations?.includes(locationId)) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",
@@ -89,7 +78,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Fetch users assigned to this location
+    // Fetch users assigned to this location (Operators only)
     const userLocations = await prisma.userLocation.findMany({
       where: {
         location_id: locationId,
@@ -118,7 +107,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Format response to include user details with access level
+    // Format response
     const users = userLocations.map((ul) => ({
       user_id: ul.user.id,
       user: {
@@ -129,7 +118,6 @@ export default defineEventHandler(async (event) => {
         role: ul.user.role,
         is_active: ul.user.is_active,
       },
-      access_level: ul.access_level,
       assigned_at: ul.assigned_at,
       assigned_by: ul.assigner
         ? {

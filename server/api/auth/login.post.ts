@@ -44,7 +44,6 @@ export default defineEventHandler(async (event) => {
         user_locations: {
           select: {
             location_id: true,
-            access_level: true,
           },
         },
       },
@@ -91,10 +90,7 @@ export default defineEventHandler(async (event) => {
       role: user.role,
       default_location_id: user.default_location_id,
       default_location: user.default_location,
-      locations: user.user_locations.map((ul) => ({
-        location_id: ul.location_id,
-        access_level: ul.access_level,
-      })),
+      locations: user.user_locations.map((ul) => ul.location_id),
     };
 
     // Create session using nuxt-auth-utils

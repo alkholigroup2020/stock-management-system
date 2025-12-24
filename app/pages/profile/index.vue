@@ -57,7 +57,6 @@ type PasswordSchema = z.output<typeof passwordSchema>;
 // User locations with full details (for operators)
 interface LocationDetail {
   location_id: string;
-  access_level: string;
   location: {
     id: string;
     code: string;
@@ -71,13 +70,14 @@ const loadingLocations = ref(true);
 
 // Fetch user's full location details
 const fetchUserLocations = async () => {
-  // If admin/supervisor, no need to fetch - they have all access
+  // If admin/supervisor, no need to fetch - they have implicit access to all
   if (isAdminOrSupervisor.value) {
     loadingLocations.value = false;
     return;
   }
 
   // For operators, we need to fetch location details
+  // user.locations is now a simple array of location IDs
   if (!user.value?.locations || user.value.locations.length === 0) {
     loadingLocations.value = false;
     return;
@@ -89,15 +89,14 @@ const fetchUserLocations = async () => {
       locations: Array<{ id: string; code: string; name: string; type: string }>;
     }>("/api/locations");
 
-    const userLocationIds = user.value.locations.map((l) => l.location_id);
+    const userLocationIds = user.value.locations; // Now a string[] of location IDs
     const locationsMap = new Map(response.locations.map((l) => [l.id, l]));
 
-    userLocations.value = user.value.locations
-      .filter((ul) => locationsMap.has(ul.location_id))
-      .map((ul) => ({
-        location_id: ul.location_id,
-        access_level: ul.access_level,
-        location: locationsMap.get(ul.location_id)!,
+    userLocations.value = userLocationIds
+      .filter((locationId) => locationsMap.has(locationId))
+      .map((locationId) => ({
+        location_id: locationId,
+        location: locationsMap.get(locationId)!,
       }));
   } catch (err) {
     console.error("Error fetching locations:", err);
@@ -216,19 +215,6 @@ const getRoleIcon = (role: string) => {
   return icons[role] || "i-lucide-user";
 };
 
-const getAccessLevelColor = (
-  level: string
-): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
-  const colors: Record<
-    string,
-    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
-  > = {
-    MANAGE: "success",
-    POST: "primary",
-    VIEW: "neutral",
-  };
-  return colors[level] || "neutral";
-};
 
 // Permissions based on role
 const permissions = computed(() => {
@@ -480,13 +466,8 @@ useHead({
                   </p>
                 </div>
               </div>
-              <UBadge
-                :color="getAccessLevelColor(loc.access_level)"
-                variant="subtle"
-                size="sm"
-                class="ml-3 flex-shrink-0"
-              >
-                {{ loc.access_level }}
+              <UBadge color="primary" variant="subtle" size="sm" class="ml-3 flex-shrink-0">
+                Assigned
               </UBadge>
             </div>
           </div>

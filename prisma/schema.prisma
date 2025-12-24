@@ -30,13 +30,6 @@ enum LocationType {
   WAREHOUSE   // Other warehouse
 }
 
-// User access level per location
-enum AccessLevel {
-  VIEW        // Read-only access
-  POST        // Can post transactions
-  MANAGE      // Full management access
-}
-
 // Item unit of measure
 enum Unit {
   KG          // Kilograms
@@ -198,11 +191,11 @@ model Location {
   @@map("locations")
 }
 
-// UserLocation model - Join table for user-location access control
+// UserLocation model - Join table for user-location assignment (Operators only)
+// Note: Admins and Supervisors have implicit access to all locations
 model UserLocation {
   user_id       String        @db.Uuid
   location_id   String        @db.Uuid
-  access_level  AccessLevel   @default(VIEW)
   assigned_at   DateTime      @default(now()) @db.Timestamptz
   assigned_by   String?       @db.Uuid
 
@@ -214,7 +207,6 @@ model UserLocation {
   @@id([user_id, location_id])
   @@index([user_id])
   @@index([location_id])
-  @@index([user_id, access_level]) // For user permission queries
   @@map("user_locations")
 }
 

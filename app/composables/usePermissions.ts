@@ -24,8 +24,15 @@ export function usePermissions() {
     hasLocationAccess,
     isAdmin,
     isSupervisor,
-    // isOperator,
+    isOperator,
+    locations,
   } = useAuth();
+
+  // Helper: Check if Operator has any assigned locations
+  // Used for navigation when no specific locationId is provided
+  const operatorHasAnyLocation = (): boolean => {
+    return isOperator.value && locations.value.length > 0;
+  };
 
   // ==================== DELIVERY PERMISSIONS ====================
 
@@ -34,27 +41,26 @@ export function usePermissions() {
    *
    * Requirements:
    * - User must be authenticated
-   * - User must have at least POST access level to the location
+   * - User must have access to the location
    * - All roles (OPERATOR, SUPERVISOR, ADMIN) can post deliveries
    *
-   * @param locationId - Location ID to check (optional, uses default location if not provided)
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can post deliveries at the location
    */
   const canPostDeliveries = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    // Admins and Supervisors have access to all locations
+    // Admins and Supervisors have implicit access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
+    // If no specific location requested, check if operator has ANY assigned locations
+    // This is used for navigation menu visibility
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
-    // Operators need POST or MANAGE access level
-    const accessLevel = user.value.locations.find(
-      (loc) => loc.location_id === targetLocationId
-    )?.access_level;
-
-    return accessLevel === "POST" || accessLevel === "MANAGE";
+    // Operators need to be assigned to the specific location
+    return hasLocationAccess(locationId);
   };
 
   // ==================== ISSUE PERMISSIONS ====================
@@ -64,27 +70,25 @@ export function usePermissions() {
    *
    * Requirements:
    * - User must be authenticated
-   * - User must have at least POST access level to the location
+   * - User must have access to the location
    * - All roles (OPERATOR, SUPERVISOR, ADMIN) can post issues
    *
-   * @param locationId - Location ID to check (optional, uses default location if not provided)
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can post issues at the location
    */
   const canPostIssues = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    // Admins and Supervisors have access to all locations
+    // Admins and Supervisors have implicit access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
-    // Operators need POST or MANAGE access level
-    const accessLevel = user.value.locations.find(
-      (loc) => loc.location_id === targetLocationId
-    )?.access_level;
-
-    return accessLevel === "POST" || accessLevel === "MANAGE";
+    // Operators need to be assigned to the specific location
+    return hasLocationAccess(locationId);
   };
 
   // ==================== ITEM MANAGEMENT PERMISSIONS ====================
@@ -180,11 +184,20 @@ export function usePermissions() {
    * - User must have access to the source location
    * - All roles can create transfers (requires supervisor approval)
    *
-   * @param fromLocationId - Source location ID
+   * @param fromLocationId - Source location ID (optional, for button visibility shows if user has any location)
    * @returns true if user can create a transfer
    */
-  const canCreateTransfer = (fromLocationId: string): boolean => {
+  const canCreateTransfer = (fromLocationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Admins and Supervisors have implicit access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!fromLocationId) {
+      return operatorHasAnyLocation();
+    }
+
     return hasLocationAccess(fromLocationId);
   };
 
@@ -211,7 +224,7 @@ export function usePermissions() {
    * - User must have access to the location
    * - All roles can VIEW reconciliations (operators see totals only)
    *
-   * @param locationId - Location ID to check
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can view reconciliations
    */
   const canViewReconciliations = (locationId?: string): boolean => {
@@ -220,10 +233,12 @@ export function usePermissions() {
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
-    return hasLocationAccess(targetLocationId);
+    return hasLocationAccess(locationId);
   };
 
   /**
@@ -267,7 +282,7 @@ export function usePermissions() {
    * - User must have access to the location
    * - All roles can enter POB data
    *
-   * @param locationId - Location ID to check
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can enter POB
    */
   const canEnterPOB = (locationId?: string): boolean => {
@@ -276,10 +291,12 @@ export function usePermissions() {
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
-    return hasLocationAccess(targetLocationId);
+    return hasLocationAccess(locationId);
   };
 
   // ==================== NCR PERMISSIONS ====================
@@ -292,7 +309,7 @@ export function usePermissions() {
    * - User must have access to the location
    * - All roles can create NCRs
    *
-   * @param locationId - Location ID to check
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can create NCRs
    */
   const canCreateNCR = (locationId?: string): boolean => {
@@ -301,10 +318,12 @@ export function usePermissions() {
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
-    return hasLocationAccess(targetLocationId);
+    return hasLocationAccess(locationId);
   };
 
   /**
@@ -385,13 +404,19 @@ export function usePermissions() {
    * - User must be authenticated
    * - User must have access to the location
    *
-   * @param locationId - Location ID to check
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can view reports
    */
   const canViewReports = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    if (!locationId) return true; // All authenticated users can view some reports
+    // Admins and Supervisors have access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
     return hasLocationAccess(locationId);
   };
@@ -415,9 +440,9 @@ export function usePermissions() {
    *
    * Requirements:
    * - User must be authenticated
-   * - User must have at least VIEW access to the location
+   * - User must have access to the location
    *
-   * @param locationId - Location ID to check
+   * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can view stock
    */
   const canViewStock = (locationId?: string): boolean => {
@@ -426,10 +451,12 @@ export function usePermissions() {
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
-    const targetLocationId = locationId || user.value.default_location_id;
-    if (!targetLocationId) return false;
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
 
-    return hasLocationAccess(targetLocationId);
+    return hasLocationAccess(locationId);
   };
 
   // ==================== RETURN ALL PERMISSION FUNCTIONS ====================

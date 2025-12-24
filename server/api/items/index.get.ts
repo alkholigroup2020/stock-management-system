@@ -22,18 +22,13 @@ import type { UserRole } from "@prisma/client";
 import { setCacheHeaders } from "../../utils/performance";
 
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[]; // Array of location IDs (for Operators)
 }
 
 // Query schema for validation
@@ -106,7 +101,7 @@ export default defineEventHandler(async (event) => {
     if (locationId) {
       // Check if user has access to this location
       if (user.role === "OPERATOR") {
-        const hasAccess = user.locations?.some((loc) => loc.location_id === locationId);
+        const hasAccess = user.locations?.includes(locationId);
         if (!hasAccess) {
           throw createError({
             statusCode: 403,

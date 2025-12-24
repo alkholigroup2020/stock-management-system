@@ -32,19 +32,7 @@
       icon="i-lucide-alert-triangle"
       title="No Locations Available"
       description="You need to create at least one location before creating a period."
-    >
-      <template #actions>
-        <UButton
-          color="warning"
-          variant="soft"
-          size="sm"
-          class="cursor-pointer"
-          @click="$router.push('/locations')"
-        >
-          Go to Locations
-        </UButton>
-      </template>
-    </UAlert>
+    ></UAlert>
 
     <!-- Current Period Alert -->
     <UAlert
@@ -214,7 +202,8 @@
             <!-- Period Name -->
             <div>
               <label for="period-name" class="form-label mb-2 block">
-                Period Name <span class="text-[var(--ui-error)]">*</span>
+                Period Name
+                <span class="text-[var(--ui-error)]">*</span>
               </label>
               <UInput
                 id="period-name"
@@ -237,7 +226,8 @@
               <!-- Start Date -->
               <div>
                 <label for="start-date" class="form-label mb-2 block">
-                  Start Date <span class="text-[var(--ui-error)]">*</span>
+                  Start Date
+                  <span class="text-[var(--ui-error)]">*</span>
                 </label>
                 <UInput
                   id="start-date"
@@ -257,7 +247,8 @@
               <!-- End Date -->
               <div>
                 <label for="end-date" class="form-label mb-2 block">
-                  End Date <span class="text-[var(--ui-error)]">*</span>
+                  End Date
+                  <span class="text-[var(--ui-error)]">*</span>
                 </label>
                 <UInput
                   id="end-date"
@@ -276,14 +267,13 @@
             </div>
 
             <!-- Workflow Info -->
-            <UAlert
-              color="info"
-              icon="i-lucide-info"
-              title="Period Workflow"
-            >
+            <UAlert color="info" icon="i-lucide-info" title="Period Workflow">
               <template #description>
                 <ol class="list-decimal list-inside text-sm space-y-1 mt-1">
-                  <li>Period will be created as <strong>DRAFT</strong></li>
+                  <li>
+                    Period will be created as
+                    <strong>DRAFT</strong>
+                  </li>
                   <li>Set prices for all items on the Prices page</li>
                   <li>Open the period to start accepting transactions</li>
                 </ol>
@@ -304,7 +294,9 @@
           </form>
 
           <template #footer>
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]">
+            <div
+              class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--ui-border)]"
+            >
               <UButton
                 color="neutral"
                 variant="outline"
@@ -373,7 +365,8 @@ const hasActiveLocations = computed(() => {
 
 const activeLocationsCount = computed(() => {
   if (!locationsData.value?.locations) return 0;
-  return locationsData.value.locations.filter((loc: { is_active: boolean }) => loc.is_active).length;
+  return locationsData.value.locations.filter((loc: { is_active: boolean }) => loc.is_active)
+    .length;
 });
 
 // Get current period from the periods list (avoid double API call)

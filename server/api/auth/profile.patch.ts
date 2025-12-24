@@ -63,7 +63,6 @@ export default defineEventHandler(async (event) => {
         user_locations: {
           select: {
             location_id: true,
-            access_level: true,
           },
         },
       },
@@ -78,10 +77,7 @@ export default defineEventHandler(async (event) => {
       role: updatedUser.role,
       default_location_id: updatedUser.default_location_id,
       default_location: updatedUser.default_location,
-      locations: updatedUser.user_locations.map((ul) => ({
-        location_id: ul.location_id,
-        access_level: ul.access_level,
-      })),
+      locations: updatedUser.user_locations.map((ul) => ul.location_id),
     };
 
     // Get current session for loggedInAt value

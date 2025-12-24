@@ -95,8 +95,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check user has POST or MANAGE access to location
-    if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
+    // Check user has access to location (Operators need explicit assignment)
+    if (user.role === "OPERATOR") {
       const userLocation = await prisma.userLocation.findUnique({
         where: {
           user_id_location_id: {
@@ -116,18 +116,8 @@ export default defineEventHandler(async (event) => {
           },
         });
       }
-
-      if (userLocation.access_level === "VIEW") {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden",
-          data: {
-            code: "INSUFFICIENT_PERMISSIONS",
-            message: "You do not have permission to create/update POB entries for this location",
-          },
-        });
-      }
     }
+    // Admins and Supervisors have implicit access to all locations
 
     // Get current open period
     const currentPeriod = await prisma.period.findFirst({

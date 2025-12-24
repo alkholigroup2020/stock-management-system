@@ -34,7 +34,6 @@ interface User {
       name: string;
       type: string;
     };
-    access_level: string;
   }>;
 }
 
@@ -146,7 +145,6 @@ const locationOptions = computed(() => [
 
 // Location access state
 const selectedLocationId = ref("");
-const selectedAccessLevel = ref("VIEW");
 const addingLocation = ref(false);
 const removingLocationId = ref<string | null>(null);
 
@@ -155,29 +153,7 @@ const isRemoveLocationModalOpen = ref(false);
 const locationToRemove = ref<{
   location_id: string;
   location: { id: string; code: string; name: string; type: string };
-  access_level: string;
 } | null>(null);
-
-const accessLevelOptions = [
-  { value: "VIEW", label: "View", description: "Can only view data" },
-  { value: "POST", label: "Post", description: "Can create transactions" },
-  { value: "MANAGE", label: "Manage", description: "Full location access" },
-];
-
-// Access level badge color
-const getAccessLevelColor = (
-  level: string
-): "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral" => {
-  const colors: Record<
-    string,
-    "error" | "info" | "primary" | "secondary" | "success" | "warning" | "neutral"
-  > = {
-    MANAGE: "success",
-    POST: "primary",
-    VIEW: "neutral",
-  };
-  return colors[level] || "neutral";
-};
 
 // Available locations (not already assigned)
 const availableLocations = computed(() => {
@@ -278,7 +254,6 @@ const addLocationAccess = async () => {
         method: "POST",
         body: {
           user_id: route.params.id as string,
-          access_level: selectedAccessLevel.value,
         },
       }
     );
@@ -289,7 +264,6 @@ const addLocationAccess = async () => {
 
     await fetchUser();
     selectedLocationId.value = "";
-    selectedAccessLevel.value = "VIEW";
   } catch (err: unknown) {
     console.error("Error adding location access:", err);
     const message =
@@ -311,7 +285,6 @@ const addLocationAccess = async () => {
 const promptRemoveLocation = (loc: {
   location_id: string;
   location: { id: string; code: string; name: string; type: string };
-  access_level: string;
 }) => {
   locationToRemove.value = loc;
   isRemoveLocationModalOpen.value = true;
@@ -766,7 +739,7 @@ useHead({
               <UIcon name="i-lucide-info" class="w-4 h-4 text-primary" />
               <p class="text-sm text-[var(--ui-text-muted)]">
                 <strong>Operators</strong> can only access their assigned locations. Add at least
-                one location with POST or MANAGE access for this user to post transactions.
+                one location for this user to post transactions.
               </p>
             </div>
           </div>
@@ -790,8 +763,8 @@ useHead({
                 </div>
               </div>
               <div class="flex items-center gap-3 flex-shrink-0">
-                <UBadge :color="getAccessLevelColor(loc.access_level)" variant="subtle" size="sm">
-                  {{ loc.access_level }}
+                <UBadge color="success" variant="subtle" size="sm">
+                  Assigned
                 </UBadge>
                 <UButton
                   icon="i-lucide-trash-2"
@@ -824,7 +797,7 @@ useHead({
           <!-- Add New Location -->
           <div v-if="availableLocations.length > 0" class="pt-4 border-t border-[var(--ui-border)]">
             <h3 class="text-base font-semibold text-[var(--ui-text)] mb-4">Add Location Access</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <USelectMenu
                 v-model="selectedLocationId"
                 :items="
@@ -840,17 +813,6 @@ useHead({
               >
                 <template #leading>
                   <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
-                </template>
-              </USelectMenu>
-              <USelectMenu
-                v-model="selectedAccessLevel"
-                :items="accessLevelOptions"
-                value-key="value"
-                size="lg"
-                class="w-full"
-              >
-                <template #leading>
-                  <UIcon name="i-lucide-key" class="w-4 h-4" />
                 </template>
               </USelectMenu>
               <UButton
@@ -922,7 +884,7 @@ useHead({
                 {{ locationToRemove.location.name }}
               </p>
               <p class="text-caption mt-1">
-                {{ locationToRemove.location.code }} - {{ locationToRemove.access_level }} access
+                {{ locationToRemove.location.code }} • {{ locationToRemove.location.type }}
               </p>
             </div>
 

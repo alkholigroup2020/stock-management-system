@@ -17,18 +17,13 @@ import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[]; // Array of location IDs (for Operators)
 }
 
 // Query schema for validation
@@ -98,7 +93,7 @@ export default defineEventHandler(async (event) => {
     } else if (locationId) {
       // Check if user has access to the requested location
       if (user.role === "OPERATOR") {
-        const hasAccess = user.locations?.some((loc) => loc.location_id === locationId);
+        const hasAccess = user.locations?.includes(locationId);
         if (!hasAccess) {
           throw createError({
             statusCode: 403,
@@ -129,7 +124,7 @@ export default defineEventHandler(async (event) => {
       };
     } else if (user.role === "OPERATOR") {
       // For operators without specific locationId, include stock from their assigned locations
-      const userLocationIds = user.locations?.map((loc) => loc.location_id) || [];
+      const userLocationIds = user.locations || [];
       if (userLocationIds.length > 0) {
         include.location_stock = {
           where: {

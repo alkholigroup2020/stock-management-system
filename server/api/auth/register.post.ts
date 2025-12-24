@@ -7,7 +7,7 @@
  */
 
 import { z } from "zod";
-import type { UserRole, AccessLevel } from "@prisma/client";
+import type { UserRole } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -166,30 +166,17 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Auto-create UserLocation if default location is assigned
-      if (validatedData.default_location_id) {
-        // Determine access level based on role
-        let accessLevel: AccessLevel | null = null;
-
-        if (validatedData.role === "OPERATOR") {
-          accessLevel = "POST"; // Can create deliveries/issues
-        } else if (validatedData.role === "SUPERVISOR") {
-          accessLevel = "MANAGE"; // Full control at location
-        }
-        // ADMIN gets no UserLocation (implicit all-location access)
-
-        if (accessLevel) {
-          // Create UserLocation record to grant access
-          await tx.userLocation.create({
-            data: {
-              user_id: createdUser.id,
-              location_id: validatedData.default_location_id,
-              access_level: accessLevel,
-              assigned_at: new Date(),
-              assigned_by: user.id, // Admin who created the user
-            },
-          });
-        }
+      // Auto-create UserLocation for Operators if default location is assigned
+      // Supervisors and Admins have implicit access to all locations
+      if (validatedData.default_location_id && validatedData.role === "OPERATOR") {
+        await tx.userLocation.create({
+          data: {
+            user_id: createdUser.id,
+            location_id: validatedData.default_location_id,
+            assigned_at: new Date(),
+            assigned_by: user.id, // Admin who created the user
+          },
+        });
       }
 
       return createdUser;

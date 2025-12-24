@@ -8,17 +8,11 @@
  * - Extracts locationId from route params
  * - Checks if user has access to the location
  * - Throws 403 if access denied
- * - Admins and Supervisors have access to all locations
- * - Operators only have access to their assigned locations
+ * - Admins and Supervisors have access to all locations (implicit)
+ * - Operators only have access to their assigned locations (via UserLocation)
  */
 
 import type { UserRole } from "@prisma/client";
-
-// User location type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
 
 // User session type
 interface AuthUser {
@@ -27,7 +21,7 @@ interface AuthUser {
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[]; // Array of location IDs (for Operators)
 }
 
 export default defineEventHandler(async (event) => {
@@ -63,7 +57,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // For Operators, check if they have access to this location
-  const hasAccess = user.locations?.some((loc) => loc.location_id === locationId);
+  const hasAccess = user.locations?.includes(locationId);
 
   if (!hasAccess) {
     throw createError({

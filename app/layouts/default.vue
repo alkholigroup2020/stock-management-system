@@ -75,11 +75,13 @@ const mainMenuItems = computed<NavigationMenuItem[]>(() => {
     });
   }
 
-  items.push({
-    label: "Transfers",
-    icon: "i-heroicons-arrow-path",
-    to: "/transfers",
-  });
+  if (permissions.canCreateTransfer()) {
+    items.push({
+      label: "Transfers",
+      icon: "i-heroicons-arrow-path",
+      to: "/transfers",
+    });
+  }
 
   if (permissions.canCreateNCR()) {
     items.push({

@@ -94,8 +94,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check if user has access to the NCR's location
-    if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
+    // Check if user has access to the NCR's location (Operators need explicit assignment)
+    if (user.role === "OPERATOR") {
       const userLocation = await prisma.userLocation.findUnique({
         where: {
           user_id_location_id: {
@@ -115,18 +115,8 @@ export default defineEventHandler(async (event) => {
           },
         });
       }
-
-      if (userLocation.access_level === "VIEW") {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden",
-          data: {
-            code: "INSUFFICIENT_PERMISSIONS",
-            message: "You do not have permission to update NCRs for this location",
-          },
-        });
-      }
     }
+    // Admins and Supervisors have implicit access to all locations
 
     // Build update data
     const updateData: Record<string, unknown> = {};

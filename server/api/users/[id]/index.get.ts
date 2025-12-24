@@ -82,7 +82,6 @@ export default defineEventHandler(async (event) => {
         user_locations: {
           select: {
             location_id: true,
-            access_level: true,
             location: {
               select: {
                 id: true,
@@ -120,7 +119,6 @@ export default defineEventHandler(async (event) => {
       locations: user.user_locations.map((ul: any) => ({
         location_id: ul.location_id,
         location: ul.location,
-        access_level: ul.access_level,
       })),
     };
 

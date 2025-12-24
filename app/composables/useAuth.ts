@@ -133,15 +133,6 @@ export const useAuth = () => {
     },
 
     /**
-     * Get access level for a specific location
-     * @param locationId - Location ID to check
-     * @returns Access level ('VIEW', 'POST', 'MANAGE') or null
-     */
-    getLocationAccessLevel: (locationId: string): "VIEW" | "POST" | "MANAGE" | null => {
-      return authStore.getLocationAccessLevel(locationId);
-    },
-
-    /**
      * Check if user can post transactions at a location
      * @param locationId - Location ID to check
      * @returns boolean

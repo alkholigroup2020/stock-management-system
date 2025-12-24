@@ -152,37 +152,29 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check user has POST or MANAGE access to location
-    const userLocation = await prisma.userLocation.findUnique({
-      where: {
-        user_id_location_id: {
-          user_id: user.id,
-          location_id: locationId,
-        },
-      },
-    });
-
-    if (!userLocation && user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-        data: {
-          code: "LOCATION_ACCESS_DENIED",
-          message: "You do not have access to this location",
+    // Check user has access to location (Operators need explicit assignment)
+    if (user.role === "OPERATOR") {
+      const userLocation = await prisma.userLocation.findUnique({
+        where: {
+          user_id_location_id: {
+            user_id: user.id,
+            location_id: locationId,
+          },
         },
       });
-    }
 
-    if (userLocation && userLocation.access_level === "VIEW") {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-        data: {
-          code: "INSUFFICIENT_PERMISSIONS",
-          message: "You do not have permission to create deliveries at this location",
-        },
-      });
+      if (!userLocation) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+          data: {
+            code: "LOCATION_ACCESS_DENIED",
+            message: "You do not have access to this location",
+          },
+        });
+      }
     }
+    // Admins and Supervisors have implicit access to all locations
 
     // Get current open period (required for posting, optional for drafts)
     const currentPeriod = await prisma.period.findFirst({

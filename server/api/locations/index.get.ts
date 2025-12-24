@@ -19,18 +19,13 @@ import type { UserRole } from "@prisma/client";
 import { setCacheHeaders } from "../../utils/performance";
 
 // User session type
-interface UserLocation {
-  location_id: string;
-  access_level: string;
-}
-
 interface AuthUser {
   id: string;
   username: string;
   email: string;
   role: UserRole;
   default_location_id: string | null;
-  locations?: UserLocation[];
+  locations?: string[]; // Array of location IDs (for Operators)
 }
 
 // Query schema for validation
@@ -113,7 +108,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // OPERATOR can only view assigned locations
-    const userLocationIds = user.locations?.map((loc) => loc.location_id) || [];
+    const userLocationIds = user.locations || [];
 
     if (userLocationIds.length === 0) {
       return {
