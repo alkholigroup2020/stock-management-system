@@ -24,7 +24,7 @@
             >
               {{ location.name }}
             </h3>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="text-sm font-mono text-[var(--ui-text-muted)]">
                 {{ location.code }}
               </span>
@@ -32,6 +32,24 @@
               <UBadge :color="locationTypeBadgeColor" variant="subtle" size="sm">
                 {{ formatLocationType(location.type) }}
               </UBadge>
+              <!-- Operators Count Badge (inline) -->
+              <template v-if="showStats">
+                <span class="text-[var(--ui-text-dimmed)]">•</span>
+                <div
+                  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]"
+                >
+                  <UIcon
+                    name="i-lucide-users"
+                    class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400"
+                  />
+                  <span class="text-xs font-medium text-[var(--ui-text)]">
+                    {{ location._count?.user_locations || 0 }}
+                    <span class="text-[var(--ui-text-muted)]">{{
+                      (location._count?.user_locations || 0) === 1 ? "operator" : "operators"
+                    }}</span>
+                  </span>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -59,43 +77,6 @@
           <span class="text-sm text-[var(--ui-text)] line-clamp-2">
             {{ location.address }}
           </span>
-        </div>
-      </div>
-
-      <!-- Stats Grid -->
-      <div v-if="showStats" class="grid grid-cols-2 gap-3 mb-4">
-        <!-- Users Count -->
-        <div
-          class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-br from-[var(--ui-bg-muted)] to-transparent border border-[var(--ui-border-muted)]"
-        >
-          <div
-            class="w-10 h-10 rounded-lg bg-[var(--ui-bg-elevated)] flex items-center justify-center"
-          >
-            <UIcon name="i-lucide-users" class="w-5 h-5 text-blue-500 dark:text-blue-400" />
-          </div>
-          <div>
-            <p class="text-xs text-[var(--ui-text-muted)] mb-0.5">Users</p>
-            <p class="text-lg font-bold text-[var(--ui-text)]">
-              {{ location._count?.user_locations || 0 }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Items Count -->
-        <div
-          class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-br from-[var(--ui-bg-muted)] to-transparent border border-[var(--ui-border-muted)]"
-        >
-          <div
-            class="w-10 h-10 rounded-lg bg-[var(--ui-bg-elevated)] flex items-center justify-center"
-          >
-            <UIcon name="i-lucide-package" class="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
-          </div>
-          <div>
-            <p class="text-xs text-[var(--ui-text-muted)] mb-0.5">Items</p>
-            <p class="text-lg font-bold text-[var(--ui-text)]">
-              {{ location._count?.location_stock || 0 }}
-            </p>
-          </div>
         </div>
       </div>
 
@@ -157,7 +138,6 @@ interface Location {
   is_active: boolean;
   _count?: {
     user_locations?: number;
-    location_stock?: number;
   };
 }
 

@@ -237,7 +237,6 @@ interface LocationItem {
   is_active: boolean;
   _count?: {
     user_locations?: number;
-    location_stock?: number;
   };
 }
 

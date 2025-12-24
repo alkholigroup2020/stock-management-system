@@ -85,8 +85,14 @@ export default defineEventHandler(async (event) => {
         include: {
           _count: {
             select: {
-              user_locations: true,
-              location_stock: true,
+              // Only count Operators (Supervisors/Admins have implicit access)
+              user_locations: {
+                where: {
+                  user: {
+                    role: "OPERATOR",
+                  },
+                },
+              },
             },
           },
         },
@@ -125,8 +131,14 @@ export default defineEventHandler(async (event) => {
       include: {
         _count: {
           select: {
-            user_locations: true,
-            location_stock: true,
+            // Only count Operators (Supervisors/Admins have implicit access)
+            user_locations: {
+              where: {
+                user: {
+                  role: "OPERATOR",
+                },
+              },
+            },
           },
         },
       },
