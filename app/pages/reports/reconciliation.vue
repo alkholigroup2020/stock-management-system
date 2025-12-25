@@ -314,7 +314,9 @@ onMounted(async () => {
         >
           <span class="hidden sm:inline">Back</span>
         </UButton>
+        <!-- Export Button (Supervisor+ only) -->
         <UButton
+          v-if="isAtLeastSupervisor"
           icon="i-lucide-download"
           color="primary"
           size="lg"

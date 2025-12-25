@@ -346,29 +346,32 @@ onMounted(async () => {
         >
           <span class="hidden sm:inline">Back</span>
         </UButton>
-        <UButton
-          icon="i-lucide-download"
-          color="primary"
-          size="lg"
-          :loading="exporting"
-          :disabled="loading || !hasData || exporting"
-          class="cursor-pointer rounded-full px-3 sm:px-5"
-          @click="exportToCSV"
-        >
-          <span class="hidden sm:inline">Export</span>
-        </UButton>
-        <UButton
-          icon="i-lucide-file-spreadsheet"
-          color="neutral"
-          variant="outline"
-          size="lg"
-          :loading="exportingDetailed"
-          :disabled="loading || !hasData || exportingDetailed"
-          class="cursor-pointer rounded-full px-3"
-          @click="exportDetailedCSV"
-        >
-          <span class="hidden lg:inline">Detail</span>
-        </UButton>
+        <!-- Export Buttons (Supervisor+ only) -->
+        <template v-if="isAtLeastSupervisor">
+          <UButton
+            icon="i-lucide-download"
+            color="primary"
+            size="lg"
+            :loading="exporting"
+            :disabled="loading || !hasData || exporting"
+            class="cursor-pointer rounded-full px-3 sm:px-5"
+            @click="exportToCSV"
+          >
+            <span class="hidden sm:inline">Export</span>
+          </UButton>
+          <UButton
+            icon="i-lucide-file-spreadsheet"
+            color="neutral"
+            variant="outline"
+            size="lg"
+            :loading="exportingDetailed"
+            :disabled="loading || !hasData || exportingDetailed"
+            class="cursor-pointer rounded-full px-3"
+            @click="exportDetailedCSV"
+          >
+            <span class="hidden lg:inline">Detail</span>
+          </UButton>
+        </template>
       </div>
     </div>
 
