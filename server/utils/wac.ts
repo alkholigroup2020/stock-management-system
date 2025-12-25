@@ -21,6 +21,8 @@
 export interface WACCalculationResult {
   /** The newly calculated Weighted Average Cost */
   newWAC: number;
+  /** The previous Weighted Average Cost (before this calculation) */
+  previousWAC: number;
   /** The new total quantity after receipt (currentQty + receivedQty) */
   newQuantity: number;
   /** The new total value (newQuantity × newWAC) */
@@ -119,6 +121,7 @@ export function calculateWAC(
   // Round to 4 decimal places for precision (database stores up to 4 decimals)
   return {
     newWAC: Math.round(newWAC * 10000) / 10000,
+    previousWAC: Math.round(currentWAC * 10000) / 10000,
     newQuantity: Math.round(newQuantity * 10000) / 10000,
     newValue: Math.round(newValue * 100) / 100, // Round currency to 2 decimals
     currentValue: Math.round(currentValue * 100) / 100,

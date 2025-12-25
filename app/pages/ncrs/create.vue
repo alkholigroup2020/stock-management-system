@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatCurrency } from "~/utils/format";
+import { formatCurrency, formatDate } from "~/utils/format";
 
 // SEO
 useSeoMeta({
@@ -16,6 +16,7 @@ const { handleError, handleSuccess } = useErrorHandler();
 
 // State
 const loading = ref(false);
+const loadingDeliveries = ref(false);
 const locations = ref<
   Array<{
     id: string;
@@ -37,19 +38,48 @@ const deliveries = ref<
   Array<{
     id: string;
     delivery_no: string;
+    delivery_date: string;
+    invoice_no: string | null;
     total_amount: number;
-    supplier?: {
+    has_variance: boolean;
+    line_count: number;
+    supplier: {
+      code: string;
       name: string;
     };
+    period: {
+      name: string;
+    };
+    posted_by: {
+      full_name: string;
+    };
+    lines?: Array<{
+      id: string;
+      quantity: number;
+      unit_price: number;
+      line_value: number;
+      item: {
+        id: string;
+        code: string;
+        name: string;
+        unit: string;
+      };
+    }>;
   }>
 >([]);
 
 // Computed permission check
 const hasNCRPermission = computed(() => permissions.canCreateNCR());
 
-// Form state
+// Get selected delivery details
+const selectedDelivery = computed(() => {
+  if (!formData.value.delivery_id) return null;
+  return deliveries.value.find((d) => d.id === formData.value.delivery_id) || null;
+});
+
+// Form state - start with no location selected (user must choose)
 const formData = ref({
-  location_id: locationStore.activeLocation?.id || "",
+  location_id: "",
   delivery_id: "",
   reason: "",
 });
@@ -62,6 +92,7 @@ const lines = ref<
     quantity: string;
     unit_value: string;
     line_value: number;
+    is_auto_filled: boolean; // Track if unit_value was auto-filled from delivery
   }>
 >([
   {
@@ -70,6 +101,7 @@ const lines = ref<
     quantity: "",
     unit_value: "",
     line_value: 0,
+    is_auto_filled: false,
   },
 ]);
 
@@ -81,6 +113,7 @@ const addLine = () => {
     quantity: "",
     unit_value: "",
     line_value: 0,
+    is_auto_filled: false,
   });
 };
 
@@ -105,6 +138,32 @@ const getItemById = (itemId: string) => {
   return items.value.find((item) => item.id === itemId);
 };
 
+// Get delivery line for a specific item from the selected delivery
+const getDeliveryLineForItem = (itemId: string) => {
+  if (!selectedDelivery.value?.lines) return null;
+  return selectedDelivery.value.lines.find((line) => line.item.id === itemId) || null;
+};
+
+// Handle item selection - auto-fill unit value from delivery if available
+const onItemSelected = (line: (typeof lines.value)[0], itemId: string) => {
+  line.item_id = itemId;
+
+  // Check if this item exists in the selected delivery
+  const deliveryLine = getDeliveryLineForItem(itemId);
+
+  if (deliveryLine) {
+    // Auto-fill from delivery line
+    line.unit_value = deliveryLine.unit_price.toString();
+    line.is_auto_filled = true;
+  } else {
+    // Clear auto-fill status if item not in delivery
+    line.unit_value = "";
+    line.is_auto_filled = false;
+  }
+
+  updateLineValue(line);
+};
+
 // Computed
 const totalValue = computed(() => {
   return lines.value.reduce((sum, line) => sum + line.line_value, 0);
@@ -125,15 +184,33 @@ const locationOptions = computed(() => {
 // Delivery options for dropdown
 const deliveryOptions = computed(() => {
   if (!deliveries.value || deliveries.value.length === 0) {
-    return [{ label: "No deliveries available", value: "" }];
+    return [];
   }
-  return [
-    { label: "No delivery selected", value: "" },
-    ...deliveries.value.map((delivery) => ({
-      label: `${delivery.delivery_no} - ${delivery.supplier?.name || "Unknown"} (${formatCurrency(delivery.total_amount)})`,
-      value: delivery.id,
-    })),
-  ];
+  return deliveries.value.map((delivery) => ({
+    label: `${delivery.delivery_no} - ${delivery.supplier?.name || "Unknown"} (${formatCurrency(delivery.total_amount)})`,
+    value: delivery.id,
+  }));
+});
+
+// Filtered items based on selected delivery
+// If a delivery is selected, only show items from that delivery
+// Otherwise, show all items
+const filteredItems = computed(() => {
+  if (!selectedDelivery.value?.lines || selectedDelivery.value.lines.length === 0) {
+    // No delivery selected or delivery has no lines - show all items
+    return items.value;
+  }
+
+  // Get item IDs from the selected delivery
+  const deliveryItemIds = new Set(selectedDelivery.value.lines.map((line) => line.item.id));
+
+  // Filter items to only those in the delivery
+  return items.value.filter((item) => deliveryItemIds.has(item.id));
+});
+
+// Check if items are being filtered by delivery
+const isItemsFiltered = computed(() => {
+  return selectedDelivery.value?.lines && selectedDelivery.value.lines.length > 0;
 });
 
 const isFormValid = computed(() => {
@@ -236,11 +313,6 @@ const fetchLocations = async () => {
       }>;
     }>("/api/locations");
     locations.value = response.locations;
-
-    // Set default location if available and not already set
-    if (!formData.value.location_id && locationStore.activeLocation?.id) {
-      formData.value.location_id = locationStore.activeLocation.id;
-    }
   } catch (error) {
     console.error("Error fetching locations:", error);
     handleError(error, { context: "fetching locations" });
@@ -271,48 +343,118 @@ const fetchItems = async () => {
   }
 };
 
-// Fetch deliveries for selected location
+// Fetch deliveries for selected location (with line items for info display)
 const fetchDeliveries = async () => {
   if (!formData.value.location_id) {
     deliveries.value = [];
     return;
   }
 
+  loadingDeliveries.value = true;
   try {
     const response = await $fetch<{
       deliveries: Array<{
         id: string;
         delivery_no: string;
+        delivery_date: string;
+        invoice_no: string | null;
         total_amount: number;
-        supplier?: {
+        has_variance: boolean;
+        line_count: number;
+        supplier: {
+          code: string;
           name: string;
         };
+        period: {
+          name: string;
+        };
+        posted_by: {
+          full_name: string;
+        };
+        lines?: Array<{
+          id: string;
+          quantity: number;
+          unit_price: number;
+          line_value: number;
+          item: {
+            id: string;
+            code: string;
+            name: string;
+            unit: string;
+          };
+        }>;
       }>;
     }>(`/api/locations/${formData.value.location_id}/deliveries`, {
       params: {
-        includeLines: false,
+        includeLines: true,
       },
     });
     deliveries.value = response.deliveries;
   } catch (error) {
     console.error("Error fetching deliveries:", error);
+  } finally {
+    loadingDeliveries.value = false;
   }
 };
 
 // Watch location changes to refresh deliveries
 watch(
   () => formData.value.location_id,
-  () => {
-    fetchDeliveries();
+  (newLocationId) => {
+    if (newLocationId) {
+      fetchDeliveries();
+    } else {
+      deliveries.value = [];
+    }
     // Reset delivery selection when location changes
     formData.value.delivery_id = "";
+  }
+);
+
+// Watch delivery changes to update auto-fill status for all lines
+watch(
+  () => formData.value.delivery_id,
+  (newDeliveryId) => {
+    // Get the new selected delivery
+    const newDelivery = newDeliveryId
+      ? deliveries.value.find((d) => d.id === newDeliveryId)
+      : null;
+
+    // Get item IDs from the new delivery (if any)
+    const deliveryItemIds = newDelivery?.lines
+      ? new Set(newDelivery.lines.map((line) => line.item.id))
+      : null;
+
+    // Re-check all lines when delivery changes
+    lines.value.forEach((line) => {
+      if (line.item_id) {
+        // If a delivery is now selected and item is NOT in that delivery, clear it
+        if (deliveryItemIds && !deliveryItemIds.has(line.item_id)) {
+          line.item_id = "";
+          line.quantity = "";
+          line.unit_value = "";
+          line.line_value = 0;
+          line.is_auto_filled = false;
+        } else {
+          // Item is in delivery (or no delivery selected) - update auto-fill
+          const deliveryLine = getDeliveryLineForItem(line.item_id);
+          if (deliveryLine) {
+            line.unit_value = deliveryLine.unit_price.toString();
+            line.is_auto_filled = true;
+          } else {
+            line.is_auto_filled = false;
+          }
+          updateLineValue(line);
+        }
+      }
+    });
   }
 );
 
 // Initial load
 onMounted(async () => {
   await Promise.all([fetchLocations(), fetchItems()]);
-  // Fetch deliveries after locations are loaded
+  // Fetch deliveries after locations are loaded (if location is already set)
   if (formData.value.location_id) {
     await fetchDeliveries();
   }
@@ -358,17 +500,124 @@ onMounted(async () => {
           <!-- Delivery (Optional) -->
           <div>
             <label class="form-label">Related Delivery (Optional)</label>
-            <USelectMenu
-              v-model="formData.delivery_id"
-              :items="deliveryOptions"
-              value-key="value"
-              placeholder="No delivery selected"
-              searchable
-              size="lg"
-              class="w-full"
-              :disabled="!formData.location_id || deliveries.length === 0"
-            />
+            <div class="flex gap-2">
+              <USelectMenu
+                v-model="formData.delivery_id"
+                :items="deliveryOptions"
+                value-key="value"
+                :placeholder="loadingDeliveries ? 'Loading deliveries...' : 'No delivery selected'"
+                searchable
+                size="lg"
+                class="flex-1"
+                :disabled="!formData.location_id || loadingDeliveries"
+                :loading="loadingDeliveries"
+              />
+              <UButton
+                v-if="formData.delivery_id"
+                icon="i-lucide-x"
+                color="neutral"
+                variant="soft"
+                size="lg"
+                class="cursor-pointer"
+                aria-label="Clear delivery selection"
+                @click="formData.delivery_id = ''"
+              />
+            </div>
             <p class="mt-1 text-caption">Link this NCR to a specific delivery if applicable</p>
+          </div>
+
+          <!-- Selected Delivery Info -->
+          <div v-if="selectedDelivery" class="lg:col-span-2">
+            <UCard
+              variant="subtle"
+              class="bg-[var(--ui-bg-muted)]"
+              :ui="{ body: 'p-4' }"
+            >
+              <div class="flex items-center gap-2 mb-3">
+                <UIcon name="i-lucide-truck" class="w-5 h-5 text-primary" />
+                <h3 class="font-semibold">Selected Delivery Details</h3>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div>
+                  <dt class="text-caption">Delivery No</dt>
+                  <dd class="text-body font-medium">{{ selectedDelivery.delivery_no }}</dd>
+                </div>
+                <div>
+                  <dt class="text-caption">Delivery Date</dt>
+                  <dd class="text-body font-medium">
+                    {{ formatDate(selectedDelivery.delivery_date) }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-caption">Supplier</dt>
+                  <dd class="text-body font-medium">{{ selectedDelivery.supplier.name }}</dd>
+                </div>
+                <div>
+                  <dt class="text-caption">Total Amount</dt>
+                  <dd class="text-body font-medium">
+                    {{ formatCurrency(selectedDelivery.total_amount) }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-caption">Period</dt>
+                  <dd class="text-body font-medium">{{ selectedDelivery.period.name }}</dd>
+                </div>
+                <div>
+                  <dt class="text-caption">Items</dt>
+                  <dd class="text-body font-medium">{{ selectedDelivery.line_count }} item(s)</dd>
+                </div>
+                <div v-if="selectedDelivery.invoice_no">
+                  <dt class="text-caption">Invoice No</dt>
+                  <dd class="text-body font-medium">{{ selectedDelivery.invoice_no }}</dd>
+                </div>
+                <div v-if="selectedDelivery.has_variance">
+                  <dt class="text-caption">Status</dt>
+                  <dd>
+                    <UBadge color="warning" variant="subtle">Has Price Variance</UBadge>
+                  </dd>
+                </div>
+              </div>
+
+              <!-- Delivery Items Section -->
+              <div
+                v-if="selectedDelivery.lines && selectedDelivery.lines.length > 0"
+                class="mt-4 pt-4 border-t border-[var(--ui-border)]"
+              >
+                <div class="flex items-center gap-2 mb-3">
+                  <UIcon name="i-lucide-package" class="w-4 h-4 text-[var(--ui-text-muted)]" />
+                  <h4 class="text-sm font-medium">Delivery Items</h4>
+                </div>
+                <div class="max-h-48 overflow-y-auto">
+                  <table class="min-w-full text-sm">
+                    <thead class="sticky top-0 bg-[var(--ui-bg-muted)]">
+                      <tr>
+                        <th class="py-1.5 pr-3 text-left text-caption font-medium">Item</th>
+                        <th class="py-1.5 px-3 text-right text-caption font-medium">Qty</th>
+                        <th class="py-1.5 px-3 text-right text-caption font-medium">Unit Price</th>
+                        <th class="py-1.5 pl-3 text-right text-caption font-medium">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[var(--ui-border-muted)]">
+                      <tr v-for="line in selectedDelivery.lines" :key="line.id">
+                        <td class="py-1.5 pr-3">
+                          <span class="font-medium">{{ line.item.name }}</span>
+                          <span class="text-caption ml-1">({{ line.item.code }})</span>
+                        </td>
+                        <td class="py-1.5 px-3 text-right">
+                          {{ line.quantity }} {{ line.item.unit }}
+                        </td>
+                        <td class="py-1.5 px-3 text-right">
+                          {{ formatCurrency(line.unit_price) }}
+                        </td>
+                        <td class="py-1.5 pl-3 text-right font-medium">
+                          {{ formatCurrency(line.line_value) }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </UCard>
           </div>
 
           <!-- Reason -->
@@ -390,7 +639,15 @@ onMounted(async () => {
       <!-- NCR Items Card -->
       <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold">NCR Items</h2>
+          <div>
+            <h2 class="text-lg font-semibold">NCR Items</h2>
+            <p v-if="isItemsFiltered" class="text-caption flex items-center gap-1 mt-1">
+              <UIcon name="i-lucide-filter" class="w-3 h-3" />
+              Showing only items from selected delivery ({{ filteredItems.length }} item{{
+                filteredItems.length !== 1 ? "s" : ""
+              }})
+            </p>
+          </div>
           <UButton
             icon="i-lucide-plus"
             color="primary"
@@ -421,15 +678,15 @@ onMounted(async () => {
                   <!-- Item Selection -->
                   <td class="px-3 sm:px-4 py-3">
                     <USelectMenu
-                      v-model="line.item_id"
-                      :items="items"
+                      :model-value="line.item_id"
+                      :items="filteredItems"
                       label-key="name"
                       value-key="id"
                       placeholder="Select item"
                       searchable
                       size="lg"
                       class="min-w-[200px]"
-                      @update:model-value="updateLineValue(line)"
+                      @update:model-value="(val: string) => onItemSelected(line, val)"
                     />
                   </td>
 
@@ -449,16 +706,29 @@ onMounted(async () => {
 
                   <!-- Unit Value -->
                   <td class="px-3 sm:px-4 py-3">
-                    <UInput
-                      v-model="line.unit_value"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      size="lg"
-                      class="w-28"
-                      @update:model-value="updateLineValue(line)"
-                    />
+                    <div class="relative">
+                      <UInput
+                        v-model="line.unit_value"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        size="lg"
+                        class="w-28"
+                        :disabled="line.is_auto_filled"
+                        @update:model-value="updateLineValue(line)"
+                      />
+                      <UTooltip
+                        v-if="line.is_auto_filled"
+                        text="Auto-filled from delivery"
+                        :popper="{ placement: 'top' }"
+                      >
+                        <UIcon
+                          name="i-lucide-lock"
+                          class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ui-text-muted)]"
+                        />
+                      </UTooltip>
+                    </div>
                   </td>
 
                   <!-- Line Value -->

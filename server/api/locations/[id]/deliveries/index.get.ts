@@ -100,6 +100,7 @@ export default defineEventHandler(async (event) => {
     const page = Math.max(1, parseInt(query.page as string) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(query.limit as string) || 20));
     const skip = (page - 1) * limit;
+    const includeLines = query.includeLines === "true";
 
     // Build where clause
     const where: Prisma.DeliveryWhereInput = {
@@ -149,7 +150,7 @@ export default defineEventHandler(async (event) => {
             name: true,
           },
         },
-        poster: {
+        creator: {
           select: {
             id: true,
             username: true,
@@ -168,6 +169,24 @@ export default defineEventHandler(async (event) => {
             ncrs: true,
           },
         },
+        ...(includeLines && {
+          delivery_lines: {
+            select: {
+              id: true,
+              quantity: true,
+              unit_price: true,
+              line_value: true,
+              item: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  unit: true,
+                },
+              },
+            },
+          },
+        }),
       },
     });
 
@@ -180,11 +199,30 @@ export default defineEventHandler(async (event) => {
         total_amount: d.total_amount,
         has_variance: d.has_variance,
         supplier: d.supplier,
-        posted_by: d.poster,
+        posted_by: d.creator,
         period: d.period,
         line_count: d._count.delivery_lines,
         ncr_count: d._count.ncrs,
         posted_at: d.posted_at,
+        // Include delivery lines if requested
+        ...(includeLines &&
+          "delivery_lines" in d && {
+            lines: (
+              d.delivery_lines as unknown as Array<{
+                id: string;
+                quantity: unknown;
+                unit_price: unknown;
+                line_value: unknown;
+                item: { id: string; code: string; name: string; unit: string };
+              }>
+            ).map((line) => ({
+              id: line.id,
+              quantity: Number(line.quantity),
+              unit_price: Number(line.unit_price),
+              line_value: Number(line.line_value),
+              item: line.item,
+            })),
+          }),
       })),
       pagination: {
         page,
