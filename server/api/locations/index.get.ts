@@ -7,10 +7,11 @@
  * - type: Filter by location type (KITCHEN, STORE, CENTRAL, WAREHOUSE)
  * - is_active: Filter by active status (true/false)
  * - search: Search by name or code
+ * - include_all: If true, returns all locations regardless of user role (for transfer destinations)
  *
  * Permissions:
  * - ADMIN/SUPERVISOR: Can view all locations
- * - OPERATOR: Can only view assigned locations
+ * - OPERATOR: Can only view assigned locations (unless include_all=true for transfer destinations)
  */
 
 import prisma from "../../utils/prisma";
@@ -36,6 +37,10 @@ const querySchema = z.object({
     .transform((val) => val === "true")
     .optional(),
   search: z.string().optional(),
+  include_all: z
+    .string()
+    .transform((val) => val === "true")
+    .optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -55,7 +60,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { type, is_active, search } = querySchema.parse(query);
+    const { type, is_active, search, include_all } = querySchema.parse(query);
 
     // Build where clause based on filters
     const where: Record<string, unknown> = {};
@@ -78,8 +83,8 @@ export default defineEventHandler(async (event) => {
       ];
     }
 
-    // ADMIN and SUPERVISOR can view all locations
-    if (user.role === "ADMIN" || user.role === "SUPERVISOR") {
+    // ADMIN, SUPERVISOR, or when include_all is true (for transfer destinations) can view all locations
+    if (user.role === "ADMIN" || user.role === "SUPERVISOR" || include_all) {
       const locations = await prisma.location.findMany({
         where,
         include: {

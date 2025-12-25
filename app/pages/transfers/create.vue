@@ -17,7 +17,8 @@ const { handleError, handleSuccess } = useErrorHandler();
 
 // State
 const loading = ref(false);
-const locations = ref<any[]>([]);
+const locations = ref<any[]>([]); // User's accessible locations (for "From" dropdown)
+const allLocations = ref<any[]>([]); // All active locations (for "To" dropdown)
 const items = ref<any[]>([]);
 const stockLevels = ref<Record<string, { on_hand: number; wac: number }>>({}); // Map of itemId -> stock info
 
@@ -111,9 +112,9 @@ const isFormValid = computed(() => {
   );
 });
 
-// Get available "to" locations (exclude from location)
+// Get available "to" locations (exclude from location) - uses ALL locations
 const availableToLocations = computed(() => {
-  return locations.value.filter((loc) => loc.id !== formData.value.from_location_id);
+  return allLocations.value.filter((loc) => loc.id !== formData.value.from_location_id);
 });
 
 // Get item by ID
@@ -121,13 +122,28 @@ const getItemById = (itemId: string) => {
   return items.value.find((item) => item.id === itemId);
 };
 
-// Fetch user's accessible locations
+// Fetch user's accessible locations (for "From" dropdown)
 const fetchLocations = async () => {
   try {
     const data: any = await $fetch("/api/user/locations");
     locations.value = data?.locations || [];
   } catch (error: any) {
     handleError(error, { context: "fetching locations" });
+  }
+};
+
+// Fetch all active locations (for "To" dropdown - transfer destinations)
+const fetchAllLocations = async () => {
+  try {
+    const data: any = await $fetch("/api/locations", {
+      query: {
+        is_active: "true",
+        include_all: "true",
+      },
+    });
+    allLocations.value = data?.locations || [];
+  } catch (error: any) {
+    handleError(error, { context: "fetching transfer destinations" });
   }
 };
 
@@ -237,8 +253,8 @@ onMounted(async () => {
     return;
   }
 
-  // Fetch required data
-  await fetchLocations();
+  // Fetch required data (user's locations for "From" and all locations for "To")
+  await Promise.all([fetchLocations(), fetchAllLocations()]);
 
   // If default location is set, fetch items for it
   if (formData.value.from_location_id) {
