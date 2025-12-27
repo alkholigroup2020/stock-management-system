@@ -9,6 +9,9 @@ const route = useRoute();
 const { user, isAuthenticated } = useAuth();
 const permissions = usePermissions();
 
+// Get loading state for overlay visibility
+const { isLoading } = useLoadingIndicator();
+
 // Navigation items configuration
 const mainMenuItems = computed<NavigationMenuItem[]>(() => {
   const items: NavigationMenuItem[] = [
@@ -356,7 +359,10 @@ const handleLogout = async () => {
 
         <!-- Body content -->
         <template #body>
-          <div class="relative h-full">
+          <div
+            class="relative h-full"
+            :class="{ 'overflow-hidden': isLoading }"
+          >
             <!-- Page navigation loading overlay -->
             <LayoutPageLoadingOverlay />
 
