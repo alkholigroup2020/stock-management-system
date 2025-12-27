@@ -260,39 +260,6 @@ const handleLogout = async () => {
           </nav>
         </template>
 
-        <!-- User Profile Footer -->
-        <template #footer="{ collapsed }">
-          <UDropdownMenu
-            v-if="isAuthenticated && user"
-            :items="[
-              [
-                {
-                  label: 'Profile',
-                  icon: 'i-heroicons-user',
-                  onSelect: () => navigateTo('/profile'),
-                },
-              ],
-              [
-                {
-                  label: 'Logout',
-                  icon: 'i-heroicons-arrow-right-on-rectangle',
-                  onSelect: handleLogout,
-                },
-              ],
-            ]"
-            :content="{ side: 'top', align: 'start' }"
-          >
-            <UButton
-              :avatar="{ alt: user.full_name || user.email }"
-              :label="collapsed ? undefined : user.full_name || 'User'"
-              :aria-label="`User menu for ${user.full_name || user.email}`"
-              color="neutral"
-              variant="ghost"
-              class="w-full cursor-pointer"
-              :block="collapsed"
-            />
-          </UDropdownMenu>
-        </template>
       </UDashboardSidebar>
 
       <!-- MAIN CONTENT PANEL -->
@@ -303,11 +270,10 @@ const handleLogout = async () => {
             aria-label="Page header"
             class="flex items-center justify-between w-full h-12 px-4 sm:px-6 border-b border-default bg-elevated"
           >
-            <!-- Left: Sidebar toggle (mobile) / collapse (desktop) and title -->
+            <!-- Left: Sidebar toggle (mobile) / collapse (desktop) -->
             <div class="flex items-center gap-4">
               <UDashboardSidebarToggle class="lg:hidden" />
               <UDashboardSidebarCollapse size="md" class="hidden lg:flex" />
-              <h1 class="text-default">{{ pageTitle }}</h1>
             </div>
 
             <!-- Center section: Location and Period indicators -->

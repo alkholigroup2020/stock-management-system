@@ -46,7 +46,6 @@ const locationItems = computed(() => {
   return [
     locationStore.userLocations.map((location) => ({
       label: location.name,
-      description: location.code,
       icon: getLocationIcon(location.type),
       iconClass: getLocationIconClass(location.type),
       active: location.id === locationStore.activeLocationId,
@@ -143,12 +142,6 @@ const currentLocationIcon = computed(() => {
           />
           <div class="flex-1 min-w-0">
             <p class="font-medium text-label truncate">{{ item.label }}</p>
-            <p
-              v-if="(item as Record<string, unknown>).description"
-              class="text-caption truncate"
-            >
-              {{ (item as Record<string, unknown>).description }}
-            </p>
           </div>
           <UIcon
             v-if="(item as Record<string, unknown>).active"
