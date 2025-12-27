@@ -62,22 +62,37 @@ const originalData = ref<{
 } | null>(null);
 
 // Form schema
-const schema = z.object({
-  email: z.string().email("Invalid email address"),
-  full_name: z.string().min(1, "Full name is required").max(100),
-  role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
-  is_active: z.boolean(),
-  default_location_id: z.string().uuid("Invalid location").nullable().optional(),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      "Password must contain uppercase, lowercase, number, and special character (@$!%*?&)"
-    )
-    .optional()
-    .or(z.literal("")),
-});
+const schema = z
+  .object({
+    email: z.string().email("Invalid email address"),
+    full_name: z.string().min(1, "Full name is required").max(100),
+    role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
+    is_active: z.boolean(),
+    default_location_id: z.string().uuid("Invalid location").nullable().optional(),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+        "Password must contain uppercase, lowercase, number, and special character (@$!%*?&)"
+      )
+      .optional()
+      .or(z.literal("")),
+    confirmPassword: z.string().optional().or(z.literal("")),
+  })
+  .refine(
+    (data) => {
+      // Only validate if password is provided
+      if (data.password && data.password.length > 0) {
+        return data.password === data.confirmPassword;
+      }
+      return true;
+    },
+    {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    }
+  );
 
 type Schema = z.output<typeof schema>;
 
@@ -89,6 +104,7 @@ const formData = reactive({
   is_active: true,
   default_location_id: null as string | null,
   password: "",
+  confirmPassword: "",
 });
 
 // Role options - with location access info
@@ -636,13 +652,12 @@ useHead({
             </div>
           </template>
 
-          <!-- Password Field at 50% width on large screens -->
-          <div class="space-y-6">
+          <!-- Password Fields - Grid layout on large screens -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <UFormField
               label="New Password"
               name="password"
               help="Leave blank to keep current password"
-              class="w-full lg:w-1/2"
             >
               <UInput
                 v-model="formData.password"
@@ -651,6 +666,22 @@ useHead({
                 icon="i-lucide-lock"
                 size="lg"
                 :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField
+              label="Confirm Password"
+              name="confirmPassword"
+              help="Re-enter the new password"
+            >
+              <UInput
+                v-model="formData.confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                icon="i-lucide-lock-keyhole"
+                size="lg"
+                :disabled="submitting || !formData.password"
                 class="w-full"
               />
             </UFormField>
