@@ -2,7 +2,8 @@
  * Auth Initialization Plugin
  *
  * This plugin runs on client-side after Pinia is initialized.
- * It fetches the user session on app startup to restore authentication state.
+ * It coordinates the initialization of auth, location, and period data
+ * using the useAppInit composable to prevent race conditions.
  *
  * Why a plugin instead of middleware?
  * - Plugins run after Pinia is ready, avoiding "getActivePinia()" errors
@@ -10,15 +11,15 @@
  * - Middleware can then just check auth state without fetching
  */
 export default defineNuxtPlugin(async () => {
-  const auth = useAuth();
+  const appInit = useAppInit();
 
-  // Fetch the current session on app initialization
-  // This will populate the auth store with the user data if they have a valid session
+  // Initialize the application (auth + location + period)
+  // This coordinates all essential data loading in the correct order
   try {
-    await auth.fetchSession();
+    await appInit.initialize();
   } catch (error) {
-    // Silently fail - user is simply not authenticated
-    // The middleware will redirect to login if needed
-    console.warn("Failed to fetch session on app init:", error);
+    // Error is handled within useAppInit
+    // The app will still render and can show appropriate error states
+    console.warn("App initialization completed with errors:", error);
   }
 });

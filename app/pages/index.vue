@@ -43,7 +43,9 @@ interface DashboardData {
 
 // Composables
 const locationStore = useLocationStore();
+const periodStore = usePeriodStore();
 const router = useRouter();
+const appInit = useAppInit();
 
 // Page metadata
 definePageMeta({
@@ -61,6 +63,11 @@ const dashboardData = ref<DashboardData | null>(null);
 
 // Fetch dashboard data
 const fetchDashboardData = async () => {
+  // Don't fetch until app is initialized and location is available
+  if (!appInit.isReady.value) {
+    return;
+  }
+
   if (!locationStore.activeLocation) {
     error.value = "Please select a location";
     loading.value = false;
@@ -75,25 +82,26 @@ const fetchDashboardData = async () => {
       `/api/locations/${locationStore.activeLocation.id}/dashboard`
     );
     dashboardData.value = data;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Failed to fetch dashboard data:", err);
-    error.value = err?.data?.message || "Failed to load dashboard data";
+    const fetchError = err as { data?: { message?: string } };
+    error.value = fetchError?.data?.message || "Failed to load dashboard data";
   } finally {
     loading.value = false;
   }
 };
 
-// Fetch data on mount
-onMounted(() => {
-  fetchDashboardData();
-});
-
-// Watch for location changes
+// Watch for app initialization and location changes
+// Using immediate: true means it will run as soon as the condition is met
 watch(
-  () => locationStore.activeLocation?.id,
-  () => {
-    fetchDashboardData();
-  }
+  [() => appInit.isReady.value, () => locationStore.activeLocation?.id],
+  ([isReady, locationId], [wasReady]) => {
+    // Only fetch when app becomes ready or when location changes after ready
+    if (isReady && (locationId || !wasReady)) {
+      fetchDashboardData();
+    }
+  },
+  { immediate: true }
 );
 
 // Computed: Metric cards data
@@ -226,7 +234,7 @@ const handleRetry = () => {
 
     <!-- No Active Period Warning -->
     <UAlert
-      v-else-if="!dashboardData?.period"
+      v-else-if="!periodStore.hasPeriod"
       icon="i-lucide-alert-triangle"
       color="warning"
       variant="subtle"

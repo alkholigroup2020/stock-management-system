@@ -3,10 +3,8 @@ import { usePeriodStore } from "~/stores/period";
 
 const periodStore = usePeriodStore();
 
-// Fetch current period on mount
-onMounted(async () => {
-  await periodStore.fetchCurrentPeriod();
-});
+// Note: Period data is now fetched centrally by useAppInit composable
+// No need to fetch here - data will be available when app is ready
 
 // Compute badge color based on period status
 const badgeColor = computed(() => {

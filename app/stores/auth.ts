@@ -116,13 +116,37 @@ export const useAuthStore = defineStore("auth", {
 
         if (response.success && response.user) {
           this.user = response.user as SessionUser;
+
+          // After successful login, fetch location and period data
+          // This ensures the app has the necessary context before rendering pages
+          const locationStore = useLocationStore();
+          const periodStore = usePeriodStore();
+
+          // Signal that we're loading post-login data (shows loading screen)
+          const appInit = useAppInit();
+          appInit.setLoadingForPostLogin();
+
+          try {
+            await Promise.all([
+              locationStore.fetchUserLocations(true), // Force refresh
+              periodStore.fetchCurrentPeriod(true), // Force refresh
+            ]);
+          } catch (err) {
+            // Log but don't fail login - the app can show warnings for missing data
+            console.error("Error fetching post-login data:", err);
+          } finally {
+            // Always signal that post-login data loading is complete
+            appInit.setReadyAfterPostLogin();
+          }
+
           return { success: true };
         }
 
         this.error = response.message || "Login failed";
         return { success: false, message: this.error };
-      } catch (error: any) {
-        const errorMessage = error?.data?.message || error?.message || "Login failed";
+      } catch (error: unknown) {
+        const fetchError = error as { data?: { message?: string }; message?: string };
+        const errorMessage = fetchError?.data?.message || fetchError?.message || "Login failed";
         this.error = errorMessage;
         return { success: false, message: errorMessage };
       } finally {
@@ -152,13 +176,19 @@ export const useAuthStore = defineStore("auth", {
           locationStore.reset();
           periodStore.reset();
 
+          // Reinitialize app state - this will detect user is not authenticated
+          // and mark the app as ready so the login page can render
+          const appInit = useAppInit();
+          await appInit.reinitialize();
+
           return { success: true };
         }
 
         this.error = response.message || "Logout failed";
         return { success: false, message: this.error };
-      } catch (error: any) {
-        const errorMessage = error?.data?.message || error?.message || "Logout failed";
+      } catch (error: unknown) {
+        const fetchError = error as { data?: { message?: string }; message?: string };
+        const errorMessage = fetchError?.data?.message || fetchError?.message || "Logout failed";
         this.error = errorMessage;
         return { success: false, message: errorMessage };
       } finally {
@@ -189,8 +219,9 @@ export const useAuthStore = defineStore("auth", {
 
         this.error = "Failed to fetch session";
         return { success: false, authenticated: false };
-      } catch (error: any) {
-        const errorMessage = error?.data?.message || error?.message || "Failed to fetch session";
+      } catch (error: unknown) {
+        const fetchError = error as { data?: { message?: string }; message?: string };
+        const errorMessage = fetchError?.data?.message || fetchError?.message || "Failed to fetch session";
         this.error = errorMessage;
         this.user = null;
         return { success: false, authenticated: false };

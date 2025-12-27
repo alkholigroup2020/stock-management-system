@@ -4,12 +4,8 @@ import { useLocationStore } from "~/stores/location";
 const locationStore = useLocationStore();
 const toast = useAppToast();
 
-// Fetch locations on mount
-onMounted(async () => {
-  if (!locationStore.userLocations.length && !locationStore.loading) {
-    await locationStore.fetchUserLocations();
-  }
-});
+// Note: Location data is now fetched centrally by useAppInit composable
+// No need to fetch here - data will be available when app is ready
 
 // Helper function to get location-specific icon
 const getLocationIcon = (type: string): string => {

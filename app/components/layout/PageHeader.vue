@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useLocationStore } from "~/stores/location";
+import { usePeriodStore } from "~/stores/period";
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -14,10 +17,19 @@ const props = withDefaults(defineProps<Props>(), {
   locationScope: "current",
 });
 
-// Get current location and period from auth store or route context
-// For now, we'll use placeholder composables - these will be implemented with auth
-const currentLocation = ref("Main Kitchen"); // TODO: Replace with actual location from auth/store
-const currentPeriod = ref("November 2025"); // TODO: Replace with actual period from store
+// Get current location and period from stores
+const locationStore = useLocationStore();
+const periodStore = usePeriodStore();
+
+// Current location name from store
+const currentLocation = computed(() => {
+  return locationStore.activeLocation?.name || null;
+});
+
+// Current period name from store
+const currentPeriod = computed(() => {
+  return periodStore.periodName;
+});
 
 const locationText = computed(() => {
   if (!props.showLocation || props.locationScope === "none") {
