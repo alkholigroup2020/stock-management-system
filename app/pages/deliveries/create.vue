@@ -102,7 +102,7 @@
           <div>
             <label class="form-label mb-2 block">
               Invoice Number
-              <span class="text-xs text-[var(--ui-text-muted)] ml-1">(required for posting)</span>
+              <span class="text-[var(--ui-error)]">*</span>
             </label>
             <UInput
               v-model="formData.invoice_no"
@@ -188,8 +188,22 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-[var(--ui-border)]">
+              <!-- Loading State -->
+              <tr v-if="loadingInitialData">
+                <td colspan="7" class="px-4 py-8">
+                  <div class="flex flex-col items-center justify-center gap-3">
+                    <UIcon
+                      name="i-lucide-loader-2"
+                      class="w-8 h-8 text-primary animate-spin"
+                    />
+                    <p class="text-sm text-[var(--ui-text-muted)]">Loading items...</p>
+                  </div>
+                </td>
+              </tr>
+
               <tr
                 v-for="line in lines"
+                v-else
                 :key="line.id"
                 :class="{
                   'bg-amber-50 dark:bg-amber-950/20': line.has_variance,
@@ -285,7 +299,7 @@
               </tr>
 
               <!-- Empty State -->
-              <tr v-if="lines.length === 0">
+              <tr v-if="!loadingInitialData && lines.length === 0">
                 <td colspan="7" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
                   No items added yet. Click "Add Item" to start.
                 </td>
@@ -391,6 +405,7 @@ const { handleError, handleSuccess, handleWarning } = useErrorHandler();
 const savingDraft = ref(false);
 const posting = ref(false);
 const showPostConfirmation = ref(false);
+const loadingInitialData = ref(true);
 
 // Helper function to get location-specific icon
 const getLocationIcon = (type: string): string => {
@@ -708,7 +723,11 @@ onMounted(async () => {
   }
 
   // Fetch required data
-  await Promise.all([fetchSuppliers(), fetchItems(), fetchPeriodPrices()]);
+  try {
+    await Promise.all([fetchSuppliers(), fetchItems(), fetchPeriodPrices()]);
+  } finally {
+    loadingInitialData.value = false;
+  }
 
   // Add initial empty line
   addLine();
