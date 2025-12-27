@@ -7,19 +7,19 @@ html {
 }
 
 @theme {
-  /* Navy Blue - Primary Brand Color (#000046) */
-  /* Revised palette with better blue tones for dark mode readability */
-  --color-navy-50: #eef2ff;
-  --color-navy-100: #d8e0ff;
-  --color-navy-200: #a8b8ff;
-  --color-navy-300: #7890eb;
-  --color-navy-400: #4a64c9;
-  --color-navy-500: #000046;
-  --color-navy-600: #00003f;
-  --color-navy-700: #000037;
-  --color-navy-800: #00002f;
-  --color-navy-900: #000020;
-  --color-navy-950: #0a0a1a;
+  /* Navy Blue - Primary Brand Color */
+  /* True navy blue palette with consistent blue tones throughout */
+  --color-navy-50: #e8f0fc;
+  --color-navy-100: #c9dbf7;
+  --color-navy-200: #9bbcf0;
+  --color-navy-300: #6a9be6;
+  --color-navy-400: #3d7dd9;
+  --color-navy-500: #1e4d8c;
+  --color-navy-600: #173d70;
+  --color-navy-700: #122f56;
+  --color-navy-800: #0d2240;
+  --color-navy-900: #08162a;
+  --color-navy-950: #040b16;
 
   /* Emerald Green - Secondary/Success Color (#45cf7b) */
   --color-emerald-50: #edfcf4;
@@ -108,27 +108,27 @@ html {
 :root {
   /* ===== Primary & Secondary Brand Colors ===== */
   --ui-primary: var(--color-navy-500);
-  --ui-secondary: var(--color-emerald-600);
+  --ui-secondary: var(--color-emerald-500);
 
   /* ===== Background Tokens ===== */
-  /* Improved contrast: slightly darker page background for better card visibility */
-  --ui-bg: #f4f5f7; /* Warmer gray for page background - better than zinc-50 */
+  /* Fresh, vibrant backgrounds with subtle blue undertone */
+  --ui-bg: #f0f4f8; /* Cool blue-gray for freshness and vibrancy */
   --ui-bg-elevated: #ffffff; /* Cards, modals, elevated surfaces */
-  --ui-bg-muted: var(--color-zinc-100); /* Subtle backgrounds, disabled states */
+  --ui-bg-muted: #e8ecf1; /* Subtle backgrounds with blue tint */
   --ui-bg-accented: var(--color-navy-50); /* Highlighted sections */
-  --ui-bg-inverted: var(--color-zinc-900); /* Dark backgrounds in light mode */
+  --ui-bg-inverted: var(--color-navy-800); /* Dark backgrounds in light mode */
 
   /* ===== Text Tokens ===== */
-  --ui-text: var(--color-zinc-800); /* Primary text - slightly softer than 900 */
-  --ui-text-muted: var(--color-zinc-500); /* Secondary/helper text */
+  --ui-text: var(--color-zinc-900); /* Primary text - strong contrast */
+  --ui-text-muted: var(--color-zinc-600); /* Secondary/helper text */
   --ui-text-dimmed: var(--color-zinc-400); /* Disabled/inactive text */
   --ui-text-highlighted: var(--color-navy-600); /* Important/emphasized text */
   --ui-text-inverted: #ffffff; /* Text on dark backgrounds */
 
   /* ===== Border Tokens ===== */
-  /* Stronger borders for better visibility */
-  --ui-border: var(--color-zinc-400); /* Default borders (cards, inputs) */
-  --ui-border-muted: var(--color-zinc-300); /* Subtle dividers */
+  /* Clean borders with subtle blue tint */
+  --ui-border: #c5cdd8; /* Soft blue-gray borders */
+  --ui-border-muted: #dde3eb; /* Subtle dividers */
   --ui-border-accented: var(--color-navy-500); /* Emphasized borders */
   --ui-border-inverted: var(--color-zinc-700); /* Borders on dark backgrounds */
 
@@ -136,13 +136,13 @@ html {
   --ui-primary-hover: var(--color-navy-600); /* Primary hover state */
   --ui-primary-active: var(--color-navy-700); /* Primary active/pressed state */
   --ui-primary-contrast: #ffffff; /* Text on primary backgrounds */
-  --ui-bg-hover: var(--color-zinc-100); /* Background hover state */
-  --ui-bg-active: var(--color-zinc-200); /* Background active state */
+  --ui-bg-hover: #e4eaf1; /* Background hover state with blue tint */
+  --ui-bg-active: #d8e0ea; /* Background active state */
 
   /* ===== Focus & Accessibility ===== */
-  --ui-ring: var(--color-navy-500); /* Focus ring color */
-  --ui-focus: var(--color-navy-500); /* Focus indicator */
-  --ui-shadow: rgba(0, 0, 70, 0.08); /* Shadow color - slight navy tint */
+  --ui-ring: var(--color-navy-400); /* Focus ring color - more visible blue */
+  --ui-focus: var(--color-navy-400); /* Focus indicator */
+  --ui-shadow: rgba(30, 77, 140, 0.12); /* Shadow color - navy tint */
 
   /* ===== Feedback Tokens (Standard) ===== */
   --ui-success: var(--color-emerald-600); /* Success messages */
@@ -180,43 +180,43 @@ html {
    ============================================ */
 .dark {
   /* ===== Primary & Secondary Brand Colors ===== */
-  /* Using updated navy palette with proper blue tones */
-  --ui-primary: var(--color-navy-300);
+  /* True blue primary that's vibrant and clearly blue */
+  --ui-primary: var(--color-navy-400);
   --ui-secondary: var(--color-emerald-400);
 
   /* ===== Background Tokens ===== */
-  /* Richer dark backgrounds with subtle warmth */
-  --ui-bg: #0f1117; /* Slightly warmer than pure zinc-950 */
-  --ui-bg-elevated: #1a1d24; /* Better contrast with page background */
-  --ui-bg-muted: #252830; /* For subtle backgrounds */
-  --ui-bg-accented: var(--color-navy-950);
-  --ui-bg-inverted: var(--color-zinc-50);
+  /* Rich dark backgrounds with subtle blue undertone for cohesion */
+  --ui-bg: #0c1220; /* Deep navy-tinted dark for consistency with brand */
+  --ui-bg-elevated: #151c2c; /* Card background with better contrast */
+  --ui-bg-muted: #1e2738; /* Subtle backgrounds with blue tint */
+  --ui-bg-accented: var(--color-navy-900);
+  --ui-bg-inverted: var(--color-zinc-100);
 
   /* ===== Text Tokens ===== */
-  --ui-text: #e8eaed; /* Softer white for less eye strain */
-  --ui-text-muted: #9ca3af; /* Better readable muted text */
-  --ui-text-dimmed: var(--color-zinc-600);
-  --ui-text-highlighted: var(--color-navy-200);
+  --ui-text: #eef1f5; /* Bright white-blue for clarity */
+  --ui-text-muted: #a0aec0; /* Blue-tinted muted text */
+  --ui-text-dimmed: #64748b; /* Softer dimmed text */
+  --ui-text-highlighted: var(--color-navy-300);
   --ui-text-inverted: var(--color-zinc-900);
 
   /* ===== Border Tokens ===== */
-  /* More visible borders in dark mode */
-  --ui-border: #454a54; /* More visible border */
-  --ui-border-muted: #363b44;
+  /* Blue-tinted borders for visual cohesion */
+  --ui-border: #2d3a4f; /* Blue-tinted border */
+  --ui-border-muted: #232d3f; /* Subtle blue-tinted divider */
   --ui-border-accented: var(--color-navy-400);
   --ui-border-inverted: var(--color-zinc-300);
 
   /* ===== Interactive State Tokens ===== */
-  --ui-primary-hover: var(--color-navy-200);
-  --ui-primary-active: var(--color-navy-100);
-  --ui-primary-contrast: #0f1117;
-  --ui-bg-hover: #252830;
-  --ui-bg-active: #2d3139;
+  --ui-primary-hover: var(--color-navy-300);
+  --ui-primary-active: var(--color-navy-200);
+  --ui-primary-contrast: #0c1220;
+  --ui-bg-hover: #1e2738;
+  --ui-bg-active: #283347;
 
   /* ===== Focus & Accessibility ===== */
   --ui-ring: var(--color-navy-400);
   --ui-focus: var(--color-navy-400);
-  --ui-shadow: rgba(0, 0, 0, 0.5);
+  --ui-shadow: rgba(0, 0, 0, 0.6);
 
   /* ===== Feedback Tokens (Dark Mode Adjustments) ===== */
   --ui-success: var(--color-emerald-400);
@@ -228,15 +228,15 @@ html {
   --ui-stock-healthy: var(--color-emerald-400);
   --ui-stock-low: var(--color-amber-400);
   --ui-stock-critical: var(--color-red-400);
-  --ui-stock-pending: var(--color-navy-300);
+  --ui-stock-pending: var(--color-navy-400);
 
   --ui-status-draft: var(--color-zinc-400);
-  --ui-status-pending: var(--color-navy-300);
+  --ui-status-pending: var(--color-navy-400);
   --ui-status-approved: var(--color-emerald-400);
   --ui-status-rejected: var(--color-red-400);
 
   --ui-period-open: var(--color-emerald-400);
-  --ui-period-ready: var(--color-navy-300);
+  --ui-period-ready: var(--color-navy-400);
   --ui-period-closed: var(--color-zinc-400);
 
   --ui-variance-detected: var(--color-amber-400);
@@ -346,17 +346,17 @@ html {
   .card-elevated {
     @apply bg-elevated border border-default;
     @apply rounded-xl;
-    /* Enhanced shadows for better elevation effect */
+    /* Enhanced shadows with navy-blue tint for cohesion */
     box-shadow:
-      0 1px 3px rgba(0, 0, 70, 0.08),
-      0 4px 12px rgba(0, 0, 70, 0.06);
+      0 1px 3px rgba(30, 77, 140, 0.1),
+      0 4px 12px rgba(30, 77, 140, 0.08);
   }
 
   .dark .card-elevated {
     box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.4),
-      0 4px 12px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 1px 3px rgba(0, 0, 0, 0.5),
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(100, 150, 220, 0.05);
   }
 
   .card-muted {
