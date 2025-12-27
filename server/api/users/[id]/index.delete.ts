@@ -127,6 +127,24 @@ export default defineEventHandler(async (event) => {
       throw error;
     }
 
+    // Handle Prisma foreign key constraint errors
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2003"
+    ) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: "Conflict",
+        data: {
+          code: "USER_HAS_REFERENCES",
+          message:
+            "Cannot delete this user because they have created transactions (deliveries, issues, transfers, etc.). Consider deactivating the user instead.",
+        },
+      });
+    }
+
     // Handle unexpected errors
     console.error("Delete user error:", error);
     throw createError({

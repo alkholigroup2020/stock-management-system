@@ -533,15 +533,23 @@ const deleteUser = async () => {
     await fetchUsers();
   } catch (err: unknown) {
     console.error("Error deleting user:", err);
-    const message =
-      err &&
-      typeof err === "object" &&
-      "data" in err &&
-      err.data &&
-      typeof err.data === "object" &&
-      "message" in err.data
-        ? String(err.data.message)
-        : "Failed to delete user";
+
+    // Extract error message from nested structure
+    let message = "Failed to delete user";
+    if (err && typeof err === "object" && "data" in err) {
+      const errData = err.data as Record<string, unknown>;
+      // Check for nested data.message (from createError's data field)
+      if (
+        errData.data &&
+        typeof errData.data === "object" &&
+        "message" in (errData.data as Record<string, unknown>)
+      ) {
+        message = String((errData.data as Record<string, unknown>).message);
+      } else if ("message" in errData) {
+        message = String(errData.message);
+      }
+    }
+
     toast.error("Error", { description: message });
 
     // Close modal and refresh list even on error
