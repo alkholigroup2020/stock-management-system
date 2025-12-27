@@ -97,12 +97,6 @@ interface ReconciliationData {
   is_auto_calculated: boolean;
 }
 
-interface Location {
-  id: string;
-  code: string;
-  name: string;
-}
-
 // State
 const loading = ref(false);
 const saving = ref(false);
@@ -117,37 +111,14 @@ const adjustments = ref({
   adjustments: 0,
 });
 
-// For location selector (supervisor/admin)
-const selectedLocationId = ref<string | undefined>(undefined);
-const locations = ref<Location[]>([]);
-const loadingLocations = ref(false);
-
-// Computed
-const activeLocationId = computed(() => {
-  // Supervisor/Admin can select location, otherwise use active location
-  if (isSupervisorOrAdmin.value && selectedLocationId.value) {
-    return selectedLocationId.value;
-  }
-  return locationStore.activeLocationId;
-});
-
-const activeLocation = computed(() => {
-  if (!activeLocationId.value) return null;
-  return locations.value.find((loc) => loc.id === activeLocationId.value) || null;
-});
-
+// Computed - use main navbar location selector via store
+const activeLocationId = computed(() => locationStore.activeLocationId);
+const activeLocation = computed(() => locationStore.activeLocation);
 const currentPeriod = computed(() => periodStore.currentPeriod);
 
 const isSupervisorOrAdmin = computed(() => {
   const role = authStore.user?.role;
   return role === "SUPERVISOR" || role === "ADMIN";
-});
-
-const locationOptions = computed(() => {
-  return locations.value.map((loc) => ({
-    label: `${loc.code} - ${loc.name}`,
-    value: loc.id,
-  }));
 });
 
 // Watch for location or period changes
@@ -163,39 +134,10 @@ onMounted(async () => {
     await periodStore.fetchCurrentPeriod();
   }
 
-  // If supervisor/admin, fetch all locations for selector
-  if (isSupervisorOrAdmin.value) {
-    await fetchLocations();
-  }
-
   if (activeLocationId.value && currentPeriod.value) {
     await fetchReconciliation();
   }
 });
-
-/**
- * Fetch all locations (for supervisor/admin selector)
- */
-async function fetchLocations() {
-  loadingLocations.value = true;
-  try {
-    const response = await $fetch<{ locations: Location[] }>("/api/locations", {
-      method: "GET",
-    });
-    locations.value = response.locations;
-
-    // Set selected location to active location by default
-    if (locationStore.activeLocationId) {
-      selectedLocationId.value = locationStore.activeLocationId;
-    } else if (locations.value.length > 0) {
-      selectedLocationId.value = locations.value[0]!.id;
-    }
-  } catch (err: unknown) {
-    console.error("Error fetching locations:", err);
-  } finally {
-    loadingLocations.value = false;
-  }
-}
 
 /**
  * Fetch reconciliation data for current location and period
@@ -423,26 +365,6 @@ const formattedDateRange = computed(() => {
         <span class="sm:hidden">All</span>
       </UButton>
     </div>
-
-    <!-- Location Selector (Supervisor/Admin only) -->
-    <UCard v-if="isSupervisorOrAdmin && locations.length > 0" class="card-elevated">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <label class="text-sm font-medium text-[var(--ui-text)]">Location:</label>
-        <USelectMenu
-          v-model="selectedLocationId"
-          :items="locationOptions"
-          value-key="value"
-          label-key="label"
-          placeholder="Select location"
-          size="lg"
-          class="w-full sm:w-96"
-        >
-          <template #leading>
-            <UIcon name="i-lucide-map-pin" class="w-5 h-5" />
-          </template>
-        </USelectMenu>
-      </div>
-    </UCard>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
