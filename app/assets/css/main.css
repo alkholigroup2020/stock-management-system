@@ -3,7 +3,7 @@
 
 /* Global font size scale - reduces all text by one step */
 html {
-  font-size: 90%; /* 12.6px base instead of 14px */
+  font-size: 100%;
 }
 
 @theme {
