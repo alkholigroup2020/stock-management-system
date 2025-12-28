@@ -2,9 +2,9 @@
 
 **Unified Design Reference for All UI/UX Decisions**
 
-Version: 2.1
+Version: 2.2
 Last Updated: December 2025
-Status: Updated color system with true navy blue palette and improved light/dark mode vibrancy
+Status: Swapped light theme backgrounds - nav/sidebar/footer use blue-gray, content area uses white
 
 ---
 
@@ -986,8 +986,8 @@ font-family:
 
 | Token              | Light Mode           | Dark Mode            | Usage                                      |
 | ------------------ | -------------------- | -------------------- | ------------------------------------------ |
-| `--ui-bg`          | #f0f4f8 (blue-gray)  | #0c1220 (navy-dark)  | Page background                            |
-| `--ui-bg-elevated` | white (#ffffff)      | #151c2c (navy-card)  | Cards, modals, dialogs, elevated surfaces  |
+| `--ui-bg`          | #ffffff (white)      | #0c1220 (navy-dark)  | Page background, main content area         |
+| `--ui-bg-elevated` | #f0f4f8 (blue-gray)  | #151c2c (navy-card)  | Nav, sidebar, footer, cards, modals, elevated surfaces |
 | `--ui-bg-muted`    | #e8ecf1 (blue-tint)  | #1e2738 (navy-muted) | Subtle backgrounds, disabled input fields  |
 | `--ui-bg-accented` | navy-50 (#e8f0fc)    | navy-900 (#08162a)   | Highlighted sections, featured areas       |
 | `--ui-bg-inverted` | navy-800 (#0d2240)   | zinc-100 (#f4f4f5)   | Dark surfaces in light mode, light in dark |

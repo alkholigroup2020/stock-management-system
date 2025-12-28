@@ -112,8 +112,8 @@ html {
 
   /* ===== Background Tokens ===== */
   /* Fresh, vibrant backgrounds with subtle blue undertone */
-  --ui-bg: #f0f4f8; /* Cool blue-gray for freshness and vibrancy */
-  --ui-bg-elevated: #ffffff; /* Cards, modals, elevated surfaces */
+  --ui-bg: #ffffff; /* Clean white for main content area */
+  --ui-bg-elevated: #f0f4f8; /* Cool blue-gray for nav, sidebar, footer */
   --ui-bg-muted: #e8ecf1; /* Subtle backgrounds with blue tint */
   --ui-bg-accented: var(--color-navy-50); /* Highlighted sections */
   --ui-bg-inverted: var(--color-navy-800); /* Dark backgrounds in light mode */

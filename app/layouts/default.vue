@@ -230,6 +230,7 @@ const handleLogout = async () => {
         resizable
         width="260"
         :toggle="{ color: 'neutral', variant: 'ghost', icon: 'i-heroicons-bars-3' }"
+        class="bg-elevated"
       >
         <!-- Logo Header -->
         <template #header="{ collapsed }">
