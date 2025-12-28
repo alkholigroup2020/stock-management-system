@@ -80,10 +80,20 @@ The loading screen is implemented as a Nuxt plugin with the `00` prefix to ensur
 └─────────────────────────────────────────┘
 ```
 
-- **Background**: Gradient from navy to slate
+- **Theme Detection**: Automatically detects user's theme preference from localStorage or system settings
 - **Logo**: SVG app icon with glow effect
 - **Spinner**: Animated rotating circle in emerald color
 - **Text**: App name and subtitle
+
+**Light Mode Colors:**
+- Background: Light blue-gray gradient (`#f0f4f8` → `#ffffff` → `#f0f4f8`)
+- Title text: Dark zinc (`#18181b`)
+- Subtitle text: Muted zinc (`#52525b`)
+
+**Dark Mode Colors:**
+- Background: Deep navy gradient (`#0c1220` → `#151c2c` → `#0c1220`)
+- Title text: Light blue-white (`#eef1f5`)
+- Subtitle text: Muted slate (`#a0aec0`)
 
 #### How It Works
 
@@ -338,14 +348,29 @@ User Action: Clicks "Deliveries" in sidebar
 
 ### Loading Screen Colors
 
+The loading screen supports both light and dark themes, automatically detecting the user's preference.
+
+**Light Mode:**
+
 | Element | Color | CSS |
 |---------|-------|-----|
-| Background | Navy gradient | `linear-gradient(135deg, #0f172a, #1e293b, #0f172a)` |
-| Glow effect | Emerald | `rgba(16, 185, 129, 0.3)` |
-| Spinner border | Emerald | `#10b981` |
-| Spinner track | Emerald (30%) | `rgba(16, 185, 129, 0.3)` |
-| Title text | White | `#ffffff` |
-| Subtitle text | Zinc | `#a1a1aa` |
+| Background | Blue-gray gradient | `linear-gradient(135deg, #f0f4f8, #ffffff, #f0f4f8)` |
+| Glow effect | Emerald | `rgba(69, 207, 123, 0.2)` |
+| Spinner border | Emerald | `#45cf7b` |
+| Spinner track | Emerald (30%) | `rgba(69, 207, 123, 0.3)` |
+| Title text | Dark zinc | `#18181b` |
+| Subtitle text | Muted zinc | `#52525b` |
+
+**Dark Mode:**
+
+| Element | Color | CSS |
+|---------|-------|-----|
+| Background | Navy gradient | `linear-gradient(135deg, #0c1220, #151c2c, #0c1220)` |
+| Glow effect | Emerald | `rgba(69, 207, 123, 0.3)` |
+| Spinner border | Emerald | `#45cf7b` |
+| Spinner track | Emerald (30%) | `rgba(69, 207, 123, 0.3)` |
+| Title text | Light blue-white | `#eef1f5` |
+| Subtitle text | Muted slate | `#a0aec0` |
 
 ### Progress Bar Colors
 

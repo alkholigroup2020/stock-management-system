@@ -55,6 +55,23 @@ const APP_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 5
   </g>
 </svg>`;
 
+// Detect the current theme preference
+function getThemePreference(): "light" | "dark" {
+  // Check localStorage first (Nuxt color mode saves preference here)
+  const stored = localStorage.getItem("nuxt-color-mode");
+  if (stored === "dark" || stored === "light") {
+    return stored;
+  }
+
+  // Check system preference
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    return "dark";
+  }
+
+  // Default to light (matches nuxt.config colorMode.preference)
+  return "light";
+}
+
 // Inject loading screen styles once
 function injectStyles() {
   const styleId = `${LOADING_SCREEN_ID}-styles`;
@@ -68,6 +85,7 @@ function injectStyles() {
     @keyframes app-loading-spin {
       to { transform: rotate(360deg); }
     }
+    /* Base styles */
     #${LOADING_SCREEN_ID} {
       position: fixed;
       inset: 0;
@@ -75,7 +93,6 @@ function injectStyles() {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       opacity: 1;
       transition: opacity 0.3s ease;
@@ -98,7 +115,6 @@ function injectStyles() {
       transform: translateX(-50%);
       width: 120px;
       height: 120px;
-      background: rgba(16, 185, 129, 0.3);
       border-radius: 50%;
       filter: blur(30px);
     }
@@ -113,7 +129,7 @@ function injectStyles() {
     #${LOADING_SCREEN_ID} .icon svg {
       width: 80px;
       height: 80px;
-      filter: drop-shadow(0 10px 40px rgba(16, 185, 129, 0.3));
+      filter: drop-shadow(0 10px 40px rgba(69, 207, 123, 0.3));
     }
     #${LOADING_SCREEN_ID} .text {
       text-align: center;
@@ -121,12 +137,10 @@ function injectStyles() {
     #${LOADING_SCREEN_ID} .text h1 {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #ffffff;
       margin: 0 0 4px 0;
     }
     #${LOADING_SCREEN_ID} .text p {
       font-size: 0.875rem;
-      color: #a1a1aa;
       margin: 0;
     }
     #${LOADING_SCREEN_ID} .spinner-container {
@@ -138,14 +152,53 @@ function injectStyles() {
     #${LOADING_SCREEN_ID} .spinner {
       width: 20px;
       height: 20px;
-      border: 3px solid rgba(16, 185, 129, 0.3);
-      border-top-color: #10b981;
+      border-width: 3px;
+      border-style: solid;
       border-radius: 50%;
       animation: app-loading-spin 1s linear infinite;
     }
     #${LOADING_SCREEN_ID} .spinner-text {
       font-size: 0.875rem;
-      color: #a1a1aa;
+    }
+    /* Light mode (default) */
+    #${LOADING_SCREEN_ID} {
+      background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 50%, #f0f4f8 100%);
+    }
+    #${LOADING_SCREEN_ID} .glow {
+      background: rgba(69, 207, 123, 0.2);
+    }
+    #${LOADING_SCREEN_ID} .text h1 {
+      color: #18181b;
+    }
+    #${LOADING_SCREEN_ID} .text p {
+      color: #52525b;
+    }
+    #${LOADING_SCREEN_ID} .spinner {
+      border-color: rgba(69, 207, 123, 0.3);
+      border-top-color: #45cf7b;
+    }
+    #${LOADING_SCREEN_ID} .spinner-text {
+      color: #52525b;
+    }
+    /* Dark mode */
+    #${LOADING_SCREEN_ID}.dark-theme {
+      background: linear-gradient(135deg, #0c1220 0%, #151c2c 50%, #0c1220 100%);
+    }
+    #${LOADING_SCREEN_ID}.dark-theme .glow {
+      background: rgba(69, 207, 123, 0.3);
+    }
+    #${LOADING_SCREEN_ID}.dark-theme .text h1 {
+      color: #eef1f5;
+    }
+    #${LOADING_SCREEN_ID}.dark-theme .text p {
+      color: #a0aec0;
+    }
+    #${LOADING_SCREEN_ID}.dark-theme .spinner {
+      border-color: rgba(69, 207, 123, 0.3);
+      border-top-color: #45cf7b;
+    }
+    #${LOADING_SCREEN_ID}.dark-theme .spinner-text {
+      color: #a0aec0;
     }
   `;
   document.head.appendChild(style);
@@ -184,11 +237,20 @@ function showLoadingScreen() {
     removalTimeout = null;
   }
 
+  // Detect theme preference
+  const theme = getThemePreference();
+
   let loadingScreen = document.getElementById(LOADING_SCREEN_ID);
 
   if (loadingScreen) {
     // Already exists - make sure it's visible and has content
     loadingScreen.classList.remove("fade-out");
+    // Update theme class
+    if (theme === "dark") {
+      loadingScreen.classList.add("dark-theme");
+    } else {
+      loadingScreen.classList.remove("dark-theme");
+    }
     // Re-inject content in case it was cleared
     if (!loadingScreen.querySelector(".content")) {
       loadingScreen.innerHTML = createLoadingScreenHTML();
@@ -199,6 +261,10 @@ function showLoadingScreen() {
   // Create loading screen element
   loadingScreen = document.createElement("div");
   loadingScreen.id = LOADING_SCREEN_ID;
+  // Apply theme class based on preference
+  if (theme === "dark") {
+    loadingScreen.classList.add("dark-theme");
+  }
   loadingScreen.innerHTML = createLoadingScreenHTML();
 
   // Insert at the beginning of body
