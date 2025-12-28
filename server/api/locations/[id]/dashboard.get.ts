@@ -127,92 +127,86 @@ export default defineEventHandler(async (event) => {
     // Fetch data in parallel for performance
     const periodId = currentPeriod?.id;
 
-    const [
-      deliveriesAggregate,
-      issuesAggregate,
-      pobAggregate,
-      recentDeliveries,
-      recentIssues,
-    ] = await Promise.all([
-      // Total receipts (sum of delivery amounts for this period and location)
-      periodId
-        ? prisma.delivery.aggregate({
-            where: {
-              location_id: locationId,
-              period_id: periodId,
-            },
-            _sum: {
-              total_amount: true,
-            },
-          })
-        : { _sum: { total_amount: null } },
+    const [deliveriesAggregate, issuesAggregate, pobAggregate, recentDeliveries, recentIssues] =
+      await Promise.all([
+        // Total receipts (sum of delivery amounts for this period and location)
+        periodId
+          ? prisma.delivery.aggregate({
+              where: {
+                location_id: locationId,
+                period_id: periodId,
+              },
+              _sum: {
+                total_amount: true,
+              },
+            })
+          : { _sum: { total_amount: null } },
 
-      // Total issues (sum of issue values for this period and location)
-      periodId
-        ? prisma.issue.aggregate({
-            where: {
-              location_id: locationId,
-              period_id: periodId,
-            },
-            _sum: {
-              total_value: true,
-            },
-          })
-        : { _sum: { total_value: null } },
+        // Total issues (sum of issue values for this period and location)
+        periodId
+          ? prisma.issue.aggregate({
+              where: {
+                location_id: locationId,
+                period_id: periodId,
+              },
+              _sum: {
+                total_value: true,
+              },
+            })
+          : { _sum: { total_value: null } },
 
-      // Total mandays (sum of crew + extra for this period and location)
-      periodId
-        ? prisma.pOB.aggregate({
-            where: {
-              location_id: locationId,
-              period_id: periodId,
-            },
-            _sum: {
-              crew_count: true,
-              extra_count: true,
-            },
-          })
-        : { _sum: { crew_count: null, extra_count: null } },
+        // Total mandays (sum of crew + extra for this period and location)
+        periodId
+          ? prisma.pOB.aggregate({
+              where: {
+                location_id: locationId,
+                period_id: periodId,
+              },
+              _sum: {
+                crew_count: true,
+                extra_count: true,
+              },
+            })
+          : { _sum: { crew_count: null, extra_count: null } },
 
-      // Recent deliveries (last 5)
-      prisma.delivery.findMany({
-        where: {
-          location_id: locationId,
-          ...(periodId && { period_id: periodId }),
-        },
-        orderBy: {
-          delivery_date: "desc",
-        },
-        take: 5,
-        include: {
-          supplier: {
-            select: {
-              id: true,
-              code: true,
-              name: true,
+        // Recent deliveries (last 5)
+        prisma.delivery.findMany({
+          where: {
+            location_id: locationId,
+            ...(periodId && { period_id: periodId }),
+          },
+          orderBy: {
+            delivery_date: "desc",
+          },
+          take: 5,
+          include: {
+            supplier: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+              },
             },
           },
-        },
-      }),
+        }),
 
-      // Recent issues (last 5)
-      prisma.issue.findMany({
-        where: {
-          location_id: locationId,
-          ...(periodId && { period_id: periodId }),
-        },
-        orderBy: {
-          issue_date: "desc",
-        },
-        take: 5,
-      }),
-    ]);
+        // Recent issues (last 5)
+        prisma.issue.findMany({
+          where: {
+            location_id: locationId,
+            ...(periodId && { period_id: periodId }),
+          },
+          orderBy: {
+            issue_date: "desc",
+          },
+          take: 5,
+        }),
+      ]);
 
     // Calculate totals
     const totalReceipts = Number(deliveriesAggregate._sum.total_amount) || 0;
     const totalIssues = Number(issuesAggregate._sum.total_value) || 0;
-    const totalMandays =
-      (pobAggregate._sum.crew_count || 0) + (pobAggregate._sum.extra_count || 0);
+    const totalMandays = (pobAggregate._sum.crew_count || 0) + (pobAggregate._sum.extra_count || 0);
 
     return {
       location: {

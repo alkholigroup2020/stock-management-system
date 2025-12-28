@@ -273,9 +273,7 @@ const handleRetry = () => {
               </div>
 
               <!-- Text -->
-              <h3
-                class="text-base sm:text-lg font-semibold text-[var(--ui-text-highlighted)] mb-1"
-              >
+              <h3 class="text-base sm:text-lg font-semibold text-[var(--ui-text-highlighted)] mb-1">
                 {{ action.label }}
               </h3>
               <p class="text-xs sm:text-sm text-[var(--ui-text-muted)]">
