@@ -221,7 +221,8 @@ export const useAuthStore = defineStore("auth", {
         return { success: false, authenticated: false };
       } catch (error: unknown) {
         const fetchError = error as { data?: { message?: string }; message?: string };
-        const errorMessage = fetchError?.data?.message || fetchError?.message || "Failed to fetch session";
+        const errorMessage =
+          fetchError?.data?.message || fetchError?.message || "Failed to fetch session";
         this.error = errorMessage;
         this.user = null;
         return { success: false, authenticated: false };

@@ -6,10 +6,10 @@ This document describes the complete loading experience implemented in the Stock
 
 The application uses a **two-tier loading system** to provide a seamless user experience:
 
-| Component | Purpose | When It Shows |
-|-----------|---------|---------------|
-| **Loading Screen** | Full-screen loader during app initialization | Hard refresh, login, logout |
-| **Page Loading Overlay** | Spinner overlay during page navigation | Route changes within the app |
+| Component                | Purpose                                      | When It Shows                |
+| ------------------------ | -------------------------------------------- | ---------------------------- |
+| **Loading Screen**       | Full-screen loader during app initialization | Hard refresh, login, logout  |
+| **Page Loading Overlay** | Spinner overlay during page navigation       | Route changes within the app |
 
 ## Architecture
 
@@ -48,6 +48,7 @@ The application uses a **two-tier loading system** to provide a seamless user ex
 ### Purpose
 
 Displays a branded full-screen loading state during critical app transitions:
+
 - Initial page load / hard refresh
 - Login (while fetching user data, locations, and period)
 - Logout (while reinitializing app state)
@@ -86,11 +87,13 @@ The loading screen is implemented as a Nuxt plugin with the `00` prefix to ensur
 - **Text**: App name and subtitle
 
 **Light Mode Colors:**
+
 - Background: Light blue-gray gradient (`#f0f4f8` → `#ffffff` → `#f0f4f8`)
 - Title text: Dark zinc (`#18181b`)
 - Subtitle text: Muted zinc (`#52525b`)
 
 **Dark Mode Colors:**
+
 - Background: Deep navy gradient (`#0c1220` → `#151c2c` → `#0c1220`)
 - Title text: Light blue-white (`#eef1f5`)
 - Subtitle text: Muted slate (`#a0aec0`)
@@ -114,24 +117,24 @@ The `useAppInit` composable coordinates app initialization and provides loading 
 
 ```typescript
 interface AppInitState {
-  isInitializing: boolean;  // Currently loading
-  isReady: boolean;         // App ready to render
-  error: string | null;     // Any initialization error
-  authLoaded: boolean;      // Auth session fetched
+  isInitializing: boolean; // Currently loading
+  isReady: boolean; // App ready to render
+  error: string | null; // Any initialization error
+  authLoaded: boolean; // Auth session fetched
   locationsLoaded: boolean; // User locations loaded
-  periodLoaded: boolean;    // Current period loaded
+  periodLoaded: boolean; // Current period loaded
 }
 ```
 
 #### Key Methods
 
-| Method | Purpose |
-|--------|---------|
-| `initialize()` | Initial app load - fetches auth, locations, period |
-| `setLoadingForPostLogin()` | Called after login to show loading screen |
-| `setReadyAfterPostLogin()` | Called when post-login data is loaded |
-| `reinitialize()` | Called on logout to reset and re-init |
-| `reset()` | Clears all state |
+| Method                     | Purpose                                            |
+| -------------------------- | -------------------------------------------------- |
+| `initialize()`             | Initial app load - fetches auth, locations, period |
+| `setLoadingForPostLogin()` | Called after login to show loading screen          |
+| `setReadyAfterPostLogin()` | Called when post-login data is loaded              |
+| `reinitialize()`           | Called on logout to reset and re-init              |
+| `reset()`                  | Clears all state                                   |
 
 ### Integration Points
 
@@ -187,10 +190,7 @@ const { isLoading } = useLoadingIndicator();
 
 <template>
   <Transition name="fade">
-    <div
-      v-if="isLoading"
-      class="absolute inset-0 z-40 flex items-center justify-center bg-default"
-    >
+    <div v-if="isLoading" class="absolute inset-0 z-40 flex items-center justify-center bg-default">
       <div class="flex flex-col items-center gap-4">
         <!-- App Logo -->
         <img
@@ -200,7 +200,9 @@ const { isLoading } = useLoadingIndicator();
         />
         <!-- Spinner with text -->
         <div class="flex items-center gap-3">
-          <div class="w-5 h-5 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <div
+            class="w-5 h-5 border-3 border-primary/30 border-t-primary rounded-full animate-spin"
+          />
           <span class="text-sm text-muted font-medium">Loading...</span>
         </div>
       </div>
@@ -244,14 +246,14 @@ const { isLoading } = useLoadingIndicator();
 
 ### Key Features
 
-| Feature | Description |
-|---------|-------------|
+| Feature                    | Description                                         |
+| -------------------------- | --------------------------------------------------- |
 | **Scoped to content area** | Only covers main content, not sidebar/header/footer |
-| **Solid background** | `bg-default` for clean, branded appearance |
-| **App logo** | 64x64px logo with rounded corners |
-| **Centered spinner** | Small animated spinner with "Loading..." text |
-| **Fade transition** | Smooth 150ms fade in/out animation |
-| **Accessible** | Includes `role="status"` and `aria-label` |
+| **Solid background**       | `bg-default` for clean, branded appearance          |
+| **App logo**               | 64x64px logo with rounded corners                   |
+| **Centered spinner**       | Small animated spinner with "Loading..." text       |
+| **Fade transition**        | Smooth 150ms fade in/out animation                  |
+| **Accessible**             | Includes `role="status"` and `aria-label`           |
 
 ### When It Shows
 
@@ -352,30 +354,30 @@ The loading screen supports both light and dark themes, automatically detecting 
 
 **Light Mode:**
 
-| Element | Color | CSS |
-|---------|-------|-----|
-| Background | Blue-gray gradient | `linear-gradient(135deg, #f0f4f8, #ffffff, #f0f4f8)` |
-| Glow effect | Emerald | `rgba(69, 207, 123, 0.2)` |
-| Spinner border | Emerald | `#45cf7b` |
-| Spinner track | Emerald (30%) | `rgba(69, 207, 123, 0.3)` |
-| Title text | Dark zinc | `#18181b` |
-| Subtitle text | Muted zinc | `#52525b` |
+| Element        | Color              | CSS                                                  |
+| -------------- | ------------------ | ---------------------------------------------------- |
+| Background     | Blue-gray gradient | `linear-gradient(135deg, #f0f4f8, #ffffff, #f0f4f8)` |
+| Glow effect    | Emerald            | `rgba(69, 207, 123, 0.2)`                            |
+| Spinner border | Emerald            | `#45cf7b`                                            |
+| Spinner track  | Emerald (30%)      | `rgba(69, 207, 123, 0.3)`                            |
+| Title text     | Dark zinc          | `#18181b`                                            |
+| Subtitle text  | Muted zinc         | `#52525b`                                            |
 
 **Dark Mode:**
 
-| Element | Color | CSS |
-|---------|-------|-----|
-| Background | Navy gradient | `linear-gradient(135deg, #0c1220, #151c2c, #0c1220)` |
-| Glow effect | Emerald | `rgba(69, 207, 123, 0.3)` |
-| Spinner border | Emerald | `#45cf7b` |
-| Spinner track | Emerald (30%) | `rgba(69, 207, 123, 0.3)` |
-| Title text | Light blue-white | `#eef1f5` |
-| Subtitle text | Muted slate | `#a0aec0` |
+| Element        | Color            | CSS                                                  |
+| -------------- | ---------------- | ---------------------------------------------------- |
+| Background     | Navy gradient    | `linear-gradient(135deg, #0c1220, #151c2c, #0c1220)` |
+| Glow effect    | Emerald          | `rgba(69, 207, 123, 0.3)`                            |
+| Spinner border | Emerald          | `#45cf7b`                                            |
+| Spinner track  | Emerald (30%)    | `rgba(69, 207, 123, 0.3)`                            |
+| Title text     | Light blue-white | `#eef1f5`                                            |
+| Subtitle text  | Muted slate      | `#a0aec0`                                            |
 
 ### Progress Bar Colors
 
-| Element | Color | Hex |
-|---------|-------|-----|
+| Element   | Color   | Hex       |
+| --------- | ------- | --------- |
 | Bar color | Emerald | `#10b981` |
 
 ## Troubleshooting
@@ -385,6 +387,7 @@ The loading screen supports both light and dark themes, automatically detecting 
 **Symptom:** Loading screen doesn't disappear
 
 **Possible Causes:**
+
 1. Error in location or period API
 2. `setReadyAfterPostLogin()` not called
 
@@ -395,6 +398,7 @@ The loading screen supports both light and dark themes, automatically detecting 
 **Symptom:** Direct jump from login to dashboard without loading screen
 
 **Possible Causes:**
+
 1. `setLoadingForPostLogin()` not called
 2. Plugin watcher not detecting state change
 
@@ -405,6 +409,7 @@ The loading screen supports both light and dark themes, automatically detecting 
 **Symptom:** No spinner overlay during navigation
 
 **Possible Causes:**
+
 1. `LayoutPageLoadingOverlay` not in layout
 2. Navigation too fast (cached pages)
 3. Parent container missing `position: relative`

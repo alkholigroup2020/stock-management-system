@@ -354,7 +354,9 @@ onMounted(() => {
         </div>
 
         <!-- Summary Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-[var(--ui-border)]">
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-[var(--ui-border)]"
+        >
           <div>
             <div class="text-sm text-[var(--ui-text-muted)]">Total Consumption</div>
             <div class="text-xl font-semibold text-[var(--ui-primary)]">

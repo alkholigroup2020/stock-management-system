@@ -44,9 +44,9 @@
                   />
                   <span class="text-xs font-medium text-[var(--ui-text)]">
                     {{ location._count?.user_locations || 0 }}
-                    <span class="text-[var(--ui-text-muted)]">{{
-                      (location._count?.user_locations || 0) === 1 ? "operator" : "operators"
-                    }}</span>
+                    <span class="text-[var(--ui-text-muted)]">
+                      {{ (location._count?.user_locations || 0) === 1 ? "operator" : "operators" }}
+                    </span>
                   </span>
                 </div>
               </template>

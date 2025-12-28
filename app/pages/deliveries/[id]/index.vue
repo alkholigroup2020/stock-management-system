@@ -223,10 +223,7 @@
         </div>
 
         <!-- Delivery Note -->
-        <div
-          v-if="delivery.delivery_note"
-          class="mt-6 pt-6 border-t border-[var(--ui-border)]"
-        >
+        <div v-if="delivery.delivery_note" class="mt-6 pt-6 border-t border-[var(--ui-border)]">
           <h3 class="text-label uppercase mb-2">Delivery Note</h3>
           <p class="text-[var(--ui-text)]">{{ delivery.delivery_note }}</p>
         </div>
@@ -453,12 +450,7 @@
       description="The delivery you're looking for doesn't exist or has been removed."
     >
       <template #actions>
-        <UButton
-          color="primary"
-          icon="i-lucide-arrow-left"
-          class="cursor-pointer"
-          @click="goBack"
-        >
+        <UButton color="primary" icon="i-lucide-arrow-left" class="cursor-pointer" @click="goBack">
           Back to Deliveries
         </UButton>
       </template>

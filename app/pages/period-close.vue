@@ -243,7 +243,12 @@
                       size="sm"
                       icon="i-lucide-check"
                       :loading="markingReady === pl.location_id"
-                      :disabled="!!markingReady || !!unmarkingReady || currentPeriod.status !== 'OPEN' || !isOnline"
+                      :disabled="
+                        !!markingReady ||
+                        !!unmarkingReady ||
+                        currentPeriod.status !== 'OPEN' ||
+                        !isOnline
+                      "
                       class="cursor-pointer"
                       @click="promptMarkReady(pl.location_id, pl.location.name)"
                     >
@@ -256,7 +261,12 @@
                         size="sm"
                         icon="i-lucide-undo-2"
                         :loading="unmarkingReady === pl.location_id"
-                        :disabled="!!markingReady || !!unmarkingReady || currentPeriod.status !== 'OPEN' || !isOnline"
+                        :disabled="
+                          !!markingReady ||
+                          !!unmarkingReady ||
+                          currentPeriod.status !== 'OPEN' ||
+                          !isOnline
+                        "
                         class="cursor-pointer"
                         @click="promptUnmarkReady(pl.location_id, pl.location.name)"
                       >
@@ -295,9 +305,7 @@
             class="w-12 h-12 mx-auto mb-4"
             style="color: var(--ui-primary)"
           />
-          <h3 class="text-xl font-semibold text-[var(--ui-text)] mb-2">
-            Period Close Pending
-          </h3>
+          <h3 class="text-xl font-semibold text-[var(--ui-text)] mb-2">Period Close Pending</h3>
           <p class="text-base text-[var(--ui-text-muted)] mb-6">
             A period close request has been submitted and is awaiting approval.
           </p>
@@ -336,9 +344,7 @@
               class="w-12 h-12 mx-auto mb-4"
               style="color: var(--ui-warning)"
             />
-            <h3 class="text-xl font-semibold text-[var(--ui-text)] mb-2">
-              Locations Not Ready
-            </h3>
+            <h3 class="text-xl font-semibold text-[var(--ui-text)] mb-2">Locations Not Ready</h3>
             <p class="text-base text-[var(--ui-text-muted)] mb-2">
               All locations must be marked as ready before closing the period.
             </p>
@@ -391,11 +397,7 @@
           <template #header>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <UIcon
-                  name="i-lucide-send"
-                  class="w-5 h-5"
-                  style="color: var(--ui-primary)"
-                />
+                <UIcon name="i-lucide-send" class="w-5 h-5" style="color: var(--ui-primary)" />
                 <h3 class="text-lg font-semibold text-[var(--ui-text)]">Request Period Close</h3>
               </div>
               <UButton
@@ -537,12 +539,19 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <UIcon
-                  :name="locationToMark?.action === 'mark' ? 'i-lucide-check-circle' : 'i-lucide-undo-2'"
+                  :name="
+                    locationToMark?.action === 'mark' ? 'i-lucide-check-circle' : 'i-lucide-undo-2'
+                  "
                   class="w-5 h-5"
-                  :style="{ color: locationToMark?.action === 'mark' ? 'var(--ui-primary)' : 'var(--ui-warning)' }"
+                  :style="{
+                    color:
+                      locationToMark?.action === 'mark' ? 'var(--ui-primary)' : 'var(--ui-warning)',
+                  }"
                 />
                 <h3 class="text-lg font-semibold text-[var(--ui-text)]">
-                  {{ locationToMark?.action === "mark" ? "Confirm Mark Ready" : "Confirm Undo Ready" }}
+                  {{
+                    locationToMark?.action === "mark" ? "Confirm Mark Ready" : "Confirm Undo Ready"
+                  }}
                 </h3>
               </div>
               <UButton
@@ -560,12 +569,14 @@
           <div class="space-y-4">
             <p class="text-base text-[var(--ui-text)]">
               <template v-if="locationToMark?.action === 'mark'">
-                You are about to mark <strong>{{ locationToMark?.name }}</strong> as ready for
-                period close.
+                You are about to mark
+                <strong>{{ locationToMark?.name }}</strong>
+                as ready for period close.
               </template>
               <template v-else>
-                You are about to revert <strong>{{ locationToMark?.name }}</strong> status back to
-                open.
+                You are about to revert
+                <strong>{{ locationToMark?.name }}</strong>
+                status back to open.
               </template>
             </p>
 
@@ -589,12 +600,7 @@
 
           <template #footer>
             <div class="flex items-center justify-end gap-3">
-              <UButton
-                color="error"
-                variant="soft"
-                class="cursor-pointer"
-                @click="cancelMarkReady"
-              >
+              <UButton color="error" variant="soft" class="cursor-pointer" @click="cancelMarkReady">
                 Cancel
               </UButton>
               <UButton
@@ -691,11 +697,7 @@
           <template #header>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <UIcon
-                  name="i-lucide-x-circle"
-                  class="w-5 h-5"
-                  style="color: var(--ui-error)"
-                />
+                <UIcon name="i-lucide-x-circle" class="w-5 h-5" style="color: var(--ui-error)" />
                 <h3 class="text-lg font-semibold text-[var(--ui-text)]">Reject Period Close</h3>
               </div>
               <UButton
@@ -713,8 +715,8 @@
           <div class="space-y-4">
             <p class="text-base text-[var(--ui-text)]">
               You are about to reject the period close request for
-              <strong>{{ currentPeriod?.name }}</strong
-              >.
+              <strong>{{ currentPeriod?.name }}</strong>
+              .
             </p>
 
             <UAlert
@@ -826,7 +828,9 @@ const activeLocationPeriodData = computed(() => {
 
 // Get active location name for display
 const activeLocationName = computed(() => {
-  return activeLocationPeriodData.value?.location?.name || locationStore.activeLocation?.name || null;
+  return (
+    activeLocationPeriodData.value?.location?.name || locationStore.activeLocation?.name || null
+  );
 });
 
 // Checklist items - now location-aware

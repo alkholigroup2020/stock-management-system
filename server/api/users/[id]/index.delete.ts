@@ -128,12 +128,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Handle Prisma foreign key constraint errors
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "P2003"
-    ) {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2003") {
       throw createError({
         statusCode: 409,
         statusMessage: "Conflict",

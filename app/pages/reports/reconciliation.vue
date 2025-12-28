@@ -495,37 +495,37 @@ onMounted(async () => {
         <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Opening Stock</p>
           <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
-            {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : '' }}
+            {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : "" }}
           </p>
         </UCard>
         <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Receipts</p>
           <p class="text-2xl sm:text-3xl font-bold text-emerald-500 dark:text-emerald-400 mt-1">
-            + {{ reportData ? formatCurrency(reportData.grand_totals.receipts) : '' }}
+            + {{ reportData ? formatCurrency(reportData.grand_totals.receipts) : "" }}
           </p>
         </UCard>
         <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Transfers In</p>
           <p class="text-2xl sm:text-3xl font-bold text-blue-500 dark:text-blue-400 mt-1">
-            + {{ reportData ? formatCurrency(reportData.grand_totals.transfers_in) : '' }}
+            + {{ reportData ? formatCurrency(reportData.grand_totals.transfers_in) : "" }}
           </p>
         </UCard>
         <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Transfers Out</p>
           <p class="text-2xl sm:text-3xl font-bold text-amber-500 dark:text-amber-400 mt-1">
-            - {{ reportData ? formatCurrency(reportData.grand_totals.transfers_out) : '' }}
+            - {{ reportData ? formatCurrency(reportData.grand_totals.transfers_out) : "" }}
           </p>
         </UCard>
         <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Issues</p>
           <p class="text-2xl sm:text-3xl font-bold text-red-500 dark:text-red-400 mt-1">
-            - {{ reportData ? formatCurrency(reportData.grand_totals.issues) : '' }}
+            - {{ reportData ? formatCurrency(reportData.grand_totals.issues) : "" }}
           </p>
         </UCard>
         <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Closing Stock</p>
           <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
-            {{ reportData ? formatCurrency(reportData.grand_totals.closing_stock) : '' }}
+            {{ reportData ? formatCurrency(reportData.grand_totals.closing_stock) : "" }}
           </p>
         </UCard>
       </div>
@@ -535,7 +535,7 @@ onMounted(async () => {
         <UCard class="card-elevated border-l-4 border-l-primary" :ui="{ body: 'p-3 sm:p-4' }">
           <p class="text-sm text-[var(--ui-text-muted)]">Total Consumption</p>
           <p class="text-2xl sm:text-3xl font-bold text-primary mt-1">
-            {{ reportData ? formatCurrency(reportData.grand_totals.consumption) : '' }}
+            {{ reportData ? formatCurrency(reportData.grand_totals.consumption) : "" }}
           </p>
         </UCard>
         <UCard
@@ -544,7 +544,7 @@ onMounted(async () => {
         >
           <p class="text-sm text-[var(--ui-text-muted)]">Total Mandays</p>
           <p class="text-2xl sm:text-3xl font-bold text-[var(--ui-text)] mt-1">
-            {{ reportData ? reportData.grand_totals.total_mandays.toLocaleString() : '' }}
+            {{ reportData ? reportData.grand_totals.total_mandays.toLocaleString() : "" }}
           </p>
         </UCard>
         <UCard
@@ -650,28 +650,28 @@ onMounted(async () => {
               <tr>
                 <td class="px-4 py-3">TOTAL</td>
                 <td class="px-4 py-3 text-right font-mono">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-emerald-500">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.receipts) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.receipts) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-blue-500">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.transfers_in) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.transfers_in) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-amber-500">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.transfers_out) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.transfers_out) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-red-500">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.issues) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.issues) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.closing_stock) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.closing_stock) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono text-primary">
-                  {{ reportData ? formatCurrency(reportData.grand_totals.consumption) : '' }}
+                  {{ reportData ? formatCurrency(reportData.grand_totals.consumption) : "" }}
                 </td>
                 <td class="px-4 py-3 text-right">
-                  {{ reportData ? reportData.grand_totals.total_mandays.toLocaleString() : '' }}
+                  {{ reportData ? reportData.grand_totals.total_mandays.toLocaleString() : "" }}
                 </td>
                 <td class="px-4 py-3 text-right font-mono">
                   {{

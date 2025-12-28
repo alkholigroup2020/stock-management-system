@@ -143,147 +143,147 @@ export default defineEventHandler(async (event) => {
     // Default 5s timeout may not be enough for multiple stock updates + network latency
     const result = await prisma.$transaction(
       async (tx) => {
-      // Process each transfer line
-      for (const line of transfer.transfer_lines) {
-        const itemId = line.item_id;
-        const quantity = parseFloat(line.quantity.toString());
-        const wacAtTransfer = parseFloat(line.wac_at_transfer.toString());
+        // Process each transfer line
+        for (const line of transfer.transfer_lines) {
+          const itemId = line.item_id;
+          const quantity = parseFloat(line.quantity.toString());
+          const wacAtTransfer = parseFloat(line.wac_at_transfer.toString());
 
-        // 1. Deduct from source location
-        const sourceStock = await tx.locationStock.findUnique({
-          where: {
-            location_id_item_id: {
-              location_id: transfer.from_location_id,
-              item_id: itemId,
-            },
-          },
-        });
-
-        if (!sourceStock) {
-          throw createError({
-            statusCode: 500,
-            statusMessage: "Internal Server Error",
-            data: {
-              code: "STOCK_RECORD_NOT_FOUND",
-              message: `Stock record not found for item ${line.item.name} at source location`,
+          // 1. Deduct from source location
+          const sourceStock = await tx.locationStock.findUnique({
+            where: {
+              location_id_item_id: {
+                location_id: transfer.from_location_id,
+                item_id: itemId,
+              },
             },
           });
-        }
 
-        const newSourceQuantity = parseFloat(sourceStock.on_hand.toString()) - quantity;
+          if (!sourceStock) {
+            throw createError({
+              statusCode: 500,
+              statusMessage: "Internal Server Error",
+              data: {
+                code: "STOCK_RECORD_NOT_FOUND",
+                message: `Stock record not found for item ${line.item.name} at source location`,
+              },
+            });
+          }
 
-        await tx.locationStock.update({
-          where: {
-            location_id_item_id: {
-              location_id: transfer.from_location_id,
-              item_id: itemId,
-            },
-          },
-          data: {
-            on_hand: newSourceQuantity,
-          },
-        });
-
-        // 2. Add to destination location
-        const destStock = await tx.locationStock.findUnique({
-          where: {
-            location_id_item_id: {
-              location_id: transfer.to_location_id,
-              item_id: itemId,
-            },
-          },
-        });
-
-        if (destStock) {
-          // Update existing stock with recalculated WAC
-          const currentQty = parseFloat(destStock.on_hand.toString());
-          const currentWAC = parseFloat(destStock.wac.toString());
-          const receivedQty = quantity;
-          const receiptPrice = wacAtTransfer; // Use source WAC as receipt price
-
-          const wacResult = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice);
+          const newSourceQuantity = parseFloat(sourceStock.on_hand.toString()) - quantity;
 
           await tx.locationStock.update({
+            where: {
+              location_id_item_id: {
+                location_id: transfer.from_location_id,
+                item_id: itemId,
+              },
+            },
+            data: {
+              on_hand: newSourceQuantity,
+            },
+          });
+
+          // 2. Add to destination location
+          const destStock = await tx.locationStock.findUnique({
             where: {
               location_id_item_id: {
                 location_id: transfer.to_location_id,
                 item_id: itemId,
               },
             },
-            data: {
-              on_hand: wacResult.newQuantity,
-              wac: wacResult.newWAC,
-            },
           });
-        } else {
-          // Create new stock record at destination
-          await tx.locationStock.create({
-            data: {
-              location_id: transfer.to_location_id,
-              item_id: itemId,
-              on_hand: quantity,
-              wac: wacAtTransfer, // Use source WAC
-            },
-          });
-        }
-      }
 
-      // 3. Update transfer status to COMPLETED
-      const updatedTransfer = await tx.transfer.update({
-        where: { id: transferId },
-        data: {
-          status: "COMPLETED",
-          approved_by: user.id,
-          approval_date: new Date(),
-          transfer_date: new Date(),
-        },
-        include: {
-          from_location: {
-            select: {
-              id: true,
-              code: true,
-              name: true,
-              type: true,
-            },
+          if (destStock) {
+            // Update existing stock with recalculated WAC
+            const currentQty = parseFloat(destStock.on_hand.toString());
+            const currentWAC = parseFloat(destStock.wac.toString());
+            const receivedQty = quantity;
+            const receiptPrice = wacAtTransfer; // Use source WAC as receipt price
+
+            const wacResult = calculateWAC(currentQty, currentWAC, receivedQty, receiptPrice);
+
+            await tx.locationStock.update({
+              where: {
+                location_id_item_id: {
+                  location_id: transfer.to_location_id,
+                  item_id: itemId,
+                },
+              },
+              data: {
+                on_hand: wacResult.newQuantity,
+                wac: wacResult.newWAC,
+              },
+            });
+          } else {
+            // Create new stock record at destination
+            await tx.locationStock.create({
+              data: {
+                location_id: transfer.to_location_id,
+                item_id: itemId,
+                on_hand: quantity,
+                wac: wacAtTransfer, // Use source WAC
+              },
+            });
+          }
+        }
+
+        // 3. Update transfer status to COMPLETED
+        const updatedTransfer = await tx.transfer.update({
+          where: { id: transferId },
+          data: {
+            status: "COMPLETED",
+            approved_by: user.id,
+            approval_date: new Date(),
+            transfer_date: new Date(),
           },
-          to_location: {
-            select: {
-              id: true,
-              code: true,
-              name: true,
-              type: true,
+          include: {
+            from_location: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                type: true,
+              },
             },
-          },
-          requester: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
+            to_location: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                type: true,
+              },
             },
-          },
-          approver: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
+            requester: {
+              select: {
+                id: true,
+                username: true,
+                full_name: true,
+              },
             },
-          },
-          transfer_lines: {
-            include: {
-              item: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                  unit: true,
+            approver: {
+              select: {
+                id: true,
+                username: true,
+                full_name: true,
+              },
+            },
+            transfer_lines: {
+              include: {
+                item: {
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    unit: true,
+                  },
                 },
               },
             },
           },
-        },
-      });
+        });
 
-      return updatedTransfer;
+        return updatedTransfer;
       },
       {
         timeout: 30000, // 30 seconds for stock movement operations

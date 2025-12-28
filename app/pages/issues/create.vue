@@ -1,7 +1,11 @@
 <template>
   <div>
     <!-- Loading Overlay -->
-    <LoadingOverlay v-if="submitting" title="Creating Issue..." message="Please wait while we process your issue" />
+    <LoadingOverlay
+      v-if="submitting"
+      title="Creating Issue..."
+      message="Please wait while we process your issue"
+    />
 
     <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
       <!-- Page Header -->

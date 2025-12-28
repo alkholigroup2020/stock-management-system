@@ -176,12 +176,7 @@
       description="The issue you're looking for doesn't exist or you don't have permission to view it."
     >
       <template #actions>
-        <UButton
-          color="primary"
-          icon="i-lucide-arrow-left"
-          class="cursor-pointer"
-          @click="goBack"
-        >
+        <UButton color="primary" icon="i-lucide-arrow-left" class="cursor-pointer" @click="goBack">
           Back to Issues
         </UButton>
       </template>

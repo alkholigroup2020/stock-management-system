@@ -278,8 +278,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Calculate consumption for response
-    const totalAdjustments =
-      back_charges - credits + condemnations + adjustments;
+    const totalAdjustments = back_charges - credits + condemnations + adjustments;
     const consumption =
       parseFloat(openingStock.toString()) +
       parseFloat(receipts.toString()) +

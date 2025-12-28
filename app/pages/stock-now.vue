@@ -314,9 +314,7 @@ const fetchStockData = async () => {
         params.append("lowStock", "true");
       }
 
-      const data = await $fetch<StockNowResponse>(
-        `/api/reports/stock-now?${params.toString()}`
-      );
+      const data = await $fetch<StockNowResponse>(`/api/reports/stock-now?${params.toString()}`);
       stockData.value = data;
 
       // Find the current location's data from the response
@@ -450,11 +448,18 @@ watch(
       </div>
       <div class="flex items-center gap-2">
         <!-- View Mode Toggle (Supervisor/Admin only) -->
-        <div v-if="isAtLeastSupervisor" class="hidden lg:flex items-center gap-1 p-1 bg-muted rounded-full">
+        <div
+          v-if="isAtLeastSupervisor"
+          class="hidden lg:flex items-center gap-1 p-1 bg-muted rounded-full"
+        >
           <button
             type="button"
             class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
-            :class="viewMode === 'single' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-default hover:bg-elevated'"
+            :class="
+              viewMode === 'single'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-muted hover:text-default hover:bg-elevated'
+            "
             @click="handleViewModeChange('single')"
           >
             Single Location
@@ -462,7 +467,11 @@ watch(
           <button
             type="button"
             class="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap"
-            :class="viewMode === 'consolidated' ? 'bg-primary text-white shadow-sm' : 'text-muted hover:text-default hover:bg-elevated'"
+            :class="
+              viewMode === 'consolidated'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-muted hover:text-default hover:bg-elevated'
+            "
             @click="handleViewModeChange('consolidated')"
           >
             All Locations
@@ -530,11 +539,7 @@ watch(
       </UCard>
 
       <!-- Current Location (single view only) -->
-      <UCard
-        v-else-if="currentLocationData"
-        class="card-elevated"
-        :ui="{ body: 'p-3 sm:p-4' }"
-      >
+      <UCard v-else-if="currentLocationData" class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-[var(--ui-text-muted)]">Current Location</p>
@@ -713,9 +718,9 @@ watch(
 
           <!-- Value -->
           <template #value-cell="{ row }">
-            <span class="font-semibold">{{
-              formatCurrency(row.original.stock_value || row.original.value || 0)
-            }}</span>
+            <span class="font-semibold">
+              {{ formatCurrency(row.original.stock_value || row.original.value || 0) }}
+            </span>
           </template>
         </UTable>
       </div>
@@ -775,7 +780,8 @@ watch(
                 :class="loc.is_low_stock ? 'text-red-500' : 'text-[var(--ui-text)]'"
                 :title="`${formatQuantity(loc.on_hand)} @ ${formatCurrency(loc.wac)}`"
               >
-                {{ loc.location_name }}<span v-if="index < row.original.locations.length - 1">,</span>
+                {{ loc.location_name }}
+                <span v-if="index < row.original.locations.length - 1">,</span>
               </span>
             </div>
           </template>

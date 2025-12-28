@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { NavigationMenuItem } from "@nuxt/ui";
 import { useRoute } from "vue-router";
 import { useAuth } from "~/composables/useAuth";
 import { usePermissions } from "~/composables/usePermissions";
@@ -12,125 +11,173 @@ const permissions = usePermissions();
 // Get loading state for overlay visibility
 const { isLoading } = useLoadingIndicator();
 
-// Navigation items configuration
-const mainMenuItems = computed<NavigationMenuItem[]>(() => {
-  const items: NavigationMenuItem[] = [
+// Hierarchical navigation items configuration
+interface NavItem {
+  label: string;
+  icon?: string;
+  to?: string;
+  children?: NavItem[];
+  permission?: boolean;
+}
+
+const mainMenuItems = computed<NavItem[]>(() => {
+  const items: NavItem[] = [
+    // 1. Dashboard
     {
       label: "Dashboard",
       icon: "i-heroicons-home",
       to: "/",
+      permission: true,
     },
   ];
 
+  // 2. Master Data section (expandable)
+  const masterDataChildren: NavItem[] = [];
   if (permissions.canManageLocations()) {
-    items.push({
+    masterDataChildren.push({
       label: "Locations",
-      icon: "i-heroicons-map-pin",
       to: "/locations",
+      permission: true,
     });
   }
-
+  if (permissions.canManageSuppliers()) {
+    masterDataChildren.push({
+      label: "Suppliers",
+      to: "/suppliers",
+      permission: true,
+    });
+  }
   if (permissions.canManageUsers()) {
-    items.push({
+    masterDataChildren.push({
       label: "Users",
-      icon: "i-heroicons-user-group",
       to: "/users",
+      permission: true,
     });
   }
 
+  if (masterDataChildren.length > 0) {
+    items.push({
+      label: "Master Data",
+      icon: "i-heroicons-cog-6-tooth",
+      children: masterDataChildren,
+      permission: true,
+    });
+  }
+
+  // 3. Transactions section (expandable)
+  const transactionChildren: NavItem[] = [];
+  if (permissions.canPostDeliveries()) {
+    transactionChildren.push({
+      label: "Deliveries",
+      to: "/deliveries",
+      permission: true,
+    });
+  }
+  if (permissions.canPostIssues()) {
+    transactionChildren.push({
+      label: "Issues",
+      to: "/issues",
+      permission: true,
+    });
+  }
+  if (permissions.canCreateTransfer()) {
+    transactionChildren.push({
+      label: "Transfers",
+      to: "/transfers",
+      permission: true,
+    });
+  }
+
+  if (transactionChildren.length > 0) {
+    items.push({
+      label: "Transactions",
+      icon: "i-heroicons-arrow-path-rounded-square",
+      children: transactionChildren,
+      permission: true,
+    });
+  }
+
+  // 4. Stock section (expandable)
+  const stockChildren: NavItem[] = [];
+  if (permissions.canViewStock()) {
+    stockChildren.push({
+      label: "Stock Now",
+      to: "/stock-now",
+      permission: true,
+    });
+    stockChildren.push({
+      label: "Items & Prices",
+      to: "/items",
+      permission: true,
+    });
+  }
+
+  if (stockChildren.length > 0) {
+    items.push({
+      label: "Stock",
+      icon: "i-heroicons-cube",
+      children: stockChildren,
+      permission: true,
+    });
+  }
+
+  // 5. POB (single item)
   if (permissions.canEnterPOB()) {
     items.push({
       label: "POB",
       icon: "i-heroicons-users",
       to: "/pob",
+      permission: true,
     });
   }
 
-  if (permissions.canManageSuppliers()) {
-    items.push({
-      label: "Suppliers",
-      icon: "i-heroicons-building-office-2",
-      to: "/suppliers",
-    });
-  }
-
-  if (permissions.canViewStock()) {
-    items.push({
-      label: "Items & Prices",
-      icon: "i-heroicons-cube",
-      to: "/items",
-    });
-  }
-
-  if (permissions.canPostDeliveries()) {
-    items.push({
-      label: "Deliveries & Invoices",
-      icon: "i-heroicons-truck",
-      to: "/deliveries",
-    });
-  }
-
-  if (permissions.canPostIssues()) {
-    items.push({
-      label: "Issues",
-      icon: "i-heroicons-arrow-trending-down",
-      to: "/issues",
-    });
-  }
-
-  if (permissions.canCreateTransfer()) {
-    items.push({
-      label: "Transfers",
-      icon: "i-heroicons-arrow-path",
-      to: "/transfers",
-    });
-  }
-
-  if (permissions.canCreateNCR()) {
-    items.push({
-      label: "NCR",
-      icon: "i-heroicons-exclamation-triangle",
-      to: "/ncrs",
-    });
-  }
-
-  if (permissions.canViewStock()) {
-    items.push({
-      label: "Stock Now",
-      icon: "i-heroicons-archive-box",
-      to: "/stock-now",
-    });
-  }
-
-  if (permissions.canViewReconciliations()) {
-    items.push({
-      label: "Reconciliations",
-      icon: "i-heroicons-calculator",
-      to: "/reconciliations",
-    });
-  }
-
-  if (permissions.canViewStock()) {
-    items.push({
-      label: "Reports",
-      icon: "i-heroicons-document-chart-bar",
-      to: "/reports",
-    });
-  }
-
+  // 6. Periods (single item)
   if (permissions.canClosePeriod()) {
     items.push({
       label: "Periods",
       icon: "i-heroicons-calendar-days",
       to: "/periods",
+      permission: true,
     });
   }
 
+  // 7. NCR (single item)
+  if (permissions.canCreateNCR()) {
+    items.push({
+      label: "NCR",
+      icon: "i-heroicons-exclamation-triangle",
+      to: "/ncrs",
+      permission: true,
+    });
+  }
+
+  // 8. Reconciliations (single item)
+  if (permissions.canViewReconciliations()) {
+    items.push({
+      label: "Reconciliations",
+      icon: "i-heroicons-calculator",
+      to: "/reconciliations",
+      permission: true,
+    });
+  }
+
+  // 9. Reports (single item)
+  if (permissions.canViewStock()) {
+    items.push({
+      label: "Reports",
+      icon: "i-heroicons-document-chart-bar",
+      to: "/reports",
+      permission: true,
+    });
+  }
+
+  // 10. Period Close (single item)
   if (permissions.canClosePeriod()) {
     items.push({
       label: "Period Close",
       icon: "i-heroicons-lock-closed",
       to: "/period-close",
+      permission: true,
     });
   }
 
@@ -224,193 +271,167 @@ const handleLogout = async () => {
 
   <!-- Dashboard Layout using Nuxt UI Dashboard Components -->
   <UDashboardGroup storage="local" storage-key="stock-management-dashboard">
-      <!-- SIDEBAR -->
-      <UDashboardSidebar
-        collapsible
-        resizable
-        width="260"
-        :toggle="{ color: 'neutral', variant: 'ghost', icon: 'i-heroicons-bars-3' }"
-        class="bg-elevated"
-      >
-        <!-- Logo Header -->
-        <template #header="{ collapsed }">
-          <NuxtLink
-            to="/"
-            aria-label="Go to dashboard"
-            class="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
-          >
-            <img
-              src="~/assets/css/icons/app-icon.svg"
-              alt="Stock Management System"
-              class="w-10 h-10 rounded-lg"
-            />
-            <div v-if="!collapsed" class="flex flex-col min-w-0">
-              <span class="text-label truncate">Stock</span>
-              <span class="text-caption truncate">Management</span>
-            </div>
-          </NuxtLink>
-        </template>
-
-        <!-- Navigation Menu -->
-        <template #default="{ collapsed }">
-          <!-- Main Navigation Menu with increased padding -->
-          <nav aria-label="Main navigation" class="space-y-1">
-            <UNavigationMenu
-              :collapsed="collapsed"
-              :items="mainMenuItems"
-              orientation="vertical"
-              class="[&_a]:py-3"
-            />
-          </nav>
-        </template>
-
-      </UDashboardSidebar>
-
-      <!-- MAIN CONTENT PANEL -->
-      <UDashboardPanel :width="null">
-        <!-- Header/Navbar -->
-        <template #header>
-          <header
-            aria-label="Page header"
-            class="flex items-center justify-between w-full h-12 px-4 sm:px-6 border-b border-default bg-elevated"
-          >
-            <!-- Left: Sidebar toggle (mobile) / collapse (desktop) -->
-            <div class="flex items-center gap-4">
-              <UDashboardSidebarToggle class="lg:hidden" />
-              <UDashboardSidebarCollapse size="md" class="hidden lg:flex" />
-            </div>
-
-            <!-- Center section: Location and Period indicators -->
-            <div class="hidden md:flex items-center gap-4 flex-1 justify-center">
-              <!-- Location Switcher -->
-              <LayoutLocationSwitcher />
-
-              <!-- Divider -->
-              <div class="h-5 w-px bg-border opacity-50" />
-
-              <!-- Period Indicator -->
-              <LayoutPeriodIndicator />
-            </div>
-
-            <!-- Right side actions -->
-            <div class="flex items-center gap-1">
-              <!-- Notifications -->
-              <UButton
-                icon="i-heroicons-bell"
-                color="neutral"
-                variant="ghost"
-                aria-label="Notifications"
-                class="cursor-pointer"
-              />
-
-              <!-- Theme Toggle -->
-              <UButton
-                :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-                color="neutral"
-                variant="ghost"
-                aria-label="Toggle color mode"
-                class="cursor-pointer"
-                @click="toggleTheme"
-              />
-
-              <!-- User Menu with Logout -->
-              <UDropdownMenu
-                v-if="isAuthenticated && user"
-                :items="[
-                  [
-                    {
-                      label: user.full_name || user.email,
-                      icon: 'i-heroicons-user-circle',
-                      type: 'label',
-                    },
-                    {
-                      label: user.role,
-                      icon: 'i-heroicons-shield-check',
-                      type: 'label',
-                    },
-                  ],
-                  [
-                    {
-                      label: 'Profile',
-                      icon: 'i-heroicons-user',
-                      onSelect: () => navigateTo('/profile'),
-                    },
-                  ],
-                  [
-                    {
-                      label: 'Logout',
-                      icon: 'i-heroicons-arrow-right-on-rectangle',
-                      onSelect: handleLogout,
-                    },
-                  ],
-                ]"
-                :content="{ side: 'bottom', align: 'end' }"
-              >
-                <UButton
-                  icon="i-heroicons-user-circle"
-                  color="neutral"
-                  variant="ghost"
-                  aria-label="User menu"
-                  class="cursor-pointer"
-                />
-              </UDropdownMenu>
-            </div>
-          </header>
-        </template>
-
-        <!-- Body content -->
-        <template #body>
-          <div
-            class="relative h-full"
-            :class="{ 'overflow-hidden': isLoading }"
-          >
-            <!-- Page navigation loading overlay -->
-            <LayoutPageLoadingOverlay />
-
-            <main
-              id="main-content"
-              aria-label="Main content"
-              class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16 max-w-[1920px] mx-auto w-full"
-            >
-              <slot />
-            </main>
+    <!-- SIDEBAR -->
+    <UDashboardSidebar
+      collapsible
+      resizable
+      width="260"
+      :toggle="{ color: 'neutral', variant: 'ghost', icon: 'i-heroicons-bars-3' }"
+      class="bg-elevated"
+    >
+      <!-- Logo Header -->
+      <template #header="{ collapsed }">
+        <NuxtLink
+          to="/"
+          aria-label="Go to dashboard"
+          class="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
+        >
+          <img
+            src="~/assets/css/icons/app-icon.svg"
+            alt="Stock Management System"
+            class="w-10 h-10 rounded-lg"
+          />
+          <div v-if="!collapsed" class="flex flex-col min-w-0">
+            <span class="text-label truncate">Stock</span>
+            <span class="text-caption truncate">Management</span>
           </div>
-        </template>
+        </NuxtLink>
+      </template>
 
-        <!-- Footer -->
-        <template #footer>
-          <footer
-            role="contentinfo"
-            aria-label="Site footer"
-            class="border-t border-default bg-elevated w-full h-fit-content"
+      <!-- Navigation Menu -->
+      <template #default="{ collapsed }">
+        <!-- Hierarchical Navigation Menu -->
+        <LayoutHierarchicalNav :items="mainMenuItems" :collapsed="collapsed" />
+      </template>
+    </UDashboardSidebar>
+
+    <!-- MAIN CONTENT PANEL -->
+    <UDashboardPanel :width="null">
+      <!-- Header/Navbar -->
+      <template #header>
+        <header
+          aria-label="Page header"
+          class="flex items-center justify-between w-full h-12 px-4 sm:px-6 border-b border-default bg-elevated"
+        >
+          <!-- Left: Sidebar toggle (mobile) / collapse (desktop) -->
+          <div class="flex items-center gap-4">
+            <UDashboardSidebarToggle class="lg:hidden" />
+            <UDashboardSidebarCollapse size="md" class="hidden lg:flex" />
+          </div>
+
+          <!-- Center section: Location and Period indicators -->
+          <div class="hidden md:flex items-center gap-4 flex-1 justify-center">
+            <!-- Location Switcher -->
+            <LayoutLocationSwitcher />
+
+            <!-- Divider -->
+            <div class="h-5 w-px bg-border opacity-50" />
+
+            <!-- Period Indicator -->
+            <LayoutPeriodIndicator />
+          </div>
+
+          <!-- Right side actions -->
+          <div class="flex items-center gap-1">
+            <!-- Notifications -->
+            <UButton
+              icon="i-heroicons-bell"
+              color="neutral"
+              variant="ghost"
+              aria-label="Notifications"
+              class="cursor-pointer"
+            />
+
+            <!-- Theme Toggle -->
+            <UButton
+              :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
+              color="neutral"
+              variant="ghost"
+              aria-label="Toggle color mode"
+              class="cursor-pointer"
+              @click="toggleTheme"
+            />
+
+            <!-- User Menu with Logout -->
+            <UDropdownMenu
+              v-if="isAuthenticated && user"
+              :items="[
+                [
+                  {
+                    label: user.full_name || user.email,
+                    icon: 'i-heroicons-user-circle',
+                    type: 'label',
+                  },
+                  {
+                    label: user.role,
+                    icon: 'i-heroicons-shield-check',
+                    type: 'label',
+                  },
+                ],
+                [
+                  {
+                    label: 'Profile',
+                    icon: 'i-heroicons-user',
+                    onSelect: () => navigateTo('/profile'),
+                  },
+                ],
+                [
+                  {
+                    label: 'Logout',
+                    icon: 'i-heroicons-arrow-right-on-rectangle',
+                    onSelect: handleLogout,
+                  },
+                ],
+              ]"
+              :content="{ side: 'bottom', align: 'end' }"
+            >
+              <UButton
+                icon="i-heroicons-user-circle"
+                color="neutral"
+                variant="ghost"
+                aria-label="User menu"
+                class="cursor-pointer"
+              />
+            </UDropdownMenu>
+          </div>
+        </header>
+      </template>
+
+      <!-- Body content -->
+      <template #body>
+        <div class="relative h-full" :class="{ 'overflow-hidden': isLoading }">
+          <!-- Page navigation loading overlay -->
+          <LayoutPageLoadingOverlay />
+
+          <main
+            id="main-content"
+            aria-label="Main content"
+            class="py-2 px-0 sm:px-12 xl:py-4 xl:px-16 max-w-[1920px] mx-auto w-full"
           >
-            <div class="px-4 sm:px-6 py-2">
-              <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <p class="text-caption">
-                  &copy; {{ new Date().getFullYear() }}
-                  <span class="hidden sm:inline">Stock Management System.</span>
-                  All rights reserved.
-                </p>
-                <p class="hidden sm:block text-caption">Version 1.0.0</p>
-              </div>
+            <slot />
+          </main>
+        </div>
+      </template>
+
+      <!-- Footer -->
+      <template #footer>
+        <footer
+          role="contentinfo"
+          aria-label="Site footer"
+          class="border-t border-default bg-elevated w-full h-fit-content"
+        >
+          <div class="px-4 sm:px-6 py-2">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <p class="text-caption">
+                &copy; {{ new Date().getFullYear() }}
+                <span class="hidden sm:inline">Stock Management System.</span>
+                All rights reserved.
+              </p>
+              <p class="hidden sm:block text-caption">Version 1.0.0</p>
             </div>
-          </footer>
-        </template>
+          </div>
+        </footer>
+      </template>
     </UDashboardPanel>
   </UDashboardGroup>
 </template>
-
-<style scoped>
-/* Active navigation indicator */
-:deep(.dashboard-sidebar nav a[aria-current="page"])::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 24px;
-  background-color: var(--ui-success, #45cf7b);
-  border-radius: 0 2px 2px 0;
-}
-</style>

@@ -79,7 +79,8 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Forbidden",
         data: {
           code: "CANNOT_DELETE_POSTED_DELIVERY",
-          message: "Posted deliveries cannot be deleted. Contact your administrator if you need to reverse this delivery.",
+          message:
+            "Posted deliveries cannot be deleted. Contact your administrator if you need to reverse this delivery.",
         },
       });
     }

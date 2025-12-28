@@ -10,11 +10,11 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 ## Role Hierarchy
 
-| Role | Description | Location Access | Primary Functions |
-|------|-------------|-----------------|-------------------|
-| **OPERATOR** | Day-to-day operations staff | Assigned locations only | Post deliveries, issues, POB entry |
-| **SUPERVISOR** | Team leads and managers | All locations (implicit) | Approvals, reconciliations, reports |
-| **ADMIN** | System administrators | All locations (implicit) | Full system control |
+| Role           | Description                 | Location Access          | Primary Functions                   |
+| -------------- | --------------------------- | ------------------------ | ----------------------------------- |
+| **OPERATOR**   | Day-to-day operations staff | Assigned locations only  | Post deliveries, issues, POB entry  |
+| **SUPERVISOR** | Team leads and managers     | All locations (implicit) | Approvals, reconciliations, reports |
+| **ADMIN**      | System administrators       | All locations (implicit) | Full system control                 |
 
 ---
 
@@ -47,15 +47,15 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 #### Navigation Access
 
-| Menu Item | Access |
-|-----------|--------|
-| Dashboard | ✅ Yes |
-| Transfers | ✅ Yes |
-| Users | ❌ No |
-| Locations | ❌ No |
-| Suppliers | ❌ No |
-| Periods | ❌ No |
-| Period Close | ❌ No |
+| Menu Item    | Access |
+| ------------ | ------ |
+| Dashboard    | ✅ Yes |
+| Transfers    | ✅ Yes |
+| Users        | ❌ No  |
+| Locations    | ❌ No  |
+| Suppliers    | ❌ No  |
+| Periods      | ❌ No  |
+| Period Close | ❌ No  |
 
 ---
 
@@ -86,23 +86,23 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 #### Navigation Access
 
-| Menu Item | Access |
-|-----------|--------|
-| Dashboard | ✅ Yes |
-| POB | ✅ Yes |
-| Items & Prices | ✅ Yes (view only) |
-| Deliveries & Invoices | ✅ Yes |
-| Issues | ✅ Yes |
-| Transfers | ✅ Yes (+ approve) |
-| NCR | ✅ Yes |
-| Stock Now | ✅ Yes |
-| Reconciliations | ✅ Yes (+ consolidated) |
-| Reports | ✅ Yes (+ export) |
-| Users | ❌ No |
-| Locations | ❌ No |
-| Suppliers | ❌ No |
-| Periods | ❌ No |
-| Period Close | ❌ No |
+| Menu Item             | Access                  |
+| --------------------- | ----------------------- |
+| Dashboard             | ✅ Yes                  |
+| POB                   | ✅ Yes                  |
+| Items & Prices        | ✅ Yes (view only)      |
+| Deliveries & Invoices | ✅ Yes                  |
+| Issues                | ✅ Yes                  |
+| Transfers             | ✅ Yes (+ approve)      |
+| NCR                   | ✅ Yes                  |
+| Stock Now             | ✅ Yes                  |
+| Reconciliations       | ✅ Yes (+ consolidated) |
+| Reports               | ✅ Yes (+ export)       |
+| Users                 | ❌ No                   |
+| Locations             | ❌ No                   |
+| Suppliers             | ❌ No                   |
+| Periods               | ❌ No                   |
+| Period Close          | ❌ No                   |
 
 ---
 
@@ -125,23 +125,23 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 #### Navigation Access
 
-| Menu Item | Access |
-|-----------|--------|
-| Dashboard | ✅ Yes |
-| Locations | ✅ Yes |
-| Users | ✅ Yes |
-| POB | ✅ Yes |
-| Suppliers | ✅ Yes |
-| Items & Prices | ✅ Yes (full control) |
-| Deliveries & Invoices | ✅ Yes |
-| Issues | ✅ Yes |
-| Transfers | ✅ Yes |
-| NCR | ✅ Yes |
-| Stock Now | ✅ Yes |
-| Reconciliations | ✅ Yes |
-| Reports | ✅ Yes |
-| Periods | ✅ Yes |
-| Period Close | ✅ Yes |
+| Menu Item             | Access                |
+| --------------------- | --------------------- |
+| Dashboard             | ✅ Yes                |
+| Locations             | ✅ Yes                |
+| Users                 | ✅ Yes                |
+| POB                   | ✅ Yes                |
+| Suppliers             | ✅ Yes                |
+| Items & Prices        | ✅ Yes (full control) |
+| Deliveries & Invoices | ✅ Yes                |
+| Issues                | ✅ Yes                |
+| Transfers             | ✅ Yes                |
+| NCR                   | ✅ Yes                |
+| Stock Now             | ✅ Yes                |
+| Reconciliations       | ✅ Yes                |
+| Reports               | ✅ Yes                |
+| Periods               | ✅ Yes                |
+| Period Close          | ✅ Yes                |
 
 ---
 
@@ -176,63 +176,63 @@ The system provides granular permission check functions for use throughout the a
 
 ### Delivery Permissions
 
-| Function | Description | Roles |
-|----------|-------------|-------|
+| Function                        | Description                 | Roles                      |
+| ------------------------------- | --------------------------- | -------------------------- |
 | `canPostDeliveries(locationId)` | Post deliveries at location | All (with location access) |
 
 ### Issue Permissions
 
-| Function | Description | Roles |
-|----------|-------------|-------|
+| Function                    | Description             | Roles                      |
+| --------------------------- | ----------------------- | -------------------------- |
 | `canPostIssues(locationId)` | Post issues at location | All (with location access) |
 
 ### Item Management
 
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `canEditItems()` | Edit item master data | ADMIN only |
-| `canCreateItems()` | Create new items | ADMIN only |
-| `canDeactivateItems()` | Deactivate items | ADMIN only |
-| `canSetItemPrices()` | Set period prices | ADMIN only |
+| Function               | Description           | Roles      |
+| ---------------------- | --------------------- | ---------- |
+| `canEditItems()`       | Edit item master data | ADMIN only |
+| `canCreateItems()`     | Create new items      | ADMIN only |
+| `canDeactivateItems()` | Deactivate items      | ADMIN only |
+| `canSetItemPrices()`   | Set period prices     | ADMIN only |
 
 ### Period Management
 
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `canClosePeriod()` | Close accounting period | ADMIN only |
-| `canOpenPeriod()` | Open new period | ADMIN only |
-| `canMarkLocationReady(locationId)` | Mark location ready | SUPERVISOR, ADMIN |
+| Function                           | Description             | Roles             |
+| ---------------------------------- | ----------------------- | ----------------- |
+| `canClosePeriod()`                 | Close accounting period | ADMIN only        |
+| `canOpenPeriod()`                  | Open new period         | ADMIN only        |
+| `canMarkLocationReady(locationId)` | Mark location ready     | SUPERVISOR, ADMIN |
 
 ### Transfer Permissions
 
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `canCreateTransfer(fromLocationId)` | Create transfer request | All (with location access) |
-| `canApproveTransfers()` | Approve/reject transfers | SUPERVISOR, ADMIN |
+| Function                            | Description              | Roles                      |
+| ----------------------------------- | ------------------------ | -------------------------- |
+| `canCreateTransfer(fromLocationId)` | Create transfer request  | All (with location access) |
+| `canApproveTransfers()`             | Approve/reject transfers | SUPERVISOR, ADMIN          |
 
 ### Reconciliation Permissions
 
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `canViewReconciliations(locationId)` | View reconciliation data | All (with location access) |
-| `canEditReconciliations(locationId)` | Edit adjustments | SUPERVISOR, ADMIN |
-| `canViewConsolidatedReconciliations()` | View all locations | SUPERVISOR, ADMIN |
+| Function                               | Description              | Roles                      |
+| -------------------------------------- | ------------------------ | -------------------------- |
+| `canViewReconciliations(locationId)`   | View reconciliation data | All (with location access) |
+| `canEditReconciliations(locationId)`   | Edit adjustments         | SUPERVISOR, ADMIN          |
+| `canViewConsolidatedReconciliations()` | View all locations       | SUPERVISOR, ADMIN          |
 
 ### Administrative Permissions
 
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `canManageUsers()` | User CRUD operations | ADMIN only |
+| Function                   | Description               | Roles      |
+| -------------------------- | ------------------------- | ---------- |
+| `canManageUsers()`         | User CRUD operations      | ADMIN only |
 | `canAssignUserLocations()` | Assign users to locations | ADMIN only |
-| `canManageLocations()` | Location CRUD operations | ADMIN only |
-| `canManageSuppliers()` | Supplier CRUD operations | ADMIN only |
+| `canManageLocations()`     | Location CRUD operations  | ADMIN only |
+| `canManageSuppliers()`     | Supplier CRUD operations  | ADMIN only |
 
 ### Reporting Permissions
 
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `canViewReports(locationId)` | View reports | All (with location access) |
-| `canExportReports()` | Export report data | SUPERVISOR, ADMIN |
+| Function                     | Description        | Roles                      |
+| ---------------------------- | ------------------ | -------------------------- |
+| `canViewReports(locationId)` | View reports       | All (with location access) |
+| `canExportReports()`         | Export report data | SUPERVISOR, ADMIN          |
 
 ---
 
@@ -258,22 +258,22 @@ All permission checks are enforced at the API level:
 
 ## Summary Matrix
 
-| Feature | OPERATOR | SUPERVISOR | ADMIN |
-|---------|----------|------------|-------|
-| Post Deliveries | ✅ Assigned | ✅ All | ✅ All |
-| Post Issues | ✅ Assigned | ✅ All | ✅ All |
-| Enter POB | ✅ Assigned | ✅ All | ✅ All |
-| Create Transfers | ✅ Assigned | ✅ All | ✅ All |
-| Approve Transfers | ❌ | ✅ | ✅ |
-| View Reconciliations | ✅ Totals | ✅ Full | ✅ Full |
-| Edit Reconciliations | ❌ | ✅ | ✅ |
-| Consolidated View | ❌ | ✅ | ✅ |
-| Export Reports | ❌ | ✅ | ✅ |
-| Manage Users | ❌ | ❌ | ✅ |
-| Manage Locations | ❌ | ❌ | ✅ |
-| Manage Suppliers | ❌ | ❌ | ✅ |
-| Manage Items/Prices | ❌ | ❌ | ✅ |
-| Period Close | ❌ | ❌ | ✅ |
+| Feature              | OPERATOR    | SUPERVISOR | ADMIN   |
+| -------------------- | ----------- | ---------- | ------- |
+| Post Deliveries      | ✅ Assigned | ✅ All     | ✅ All  |
+| Post Issues          | ✅ Assigned | ✅ All     | ✅ All  |
+| Enter POB            | ✅ Assigned | ✅ All     | ✅ All  |
+| Create Transfers     | ✅ Assigned | ✅ All     | ✅ All  |
+| Approve Transfers    | ❌          | ✅         | ✅      |
+| View Reconciliations | ✅ Totals   | ✅ Full    | ✅ Full |
+| Edit Reconciliations | ❌          | ✅         | ✅      |
+| Consolidated View    | ❌          | ✅         | ✅      |
+| Export Reports       | ❌          | ✅         | ✅      |
+| Manage Users         | ❌          | ❌         | ✅      |
+| Manage Locations     | ❌          | ❌         | ✅      |
+| Manage Suppliers     | ❌          | ❌         | ✅      |
+| Manage Items/Prices  | ❌          | ❌         | ✅      |
+| Period Close         | ❌          | ❌         | ✅      |
 
 ---
 

@@ -250,7 +250,9 @@ function handleChange(dateStr: string) {
           <h1 class="text-xl sm:text-3xl font-bold text-primary">POB Entry</h1>
           <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
             Personnel On Board daily entry for
-            {{ pobData?.location?.name || locationStore.activeLocation?.name || "current location" }}
+            {{
+              pobData?.location?.name || locationStore.activeLocation?.name || "current location"
+            }}
           </p>
         </div>
       </div>

@@ -22,11 +22,13 @@ This created confusion for administrators and unnecessary work when creating/edi
 ## Root Cause Analysis
 
 The server-side permission logic was implemented correctly in:
+
 - `server/middleware/location-access.ts` - Correctly grants Admins/Supervisors access to all locations
 - `app/stores/auth.ts` - `hasLocationAccess()` correctly gives Admins/Supervisors access to all locations
 - `app/composables/usePermissions.ts` - Correctly handles role-based permission checks
 
 However, the UI components were not reflecting this business logic:
+
 - `app/pages/users/[id]/edit.vue` - Showed location assignment UI for ALL roles
 - `app/pages/users/create.vue` - Didn't clearly indicate automatic location access for Supervisors/Admins
 - Role descriptions didn't mention location access implications
@@ -38,6 +40,7 @@ However, the UI components were not reflecting this business logic:
 ### 1. User Edit Page (`app/pages/users/[id]/edit.vue`)
 
 **Changes Made:**
+
 - Added `isOperatorRole` computed property to check if the form role is OPERATOR
 - Updated role options with descriptive labels including location access info:
   - Operator: "Post transactions at assigned locations only"
@@ -54,6 +57,7 @@ However, the UI components were not reflecting this business logic:
 ### 2. User Create Page (`app/pages/users/create.vue`)
 
 **Changes Made:**
+
 - Updated role options with same descriptive labels as edit page
 - Added `isOperatorRole` computed property
 - Made Default Location help text dynamic based on selected role:
@@ -78,15 +82,15 @@ However, the UI components were not reflecting this business logic:
 
 All test scenarios passed using Playwright MCP server:
 
-| Scenario | Expected | Result |
-|----------|----------|--------|
-| Edit Operator user | Location Access Management visible with add/remove functionality | PASS |
-| Edit Supervisor user | Info card "All Locations Access" displayed, no location management UI | PASS |
-| Edit Admin user | Info card "Full System Access" displayed, no location management UI | PASS |
-| Create user - Operator selected | Blue info card "Location Assignment Required" | PASS |
-| Create user - Supervisor selected | Green info card "All Locations Access" | PASS |
-| Create user - Admin selected | Green info card "Full System Access" | PASS |
-| Role descriptions in dropdown | All roles show location access info | PASS |
+| Scenario                          | Expected                                                              | Result |
+| --------------------------------- | --------------------------------------------------------------------- | ------ |
+| Edit Operator user                | Location Access Management visible with add/remove functionality      | PASS   |
+| Edit Supervisor user              | Info card "All Locations Access" displayed, no location management UI | PASS   |
+| Edit Admin user                   | Info card "Full System Access" displayed, no location management UI   | PASS   |
+| Create user - Operator selected   | Blue info card "Location Assignment Required"                         | PASS   |
+| Create user - Supervisor selected | Green info card "All Locations Access"                                | PASS   |
+| Create user - Admin selected      | Green info card "Full System Access"                                  | PASS   |
+| Role descriptions in dropdown     | All roles show location access info                                   | PASS   |
 
 ---
 

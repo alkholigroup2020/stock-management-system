@@ -615,9 +615,11 @@ useHead({
               <div>
                 <p class="font-semibold text-primary mb-1">Role Upgrade - Location Access Change</p>
                 <p class="text-sm text-[var(--ui-text-muted)]">
-                  Changing to <strong>{{ formData.role }}</strong> will grant this user automatic
-                  access to <strong>all locations</strong>. The current location assignments will no
-                  longer be enforced.
+                  Changing to
+                  <strong>{{ formData.role }}</strong>
+                  will grant this user automatic access to
+                  <strong>all locations</strong>
+                  . The current location assignments will no longer be enforced.
                 </p>
               </div>
             </div>
@@ -628,13 +630,19 @@ useHead({
             class="mt-6 p-4 rounded-lg bg-warning/10 border border-warning"
           >
             <div class="flex items-start gap-3">
-              <UIcon name="i-lucide-alert-triangle" class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+              <UIcon
+                name="i-lucide-alert-triangle"
+                class="w-5 h-5 text-warning flex-shrink-0 mt-0.5"
+              />
               <div>
-                <p class="font-semibold text-warning mb-1">Role Downgrade - Location Access Required</p>
+                <p class="font-semibold text-warning mb-1">
+                  Role Downgrade - Location Access Required
+                </p>
                 <p class="text-sm text-[var(--ui-text-muted)]">
-                  Changing to <strong>Operator</strong> will restrict this user to only their
-                  assigned locations. After saving, you must assign at least one location for
-                  this user to work effectively.
+                  Changing to
+                  <strong>Operator</strong>
+                  will restrict this user to only their assigned locations. After saving, you must
+                  assign at least one location for this user to work effectively.
                 </p>
               </div>
             </div>
@@ -713,9 +721,7 @@ useHead({
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary" />
-            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
-              Location Access
-            </h2>
+            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Location Access</h2>
           </div>
         </template>
 
@@ -731,14 +737,20 @@ useHead({
                 </p>
                 <p class="text-sm text-[var(--ui-text-muted)] mb-3">
                   <template v-if="formData.role === 'ADMIN'">
-                    As an <strong>Admin</strong>, this user automatically has <strong>full access</strong>
+                    As an
+                    <strong>Admin</strong>
+                    , this user automatically has
+                    <strong>full access</strong>
                     to all locations in the system with complete control (MANAGE level). No manual
                     location assignment is required.
                   </template>
                   <template v-else>
-                    As a <strong>Supervisor</strong>, this user automatically has <strong>access to
-                    all locations</strong> in the system. They can view, post transactions, and manage
-                    reconciliations at any location. No manual location assignment is required.
+                    As a
+                    <strong>Supervisor</strong>
+                    , this user automatically has
+                    <strong>access to all locations</strong>
+                    in the system. They can view, post transactions, and manage reconciliations at
+                    any location. No manual location assignment is required.
                   </template>
                 </p>
                 <div class="flex flex-wrap gap-2">
@@ -750,7 +762,12 @@ useHead({
                     <UIcon name="i-lucide-check" class="w-3 h-3 mr-1" />
                     Automatic Access
                   </UBadge>
-                  <UBadge v-if="formData.role === 'ADMIN'" color="success" variant="subtle" size="sm">
+                  <UBadge
+                    v-if="formData.role === 'ADMIN'"
+                    color="success"
+                    variant="subtle"
+                    size="sm"
+                  >
                     <UIcon name="i-lucide-check" class="w-3 h-3 mr-1" />
                     Full Control
                   </UBadge>
@@ -760,12 +777,16 @@ useHead({
           </div>
 
           <!-- Note about Default Location -->
-          <div class="mt-4 p-3 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]">
+          <div
+            class="mt-4 p-3 rounded-lg bg-[var(--ui-bg-muted)] border border-[var(--ui-border-muted)]"
+          >
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-info" class="w-4 h-4 text-[var(--ui-text-muted)]" />
               <p class="text-sm text-[var(--ui-text-muted)]">
-                The <strong>Default Location</strong> above is only used as a preference for which
-                location to display first when the user logs in. It does not restrict access.
+                The
+                <strong>Default Location</strong>
+                above is only used as a preference for which location to display first when the user
+                logs in. It does not restrict access.
               </p>
             </div>
           </div>
@@ -778,8 +799,9 @@ useHead({
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-info" class="w-4 h-4 text-primary" />
               <p class="text-sm text-[var(--ui-text-muted)]">
-                <strong>Operators</strong> can only access their assigned locations. Add at least
-                one location for this user to post transactions.
+                <strong>Operators</strong>
+                can only access their assigned locations. Add at least one location for this user to
+                post transactions.
               </p>
             </div>
           </div>
@@ -803,9 +825,7 @@ useHead({
                 </div>
               </div>
               <div class="flex items-center gap-3 flex-shrink-0">
-                <UBadge color="success" variant="subtle" size="sm">
-                  Assigned
-                </UBadge>
+                <UBadge color="success" variant="subtle" size="sm">Assigned</UBadge>
                 <UButton
                   icon="i-lucide-trash-2"
                   color="error"
@@ -824,10 +844,7 @@ useHead({
             v-else
             class="text-center py-8 px-4 rounded-lg bg-warning/10 border border-warning mb-6"
           >
-            <UIcon
-              name="i-lucide-alert-triangle"
-              class="w-12 h-12 text-warning mx-auto mb-3"
-            />
+            <UIcon name="i-lucide-alert-triangle" class="w-12 h-12 text-warning mx-auto mb-3" />
             <p class="font-semibold text-warning mb-1">No Locations Assigned</p>
             <p class="text-sm text-[var(--ui-text-muted)]">
               This operator cannot access any locations. Add at least one location below.
@@ -931,12 +948,7 @@ useHead({
           >
             Continue Editing
           </UButton>
-          <UButton
-            color="error"
-            icon="i-lucide-x"
-            class="cursor-pointer"
-            @click="confirmCancel"
-          >
+          <UButton color="error" icon="i-lucide-x" class="cursor-pointer" @click="confirmCancel">
             Discard Changes
           </UButton>
         </div>
@@ -952,10 +964,7 @@ useHead({
     >
       <template #body>
         <div class="space-y-4">
-          <div
-            v-if="locationToRemove"
-            class="p-4 rounded-lg border-2 border-warning bg-warning/10"
-          >
+          <div v-if="locationToRemove" class="p-4 rounded-lg border-2 border-warning bg-warning/10">
             <p class="font-semibold text-warning">
               {{ locationToRemove.location.name }}
             </p>

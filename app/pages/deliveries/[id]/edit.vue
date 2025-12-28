@@ -16,10 +16,13 @@
           <UIcon name="i-lucide-truck" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="text-xl sm:text-3xl font-bold text-primary">
-                Edit {{ deliveryNo }}
-              </h1>
-              <UBadge color="neutral" variant="subtle" size="md" class="inline-flex items-center gap-1">
+              <h1 class="text-xl sm:text-3xl font-bold text-primary">Edit {{ deliveryNo }}</h1>
+              <UBadge
+                color="neutral"
+                variant="subtle"
+                size="md"
+                class="inline-flex items-center gap-1"
+              >
                 <UIcon name="i-lucide-file-edit" class="h-3 w-3" />
                 Draft
               </UBadge>
@@ -196,12 +199,16 @@
                 <tr class="bg-[var(--ui-bg-elevated)]">
                   <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
                   <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Quantity</th>
-                  <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit Price</th>
+                  <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
+                    Unit Price
+                  </th>
                   <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
                     Period Price
                   </th>
                   <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Variance</th>
-                  <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
+                  <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
+                    Line Value
+                  </th>
                   <th class="px-4 py-3 text-center text-label uppercase tracking-wider">Action</th>
                 </tr>
               </thead>

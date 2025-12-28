@@ -40,17 +40,20 @@ This creates confusion and unnecessary work when creating/editing Supervisor or 
 ### Fix 1: User Edit Page (`edit.vue`)
 
 **Changes:**
+
 - Add computed property to check if user role is OPERATOR
 - Conditionally show "Location Access Management" section ONLY for Operators
 - Add info card for Supervisor/Admin explaining they have automatic access to all locations
 - Update UI to clearly distinguish between role types
 
 **Files to modify:**
+
 - `app/pages/users/[id]/edit.vue`
 
 ### Fix 2: User Create Page (`create.vue`)
 
 **Changes:**
+
 - Add dynamic info section that changes based on selected role
 - For OPERATOR: Show note that locations must be assigned after creation
 - For SUPERVISOR: Show note that they'll have access to all locations automatically
@@ -58,23 +61,27 @@ This creates confusion and unnecessary work when creating/editing Supervisor or 
 - Update role option descriptions
 
 **Files to modify:**
+
 - `app/pages/users/create.vue`
 
 ### Fix 3: Role Descriptions Update
 
 **Changes:**
+
 - Update role option labels to include location access info:
   - OPERATOR: "Operator - Can post transactions at assigned locations only"
   - SUPERVISOR: "Supervisor - Access to all locations, can approve transfers"
   - ADMIN: "Admin - Full system access with complete control over all locations"
 
 **Files to modify:**
+
 - `app/pages/users/[id]/edit.vue`
 - `app/pages/users/create.vue`
 
 ### Fix 4: Add Role-Based Info Cards
 
 **New UI Components:**
+
 - Create reusable alert/info component showing location access rules per role
 - Display warning when changing role from OPERATOR to SUPERVISOR/ADMIN (locations become irrelevant)
 - Display warning when changing role from SUPERVISOR/ADMIN to OPERATOR (requires location assignment)
@@ -84,37 +91,45 @@ This creates confusion and unnecessary work when creating/editing Supervisor or 
 ## Test Scenarios
 
 ### Scenario 1: Edit Operator User
+
 - [ ] Location Access Management section should be visible
 - [ ] Can add/remove locations
 - [ ] Proper access levels (VIEW, POST, MANAGE) available
 
 ### Scenario 2: Edit Supervisor User
+
 - [ ] Location Access Management section should be HIDDEN
 - [ ] Info card should display explaining automatic access to all locations
 - [ ] User should still be able to set Default Location (preference only)
 
 ### Scenario 3: Edit Admin User
+
 - [ ] Location Access Management section should be HIDDEN
 - [ ] Info card should display explaining full access to all locations
 - [ ] User should still be able to set Default Location (preference only)
 
 ### Scenario 4: Create Operator User
+
 - [ ] Role selection should show location requirement note
 - [ ] After creation, redirect to edit page for location assignment
 
 ### Scenario 5: Create Supervisor User
+
 - [ ] Role selection should show automatic access note
 - [ ] No location assignment required
 
 ### Scenario 6: Create Admin User
+
 - [ ] Role selection should show full access note
 - [ ] No location assignment required
 
 ### Scenario 7: Change Role from Operator to Supervisor
+
 - [ ] Warning should appear about locations becoming irrelevant
 - [ ] Existing location assignments should remain but won't be enforced
 
 ### Scenario 8: Change Role from Supervisor to Operator
+
 - [ ] Warning should appear about needing location assignment
 - [ ] User must have at least one location assigned to function
 

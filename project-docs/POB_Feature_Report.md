@@ -12,6 +12,7 @@
 POB (Personnel On Board) is a daily headcount tracking feature that records crew and extra personnel counts for each location within the Stock Management System. The primary purpose of POB is to calculate **Total Mandays**, which serves as the denominator for the critical **Manday Cost** calculation at period-end reconciliations.
 
 **Key Formula:**
+
 ```
 Manday Cost = Total Consumption ÷ Total Mandays
 ```
@@ -21,6 +22,7 @@ Manday Cost = Total Consumption ÷ Total Mandays
 ## 2. Feature Purpose & Business Value
 
 ### 2.1 What POB Does
+
 - **Tracks daily headcount** at each location (Kitchen, Store, Central, Warehouse)
 - **Records two count types:**
   - **Crew Count** – Regular staff meals
@@ -28,12 +30,14 @@ Manday Cost = Total Consumption ÷ Total Mandays
 - **Calculates Total Mandays** – Sum of all daily crew + extra counts for the period
 
 ### 2.2 Why POB Matters
+
 - **Cost Control:** Enables management to understand per-person food cost
 - **Period Reconciliation:** Mandays become the denominator for calculating consumption efficiency
 - **Benchmarking:** Compare manday costs across locations and periods
 - **Budgeting:** Forecast food costs based on expected headcount
 
 ### 2.3 Business Example
+
 ```
 Period: November 2025
 Total Consumption (Food + Clean): SAR 45,000
@@ -74,13 +78,13 @@ model POB {
 
 ### 3.2 Key Constraints
 
-| Constraint | Description |
-| --- | --- |
-| **Unique Composite Key** | period_id + location_id + date ensures one entry per location per day |
-| **Non-Negative Integers** | crew_count and extra_count must be ≥ 0 |
-| **Whole Numbers Only** | Counts must be integers (no decimals) |
-| **Period Scope** | Entries are tied to a specific accounting period |
-| **Location Scope** | Each entry belongs to a specific location |
+| Constraint                | Description                                                           |
+| ------------------------- | --------------------------------------------------------------------- |
+| **Unique Composite Key**  | period_id + location_id + date ensures one entry per location per day |
+| **Non-Negative Integers** | crew_count and extra_count must be ≥ 0                                |
+| **Whole Numbers Only**    | Counts must be integers (no decimals)                                 |
+| **Period Scope**          | Entries are tied to a specific accounting period                      |
+| **Location Scope**        | Each entry belongs to a specific location                             |
 
 ---
 
@@ -89,22 +93,24 @@ model POB {
 ### 4.1 POB Entry Page (`/pob`)
 
 **Page Components:**
+
 1. **POBSummary** – Displays current period info and total mandays
 2. **POBTable** – Inline editable table for daily entries
 
 **Summary Card Shows:**
+
 - Current Period name and date range
 - Total Mandays (crew + extra sum)
 - Breakdown: X crew + Y extra
 
 **Table Columns:**
 
-| Column | Description |
-| --- | --- |
-| Date | Day of the week + formatted date (e.g., "Mon, 01/11/2025") |
-| Crew Count | Editable input field for regular staff |
-| Extra Count | Editable input field for guests/extras |
-| Total | Auto-calculated (crew + extra) |
+| Column      | Description                                                |
+| ----------- | ---------------------------------------------------------- |
+| Date        | Day of the week + formatted date (e.g., "Mon, 01/11/2025") |
+| Crew Count  | Editable input field for regular staff                     |
+| Extra Count | Editable input field for guests/extras                     |
+| Total       | Auto-calculated (crew + extra)                             |
 
 ### 4.2 UI States
 
@@ -115,6 +121,7 @@ model POB {
 5. **Normal Entry Mode** – Full editing capabilities
 
 ### 4.3 Auto-Save Feature
+
 - POB entries are **automatically saved** when the user moves to the next field (on blur)
 - Visual indicator shows saving status per row
 - Success toast confirms save completion
@@ -124,11 +131,13 @@ model POB {
 ## 5. API Endpoints
 
 ### 5.1 GET POB Data
+
 ```
 GET /api/locations/{locationId}/pob
 ```
 
 **Response:**
+
 ```json
 {
   "location": { "id": "...", "code": "RYD-01", "name": "Riyadh Kitchen" },
@@ -154,11 +163,13 @@ GET /api/locations/{locationId}/pob
 ```
 
 ### 5.2 POST/Update POB Entries
+
 ```
 POST /api/locations/{locationId}/pob
 ```
 
 **Request Body:**
+
 ```json
 {
   "entries": [
@@ -172,11 +183,13 @@ POST /api/locations/{locationId}/pob
 ```
 
 ### 5.3 PATCH Single POB Entry
+
 ```
 PATCH /api/pob/{id}
 ```
 
 **Request Body:**
+
 ```json
 {
   "crew_count": 48,
@@ -190,21 +203,21 @@ PATCH /api/pob/{id}
 
 ### 6.1 Data Validation Rules
 
-| Rule | Description |
-| --- | --- |
-| **Non-Negative** | crew_count ≥ 0, extra_count ≥ 0 |
-| **Integer Only** | Must be whole numbers |
-| **Period Must Be OPEN** | Cannot modify POB for closed periods |
-| **Location Access** | User must have POST or MANAGE access to the location |
-| **One Entry Per Day** | Unique constraint on (period + location + date) |
+| Rule                    | Description                                          |
+| ----------------------- | ---------------------------------------------------- |
+| **Non-Negative**        | crew_count ≥ 0, extra_count ≥ 0                      |
+| **Integer Only**        | Must be whole numbers                                |
+| **Period Must Be OPEN** | Cannot modify POB for closed periods                 |
+| **Location Access**     | User must have POST or MANAGE access to the location |
+| **One Entry Per Day**   | Unique constraint on (period + location + date)      |
 
 ### 6.2 Access Control
 
-| Role | Permissions |
-| --- | --- |
-| **Operator** | Enter/edit POB for assigned locations only |
-| **Supervisor** | Enter/edit POB for all locations |
-| **Admin** | Full access to all POB data |
+| Role           | Permissions                                |
+| -------------- | ------------------------------------------ |
+| **Operator**   | Enter/edit POB for assigned locations only |
+| **Supervisor** | Enter/edit POB for all locations           |
+| **Admin**      | Full access to all POB data                |
 
 ### 6.3 Period Lifecycle
 
@@ -250,9 +263,7 @@ const totalMandays = pobEntries.reduce(
   0
 );
 
-const mandayCost = totalMandays > 0
-  ? consumption / totalMandays
-  : null;
+const mandayCost = totalMandays > 0 ? consumption / totalMandays : null;
 ```
 
 ---
@@ -331,35 +342,39 @@ User Input
 
 ### 9.1 Frontend Components
 
-| Component | Location | Purpose |
-| --- | --- | --- |
-| `pob.vue` | `/app/pages/pob.vue` | Main POB entry page |
+| Component        | Location               | Purpose                       |
+| ---------------- | ---------------------- | ----------------------------- |
+| `pob.vue`        | `/app/pages/pob.vue`   | Main POB entry page           |
 | `POBSummary.vue` | `/app/components/pob/` | Period info & mandays summary |
-| `POBTable.vue` | `/app/components/pob/` | Editable entry table |
+| `POBTable.vue`   | `/app/components/pob/` | Editable entry table          |
 
 ### 9.2 Key Frontend Logic
 
 **Entry Initialization:**
+
 - Generates all dates in the period
 - Populates existing entries from API
 - Creates empty entries for missing dates
 
 **Auto-Save Logic:**
+
 ```typescript
 function handleBlur(dateStr: string) {
-  updateTotal(dateStr);  // Recalculate total
-  saveEntry(dateStr);    // POST to API
+  updateTotal(dateStr); // Recalculate total
+  saveEntry(dateStr); // POST to API
 }
 ```
 
 ### 9.3 Backend API Logic
 
 **Permission Check:**
+
 1. User must be authenticated
 2. User must have location access (or be Supervisor/Admin)
 3. Period must be OPEN for the location
 
 **Update Logic:**
+
 - Upsert pattern: Create if not exists, update if exists
 - Tracks last modifier (entered_by)
 - Timestamps automatically updated
@@ -370,14 +385,14 @@ function handleBlur(dateStr: string) {
 
 ### 10.1 Common Error Codes
 
-| Code | HTTP | Description |
-| --- | --- | --- |
-| `NOT_AUTHENTICATED` | 401 | User not logged in |
-| `LOCATION_ACCESS_DENIED` | 403 | No access to location |
-| `INSUFFICIENT_PERMISSIONS` | 403 | VIEW-only access, cannot edit |
-| `PERIOD_CLOSED` | 400 | Period not open for editing |
-| `VALIDATION_ERROR` | 400 | Invalid input (negative, non-integer) |
-| `POB_NOT_FOUND` | 404 | POB entry ID not found |
+| Code                       | HTTP | Description                           |
+| -------------------------- | ---- | ------------------------------------- |
+| `NOT_AUTHENTICATED`        | 401  | User not logged in                    |
+| `LOCATION_ACCESS_DENIED`   | 403  | No access to location                 |
+| `INSUFFICIENT_PERMISSIONS` | 403  | VIEW-only access, cannot edit         |
+| `PERIOD_CLOSED`            | 400  | Period not open for editing           |
+| `VALIDATION_ERROR`         | 400  | Invalid input (negative, non-integer) |
+| `POB_NOT_FOUND`            | 404  | POB entry ID not found                |
 
 ### 10.2 UI Error States
 
@@ -393,6 +408,7 @@ function handleBlur(dateStr: string) {
 ### 11.1 POB Data in Reports
 
 POB data appears in:
+
 1. **Dashboard** – Total Mandays for current period
 2. **Reconciliation Page** – Manday cost calculation
 3. **Consolidated Reconciliation** – Cross-location totals
@@ -400,12 +416,12 @@ POB data appears in:
 
 ### 11.2 Key Metrics
 
-| Metric | Formula |
-| --- | --- |
+| Metric            | Formula                                |
+| ----------------- | -------------------------------------- |
 | **Total Mandays** | Σ(crew_count + extra_count) for period |
-| **Daily Average** | Total Mandays ÷ Days in Period |
-| **Manday Cost** | Total Consumption ÷ Total Mandays |
-| **Crew Ratio** | crew_count ÷ total_count |
+| **Daily Average** | Total Mandays ÷ Days in Period         |
+| **Manday Cost**   | Total Consumption ÷ Total Mandays      |
+| **Crew Ratio**    | crew_count ÷ total_count               |
 
 ---
 
@@ -419,10 +435,10 @@ POB data appears in:
 
 ### 12.2 Response Time Targets
 
-| Operation | Target |
-| --- | --- |
-| Load POB page | < 500ms |
-| Save single entry | < 300ms |
+| Operation         | Target                |
+| ----------------- | --------------------- |
+| Load POB page     | < 500ms               |
+| Save single entry | < 300ms               |
 | Calculate summary | < 100ms (client-side) |
 
 ---
@@ -478,6 +494,7 @@ POB data appears in:
 POB is a foundational feature that enables accurate cost-per-person calculations in the Stock Management System. By tracking daily headcounts, the system can compute meaningful **Manday Cost** metrics that help management understand and control food costs across all locations.
 
 **Key Takeaways:**
+
 1. POB data is entered daily per location
 2. Total Mandays = Sum of (crew + extra) for the period
 3. Manday Cost = Consumption ÷ Total Mandays
@@ -486,5 +503,5 @@ POB is a foundational feature that enables accurate cost-per-person calculations
 
 ---
 
-*Report generated from project documentation analysis*
-*Stock Management System - December 2025*
+_Report generated from project documentation analysis_
+_Stock Management System - December 2025_

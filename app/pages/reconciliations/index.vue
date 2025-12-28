@@ -152,16 +152,13 @@ async function fetchReconciliation() {
   error.value = null;
 
   try {
-    const response = await $fetch<ReconciliationReportResponse>(
-      "/api/reports/reconciliation",
-      {
-        method: "GET",
-        query: {
-          periodId: currentPeriod.value.id,
-          locationId: activeLocationId.value,
-        },
-      }
-    );
+    const response = await $fetch<ReconciliationReportResponse>("/api/reports/reconciliation", {
+      method: "GET",
+      query: {
+        periodId: currentPeriod.value.id,
+        locationId: activeLocationId.value,
+      },
+    });
 
     // Extract the location data from the response
     const locationData = response.locations.find(

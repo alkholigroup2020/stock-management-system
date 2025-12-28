@@ -192,10 +192,7 @@
               <tr v-if="loadingInitialData">
                 <td colspan="7" class="px-4 py-8">
                   <div class="flex flex-col items-center justify-center gap-3">
-                    <UIcon
-                      name="i-lucide-loader-2"
-                      class="w-8 h-8 text-primary animate-spin"
-                    />
+                    <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
                     <p class="text-sm text-[var(--ui-text-muted)]">Loading items...</p>
                   </div>
                 </td>

@@ -210,9 +210,7 @@ export default defineEventHandler(async (event) => {
           .map((line) => {
             const quantity = parseFloat(line.quantity.toString());
             const unitPrice = parseFloat(line.unit_price.toString());
-            const periodPrice = line.period_price
-              ? parseFloat(line.period_price.toString())
-              : null;
+            const periodPrice = line.period_price ? parseFloat(line.period_price.toString()) : null;
             const priceVariance = parseFloat(line.price_variance.toString());
             const lineValue = parseFloat(line.line_value.toString());
 

@@ -189,12 +189,14 @@ export default defineEventHandler(async (event) => {
     }
 
     // Get items for validation
-    const linesToProcess = data.lines || delivery.delivery_lines.map((l) => ({
-      id: l.id,
-      item_id: l.item_id,
-      quantity: parseFloat(l.quantity.toString()),
-      unit_price: parseFloat(l.unit_price.toString()),
-    }));
+    const linesToProcess =
+      data.lines ||
+      delivery.delivery_lines.map((l) => ({
+        id: l.id,
+        item_id: l.item_id,
+        quantity: parseFloat(l.quantity.toString()),
+        unit_price: parseFloat(l.unit_price.toString()),
+      }));
 
     const itemIds = linesToProcess.map((line) => line.item_id);
     const items = await prisma.item.findMany({
@@ -261,200 +263,200 @@ export default defineEventHandler(async (event) => {
           });
         }
 
-      let totalAmount = 0;
-      let hasVariance = false;
-      const createdLines: unknown[] = [];
-      const createdNCRs: unknown[] = [];
+        let totalAmount = 0;
+        let hasVariance = false;
+        const createdLines: unknown[] = [];
+        const createdNCRs: unknown[] = [];
 
-      // Process each delivery line
-      for (const lineData of linesToProcess) {
-        const item = items.find((i) => i.id === lineData.item_id)!;
-        const periodPrice = periodPriceMap.get(lineData.item_id);
-        const currentStock = stockMap.get(lineData.item_id) || { quantity: 0, wac: 0 };
+        // Process each delivery line
+        for (const lineData of linesToProcess) {
+          const item = items.find((i) => i.id === lineData.item_id)!;
+          const periodPrice = periodPriceMap.get(lineData.item_id);
+          const currentStock = stockMap.get(lineData.item_id) || { quantity: 0, wac: 0 };
 
-        // Calculate line value
-        const lineValue = lineData.quantity * lineData.unit_price;
-        totalAmount += lineValue;
+          // Calculate line value
+          const lineValue = lineData.quantity * lineData.unit_price;
+          totalAmount += lineValue;
 
-        // Calculate WAC and check variance only when posting
-        let wacResult = { newWAC: 0, previousWAC: 0 };
-        let priceVariance = 0;
-        let variancePercent = 0;
-        let lineHasVariance = false;
+          // Calculate WAC and check variance only when posting
+          let wacResult = { newWAC: 0, previousWAC: 0 };
+          let priceVariance = 0;
+          let variancePercent = 0;
+          let lineHasVariance = false;
 
-        if (isPosting) {
-          // Calculate new WAC
-          wacResult = calculateWAC(
-            currentStock.quantity,
-            currentStock.wac,
-            lineData.quantity,
-            lineData.unit_price
-          );
-
-          // Check for price variance
-          if (periodPrice !== undefined) {
-            const varianceResult = checkPriceVariance(
-              lineData.unit_price,
-              periodPrice,
-              lineData.quantity
+          if (isPosting) {
+            // Calculate new WAC
+            wacResult = calculateWAC(
+              currentStock.quantity,
+              currentStock.wac,
+              lineData.quantity,
+              lineData.unit_price
             );
-            priceVariance = varianceResult.variance;
-            variancePercent = varianceResult.variancePercent;
-            lineHasVariance = varianceResult.hasVariance;
 
-            if (lineHasVariance) {
-              hasVariance = true;
+            // Check for price variance
+            if (periodPrice !== undefined) {
+              const varianceResult = checkPriceVariance(
+                lineData.unit_price,
+                periodPrice,
+                lineData.quantity
+              );
+              priceVariance = varianceResult.variance;
+              variancePercent = varianceResult.variancePercent;
+              lineHasVariance = varianceResult.hasVariance;
+
+              if (lineHasVariance) {
+                hasVariance = true;
+              }
             }
           }
-        }
 
-        // Create delivery line (either new or recreated)
-        const deliveryLine = await tx.deliveryLine.create({
-          data: {
-            delivery_id: deliveryId,
-            item_id: lineData.item_id,
+          // Create delivery line (either new or recreated)
+          const deliveryLine = await tx.deliveryLine.create({
+            data: {
+              delivery_id: deliveryId,
+              item_id: lineData.item_id,
+              quantity: lineData.quantity,
+              unit_price: lineData.unit_price,
+              period_price: periodPrice || lineData.unit_price,
+              price_variance: priceVariance,
+              line_value: lineValue,
+            },
+          });
+
+          // Update or create location stock (only when posting)
+          if (isPosting) {
+            await tx.locationStock.upsert({
+              where: {
+                location_id_item_id: {
+                  location_id: delivery.location_id,
+                  item_id: lineData.item_id,
+                },
+              },
+              update: {
+                on_hand: { increment: lineData.quantity },
+                wac: wacResult.newWAC,
+              },
+              create: {
+                location_id: delivery.location_id,
+                item_id: lineData.item_id,
+                on_hand: lineData.quantity,
+                wac: wacResult.newWAC,
+              },
+            });
+
+            // Create NCR if price variance detected
+            if (lineHasVariance && periodPrice !== undefined) {
+              const ncrPrefix = `NCR-${new Date().getFullYear()}-`;
+              const lastNCR = await tx.nCR.findFirst({
+                where: { ncr_no: { startsWith: ncrPrefix } },
+                orderBy: { ncr_no: "desc" },
+                select: { ncr_no: true },
+              });
+
+              let ncrNumber = 1;
+              if (lastNCR) {
+                const parts = lastNCR.ncr_no.split("-");
+                ncrNumber = parseInt(parts[2] || "0", 10) + 1;
+              }
+              const ncrNo = `${ncrPrefix}${ncrNumber.toString().padStart(3, "0")}`;
+
+              const ncr = await tx.nCR.create({
+                data: {
+                  ncr_no: ncrNo,
+                  location_id: delivery.location_id,
+                  delivery_id: deliveryId,
+                  delivery_line_id: deliveryLine.id,
+                  type: "PRICE_VARIANCE",
+                  status: "OPEN",
+                  reason: `Price variance detected: Expected ${periodPrice?.toFixed(2)}, Actual ${lineData.unit_price.toFixed(2)} (${variancePercent.toFixed(1)}% ${priceVariance > 0 ? "increase" : "decrease"})`,
+                  quantity: lineData.quantity,
+                  value: Math.abs(priceVariance * lineData.quantity),
+                  auto_generated: true,
+                  created_by: user.id,
+                },
+              });
+
+              createdNCRs.push({
+                id: ncr.id,
+                ncr_no: ncr.ncr_no,
+                type: ncr.type,
+                item: {
+                  id: item.id,
+                  code: item.code,
+                  name: item.name,
+                },
+                expected_price: periodPrice,
+                actual_price: lineData.unit_price,
+                variance: priceVariance,
+                variance_percent: variancePercent,
+              });
+            }
+          }
+
+          createdLines.push({
+            id: deliveryLine.id,
+            item: {
+              id: item.id,
+              code: item.code,
+              name: item.name,
+              unit: item.unit,
+            },
             quantity: lineData.quantity,
             unit_price: lineData.unit_price,
             period_price: periodPrice || lineData.unit_price,
             price_variance: priceVariance,
             line_value: lineValue,
-          },
-        });
-
-        // Update or create location stock (only when posting)
-        if (isPosting) {
-          await tx.locationStock.upsert({
-            where: {
-              location_id_item_id: {
-                location_id: delivery.location_id,
-                item_id: lineData.item_id,
-              },
-            },
-            update: {
-              on_hand: { increment: lineData.quantity },
-              wac: wacResult.newWAC,
-            },
-            create: {
-              location_id: delivery.location_id,
-              item_id: lineData.item_id,
-              on_hand: lineData.quantity,
-              wac: wacResult.newWAC,
-            },
+            wac_before: currentStock.wac,
+            wac_after: wacResult.newWAC,
           });
-
-          // Create NCR if price variance detected
-          if (lineHasVariance && periodPrice !== undefined) {
-            const ncrPrefix = `NCR-${new Date().getFullYear()}-`;
-            const lastNCR = await tx.nCR.findFirst({
-              where: { ncr_no: { startsWith: ncrPrefix } },
-              orderBy: { ncr_no: "desc" },
-              select: { ncr_no: true },
-            });
-
-            let ncrNumber = 1;
-            if (lastNCR) {
-              const parts = lastNCR.ncr_no.split("-");
-              ncrNumber = parseInt(parts[2] || "0", 10) + 1;
-            }
-            const ncrNo = `${ncrPrefix}${ncrNumber.toString().padStart(3, "0")}`;
-
-            const ncr = await tx.nCR.create({
-              data: {
-                ncr_no: ncrNo,
-                location_id: delivery.location_id,
-                delivery_id: deliveryId,
-                delivery_line_id: deliveryLine.id,
-                type: "PRICE_VARIANCE",
-                status: "OPEN",
-                reason: `Price variance detected: Expected ${periodPrice?.toFixed(2)}, Actual ${lineData.unit_price.toFixed(2)} (${variancePercent.toFixed(1)}% ${priceVariance > 0 ? "increase" : "decrease"})`,
-                quantity: lineData.quantity,
-                value: Math.abs(priceVariance * lineData.quantity),
-                auto_generated: true,
-                created_by: user.id,
-              },
-            });
-
-            createdNCRs.push({
-              id: ncr.id,
-              ncr_no: ncr.ncr_no,
-              type: ncr.type,
-              item: {
-                id: item.id,
-                code: item.code,
-                name: item.name,
-              },
-              expected_price: periodPrice,
-              actual_price: lineData.unit_price,
-              variance: priceVariance,
-              variance_percent: variancePercent,
-            });
-          }
         }
 
-        createdLines.push({
-          id: deliveryLine.id,
-          item: {
-            id: item.id,
-            code: item.code,
-            name: item.name,
-            unit: item.unit,
+        // Update delivery record
+        const updatedDelivery = await tx.delivery.update({
+          where: { id: deliveryId },
+          data: {
+            supplier_id: data.supplier_id,
+            po_id: data.po_id,
+            invoice_no: data.invoice_no ?? delivery.invoice_no,
+            delivery_note: data.delivery_note ?? delivery.delivery_note,
+            delivery_date: data.delivery_date ? new Date(data.delivery_date) : undefined,
+            period_id: isPosting && currentPeriod ? currentPeriod.id : undefined,
+            status: data.status,
+            posted_at: isPosting ? new Date() : undefined,
+            total_amount: totalAmount,
+            has_variance: hasVariance,
           },
-          quantity: lineData.quantity,
-          unit_price: lineData.unit_price,
-          period_price: periodPrice || lineData.unit_price,
-          price_variance: priceVariance,
-          line_value: lineValue,
-          wac_before: currentStock.wac,
-          wac_after: wacResult.newWAC,
+          include: {
+            location: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                type: true,
+              },
+            },
+            supplier: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+              },
+            },
+            creator: {
+              select: {
+                id: true,
+                username: true,
+                full_name: true,
+              },
+            },
+          },
         });
-      }
 
-      // Update delivery record
-      const updatedDelivery = await tx.delivery.update({
-        where: { id: deliveryId },
-        data: {
-          supplier_id: data.supplier_id,
-          po_id: data.po_id,
-          invoice_no: data.invoice_no ?? delivery.invoice_no,
-          delivery_note: data.delivery_note ?? delivery.delivery_note,
-          delivery_date: data.delivery_date ? new Date(data.delivery_date) : undefined,
-          period_id: isPosting && currentPeriod ? currentPeriod.id : undefined,
-          status: data.status,
-          posted_at: isPosting ? new Date() : undefined,
-          total_amount: totalAmount,
-          has_variance: hasVariance,
-        },
-        include: {
-          location: {
-            select: {
-              id: true,
-              code: true,
-              name: true,
-              type: true,
-            },
-          },
-          supplier: {
-            select: {
-              id: true,
-              code: true,
-              name: true,
-            },
-          },
-          creator: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-            },
-          },
-        },
-      });
-
-      return {
-        delivery: updatedDelivery,
-        lines: createdLines,
-        ncrs: createdNCRs,
-      };
+        return {
+          delivery: updatedDelivery,
+          lines: createdLines,
+          ncrs: createdNCRs,
+        };
       },
       {
         maxWait: 10000, // Max time to wait for a transaction slot (10 seconds)

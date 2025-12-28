@@ -127,8 +127,12 @@ export default defineEventHandler(async (event) => {
     const deliveryMap = new Map(deliveryCounts.map((d) => [d.location_id, d._count.id]));
     const issueMap = new Map(issueCounts.map((i) => [i.location_id, i._count.id]));
     const transferFromMap = new Map(transferCounts.map((t) => [t.from_location_id, t._count._all]));
-    const transferToMap = new Map(transferToLocationCounts.map((t) => [t.to_location_id, t._count._all]));
-    const reconciliationMap = new Map(reconciliationCounts.map((r) => [r.location_id, r._count.id]));
+    const transferToMap = new Map(
+      transferToLocationCounts.map((t) => [t.to_location_id, t._count._all])
+    );
+    const reconciliationMap = new Map(
+      reconciliationCounts.map((r) => [r.location_id, r._count.id])
+    );
 
     // Enhance period_locations with per-location counts
     const enhancedPeriodLocations = currentPeriod.period_locations.map((pl) => {

@@ -116,7 +116,8 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Bad Request",
         data: {
           code: "NO_LOCATIONS",
-          message: "Cannot create a period without any active locations. Please create at least one location first.",
+          message:
+            "Cannot create a period without any active locations. Please create at least one location first.",
         },
       });
     }

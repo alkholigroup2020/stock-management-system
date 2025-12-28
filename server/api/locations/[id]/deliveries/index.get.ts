@@ -121,14 +121,14 @@ export default defineEventHandler(async (event) => {
 
     if (query.from_date) {
       where.delivery_date = {
-        ...(where.delivery_date as Prisma.DateTimeFilter || {}),
+        ...((where.delivery_date as Prisma.DateTimeFilter) || {}),
         gte: new Date(query.from_date as string),
       };
     }
 
     if (query.to_date) {
       where.delivery_date = {
-        ...(where.delivery_date as Prisma.DateTimeFilter || {}),
+        ...((where.delivery_date as Prisma.DateTimeFilter) || {}),
         lte: new Date(query.to_date as string),
       };
     }

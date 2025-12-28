@@ -37,14 +37,11 @@ const querySchema = z.object({
   search: z.string().optional(),
   locationId: z.string().uuid().optional(),
   is_active: z
-    .preprocess(
-      (val) => {
-        if (val === "true" || val === true) return true;
-        if (val === "false" || val === false) return false;
-        return undefined;
-      },
-      z.boolean().optional()
-    )
+    .preprocess((val) => {
+      if (val === "true" || val === true) return true;
+      if (val === "false" || val === false) return false;
+      return undefined;
+    }, z.boolean().optional())
     .optional(),
   page: z.coerce.number().default(1),
   limit: z.coerce.number().max(200).default(50),

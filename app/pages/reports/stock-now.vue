@@ -582,9 +582,9 @@ onMounted(async () => {
               </template>
 
               <template #wac-data="{ row }">
-                <span class="text-sm">{{
-                  formatCurrency((row as unknown as StockReportItem).wac)
-                }}</span>
+                <span class="text-sm">
+                  {{ formatCurrency((row as unknown as StockReportItem).wac) }}
+                </span>
               </template>
 
               <template #stock_value-data="{ row }">

@@ -640,7 +640,9 @@ onMounted(async () => {
                 :key="item.item_code"
                 class="flex justify-between text-sm"
               >
-                <span class="truncate text-[var(--ui-text)]">{{ idx + 1 }}. {{ item.item_name }}</span>
+                <span class="truncate text-[var(--ui-text)]">
+                  {{ idx + 1 }}. {{ item.item_name }}
+                </span>
                 <span class="font-mono text-[var(--ui-text-muted)]">
                   {{ formatCurrency(item.total_value) }}
                 </span>
@@ -724,7 +726,9 @@ onMounted(async () => {
                     {{ issue.cost_centre }}
                   </UBadge>
                 </td>
-                <td class="px-4 py-3 text-right font-mono font-semibold text-red-500 dark:text-red-400">
+                <td
+                  class="px-4 py-3 text-right font-mono font-semibold text-red-500 dark:text-red-400"
+                >
                   {{ formatCurrency(issue.total_value) }}
                 </td>
                 <td class="px-4 py-3 text-right">{{ issue.line_count }}</td>

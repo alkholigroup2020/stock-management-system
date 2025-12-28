@@ -291,7 +291,9 @@
                   class="inline-flex items-center gap-1"
                 >
                   <UIcon
-                    :name="delivery.status === 'DRAFT' ? 'i-lucide-file-edit' : 'i-lucide-check-circle'"
+                    :name="
+                      delivery.status === 'DRAFT' ? 'i-lucide-file-edit' : 'i-lucide-check-circle'
+                    "
                     class="h-3 w-3"
                   />
                   {{ delivery.status === "DRAFT" ? "Draft" : "Posted" }}

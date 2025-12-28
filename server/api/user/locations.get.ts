@@ -58,9 +58,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Filter active locations
-    const locations = userLocations
-      .filter((ul) => ul.location.is_active)
-      .map((ul) => ul.location);
+    const locations = userLocations.filter((ul) => ul.location.is_active).map((ul) => ul.location);
 
     // Set cache headers (20 seconds for user locations)
     setCacheHeaders(event, {

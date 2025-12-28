@@ -104,9 +104,7 @@ function formatCurrency(value: number | null): string {
         <div>
           <div class="flex items-center gap-1">
             <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Closing Stock</h4>
-            <UTooltip
-              text="Calculated from current inventory levels (on-hand × WAC for all items)"
-            >
+            <UTooltip text="Calculated from current inventory levels (on-hand × WAC for all items)">
               <UIcon name="i-lucide-info" class="w-3.5 h-3.5 text-[var(--ui-text-muted)]" />
             </UTooltip>
           </div>

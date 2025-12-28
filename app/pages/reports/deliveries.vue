@@ -604,7 +604,10 @@ onMounted(async () => {
       </UCard>
 
       <!-- By Supplier Summary -->
-      <UCard v-if="reportData?.by_supplier && reportData.by_supplier.length > 0" class="card-elevated">
+      <UCard
+        v-if="reportData?.by_supplier && reportData.by_supplier.length > 0"
+        class="card-elevated"
+      >
         <template #header>
           <h3 class="text-lg font-semibold text-[var(--ui-text)]">Top Suppliers</h3>
         </template>

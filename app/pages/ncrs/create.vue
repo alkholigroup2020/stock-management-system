@@ -123,11 +123,7 @@ const removeLine = (id: string) => {
 };
 
 // Calculate line value
-const updateLineValue = (line: {
-  quantity: string;
-  unit_value: string;
-  line_value: number;
-}) => {
+const updateLineValue = (line: { quantity: string; unit_value: string; line_value: number }) => {
   const quantity = parseFloat(line.quantity) || 0;
   const unitValue = parseFloat(line.unit_value) || 0;
   line.line_value = quantity * unitValue;
@@ -416,9 +412,7 @@ watch(
   () => formData.value.delivery_id,
   (newDeliveryId) => {
     // Get the new selected delivery
-    const newDelivery = newDeliveryId
-      ? deliveries.value.find((d) => d.id === newDeliveryId)
-      : null;
+    const newDelivery = newDeliveryId ? deliveries.value.find((d) => d.id === newDeliveryId) : null;
 
     // Get item IDs from the new delivery (if any)
     const deliveryItemIds = newDelivery?.lines
@@ -528,11 +522,7 @@ onMounted(async () => {
 
           <!-- Selected Delivery Info -->
           <div v-if="selectedDelivery" class="lg:col-span-2">
-            <UCard
-              variant="subtle"
-              class="bg-[var(--ui-bg-muted)]"
-              :ui="{ body: 'p-4' }"
-            >
+            <UCard variant="subtle" class="bg-[var(--ui-bg-muted)]" :ui="{ body: 'p-4' }">
               <div class="flex items-center gap-2 mb-3">
                 <UIcon name="i-lucide-truck" class="w-5 h-5 text-primary" />
                 <h3 class="font-semibold">Selected Delivery Details</h3>

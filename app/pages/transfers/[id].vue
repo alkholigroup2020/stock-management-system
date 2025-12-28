@@ -397,20 +397,12 @@ onMounted(async () => {
           <table class="min-w-full divide-y divide-[var(--ui-border)]">
             <thead>
               <tr class="bg-[var(--ui-bg-elevated)]">
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                  Item Code
-                </th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                  Item Name
-                </th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item Code</th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item Name</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
-                  Quantity
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Quantity</th>
                 <th class="px-4 py-3 text-right text-label uppercase tracking-wider">WAC</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">
-                  Line Value
-                </th>
+                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[var(--ui-border)]">
@@ -457,9 +449,7 @@ onMounted(async () => {
                 <td colspan="3" class="px-4 py-3 text-body font-semibold">Total</td>
                 <td class="whitespace-nowrap px-4 py-3 text-right text-body font-semibold">
                   {{
-                    transfer.lines
-                      .reduce((sum, line) => sum + Number(line.quantity), 0)
-                      .toFixed(4)
+                    transfer.lines.reduce((sum, line) => sum + Number(line.quantity), 0).toFixed(4)
                   }}
                 </td>
                 <td></td>
@@ -473,7 +463,11 @@ onMounted(async () => {
       </UCard>
 
       <!-- Approval Actions Card (Supervisor/Admin only, Pending status only) -->
-      <UCard v-if="canUserApprove" class="card-elevated border-primary" :ui="{ body: 'p-3 sm:p-4' }">
+      <UCard
+        v-if="canUserApprove"
+        class="card-elevated border-primary"
+        :ui="{ body: 'p-3 sm:p-4' }"
+      >
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-user-check" class="h-5 w-5 text-primary" />

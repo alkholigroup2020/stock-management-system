@@ -77,24 +77,24 @@ Manday Cost = Total Consumption / Total Mandays
 
 ### 5.1 Automatic Data (System-Calculated)
 
-| Component         | Source                   | Description                                    |
-| ----------------- | ------------------------ | ---------------------------------------------- |
-| **Opening Stock** | Previous period snapshot | Value carried forward from last period close   |
-| **Receipts**      | Deliveries posted        | Sum of all delivery values in period           |
+| Component         | Source                   | Description                                         |
+| ----------------- | ------------------------ | --------------------------------------------------- |
+| **Opening Stock** | Previous period snapshot | Value carried forward from last period close        |
+| **Receipts**      | Deliveries posted        | Sum of all delivery values in period                |
 | **Transfers In**  | Transfer records         | Stock received from other locations (at source WAC) |
-| **Transfers Out** | Transfer records         | Stock sent to other locations (at current WAC) |
-| **Issues**        | Issues posted            | Sum of all issue values (Food + Clean)         |
-| **Total Mandays** | POB entries              | Sum of (Crew + Extra) for all days in period   |
+| **Transfers Out** | Transfer records         | Stock sent to other locations (at current WAC)      |
+| **Issues**        | Issues posted            | Sum of all issue values (Food + Clean)              |
+| **Total Mandays** | POB entries              | Sum of (Crew + Extra) for all days in period        |
 
 ### 5.2 Manual Adjustments (User-Entered)
 
-| Adjustment        | Effect   | Description                            |
-| ----------------- | -------- | -------------------------------------- |
+| Adjustment        | Effect   | Description                                |
+| ----------------- | -------- | ------------------------------------------ |
 | **Closing Stock** | Subtract | Physical count value entered by supervisor |
-| **Back-charges**  | Add      | Costs charged back to consumption      |
-| **Credits Due**   | Subtract | Supplier credits from NCRs             |
-| **Condemnations** | Add      | Items written off (damaged/expired)    |
-| **Others**        | +/-      | Miscellaneous adjustments              |
+| **Back-charges**  | Add      | Costs charged back to consumption          |
+| **Credits Due**   | Subtract | Supplier credits from NCRs                 |
+| **Condemnations** | Add      | Items written off (damaged/expired)        |
+| **Others**        | +/-      | Miscellaneous adjustments                  |
 
 ---
 
@@ -278,27 +278,27 @@ Every reconciliation change logs:
 
 ## 11. Integration Points
 
-| System Component | Integration                    |
-| ---------------- | ------------------------------ |
-| **Deliveries**   | Feeds receipts total           |
-| **Issues**       | Feeds consumption ledger       |
-| **Transfers**    | Feeds transfers in/out         |
-| **POB**          | Feeds total mandays            |
-| **NCRs**         | Feeds credits due              |
-| **Stock Now**    | Reference for closing stock    |
-| **Period Close** | Consumes reconciliation data   |
+| System Component | Integration                     |
+| ---------------- | ------------------------------- |
+| **Deliveries**   | Feeds receipts total            |
+| **Issues**       | Feeds consumption ledger        |
+| **Transfers**    | Feeds transfers in/out          |
+| **POB**          | Feeds total mandays             |
+| **NCRs**         | Feeds credits due               |
+| **Stock Now**    | Reference for closing stock     |
+| **Period Close** | Consumes reconciliation data    |
 | **Dashboard**    | Displays reconciliation summary |
 
 ---
 
 ## 12. Performance Requirements
 
-| Operation              | Target Response Time |
-| ---------------------- | -------------------- |
-| Load reconciliation    | < 2 seconds          |
-| Save adjustments       | < 1 second           |
-| Calculate consumption  | < 500ms              |
-| Consolidated report    | < 5 seconds          |
+| Operation             | Target Response Time |
+| --------------------- | -------------------- |
+| Load reconciliation   | < 2 seconds          |
+| Save adjustments      | < 1 second           |
+| Calculate consumption | < 500ms              |
+| Consolidated report   | < 5 seconds          |
 
 ---
 

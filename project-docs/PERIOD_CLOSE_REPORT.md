@@ -17,11 +17,11 @@ The **Period Close** feature is a critical month-end process that finalizes acco
 
 ### What Period Close Does
 
-| Action | Description |
-|--------|-------------|
-| **Lock the Month** | Prevents any further edits to the closed period |
-| **Create Snapshots** | Saves a permanent record of each location's final state |
-| **Roll Forward** | Sets opening balances for next period = closing balances |
+| Action               | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| **Lock the Month**   | Prevents any further edits to the closed period            |
+| **Create Snapshots** | Saves a permanent record of each location's final state    |
+| **Roll Forward**     | Sets opening balances for next period = closing balances   |
 | **Start New Period** | Automatically creates and opens the next accounting period |
 
 ### Why It Matters
@@ -38,18 +38,21 @@ The **Period Close** feature is a critical month-end process that finalizes acco
 Before Period Close can be executed, ALL of the following must be complete:
 
 ### Operations Complete
+
 - [ ] All deliveries for the period have been posted
 - [ ] All issues for the period have been posted
 - [ ] All transfers between locations have been completed
 - [ ] All NCRs have been reviewed (resolved or pending next period)
 
 ### Reconciliation Complete
+
 - [ ] Physical stock count completed at each location
 - [ ] Closing stock values entered in Reconciliations
 - [ ] Adjustments entered (back-charges, credits, condemnations)
 - [ ] Consumption and Manday Cost reviewed
 
 ### Location Readiness
+
 - [ ] Each location marked as "READY" by Supervisor
 - [ ] ALL locations must be ready (no partial closes allowed)
 
@@ -74,15 +77,16 @@ The period follows a strict state progression:
 
 ### State Descriptions
 
-| State | Description | Allowed Operations |
-|-------|-------------|-------------------|
-| **OPEN** | Normal operations | Post deliveries, issues, transfers, update POB, edit reconciliations, mark locations ready |
-| **PENDING_CLOSE** | Awaiting admin approval | View only, Admin can approve (execute close) or reject (revert to OPEN) |
-| **CLOSED** | Locked permanently | Read-only access, historical reference only |
+| State             | Description             | Allowed Operations                                                                         |
+| ----------------- | ----------------------- | ------------------------------------------------------------------------------------------ |
+| **OPEN**          | Normal operations       | Post deliveries, issues, transfers, update POB, edit reconciliations, mark locations ready |
+| **PENDING_CLOSE** | Awaiting admin approval | View only, Admin can approve (execute close) or reject (revert to OPEN)                    |
+| **CLOSED**        | Locked permanently      | Read-only access, historical reference only                                                |
 
 ### Rejection Flow
 
 When an admin **rejects** a period close request:
+
 - Period status reverts from `PENDING_CLOSE` → `OPEN`
 - All location statuses **remain READY** (not reset)
 - Operators/Supervisors can make corrections
@@ -104,6 +108,7 @@ When an admin **rejects** a period close request:
    - Status per location: NOT_READY → READY
 
 2. **Readiness Dashboard**
+
    ```
    Period: 2025-11
 
@@ -130,11 +135,11 @@ When an admin **rejects** a period close request:
 
 ### Who Does What
 
-| Role | Capabilities | Period Close Actions |
-|------|-------------|---------------------|
-| **Operator** | Post deliveries, issues, view stock | Cannot close or mark ready |
+| Role           | Capabilities                              | Period Close Actions                         |
+| -------------- | ----------------------------------------- | -------------------------------------------- |
+| **Operator**   | Post deliveries, issues, view stock       | Cannot close or mark ready                   |
 | **Supervisor** | Review reconciliations, approve transfers | Mark location as READY, cannot approve close |
-| **Admin** | Full system access | Approve and execute Period Close |
+| **Admin**      | Full system access                        | Approve and execute Period Close             |
 
 ### Approval Workflow
 
@@ -390,11 +395,11 @@ When a period closes, the system captures permanent snapshots:
         "item_code": "RIC001",
         "item_name": "Rice 5kg",
         "quantity": 150.5,
-        "wac": 25.50,
+        "wac": 25.5,
         "value": 3837.75
       }
     ],
-    "total_stock_value": 125430.50,
+    "total_stock_value": 125430.5,
     "total_items": 156
   }
 }
@@ -406,19 +411,19 @@ When a period closes, the system captures permanent snapshots:
 {
   "location_id": "loc_123",
   "period_id": "period_202511",
-  "opening_stock": 125000.00,
-  "receipts": 45000.00,
-  "transfers_in": 5000.00,
-  "transfers_out": 3000.00,
-  "issues": 35000.00,
-  "closing_stock": 137000.00,
+  "opening_stock": 125000.0,
+  "receipts": 45000.0,
+  "transfers_in": 5000.0,
+  "transfers_out": 3000.0,
+  "issues": 35000.0,
+  "closing_stock": 137000.0,
   "adjustments": {
-    "back_charges": 1000.00,
-    "credits": -500.00,
-    "condemnations": 200.00,
-    "others": 0.00
+    "back_charges": 1000.0,
+    "credits": -500.0,
+    "condemnations": 200.0,
+    "others": 0.0
   },
-  "consumption": 34500.00,
+  "consumption": 34500.0,
   "total_mandays": 2100,
   "manday_cost": 16.43
 }
@@ -430,14 +435,14 @@ When a period closes, the system captures permanent snapshots:
 
 ### Common Errors
 
-| Error Code | HTTP Status | Scenario | Resolution |
-|------------|-------------|----------|------------|
-| `LOCATIONS_NOT_READY` | 400 | Not all locations marked ready | Supervisor must mark all locations ready |
-| `PERIOD_ALREADY_CLOSED` | 400 | Attempting to close already closed period | No action needed |
-| `PENDING_TRANSACTIONS` | 400 | Unposted deliveries/issues exist | Complete all transactions first |
-| `APPROVAL_REQUIRED` | 202 | Close attempted without approval | Submit approval request first |
-| `APPROVAL_EXPIRED` | 400 | Approval token expired | Request new approval |
-| `INSUFFICIENT_PERMISSIONS` | 403 | Non-admin attempting close | Admin must perform close |
+| Error Code                 | HTTP Status | Scenario                                  | Resolution                               |
+| -------------------------- | ----------- | ----------------------------------------- | ---------------------------------------- |
+| `LOCATIONS_NOT_READY`      | 400         | Not all locations marked ready            | Supervisor must mark all locations ready |
+| `PERIOD_ALREADY_CLOSED`    | 400         | Attempting to close already closed period | No action needed                         |
+| `PENDING_TRANSACTIONS`     | 400         | Unposted deliveries/issues exist          | Complete all transactions first          |
+| `APPROVAL_REQUIRED`        | 202         | Close attempted without approval          | Submit approval request first            |
+| `APPROVAL_EXPIRED`         | 400         | Approval token expired                    | Request new approval                     |
+| `INSUFFICIENT_PERMISSIONS` | 403         | Non-admin attempting close                | Admin must perform close                 |
 
 ### Post-Close Errors
 
@@ -553,13 +558,13 @@ Every period close action is logged:
 
 ## 13. Performance Requirements
 
-| Operation | Target Response Time |
-|-----------|---------------------|
-| Get period status | < 200ms |
-| Mark location ready | < 500ms |
-| Request approval | < 500ms |
-| Execute period close | < 5000ms |
-| Retrieve closed period data | < 2000ms |
+| Operation                   | Target Response Time |
+| --------------------------- | -------------------- |
+| Get period status           | < 200ms              |
+| Mark location ready         | < 500ms              |
+| Request approval            | < 500ms              |
+| Execute period close        | < 5000ms             |
+| Retrieve closed period data | < 2000ms             |
 
 ---
 
@@ -623,22 +628,24 @@ Every period close action is logged:
 
 ### Common Issues
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Cannot mark location ready | Reconciliation not complete | Complete all reconciliation entries |
-| Close button disabled | Not all locations ready | Contact supervisors of pending locations |
-| Approval request fails | Missing required data | Ensure all locations have snapshots |
-| Close timeout | Large dataset | Wait and retry; contact support if persists |
-| Wrong period closed | User error | Cannot undo; document in next period |
+| Issue                      | Cause                       | Solution                                    |
+| -------------------------- | --------------------------- | ------------------------------------------- |
+| Cannot mark location ready | Reconciliation not complete | Complete all reconciliation entries         |
+| Close button disabled      | Not all locations ready     | Contact supervisors of pending locations    |
+| Approval request fails     | Missing required data       | Ensure all locations have snapshots         |
+| Close timeout              | Large dataset               | Wait and retry; contact support if persists |
+| Wrong period closed        | User error                  | Cannot undo; document in next period        |
 
 ### Recovery Scenarios
 
 **If close fails mid-execution:**
+
 - System automatically rolls back
 - Period returns to PENDING_CLOSE
 - Admin can retry after issue resolved
 
 **If system error during snapshot:**
+
 - Snapshots are transactional
 - All-or-nothing execution
 - Retry safe after investigation
@@ -693,13 +700,13 @@ Following the checklist and best practices ensures smooth month-end operations a
 
 #### API Endpoints Updated
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/periods/current` | GET | Now returns both OPEN and PENDING_CLOSE periods |
-| `/api/period-locations/ready` | PATCH | Mark location as ready (body: periodId, locationId) |
-| `/api/periods/:id/close` | POST | Request period close (creates approval) |
-| `/api/approvals/:id/approve` | PATCH | Approve and execute close |
-| `/api/approvals/:id/reject` | PATCH | Reject and revert to OPEN |
+| Endpoint                      | Method | Purpose                                             |
+| ----------------------------- | ------ | --------------------------------------------------- |
+| `/api/periods/current`        | GET    | Now returns both OPEN and PENDING_CLOSE periods     |
+| `/api/period-locations/ready` | PATCH  | Mark location as ready (body: periodId, locationId) |
+| `/api/periods/:id/close`      | POST   | Request period close (creates approval)             |
+| `/api/approvals/:id/approve`  | PATCH  | Approve and execute close                           |
+| `/api/approvals/:id/reject`   | PATCH  | Reject and revert to OPEN                           |
 
 #### E2E Testing Performed
 

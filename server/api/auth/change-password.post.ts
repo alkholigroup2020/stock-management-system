@@ -94,10 +94,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check if new password is the same as current password
-    const isSamePassword = await verifyUserPassword(
-      validatedData.newPassword,
-      user.password_hash
-    );
+    const isSamePassword = await verifyUserPassword(validatedData.newPassword, user.password_hash);
 
     if (isSamePassword) {
       throw createError({

@@ -184,12 +184,7 @@
       "
     >
       <template v-if="canPostIssues() && activeFilters.length === 0" #actions>
-        <UButton
-          color="primary"
-          icon="i-lucide-plus"
-          class="cursor-pointer"
-          @click="goToNewIssue"
-        >
+        <UButton color="primary" icon="i-lucide-plus" class="cursor-pointer" @click="goToNewIssue">
           Create First Issue
         </UButton>
       </template>

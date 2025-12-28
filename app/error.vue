@@ -150,15 +150,24 @@ const handleClearError = () => {
                 <p class="font-semibold">Need access to this page?</p>
                 <ul class="text-left space-y-1 max-w-md mx-auto">
                   <li class="flex items-start gap-2">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                    <UIcon
+                      name="i-lucide-check"
+                      class="w-4 h-4 mt-0.5 text-primary flex-shrink-0"
+                    />
                     <span>Contact your supervisor or administrator</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                    <UIcon
+                      name="i-lucide-check"
+                      class="w-4 h-4 mt-0.5 text-primary flex-shrink-0"
+                    />
                     <span>Request the appropriate role permissions</span>
                   </li>
                   <li class="flex items-start gap-2">
-                    <UIcon name="i-lucide-check" class="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                    <UIcon
+                      name="i-lucide-check"
+                      class="w-4 h-4 mt-0.5 text-primary flex-shrink-0"
+                    />
                     <span>Ensure you're logged in with the correct account</span>
                   </li>
                 </ul>

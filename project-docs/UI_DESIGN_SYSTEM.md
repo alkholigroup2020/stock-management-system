@@ -74,17 +74,17 @@ Colors in this system map directly to business logic and user intent:
 **Full palette:**
 
 ```css
---color-navy-50: #e8f0fc;   /* Lightest - subtle blue tint */
+--color-navy-50: #e8f0fc; /* Lightest - subtle blue tint */
 --color-navy-100: #c9dbf7;
 --color-navy-200: #9bbcf0;
---color-navy-300: #6a9be6;  /* Used for dark mode highlighted text */
---color-navy-400: #3d7dd9;  /* Dark mode primary - vibrant blue */
---color-navy-500: #1e4d8c;  /* Light mode primary, brand color */
+--color-navy-300: #6a9be6; /* Used for dark mode highlighted text */
+--color-navy-400: #3d7dd9; /* Dark mode primary - vibrant blue */
+--color-navy-500: #1e4d8c; /* Light mode primary, brand color */
 --color-navy-600: #173d70;
 --color-navy-700: #122f56;
 --color-navy-800: #0d2240;
 --color-navy-900: #08162a;
---color-navy-950: #040b16;  /* Darkest */
+--color-navy-950: #040b16; /* Darkest */
 ```
 
 ### Secondary Color - Emerald Green (#45cf7b)
@@ -984,49 +984,49 @@ font-family:
 
 ### Background Tokens
 
-| Token              | Light Mode           | Dark Mode            | Usage                                      |
-| ------------------ | -------------------- | -------------------- | ------------------------------------------ |
-| `--ui-bg`          | #ffffff (white)      | #0c1220 (navy-dark)  | Page background, main content area         |
-| `--ui-bg-elevated` | #f0f4f8 (blue-gray)  | #151c2c (navy-card)  | Nav, sidebar, footer, cards, modals, elevated surfaces |
-| `--ui-bg-muted`    | #e8ecf1 (blue-tint)  | #1e2738 (navy-muted) | Subtle backgrounds, disabled input fields  |
-| `--ui-bg-accented` | navy-50 (#e8f0fc)    | navy-900 (#08162a)   | Highlighted sections, featured areas       |
-| `--ui-bg-inverted` | navy-800 (#0d2240)   | zinc-100 (#f4f4f5)   | Dark surfaces in light mode, light in dark |
+| Token              | Light Mode          | Dark Mode            | Usage                                                  |
+| ------------------ | ------------------- | -------------------- | ------------------------------------------------------ |
+| `--ui-bg`          | #ffffff (white)     | #0c1220 (navy-dark)  | Page background, main content area                     |
+| `--ui-bg-elevated` | #f0f4f8 (blue-gray) | #151c2c (navy-card)  | Nav, sidebar, footer, cards, modals, elevated surfaces |
+| `--ui-bg-muted`    | #e8ecf1 (blue-tint) | #1e2738 (navy-muted) | Subtle backgrounds, disabled input fields              |
+| `--ui-bg-accented` | navy-50 (#e8f0fc)   | navy-900 (#08162a)   | Highlighted sections, featured areas                   |
+| `--ui-bg-inverted` | navy-800 (#0d2240)  | zinc-100 (#f4f4f5)   | Dark surfaces in light mode, light in dark             |
 
 ### Text Tokens
 
-| Token                   | Light Mode         | Dark Mode          | Usage                                        |
-| ----------------------- | ------------------ | ------------------ | -------------------------------------------- |
-| `--ui-text`             | zinc-900 (#18181b) | #eef1f5 (bright)   | Primary body text                            |
-| `--ui-text-muted`       | zinc-600 (#52525b) | #a0aec0 (blue-tint)| Secondary text, descriptions, labels         |
-| `--ui-text-dimmed`      | zinc-400 (#a1a1aa) | #64748b            | Disabled text, placeholder text              |
-| `--ui-text-highlighted` | navy-600 (#173d70) | navy-300 (#6a9be6) | Important text, headings, emphasized content |
-| `--ui-text-inverted`    | white (#ffffff)    | zinc-900 (#18181b) | Text on inverted backgrounds                 |
+| Token                   | Light Mode         | Dark Mode           | Usage                                        |
+| ----------------------- | ------------------ | ------------------- | -------------------------------------------- |
+| `--ui-text`             | zinc-900 (#18181b) | #eef1f5 (bright)    | Primary body text                            |
+| `--ui-text-muted`       | zinc-600 (#52525b) | #a0aec0 (blue-tint) | Secondary text, descriptions, labels         |
+| `--ui-text-dimmed`      | zinc-400 (#a1a1aa) | #64748b             | Disabled text, placeholder text              |
+| `--ui-text-highlighted` | navy-600 (#173d70) | navy-300 (#6a9be6)  | Important text, headings, emphasized content |
+| `--ui-text-inverted`    | white (#ffffff)    | zinc-900 (#18181b)  | Text on inverted backgrounds                 |
 
 ### Border Tokens
 
-| Token                  | Light Mode         | Dark Mode          | Usage                             |
-| ---------------------- | ------------------ | ------------------ | --------------------------------- |
-| `--ui-border`          | #c5cdd8 (blue-gray)| #2d3a4f (blue-tint)| Default borders for cards, inputs |
-| `--ui-border-muted`    | #dde3eb            | #232d3f            | Subtle dividers, table borders    |
-| `--ui-border-accented` | navy-500 (#1e4d8c) | navy-400 (#3d7dd9) | Emphasized borders, focus states  |
-| `--ui-border-inverted` | zinc-700 (#3f3f46) | zinc-300 (#d4d4d8) | Borders on inverted surfaces      |
+| Token                  | Light Mode          | Dark Mode           | Usage                             |
+| ---------------------- | ------------------- | ------------------- | --------------------------------- |
+| `--ui-border`          | #c5cdd8 (blue-gray) | #2d3a4f (blue-tint) | Default borders for cards, inputs |
+| `--ui-border-muted`    | #dde3eb             | #232d3f             | Subtle dividers, table borders    |
+| `--ui-border-accented` | navy-500 (#1e4d8c)  | navy-400 (#3d7dd9)  | Emphasized borders, focus states  |
+| `--ui-border-inverted` | zinc-700 (#3f3f46)  | zinc-300 (#d4d4d8)  | Borders on inverted surfaces      |
 
 **Border Consistency Rule:**
 All form fields (inputs, dropdowns, buttons with outline variant) use the same border color as cards via the `--ui-border` CSS variable.
 
 ### Interactive State Tokens
 
-| Token                   | Purpose                                       | Usage                                 |
-| ----------------------- | --------------------------------------------- | ------------------------------------- |
-| `--ui-primary`          | Primary brand color (navy-500 / navy-400)     | Mapped to Nuxt UI `color="primary"`   |
-| `--ui-secondary`        | Secondary color (emerald-500 / emerald-400)   | Mapped to Nuxt UI `color="secondary"` |
-| `--ui-primary-hover`    | Primary hover state (navy-600 / navy-300)     | Custom button hover states            |
-| `--ui-primary-active`   | Primary active state (navy-700 / navy-200)    | Custom button pressed states          |
-| `--ui-primary-contrast` | Text on primary bg (white / dark bg color)    | Button text color                     |
-| `--ui-bg-hover`         | Background hover (#e4eaf1 / #1e2738)          | Hover states for neutral elements     |
-| `--ui-bg-active`        | Background active (#d8e0ea / #283347)         | Active states for neutral elements    |
-| `--ui-ring`             | Focus ring color (navy-400 / navy-400)        | Focus indicators                      |
-| `--ui-focus`            | Focus outline (navy-400 / navy-400)           | Alternative focus styling             |
+| Token                   | Purpose                                     | Usage                                 |
+| ----------------------- | ------------------------------------------- | ------------------------------------- |
+| `--ui-primary`          | Primary brand color (navy-500 / navy-400)   | Mapped to Nuxt UI `color="primary"`   |
+| `--ui-secondary`        | Secondary color (emerald-500 / emerald-400) | Mapped to Nuxt UI `color="secondary"` |
+| `--ui-primary-hover`    | Primary hover state (navy-600 / navy-300)   | Custom button hover states            |
+| `--ui-primary-active`   | Primary active state (navy-700 / navy-200)  | Custom button pressed states          |
+| `--ui-primary-contrast` | Text on primary bg (white / dark bg color)  | Button text color                     |
+| `--ui-bg-hover`         | Background hover (#e4eaf1 / #1e2738)        | Hover states for neutral elements     |
+| `--ui-bg-active`        | Background active (#d8e0ea / #283347)       | Active states for neutral elements    |
+| `--ui-ring`             | Focus ring color (navy-400 / navy-400)      | Focus indicators                      |
+| `--ui-focus`            | Focus outline (navy-400 / navy-400)         | Alternative focus styling             |
 
 ### Feedback Tokens
 
@@ -1648,24 +1648,24 @@ The `LoadingOverlay` component (at `app/components/LoadingOverlay.vue`) provides
 Use descriptive boolean state variables tied to specific operations:
 
 ```typescript
-const savingDraft = ref(false);   // For draft save operations
-const saving = ref(false);        // For update/save operations
-const posting = ref(false);       // For post/submit operations
-const approving = ref(false);     // For approval actions
-const deleting = ref(false);      // For delete operations
+const savingDraft = ref(false); // For draft save operations
+const saving = ref(false); // For update/save operations
+const posting = ref(false); // For post/submit operations
+const approving = ref(false); // For approval actions
+const deleting = ref(false); // For delete operations
 ```
 
 ### Loading Messages by Operation Type
 
-| Operation       | Title                   | Message                                            |
-| --------------- | ----------------------- | -------------------------------------------------- |
-| **Save Draft**  | "Saving Draft..."       | "Please wait while we save your delivery draft"    |
-| **Save**        | "Saving Changes..."     | "Please wait while we save your changes"           |
-| **Post**        | "Posting Delivery..."   | "Please wait while we process your delivery"       |
-| **Approve**     | "Approving..."          | "Please wait while we process your approval"       |
-| **Reject**      | "Rejecting..."          | "Please wait while we process your rejection"      |
-| **Delete**      | "Deleting..."           | "Please wait while we remove the item"             |
-| **Period Close**| "Closing Period..."     | "Please wait while we close the accounting period" |
+| Operation        | Title                 | Message                                            |
+| ---------------- | --------------------- | -------------------------------------------------- |
+| **Save Draft**   | "Saving Draft..."     | "Please wait while we save your delivery draft"    |
+| **Save**         | "Saving Changes..."   | "Please wait while we save your changes"           |
+| **Post**         | "Posting Delivery..." | "Please wait while we process your delivery"       |
+| **Approve**      | "Approving..."        | "Please wait while we process your approval"       |
+| **Reject**       | "Rejecting..."        | "Please wait while we process your rejection"      |
+| **Delete**       | "Deleting..."         | "Please wait while we remove the item"             |
+| **Period Close** | "Closing Period..."   | "Please wait while we close the accounting period" |
 
 ### Implementation Checklist
 

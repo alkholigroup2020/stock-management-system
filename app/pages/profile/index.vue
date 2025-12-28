@@ -215,7 +215,6 @@ const getRoleIcon = (role: string) => {
   return icons[role] || "i-lucide-user";
 };
 
-
 // Permissions based on role
 const permissions = computed(() => {
   const role = user.value?.role;
@@ -408,9 +407,7 @@ useHead({
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-primary" />
-            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
-              Location Access
-            </h2>
+            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Location Access</h2>
           </div>
         </template>
 
@@ -420,14 +417,18 @@ useHead({
         </div>
 
         <!-- For ADMIN/SUPERVISOR: Show "All Locations Access" -->
-        <div v-else-if="isAdminOrSupervisor" class="p-4 rounded-lg bg-success/10 border border-success">
+        <div
+          v-else-if="isAdminOrSupervisor"
+          class="p-4 rounded-lg bg-success/10 border border-success"
+        >
           <div class="flex items-start gap-3">
             <UIcon name="i-lucide-globe" class="w-6 h-6 text-success flex-shrink-0 mt-0.5" />
             <div>
               <p class="font-semibold text-success mb-1">All Locations Access</p>
               <p class="text-sm text-[var(--ui-text-muted)]">
-                As a <strong>{{ user.role }}</strong
-                >, you have automatic access to all locations in the system.
+                As a
+                <strong>{{ user.role }}</strong>
+                , you have automatic access to all locations in the system.
                 {{
                   user.role === "ADMIN"
                     ? "You can manage all aspects of the system."
@@ -479,7 +480,9 @@ useHead({
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-shield" class="w-5 h-5 text-primary" />
-            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">Your Permissions</h2>
+            <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+              Your Permissions
+            </h2>
           </div>
         </template>
 
