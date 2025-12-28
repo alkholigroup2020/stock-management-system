@@ -1,8 +1,6 @@
-# API_Contract
+# API Contract - Multi-Location Stock Management System
 
-# API Contract - Multi-Location System
-
-**Last Updated:** November 2025
+**Last Updated:** December 2025
 
 **Purpose:** Define the backend API for the multi-location stock management system
 
@@ -17,13 +15,13 @@
 - **Times:** ISO 8601 UTC
 - **Currency:** SAR (Saudi Riyal)
 - **Pagination:** `?page=1&limit=50` + `X-Total-Count` header
-- **Location Context:** `X-Location-Id` header or route parameter
+- **Location Context:** Route parameter or query parameter
 
 ### API Architecture
 
 ```mermaid
 flowchart LR
-    Client[Multi-Location PWA] --> Nuxt[Nuxt 3 SPA]
+    Client[Multi-Location PWA] --> Nuxt[Nuxt 4 SPA]
     Nuxt --> API[Server Routes /server/api]
     API --> Prisma[Prisma ORM]
     Prisma --> DB[(PostgreSQL - Supabase)]
@@ -31,12 +29,14 @@ flowchart LR
 
 **Key Points:**
 
-- Single monolithic Nuxt 3 application
+- Single monolithic Nuxt 4 application
 - Frontend and API in same deployment
 - Serverless functions on Vercel
 - Direct Prisma connection to Supabase
 - No separate backend service
 - No Redis or message queue for MVP
+
+---
 
 ## Authentication & Authorization
 
@@ -53,48 +53,153 @@ flowchart LR
 interface UserSession {
   user: {
     id: string;
+    username: string;
     email: string;
+    full_name: string;
     role: "OPERATOR" | "SUPERVISOR" | "ADMIN";
-    locations: Array<{
+    default_location_id: string | null;
+    default_location: {
       id: string;
       code: string;
-      access: "VIEW" | "POST" | "MANAGE";
-    }>;
+      name: string;
+      type: string;
+    } | null;
+    locations: string[]; // Array of location IDs user has access to
   };
-  loggedInAt: number;
+  loggedInAt: string; // ISO date string
 }
 ```
 
 ### Authentication Endpoints
 
-```typescript
-// Login
+#### Login
+
+```
 POST /api/auth/login
-Body: { email: string, password: string }
-Response: { user: UserSession['user'] }
-Sets: httpOnly cookie
+```
 
-// Logout
+**Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Note:** The `email` field accepts either email or username.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "user": {
+    "id": "uuid",
+    "username": "admin",
+    "email": "admin@example.com",
+    "full_name": "Admin User",
+    "role": "ADMIN",
+    "default_location_id": "uuid",
+    "default_location": {
+      "id": "uuid",
+      "code": "KIT",
+      "name": "Kitchen",
+      "type": "KITCHEN"
+    },
+    "locations": ["uuid1", "uuid2"]
+  }
+}
+```
+
+#### Logout
+
+```
 POST /api/auth/logout
-Response: { success: true }
-Clears: httpOnly cookie
+```
 
-// Current session
+**Response:**
+
+```json
+{ "success": true }
+```
+
+#### Get Current Session
+
+```
 GET /api/auth/session
-Response: UserSession | null
+```
+
+**Response:** `UserSession | null`
+
+#### Register User
+
+```
+POST /api/auth/register
+```
+
+**Body:**
+
+```json
+{
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "password": "password123",
+  "full_name": "New User",
+  "role": "OPERATOR"
+}
+```
+
+**Permissions:** ADMIN only
+
+#### Change Password
+
+```
+POST /api/auth/change-password
+```
+
+**Body:**
+
+```json
+{
+  "currentPassword": "oldpassword",
+  "newPassword": "newpassword"
+}
+```
+
+#### Update Profile
+
+```
+PATCH /api/auth/profile
+```
+
+**Body:**
+
+```json
+{
+  "full_name": "Updated Name",
+  "email": "newemail@example.com"
+}
 ```
 
 ### Role Permissions
 
-| Role           | Permissions                          |
-| -------------- | ------------------------------------ |
-| **OPERATOR**   | View/Post at assigned locations      |
-| **SUPERVISOR** | All locations, approve transfers/PRF |
-| **ADMIN**      | Full system access, period close     |
+| Role           | Permissions                                      |
+| -------------- | ------------------------------------------------ |
+| **OPERATOR**   | View/Post at assigned locations only             |
+| **SUPERVISOR** | All locations, approve transfers, manage NCRs    |
+| **ADMIN**      | Full system access, period close, user management|
 
 ### Middleware Protection
 
-All `/api/*` routes automatically protected via:
+All `/api/*` routes automatically protected via server middleware, except:
+
+- `/api/auth/login`
+- `/api/auth/logout`
+- `/api/auth/session`
+- `/api/auth/register`
+- `/api/health`
 
 ```typescript
 // server/middleware/auth.ts
@@ -107,21 +212,22 @@ export default defineEventHandler(async (event) => {
 });
 ```
 
+---
+
 ## Core Endpoints
 
 ### 1. Location Management
 
-### List Locations
+#### List Locations
 
 ```
-GET /locations
+GET /api/locations
 ```
 
 **Query Params:**
 
-- `type`: KITCHEN, STORE, CENTRAL
+- `type`: KITCHEN, STORE, CENTRAL, WAREHOUSE
 - `active`: true/false
-- `manager_id`: UUID
 
 **Response:**
 
@@ -129,69 +235,192 @@ GET /locations
 {
   "locations": [
     {
-      "id": "loc_123",
-      "code": "RYD-01",
-      "name": "Riyadh Central Kitchen",
+      "id": "uuid",
+      "code": "KIT",
+      "name": "Kitchen",
       "type": "KITCHEN",
-      "address": "123 Main St, Riyadh",
-      "manager": { "id": "user_456", "name": "Ahmed Hassan" },
       "is_active": true
     }
   ],
-  "total": 15
+  "total": 4
 }
 ```
 
-### Get Location Details
+#### Get Location Details
 
 ```
-GET /locations/{id}
+GET /api/locations/{id}
 ```
 
-### Create Location
+#### Create Location
 
 ```
-POST /locations
+POST /api/locations
 ```
 
 **Body:**
 
 ```json
 {
-  "code": "RYD-02",
-  "name": "Riyadh Store 2",
-  "type": "STORE",
-  "address": "456 King Fahd Rd",
-  "manager_id": "user_789"
+  "code": "STR",
+  "name": "Store",
+  "type": "STORE"
 }
 ```
 
-### 2. Period Management
+**Permissions:** ADMIN only
 
-### Get Current Period
+#### Update Location
 
 ```
-GET /periods/current
+PATCH /api/locations/{id}
+```
+
+#### Delete Location
+
+```
+DELETE /api/locations/{id}
+```
+
+**Permissions:** ADMIN only
+
+#### Get Location Dashboard
+
+```
+GET /api/locations/{id}/dashboard
 ```
 
 **Response:**
 
 ```json
 {
-  "id": "period_202511",
-  "name": "2025-11",
-  "status": "OPEN",
-  "start_date": "2025-11-01",
-  "end_date": "2025-11-30",
-  "locations_ready": 3,
-  "locations_total": 5
+  "location": {
+    "id": "uuid",
+    "code": "KIT",
+    "name": "Kitchen"
+  },
+  "period": {
+    "id": "uuid",
+    "name": "Jan 2026",
+    "start_date": "2026-01-01",
+    "end_date": "2026-01-31",
+    "status": "OPEN"
+  },
+  "totals": {
+    "total_receipts": 5000.00,
+    "total_issues": 3000.00,
+    "total_mandays": 500,
+    "days_left": 15
+  },
+  "recent_deliveries": [...],
+  "recent_issues": [...]
 }
 ```
 
-### Set Period Prices (NEW)
+#### Manage Location Users
 
 ```
-POST /periods/{id}/prices
+POST /api/locations/{id}/users
+DELETE /api/locations/{id}/users/{userId}
+```
+
+---
+
+### 2. Dashboard
+
+#### Get Consolidated Dashboard
+
+```
+GET /api/dashboard/consolidated
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Response:**
+
+```json
+{
+  "current_period": {...},
+  "locations": [...],
+  "totals": {
+    "total_receipts": 50000.00,
+    "total_issues": 35000.00,
+    "total_stock_value": 125000.00
+  },
+  "pending_approvals": 3
+}
+```
+
+---
+
+### 3. Period Management
+
+#### List Periods
+
+```
+GET /api/periods
+```
+
+#### Get Current Period
+
+```
+GET /api/periods/current
+```
+
+**Response:**
+
+```json
+{
+  "id": "uuid",
+  "name": "Jan 2026",
+  "status": "OPEN",
+  "start_date": "2026-01-01",
+  "end_date": "2026-01-31",
+  "locations_ready": 2,
+  "locations_total": 4
+}
+```
+
+#### Get Period Details
+
+```
+GET /api/periods/{id}
+```
+
+#### Create Period
+
+```
+POST /api/periods
+```
+
+**Body:**
+
+```json
+{
+  "name": "Feb 2026",
+  "start_date": "2026-02-01",
+  "end_date": "2026-02-28"
+}
+```
+
+**Permissions:** ADMIN only
+
+#### Update Period
+
+```
+PATCH /api/periods/{id}
+```
+
+#### Get Period Prices
+
+```
+GET /api/periods/{periodId}/prices
+```
+
+#### Set Period Prices
+
+```
+POST /api/periods/{periodId}/prices
 ```
 
 **Body:**
@@ -199,323 +428,889 @@ POST /periods/{id}/prices
 ```json
 {
   "prices": [
-    { "item_id": "item_001", "price": 25.5 },
-    { "item_id": "item_002", "price": 18.75 }
+    { "item_id": "uuid", "price": 25.50 },
+    { "item_id": "uuid", "price": 18.75 }
   ]
 }
 ```
 
-**Note:** Admin only. Prices are fixed for the entire period.
+**Permissions:** ADMIN only
 
-### Close Period (Requires Approval)
+#### Copy Prices from Previous Period
 
 ```
-POST /periods/{id}/close
+POST /api/periods/{periodId}/prices-copy
+```
+
+#### Open Period
+
+```
+POST /api/periods/{periodId}/open
+```
+
+**Permissions:** ADMIN only
+
+#### Close Period
+
+```
+POST /api/periods/{periodId}/close
 ```
 
 **Body:**
 
 ```json
-{ "approval_token": "approval_xyz", "closing_notes": "All locations reconciled" }
+{
+  "closing_notes": "All locations reconciled"
+}
 ```
 
-### 3. Stock Operations
+**Permissions:** ADMIN only. All locations must be in READY status.
 
-### Get Location Stock
+#### Roll Forward Period
 
 ```
-GET /locations/{locationId}/stock
+POST /api/periods/{periodId}/roll-forward
+```
+
+Creates next period and copies closing stock as opening stock.
+
+---
+
+### 4. Period Location Status
+
+#### Mark Location Ready for Close
+
+```
+PATCH /api/period-locations/ready
+```
+
+**Body:**
+
+```json
+{
+  "periodId": "uuid",
+  "locationId": "uuid"
+}
+```
+
+#### Mark Location Not Ready
+
+```
+PATCH /api/period-locations/unready
+```
+
+---
+
+### 5. Stock Operations
+
+#### Get Consolidated Stock
+
+```
+GET /api/stock/consolidated
 ```
 
 **Query Params:**
 
 - `category`: Filter by category
-- `low_stock`: true to show only low stock
-- `search`: Item name/code search
+- `lowStock`: "true" to show only low stock items
+
+**Permissions:** SUPERVISOR/ADMIN only
 
 **Response:**
 
 ```json
 {
-  "location": { "id": "loc_123", "name": "Riyadh Central Kitchen" },
-  "items": [
+  "consolidated_stock": [
     {
-      "item_id": "item_001",
-      "code": "RIC001",
-      "name": "Rice 5kg",
-      "unit": "KG",
-      "on_hand": 150.5,
-      "wac": 25.5,
-      "value": 3837.75,
-      "min_stock": 50,
-      "max_stock": 500
+      "item_id": "uuid",
+      "item_code": "PRO-001",
+      "item_name": "Chicken Breast",
+      "item_unit": "KG",
+      "item_category": "PROTEINS",
+      "total_on_hand": 250.5,
+      "total_value": 6387.75,
+      "locations": [
+        {
+          "location_id": "uuid",
+          "location_code": "KIT",
+          "location_name": "Kitchen",
+          "on_hand": 150.5,
+          "wac": 25.50,
+          "value": 3837.75,
+          "min_stock": 50,
+          "max_stock": 500,
+          "is_low_stock": false
+        }
+      ]
     }
   ],
-  "total_value": 125430.5
+  "location_totals": [...],
+  "grand_total_value": 125430.50,
+  "total_items": 45,
+  "total_locations": 4
 }
 ```
 
-### 4. Deliveries with Price Variance Detection
+---
 
-### Post Delivery
+### 6. Items Management
+
+#### List Items
 
 ```
-POST /locations/{locationId}/deliveries
+GET /api/items
+```
+
+**Query Params:**
+
+- `category`: Filter by category
+- `active`: true/false
+- `search`: Search by name or code
+- `locationId`: Include stock levels for specific location
+
+#### Get Item Details
+
+```
+GET /api/items/{id}
+```
+
+#### Create Item
+
+```
+POST /api/items
 ```
 
 **Body:**
 
 ```json
-{  "supplier_id": "supp_123",  "invoice_no": "INV-2025-1234",  "delivery_note": "DN-5678",  "delivery_date": "2025-11-02",  "lines": [    {      "item_id": "item_001",      "quantity": 100,      "unit_price": 26.00  // Different from period price!    }  ]}
+{
+  "code": "PRO-001",
+  "name": "Chicken Breast",
+  "unit": "KG",
+  "category": "PROTEINS",
+  "sub_category": "Poultry"
+}
 ```
+
+**Permissions:** ADMIN only
+
+#### Update Item
+
+```
+PATCH /api/items/{id}
+```
+
+#### Delete Item
+
+```
+DELETE /api/items/{id}
+```
+
+**Permissions:** ADMIN only
+
+#### Update Item Price
+
+```
+PATCH /api/items/{itemId}/price
+```
+
+**Body:**
+
+```json
+{
+  "price": 28.50,
+  "periodId": "uuid"
+}
+```
+
+---
+
+### 7. Suppliers Management
+
+#### List Suppliers
+
+```
+GET /api/suppliers
+```
+
+#### Get Supplier Details
+
+```
+GET /api/suppliers/{id}
+```
+
+#### Create Supplier
+
+```
+POST /api/suppliers
+```
+
+**Body:**
+
+```json
+{
+  "code": "SUP-001",
+  "name": "Fresh Foods Co.",
+  "contact_person": "John Doe",
+  "phone": "+966501234567",
+  "email": "contact@freshfoods.com"
+}
+```
+
+#### Update Supplier
+
+```
+PATCH /api/suppliers/{id}
+```
+
+#### Delete Supplier
+
+```
+DELETE /api/suppliers/{id}
+```
+
+---
+
+### 8. Deliveries
+
+#### List Location Deliveries
+
+```
+GET /api/locations/{id}/deliveries
+```
+
+**Query Params:**
+
+- `status`: DRAFT, POSTED
+- `supplierId`: Filter by supplier
+- `hasVariance`: true/false
+- `startDate`: ISO date
+- `endDate`: ISO date
+
+#### Get Delivery Details
+
+```
+GET /api/deliveries/{id}
+```
+
+#### Create Delivery
+
+```
+POST /api/locations/{id}/deliveries
+```
+
+**Body:**
+
+```json
+{
+  "supplier_id": "uuid",
+  "invoice_no": "INV-2025-001",
+  "delivery_note": "DN-001",
+  "delivery_date": "2025-12-25",
+  "status": "POSTED",
+  "lines": [
+    {
+      "item_id": "uuid",
+      "quantity": 100,
+      "unit_price": 26.00
+    }
+  ]
+}
+```
+
+**Status Options:**
+
+- `DRAFT`: Saves without affecting stock (invoice_no optional)
+- `POSTED`: Immediately updates stock and WAC (invoice_no required)
 
 **Response with Price Variance:**
 
 ```json
 {
+  "id": "uuid",
+  "message": "Delivery posted. 1 price variance(s) detected and NCR(s) created automatically.",
   "delivery": {
-    "id": "del_789",
-    "delivery_no": "D-2025-0156",
-    "total": 2600.0,
-    "has_variance": true
+    "id": "uuid",
+    "delivery_no": "DEL-2025-001",
+    "delivery_date": "2025-12-25",
+    "invoice_no": "INV-2025-001",
+    "total_amount": 2600.00,
+    "has_variance": true,
+    "status": "POSTED"
   },
-  "variances": [
+  "lines": [...],
+  "ncrs": [
     {
-      "item": "Rice 5kg",
-      "expected_price": 25.5,
-      "actual_price": 26.0,
-      "variance": 0.5,
-      "ncr_created": {
-        "id": "ncr_456",
-        "ncr_no": "NCR-2025-0089",
-        "type": "PRICE_VARIANCE",
-        "auto_generated": true
-      }
+      "id": "uuid",
+      "ncr_no": "NCR-2025-001",
+      "type": "PRICE_VARIANCE",
+      "item": { "id": "uuid", "code": "PRO-001", "name": "Chicken Breast" },
+      "expected_price": 25.00,
+      "actual_price": 26.00,
+      "variance": 1.00,
+      "variance_percent": 4.0
     }
-  ],
-  "message": "Delivery posted. Price variance detected and NCR created automatically."
-}
-```
-
-### 5. Transfers (NEW)
-
-### Create Transfer Request
-
-```
-POST /transfers
-```
-
-**Body:**
-
-```json
-{
-  "from_location_id": "loc_123",
-  "to_location_id": "loc_456",
-  "transfer_date": "2025-11-03",
-  "lines": [{ "item_id": "item_001", "quantity": 50 }],
-  "notes": "Stock rebalancing"
-}
-```
-
-**Response:**
-
-```json
-{
-  "transfer": {
-    "id": "trf_001",
-    "transfer_no": "TRF-2025-0001",
-    "status": "PENDING_APPROVAL",
-    "total_value": 1275.0,
-    "requires_approval": true
-  }
-}
-```
-
-### Approve Transfer
-
-```
-PATCH /transfers/{id}/approve
-```
-
-**Body:**
-
-```json
-{ "comments": "Approved for urgent requirement" }
-```
-
-### Get Transfer Status
-
-```
-GET /transfers/{id}
-```
-
-### List Transfers
-
-```
-GET /transfers
-```
-
-**Query Params:**
-
-- `from_location`: UUID
-- `to_location`: UUID
-- `status`: PENDING_APPROVAL, APPROVED, etc.
-- `date_from`: ISO date
-- `date_to`: ISO date
-
-### 6. Issues
-
-### Post Issue
-
-```
-POST /locations/{locationId}/issues
-```
-
-**Body:**
-
-```json
-{
-  "issue_date": "2025-11-02",
-  "cost_centre": "FOOD",
-  "lines": [{ "item_id": "item_001", "quantity": 15.5 }]
-}
-```
-
-**Response:**
-
-```json
-{
-  "issue": { "id": "iss_234", "issue_no": "I-2025-3042", "total_value": 395.25 },
-  "lines": [{ "item": "Rice 5kg", "quantity": 15.5, "wac": 25.5, "value": 395.25 }]
-}
-```
-
-### 7. NCR Management
-
-### List NCRs
-
-```
-GET /ncrs
-```
-
-**Query Params:**
-
-- `location_id`: UUID
-- `type`: MANUAL, PRICE_VARIANCE
-- `status`: OPEN, CREDITED, etc.
-- `auto_generated`: true/false
-
-### Create Manual NCR
-
-```
-POST /ncrs
-```
-
-**Body:**
-
-```json
-{
-  "location_id": "loc_123",
-  "delivery_id": "del_456",
-  "reason": "Items damaged in transit",
-  "lines": [{ "item_id": "item_001", "quantity": 5, "value": 127.5 }]
-}
-```
-
-### 8. POB (People on Board)
-
-### Update POB
-
-```
-PATCH /locations/{locationId}/pob
-```
-
-**Body:**
-
-```json
-{
-  "period_id": "period_202511",
-  "entries": [
-    { "date": "2025-11-01", "crew_count": 60, "extra_count": 15 },
-    { "date": "2025-11-02", "crew_count": 62, "extra_count": 10 }
   ]
 }
 ```
 
-### 9. Reconciliations
-
-### Get Location Reconciliation
+#### Update Delivery (Draft Only)
 
 ```
-GET /locations/{locationId}/reconciliations/{periodId}
+PATCH /api/deliveries/{id}
+```
+
+#### Delete Delivery (Draft Only)
+
+```
+DELETE /api/deliveries/{id}
+```
+
+---
+
+### 9. Issues
+
+#### List Location Issues
+
+```
+GET /api/locations/{id}/issues
+```
+
+#### Get Issue Details
+
+```
+GET /api/issues/{id}
+```
+
+#### Create Issue
+
+```
+POST /api/locations/{id}/issues
+```
+
+**Body:**
+
+```json
+{
+  "issue_date": "2025-12-25",
+  "cost_centre": "FOOD",
+  "lines": [
+    {
+      "item_id": "uuid",
+      "quantity": 15.5
+    }
+  ]
+}
 ```
 
 **Response:**
 
 ```json
 {
-  "location": "Riyadh Central Kitchen",
-  "period": "2025-11",
-  "opening_stock": 125000.0,
-  "receipts": 45000.0,
-  "transfers_in": 5000.0,
-  "transfers_out": 3000.0,
-  "issues": 35000.0,
-  "closing_stock": 137000.0,
-  "adjustments": -500.0,
-  "consumption": 34500.0,
-  "total_mandays": 2100,
-  "manday_cost": 16.43
+  "issue": {
+    "id": "uuid",
+    "issue_no": "ISS-2025-001",
+    "issue_date": "2025-12-25",
+    "cost_centre": "FOOD",
+    "total_value": 395.25
+  },
+  "lines": [
+    {
+      "item": { "id": "uuid", "code": "PRO-001", "name": "Chicken Breast" },
+      "quantity": 15.5,
+      "wac": 25.50,
+      "value": 395.25
+    }
+  ]
 }
 ```
 
-### Update Reconciliation
+---
+
+### 10. Transfers
+
+#### List Transfers
 
 ```
-PATCH /locations/{locationId}/reconciliations/{periodId}
+GET /api/transfers
 ```
 
-**Body:**
+**Query Params:**
 
-```json
-{ "adjustments": -500.0, "back_charges": 1000.0, "credits": 500.0, "condemnations": 200.0 }
+- `fromLocationId`: Source location UUID
+- `toLocationId`: Destination location UUID
+- `status`: PENDING_APPROVAL, APPROVED, COMPLETED, REJECTED
+- `startDate`: ISO date
+- `endDate`: ISO date
+
+#### Get Transfer Details
+
+```
+GET /api/transfers/{id}
 ```
 
-### 10. Approvals
-
-### Request Approval
+#### Create Transfer Request
 
 ```
-POST /approvals
+POST /api/transfers
 ```
 
 **Body:**
 
 ```json
 {
-  "entity_type": "PERIOD_CLOSE",
-  "entity_id": "period_202511",
-  "notes": "All locations reconciled, ready for close"
+  "from_location_id": "uuid",
+  "to_location_id": "uuid",
+  "request_date": "2025-12-25",
+  "notes": "Stock rebalancing",
+  "lines": [
+    {
+      "item_id": "uuid",
+      "quantity": 50
+    }
+  ]
 }
 ```
 
-### Get Pending Approvals
+**Response:**
+
+```json
+{
+  "message": "Transfer created successfully and is pending approval",
+  "transfer": {
+    "id": "uuid",
+    "transfer_no": "TRF-2025-001",
+    "request_date": "2025-12-25",
+    "status": "PENDING_APPROVAL",
+    "total_value": 1275.00,
+    "from_location": { "id": "uuid", "code": "KIT", "name": "Kitchen" },
+    "to_location": { "id": "uuid", "code": "STR", "name": "Store" },
+    "lines": [...]
+  }
+}
+```
+
+#### Approve Transfer
 
 ```
-GET /approvals/pending
+PATCH /api/transfers/{id}/approve
 ```
 
-### Approve/Reject
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Response:** Transfer with status COMPLETED and stock movements applied.
+
+#### Reject Transfer
 
 ```
-PATCH /approvals/{id}
+PATCH /api/transfers/{id}/reject
 ```
 
 **Body:**
 
 ```json
-{ "action": "APPROVE", "comments": "Verified all reconciliations" }
+{
+  "reason": "Insufficient justification for transfer"
+}
 ```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+---
+
+### 11. NCR Management
+
+#### List NCRs
+
+```
+GET /api/ncrs
+```
+
+**Query Params:**
+
+- `locationId`: Filter by location
+- `type`: MANUAL, PRICE_VARIANCE
+- `status`: OPEN, SENT, CREDITED, CLOSED
+- `startDate`: ISO date
+- `endDate`: ISO date
+
+#### Get NCR Details
+
+```
+GET /api/ncrs/{id}
+```
+
+#### Create Manual NCR
+
+```
+POST /api/ncrs
+```
+
+**Body:**
+
+```json
+{
+  "location_id": "uuid",
+  "delivery_id": "uuid",
+  "reason": "Items damaged in transit",
+  "lines": [
+    {
+      "item_id": "uuid",
+      "quantity": 5,
+      "value": 127.50
+    }
+  ]
+}
+```
+
+#### Update NCR Status
+
+```
+PATCH /api/ncrs/{id}
+```
+
+**Body:**
+
+```json
+{
+  "status": "SENT",
+  "resolution": "Credit note received"
+}
+```
+
+---
+
+### 12. POB (People on Board)
+
+#### Get Location POB Entries
+
+```
+GET /api/locations/{id}/pob
+```
+
+**Query Params:**
+
+- `periodId`: Filter by period
+
+**Response:**
+
+```json
+{
+  "period": { "id": "uuid", "name": "Jan 2026" },
+  "location": { "id": "uuid", "name": "Kitchen" },
+  "entries": [
+    {
+      "id": "uuid",
+      "date": "2026-01-01",
+      "crew_count": 60,
+      "extra_count": 15,
+      "total": 75
+    }
+  ],
+  "totals": {
+    "total_crew": 1800,
+    "total_extra": 450,
+    "total_mandays": 2250
+  }
+}
+```
+
+#### Create POB Entry
+
+```
+POST /api/locations/{id}/pob
+```
+
+**Body:**
+
+```json
+{
+  "periodId": "uuid",
+  "date": "2026-01-01",
+  "crew_count": 60,
+  "extra_count": 15
+}
+```
+
+#### Update POB Entry
+
+```
+PATCH /api/pob/{id}
+```
+
+**Body:**
+
+```json
+{
+  "crew_count": 62,
+  "extra_count": 10
+}
+```
+
+---
+
+### 13. Reconciliations
+
+#### Get Consolidated Reconciliation
+
+```
+GET /api/reconciliations/consolidated
+```
+
+**Query Params:**
+
+- `periodId`: Required - Period UUID
+- `locationId`: Optional - Filter by location
+
+**Response:**
+
+```json
+{
+  "period": { "id": "uuid", "name": "Jan 2026" },
+  "reconciliations": [
+    {
+      "location": { "id": "uuid", "code": "KIT", "name": "Kitchen" },
+      "opening_stock": 125000.00,
+      "receipts": 45000.00,
+      "transfers_in": 5000.00,
+      "transfers_out": 3000.00,
+      "issues": 35000.00,
+      "closing_stock": 137000.00,
+      "back_charges": 1000.00,
+      "credits": 500.00,
+      "condemnations": 200.00,
+      "adjustments": 0.00,
+      "consumption": 34500.00,
+      "total_mandays": 2100,
+      "manday_cost": 16.43,
+      "is_confirmed": true
+    }
+  ],
+  "grand_totals": {...}
+}
+```
+
+#### Save/Update Reconciliation
+
+```
+POST /api/reconciliations
+```
+
+**Body:**
+
+```json
+{
+  "periodId": "uuid",
+  "locationId": "uuid",
+  "back_charges": 1000.00,
+  "credits": 500.00,
+  "condemnations": 200.00,
+  "adjustments": 0.00
+}
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Reconciliation adjustments saved successfully",
+  "reconciliation": {...},
+  "calculations": {
+    "consumption": 34500.00,
+    "total_adjustments": 700.00
+  }
+}
+```
+
+---
+
+### 14. Approvals
+
+#### Get Approval Details
+
+```
+GET /api/approvals/{id}
+```
+
+**Response:**
+
+```json
+{
+  "approval": {
+    "id": "uuid",
+    "entityType": "TRANSFER",
+    "entityId": "uuid",
+    "status": "PENDING",
+    "requester": { "id": "uuid", "username": "operator1", "full_name": "Operator One" },
+    "reviewer": null,
+    "requestedAt": "2025-12-25T10:00:00Z",
+    "reviewedAt": null,
+    "comments": null
+  },
+  "entity": {
+    "id": "uuid",
+    "transfer_no": "TRF-2025-001",
+    "status": "PENDING_APPROVAL",
+    ...
+  }
+}
+```
+
+#### Approve
+
+```
+PATCH /api/approvals/{id}/approve
+```
+
+**Body:**
+
+```json
+{
+  "comments": "Approved - verified all details"
+}
+```
+
+**Permissions:** SUPERVISOR/ADMIN (role depends on entity type)
+
+#### Reject
+
+```
+PATCH /api/approvals/{id}/reject
+```
+
+**Body:**
+
+```json
+{
+  "comments": "Rejected - insufficient justification"
+}
+```
+
+**Note:** Approvals are created implicitly when entities requiring approval (transfers, period close requests) are created. There is no standalone `POST /api/approvals` endpoint.
+
+---
+
+### 15. Users Management
+
+#### List Users
+
+```
+GET /api/users
+```
+
+**Permissions:** ADMIN only
+
+#### Get User Details
+
+```
+GET /api/users/{id}
+```
+
+#### Update User
+
+```
+PATCH /api/users/{id}
+```
+
+**Body:**
+
+```json
+{
+  "full_name": "Updated Name",
+  "role": "SUPERVISOR",
+  "is_active": true
+}
+```
+
+**Permissions:** ADMIN only
+
+#### Delete User
+
+```
+DELETE /api/users/{id}
+```
+
+**Permissions:** ADMIN only
+
+---
+
+### 16. Reports
+
+#### Stock Now Report
+
+```
+GET /api/reports/stock-now
+```
+
+**Query Params:**
+
+- `locationId`: Required
+- `category`: Optional filter
+
+#### Deliveries Report
+
+```
+GET /api/reports/deliveries
+```
+
+**Query Params:**
+
+- `locationId`: Required
+- `periodId`: Required
+- `supplierId`: Optional
+
+#### Issues Report
+
+```
+GET /api/reports/issues
+```
+
+**Query Params:**
+
+- `locationId`: Required
+- `periodId`: Required
+- `costCentre`: Optional
+
+#### Reconciliation Report
+
+```
+GET /api/reports/reconciliation
+```
+
+**Query Params:**
+
+- `periodId`: Required
+- `locationId`: Optional (all locations if not specified)
+
+---
+
+### 17. System
+
+#### Health Check
+
+```
+GET /api/health
+```
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2025-12-25T10:00:00Z"
+}
+```
+
+#### Performance Metrics
+
+```
+GET /api/metrics/performance
+```
+
+---
 
 ## Error Handling
 
@@ -525,26 +1320,26 @@ PATCH /approvals/{id}
 // Nuxt Server Route error
 throw createError({
   statusCode: 400,
-  statusMessage: 'Insufficient Stock',
+  statusMessage: "Insufficient Stock",
   data: {
-    code: 'INSUFFICIENT_STOCK',
-    message: 'Cannot issue 100 KG of Rice. Only 75 KG available at location RYD-01',
+    code: "INSUFFICIENT_STOCK",
+    message: "Cannot issue 100 KG of Chicken Breast. Only 75 KG available.",
     details: {
-      item: 'Rice 5kg',
+      item: "Chicken Breast",
       requested: 100,
       available: 75,
-      location: 'RYD-01'
+      location: "KIT"
     }
   }
-})
+});
 
 // Client receives:
 {
   statusCode: 400,
-  statusMessage: 'Insufficient Stock',
+  statusMessage: "Insufficient Stock",
   data: {
-    code: 'INSUFFICIENT_STOCK',
-    message: '...',
+    code: "INSUFFICIENT_STOCK",
+    message: "...",
     details: { ... }
   }
 }
@@ -552,35 +1347,40 @@ throw createError({
 
 ### Error Codes
 
-| Code                     | HTTP Status | Description                             |
-| ------------------------ | ----------- | --------------------------------------- |
-| `INSUFFICIENT_STOCK`     | 400         | Not enough stock for issue/transfer     |
-| `PRICE_VARIANCE`         | 200         | Price differs from period (NCR created) |
-| `LOCATION_ACCESS_DENIED` | 403         | User lacks access to location           |
-| `PERIOD_CLOSED`          | 400         | Cannot post to closed period            |
-| `APPROVAL_REQUIRED`      | 202         | Action needs approval                   |
-| `DUPLICATE_ENTRY`        | 409         | Duplicate invoice/document number       |
-| `VALIDATION_ERROR`       | 400         | Zod validation failed                   |
-| `UNAUTHORIZED`           | 401         | Not authenticated                       |
-| `FORBIDDEN`              | 403         | Insufficient permissions                |
+| Code                       | HTTP Status | Description                              |
+| -------------------------- | ----------- | ---------------------------------------- |
+| `NOT_AUTHENTICATED`        | 401         | User not logged in                       |
+| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action          |
+| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location            |
+| `VALIDATION_ERROR`         | 400         | Zod validation failed                    |
+| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer      |
+| `PERIOD_CLOSED`            | 400         | Cannot post to closed period             |
+| `NO_OPEN_PERIOD`           | 400         | No open period exists                    |
+| `INVALID_STATUS`           | 400         | Entity status doesn't allow action       |
+| `NOT_FOUND`                | 404         | Resource not found                       |
+| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number        |
+| `INTERNAL_ERROR`           | 500         | Unexpected server error                  |
 
 ### Validation Errors (Zod)
 
-```typescript
-// Zod validation error format
+```json
 {
-  statusCode: 400,
-  data: {
-    code: 'VALIDATION_ERROR',
-    issues: [
+  "statusCode": 400,
+  "statusMessage": "Bad Request",
+  "data": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request data",
+    "details": [
       {
-        path: ['lines', 0, 'quantity'],
-        message: 'Must be greater than 0'
+        "path": ["lines", 0, "quantity"],
+        "message": "Number must be greater than 0"
       }
     ]
   }
 }
 ```
+
+---
 
 ## Webhooks (Post-MVP)
 
@@ -597,14 +1397,7 @@ throw createError({
 - `period.closed`
 - `stock.low`
 
-### Future Implementation
-
-Will use server-side events or webhook endpoints for integration with:
-
-- Email notifications
-- Slack/Teams alerts
-- Third-party inventory systems
-- Analytics platforms
+---
 
 ## Rate Limiting
 
@@ -613,38 +1406,22 @@ Will use server-side events or webhook endpoints for integration with:
 - Basic rate limiting via Nuxt middleware
 - 60 requests/minute per session
 - Applied at server route level
-
-**Headers (Future):**
-
-```
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 45
-X-RateLimit-Reset: 1698768060
-```
-
-**Current Limits:**
-
-- Standard operations: 60/minute per user
-- No separate limits for bulk operations in MVP
 - Vercel serverless functions: 10s timeout per request
 
-## Versioning
-
-- API version in URL: `/v2/`
-- Breaking changes require new version
-- Deprecation notice: 6 months minimum
-- Sunset period: 12 months
+---
 
 ## Performance SLAs
 
-| Operation             | Target Response Time |
-| --------------------- | -------------------- |
-| GET single record     | < 200ms              |
-| GET list (paginated)  | < 500ms              |
-| POST delivery/issue   | < 1000ms             |
-| Transfer execution    | < 1500ms             |
-| Location stock report | < 2000ms             |
-| Consolidated reports  | < 5000ms             |
+| Operation              | Target Response Time |
+| ---------------------- | -------------------- |
+| GET single record      | < 200ms              |
+| GET list (paginated)   | < 500ms              |
+| POST delivery/issue    | < 1000ms             |
+| Transfer execution     | < 1500ms             |
+| Location stock report  | < 2000ms             |
+| Consolidated reports   | < 5000ms             |
+
+---
 
 ## Security
 
@@ -654,27 +1431,9 @@ X-RateLimit-Reset: 1698768060
 Cookie: nuxt-session=<encrypted-jwt>
 Content-Type: application/json
 Accept: application/json
-X-Location-Context: <location-id> (when applicable)
 ```
 
 **Note:** No Authorization header needed - JWT in httpOnly cookie
-
-### CORS Configuration
-
-**Not Required for MVP:**
-
-- SPA and API on same origin (Vercel deployment)
-- No cross-origin requests
-- Cookies work automatically
-
-**Future (if API exposed externally):**
-
-```
-Access-Control-Allow-Origin: https://app.foodstock.com
-Access-Control-Allow-Methods: GET, POST, PATCH, DELETE
-Access-Control-Allow-Credentials: true
-Access-Control-Max-Age: 86400
-```
 
 ### Security Features
 
@@ -688,37 +1447,14 @@ Access-Control-Max-Age: 86400
 
 ### Audit Logging
 
-All API calls logged with:
+All mutating API calls are logged with:
 
 - User ID (from session)
 - Location context
 - Action performed
 - Timestamp (UTC)
-- Request IP (from Vercel headers)
-- Changes (via Prisma middleware)
-
-**Implementation:**
-
-```typescript
-// Prisma middleware for audit trail
-prisma.$use(async (params, next) => {
-  const result = await next(params);
-
-  if (["create", "update", "delete"].includes(params.action)) {
-    await prisma.auditLog.create({
-      data: {
-        userId: context.user.id,
-        action: params.action,
-        model: params.model,
-        data: params.args,
-      },
-    });
-  }
-
-  return result;
-});
-```
+- Request details
 
 ---
 
-**Note:** This API contract supports multi-location operations with automatic price variance detection, transfer management, and comprehensive approval workflows.
+**Note:** This API contract reflects the actual implemented endpoints as of December 2025. It supports multi-location operations with automatic price variance detection, transfer management, and comprehensive approval workflows.
