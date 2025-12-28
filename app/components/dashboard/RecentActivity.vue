@@ -92,60 +92,68 @@ const getBadgeColor = (
 </script>
 
 <template>
-  <UCard class="card-elevated">
+  <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
     <!-- Header -->
-    <template #header>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <UIcon v-if="icon" :name="`i-lucide-${icon}`" class="w-5 h-5 text-muted" />
-          <h2 class="text-subheading">{{ title }}</h2>
-        </div>
-        <UButton
-          v-if="viewAllRoute"
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          @click="handleViewAll"
-        >
-          {{ viewAllText }}
-          <UIcon name="i-lucide-arrow-right" class="w-4 h-4 ml-1" />
-        </UButton>
+    <div class="flex items-center justify-between mb-3 sm:mb-4">
+      <div class="flex items-center gap-2">
+        <UIcon v-if="icon" :name="`i-lucide-${icon}`" class="w-5 h-5 text-primary" />
+        <h2 class="text-base sm:text-lg font-semibold text-[var(--ui-text)]">{{ title }}</h2>
       </div>
-    </template>
+      <UButton
+        v-if="viewAllRoute"
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        class="cursor-pointer"
+        @click="handleViewAll"
+      >
+        <span class="hidden sm:inline">{{ viewAllText }}</span>
+        <UIcon name="i-lucide-arrow-right" class="w-4 h-4" :class="{ 'ml-1': viewAllText }" />
+      </UButton>
+    </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex items-center justify-center py-8">
-      <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-muted" />
+    <div v-if="loading" class="flex items-center justify-center py-8 sm:py-12">
+      <UIcon
+        name="i-lucide-loader-circle"
+        class="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-[var(--ui-text-muted)]"
+      />
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="items.length === 0" class="py-8 text-center">
-      <UIcon name="i-lucide-inbox" class="w-12 h-12 mx-auto mb-3 text-muted" />
-      <p class="text-caption">{{ emptyMessage }}</p>
+    <div v-else-if="items.length === 0" class="py-8 sm:py-12 text-center">
+      <UIcon
+        name="i-lucide-inbox"
+        class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-[var(--ui-text-muted)]"
+      />
+      <p class="text-sm text-[var(--ui-text-muted)]">{{ emptyMessage }}</p>
     </div>
 
     <!-- Activity List -->
-    <div v-else class="divide-y divide-default">
+    <div v-else class="divide-y divide-[var(--ui-border-muted)]">
       <div
         v-for="item in items"
         :key="item.id"
-        class="py-3 cursor-pointer hover:bg-elevated transition-colors rounded-lg px-2 -mx-2"
+        class="py-2 sm:py-3 cursor-pointer hover:bg-[var(--ui-bg-hover)] smooth-transition rounded-lg px-2 -mx-2"
         @click="handleItemClick(item)"
       >
-        <div class="flex items-start justify-between gap-4">
+        <div class="flex items-start justify-between gap-3 sm:gap-4">
           <!-- Left Side: Icon + Content -->
-          <div class="flex items-start gap-3 flex-1 min-w-0">
+          <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
             <!-- Icon -->
             <div v-if="item.icon" class="shrink-0 mt-0.5">
-              <div class="p-2 rounded-lg bg-default">
-                <UIcon :name="`i-lucide-${item.icon}`" class="w-4 h-4 text-muted" />
+              <div class="p-1.5 sm:p-2 rounded-lg bg-[var(--ui-bg-muted)]">
+                <UIcon
+                  :name="`i-lucide-${item.icon}`"
+                  class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--ui-text-muted)]"
+                />
               </div>
             </div>
 
             <!-- Text Content -->
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
-                <p class="text-body font-medium truncate">
+              <div class="flex items-center gap-2 mb-0.5 sm:mb-1">
+                <p class="text-sm sm:text-base font-medium text-[var(--ui-text)] truncate">
                   {{ item.primary }}
                 </p>
                 <UBadge
@@ -153,14 +161,15 @@ const getBadgeColor = (
                   :color="getBadgeColor(item.badgeColor)"
                   variant="subtle"
                   size="xs"
+                  class="shrink-0"
                 >
                   {{ item.badge }}
                 </UBadge>
               </div>
-              <p class="text-caption mb-0.5">
+              <p class="text-xs sm:text-sm text-[var(--ui-text-muted)] mb-0.5">
                 {{ item.secondary }}
               </p>
-              <p v-if="item.tertiary" class="text-caption truncate">
+              <p v-if="item.tertiary" class="text-xs text-[var(--ui-text-muted)] truncate">
                 {{ item.tertiary }}
               </p>
             </div>
@@ -168,7 +177,7 @@ const getBadgeColor = (
 
           <!-- Right Side: Amount -->
           <div v-if="item.amount" class="shrink-0 text-right">
-            <p class="text-body font-semibold">
+            <p class="text-sm sm:text-base font-semibold text-[var(--ui-text)]">
               {{ item.amount }}
             </p>
           </div>

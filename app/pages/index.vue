@@ -214,15 +214,19 @@ const handleRetry = () => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
-    <LayoutPageHeader
-      title="Dashboard"
-      icon="i-lucide-layout-dashboard"
-      :show-location="true"
-      :show-period="true"
-      location-scope="current"
-    />
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 sm:gap-4">
+        <UIcon name="i-lucide-layout-dashboard" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+        <div>
+          <h1 class="text-xl sm:text-3xl font-bold text-primary">Dashboard</h1>
+          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
+            Overview of your current location's activity
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-20">
@@ -243,9 +247,47 @@ const handleRetry = () => {
     />
 
     <!-- Dashboard Content -->
-    <div v-if="dashboardData && !loading">
+    <template v-if="dashboardData && !loading">
+      <!-- Quick Actions -->
+      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="flex items-center gap-2 mb-4">
+          <UIcon name="i-lucide-zap" class="w-5 h-5 text-primary" />
+          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Quick Actions</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <button
+            v-for="action in quickActions"
+            :key="action.route"
+            class="group relative overflow-hidden rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 text-left smooth-transition hover:shadow-md hover:border-[var(--ui-border-accented)] focus:outline-none focus-ring cursor-pointer"
+            @click="handleQuickAction(action.route)"
+          >
+            <!-- Content -->
+            <div class="relative z-10">
+              <!-- Icon -->
+              <div
+                class="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg mb-3 sm:mb-4 bg-gradient-to-br smooth-transition"
+                :class="action.gradient"
+              >
+                <UIcon :name="`i-lucide-${action.icon}`" class="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+
+              <!-- Text -->
+              <h3
+                class="text-base sm:text-lg font-semibold text-[var(--ui-text-highlighted)] mb-1"
+              >
+                {{ action.label }}
+              </h3>
+              <p class="text-xs sm:text-sm text-[var(--ui-text-muted)]">
+                {{ action.description }}
+              </p>
+            </div>
+          </button>
+        </div>
+      </UCard>
+
       <!-- Metric Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <DashboardMetricCard
           v-for="(card, index) in metricCards"
           :key="index"
@@ -257,7 +299,7 @@ const handleRetry = () => {
       </div>
 
       <!-- Recent Activity Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <!-- Recent Deliveries -->
         <DashboardRecentActivity
           title="Recent Deliveries"
@@ -278,57 +320,6 @@ const handleRetry = () => {
           view-all-route="/issues"
         />
       </div>
-
-      <!-- Quick Actions -->
-      <div>
-        <div class="flex items-center gap-2 mb-4">
-          <UIcon name="i-lucide-zap" class="w-5 h-5 text-muted" />
-          <h2 class="text-subheading">Quick Actions</h2>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button
-            v-for="action in quickActions"
-            :key="action.route"
-            @click="handleQuickAction(action.route)"
-            class="group relative overflow-hidden rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-6 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ui-ring)] focus-visible:ring-offset-2"
-          >
-            <!-- Gradient Background on Hover -->
-            <div
-              class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-              :class="action.gradient"
-            ></div>
-
-            <!-- Content -->
-            <div class="relative z-10">
-              <!-- Icon -->
-              <div
-                class="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 bg-gradient-to-br transition-transform duration-300 group-hover:scale-110"
-                :class="action.gradient"
-              >
-                <UIcon :name="`i-lucide-${action.icon}`" class="w-6 h-6 text-white" />
-              </div>
-
-              <!-- Text -->
-              <h3
-                class="text-lg font-semibold text-[var(--ui-text-highlighted)] mb-1 transition-colors duration-300 group-hover:text-[var(--ui-primary)]"
-              >
-                {{ action.label }}
-              </h3>
-              <p class="text-sm text-[var(--ui-text-muted)]">
-                {{ action.description }}
-              </p>
-
-              <!-- Arrow Icon -->
-              <div
-                class="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
-              >
-                <UIcon name="i-lucide-arrow-right" class="w-5 h-5 text-[var(--ui-primary)]" />
-              </div>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
+    </template>
   </div>
 </template>

@@ -63,31 +63,38 @@ const trendIcon = computed(() => {
 </script>
 
 <template>
-  <UCard class="card-elevated">
+  <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
     <!-- Loading State -->
-    <div v-if="loading" class="flex items-center justify-center h-32">
-      <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-muted" />
+    <div v-if="loading" class="flex items-center justify-center h-24">
+      <UIcon
+        name="i-lucide-loader-circle"
+        class="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-[var(--ui-text-muted)]"
+      />
     </div>
 
     <!-- Content -->
-    <div v-else class="flex items-start gap-4">
+    <div v-else class="flex items-center gap-3 sm:gap-4">
       <!-- Icon -->
-      <div v-if="icon" class="shrink-0 p-3 rounded-lg" :class="colorClasses">
-        <UIcon :name="`i-lucide-${icon}`" class="w-6 h-6" />
+      <div v-if="icon" class="shrink-0 p-2 sm:p-3 rounded-lg" :class="colorClasses">
+        <UIcon :name="`i-lucide-${icon}`" class="w-5 h-5 sm:w-6 sm:h-6" />
       </div>
 
       <!-- Text Content -->
       <div class="flex-1 min-w-0">
-        <p class="text-label mb-1">
+        <p class="text-xs sm:text-sm text-[var(--ui-text-muted)] mb-0.5 sm:mb-1">
           {{ label }}
         </p>
-        <p class="text-heading font-bold mb-2">
+        <p class="text-xl sm:text-2xl font-bold text-[var(--ui-text)] truncate">
           {{ value }}
         </p>
 
         <!-- Trend Indicator -->
-        <div v-if="trend" class="flex items-center gap-1 text-body" :class="trendColorClass">
-          <UIcon :name="`i-lucide-${trendIcon}`" class="w-4 h-4" />
+        <div
+          v-if="trend"
+          class="flex items-center gap-1 text-xs sm:text-sm mt-1"
+          :class="trendColorClass"
+        >
+          <UIcon :name="`i-lucide-${trendIcon}`" class="w-3 h-3 sm:w-4 sm:h-4" />
           <span>{{ Math.abs(trend.value) }}%</span>
         </div>
       </div>
