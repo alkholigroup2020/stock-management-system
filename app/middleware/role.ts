@@ -20,7 +20,7 @@
  * ```
  */
 
-import type { UserRole } from "@prisma/client";
+import type { UserRole } from "~~/shared/types/database";
 
 // Define role hierarchy (higher number = more privileges)
 const ROLE_HIERARCHY: Record<UserRole, number> = {

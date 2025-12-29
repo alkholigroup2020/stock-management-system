@@ -13,7 +13,7 @@
  * - Uses active location from nav location switcher
  */
 
-import type { LocationType } from "@prisma/client";
+import type { LocationType } from "~~/shared/types/database";
 
 // Page metadata
 // Auth is handled by auth.global.ts middleware automatically

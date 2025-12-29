@@ -294,7 +294,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Item, LocationStock } from "@prisma/client";
+import type { Item, LocationStock } from "~~/shared/types/database";
 import dayjs from "dayjs";
 
 // Type for Item with location stock

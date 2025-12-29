@@ -10,8 +10,7 @@
  * - Consolidated View (Supervisor/Admin only): Shows aggregated data across all locations
  */
 
-import type { Delivery } from "@prisma/client";
-import type { Issue } from "@prisma/client";
+import type { Delivery, Issue } from "~~/shared/types/database";
 import { formatCurrency, formatDate } from "~/utils/format";
 
 // Types for single location dashboard

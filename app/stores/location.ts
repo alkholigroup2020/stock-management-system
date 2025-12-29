@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Location, UserLocation } from "@prisma/client";
+import type { Location } from "~~/shared/types/database";
 
 // Extended location with access level
 export interface LocationWithAccess extends Location {

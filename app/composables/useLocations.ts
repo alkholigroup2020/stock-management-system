@@ -5,7 +5,7 @@
  * Uses Nuxt's useAsyncData for built-in caching and SSR support.
  */
 
-import type { LocationType } from "@prisma/client";
+import type { LocationType } from "~~/shared/types/database";
 
 // Types
 export interface LocationItem {

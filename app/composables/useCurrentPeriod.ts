@@ -10,10 +10,10 @@
  * - Locking prices at period start
  */
 
-import type { PeriodStatus, PeriodLocationStatus, LocationType } from "@prisma/client";
+import type { PeriodStatus, PeriodLocationStatus, LocationType } from "~~/shared/types/database";
 
-// Types
-export interface PeriodLocation {
+// Extended PeriodLocation type with joined location data (API response type)
+interface PeriodLocationWithDetails {
   location_id: string;
   status: PeriodLocationStatus;
   opening_value: number | null;
@@ -40,7 +40,7 @@ export interface PeriodData {
   closed_at: Date | null;
   created_at: Date;
   updated_at: Date;
-  period_locations: PeriodLocation[];
+  period_locations: PeriodLocationWithDetails[];
   _count?: {
     deliveries: number;
     issues: number;

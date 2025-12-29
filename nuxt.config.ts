@@ -175,31 +175,36 @@ export default defineNuxtConfig({
     payloadExtraction: true,
   },
 
+  // Nitro configuration for server-side bundling
+  nitro: {
+    // Use Vercel preset only in production (Vercel handles Prisma automatically)
+    // For local builds, don't specify preset (defaults to node-server)
+    preset: process.env.VERCEL ? "vercel" : undefined,
+    // Module bundling configuration
+    moduleSideEffects: ["@prisma/client"],
+    // Custom rollup config to handle Prisma's .prisma internal module
+    rollupConfig: {
+      plugins: [
+        {
+          name: "prisma-resolver",
+          resolveId(source: string) {
+            // Mark .prisma imports as external to prevent bundling issues
+            if (source.startsWith(".prisma")) {
+              return { id: source, external: true };
+            }
+            return null;
+          },
+        },
+      ],
+    },
+  },
+
   // Vite configuration for bundle optimization
   vite: {
     build: {
       // Optimize chunk size
       chunkSizeWarningLimit: 500,
-      rollupOptions: {
-        output: {
-          // Manual chunk splitting for better caching
-          manualChunks(id) {
-            // Vendor chunks
-            if (id.includes("node_modules")) {
-              if (id.includes("@nuxt/ui")) {
-                return "vendor-ui";
-              }
-              if (id.includes("vue") || id.includes("@vue")) {
-                return "vendor-vue";
-              }
-              if (id.includes("pinia")) {
-                return "vendor-pinia";
-              }
-              return "vendor";
-            }
-          },
-        },
-      },
+      // Note: Manual chunk splitting removed as it can cause circular dependency issues on Vercel
     },
     // Optimize dependencies
     optimizeDeps: {

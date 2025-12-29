@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Period } from "@prisma/client";
+import type { Period } from "~~/shared/types/database";
 
 export interface PeriodState {
   currentPeriod: Period | null;

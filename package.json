@@ -2,8 +2,19 @@
   "name": "stock-management-system",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.20.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "bcrypt",
+      "sharp",
+      "esbuild"
+    ]
+  },
   "scripts": {
-    "build": "nuxt build",
+    "build": "prisma generate && nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -25,6 +36,7 @@
   },
   "dependencies": {
     "@nuxt/eslint": "^1.10.0",
+    "tailwindcss": "^4.1.8",
     "@nuxt/image": "^1.11.0",
     "@nuxt/ui": "^4.1.0",
     "@pinia/nuxt": "^0.11.2",

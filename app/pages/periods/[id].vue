@@ -479,7 +479,7 @@
 </template>
 
 <script setup lang="ts">
-import { Decimal } from "@prisma/client/runtime/library";
+import type { DecimalValue } from "~~/shared/types/database";
 
 definePageMeta({
   middleware: "role",
@@ -542,7 +542,7 @@ function formatDateTime(date: string | Date): string {
   });
 }
 
-function formatCurrency(value: number | Decimal | null): string {
+function formatCurrency(value: DecimalValue | null): string {
   if (value === null || value === undefined) return "SAR 0.00";
   const numValue = typeof value === "number" ? value : parseFloat(value.toString());
   return `SAR ${numValue.toLocaleString("en-US", {

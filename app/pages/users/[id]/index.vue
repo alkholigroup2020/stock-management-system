@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserRole } from "@prisma/client";
+import type { UserRole } from "~~/shared/types/database";
 
 definePageMeta({
   middleware: "role",

@@ -297,7 +297,7 @@
 
 <script setup lang="ts">
 import { z } from "zod";
-import type { LocationType } from "@prisma/client";
+import type { LocationType } from "~~/shared/types/database";
 
 definePageMeta({
   middleware: ["role"],

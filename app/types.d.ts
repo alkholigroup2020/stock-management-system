@@ -5,7 +5,7 @@
  * used throughout the application.
  */
 
-import type { UserRole } from "@prisma/client";
+import type { UserRole } from "~~/shared/types/database";
 
 declare module "#app" {
   interface PageMeta {

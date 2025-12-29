@@ -6,7 +6,7 @@
  * with top consumed items analysis.
  */
 
-import type { PeriodStatus, CostCentre } from "@prisma/client";
+import type { PeriodStatus, CostCentre } from "~~/shared/types/database";
 import {
   generateSimpleCSV,
   downloadCSV,

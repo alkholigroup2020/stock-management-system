@@ -6,7 +6,7 @@
  * receipts, transfers, issues, and closing values with consumption calculations.
  */
 
-import type { PeriodStatus } from "@prisma/client";
+import type { PeriodStatus } from "~~/shared/types/database";
 import { generateSimpleCSV, downloadCSV, formatCurrencyForCSV } from "~/utils/csvExport";
 
 // Page metadata
