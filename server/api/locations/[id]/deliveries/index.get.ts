@@ -58,10 +58,20 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Check if location exists
-    const location = await prisma.location.findUnique({
-      where: { id: locationId },
-    });
+    // Use $transaction to batch authorization queries into a single database round-trip
+    const [location, userLocation] = await prisma.$transaction([
+      prisma.location.findUnique({
+        where: { id: locationId },
+      }),
+      prisma.userLocation.findUnique({
+        where: {
+          user_id_location_id: {
+            user_id: user.id,
+            location_id: locationId,
+          },
+        },
+      }),
+    ]);
 
     if (!location) {
       throw createError({
@@ -73,16 +83,6 @@ export default defineEventHandler(async (event) => {
         },
       });
     }
-
-    // Check user has access to location
-    const userLocation = await prisma.userLocation.findUnique({
-      where: {
-        user_id_location_id: {
-          user_id: user.id,
-          location_id: locationId,
-        },
-      },
-    });
 
     if (!userLocation && user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
       throw createError({
@@ -133,11 +133,10 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    // Get total count
-    const total = await prisma.delivery.count({ where });
-
-    // Get deliveries
-    const deliveries = await prisma.delivery.findMany({
+    // Use $transaction to batch data queries into a single database round-trip
+    const [total, deliveries] = await prisma.$transaction([
+      prisma.delivery.count({ where }),
+      prisma.delivery.findMany({
       where,
       skip,
       take: limit,
@@ -188,7 +187,8 @@ export default defineEventHandler(async (event) => {
           },
         }),
       },
-    });
+    }),
+    ]);
 
     return {
       deliveries: deliveries.map((d) => ({

@@ -73,10 +73,22 @@ export default defineEventHandler(async (event) => {
     const query = await getQuery(event);
     const { periodId } = querySchema.parse(query);
 
-    // Check if period exists
-    const period = await prisma.period.findUnique({
-      where: { id: periodId },
-    });
+    // Use $transaction to batch initial queries into a single database round-trip
+    const [period, locations] = await prisma.$transaction([
+      // Check if period exists
+      prisma.period.findUnique({
+        where: { id: periodId },
+      }),
+      // Get all active locations
+      prisma.location.findMany({
+        where: {
+          is_active: true,
+        },
+        orderBy: {
+          code: "asc",
+        },
+      }),
+    ]);
 
     if (!period) {
       throw createError({
@@ -88,16 +100,6 @@ export default defineEventHandler(async (event) => {
         },
       });
     }
-
-    // Get all active locations
-    const locations = await prisma.location.findMany({
-      where: {
-        is_active: true,
-      },
-      orderBy: {
-        code: "asc",
-      },
-    });
 
     // Helper function to calculate reconciliation for a location
     async function getLocationReconciliation(locationId: string, currentPeriod: Period) {

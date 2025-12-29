@@ -70,10 +70,20 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const { costCentre, startDate, endDate, page, limit } = querySchema.parse(query);
 
-    // Check if location exists
-    const location = await prisma.location.findUnique({
-      where: { id: locationId },
-    });
+    // Use $transaction to batch authorization queries into a single database round-trip
+    const [location, userLocation] = await prisma.$transaction([
+      prisma.location.findUnique({
+        where: { id: locationId },
+      }),
+      prisma.userLocation.findUnique({
+        where: {
+          user_id_location_id: {
+            user_id: user.id,
+            location_id: locationId,
+          },
+        },
+      }),
+    ]);
 
     if (!location) {
       throw createError({
@@ -85,16 +95,6 @@ export default defineEventHandler(async (event) => {
         },
       });
     }
-
-    // Check user has access to location
-    const userLocation = await prisma.userLocation.findUnique({
-      where: {
-        user_id_location_id: {
-          user_id: user.id,
-          location_id: locationId,
-        },
-      },
-    });
 
     if (!userLocation && user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
       throw createError({
@@ -136,8 +136,8 @@ export default defineEventHandler(async (event) => {
     // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Fetch issues with pagination
-    const [issues, total] = await Promise.all([
+    // Use $transaction to batch data queries into a single database round-trip
+    const [issues, total] = await prisma.$transaction([
       prisma.issue.findMany({
         where,
         include: {

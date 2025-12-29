@@ -118,8 +118,8 @@ export default defineEventHandler(async (event) => {
     const skip = (page - 1) * limit;
     const take = limit;
 
-    // Fetch transfers with pagination
-    const [transfers, total] = await Promise.all([
+    // Use $transaction to batch data queries into a single database round-trip
+    const [transfers, total] = await prisma.$transaction([
       prisma.transfer.findMany({
         where,
         include: {

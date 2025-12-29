@@ -54,15 +54,44 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Check if location exists
-    const location = await prisma.location.findUnique({
-      where: { id: locationId },
-      select: {
-        id: true,
-        code: true,
-        name: true,
-      },
-    });
+    // Use $transaction to batch the initial queries into a single database round-trip
+    // This significantly reduces latency when connecting to remote databases
+    const [location, currentPeriod, userLocationAccess] = await prisma.$transaction([
+      // Check if location exists
+      prisma.location.findUnique({
+        where: { id: locationId },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+        },
+      }),
+      // Get current open period
+      prisma.period.findFirst({
+        where: {
+          status: { in: ["OPEN", "PENDING_CLOSE"] },
+        },
+        orderBy: {
+          start_date: "desc",
+        },
+        select: {
+          id: true,
+          name: true,
+          start_date: true,
+          end_date: true,
+          status: true,
+        },
+      }),
+      // Check user access (only used for non-admin/supervisor)
+      prisma.userLocation.findUnique({
+        where: {
+          user_id_location_id: {
+            user_id: user.id,
+            location_id: locationId,
+          },
+        },
+      }),
+    ]);
 
     if (!location) {
       throw createError({
@@ -77,16 +106,7 @@ export default defineEventHandler(async (event) => {
 
     // Check user has access to location
     if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: locationId,
-          },
-        },
-      });
-
-      if (!userLocation) {
+      if (!userLocationAccess) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",
@@ -98,23 +118,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Get current open period
-    const currentPeriod = await prisma.period.findFirst({
-      where: {
-        status: { in: ["OPEN", "PENDING_CLOSE"] },
-      },
-      orderBy: {
-        start_date: "desc",
-      },
-      select: {
-        id: true,
-        name: true,
-        start_date: true,
-        end_date: true,
-        status: true,
-      },
-    });
-
     // Calculate days left in period
     let daysLeft = 0;
     if (currentPeriod) {
@@ -124,9 +127,10 @@ export default defineEventHandler(async (event) => {
       daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     }
 
-    // Fetch data in parallel for performance
+    // Fetch dashboard data in a single batched transaction
     const periodId = currentPeriod?.id;
 
+    // Fetch dashboard data in parallel for performance
     const [deliveriesAggregate, issuesAggregate, pobAggregate, recentDeliveries, recentIssues] =
       await Promise.all([
         // Total receipts (sum of delivery amounts for this period and location)
@@ -140,7 +144,7 @@ export default defineEventHandler(async (event) => {
                 total_amount: true,
               },
             })
-          : { _sum: { total_amount: null } },
+          : Promise.resolve({ _sum: { total_amount: null } }),
 
         // Total issues (sum of issue values for this period and location)
         periodId
@@ -153,7 +157,7 @@ export default defineEventHandler(async (event) => {
                 total_value: true,
               },
             })
-          : { _sum: { total_value: null } },
+          : Promise.resolve({ _sum: { total_value: null } }),
 
         // Total mandays (sum of crew + extra for this period and location)
         periodId
@@ -167,7 +171,7 @@ export default defineEventHandler(async (event) => {
                 extra_count: true,
               },
             })
-          : { _sum: { crew_count: null, extra_count: null } },
+          : Promise.resolve({ _sum: { crew_count: null, extra_count: null } }),
 
         // Recent deliveries (last 5)
         prisma.delivery.findMany({

@@ -136,10 +136,41 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check if location exists
-    const location = await prisma.location.findUnique({
-      where: { id: locationId },
-    });
+    // Verify all items exist (for drafts, just check they exist; for posting, check they're active)
+    const itemIds = data.lines.map((line) => line.item_id);
+
+    // Use $transaction to batch all initial validation queries into a single database round-trip
+    const [location, userLocation, currentPeriod, supplier, items] = await prisma.$transaction([
+      // Check if location exists
+      prisma.location.findUnique({
+        where: { id: locationId },
+      }),
+      // Check user access
+      prisma.userLocation.findUnique({
+        where: {
+          user_id_location_id: {
+            user_id: user.id,
+            location_id: locationId,
+          },
+        },
+      }),
+      // Get current open period
+      prisma.period.findFirst({
+        where: { status: "OPEN" },
+        orderBy: { start_date: "desc" },
+      }),
+      // Verify supplier exists
+      prisma.supplier.findUnique({
+        where: { id: data.supplier_id },
+      }),
+      // Verify all items exist
+      prisma.item.findMany({
+        where: {
+          id: { in: itemIds },
+          ...(isPosting ? { is_active: true } : {}),
+        },
+      }),
+    ]);
 
     if (!location) {
       throw createError({
@@ -153,34 +184,17 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check user has access to location (Operators need explicit assignment)
-    if (user.role === "OPERATOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: locationId,
-          },
+    if (user.role === "OPERATOR" && !userLocation) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        data: {
+          code: "LOCATION_ACCESS_DENIED",
+          message: "You do not have access to this location",
         },
       });
-
-      if (!userLocation) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden",
-          data: {
-            code: "LOCATION_ACCESS_DENIED",
-            message: "You do not have access to this location",
-          },
-        });
-      }
     }
     // Admins and Supervisors have implicit access to all locations
-
-    // Get current open period (required for posting, optional for drafts)
-    const currentPeriod = await prisma.period.findFirst({
-      where: { status: "OPEN" },
-      orderBy: { start_date: "desc" },
-    });
 
     if (isPosting && !currentPeriod) {
       throw createError({
@@ -193,11 +207,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Verify supplier exists
-    const supplier = await prisma.supplier.findUnique({
-      where: { id: data.supplier_id },
-    });
-
     if (!supplier) {
       throw createError({
         statusCode: 404,
@@ -208,15 +217,6 @@ export default defineEventHandler(async (event) => {
         },
       });
     }
-
-    // Verify all items exist (for drafts, just check they exist; for posting, check they're active)
-    const itemIds = data.lines.map((line) => line.item_id);
-    const items = await prisma.item.findMany({
-      where: {
-        id: { in: itemIds },
-        ...(isPosting ? { is_active: true } : {}),
-      },
-    });
 
     if (items.length !== itemIds.length) {
       throw createError({
@@ -231,29 +231,31 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Get period prices for variance detection (only needed if posting)
+    // Build maps for period prices and stock levels
     const periodPriceMap = new Map<string, number>();
+    const stockMap = new Map<string, { quantity: number; wac: number }>();
+    let periodIdForDelivery = currentPeriod?.id;
+
+    // Use $transaction to batch additional queries into a single database round-trip
     if (isPosting && currentPeriod) {
-      const periodPrices = await prisma.itemPrice.findMany({
-        where: {
-          period_id: currentPeriod.id,
-          item_id: { in: itemIds },
-        },
-      });
+      // When posting, fetch period prices and current stock levels together
+      const [periodPrices, currentStocks] = await prisma.$transaction([
+        prisma.itemPrice.findMany({
+          where: {
+            period_id: currentPeriod.id,
+            item_id: { in: itemIds },
+          },
+        }),
+        prisma.locationStock.findMany({
+          where: {
+            location_id: locationId,
+            item_id: { in: itemIds },
+          },
+        }),
+      ]);
 
       periodPrices.forEach((pp) => {
         periodPriceMap.set(pp.item_id, parseFloat(pp.price.toString()));
-      });
-    }
-
-    // Get current stock levels for WAC calculation (only needed if posting)
-    const stockMap = new Map<string, { quantity: number; wac: number }>();
-    if (isPosting) {
-      const currentStocks = await prisma.locationStock.findMany({
-        where: {
-          location_id: locationId,
-          item_id: { in: itemIds },
-        },
       });
 
       currentStocks.forEach((stock) => {
@@ -262,11 +264,8 @@ export default defineEventHandler(async (event) => {
           wac: parseFloat(stock.wac.toString()),
         });
       });
-    }
-
-    // For drafts without open period, use the most recent period
-    let periodIdForDelivery = currentPeriod?.id;
-    if (!periodIdForDelivery) {
+    } else if (!periodIdForDelivery) {
+      // For drafts without open period, find the most recent period
       const mostRecentPeriod = await prisma.period.findFirst({
         orderBy: { start_date: "desc" },
         select: { id: true },
@@ -287,6 +286,21 @@ export default defineEventHandler(async (event) => {
     // Generate delivery number
     const deliveryNo = await generateDeliveryNumber();
 
+    // Ensure periodIdForDelivery is defined before creating delivery
+    if (!periodIdForDelivery) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "NO_PERIOD_EXISTS",
+          message: "No accounting period exists. Please create a period first.",
+        },
+      });
+    }
+
+    // Capture periodIdForDelivery in a const for type safety inside transaction
+    const periodId = periodIdForDelivery;
+
     // Use a transaction to ensure atomicity
     // Increase timeout to 30 seconds to handle multiple line items and stock updates
     const result = await prisma.$transaction(
@@ -297,7 +311,7 @@ export default defineEventHandler(async (event) => {
             delivery_no: deliveryNo,
             location_id: locationId,
             supplier_id: data.supplier_id,
-            period_id: periodIdForDelivery,
+            period_id: periodId,
             po_id: data.po_id || null,
             invoice_no: data.invoice_no || null,
             delivery_note: data.delivery_note || null,

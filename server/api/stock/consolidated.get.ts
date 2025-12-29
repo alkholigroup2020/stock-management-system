@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     const { category, lowStock } = querySchema.parse(query);
 
     // Build where clause for items
-    const itemWhere: any = {
+    const itemWhere: { is_active: boolean; category?: string } = {
       is_active: true,
     };
 
@@ -61,47 +61,49 @@ export default defineEventHandler(async (event) => {
       itemWhere.category = category;
     }
 
-    // Fetch all locations
-    const locations = await prisma.location.findMany({
-      where: { is_active: true },
-      select: {
-        id: true,
-        code: true,
-        name: true,
-        type: true,
-      },
-      orderBy: { name: "asc" },
-    });
-
-    // Fetch all stock across all locations
-    // NOTE: Removed nested orderBy on item.name for performance
-    // Sorting is done in JavaScript after aggregation
-    const allStock = await prisma.locationStock.findMany({
-      where: {
-        location: { is_active: true },
-        item: itemWhere,
-      },
-      include: {
-        item: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            unit: true,
-            category: true,
-            sub_category: true,
+    // Use $transaction to batch both queries into a single database round-trip
+    const [locations, allStock] = await prisma.$transaction([
+      // Fetch all locations
+      prisma.location.findMany({
+        where: { is_active: true },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          type: true,
+        },
+        orderBy: { name: "asc" },
+      }),
+      // Fetch all stock across all locations
+      // NOTE: Removed nested orderBy on item.name for performance
+      // Sorting is done in JavaScript after aggregation
+      prisma.locationStock.findMany({
+        where: {
+          location: { is_active: true },
+          item: itemWhere,
+        },
+        include: {
+          item: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              unit: true,
+              category: true,
+              sub_category: true,
+            },
+          },
+          location: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              type: true,
+            },
           },
         },
-        location: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            type: true,
-          },
-        },
-      },
-    });
+      }),
+    ]);
 
     // Group stock by item and aggregate across locations
     const stockByItem = new Map<

@@ -61,34 +61,36 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Get all active locations
-    const locations = await prisma.location.findMany({
-      where: { is_active: true },
-      select: {
-        id: true,
-        code: true,
-        name: true,
-        type: true,
-      },
-      orderBy: { code: "asc" },
-    });
-
-    // Get current open period
-    const currentPeriod = await prisma.period.findFirst({
-      where: {
-        status: { in: ["OPEN", "PENDING_CLOSE"] },
-      },
-      orderBy: {
-        start_date: "desc",
-      },
-      select: {
-        id: true,
-        name: true,
-        start_date: true,
-        end_date: true,
-        status: true,
-      },
-    });
+    // Use $transaction to batch the initial queries into a single database round-trip
+    const [locations, currentPeriod] = await prisma.$transaction([
+      // Get all active locations
+      prisma.location.findMany({
+        where: { is_active: true },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          type: true,
+        },
+        orderBy: { code: "asc" },
+      }),
+      // Get current open period
+      prisma.period.findFirst({
+        where: {
+          status: { in: ["OPEN", "PENDING_CLOSE"] },
+        },
+        orderBy: {
+          start_date: "desc",
+        },
+        select: {
+          id: true,
+          name: true,
+          start_date: true,
+          end_date: true,
+          status: true,
+        },
+      }),
+    ]);
 
     // Calculate days left in period
     let daysLeft = 0;
@@ -101,7 +103,7 @@ export default defineEventHandler(async (event) => {
 
     const periodId = currentPeriod?.id;
 
-    // Fetch aggregated data across all locations
+    // Fetch aggregated data across all locations in parallel
     const [
       totalDeliveriesAggregate,
       totalIssuesAggregate,
@@ -120,7 +122,7 @@ export default defineEventHandler(async (event) => {
             where: { period_id: periodId },
             _sum: { total_amount: true },
           })
-        : { _sum: { total_amount: null } },
+        : Promise.resolve({ _sum: { total_amount: null } }),
 
       // Global totals - issues
       periodId
@@ -128,7 +130,7 @@ export default defineEventHandler(async (event) => {
             where: { period_id: periodId },
             _sum: { total_value: true },
           })
-        : { _sum: { total_value: null } },
+        : Promise.resolve({ _sum: { total_value: null } }),
 
       // Global totals - POB
       periodId
@@ -136,7 +138,7 @@ export default defineEventHandler(async (event) => {
             where: { period_id: periodId },
             _sum: { crew_count: true, extra_count: true },
           })
-        : { _sum: { crew_count: null, extra_count: null } },
+        : Promise.resolve({ _sum: { crew_count: null, extra_count: null } }),
 
       // Per-location deliveries
       periodId
@@ -145,7 +147,7 @@ export default defineEventHandler(async (event) => {
             where: { period_id: periodId },
             _sum: { total_amount: true },
           })
-        : [],
+        : Promise.resolve([]),
 
       // Per-location issues
       periodId
@@ -154,7 +156,7 @@ export default defineEventHandler(async (event) => {
             where: { period_id: periodId },
             _sum: { total_value: true },
           })
-        : [],
+        : Promise.resolve([]),
 
       // Per-location POB
       periodId
@@ -163,7 +165,7 @@ export default defineEventHandler(async (event) => {
             where: { period_id: periodId },
             _sum: { crew_count: true, extra_count: true },
           })
-        : [],
+        : Promise.resolve([]),
 
       // Recent deliveries across all locations (last 10)
       prisma.delivery.findMany({

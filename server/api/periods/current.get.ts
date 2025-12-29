@@ -67,69 +67,71 @@ export default defineEventHandler(async (event) => {
     // Get per-location counts for the current period
     const locationIds = currentPeriod.period_locations.map((pl) => pl.location_id);
 
-    // Fetch counts in parallel for better performance
-    const [deliveryCounts, issueCounts, transferCounts, reconciliationCounts] = await Promise.all([
-      // Deliveries per location
-      prisma.delivery.groupBy({
-        by: ["location_id"],
-        where: {
-          period_id: currentPeriod.id,
-          location_id: { in: locationIds },
-        },
-        _count: { id: true },
-      }),
-      // Issues per location
-      prisma.issue.groupBy({
-        by: ["location_id"],
-        where: {
-          period_id: currentPeriod.id,
-          location_id: { in: locationIds },
-        },
-        _count: { id: true },
-      }),
-      // Transfers per location (from) - filter by date range since transfers don't have period_id
-      prisma.transfer.groupBy({
-        by: ["from_location_id"],
-        where: {
-          from_location_id: { in: locationIds },
-          request_date: {
-            gte: currentPeriod.start_date,
-            lte: currentPeriod.end_date,
+    // Fetch counts in parallel using Promise.all for better performance
+    // Note: Using Promise.all instead of $transaction because groupBy queries
+    // with the same structure execute efficiently in parallel
+    const [deliveryCounts, issueCounts, transferFromCounts, reconciliationCounts, transferToCounts] =
+      await Promise.all([
+        // Deliveries per location
+        prisma.delivery.groupBy({
+          by: ["location_id"],
+          where: {
+            period_id: currentPeriod.id,
+            location_id: { in: locationIds },
           },
-        },
-        _count: { _all: true },
-      }),
-      // Reconciliations per location
-      prisma.reconciliation.groupBy({
-        by: ["location_id"],
-        where: {
-          period_id: currentPeriod.id,
-          location_id: { in: locationIds },
-        },
-        _count: { id: true },
-      }),
-    ]);
-
-    // Also get transfers by to_location_id for accurate per-location counts
-    const transferToLocationCounts = await prisma.transfer.groupBy({
-      by: ["to_location_id"],
-      where: {
-        to_location_id: { in: locationIds },
-        request_date: {
-          gte: currentPeriod.start_date,
-          lte: currentPeriod.end_date,
-        },
-      },
-      _count: { _all: true },
-    });
+          _count: { id: true },
+        }),
+        // Issues per location
+        prisma.issue.groupBy({
+          by: ["location_id"],
+          where: {
+            period_id: currentPeriod.id,
+            location_id: { in: locationIds },
+          },
+          _count: { id: true },
+        }),
+        // Transfers per location (from) - filter by date range since transfers don't have period_id
+        prisma.transfer.groupBy({
+          by: ["from_location_id"],
+          where: {
+            from_location_id: { in: locationIds },
+            request_date: {
+              gte: currentPeriod.start_date,
+              lte: currentPeriod.end_date,
+            },
+          },
+          _count: { _all: true },
+        }),
+        // Reconciliations per location
+        prisma.reconciliation.groupBy({
+          by: ["location_id"],
+          where: {
+            period_id: currentPeriod.id,
+            location_id: { in: locationIds },
+          },
+          _count: { id: true },
+        }),
+        // Transfers per location (to) for accurate per-location counts
+        prisma.transfer.groupBy({
+          by: ["to_location_id"],
+          where: {
+            to_location_id: { in: locationIds },
+            request_date: {
+              gte: currentPeriod.start_date,
+              lte: currentPeriod.end_date,
+            },
+          },
+          _count: { _all: true },
+        }),
+      ]);
 
     // Build lookup maps for quick access
     const deliveryMap = new Map(deliveryCounts.map((d) => [d.location_id, d._count.id]));
     const issueMap = new Map(issueCounts.map((i) => [i.location_id, i._count.id]));
-    const transferFromMap = new Map(transferCounts.map((t) => [t.from_location_id, t._count._all]));
-    const transferToMap = new Map(
-      transferToLocationCounts.map((t) => [t.to_location_id, t._count._all])
+    const transferFromMap = new Map(
+      transferFromCounts.map((t) => [t.from_location_id, t._count._all])
     );
+    const transferToMap = new Map(transferToCounts.map((t) => [t.to_location_id, t._count._all]));
     const reconciliationMap = new Map(
       reconciliationCounts.map((r) => [r.location_id, r._count.id])
     );
