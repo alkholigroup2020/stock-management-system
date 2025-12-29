@@ -976,6 +976,56 @@ font-family:
   sans-serif;
 ```
 
+### Help Content Typography
+
+**DESIGN RULE:** All help content pages (Getting Started, Role Guides, Permissions pages) must use consistent font sizes throughout.
+
+| Element                    | Font Size Class              | Usage                                           |
+| -------------------------- | ---------------------------- | ----------------------------------------------- |
+| **Page Title (h2)**        | `text-2xl font-bold`         | Main page heading (e.g., "Operator Guide")      |
+| **Page Subtitle**          | `text-sm`                    | Description under title                         |
+| **Section Title (h3)**     | `text-lg font-semibold`      | Collapsible section headings, major sections    |
+| **Subsection Title (h4)**  | `font-medium`                | Subsection headings within expanded content     |
+| **All Content**            | `text-sm`                    | Paragraphs, lists, table cells, descriptions    |
+
+**Example Structure:**
+
+```vue
+<template>
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="pb-4 border-b border-[var(--ui-border)]">
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">
+        Page Title
+      </h2>
+      <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+        Page subtitle/description
+      </p>
+    </div>
+
+    <!-- Section -->
+    <section>
+      <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)] mb-3">
+        Section Title
+      </h3>
+      <p class="text-sm text-[var(--ui-text-muted)] mb-4">
+        Section description paragraph.
+      </p>
+      <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+        <li>List item content</li>
+      </ul>
+    </section>
+  </div>
+</template>
+```
+
+**Rules:**
+
+- All paragraphs (`<p>`) must include `text-sm`
+- All lists (`<ul>`, `<ol>`) must include `text-sm` on the list element
+- Page subtitles must use `text-sm` (not default size)
+- Maintain consistency across all help pages (guides, permissions, getting started)
+
 ---
 
 ## Semantic Design Tokens

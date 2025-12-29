@@ -258,6 +258,35 @@ const handleLogout = async () => {
   await useAuth().logout();
   await navigateTo("/login");
 };
+
+// Help drawer state
+const helpDrawerOpen = ref(false);
+
+const openHelpDrawer = () => {
+  helpDrawerOpen.value = true;
+};
+
+// Keyboard shortcut for help (? or F1)
+const handleGlobalKeydown = (event: KeyboardEvent) => {
+  // Check for ? key (Shift + /) or F1
+  if ((event.key === "?" && !event.ctrlKey && !event.altKey) || event.key === "F1") {
+    // Don't trigger if user is typing in an input
+    const target = event.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return;
+    }
+    event.preventDefault();
+    openHelpDrawer();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener("keydown", handleGlobalKeydown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleGlobalKeydown);
+});
 </script>
 
 <template>
@@ -333,13 +362,14 @@ const handleLogout = async () => {
 
           <!-- Right side actions -->
           <div class="flex items-center gap-1">
-            <!-- Notifications -->
+            <!-- Help -->
             <UButton
-              icon="i-heroicons-bell"
+              icon="i-heroicons-question-mark-circle"
               color="neutral"
               variant="ghost"
-              aria-label="Notifications"
+              aria-label="Help (Press ? or F1)"
               class="cursor-pointer"
+              @click="openHelpDrawer"
             />
 
             <!-- Theme Toggle -->
@@ -434,4 +464,7 @@ const handleLogout = async () => {
       </template>
     </UDashboardPanel>
   </UDashboardGroup>
+
+  <!-- Help Drawer -->
+  <LayoutHelpDrawer v-model:open="helpDrawerOpen" />
 </template>

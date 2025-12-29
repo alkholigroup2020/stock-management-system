@@ -1,0 +1,167 @@
+<script setup lang="ts">
+// Supervisor Permissions - Responsibilities and permissions for Supervisor role
+</script>
+
+<template>
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="pb-4 border-b border-[var(--ui-border)]">
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">
+        Supervisor Role
+      </h2>
+      <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+        Your responsibilities and system permissions
+      </p>
+    </div>
+
+    <!-- Your Responsibilities Section -->
+    <section class="p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
+      <h3 class="font-semibold text-[var(--ui-text-highlighted)] mb-3 flex items-center gap-2">
+        <UIcon name="i-heroicons-clipboard-document-check" class="text-[var(--ui-primary)]" />
+        Your Responsibilities
+      </h3>
+      <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+          <span>Approve or reject transfer requests between locations</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+          <span>Manage period-end reconciliations for each location</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+          <span>Create manual NCRs for quality issues</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+          <span>View consolidated reports across all locations</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+          <span>Approve purchase requisitions (PRF) and create POs</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+          <span>All Operator tasks (deliveries, issues, POB, etc.)</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Permissions Matrix -->
+    <section>
+      <h3 class="font-semibold text-[var(--ui-text-highlighted)] mb-3 flex items-center gap-2">
+        <UIcon name="i-heroicons-shield-check" class="text-[var(--ui-primary)]" />
+        Permissions Summary
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border border-[var(--ui-border)] rounded-lg overflow-hidden">
+          <thead>
+            <tr class="bg-[var(--ui-bg-elevated)]">
+              <th class="text-left p-3 font-medium text-[var(--ui-text-highlighted)] border-b border-[var(--ui-border)]">Feature</th>
+              <th class="text-center p-3 font-medium text-[var(--ui-text-highlighted)] border-b border-[var(--ui-border)]">Access</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--ui-border)]">
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Dashboard (view)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">POB (enter/edit)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Items & Prices (view)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Items & Prices (create/edit)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Deliveries (post)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Issues (post)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">NCR (create/update)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Stock Now (view)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Reconciliations (view)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Reconciliations (edit)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Transfer (create request)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Transfer (approve)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">PRF (create)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">PRF (approve)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">PO (create)</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Set Period Prices</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Period Close</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">User & Role management</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Location management</td>
+              <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Legend -->
+    <section class="flex items-center gap-6 text-sm text-[var(--ui-text-muted)]">
+      <div class="flex items-center gap-2">
+        <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+        <span>Allowed</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)]" />
+        <span>Not allowed</span>
+      </div>
+    </section>
+
+    <!-- Note -->
+    <section class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+      <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+        <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
+        <span>Supervisors have access to all locations. You can view and manage data across the entire system.</span>
+      </p>
+    </section>
+  </div>
+</template>
