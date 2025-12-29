@@ -418,7 +418,7 @@ This document contains a comprehensive, step-by-step task list for building the 
 - [x] Define navigation menu structure
   - [x] Dashboard (icon + label)
   - [x] POB
-  - [x] Items & Prices
+  - [x] Items
   - [x] Orders (PRF/PO) - optional for MVP
   - [x] Deliveries & Invoices
   - [x] Issues
@@ -546,7 +546,7 @@ This document contains a comprehensive, step-by-step task list for building the 
 
 ---
 
-## Phase 1.6: Items & Prices (Days 6-8)
+## Phase 1.6: Items (Days 6-8)
 
 ### 1.6.1 Item API Routes
 

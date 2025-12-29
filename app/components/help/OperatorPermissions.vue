@@ -72,11 +72,11 @@
               <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
             </tr>
             <tr>
-              <td class="p-3 text-[var(--ui-text)]">Items & Prices (view)</td>
+              <td class="p-3 text-[var(--ui-text)]">Items (view)</td>
               <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
             </tr>
             <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Items & Prices (create/edit)</td>
+              <td class="p-3 text-[var(--ui-text)]">Items (create/edit)</td>
               <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
             </tr>
             <tr>

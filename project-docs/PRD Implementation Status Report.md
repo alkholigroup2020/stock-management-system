@@ -32,7 +32,7 @@ This report analyzes the implementation status of all features and specification
 - **Recent activity** - `DashboardRecentActivity` component showing deliveries/issues
 - **Quick actions** - Record Delivery, Record Issue, View Stock, Enter POB
 
-#### 3. Items & Prices
+#### 3. Items
 
 - **Global item master** - `pages/items/`, full CRUD implemented
 - **Period price setting** - `pages/periods/[periodId]/prices.vue`
@@ -150,7 +150,7 @@ This report analyzes the implementation status of all features and specification
 | --------------------- | ------------------- | --------------------------------------- |
 | Location Management   | Complete            | Full CRUD, user assignment              |
 | Dashboard             | Complete            | Metrics, recent activity, quick actions |
-| Items & Prices        | Complete            | Period prices, variance detection       |
+| Items                 | Complete            | Period prices, variance detection       |
 | **Orders (PRF → PO)** | **NOT IMPLEMENTED** | Schema only, no UI or API               |
 | Deliveries            | Complete            | Draft/Post, WAC, NCR auto-generation    |
 | Issues                | Complete            | Location-specific, cost centres         |

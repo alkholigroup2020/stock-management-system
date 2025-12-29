@@ -54,6 +54,13 @@ const mainMenuItems = computed<NavItem[]>(() => {
       permission: true,
     });
   }
+  if (permissions.canViewStock()) {
+    masterDataChildren.push({
+      label: "Items",
+      to: "/items",
+      permission: true,
+    });
+  }
 
   if (masterDataChildren.length > 0) {
     items.push({
@@ -97,31 +104,7 @@ const mainMenuItems = computed<NavItem[]>(() => {
     });
   }
 
-  // 4. Stock section (expandable)
-  const stockChildren: NavItem[] = [];
-  if (permissions.canViewStock()) {
-    stockChildren.push({
-      label: "Stock Now",
-      to: "/stock-now",
-      permission: true,
-    });
-    stockChildren.push({
-      label: "Items & Prices",
-      to: "/items",
-      permission: true,
-    });
-  }
-
-  if (stockChildren.length > 0) {
-    items.push({
-      label: "Stock",
-      icon: "i-heroicons-cube",
-      children: stockChildren,
-      permission: true,
-    });
-  }
-
-  // 5. POB (single item)
+  // 4. POB (single item)
   if (permissions.canEnterPOB()) {
     items.push({
       label: "POB",
@@ -131,17 +114,17 @@ const mainMenuItems = computed<NavItem[]>(() => {
     });
   }
 
-  // 6. Periods (single item)
-  if (permissions.canClosePeriod()) {
+  // 5. Stock Now (single item)
+  if (permissions.canViewStock()) {
     items.push({
-      label: "Periods",
-      icon: "i-heroicons-calendar-days",
-      to: "/periods",
+      label: "Stock Now",
+      icon: "i-heroicons-cube",
+      to: "/stock-now",
       permission: true,
     });
   }
 
-  // 7. NCR (single item)
+  // 6. NCR (single item)
   if (permissions.canCreateNCR()) {
     items.push({
       label: "NCR",
@@ -151,7 +134,7 @@ const mainMenuItems = computed<NavItem[]>(() => {
     });
   }
 
-  // 8. Reconciliations (single item)
+  // 7. Reconciliations (single item)
   if (permissions.canViewReconciliations()) {
     items.push({
       label: "Reconciliations",
@@ -161,12 +144,22 @@ const mainMenuItems = computed<NavItem[]>(() => {
     });
   }
 
-  // 9. Reports (single item)
+  // 8. Reports (single item)
   if (permissions.canViewStock()) {
     items.push({
       label: "Reports",
       icon: "i-heroicons-document-chart-bar",
       to: "/reports",
+      permission: true,
+    });
+  }
+
+  // 9. Periods (single item)
+  if (permissions.canClosePeriod()) {
+    items.push({
+      label: "Periods",
+      icon: "i-heroicons-calendar-days",
+      to: "/periods",
       permission: true,
     });
   }
@@ -199,7 +192,7 @@ const pageTitleMap: Record<string, string> = {
   "suppliers-create": "Create Supplier",
   "suppliers-id": "Supplier Details",
   "suppliers-id-edit": "Edit Supplier",
-  items: "Items & Prices",
+  items: "Items",
   "items-create": "Create Item",
   "items-id": "Item Details",
   "items-id-edit": "Edit Item",

@@ -90,7 +90,7 @@ This document provides a comprehensive overview of the **User Roles & Permission
 | --------------------- | ----------------------- |
 | Dashboard             | ✅ Yes                  |
 | POB                   | ✅ Yes                  |
-| Items & Prices        | ✅ Yes (view only)      |
+| Items                 | ✅ Yes (view only)      |
 | Deliveries & Invoices | ✅ Yes                  |
 | Issues                | ✅ Yes                  |
 | Transfers             | ✅ Yes (+ approve)      |
@@ -132,7 +132,7 @@ This document provides a comprehensive overview of the **User Roles & Permission
 | Users                 | ✅ Yes                |
 | POB                   | ✅ Yes                |
 | Suppliers             | ✅ Yes                |
-| Items & Prices        | ✅ Yes (full control) |
+| Items                 | ✅ Yes (full control) |
 | Deliveries & Invoices | ✅ Yes                |
 | Issues                | ✅ Yes                |
 | Transfers             | ✅ Yes                |

@@ -36,7 +36,7 @@ A web application managing stock across **multiple locations**. Core operations 
 | -------------- | ------------------------------------------------------------- | ----------------------- |
 | **Operator**   | Post Deliveries & Issues; view Stock Now                      | Assigned locations only |
 | **Supervisor** | Approve PRFs & Transfers; manage Reconciliations              | All locations           |
-| **Admin**      | Manage Items & Prices; Approve Period Close; configure system | All locations           |
+| **Admin**      | Manage Items; Approve Period Close; configure system          | All locations           |
 | **System**     | Auto-generate price variance NCRs; enforce rules              | All locations           |
 
 ## 3) System Context - Multi-Location Architecture

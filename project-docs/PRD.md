@@ -28,7 +28,7 @@ The Excel file is slow to update, easy to break, and hard to audit. Month-end ta
 
 - **Operator (Store/Kitchen):** Posts Deliveries & Issues at their location, views stock
 - **Supervisor:** Reviews numbers, manages transfers between locations, prepares reconciliations
-- **Admin:** Maintains Items & Prices globally, approves Period Close, manages all locations
+- **Admin:** Maintains Items globally, approves Period Close, manages all locations
 
 ## 2) Goals and Business Objectives
 
@@ -115,7 +115,7 @@ The Excel file is slow to update, easy to break, and hard to audit. Month-end ta
    - Period totals per location
    - Consolidated view for supervisors/admins
    - Recent activity across locations
-3. **Items & Prices**
+3. **Items**
    - Global item master
    - Period price setting (fixed per period)
    - Location-specific stock levels
