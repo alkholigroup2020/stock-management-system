@@ -59,13 +59,5 @@ const progress = computed(() => getOverallProgress(planData.phases));
       <TestingPlanContent />
     </div>
 
-    <!-- Footer -->
-    <div
-      class="flex-shrink-0 border-t border-[var(--ui-border)] px-4 py-2 bg-[var(--ui-bg-elevated)]"
-    >
-      <p class="text-xs text-[var(--ui-text-muted)] text-center">
-        v{{ planData.version }} &middot; Last updated: {{ planData.lastUpdated }}
-      </p>
-    </div>
   </aside>
 </template>
