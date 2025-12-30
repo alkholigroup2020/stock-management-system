@@ -58,8 +58,8 @@ export default defineEventHandler(async (event) => {
 
     if (!currentPeriod) {
       setCacheHeaders(event, {
-        maxAge: 10,
-        staleWhileRevalidate: 10,
+        maxAge: 2,
+        staleWhileRevalidate: 2,
       });
       return { period: null };
     }
@@ -160,10 +160,10 @@ export default defineEventHandler(async (event) => {
       ),
     };
 
-    // Set cache headers (10 seconds for current period - critical data)
+    // Set cache headers (2 seconds for current period - critical data)
     setCacheHeaders(event, {
-      maxAge: 10,
-      staleWhileRevalidate: 10,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

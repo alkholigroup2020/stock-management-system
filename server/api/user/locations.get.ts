@@ -36,10 +36,10 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Set cache headers (20 seconds for user locations)
+      // Set cache headers (2 seconds for user locations)
       setCacheHeaders(event, {
-        maxAge: 20,
-        staleWhileRevalidate: 10,
+        maxAge: 2,
+        staleWhileRevalidate: 2,
       });
 
       return {
@@ -60,10 +60,10 @@ export default defineEventHandler(async (event) => {
     // Filter active locations
     const locations = userLocations.filter((ul) => ul.location.is_active).map((ul) => ul.location);
 
-    // Set cache headers (20 seconds for user locations)
+    // Set cache headers (2 seconds for user locations)
     setCacheHeaders(event, {
-      maxAge: 20,
-      staleWhileRevalidate: 10,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

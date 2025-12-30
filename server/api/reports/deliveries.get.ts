@@ -431,10 +431,10 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Set cache headers (30 seconds for report data)
+    // Set cache headers (2 seconds for report data)
     setCacheHeaders(event, {
-      maxAge: 30,
-      staleWhileRevalidate: 15,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

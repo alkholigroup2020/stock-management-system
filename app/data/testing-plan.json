@@ -11,7 +11,7 @@
       "items": [
         {
           "id": "p1-auth-1",
-          "label": "Navigate to http://localhost:3000"
+          "label": "Navigate to https://stock-management.alkholi.com/"
         },
         {
           "id": "p1-auth-2",

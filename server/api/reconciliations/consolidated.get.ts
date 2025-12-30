@@ -445,10 +445,10 @@ export default defineEventHandler(async (event) => {
         ? Math.round((grandTotals.consumption / grandTotals.total_mandays) * 100) / 100
         : null;
 
-    // Set cache headers (60 seconds for consolidated reconciliation - expensive to compute)
+    // Set cache headers (2 seconds for consolidated reconciliation)
     setCacheHeaders(event, {
-      maxAge: 60,
-      staleWhileRevalidate: 30,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

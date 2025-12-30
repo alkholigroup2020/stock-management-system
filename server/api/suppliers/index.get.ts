@@ -55,10 +55,10 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Set cache headers (20 seconds for suppliers list)
+    // Set cache headers (2 seconds for suppliers list)
     setCacheHeaders(event, {
-      maxAge: 20,
-      staleWhileRevalidate: 10,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

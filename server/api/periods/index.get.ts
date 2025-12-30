@@ -121,10 +121,10 @@ export default defineEventHandler(async (event) => {
       ),
     }));
 
-    // Set cache headers (20 seconds with 10 second stale-while-revalidate)
+    // Set cache headers (2 seconds with 2 second stale-while-revalidate)
     setCacheHeaders(event, {
-      maxAge: 20,
-      staleWhileRevalidate: 10,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

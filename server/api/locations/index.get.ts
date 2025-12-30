@@ -106,10 +106,10 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Set cache headers (20 seconds for locations list)
+      // Set cache headers (2 seconds for locations list)
       setCacheHeaders(event, {
-        maxAge: 20,
-        staleWhileRevalidate: 10,
+        maxAge: 2,
+        staleWhileRevalidate: 2,
       });
 
       return {
@@ -152,10 +152,10 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Set cache headers (20 seconds for locations list)
+    // Set cache headers (2 seconds for locations list)
     setCacheHeaders(event, {
-      maxAge: 20,
-      staleWhileRevalidate: 10,
+      maxAge: 2,
+      staleWhileRevalidate: 2,
     });
 
     return {

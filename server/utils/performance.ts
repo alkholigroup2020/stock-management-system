@@ -109,7 +109,7 @@ export function setCacheHeaders(
   } = {}
 ) {
   const {
-    maxAge = 300, // 5 minutes default
+    maxAge = 2, // 2 seconds default
     sMaxAge,
     staleWhileRevalidate,
     public: isPublic = true,
