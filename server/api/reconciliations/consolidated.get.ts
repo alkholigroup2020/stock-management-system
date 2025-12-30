@@ -19,13 +19,15 @@
  *
  * Permissions:
  * - User must be Supervisor or Admin
+ *
+ * OPTIMIZED: Uses batched queries and pre-fetched data to reduce latency
  */
 
 import prisma from "../../utils/prisma";
 import { setCacheHeaders } from "../../utils/performance";
 import { calculateConsumption, calculateMandayCost } from "../../utils/reconciliation";
 import { z } from "zod";
-import type { UserRole, Period } from "@prisma/client";
+import type { UserRole, Reconciliation } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 
 // User session type
@@ -41,6 +43,18 @@ interface AuthUser {
 const querySchema = z.object({
   periodId: z.string().uuid(),
 });
+
+// Pre-fetched data structure for efficient location processing
+interface PreFetchedData {
+  savedReconciliations: Map<string, Reconciliation>;
+  previousPeriodReconciliations: Map<string, Reconciliation>;
+  deliveryTotals: Map<string, Decimal>;
+  transfersInTotals: Map<string, Decimal>;
+  transfersOutTotals: Map<string, Decimal>;
+  issueTotals: Map<string, Decimal>;
+  closingStockTotals: Map<string, Decimal>;
+  pobTotals: Map<string, number>;
+}
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user as AuthUser | undefined;
@@ -73,20 +87,21 @@ export default defineEventHandler(async (event) => {
     const query = await getQuery(event);
     const { periodId } = querySchema.parse(query);
 
-    // Use $transaction to batch initial queries into a single database round-trip
-    const [period, locations] = await prisma.$transaction([
+    // OPTIMIZATION 1: Batch initial queries into a single parallel fetch
+    const [period, locations, previousPeriod] = await Promise.all([
       // Check if period exists
       prisma.period.findUnique({
         where: { id: periodId },
       }),
       // Get all active locations
       prisma.location.findMany({
-        where: {
-          is_active: true,
-        },
-        orderBy: {
-          code: "asc",
-        },
+        where: { is_active: true },
+        orderBy: { code: "asc" },
+      }),
+      // Get previous period (needed for opening stock calculation) - ONCE for all locations
+      prisma.period.findFirst({
+        where: { status: "CLOSED" },
+        orderBy: { end_date: "desc" },
       }),
     ]);
 
@@ -101,236 +116,294 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Helper function to calculate reconciliation for a location
-    async function getLocationReconciliation(locationId: string, currentPeriod: Period) {
-      // Try to fetch existing reconciliation
-      let reconciliation = await prisma.reconciliation.findUnique({
-        where: {
-          period_id_location_id: {
-            period_id: periodId,
-            location_id: locationId,
-          },
+    if (locations.length === 0) {
+      return {
+        period: {
+          id: period.id,
+          name: period.name,
+          start_date: period.start_date,
+          end_date: period.end_date,
+          status: period.status,
         },
-      });
+        locations: [],
+        grand_totals: {
+          opening_stock: 0,
+          receipts: 0,
+          transfers_in: 0,
+          transfers_out: 0,
+          issues: 0,
+          closing_stock: 0,
+          adjustments: 0,
+          back_charges: 0,
+          credits: 0,
+          condemnations: 0,
+          consumption: 0,
+          total_mandays: 0,
+          average_manday_cost: null,
+        },
+        summary: {
+          total_locations: 0,
+          locations_with_saved_reconciliations: 0,
+          locations_with_auto_calculated: 0,
+        },
+      };
+    }
 
-      // If reconciliation doesn't exist, auto-calculate
-      if (!reconciliation) {
-        // Calculate opening stock (from previous period's closing stock)
-        let openingStock = new Decimal(0);
+    const locationIds = locations.map((l) => l.id);
 
-        const previousPeriod = await prisma.period.findFirst({
-          where: {
-            end_date: {
-              lt: currentPeriod.start_date,
-            },
-          },
-          orderBy: {
-            end_date: "desc",
-          },
-        });
-
-        if (previousPeriod) {
-          const previousReconciliation = await prisma.reconciliation.findUnique({
-            where: {
-              period_id_location_id: {
-                period_id: previousPeriod.id,
-                location_id: locationId,
-              },
-            },
-          });
-
-          if (previousReconciliation) {
-            openingStock = previousReconciliation.closing_stock;
-          }
-        }
-
-        // Calculate receipts (sum of deliveries)
-        const deliveries = await prisma.delivery.findMany({
-          where: {
-            location_id: locationId,
-            period_id: periodId,
-          },
-          include: {
-            delivery_lines: true,
-          },
-        });
-
-        const receipts = deliveries.reduce((sum, delivery) => {
-          const deliveryTotal = delivery.delivery_lines.reduce((lineSum: Decimal, line) => {
-            return lineSum.add(line.line_value);
-          }, new Decimal(0));
-          return sum.add(deliveryTotal);
-        }, new Decimal(0));
-
-        // Calculate transfers in (TO this location)
-        const transfersIn = await prisma.transfer.findMany({
-          where: {
-            to_location_id: locationId,
-            transfer_date: {
-              gte: currentPeriod.start_date,
-              lte: currentPeriod.end_date,
-            },
-            status: "COMPLETED",
-          },
-          include: {
-            transfer_lines: true,
-          },
-        });
-
-        const transfersInValue = transfersIn.reduce((sum, transfer) => {
-          const transferTotal = transfer.transfer_lines.reduce((lineSum: Decimal, line) => {
-            return lineSum.add(line.line_value);
-          }, new Decimal(0));
-          return sum.add(transferTotal);
-        }, new Decimal(0));
-
-        // Calculate transfers out (FROM this location)
-        const transfersOut = await prisma.transfer.findMany({
-          where: {
-            from_location_id: locationId,
-            transfer_date: {
-              gte: currentPeriod.start_date,
-              lte: currentPeriod.end_date,
-            },
-            status: "COMPLETED",
-          },
-          include: {
-            transfer_lines: true,
-          },
-        });
-
-        const transfersOutValue = transfersOut.reduce((sum, transfer) => {
-          const transferTotal = transfer.transfer_lines.reduce((lineSum: Decimal, line) => {
-            return lineSum.add(line.line_value);
-          }, new Decimal(0));
-          return sum.add(transferTotal);
-        }, new Decimal(0));
-
-        // Calculate issues (sum of issues)
-        const issues = await prisma.issue.findMany({
-          where: {
-            location_id: locationId,
-            period_id: periodId,
-          },
-          include: {
-            issue_lines: true,
-          },
-        });
-
-        const issuesValue = issues.reduce((sum, issue) => {
-          const issueTotal = issue.issue_lines.reduce((lineSum: Decimal, line) => {
-            return lineSum.add(line.line_value);
-          }, new Decimal(0));
-          return sum.add(issueTotal);
-        }, new Decimal(0));
-
-        // Calculate closing stock (sum of LocationStock values)
-        const locationStocks = await prisma.locationStock.findMany({
-          where: {
-            location_id: locationId,
-          },
-        });
-
-        const closingStock = locationStocks.reduce((sum, stock) => {
-          const stockValue = stock.on_hand.mul(stock.wac);
-          return sum.add(stockValue);
-        }, new Decimal(0));
-
-        // Create auto-calculated reconciliation object (not saved to DB)
-        reconciliation = {
-          id: `auto-calculated-${locationId}`,
+    // OPTIMIZATION 2: Pre-fetch ALL data for all locations in parallel
+    const [
+      savedReconciliations,
+      previousReconciliations,
+      deliveryAggregates,
+      transfersInAggregates,
+      transfersOutAggregates,
+      issueAggregates,
+      locationStocks,
+      pobEntries,
+    ] = await Promise.all([
+      // All saved reconciliations for this period
+      prisma.reconciliation.findMany({
+        where: {
           period_id: periodId,
-          location_id: locationId,
+          location_id: { in: locationIds },
+        },
+      }),
+      // Previous period reconciliations (for opening stock)
+      previousPeriod
+        ? prisma.reconciliation.findMany({
+            where: {
+              period_id: previousPeriod.id,
+              location_id: { in: locationIds },
+            },
+          })
+        : Promise.resolve([]),
+      // Delivery totals per location using aggregate
+      prisma.delivery.groupBy({
+        by: ["location_id"],
+        where: {
+          period_id: periodId,
+          location_id: { in: locationIds },
+        },
+        _sum: { total_amount: true },
+      }),
+      // Transfers IN totals per location
+      prisma.transfer.groupBy({
+        by: ["to_location_id"],
+        where: {
+          to_location_id: { in: locationIds },
+          transfer_date: {
+            gte: period.start_date,
+            lte: period.end_date,
+          },
+          status: "COMPLETED",
+        },
+        _sum: { total_value: true },
+      }),
+      // Transfers OUT totals per location
+      prisma.transfer.groupBy({
+        by: ["from_location_id"],
+        where: {
+          from_location_id: { in: locationIds },
+          transfer_date: {
+            gte: period.start_date,
+            lte: period.end_date,
+          },
+          status: "COMPLETED",
+        },
+        _sum: { total_value: true },
+      }),
+      // Issue totals per location
+      prisma.issue.groupBy({
+        by: ["location_id"],
+        where: {
+          period_id: periodId,
+          location_id: { in: locationIds },
+        },
+        _sum: { total_value: true },
+      }),
+      // All location stocks (for closing stock calculation)
+      prisma.locationStock.findMany({
+        where: {
+          location_id: { in: locationIds },
+        },
+        select: {
+          location_id: true,
+          on_hand: true,
+          wac: true,
+        },
+      }),
+      // All POB entries for mandays calculation
+      prisma.pOB.findMany({
+        where: {
+          period_id: periodId,
+          location_id: { in: locationIds },
+        },
+        select: {
+          location_id: true,
+          crew_count: true,
+          extra_count: true,
+        },
+      }),
+    ]);
+
+    // OPTIMIZATION 3: Build lookup maps for O(1) access
+    const preFetchedData: PreFetchedData = {
+      savedReconciliations: new Map(savedReconciliations.map((r) => [r.location_id, r])),
+      previousPeriodReconciliations: new Map(previousReconciliations.map((r) => [r.location_id, r])),
+      deliveryTotals: new Map(
+        deliveryAggregates.map((d) => [d.location_id, new Decimal(d._sum.total_amount || 0)])
+      ),
+      transfersInTotals: new Map(
+        transfersInAggregates.map((t) => [t.to_location_id, new Decimal(t._sum.total_value || 0)])
+      ),
+      transfersOutTotals: new Map(
+        transfersOutAggregates.map((t) => [
+          t.from_location_id,
+          new Decimal(t._sum.total_value || 0),
+        ])
+      ),
+      issueTotals: new Map(
+        issueAggregates.map((i) => [i.location_id, new Decimal(i._sum.total_value || 0)])
+      ),
+      closingStockTotals: new Map(),
+      pobTotals: new Map(),
+    };
+
+    // Calculate closing stock totals per location
+    for (const stock of locationStocks) {
+      const stockValue = stock.on_hand.mul(stock.wac);
+      const existing = preFetchedData.closingStockTotals.get(stock.location_id) || new Decimal(0);
+      preFetchedData.closingStockTotals.set(stock.location_id, existing.add(stockValue));
+    }
+
+    // Calculate POB totals per location
+    for (const pob of pobEntries) {
+      const existing = preFetchedData.pobTotals.get(pob.location_id) || 0;
+      preFetchedData.pobTotals.set(pob.location_id, existing + pob.crew_count + pob.extra_count);
+    }
+
+    // OPTIMIZATION 4: Process all locations using pre-fetched data (no additional queries)
+    const locationReconciliations = locations.map((location) => {
+      // Check if we have a saved reconciliation
+      const savedRec = preFetchedData.savedReconciliations.get(location.id);
+
+      let reconciliationData: {
+        id: string;
+        period_id: string;
+        location_id: string;
+        opening_stock: Decimal;
+        receipts: Decimal;
+        transfers_in: Decimal;
+        transfers_out: Decimal;
+        issues: Decimal;
+        closing_stock: Decimal;
+        adjustments: Decimal;
+        back_charges: Decimal;
+        credits: Decimal;
+        condemnations: Decimal;
+        last_updated: Date;
+      };
+      let isAutoCalculated = false;
+
+      if (savedRec) {
+        // Use saved reconciliation data
+        reconciliationData = {
+          id: savedRec.id,
+          period_id: savedRec.period_id,
+          location_id: savedRec.location_id,
+          opening_stock: savedRec.opening_stock,
+          receipts: savedRec.receipts,
+          transfers_in: savedRec.transfers_in,
+          transfers_out: savedRec.transfers_out,
+          issues: savedRec.issues,
+          closing_stock: savedRec.closing_stock,
+          adjustments: savedRec.adjustments,
+          back_charges: savedRec.back_charges,
+          credits: savedRec.credits,
+          condemnations: savedRec.condemnations,
+          last_updated: savedRec.last_updated,
+        };
+      } else {
+        // Auto-calculate from pre-fetched data
+        const previousRec = preFetchedData.previousPeriodReconciliations.get(location.id);
+        const openingStock = previousRec ? previousRec.closing_stock : new Decimal(0);
+
+        reconciliationData = {
+          id: `auto-calculated-${location.id}`,
+          period_id: periodId,
+          location_id: location.id,
           opening_stock: openingStock,
-          receipts: receipts,
-          transfers_in: transfersInValue,
-          transfers_out: transfersOutValue,
-          issues: issuesValue,
-          closing_stock: closingStock,
+          receipts: preFetchedData.deliveryTotals.get(location.id) || new Decimal(0),
+          transfers_in: preFetchedData.transfersInTotals.get(location.id) || new Decimal(0),
+          transfers_out: preFetchedData.transfersOutTotals.get(location.id) || new Decimal(0),
+          issues: preFetchedData.issueTotals.get(location.id) || new Decimal(0),
+          closing_stock: preFetchedData.closingStockTotals.get(location.id) || new Decimal(0),
           adjustments: new Decimal(0),
           back_charges: new Decimal(0),
           credits: new Decimal(0),
           condemnations: new Decimal(0),
           last_updated: new Date(),
         };
+        isAutoCalculated = true;
       }
 
-      // Get total mandays from POB
-      const pobEntries = await prisma.pOB.findMany({
-        where: {
-          location_id: locationId,
-          period_id: periodId,
-        },
-      });
-
-      const totalMandays = pobEntries.reduce(
-        (sum, entry) => sum + entry.crew_count + entry.extra_count,
-        0
-      );
+      // Get POB totals
+      const totalMandays = preFetchedData.pobTotals.get(location.id) || 0;
 
       // Calculate consumption
       const consumptionResult = calculateConsumption({
-        openingStock: reconciliation.opening_stock,
-        receipts: reconciliation.receipts,
-        transfersIn: reconciliation.transfers_in,
-        transfersOut: reconciliation.transfers_out,
-        issues: reconciliation.issues,
-        closingStock: reconciliation.closing_stock,
-        adjustments: reconciliation.adjustments,
-        backCharges: reconciliation.back_charges,
-        credits: reconciliation.credits,
-        condemnations: reconciliation.condemnations,
+        openingStock: reconciliationData.opening_stock,
+        receipts: reconciliationData.receipts,
+        transfersIn: reconciliationData.transfers_in,
+        transfersOut: reconciliationData.transfers_out,
+        issues: reconciliationData.issues,
+        closingStock: reconciliationData.closing_stock,
+        adjustments: reconciliationData.adjustments,
+        backCharges: reconciliationData.back_charges,
+        credits: reconciliationData.credits,
+        condemnations: reconciliationData.condemnations,
       });
 
       // Calculate manday cost if mandays > 0
-      let mandayCostResult = null;
+      let mandayCost: number | null = null;
       if (totalMandays > 0) {
-        mandayCostResult = calculateMandayCost(consumptionResult.consumption, totalMandays);
+        const mandayCostResult = calculateMandayCost(consumptionResult.consumption, totalMandays);
+        mandayCost = mandayCostResult.mandayCost;
       }
 
       return {
+        location: {
+          id: location.id,
+          code: location.code,
+          name: location.name,
+          type: location.type,
+        },
         reconciliation: {
-          id: reconciliation.id,
-          period_id: reconciliation.period_id,
-          location_id: reconciliation.location_id,
-          opening_stock: reconciliation.opening_stock.toNumber(),
-          receipts: reconciliation.receipts.toNumber(),
-          transfers_in: reconciliation.transfers_in.toNumber(),
-          transfers_out: reconciliation.transfers_out.toNumber(),
-          issues: reconciliation.issues.toNumber(),
-          closing_stock: reconciliation.closing_stock.toNumber(),
-          adjustments: reconciliation.adjustments.toNumber(),
-          back_charges: reconciliation.back_charges.toNumber(),
-          credits: reconciliation.credits.toNumber(),
-          condemnations: reconciliation.condemnations.toNumber(),
-          last_updated: reconciliation.last_updated,
+          id: reconciliationData.id,
+          period_id: reconciliationData.period_id,
+          location_id: reconciliationData.location_id,
+          opening_stock: reconciliationData.opening_stock.toNumber(),
+          receipts: reconciliationData.receipts.toNumber(),
+          transfers_in: reconciliationData.transfers_in.toNumber(),
+          transfers_out: reconciliationData.transfers_out.toNumber(),
+          issues: reconciliationData.issues.toNumber(),
+          closing_stock: reconciliationData.closing_stock.toNumber(),
+          adjustments: reconciliationData.adjustments.toNumber(),
+          back_charges: reconciliationData.back_charges.toNumber(),
+          credits: reconciliationData.credits.toNumber(),
+          condemnations: reconciliationData.condemnations.toNumber(),
+          last_updated: reconciliationData.last_updated,
         },
         calculations: {
           consumption: consumptionResult.consumption,
           total_adjustments: consumptionResult.totalAdjustments,
           total_mandays: totalMandays,
-          manday_cost: mandayCostResult ? mandayCostResult.mandayCost : null,
+          manday_cost: mandayCost,
         },
-        is_auto_calculated: reconciliation.id.startsWith("auto-calculated"),
+        is_auto_calculated: isAutoCalculated,
       };
-    }
-
-    // Fetch reconciliations for all locations
-    const locationReconciliations = await Promise.all(
-      locations.map(async (location) => {
-        const reconciliationData = await getLocationReconciliation(location.id, period);
-
-        return {
-          location: {
-            id: location.id,
-            code: location.code,
-            name: location.name,
-            type: location.type,
-          },
-          ...reconciliationData,
-        };
-      })
-    );
+    });
 
     // Calculate grand totals
     const grandTotals = locationReconciliations.reduce(

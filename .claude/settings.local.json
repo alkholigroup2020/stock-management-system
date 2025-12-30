@@ -93,7 +93,9 @@
       "Skill(ux-review)",
       "Bash(tree:*)",
       "Bash(for file in \"useCache\" \"useAppToast\" \"useErrorHandler\" \"useOfflineGuard\" \"useSuppliers\")",
-      "Bash(do echo \"=== $file ===\")"
+      "Bash(do echo \"=== $file ===\")",
+      "mcp__vercel__getDeployments",
+      "mcp__vercel__getDeployment"
     ],
     "deny": [],
     "ask": []

@@ -1,6 +1,3 @@
-// This is your Prisma schema file
-// Learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,198 +8,73 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ========================================
-// ENUMS
-// ========================================
-
-// User roles for role-based access control
-enum UserRole {
-  OPERATOR    // Can post deliveries/issues, view stock
-  SUPERVISOR  // Operator + approve transfers/PRF, manage reconciliations
-  ADMIN       // Supervisor + manage items/prices, close periods, system config
-}
-
-// Location types
-enum LocationType {
-  KITCHEN     // Kitchen location
-  STORE       // Store location
-  CENTRAL     // Central warehouse
-  WAREHOUSE   // Other warehouse
-}
-
-// Item unit of measure
-enum Unit {
-  KG          // Kilograms
-  EA          // Each
-  LTR         // Liters
-  BOX         // Box
-  CASE        // Case
-  PACK        // Pack
-}
-
-// Period status for period lifecycle
-enum PeriodStatus {
-  DRAFT           // Period created but not yet opened
-  OPEN            // Period is active for transactions
-  PENDING_CLOSE   // Closing initiated, awaiting approval
-  APPROVED        // Close approved, ready to execute
-  CLOSED          // Period is closed
-}
-
-// Period-Location status for coordinated close
-enum PeriodLocationStatus {
-  OPEN            // Location can post transactions
-  READY           // Location ready for period close
-  CLOSED          // Location closed for this period
-}
-
-// PRF (Purchase Request Form) status
-enum PRFStatus {
-  DRAFT           // PRF is being created
-  PENDING         // Awaiting approval
-  APPROVED        // Approved, can create PO
-  REJECTED        // Rejected by approver
-}
-
-// PO (Purchase Order) status
-enum POStatus {
-  OPEN            // PO is active
-  CLOSED          // PO is closed/completed
-}
-
-// Delivery status for draft/posted lifecycle
-enum DeliveryStatus {
-  DRAFT           // Delivery saved but not posted (no stock impact)
-  POSTED          // Delivery finalized (stock updated, immutable)
-}
-
-// Cost centre for issue transactions
-enum CostCentre {
-  FOOD            // Food cost
-  CLEAN           // Cleaning supplies
-  OTHER           // Other costs
-}
-
-// Transfer status for transfer lifecycle
-enum TransferStatus {
-  DRAFT               // Transfer is being created
-  PENDING_APPROVAL    // Awaiting supervisor/admin approval
-  APPROVED            // Approved, ready to execute
-  REJECTED            // Rejected by approver
-  COMPLETED           // Transfer completed (stock moved)
-}
-
-// NCR type for non-conformance reports
-enum NCRType {
-  MANUAL              // Manually created NCR
-  PRICE_VARIANCE      // Auto-generated from delivery price variance
-}
-
-// NCR status for lifecycle tracking
-enum NCRStatus {
-  OPEN                // NCR created, not yet sent
-  SENT                // NCR sent to supplier
-  CREDITED            // Credit received from supplier
-  REJECTED            // Supplier rejected NCR
-  RESOLVED            // NCR resolved/closed
-}
-
-// Approval entity type for approval workflow
-enum ApprovalEntityType {
-  PRF                 // Purchase Request Form approval
-  PO                  // Purchase Order approval
-  PERIOD_CLOSE        // Period close approval
-  TRANSFER            // Transfer approval
-}
-
-// Approval status
-enum ApprovalStatus {
-  PENDING             // Awaiting approval
-  APPROVED            // Approved
-  REJECTED            // Rejected
-}
-
-// ========================================
-// CORE MODELS (Task 1.2.3)
-// ========================================
-
-// User model - System users with role-based access
 model User {
-  id                  String          @id @default(uuid()) @db.Uuid
-  username            String          @unique @db.VarChar(50)
-  email               String          @unique @db.VarChar(100)
-  full_name           String?         @db.VarChar(100)
-  role                UserRole        @default(OPERATOR)
-  password_hash       String          @db.VarChar(255) // Added for authentication
-  default_location_id String?         @db.Uuid
-  is_active           Boolean         @default(true)
-  created_at          DateTime        @default(now()) @db.Timestamptz
-  last_login          DateTime?       @db.Timestamptz
-
-  // Relations
-  default_location    Location?       @relation("UserDefaultLocation", fields: [default_location_id], references: [id], onDelete: SetNull)
+  id                  String         @id @default(uuid()) @db.Uuid
+  username            String         @unique @db.VarChar(50)
+  email               String         @unique @db.VarChar(100)
+  full_name           String?        @db.VarChar(100)
+  role                UserRole       @default(OPERATOR)
+  password_hash       String         @db.VarChar(255)
+  default_location_id String?        @db.Uuid
+  is_active           Boolean        @default(true)
+  created_at          DateTime       @default(now()) @db.Timestamptz(6)
+  last_login          DateTime?      @db.Timestamptz(6)
+  requested_approvals Approval[]     @relation("ApprovalRequester")
+  reviewed_approvals  Approval[]     @relation("ApprovalReviewer")
+  created_deliveries  Delivery[]     @relation("DeliveryCreator")
+  posted_issues       Issue[]        @relation("IssuePoster")
+  created_ncrs        NCR[]          @relation("NCRCreator")
+  entered_pobs        POB[]          @relation("POBEnterer")
+  approved_prfs       PRF[]          @relation("PRFApprover")
+  requested_prfs      PRF[]          @relation("PRFRequester")
+  approved_transfers  Transfer[]     @relation("TransferApprover")
+  requested_transfers Transfer[]     @relation("TransferRequester")
+  assigned_users      UserLocation[] @relation("AssignedBy")
   user_locations      UserLocation[]
-  assigned_users      UserLocation[]  @relation("AssignedBy")
-  requested_prfs      PRF[]           @relation("PRFRequester")
-  approved_prfs       PRF[]           @relation("PRFApprover")
-  created_deliveries  Delivery[]      @relation("DeliveryCreator")
-  posted_issues       Issue[]         @relation("IssuePoster")
-  requested_transfers Transfer[]      @relation("TransferRequester")
-  approved_transfers  Transfer[]      @relation("TransferApprover")
-  created_ncrs        NCR[]           @relation("NCRCreator")
-  entered_pobs        POB[]           @relation("POBEnterer")
-  requested_approvals Approval[]      @relation("ApprovalRequester")
-  reviewed_approvals  Approval[]      @relation("ApprovalReviewer")
+  default_location    Location?      @relation("UserDefaultLocation", fields: [default_location_id], references: [id])
 
-  @@index([role]) // For role-based queries
-  @@index([is_active]) // For active user queries
-  @@index([default_location_id]) // For location default users
+  @@index([role])
+  @@index([is_active])
+  @@index([default_location_id])
   @@map("users")
 }
 
-// Location model - Physical sites (Kitchen, Store, Central, Warehouse)
 model Location {
-  id                String             @id @default(uuid()) @db.Uuid
-  code              String             @unique @db.VarChar(10)
-  name              String             @db.VarChar(100)
+  id                String           @id @default(uuid()) @db.Uuid
+  code              String           @unique @db.VarChar(10)
+  name              String           @db.VarChar(100)
   type              LocationType
-  address           String?            @db.Text
-  timezone          String             @default("Asia/Riyadh") @db.VarChar(50)
-  is_active         Boolean            @default(true)
-  created_at        DateTime           @default(now()) @db.Timestamptz
-  updated_at        DateTime           @updatedAt @db.Timestamptz
-
-  // Relations
-  default_for_users User[]             @relation("UserDefaultLocation")
-  user_locations    UserLocation[]
-  period_locations  PeriodLocation[]
-  location_stock    LocationStock[]
-  prfs              PRF[]
+  address           String?
+  timezone          String           @default("Asia/Riyadh") @db.VarChar(50)
+  is_active         Boolean          @default(true)
+  created_at        DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime         @updatedAt @db.Timestamptz(6)
   deliveries        Delivery[]
   issues            Issue[]
-  transfers_from    Transfer[]         @relation("TransferFrom")
-  transfers_to      Transfer[]         @relation("TransferTo")
+  location_stock    LocationStock[]
   ncrs              NCR[]
+  period_locations  PeriodLocation[]
   pobs              POB[]
+  prfs              PRF[]
   reconciliations   Reconciliation[]
+  transfers_from    Transfer[]       @relation("TransferFrom")
+  transfers_to      Transfer[]       @relation("TransferTo")
+  user_locations    UserLocation[]
+  default_for_users User[]           @relation("UserDefaultLocation")
 
-  @@index([type]) // For location type filtering
-  @@index([is_active]) // For active location queries
+  @@index([type])
+  @@index([is_active])
   @@map("locations")
 }
 
-// UserLocation model - Join table for user-location assignment (Operators only)
-// Note: Admins and Supervisors have implicit access to all locations
 model UserLocation {
-  user_id       String        @db.Uuid
-  location_id   String        @db.Uuid
-  assigned_at   DateTime      @default(now()) @db.Timestamptz
-  assigned_by   String?       @db.Uuid
-
-  // Relations
-  user          User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  location      Location      @relation(fields: [location_id], references: [id], onDelete: Cascade)
-  assigner      User?         @relation("AssignedBy", fields: [assigned_by], references: [id], onDelete: SetNull)
+  user_id     String   @db.Uuid
+  location_id String   @db.Uuid
+  assigned_at DateTime @default(now()) @db.Timestamptz(6)
+  assigned_by String?  @db.Uuid
+  assigner    User?    @relation("AssignedBy", fields: [assigned_by], references: [id])
+  location    Location @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([user_id, location_id])
   @@index([user_id])
@@ -210,70 +82,57 @@ model UserLocation {
   @@map("user_locations")
 }
 
-// Item model - Product master (global across locations)
 model Item {
-  id            String           @id @default(uuid()) @db.Uuid
-  code          String           @unique @db.VarChar(50)
-  name          String           @db.VarChar(200)
-  unit          Unit
-  category      String?          @db.VarChar(50)
-  sub_category  String?          @db.VarChar(50)
-  is_active     Boolean          @default(true)
-  created_at    DateTime         @default(now()) @db.Timestamptz
-  updated_at    DateTime         @updatedAt @db.Timestamptz
-
-  // Relations
-  item_prices    ItemPrice[]
-  location_stock LocationStock[]
+  id             String          @id @default(uuid()) @db.Uuid
+  code           String          @unique @db.VarChar(50)
+  name           String          @db.VarChar(200)
+  unit           Unit
+  category       String?         @db.VarChar(50)
+  sub_category   String?         @db.VarChar(50)
+  is_active      Boolean         @default(true)
+  created_at     DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime        @updatedAt @db.Timestamptz(6)
   delivery_lines DeliveryLine[]
   issue_lines    IssueLine[]
+  item_prices    ItemPrice[]
+  location_stock LocationStock[]
   transfer_lines TransferLine[]
 
   @@index([category])
   @@index([is_active])
-  @@index([is_active, category]) // For filtered active items by category
+  @@index([is_active, category])
   @@map("items")
 }
 
-// Supplier model - Vendor information
 model Supplier {
-  id            String        @id @default(uuid()) @db.Uuid
-  code          String        @unique @db.VarChar(50)
-  name          String        @db.VarChar(200)
-  contact       String?       @db.Text
-  is_active     Boolean       @default(true)
-  created_at    DateTime      @default(now()) @db.Timestamptz
-
-  // Relations
-  purchase_orders PO[]
+  id              String     @id @default(uuid()) @db.Uuid
+  code            String     @unique @db.VarChar(50)
+  name            String     @db.VarChar(200)
+  contact         String?
+  is_active       Boolean    @default(true)
+  created_at      DateTime   @default(now()) @db.Timestamptz(6)
   deliveries      Delivery[]
+  purchase_orders PO[]
 
   @@index([is_active])
   @@map("suppliers")
 }
 
-// ========================================
-// PERIOD & STOCK MODELS (Task 1.2.4)
-// ========================================
-
-// Period model - Monthly accounting periods
 model Period {
-  id            String              @id @default(uuid()) @db.Uuid
-  name          String              @db.VarChar(100) // e.g., "January 2025"
-  start_date    DateTime            @db.Date
-  end_date      DateTime            @db.Date
-  status        PeriodStatus        @default(DRAFT)
-  approval_id   String?             @db.Uuid // Reference to Approval model (to be added in 1.2.7)
-  created_at    DateTime            @default(now()) @db.Timestamptz
-  closed_at     DateTime?           @db.Timestamptz
-
-  // Relations
-  period_locations PeriodLocation[]
-  item_prices      ItemPrice[]
-  prfs             PRF[]
+  id               String           @id @default(uuid()) @db.Uuid
+  name             String           @db.VarChar(100)
+  start_date       DateTime         @db.Date
+  end_date         DateTime         @db.Date
+  status           PeriodStatus     @default(DRAFT)
+  approval_id      String?          @db.Uuid
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  closed_at        DateTime?        @db.Timestamptz(6)
   deliveries       Delivery[]
   issues           Issue[]
+  item_prices      ItemPrice[]
+  period_locations PeriodLocation[]
   pobs             POB[]
+  prfs             PRF[]
   reconciliations  Reconciliation[]
 
   @@index([status])
@@ -281,96 +140,80 @@ model Period {
   @@map("periods")
 }
 
-// PeriodLocation model - Period status per location for coordinated close
 model PeriodLocation {
-  period_id      String                @db.Uuid
-  location_id    String                @db.Uuid
-  status         PeriodLocationStatus  @default(OPEN)
-  opening_value  Decimal?              @db.Decimal(15, 2) // Total opening stock value
-  closing_value  Decimal?              @db.Decimal(15, 2) // Total closing stock value
-  snapshot_id    String?               @db.Uuid // Reference to stock snapshot (JSON stored here or separate table)
-  snapshot_data  Json?                 // Stock snapshot at period close
-  ready_at       DateTime?             @db.Timestamptz
-  closed_at      DateTime?             @db.Timestamptz
-
-  // Relations
-  period         Period                @relation(fields: [period_id], references: [id], onDelete: Cascade)
-  location       Location              @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  period_id     String               @db.Uuid
+  location_id   String               @db.Uuid
+  status        PeriodLocationStatus @default(OPEN)
+  opening_value Decimal?             @db.Decimal(15, 2)
+  closing_value Decimal?             @db.Decimal(15, 2)
+  snapshot_id   String?              @db.Uuid
+  snapshot_data Json?
+  ready_at      DateTime?            @db.Timestamptz(6)
+  closed_at     DateTime?            @db.Timestamptz(6)
+  location      Location             @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  period        Period               @relation(fields: [period_id], references: [id], onDelete: Cascade)
 
   @@id([period_id, location_id])
   @@index([period_id])
   @@index([location_id])
   @@index([status])
-  @@index([period_id, status]) // For period readiness queries
+  @@index([period_id, status])
   @@map("period_locations")
 }
 
-// ItemPrice model - Locked prices per period
 model ItemPrice {
-  id         String    @id @default(uuid()) @db.Uuid
-  item_id    String    @db.Uuid
-  period_id  String    @db.Uuid
-  price      Decimal   @db.Decimal(15, 4) // Unit price
-  currency   String    @default("SAR") @db.VarChar(3)
-  set_by     String?   @db.Uuid // User who set the price
-  set_at     DateTime  @default(now()) @db.Timestamptz
+  id        String   @id @default(uuid()) @db.Uuid
+  item_id   String   @db.Uuid
+  period_id String   @db.Uuid
+  price     Decimal  @db.Decimal(15, 4)
+  currency  String   @default("SAR") @db.VarChar(3)
+  set_by    String?  @db.Uuid
+  set_at    DateTime @default(now()) @db.Timestamptz(6)
+  item      Item     @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  period    Period   @relation(fields: [period_id], references: [id], onDelete: Cascade)
 
-  // Relations
-  item       Item      @relation(fields: [item_id], references: [id], onDelete: Cascade)
-  period     Period    @relation(fields: [period_id], references: [id], onDelete: Cascade)
-
-  @@unique([item_id, period_id]) // One price per item per period
+  @@unique([item_id, period_id])
   @@index([period_id])
   @@index([item_id])
   @@map("item_prices")
 }
 
-// LocationStock model - Current stock levels per location
 model LocationStock {
   location_id  String    @db.Uuid
   item_id      String    @db.Uuid
-  on_hand      Decimal   @default(0) @db.Decimal(15, 4) // Quantity on hand
-  wac          Decimal   @default(0) @db.Decimal(15, 4) // Weighted Average Cost
-  min_stock    Decimal?  @db.Decimal(15, 4) // Minimum stock level (optional)
-  max_stock    Decimal?  @db.Decimal(15, 4) // Maximum stock level (optional)
-  last_counted DateTime? @db.Timestamptz     // Last physical count date
-  updated_at   DateTime  @updatedAt @db.Timestamptz
-
-  // Relations
-  location     Location  @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  on_hand      Decimal   @default(0) @db.Decimal(15, 4)
+  wac          Decimal   @default(0) @db.Decimal(15, 4)
+  min_stock    Decimal?  @db.Decimal(15, 4)
+  max_stock    Decimal?  @db.Decimal(15, 4)
+  last_counted DateTime? @db.Timestamptz(6)
+  updated_at   DateTime  @updatedAt @db.Timestamptz(6)
   item         Item      @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  location     Location  @relation(fields: [location_id], references: [id], onDelete: Cascade)
 
   @@id([location_id, item_id])
   @@index([location_id])
   @@index([item_id])
-  @@index([on_hand]) // For low stock queries
+  @@index([on_hand])
   @@map("location_stock")
 }
 
-// ========================================
-// TRANSACTION MODELS (Task 1.2.5)
-// ========================================
-
-// PRF model - Purchase Request Form
 model PRF {
-  id            String        @id @default(uuid()) @db.Uuid
-  prf_no        String        @unique @db.VarChar(50) // e.g., "PRF-2025-001"
-  period_id     String        @db.Uuid
-  location_id   String        @db.Uuid
-  status        PRFStatus     @default(DRAFT)
-  requested_by  String        @db.Uuid // User who requested
-  approved_by   String?       @db.Uuid // User who approved/rejected
-  request_date  DateTime      @db.Date
-  approval_date DateTime?     @db.Date
-  notes         String?       @db.Text
-  created_at    DateTime      @default(now()) @db.Timestamptz
-  updated_at    DateTime      @updatedAt @db.Timestamptz
-
-  // Relations
-  period        Period        @relation(fields: [period_id], references: [id], onDelete: Restrict)
-  location      Location      @relation(fields: [location_id], references: [id], onDelete: Restrict)
-  requester     User          @relation("PRFRequester", fields: [requested_by], references: [id], onDelete: Restrict)
-  approver      User?         @relation("PRFApprover", fields: [approved_by], references: [id], onDelete: SetNull)
+  id              String    @id @default(uuid()) @db.Uuid
+  prf_no          String    @unique @db.VarChar(50)
+  period_id       String    @db.Uuid
+  location_id     String    @db.Uuid
+  status          PRFStatus @default(DRAFT)
+  requested_by    String    @db.Uuid
+  approved_by     String?   @db.Uuid
+  request_date    DateTime  @db.Date
+  approval_date   DateTime? @db.Date
+  notes           String?
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @updatedAt @db.Timestamptz(6)
+  approver        User?     @relation("PRFApprover", fields: [approved_by], references: [id])
+  location        Location  @relation(fields: [location_id], references: [id])
+  period          Period    @relation(fields: [period_id], references: [id])
+  requester       User      @relation("PRFRequester", fields: [requested_by], references: [id])
   purchase_orders PO[]
 
   @@index([period_id])
@@ -380,22 +223,19 @@ model PRF {
   @@map("prfs")
 }
 
-// PO model - Purchase Order
 model PO {
-  id            String        @id @default(uuid()) @db.Uuid
-  po_no         String        @unique @db.VarChar(50) // e.g., "PO-2025-001"
-  prf_id        String?       @db.Uuid // Optional link to PRF
-  supplier_id   String        @db.Uuid
-  status        POStatus      @default(OPEN)
-  total_amount  Decimal       @default(0) @db.Decimal(15, 2)
-  notes         String?       @db.Text
-  created_at    DateTime      @default(now()) @db.Timestamptz
-  updated_at    DateTime      @updatedAt @db.Timestamptz
-
-  // Relations
-  prf           PRF?          @relation(fields: [prf_id], references: [id], onDelete: SetNull)
-  supplier      Supplier      @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
-  deliveries    Delivery[]
+  id           String     @id @default(uuid()) @db.Uuid
+  po_no        String     @unique @db.VarChar(50)
+  prf_id       String?    @db.Uuid
+  supplier_id  String     @db.Uuid
+  status       POStatus   @default(OPEN)
+  total_amount Decimal    @default(0) @db.Decimal(15, 2)
+  notes        String?
+  created_at   DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime   @updatedAt @db.Timestamptz(6)
+  deliveries   Delivery[]
+  prf          PRF?       @relation(fields: [prf_id], references: [id])
+  supplier     Supplier   @relation(fields: [supplier_id], references: [id])
 
   @@index([prf_id])
   @@index([supplier_id])
@@ -403,65 +243,59 @@ model PO {
   @@map("purchase_orders")
 }
 
-// Delivery model - Goods receipt transaction
 model Delivery {
-  id            String          @id @default(uuid()) @db.Uuid
-  delivery_no   String          @unique @db.VarChar(50) // e.g., "DEL-2025-001"
-  period_id     String          @db.Uuid
-  location_id   String          @db.Uuid
-  supplier_id   String          @db.Uuid
-  po_id         String?         @db.Uuid // Optional link to PO
-  invoice_no    String?         @db.VarChar(100)
-  delivery_note String?         @db.Text
-  delivery_date DateTime        @db.Date
-  total_amount  Decimal         @default(0) @db.Decimal(15, 2)
-  has_variance  Boolean         @default(false) // True if any line has price variance
-  status        DeliveryStatus  @default(DRAFT) // Draft or Posted status
-  created_by    String          @db.Uuid // User who created the delivery
-  posted_at     DateTime?       @db.Timestamptz // When status became POSTED (null for drafts)
-  created_at    DateTime        @default(now()) @db.Timestamptz // When draft was created
-  updated_at    DateTime        @updatedAt @db.Timestamptz // Last modification
-
-  // Relations
-  period        Period          @relation(fields: [period_id], references: [id], onDelete: Restrict)
-  location      Location        @relation(fields: [location_id], references: [id], onDelete: Restrict)
-  supplier      Supplier        @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
-  po            PO?             @relation(fields: [po_id], references: [id], onDelete: SetNull)
-  creator       User            @relation("DeliveryCreator", fields: [created_by], references: [id], onDelete: Restrict)
+  id             String         @id @default(uuid()) @db.Uuid
+  delivery_no    String         @unique @db.VarChar(50)
+  period_id      String         @db.Uuid
+  location_id    String         @db.Uuid
+  supplier_id    String         @db.Uuid
+  po_id          String?        @db.Uuid
+  invoice_no     String?        @db.VarChar(100)
+  delivery_note  String?
+  delivery_date  DateTime       @db.Date
+  total_amount   Decimal        @default(0) @db.Decimal(15, 2)
+  has_variance   Boolean        @default(false)
+  status         DeliveryStatus @default(DRAFT)
+  created_by     String         @db.Uuid
+  posted_at      DateTime?      @db.Timestamptz(6)
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime       @updatedAt @db.Timestamptz(6)
+  creator        User           @relation("DeliveryCreator", fields: [created_by], references: [id])
+  location       Location       @relation(fields: [location_id], references: [id])
+  period         Period         @relation(fields: [period_id], references: [id])
+  po             PO?            @relation(fields: [po_id], references: [id])
+  supplier       Supplier       @relation(fields: [supplier_id], references: [id])
   delivery_lines DeliveryLine[]
-  ncrs          NCR[]
+  ncrs           NCR[]
 
   @@index([period_id])
   @@index([location_id])
   @@index([supplier_id])
   @@index([po_id])
   @@index([delivery_date])
-  @@index([has_variance]) // For price variance queries
-  @@index([posted_at]) // For sorting by posted timestamp
-  @@index([status]) // For filtering by draft/posted status
-  @@index([period_id, location_id]) // For location deliveries in period
-  @@index([location_id, has_variance]) // For price variance filtering by location
-  @@index([location_id, delivery_date]) // For date-based queries per location
-  @@index([location_id, status]) // For draft/posted filtering by location
-  @@index([created_by, status]) // For user's drafts (My Drafts filter)
+  @@index([has_variance])
+  @@index([posted_at])
+  @@index([status])
+  @@index([period_id, location_id])
+  @@index([location_id, has_variance])
+  @@index([location_id, delivery_date])
+  @@index([location_id, status])
+  @@index([created_by, status])
   @@map("deliveries")
 }
 
-// DeliveryLine model - Line items in delivery
 model DeliveryLine {
-  id             String      @id @default(uuid()) @db.Uuid
-  delivery_id    String      @db.Uuid
-  item_id        String      @db.Uuid
-  quantity       Decimal     @db.Decimal(15, 4)
-  unit_price     Decimal     @db.Decimal(15, 4) // Actual price from delivery
-  period_price   Decimal     @db.Decimal(15, 4) // Expected price from period
-  price_variance Decimal     @default(0) @db.Decimal(15, 4) // unit_price - period_price
-  line_value     Decimal     @db.Decimal(15, 2) // quantity × unit_price
-  ncr_id         String?     @db.Uuid // Link to auto-generated NCR (to be added in 1.2.7)
-
-  // Relations
-  delivery       Delivery    @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
-  item           Item        @relation(fields: [item_id], references: [id], onDelete: Restrict)
+  id             String   @id @default(uuid()) @db.Uuid
+  delivery_id    String   @db.Uuid
+  item_id        String   @db.Uuid
+  quantity       Decimal  @db.Decimal(15, 4)
+  unit_price     Decimal  @db.Decimal(15, 4)
+  period_price   Decimal  @db.Decimal(15, 4)
+  price_variance Decimal  @default(0) @db.Decimal(15, 4)
+  line_value     Decimal  @db.Decimal(15, 2)
+  ncr_id         String?  @db.Uuid
+  delivery       Delivery @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
+  item           Item     @relation(fields: [item_id], references: [id])
   ncrs           NCR[]
 
   @@index([delivery_id])
@@ -470,139 +304,116 @@ model DeliveryLine {
   @@map("delivery_lines")
 }
 
-// Issue model - Stock issue transaction
 model Issue {
-  id            String        @id @default(uuid()) @db.Uuid
-  issue_no      String        @unique @db.VarChar(50) // e.g., "ISS-2025-001"
-  period_id     String        @db.Uuid
-  location_id   String        @db.Uuid
-  issue_date    DateTime      @db.Date
-  cost_centre   CostCentre    @default(FOOD)
-  total_value   Decimal       @default(0) @db.Decimal(15, 2)
-  notes         String?       @db.Text
-  posted_by     String        @db.Uuid // User who posted
-  posted_at     DateTime      @default(now()) @db.Timestamptz
-
-  // Relations
-  period        Period        @relation(fields: [period_id], references: [id], onDelete: Restrict)
-  location      Location      @relation(fields: [location_id], references: [id], onDelete: Restrict)
-  poster        User          @relation("IssuePoster", fields: [posted_by], references: [id], onDelete: Restrict)
-  issue_lines   IssueLine[]
+  id          String      @id @default(uuid()) @db.Uuid
+  issue_no    String      @unique @db.VarChar(50)
+  period_id   String      @db.Uuid
+  location_id String      @db.Uuid
+  issue_date  DateTime    @db.Date
+  cost_centre CostCentre  @default(FOOD)
+  total_value Decimal     @default(0) @db.Decimal(15, 2)
+  notes       String?
+  posted_by   String      @db.Uuid
+  posted_at   DateTime    @default(now()) @db.Timestamptz(6)
+  issue_lines IssueLine[]
+  location    Location    @relation(fields: [location_id], references: [id])
+  period      Period      @relation(fields: [period_id], references: [id])
+  poster      User        @relation("IssuePoster", fields: [posted_by], references: [id])
 
   @@index([period_id])
   @@index([location_id])
   @@index([issue_date])
   @@index([cost_centre])
-  @@index([posted_at]) // For sorting by posted timestamp
-  @@index([period_id, location_id]) // For location issues in period
-  @@index([location_id, cost_centre]) // For cost centre filtering by location
-  @@index([location_id, issue_date]) // For date-based queries per location
+  @@index([posted_at])
+  @@index([period_id, location_id])
+  @@index([location_id, cost_centre])
+  @@index([location_id, issue_date])
   @@map("issues")
 }
 
-// IssueLine model - Line items in issue
 model IssueLine {
-  id            String      @id @default(uuid()) @db.Uuid
-  issue_id      String      @db.Uuid
-  item_id       String      @db.Uuid
-  quantity      Decimal     @db.Decimal(15, 4)
-  wac_at_issue  Decimal     @db.Decimal(15, 4) // WAC at time of issue (not recalculated)
-  line_value    Decimal     @db.Decimal(15, 2) // quantity × wac_at_issue
-
-  // Relations
-  issue         Issue       @relation(fields: [issue_id], references: [id], onDelete: Cascade)
-  item          Item        @relation(fields: [item_id], references: [id], onDelete: Restrict)
+  id           String  @id @default(uuid()) @db.Uuid
+  issue_id     String  @db.Uuid
+  item_id      String  @db.Uuid
+  quantity     Decimal @db.Decimal(15, 4)
+  wac_at_issue Decimal @db.Decimal(15, 4)
+  line_value   Decimal @db.Decimal(15, 2)
+  issue        Issue   @relation(fields: [issue_id], references: [id], onDelete: Cascade)
+  item         Item    @relation(fields: [item_id], references: [id])
 
   @@index([issue_id])
   @@index([item_id])
   @@map("issue_lines")
 }
 
-// ========================================
-// TRANSFER MODELS (Task 1.2.6)
-// ========================================
-
-// Transfer model - Inter-location stock transfers
 model Transfer {
-  id                String          @id @default(uuid()) @db.Uuid
-  transfer_no       String          @unique @db.VarChar(50) // e.g., "TRF-2025-001"
-  from_location_id  String          @db.Uuid
-  to_location_id    String          @db.Uuid
-  status            TransferStatus  @default(DRAFT)
-  requested_by      String          @db.Uuid // User who requested
-  approved_by       String?         @db.Uuid // User who approved/rejected
-  request_date      DateTime        @db.Date
-  approval_date     DateTime?       @db.Date
-  transfer_date     DateTime?       @db.Date // Date when transfer was completed
-  total_value       Decimal         @default(0) @db.Decimal(15, 2)
-  notes             String?         @db.Text
-  created_at        DateTime        @default(now()) @db.Timestamptz
-  updated_at        DateTime        @updatedAt @db.Timestamptz
-
-  // Relations
-  from_location     Location        @relation("TransferFrom", fields: [from_location_id], references: [id], onDelete: Restrict)
-  to_location       Location        @relation("TransferTo", fields: [to_location_id], references: [id], onDelete: Restrict)
-  requester         User            @relation("TransferRequester", fields: [requested_by], references: [id], onDelete: Restrict)
-  approver          User?           @relation("TransferApprover", fields: [approved_by], references: [id], onDelete: SetNull)
-  transfer_lines    TransferLine[]
+  id               String         @id @default(uuid()) @db.Uuid
+  transfer_no      String         @unique @db.VarChar(50)
+  from_location_id String         @db.Uuid
+  to_location_id   String         @db.Uuid
+  status           TransferStatus @default(DRAFT)
+  requested_by     String         @db.Uuid
+  approved_by      String?        @db.Uuid
+  request_date     DateTime       @db.Date
+  approval_date    DateTime?      @db.Date
+  transfer_date    DateTime?      @db.Date
+  total_value      Decimal        @default(0) @db.Decimal(15, 2)
+  notes            String?
+  created_at       DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime       @updatedAt @db.Timestamptz(6)
+  transfer_lines   TransferLine[]
+  approver         User?          @relation("TransferApprover", fields: [approved_by], references: [id])
+  from_location    Location       @relation("TransferFrom", fields: [from_location_id], references: [id])
+  requester        User           @relation("TransferRequester", fields: [requested_by], references: [id])
+  to_location      Location       @relation("TransferTo", fields: [to_location_id], references: [id])
 
   @@index([from_location_id])
   @@index([to_location_id])
   @@index([status])
   @@index([request_date])
   @@index([transfer_date])
-  @@index([from_location_id, status]) // For outbound transfer queries by status
-  @@index([to_location_id, status]) // For inbound transfer queries by status
-  @@index([requested_by]) // For user's requested transfers
-  @@index([status, request_date]) // For filtering by status and sorting by date
+  @@index([from_location_id, status])
+  @@index([to_location_id, status])
+  @@index([requested_by])
+  @@index([status, request_date])
   @@map("transfers")
 }
 
-// TransferLine model - Line items in transfer
 model TransferLine {
-  id              String      @id @default(uuid()) @db.Uuid
-  transfer_id     String      @db.Uuid
-  item_id         String      @db.Uuid
-  quantity        Decimal     @db.Decimal(15, 4)
-  wac_at_transfer Decimal     @db.Decimal(15, 4) // WAC from source location at time of transfer
-  line_value      Decimal     @db.Decimal(15, 2) // quantity × wac_at_transfer
-
-  // Relations
-  transfer        Transfer    @relation(fields: [transfer_id], references: [id], onDelete: Cascade)
-  item            Item        @relation(fields: [item_id], references: [id], onDelete: Restrict)
+  id              String   @id @default(uuid()) @db.Uuid
+  transfer_id     String   @db.Uuid
+  item_id         String   @db.Uuid
+  quantity        Decimal  @db.Decimal(15, 4)
+  wac_at_transfer Decimal  @db.Decimal(15, 4)
+  line_value      Decimal  @db.Decimal(15, 2)
+  item            Item     @relation(fields: [item_id], references: [id])
+  transfer        Transfer @relation(fields: [transfer_id], references: [id], onDelete: Cascade)
 
   @@index([transfer_id])
   @@index([item_id])
   @@map("transfer_lines")
 }
 
-// ========================================
-// CONTROL MODELS (Task 1.2.7)
-// ========================================
-
-// NCR model - Non-Conformance Report for quality/price issues
 model NCR {
-  id                String        @id @default(uuid()) @db.Uuid
-  ncr_no            String        @unique @db.VarChar(50) // e.g., "NCR-2025-001"
-  location_id       String        @db.Uuid
-  type              NCRType       @default(MANUAL)
-  auto_generated    Boolean       @default(false) // True if auto-created from price variance
-  delivery_id       String?       @db.Uuid // Link to delivery (if price variance)
-  delivery_line_id  String?       @db.Uuid // Link to specific delivery line
-  reason            String        @db.Text
-  quantity          Decimal?      @db.Decimal(15, 4)
-  value             Decimal       @db.Decimal(15, 2)
-  status            NCRStatus     @default(OPEN)
-  created_by        String        @db.Uuid // User who created NCR
-  created_at        DateTime      @default(now()) @db.Timestamptz
-  resolved_at       DateTime?     @db.Timestamptz
-  resolution_notes  String?       @db.Text
-
-  // Relations
-  location          Location      @relation(fields: [location_id], references: [id], onDelete: Restrict)
-  delivery          Delivery?     @relation(fields: [delivery_id], references: [id], onDelete: SetNull)
-  delivery_line     DeliveryLine? @relation(fields: [delivery_line_id], references: [id], onDelete: SetNull)
-  creator           User          @relation("NCRCreator", fields: [created_by], references: [id], onDelete: Restrict)
+  id               String        @id @default(uuid()) @db.Uuid
+  ncr_no           String        @unique @db.VarChar(50)
+  location_id      String        @db.Uuid
+  type             NCRType       @default(MANUAL)
+  auto_generated   Boolean       @default(false)
+  delivery_id      String?       @db.Uuid
+  delivery_line_id String?       @db.Uuid
+  reason           String
+  quantity         Decimal?      @db.Decimal(15, 4)
+  value            Decimal       @db.Decimal(15, 2)
+  status           NCRStatus     @default(OPEN)
+  created_by       String        @db.Uuid
+  created_at       DateTime      @default(now()) @db.Timestamptz(6)
+  resolved_at      DateTime?     @db.Timestamptz(6)
+  resolution_notes String?
+  creator          User          @relation("NCRCreator", fields: [created_by], references: [id])
+  delivery         Delivery?     @relation(fields: [delivery_id], references: [id])
+  delivery_line    DeliveryLine? @relation(fields: [delivery_line_id], references: [id])
+  location         Location      @relation(fields: [location_id], references: [id])
 
   @@index([location_id])
   @@index([type])
@@ -610,153 +421,172 @@ model NCR {
   @@index([delivery_id])
   @@index([delivery_line_id])
   @@index([auto_generated])
-  @@index([created_at]) // For sorting by created timestamp
-  @@index([location_id, status]) // For location NCR queries by status
-  @@index([location_id, type]) // For location NCR queries by type
-  @@index([location_id, created_at]) // For recent NCRs by location
-  @@index([created_by]) // For user's created NCRs
+  @@index([created_at])
+  @@index([location_id, status])
+  @@index([location_id, type])
+  @@index([location_id, created_at])
+  @@index([created_by])
   @@map("ncrs")
 }
 
-// POB model - People on Board (daily headcount)
 model POB {
-  id          String      @id @default(uuid()) @db.Uuid
-  period_id   String      @db.Uuid
-  location_id String      @db.Uuid
-  date        DateTime    @db.Date
-  crew_count  Int         @default(0)
-  extra_count Int         @default(0)
-  entered_by  String      @db.Uuid // User who entered data
-  entered_at  DateTime    @default(now()) @db.Timestamptz
-  updated_at  DateTime    @updatedAt @db.Timestamptz
+  id          String   @id @default(uuid()) @db.Uuid
+  period_id   String   @db.Uuid
+  location_id String   @db.Uuid
+  date        DateTime @db.Date
+  crew_count  Int      @default(0)
+  extra_count Int      @default(0)
+  entered_by  String   @db.Uuid
+  entered_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @updatedAt @db.Timestamptz(6)
+  enterer     User     @relation("POBEnterer", fields: [entered_by], references: [id])
+  location    Location @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  period      Period   @relation(fields: [period_id], references: [id], onDelete: Cascade)
 
-  // Relations
-  period      Period      @relation(fields: [period_id], references: [id], onDelete: Cascade)
-  location    Location    @relation(fields: [location_id], references: [id], onDelete: Cascade)
-  enterer     User        @relation("POBEnterer", fields: [entered_by], references: [id], onDelete: Restrict)
-
-  @@unique([period_id, location_id, date]) // One entry per location per day per period
+  @@unique([period_id, location_id, date])
   @@index([period_id])
   @@index([location_id])
   @@index([date])
-  @@index([period_id, location_id]) // For location POB queries in period
+  @@index([period_id, location_id])
   @@map("pob")
 }
 
-// Reconciliation model - Period-end reconciliation per location
 model Reconciliation {
-  id              String      @id @default(uuid()) @db.Uuid
-  period_id       String      @db.Uuid
-  location_id     String      @db.Uuid
-  opening_stock   Decimal     @default(0) @db.Decimal(15, 2)
-  receipts        Decimal     @default(0) @db.Decimal(15, 2)
-  transfers_in    Decimal     @default(0) @db.Decimal(15, 2)
-  transfers_out   Decimal     @default(0) @db.Decimal(15, 2)
-  issues          Decimal     @default(0) @db.Decimal(15, 2)
-  closing_stock   Decimal     @default(0) @db.Decimal(15, 2)
-  adjustments     Decimal     @default(0) @db.Decimal(15, 2) // General adjustments
-  back_charges    Decimal     @default(0) @db.Decimal(15, 2)
-  credits         Decimal     @default(0) @db.Decimal(15, 2)
-  condemnations   Decimal     @default(0) @db.Decimal(15, 2)
-  last_updated    DateTime    @updatedAt @db.Timestamptz
+  id            String   @id @default(uuid()) @db.Uuid
+  period_id     String   @db.Uuid
+  location_id   String   @db.Uuid
+  opening_stock Decimal  @default(0) @db.Decimal(15, 2)
+  receipts      Decimal  @default(0) @db.Decimal(15, 2)
+  transfers_in  Decimal  @default(0) @db.Decimal(15, 2)
+  transfers_out Decimal  @default(0) @db.Decimal(15, 2)
+  issues        Decimal  @default(0) @db.Decimal(15, 2)
+  closing_stock Decimal  @default(0) @db.Decimal(15, 2)
+  adjustments   Decimal  @default(0) @db.Decimal(15, 2)
+  back_charges  Decimal  @default(0) @db.Decimal(15, 2)
+  credits       Decimal  @default(0) @db.Decimal(15, 2)
+  condemnations Decimal  @default(0) @db.Decimal(15, 2)
+  last_updated  DateTime @updatedAt @db.Timestamptz(6)
+  location      Location @relation(fields: [location_id], references: [id], onDelete: Cascade)
+  period        Period   @relation(fields: [period_id], references: [id], onDelete: Cascade)
 
-  // Relations
-  period          Period      @relation(fields: [period_id], references: [id], onDelete: Cascade)
-  location        Location    @relation(fields: [location_id], references: [id], onDelete: Cascade)
-
-  @@unique([period_id, location_id]) // One reconciliation per location per period
+  @@unique([period_id, location_id])
   @@index([period_id])
   @@index([location_id])
   @@map("reconciliations")
 }
 
-// Approval model - Generic approval workflow
 model Approval {
-  id            String              @id @default(uuid()) @db.Uuid
-  entity_type   ApprovalEntityType
-  entity_id     String              @db.Uuid // ID of the entity being approved (PRF, PO, Period, Transfer)
-  status        ApprovalStatus      @default(PENDING)
-  requested_by  String              @db.Uuid // User who requested approval
-  reviewed_by   String?             @db.Uuid // User who reviewed (approved/rejected)
-  requested_at  DateTime            @default(now()) @db.Timestamptz
-  reviewed_at   DateTime?           @db.Timestamptz
-  comments      String?             @db.Text
-
-  // Relations
-  requester     User                @relation("ApprovalRequester", fields: [requested_by], references: [id], onDelete: Restrict)
-  reviewer      User?               @relation("ApprovalReviewer", fields: [reviewed_by], references: [id], onDelete: SetNull)
+  id           String             @id @default(uuid()) @db.Uuid
+  entity_type  ApprovalEntityType
+  entity_id    String             @db.Uuid
+  status       ApprovalStatus     @default(PENDING)
+  requested_by String             @db.Uuid
+  reviewed_by  String?            @db.Uuid
+  requested_at DateTime           @default(now()) @db.Timestamptz(6)
+  reviewed_at  DateTime?          @db.Timestamptz(6)
+  comments     String?
+  requester    User               @relation("ApprovalRequester", fields: [requested_by], references: [id])
+  reviewer     User?              @relation("ApprovalReviewer", fields: [reviewed_by], references: [id])
 
   @@index([entity_type])
   @@index([entity_id])
   @@index([status])
   @@index([requested_by])
   @@index([reviewed_by])
-  @@index([entity_type, entity_id]) // For finding approval by entity
-  @@index([entity_type, status]) // For filtering approvals by type and status
+  @@index([entity_type, entity_id])
+  @@index([entity_type, status])
   @@map("approvals")
 }
 
-// ========================================
-// DATABASE CONSTRAINTS (To be implemented in migrations)
-// ========================================
-//
-// The following check constraints should be added in database migrations:
-//
-// 1. POSITIVE STOCK CHECK:
-//    ALTER TABLE location_stock ADD CONSTRAINT check_positive_stock
-//    CHECK (on_hand >= 0);
-//    - Prevents negative stock levels
-//
-// 2. POSITIVE WAC CHECK:
-//    ALTER TABLE location_stock ADD CONSTRAINT check_positive_wac
-//    CHECK (wac >= 0);
-//    - Ensures WAC is never negative
-//
-// 3. POSITIVE PRICE CHECK:
-//    ALTER TABLE item_prices ADD CONSTRAINT check_positive_price
-//    CHECK (price > 0);
-//    - Ensures item prices are always positive
-//
-// 4. DIFFERENT LOCATIONS FOR TRANSFERS:
-//    ALTER TABLE transfers ADD CONSTRAINT check_different_locations
-//    CHECK (from_location_id != to_location_id);
-//    - Prevents transfers from a location to itself
-//
-// 5. POSITIVE QUANTITY CHECKS:
-//    ALTER TABLE delivery_lines ADD CONSTRAINT check_positive_delivery_qty
-//    CHECK (quantity > 0);
-//
-//    ALTER TABLE issue_lines ADD CONSTRAINT check_positive_issue_qty
-//    CHECK (quantity > 0);
-//
-//    ALTER TABLE transfer_lines ADD CONSTRAINT check_positive_transfer_qty
-//    CHECK (quantity > 0);
-//    - Ensures all transaction quantities are positive
-//
-// 6. POSITIVE VALUE CHECKS:
-//    ALTER TABLE deliveries ADD CONSTRAINT check_positive_delivery_total
-//    CHECK (total_amount >= 0);
-//
-//    ALTER TABLE issues ADD CONSTRAINT check_positive_issue_total
-//    CHECK (total_value >= 0);
-//
-//    ALTER TABLE transfers ADD CONSTRAINT check_positive_transfer_total
-//    CHECK (total_value >= 0);
-//    - Ensures transaction totals are non-negative
-//
-// 7. POSITIVE PEOPLE COUNT:
-//    ALTER TABLE pob ADD CONSTRAINT check_positive_crew
-//    CHECK (crew_count >= 0);
-//
-//    ALTER TABLE pob ADD CONSTRAINT check_positive_extra
-//    CHECK (extra_count >= 0);
-//    - Ensures people counts are non-negative
-//
-// 8. PERIOD DATE RANGE:
-//    ALTER TABLE periods ADD CONSTRAINT check_period_dates
-//    CHECK (end_date > start_date);
-//    - Ensures period end date is after start date
-//
-// Note: These constraints will be added in the migration file (task 1.2.9)
-// to ensure data integrity at the database level.
-//
+enum UserRole {
+  OPERATOR
+  SUPERVISOR
+  ADMIN
+}
+
+enum LocationType {
+  KITCHEN
+  STORE
+  CENTRAL
+  WAREHOUSE
+}
+
+enum Unit {
+  KG
+  EA
+  LTR
+  BOX
+  CASE
+  PACK
+}
+
+enum PeriodStatus {
+  DRAFT
+  OPEN
+  PENDING_CLOSE
+  APPROVED
+  CLOSED
+}
+
+enum PeriodLocationStatus {
+  OPEN
+  READY
+  CLOSED
+}
+
+enum PRFStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum POStatus {
+  OPEN
+  CLOSED
+}
+
+enum DeliveryStatus {
+  DRAFT
+  POSTED
+}
+
+enum CostCentre {
+  FOOD
+  CLEAN
+  OTHER
+}
+
+enum TransferStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum NCRType {
+  MANUAL
+  PRICE_VARIANCE
+}
+
+enum NCRStatus {
+  OPEN
+  SENT
+  CREDITED
+  REJECTED
+  RESOLVED
+}
+
+enum ApprovalEntityType {
+  PRF
+  PO
+  PERIOD_CLOSE
+  TRANSFER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

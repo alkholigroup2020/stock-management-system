@@ -128,38 +128,61 @@ export default defineEventHandler(async (event) => {
     const { periodId, locationId, supplierId, startDate, endDate, hasVariance, status, myDrafts } =
       querySchema.parse(query);
 
-    // Get user's accessible locations
+    // OPTIMIZATION: If specific location provided, verify access to just that location
+    // instead of fetching ALL accessible locations
     let accessibleLocationIds: string[] = [];
 
-    if (user.role === "ADMIN" || user.role === "SUPERVISOR") {
-      // Admin and Supervisor can see all active locations
-      const allLocations = await prisma.location.findMany({
-        where: { is_active: true },
-        select: { id: true },
-      });
-      accessibleLocationIds = allLocations.map((l) => l.id);
-    } else {
-      // Operator can only see assigned locations
-      const userLocations = await prisma.userLocation.findMany({
-        where: { user_id: user.id },
-        select: { location_id: true },
-      });
-      accessibleLocationIds = userLocations.map((ul) => ul.location_id);
-    }
-
-    // If specific location requested, verify access
     if (locationId) {
-      if (!accessibleLocationIds.includes(locationId)) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden",
-          data: {
-            code: "LOCATION_ACCESS_DENIED",
-            message: "You do not have access to this location",
-          },
+      // Verify access to the specific location
+      if (user.role === "ADMIN" || user.role === "SUPERVISOR") {
+        // Admin/Supervisor can access any active location
+        const locationExists = await prisma.location.findFirst({
+          where: { id: locationId, is_active: true },
+          select: { id: true },
         });
+        if (!locationExists) {
+          throw createError({
+            statusCode: 404,
+            statusMessage: "Not Found",
+            data: {
+              code: "LOCATION_NOT_FOUND",
+              message: "Location not found or inactive",
+            },
+          });
+        }
+      } else {
+        // Operator must have explicit access
+        const hasAccess = await prisma.userLocation.findFirst({
+          where: { user_id: user.id, location_id: locationId },
+          select: { location_id: true },
+        });
+        if (!hasAccess) {
+          throw createError({
+            statusCode: 403,
+            statusMessage: "Forbidden",
+            data: {
+              code: "LOCATION_ACCESS_DENIED",
+              message: "You do not have access to this location",
+            },
+          });
+        }
       }
       accessibleLocationIds = [locationId];
+    } else {
+      // No specific location - get all accessible locations
+      if (user.role === "ADMIN" || user.role === "SUPERVISOR") {
+        const allLocations = await prisma.location.findMany({
+          where: { is_active: true },
+          select: { id: true },
+        });
+        accessibleLocationIds = allLocations.map((l) => l.id);
+      } else {
+        const userLocations = await prisma.userLocation.findMany({
+          where: { user_id: user.id },
+          select: { location_id: true },
+        });
+        accessibleLocationIds = userLocations.map((ul) => ul.location_id);
+      }
     }
 
     // Build where clause
@@ -230,6 +253,9 @@ export default defineEventHandler(async (event) => {
           select: {
             id: true,
             name: true,
+            start_date: true,
+            end_date: true,
+            status: true,
           },
         },
         creator: {
@@ -377,20 +403,32 @@ export default defineEventHandler(async (event) => {
       total_line_items: deliveryReports.reduce((sum, d) => sum + d.lines.length, 0),
     };
 
-    // Get period info if filtered
+    // Get period info from deliveries (already included) or fetch if no deliveries
     let periodInfo = null;
     if (periodId) {
-      const period = await prisma.period.findUnique({
-        where: { id: periodId },
-        select: {
-          id: true,
-          name: true,
-          start_date: true,
-          end_date: true,
-          status: true,
-        },
-      });
-      periodInfo = period;
+      // Try to get period info from first delivery (already fetched)
+      const firstDeliveryWithPeriod = deliveries.find((d) => d.period.id === periodId);
+      if (firstDeliveryWithPeriod) {
+        periodInfo = {
+          id: firstDeliveryWithPeriod.period.id,
+          name: firstDeliveryWithPeriod.period.name,
+          start_date: firstDeliveryWithPeriod.period.start_date,
+          end_date: firstDeliveryWithPeriod.period.end_date,
+          status: firstDeliveryWithPeriod.period.status,
+        };
+      } else {
+        // Only fetch if no deliveries matched (edge case)
+        periodInfo = await prisma.period.findUnique({
+          where: { id: periodId },
+          select: {
+            id: true,
+            name: true,
+            start_date: true,
+            end_date: true,
+            status: true,
+          },
+        });
+      }
     }
 
     // Set cache headers (30 seconds for report data)

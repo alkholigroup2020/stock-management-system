@@ -53,13 +53,23 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Fetch the existing delivery
-    const delivery = await prisma.delivery.findUnique({
-      where: { id: deliveryId },
-      include: {
-        location: true,
-      },
-    });
+    // OPTIMIZATION: Fetch delivery and user's location access in parallel
+    const [delivery, userLocations] = await Promise.all([
+      // Fetch the existing delivery
+      prisma.delivery.findUnique({
+        where: { id: deliveryId },
+        include: {
+          location: true,
+        },
+      }),
+      // For operators, fetch their location assignments
+      user.role === "OPERATOR"
+        ? prisma.userLocation.findMany({
+            where: { user_id: user.id },
+            select: { location_id: true },
+          })
+        : Promise.resolve([]),
+    ]);
 
     if (!delivery) {
       throw createError({
@@ -99,16 +109,11 @@ export default defineEventHandler(async (event) => {
 
     // Check user has access to location (Operators need explicit assignment)
     if (user.role === "OPERATOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: delivery.location_id,
-          },
-        },
-      });
+      const hasLocationAccess = userLocations.some(
+        (ul) => ul.location_id === delivery.location_id
+      );
 
-      if (!userLocation) {
+      if (!hasLocationAccess) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",

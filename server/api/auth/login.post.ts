@@ -7,9 +7,7 @@
  */
 
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../../utils/prisma";
 
 // Validation schema for login request
 const loginSchema = z.object({
@@ -75,11 +73,15 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Update last login timestamp
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { last_login: new Date() },
-    });
+    // Update last login timestamp (non-blocking - don't wait for response)
+    prisma.user
+      .update({
+        where: { id: user.id },
+        data: { last_login: new Date() },
+      })
+      .catch((err) => {
+        console.error("Failed to update last_login:", err);
+      });
 
     // Prepare user session data (exclude password_hash)
     const sessionUser = {

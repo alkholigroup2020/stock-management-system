@@ -87,14 +87,43 @@ export default defineEventHandler(async (event) => {
     const data = bodySchema.parse(body);
     const isPosting = data.status === "POSTED";
 
-    // Fetch the existing delivery
-    const delivery = await prisma.delivery.findUnique({
-      where: { id: deliveryId },
-      include: {
-        delivery_lines: true,
-        location: true,
-      },
-    });
+    // Get item IDs from request for validation query
+    const requestItemIds = data.lines?.map((line) => line.item_id) || [];
+
+    // OPTIMIZATION: Batch all initial validation queries into a single parallel fetch
+    const [delivery, userLocations, currentPeriod, items] = await Promise.all([
+      // Fetch the existing delivery
+      prisma.delivery.findUnique({
+        where: { id: deliveryId },
+        include: {
+          delivery_lines: true,
+          location: true,
+        },
+      }),
+      // For operators, fetch their location assignments
+      user.role === "OPERATOR"
+        ? prisma.userLocation.findMany({
+            where: { user_id: user.id },
+            select: { location_id: true },
+          })
+        : Promise.resolve([]),
+      // Get current open period (needed for posting)
+      isPosting
+        ? prisma.period.findFirst({
+            where: { status: "OPEN" },
+            orderBy: { start_date: "desc" },
+          })
+        : Promise.resolve(null),
+      // Get items for validation (if lines provided in request)
+      requestItemIds.length > 0
+        ? prisma.item.findMany({
+            where: {
+              id: { in: requestItemIds },
+              ...(isPosting ? { is_active: true } : {}),
+            },
+          })
+        : Promise.resolve([]),
+    ]);
 
     if (!delivery) {
       throw createError({
@@ -133,16 +162,11 @@ export default defineEventHandler(async (event) => {
 
     // Check user has access to location (Operators need explicit assignment)
     if (user.role === "OPERATOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: delivery.location_id,
-          },
-        },
-      });
+      const hasLocationAccess = userLocations.some(
+        (ul) => ul.location_id === delivery.location_id
+      );
 
-      if (!userLocation) {
+      if (!hasLocationAccess) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",
@@ -168,27 +192,19 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Get current open period (required for posting)
-    let currentPeriod = null;
-    if (isPosting) {
-      currentPeriod = await prisma.period.findFirst({
-        where: { status: "OPEN" },
-        orderBy: { start_date: "desc" },
+    // Validate period exists for posting
+    if (isPosting && !currentPeriod) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "NO_OPEN_PERIOD",
+          message: "No open accounting period. Please open a period before posting deliveries.",
+        },
       });
-
-      if (!currentPeriod) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Bad Request",
-          data: {
-            code: "NO_OPEN_PERIOD",
-            message: "No open accounting period. Please open a period before posting deliveries.",
-          },
-        });
-      }
     }
 
-    // Get items for validation
+    // Get items for validation - use fetched items or fetch from existing delivery lines
     const linesToProcess =
       data.lines ||
       delivery.delivery_lines.map((l) => ({
@@ -199,14 +215,19 @@ export default defineEventHandler(async (event) => {
       }));
 
     const itemIds = linesToProcess.map((line) => line.item_id);
-    const items = await prisma.item.findMany({
-      where: {
-        id: { in: itemIds },
-        ...(isPosting ? { is_active: true } : {}),
-      },
-    });
 
-    if (items.length !== itemIds.length) {
+    // If no lines were in request, fetch items from existing delivery lines
+    let finalItems = items;
+    if (requestItemIds.length === 0 && itemIds.length > 0) {
+      finalItems = await prisma.item.findMany({
+        where: {
+          id: { in: itemIds },
+          ...(isPosting ? { is_active: true } : {}),
+        },
+      });
+    }
+
+    if (finalItems.length !== itemIds.length) {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",
@@ -270,7 +291,7 @@ export default defineEventHandler(async (event) => {
 
         // Process each delivery line
         for (const lineData of linesToProcess) {
-          const item = items.find((i) => i.id === lineData.item_id)!;
+          const item = finalItems.find((i) => i.id === lineData.item_id)!;
           const periodPrice = periodPriceMap.get(lineData.item_id);
           const currentStock = stockMap.get(lineData.item_id) || { quantity: 0, wac: 0 };
 
