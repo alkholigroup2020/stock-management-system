@@ -259,6 +259,9 @@ const openHelpDrawer = () => {
   helpDrawerOpen.value = true;
 };
 
+// Testing plan state
+const { isPanelOpen, isLargeScreen, togglePanel, closePanel } = useTestingPlanProgress();
+
 // Keyboard shortcut for help (? or F1)
 const handleGlobalKeydown = (event: KeyboardEvent) => {
   // Check for ? key (Shift + /) or F1
@@ -292,7 +295,12 @@ onUnmounted(() => {
   </a>
 
   <!-- Dashboard Layout using Nuxt UI Dashboard Components -->
-  <UDashboardGroup storage="local" storage-key="stock-management-dashboard">
+  <UDashboardGroup
+    storage="local"
+    storage-key="stock-management-dashboard"
+    class="transition-all duration-300"
+    :class="{ 'lg:mr-[400px]': isPanelOpen && isLargeScreen }"
+  >
     <!-- SIDEBAR -->
     <UDashboardSidebar
       collapsible
@@ -380,6 +388,9 @@ onUnmounted(() => {
 
           <!-- Right side actions -->
           <div class="flex items-center gap-1">
+            <!-- Testing Plan Toggle -->
+            <TestingPlanToggle @click="togglePanel" />
+
             <!-- Help -->
             <UButton
               icon="i-heroicons-question-mark-circle"
@@ -485,4 +496,17 @@ onUnmounted(() => {
 
   <!-- Help Drawer -->
   <LayoutHelpDrawer v-model:open="helpDrawerOpen" />
+
+  <!-- Testing Plan Panel (lg+ screens) -->
+  <TestingPlanPanel
+    v-if="isPanelOpen && isLargeScreen"
+    @close="closePanel"
+  />
+
+  <!-- Testing Plan Modal (smaller screens) -->
+  <TestingPlanModal
+    v-if="isPanelOpen && !isLargeScreen"
+    :open="isPanelOpen"
+    @close="closePanel"
+  />
 </template>

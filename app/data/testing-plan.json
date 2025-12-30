@@ -1,0 +1,1255 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2025-01-15",
+  "title": "Complete End-to-End Testing Plan v2",
+  "description": "This streamlined testing plan validates all role-based permissions in the Stock Management System. It uses minimal test data (2 locations, 3 users, 2 suppliers, 6 items) while ensuring comprehensive coverage of the RBAC system.",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Phase 1: Admin Master Data Setup",
+      "description": "Configure base system data as Admin user",
+      "items": [
+        {
+          "id": "p1-auth-1",
+          "label": "Navigate to http://localhost:3000"
+        },
+        {
+          "id": "p1-auth-2",
+          "label": "Verify redirect to /login"
+        },
+        {
+          "id": "p1-auth-3",
+          "label": "Login with invalid credentials - Expect error toast"
+        },
+        {
+          "id": "p1-auth-4",
+          "label": "Login with admin credentials - Expect redirect to dashboard"
+        },
+        {
+          "id": "p1-auth-5",
+          "label": "Verify navbar shows: username, role badge (Admin)"
+        },
+        {
+          "id": "p1-nav-1",
+          "label": "Verify Dashboard menu visible"
+        },
+        {
+          "id": "p1-nav-2",
+          "label": "Verify Locations menu visible"
+        },
+        {
+          "id": "p1-nav-3",
+          "label": "Verify Users menu visible"
+        },
+        {
+          "id": "p1-nav-4",
+          "label": "Verify Suppliers menu visible"
+        },
+        {
+          "id": "p1-nav-5",
+          "label": "Verify Items & Prices menu visible"
+        },
+        {
+          "id": "p1-nav-6",
+          "label": "Verify Periods menu visible"
+        },
+        {
+          "id": "p1-nav-7",
+          "label": "Verify Period Close menu visible"
+        },
+        {
+          "id": "p1-nav-8",
+          "label": "Verify all operational menus visible (Deliveries, Issues, Transfers, etc.)"
+        },
+        {
+          "id": "p1-loc-1",
+          "label": "Navigate to /locations"
+        },
+        {
+          "id": "p1-loc-2",
+          "label": "Verify empty state: 'No locations found'"
+        },
+        {
+          "id": "p1-loc-3",
+          "label": "Click 'Create Location'"
+        },
+        {
+          "id": "p1-loc-4",
+          "label": "Create Kitchen: Name: Kitchen, Code: KIT, Type: KITCHEN, Address: Building A"
+        },
+        {
+          "id": "p1-loc-5",
+          "label": "Create Store: Name: Store, Code: STR, Type: STORE, Address: Building B"
+        },
+        {
+          "id": "p1-loc-6",
+          "label": "Verify both locations appear in list"
+        },
+        {
+          "id": "p1-loc-7",
+          "label": "Verify location switcher in navbar shows both options"
+        },
+        {
+          "id": "p1-sup-1",
+          "label": "Navigate to /suppliers"
+        },
+        {
+          "id": "p1-sup-2",
+          "label": "Verify empty state"
+        },
+        {
+          "id": "p1-sup-3",
+          "label": "Create Supplier 1: Fresh Foods Co., Contact: Ali Hassan, Phone: +966 50 123 4567"
+        },
+        {
+          "id": "p1-sup-4",
+          "label": "Create Supplier 2: Gulf Provisions, Contact: Mohammed Al-Rashid, Phone: +966 55 987 6543"
+        },
+        {
+          "id": "p1-sup-5",
+          "label": "Verify both suppliers appear in list"
+        },
+        {
+          "id": "p1-item-1",
+          "label": "Navigate to /items"
+        },
+        {
+          "id": "p1-item-2",
+          "label": "Verify empty state: 'No items found'"
+        },
+        {
+          "id": "p1-item-3",
+          "label": "Create Item 1: PRO-001, Chicken Breast, KG, Proteins"
+        },
+        {
+          "id": "p1-item-4",
+          "label": "Create Item 2: PRO-002, Beef Mince, KG, Proteins"
+        },
+        {
+          "id": "p1-item-5",
+          "label": "Create Item 3: VEG-001, Tomatoes, KG, Produce"
+        },
+        {
+          "id": "p1-item-6",
+          "label": "Create Item 4: VEG-002, Onions, KG, Produce"
+        },
+        {
+          "id": "p1-item-7",
+          "label": "Create Item 5: DRY-001, Rice (Basmati), KG, Dry Goods"
+        },
+        {
+          "id": "p1-item-8",
+          "label": "Create Item 6: DRY-002, Cooking Oil, LTR, Dry Goods"
+        },
+        {
+          "id": "p1-item-9",
+          "label": "Verify all 6 items in list"
+        },
+        {
+          "id": "p1-item-10",
+          "label": "Test search: type 'Chicken' - verify filter works"
+        },
+        {
+          "id": "p1-user-1",
+          "label": "Navigate to /users"
+        },
+        {
+          "id": "p1-user-2",
+          "label": "Click 'Create User' for Supervisor"
+        },
+        {
+          "id": "p1-user-3",
+          "label": "Create Supervisor: Name: Sarah Johnson, Username: sjohnson, Email: supervisor@foodstock.local, Password: Super@123, Role: SUPERVISOR"
+        },
+        {
+          "id": "p1-user-4",
+          "label": "DO NOT assign locations (Supervisors have implicit all-location access)"
+        },
+        {
+          "id": "p1-user-5",
+          "label": "Verify Supervisor user created successfully"
+        },
+        {
+          "id": "p1-user-6",
+          "label": "Click 'Create User' for Operator"
+        },
+        {
+          "id": "p1-user-7",
+          "label": "Create Operator: Name: Mike Williams, Username: mwilliams, Email: operator@foodstock.local, Password: Oper@123, Role: OPERATOR"
+        },
+        {
+          "id": "p1-user-8",
+          "label": "Assign Operator to Kitchen ONLY (testing location restriction)"
+        },
+        {
+          "id": "p1-user-9",
+          "label": "Verify Operator user created with location assignment"
+        },
+        {
+          "id": "p1-user-10",
+          "label": "Verify both users appear in user list"
+        },
+        {
+          "id": "p1-user-11",
+          "label": "Verify Operator shows 'Kitchen' in locations column"
+        },
+        {
+          "id": "p1-user-12",
+          "label": "Verify Supervisor shows 'All Locations' or no specific assignment"
+        },
+        {
+          "id": "p1-period-1",
+          "label": "Navigate to /periods"
+        },
+        {
+          "id": "p1-period-2",
+          "label": "Verify empty state"
+        },
+        {
+          "id": "p1-period-3",
+          "label": "Click 'Create Period'"
+        },
+        {
+          "id": "p1-period-4",
+          "label": "Fill in: Name: 'December 2025', Start: 1st of month, End: Last day of month"
+        },
+        {
+          "id": "p1-period-5",
+          "label": "Click Create"
+        },
+        {
+          "id": "p1-period-6",
+          "label": "Verify period appears with DRAFT status"
+        },
+        {
+          "id": "p1-price-1",
+          "label": "Click on the period - Navigate to Prices tab"
+        },
+        {
+          "id": "p1-price-2",
+          "label": "Set price for Chicken Breast: SAR 25.00"
+        },
+        {
+          "id": "p1-price-3",
+          "label": "Set price for Beef Mince: SAR 35.00"
+        },
+        {
+          "id": "p1-price-4",
+          "label": "Set price for Tomatoes: SAR 5.00"
+        },
+        {
+          "id": "p1-price-5",
+          "label": "Set price for Onions: SAR 3.50"
+        },
+        {
+          "id": "p1-price-6",
+          "label": "Set price for Rice (Basmati): SAR 8.00"
+        },
+        {
+          "id": "p1-price-7",
+          "label": "Set price for Cooking Oil: SAR 12.00"
+        },
+        {
+          "id": "p1-price-8",
+          "label": "Click 'Save All Prices'"
+        },
+        {
+          "id": "p1-price-9",
+          "label": "Verify success toast"
+        },
+        {
+          "id": "p1-open-1",
+          "label": "Return to period list"
+        },
+        {
+          "id": "p1-open-2",
+          "label": "Change period status from DRAFT to OPEN"
+        },
+        {
+          "id": "p1-open-3",
+          "label": "Verify confirmation modal"
+        },
+        {
+          "id": "p1-open-4",
+          "label": "Confirm opening"
+        },
+        {
+          "id": "p1-open-5",
+          "label": "Verify period indicator in navbar shows the open period"
+        },
+        {
+          "id": "p1-stock-1",
+          "label": "Navigate to /deliveries/create"
+        },
+        {
+          "id": "p1-stock-2",
+          "label": "Select Location: Kitchen, Supplier: Fresh Foods Co., Invoice: INV-INIT-001"
+        },
+        {
+          "id": "p1-stock-3",
+          "label": "Add line: Chicken Breast, Qty: 10, Unit Price: 25.00"
+        },
+        {
+          "id": "p1-stock-4",
+          "label": "Add line: Tomatoes, Qty: 20, Unit Price: 5.00"
+        },
+        {
+          "id": "p1-stock-5",
+          "label": "Add line: Rice (Basmati), Qty: 50, Unit Price: 8.00"
+        },
+        {
+          "id": "p1-stock-6",
+          "label": "Submit delivery (DEL-2025-001 created, Total: SAR 750.00)"
+        },
+        {
+          "id": "p1-stock-7",
+          "label": "Verify delivery created successfully"
+        },
+        {
+          "id": "p1-stock-8",
+          "label": "Verify NO NCR created (prices match period prices)"
+        },
+        {
+          "id": "p1-stock-9",
+          "label": "Navigate to /stock-now - Kitchen"
+        },
+        {
+          "id": "p1-stock-10",
+          "label": "Verify stock levels match delivery quantities"
+        },
+        {
+          "id": "p1-logout-1",
+          "label": "Click user dropdown - Logout"
+        },
+        {
+          "id": "p1-logout-2",
+          "label": "Verify redirect to /login"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Phase 2: Operator Permissions Test",
+      "description": "Test Operator role capabilities and restrictions. Login as OPERATOR (operator@test.com / Oper123!)",
+      "items": [
+        {
+          "id": "p2-login-1",
+          "label": "Login as operator@test.com"
+        },
+        {
+          "id": "p2-login-2",
+          "label": "Verify navbar shows: Mike Williams, role badge (Operator)"
+        },
+        {
+          "id": "p2-nav-hidden-1",
+          "label": "Verify Users menu is NOT visible"
+        },
+        {
+          "id": "p2-nav-hidden-2",
+          "label": "Verify Locations menu is NOT visible"
+        },
+        {
+          "id": "p2-nav-hidden-3",
+          "label": "Verify Suppliers menu is NOT visible"
+        },
+        {
+          "id": "p2-nav-hidden-4",
+          "label": "Verify Periods menu is NOT visible"
+        },
+        {
+          "id": "p2-nav-hidden-5",
+          "label": "Verify Period Close menu is NOT visible"
+        },
+        {
+          "id": "p2-nav-visible-1",
+          "label": "Verify Dashboard is visible"
+        },
+        {
+          "id": "p2-nav-visible-2",
+          "label": "Verify Deliveries & Invoices is visible"
+        },
+        {
+          "id": "p2-nav-visible-3",
+          "label": "Verify Issues is visible"
+        },
+        {
+          "id": "p2-nav-visible-4",
+          "label": "Verify Transfers is visible"
+        },
+        {
+          "id": "p2-nav-visible-5",
+          "label": "Verify Stock Now is visible"
+        },
+        {
+          "id": "p2-nav-visible-6",
+          "label": "Verify NCR is visible"
+        },
+        {
+          "id": "p2-nav-visible-7",
+          "label": "Verify POB is visible"
+        },
+        {
+          "id": "p2-loc-1",
+          "label": "Check location switcher in navbar"
+        },
+        {
+          "id": "p2-loc-2",
+          "label": "Verify ONLY 'Kitchen' is available (Operator's assigned location)"
+        },
+        {
+          "id": "p2-loc-3",
+          "label": "Verify 'Store' is NOT available"
+        },
+        {
+          "id": "p2-url-1",
+          "label": "Navigate to /users via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p2-url-2",
+          "label": "Navigate to /locations via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p2-url-3",
+          "label": "Navigate to /suppliers via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p2-url-4",
+          "label": "Navigate to /periods via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p2-url-5",
+          "label": "Navigate to /period-close via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p2-del-1",
+          "label": "Navigate to /deliveries/create"
+        },
+        {
+          "id": "p2-del-2",
+          "label": "Verify location dropdown only shows 'Kitchen'"
+        },
+        {
+          "id": "p2-del-3",
+          "label": "Fill in: Location: Kitchen, Supplier: Gulf Provisions, Invoice: OP-DEL-001"
+        },
+        {
+          "id": "p2-del-4",
+          "label": "Add line: Chicken Breast, Qty: 50, Price: SAR 28.00 (triggers price variance!)"
+        },
+        {
+          "id": "p2-del-5",
+          "label": "Submit delivery"
+        },
+        {
+          "id": "p2-del-6",
+          "label": "Verify delivery created successfully"
+        },
+        {
+          "id": "p2-del-7",
+          "label": "Verify price variance NCR auto-generated"
+        },
+        {
+          "id": "p2-stock-1",
+          "label": "Navigate to /stock-now"
+        },
+        {
+          "id": "p2-stock-2",
+          "label": "Verify Kitchen stock is visible"
+        },
+        {
+          "id": "p2-stock-3",
+          "label": "Verify Chicken Breast shows updated quantity (100 + 50 = 150)"
+        },
+        {
+          "id": "p2-stock-4",
+          "label": "Verify WAC recalculated: (100x25 + 50x28) / 150 = SAR 26.00"
+        },
+        {
+          "id": "p2-issue-1",
+          "label": "Navigate to /issues/create"
+        },
+        {
+          "id": "p2-issue-2",
+          "label": "Verify location dropdown only shows 'Kitchen'"
+        },
+        {
+          "id": "p2-issue-3",
+          "label": "Fill in: Location: Kitchen, Cost Centre: FOOD"
+        },
+        {
+          "id": "p2-issue-4",
+          "label": "Add line: Chicken Breast, Qty: 10"
+        },
+        {
+          "id": "p2-issue-5",
+          "label": "Submit issue"
+        },
+        {
+          "id": "p2-issue-6",
+          "label": "Verify issue created successfully"
+        },
+        {
+          "id": "p2-transfer-1",
+          "label": "Navigate to /transfers/create"
+        },
+        {
+          "id": "p2-transfer-2",
+          "label": "Fill in: From: Kitchen, To: Store, Notes: 'Stock balancing'"
+        },
+        {
+          "id": "p2-transfer-3",
+          "label": "Add line: Rice (Basmati), Qty: 50"
+        },
+        {
+          "id": "p2-transfer-4",
+          "label": "Submit transfer"
+        },
+        {
+          "id": "p2-transfer-5",
+          "label": "Verify transfer created with status 'PENDING_APPROVAL'"
+        },
+        {
+          "id": "p2-transfer-6",
+          "label": "Navigate to transfer detail"
+        },
+        {
+          "id": "p2-transfer-7",
+          "label": "Verify NO Approve/Reject buttons visible (Operator cannot approve)"
+        },
+        {
+          "id": "p2-pob-1",
+          "label": "Navigate to /pob"
+        },
+        {
+          "id": "p2-pob-2",
+          "label": "Select Kitchen location"
+        },
+        {
+          "id": "p2-pob-3",
+          "label": "Enter POB: Crew Count: 45, Extra Count: 5"
+        },
+        {
+          "id": "p2-pob-4",
+          "label": "Verify data saves successfully"
+        },
+        {
+          "id": "p2-ncr-1",
+          "label": "Navigate to /ncrs"
+        },
+        {
+          "id": "p2-ncr-2",
+          "label": "Verify auto-generated price variance NCR is visible"
+        },
+        {
+          "id": "p2-ncr-3",
+          "label": "Click 'Create NCR' (if available)"
+        },
+        {
+          "id": "p2-ncr-4",
+          "label": "Create manual NCR for Kitchen location"
+        },
+        {
+          "id": "p2-ncr-5",
+          "label": "Verify NCR created"
+        },
+        {
+          "id": "p2-recon-1",
+          "label": "Navigate to /reconciliations"
+        },
+        {
+          "id": "p2-recon-2",
+          "label": "Select Kitchen location"
+        },
+        {
+          "id": "p2-recon-3",
+          "label": "Verify reconciliation data is visible (totals view)"
+        },
+        {
+          "id": "p2-recon-4",
+          "label": "Verify NO edit buttons for adjustments"
+        },
+        {
+          "id": "p2-recon-5",
+          "label": "Verify adjustments section is read-only or hidden"
+        },
+        {
+          "id": "p2-consol-1",
+          "label": "Navigate to /reconciliations/consolidated via URL"
+        },
+        {
+          "id": "p2-consol-2",
+          "label": "Verify access denied or page not accessible"
+        },
+        {
+          "id": "p2-report-1",
+          "label": "Navigate to /reports"
+        },
+        {
+          "id": "p2-report-2",
+          "label": "Verify reports are viewable"
+        },
+        {
+          "id": "p2-report-3",
+          "label": "Verify NO Export button is visible/enabled"
+        },
+        {
+          "id": "p2-logout-1",
+          "label": "Logout as Operator"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Phase 3: Supervisor Permissions Test",
+      "description": "Test Supervisor role capabilities. Login as SUPERVISOR (supervisor@test.com / Super123!)",
+      "items": [
+        {
+          "id": "p3-login-1",
+          "label": "Login as supervisor@test.com"
+        },
+        {
+          "id": "p3-login-2",
+          "label": "Verify navbar shows: Sarah Johnson, role badge (Supervisor)"
+        },
+        {
+          "id": "p3-nav-hidden-1",
+          "label": "Verify Users menu is NOT visible"
+        },
+        {
+          "id": "p3-nav-hidden-2",
+          "label": "Verify Locations menu is NOT visible"
+        },
+        {
+          "id": "p3-nav-hidden-3",
+          "label": "Verify Suppliers menu is NOT visible"
+        },
+        {
+          "id": "p3-nav-hidden-4",
+          "label": "Verify Periods menu is NOT visible"
+        },
+        {
+          "id": "p3-nav-hidden-5",
+          "label": "Verify Period Close menu is NOT visible"
+        },
+        {
+          "id": "p3-nav-visible-1",
+          "label": "Verify Dashboard is visible"
+        },
+        {
+          "id": "p3-nav-visible-2",
+          "label": "Verify all operational menus visible (Deliveries, Issues, Transfers, etc.)"
+        },
+        {
+          "id": "p3-nav-visible-3",
+          "label": "Verify Reconciliations menu visible"
+        },
+        {
+          "id": "p3-nav-visible-4",
+          "label": "Verify Reports menu visible"
+        },
+        {
+          "id": "p3-loc-1",
+          "label": "Check location switcher in navbar"
+        },
+        {
+          "id": "p3-loc-2",
+          "label": "Verify BOTH 'Kitchen' AND 'Store' are available"
+        },
+        {
+          "id": "p3-loc-3",
+          "label": "Switch to Store location"
+        },
+        {
+          "id": "p3-loc-4",
+          "label": "Navigate to /stock-now - Store"
+        },
+        {
+          "id": "p3-loc-5",
+          "label": "Verify Store stock is accessible (even though supervisor wasn't assigned)"
+        },
+        {
+          "id": "p3-url-1",
+          "label": "Navigate to /users via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p3-url-2",
+          "label": "Navigate to /locations via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p3-url-3",
+          "label": "Navigate to /suppliers via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p3-url-4",
+          "label": "Navigate to /periods via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p3-url-5",
+          "label": "Navigate to /period-close via URL - Expect 403 or redirect"
+        },
+        {
+          "id": "p3-approve-1",
+          "label": "Navigate to /transfers"
+        },
+        {
+          "id": "p3-approve-2",
+          "label": "Find the pending transfer from Kitchen to Store"
+        },
+        {
+          "id": "p3-approve-3",
+          "label": "Click to open transfer detail"
+        },
+        {
+          "id": "p3-approve-4",
+          "label": "Verify Approve and Reject buttons ARE visible"
+        },
+        {
+          "id": "p3-approve-5",
+          "label": "Click 'Approve'"
+        },
+        {
+          "id": "p3-approve-6",
+          "label": "Confirm in modal"
+        },
+        {
+          "id": "p3-approve-7",
+          "label": "Verify transfer status changes to 'APPROVED' then 'COMPLETED'"
+        },
+        {
+          "id": "p3-reject-1",
+          "label": "Create a new transfer request (Supervisor can do this at any location)"
+        },
+        {
+          "id": "p3-reject-2",
+          "label": "Navigate to /transfers/create"
+        },
+        {
+          "id": "p3-reject-3",
+          "label": "From: Kitchen, To: Store"
+        },
+        {
+          "id": "p3-reject-4",
+          "label": "Add: Olive Oil, Qty: 10"
+        },
+        {
+          "id": "p3-reject-5",
+          "label": "Submit transfer"
+        },
+        {
+          "id": "p3-reject-6",
+          "label": "Open the pending transfer"
+        },
+        {
+          "id": "p3-reject-7",
+          "label": "Click 'Reject'"
+        },
+        {
+          "id": "p3-reject-8",
+          "label": "Enter reason: 'Insufficient justification'"
+        },
+        {
+          "id": "p3-reject-9",
+          "label": "Confirm rejection"
+        },
+        {
+          "id": "p3-reject-10",
+          "label": "Verify transfer status = 'REJECTED'"
+        },
+        {
+          "id": "p3-reject-11",
+          "label": "Verify stock NOT moved"
+        },
+        {
+          "id": "p3-recon-1",
+          "label": "Navigate to /reconciliations"
+        },
+        {
+          "id": "p3-recon-2",
+          "label": "Select Kitchen location and current period"
+        },
+        {
+          "id": "p3-recon-3",
+          "label": "Verify reconciliation data loads"
+        },
+        {
+          "id": "p3-recon-4",
+          "label": "Verify Edit capabilities ARE available"
+        },
+        {
+          "id": "p3-recon-5",
+          "label": "Enter adjustments: Back-charges: SAR 50.00, Condemnations: SAR 25.00"
+        },
+        {
+          "id": "p3-recon-6",
+          "label": "Click 'Save Adjustments'"
+        },
+        {
+          "id": "p3-recon-7",
+          "label": "Verify adjustments saved successfully"
+        },
+        {
+          "id": "p3-consol-1",
+          "label": "Navigate to /reconciliations/consolidated"
+        },
+        {
+          "id": "p3-consol-2",
+          "label": "Verify page loads successfully"
+        },
+        {
+          "id": "p3-consol-3",
+          "label": "Verify both Kitchen and Store displayed"
+        },
+        {
+          "id": "p3-consol-4",
+          "label": "Verify grand totals row shows sums"
+        },
+        {
+          "id": "p3-report-1",
+          "label": "Navigate to /reports"
+        },
+        {
+          "id": "p3-report-2",
+          "label": "Verify Export button IS visible"
+        },
+        {
+          "id": "p3-report-3",
+          "label": "Click 'Export CSV' on any report"
+        },
+        {
+          "id": "p3-report-4",
+          "label": "Verify CSV file downloads"
+        },
+        {
+          "id": "p3-ncr-1",
+          "label": "Navigate to /ncrs"
+        },
+        {
+          "id": "p3-ncr-2",
+          "label": "Find the price variance NCR"
+        },
+        {
+          "id": "p3-ncr-3",
+          "label": "Click to open detail"
+        },
+        {
+          "id": "p3-ncr-4",
+          "label": "Update status to 'SENT'"
+        },
+        {
+          "id": "p3-ncr-5",
+          "label": "Add notes: 'Contacted supplier'"
+        },
+        {
+          "id": "p3-ncr-6",
+          "label": "Verify status saved"
+        },
+        {
+          "id": "p3-ready-1",
+          "label": "Navigate to /reconciliations - Kitchen"
+        },
+        {
+          "id": "p3-ready-2",
+          "label": "Look for 'Mark Ready' button or similar"
+        },
+        {
+          "id": "p3-ready-3",
+          "label": "Mark Kitchen as ready for period close"
+        },
+        {
+          "id": "p3-ready-4",
+          "label": "Verify Kitchen shows 'READY' status"
+        },
+        {
+          "id": "p3-ready-5",
+          "label": "Repeat for Store"
+        },
+        {
+          "id": "p3-ready-6",
+          "label": "Verify NO 'Close Period' button available (Admin only)"
+        },
+        {
+          "id": "p3-items-1",
+          "label": "Navigate to /items"
+        },
+        {
+          "id": "p3-items-2",
+          "label": "Verify items are viewable"
+        },
+        {
+          "id": "p3-items-3",
+          "label": "Verify NO Create/Edit/Delete buttons visible"
+        },
+        {
+          "id": "p3-items-4",
+          "label": "Click on an item (Note: Bug in Stock Levels section)"
+        },
+        {
+          "id": "p3-items-5",
+          "label": "Verify NO Edit button on item detail"
+        },
+        {
+          "id": "p3-logout-1",
+          "label": "Logout as Supervisor"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Phase 4: Admin Period Close & Verification",
+      "description": "Test period close workflow as Admin",
+      "items": [
+        {
+          "id": "p4-login-1",
+          "label": "Login with admin credentials"
+        },
+        {
+          "id": "p4-access-1",
+          "label": "Navigate to /users - Page loads successfully"
+        },
+        {
+          "id": "p4-access-2",
+          "label": "Navigate to /locations - Page loads successfully"
+        },
+        {
+          "id": "p4-access-3",
+          "label": "Navigate to /suppliers - Page loads successfully"
+        },
+        {
+          "id": "p4-access-4",
+          "label": "Navigate to /periods - Page loads successfully"
+        },
+        {
+          "id": "p4-access-5",
+          "label": "Navigate to /period-close - Page loads successfully"
+        },
+        {
+          "id": "p4-items-1",
+          "label": "Navigate to /items"
+        },
+        {
+          "id": "p4-items-2",
+          "label": "Verify Create/Edit buttons are visible"
+        },
+        {
+          "id": "p4-items-3",
+          "label": "Click on an item"
+        },
+        {
+          "id": "p4-items-4",
+          "label": "Verify Edit button is visible"
+        },
+        {
+          "id": "p4-items-5",
+          "label": "Navigate to period prices"
+        },
+        {
+          "id": "p4-items-6",
+          "label": "Verify price editing is available"
+        },
+        {
+          "id": "p4-close-1",
+          "label": "Navigate to /period-close"
+        },
+        {
+          "id": "p4-close-2",
+          "label": "Verify all locations show 'READY' status"
+        },
+        {
+          "id": "p4-close-3",
+          "label": "Click 'Request Period Close' (or 'Close Period')"
+        },
+        {
+          "id": "p4-close-4",
+          "label": "Confirm in modal"
+        },
+        {
+          "id": "p4-close-5",
+          "label": "Approve the period close request"
+        },
+        {
+          "id": "p4-close-6",
+          "label": "Verify period status = 'CLOSED'"
+        },
+        {
+          "id": "p4-close-7",
+          "label": "Verify success toast"
+        },
+        {
+          "id": "p4-blocked-1",
+          "label": "Try to create a delivery (UX - App shouldn't allow initially)"
+        },
+        {
+          "id": "p4-blocked-2",
+          "label": "Verify system prevents posting to closed period"
+        },
+        {
+          "id": "p4-blocked-3",
+          "label": "Try to create an issue (UX - App shouldn't allow initially)"
+        },
+        {
+          "id": "p4-blocked-4",
+          "label": "Verify system prevents posting to closed period"
+        },
+        {
+          "id": "p4-roll-1",
+          "label": "Navigate to /periods"
+        },
+        {
+          "id": "p4-roll-2",
+          "label": "Find the closed period"
+        },
+        {
+          "id": "p4-roll-3",
+          "label": "Click 'Roll Forward' (or create new period)"
+        },
+        {
+          "id": "p4-roll-4",
+          "label": "Verify new period created"
+        },
+        {
+          "id": "p4-roll-5",
+          "label": "Set new period to OPEN"
+        },
+        {
+          "id": "p4-roll-6",
+          "label": "Verify opening stock = closing stock from previous period"
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "title": "Phase 5: Edge Cases & Security",
+      "description": "Test error handling and security measures",
+      "items": [
+        {
+          "id": "p5-neg-1",
+          "label": "Login as Operator"
+        },
+        {
+          "id": "p5-neg-2",
+          "label": "Navigate to /issues/create"
+        },
+        {
+          "id": "p5-neg-3",
+          "label": "Try to issue MORE than available stock"
+        },
+        {
+          "id": "p5-neg-4",
+          "label": "Verify error prevents submission"
+        },
+        {
+          "id": "p5-cross-1",
+          "label": "As Operator, try to access Store stock via direct API"
+        },
+        {
+          "id": "p5-cross-2",
+          "label": "Verify 403 Access Denied"
+        },
+        {
+          "id": "p5-session-1",
+          "label": "Clear cookies/session"
+        },
+        {
+          "id": "p5-session-2",
+          "label": "Refresh page"
+        },
+        {
+          "id": "p5-session-3",
+          "label": "Verify redirect to login"
+        },
+        {
+          "id": "p5-offline-1",
+          "label": "Open DevTools - Network - Set 'Offline'"
+        },
+        {
+          "id": "p5-offline-2",
+          "label": "Verify offline banner appears"
+        },
+        {
+          "id": "p5-offline-3",
+          "label": "Verify action buttons disabled"
+        },
+        {
+          "id": "p5-offline-4",
+          "label": "Set back to 'Online'"
+        },
+        {
+          "id": "p5-offline-5",
+          "label": "Verify functionality restored"
+        }
+      ]
+    },
+    {
+      "id": "summary-operator",
+      "title": "Summary: OPERATOR Permissions Verified",
+      "description": "Final verification checklist for Operator role",
+      "items": [
+        {
+          "id": "sum-op-1",
+          "label": "CAN post deliveries at assigned location"
+        },
+        {
+          "id": "sum-op-2",
+          "label": "CAN post issues at assigned location"
+        },
+        {
+          "id": "sum-op-3",
+          "label": "CAN enter POB data"
+        },
+        {
+          "id": "sum-op-4",
+          "label": "CAN create NCRs"
+        },
+        {
+          "id": "sum-op-5",
+          "label": "CAN create transfer requests"
+        },
+        {
+          "id": "sum-op-6",
+          "label": "CAN view stock at assigned location"
+        },
+        {
+          "id": "sum-op-7",
+          "label": "CAN view reconciliation totals"
+        },
+        {
+          "id": "sum-op-8",
+          "label": "CANNOT access Users/Locations/Suppliers/Periods"
+        },
+        {
+          "id": "sum-op-9",
+          "label": "CANNOT approve transfers"
+        },
+        {
+          "id": "sum-op-10",
+          "label": "CANNOT edit reconciliations"
+        },
+        {
+          "id": "sum-op-11",
+          "label": "CANNOT view consolidated reconciliations"
+        },
+        {
+          "id": "sum-op-12",
+          "label": "CANNOT export reports"
+        },
+        {
+          "id": "sum-op-13",
+          "label": "CANNOT access unassigned locations"
+        }
+      ]
+    },
+    {
+      "id": "summary-supervisor",
+      "title": "Summary: SUPERVISOR Permissions Verified",
+      "description": "Final verification checklist for Supervisor role",
+      "items": [
+        {
+          "id": "sum-sup-1",
+          "label": "CAN do all Operator tasks"
+        },
+        {
+          "id": "sum-sup-2",
+          "label": "CAN access ALL locations (implicit)"
+        },
+        {
+          "id": "sum-sup-3",
+          "label": "CAN approve/reject transfers"
+        },
+        {
+          "id": "sum-sup-4",
+          "label": "CAN edit reconciliations"
+        },
+        {
+          "id": "sum-sup-5",
+          "label": "CAN view consolidated reconciliations"
+        },
+        {
+          "id": "sum-sup-6",
+          "label": "CAN export reports"
+        },
+        {
+          "id": "sum-sup-7",
+          "label": "CAN update NCR status"
+        },
+        {
+          "id": "sum-sup-8",
+          "label": "CAN mark locations ready"
+        },
+        {
+          "id": "sum-sup-9",
+          "label": "CANNOT access Users/Locations/Suppliers/Periods"
+        },
+        {
+          "id": "sum-sup-10",
+          "label": "CANNOT close periods"
+        },
+        {
+          "id": "sum-sup-11",
+          "label": "CANNOT manage items/prices"
+        }
+      ]
+    },
+    {
+      "id": "summary-admin",
+      "title": "Summary: ADMIN Permissions Verified",
+      "description": "Final verification checklist for Admin role",
+      "items": [
+        {
+          "id": "sum-admin-1",
+          "label": "CAN do all Supervisor tasks"
+        },
+        {
+          "id": "sum-admin-2",
+          "label": "CAN manage users"
+        },
+        {
+          "id": "sum-admin-3",
+          "label": "CAN manage locations"
+        },
+        {
+          "id": "sum-admin-4",
+          "label": "CAN manage suppliers"
+        },
+        {
+          "id": "sum-admin-5",
+          "label": "CAN manage items"
+        },
+        {
+          "id": "sum-admin-6",
+          "label": "CAN set item prices"
+        },
+        {
+          "id": "sum-admin-7",
+          "label": "CAN open/close periods"
+        },
+        {
+          "id": "sum-admin-8",
+          "label": "CAN execute period close"
+        }
+      ]
+    },
+    {
+      "id": "summary-security",
+      "title": "Summary: Security Verified",
+      "description": "Final verification checklist for security measures",
+      "items": [
+        {
+          "id": "sum-sec-1",
+          "label": "Server-side permission enforcement (403 errors)"
+        },
+        {
+          "id": "sum-sec-2",
+          "label": "Client-side navigation filtering"
+        },
+        {
+          "id": "sum-sec-3",
+          "label": "Location access restrictions"
+        },
+        {
+          "id": "sum-sec-4",
+          "label": "Session management"
+        }
+      ]
+    }
+  ]
+}
