@@ -22,7 +22,7 @@ interface Props {
   /** Optional icon name from lucide icons */
   icon?: string;
   /** Color variant */
-  color?: "primary" | "secondary" | "success" | "error" | "neutral";
+  color?: "primary" | "secondary" | "success" | "warning" | "error" | "neutral";
   /** Whether the card is loading */
   loading?: boolean;
   /** Optional trend indicator (up/down percentage) */
@@ -43,6 +43,7 @@ const colorClasses = computed(() => {
     primary: "bg-navy-50 dark:bg-navy-900/20 text-navy-600 dark:text-navy-400",
     secondary: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
     success: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400",
+    warning: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400",
     error: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
     neutral: "bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400",
   };

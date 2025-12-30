@@ -61,15 +61,15 @@
         },
         {
           "id": "p1-14",
-          "label": "Navigate to Users - Create 'Sarah Johnson' (SUPERVISOR role, all locations)"
+          "label": "Navigate to Users - Create Supervisor: Sarah Johnson (username: sarah, email: sarah@foodstock.local, password: Sarah@123, role: SUPERVISOR, all locations)"
         },
         {
           "id": "p1-15",
-          "label": "Create 'Mike Williams' (OPERATOR role, assign to Kitchen only)"
+          "label": "Create Operator: Mike Williams (username: mike, email: mike@foodstock.local, password: Mike@123, role: OPERATOR, assign to Kitchen only)"
         },
         {
           "id": "p1-16",
-          "label": "Create 'Emma Davis' (OPERATOR role, assign to Store only)"
+          "label": "Create Operator: Emma Davis (username: emma, email: emma@foodstock.local, password: Emma@123, role: OPERATOR, assign to Store only)"
         },
         {
           "id": "p1-17",
@@ -100,7 +100,7 @@
       "items": [
         {
           "id": "p2-1",
-          "label": "Login as Mike Williams (mike@foodstock.local)"
+          "label": "Login as Mike Williams (mike@foodstock.local / Mike@123)"
         },
         {
           "id": "p2-2",
@@ -203,7 +203,7 @@
       "items": [
         {
           "id": "p3-1",
-          "label": "Login as Emma Davis (emma@foodstock.local)"
+          "label": "Login as Emma Davis (emma@foodstock.local / Emma@123)"
         },
         {
           "id": "p3-2",
@@ -274,7 +274,7 @@
       "items": [
         {
           "id": "p4-1",
-          "label": "Login as Mike Williams"
+          "label": "Login as Mike Williams (mike@foodstock.local / Mike@123)"
         },
         {
           "id": "p4-2",
@@ -310,22 +310,6 @@
         },
         {
           "id": "p4-10",
-          "label": "Create manual NCR for damaged goods"
-        },
-        {
-          "id": "p4-11",
-          "label": "Select type: QUALITY, Item: Tomatoes, Qty: 5kg"
-        },
-        {
-          "id": "p4-12",
-          "label": "Add description: 'Received damaged - rejected at receiving'"
-        },
-        {
-          "id": "p4-13",
-          "label": "Submit NCR - Verify success"
-        },
-        {
-          "id": "p4-14",
           "label": "Logout as Mike"
         }
       ]
@@ -337,7 +321,7 @@
       "items": [
         {
           "id": "p5-1",
-          "label": "Login as Sarah Johnson (sarah@foodstock.local)"
+          "label": "Login as Sarah Johnson (sarah@foodstock.local / Sarah@123)"
         },
         {
           "id": "p5-2",
@@ -427,295 +411,244 @@
     },
     {
       "id": "phase-6",
-      "title": "Admin - Reports Review",
-      "description": "Admin verifies all reports show accurate data",
+      "title": "Supervisor - Reconciliation Adjustments",
+      "description": "Supervisor enters and saves adjustments for both locations",
       "items": [
         {
           "id": "p6-1",
-          "label": "Login as Admin"
+          "label": "Login as Sarah Johnson (sarah@foodstock.local / Sarah@123)"
         },
         {
           "id": "p6-2",
-          "label": "Navigate to Reports"
-        },
-        {
-          "id": "p6-3",
-          "label": "View Deliveries Report - Verify all deliveries listed"
-        },
-        {
-          "id": "p6-4",
-          "label": "Filter by location (Kitchen) - Verify only Kitchen deliveries shown"
-        },
-        {
-          "id": "p6-5",
-          "label": "Filter by supplier (Fresh Foods) - Verify correct filtering"
-        },
-        {
-          "id": "p6-6",
-          "label": "View Issues Report - Verify all issues listed"
-        },
-        {
-          "id": "p6-7",
-          "label": "View Stock Now Report - Verify current quantities"
-        },
-        {
-          "id": "p6-8",
-          "label": "Export a report to CSV - Verify file downloads"
-        },
-        {
-          "id": "p6-9",
-          "label": "Open CSV - Verify data matches screen"
-        },
-        {
-          "id": "p6-10",
-          "label": "Logout as Admin"
-        }
-      ]
-    },
-    {
-      "id": "phase-7",
-      "title": "Supervisor - Reconciliation",
-      "description": "Supervisor completes reconciliation for both locations",
-      "items": [
-        {
-          "id": "p7-1",
-          "label": "Login as Sarah Johnson"
-        },
-        {
-          "id": "p7-2",
           "label": "Navigate to Reconciliations"
         },
         {
-          "id": "p7-3",
+          "id": "p6-3",
           "label": "Select Kitchen location"
         },
         {
-          "id": "p7-4",
+          "id": "p6-4",
           "label": "Verify Opening Stock shows 0 (first period)"
         },
         {
-          "id": "p7-5",
-          "label": "Verify Receipts total matches delivery totals"
-        },
-        {
-          "id": "p7-6",
-          "label": "Verify Issues total matches issue totals"
-        },
-        {
-          "id": "p7-7",
-          "label": "Verify Transfer In/Out amounts correct"
-        },
-        {
-          "id": "p7-8",
+          "id": "p6-5",
           "label": "Enter Adjustments - Back-charges: SAR 50.00"
         },
         {
-          "id": "p7-9",
+          "id": "p6-6",
           "label": "Enter Condemnations: SAR 25.00"
         },
         {
-          "id": "p7-10",
+          "id": "p6-7",
           "label": "Save adjustments - Verify success"
         },
         {
-          "id": "p7-11",
+          "id": "p6-8",
           "label": "Verify Closing Stock calculation is correct"
         },
         {
-          "id": "p7-12",
-          "label": "Mark Kitchen as 'Ready' for period close"
-        },
-        {
-          "id": "p7-13",
+          "id": "p6-9",
           "label": "Switch to Store location reconciliation"
         },
         {
-          "id": "p7-14",
+          "id": "p6-10",
           "label": "Verify all Store figures are correct"
         },
         {
-          "id": "p7-15",
-          "label": "Mark Store as 'Ready' for period close"
+          "id": "p6-11",
+          "label": "Save Store adjustments (if any)"
         },
         {
-          "id": "p7-16",
+          "id": "p6-12",
           "label": "Navigate to Consolidated Reconciliation"
         },
         {
-          "id": "p7-17",
+          "id": "p6-13",
           "label": "Verify both locations displayed"
         },
         {
-          "id": "p7-18",
+          "id": "p6-14",
           "label": "Verify grand totals row shows combined figures"
         },
         {
-          "id": "p7-19",
+          "id": "p6-15",
           "label": "Logout as Sarah"
         }
       ]
     },
     {
-      "id": "phase-8",
+      "id": "phase-7",
       "title": "Admin - Period Close & New Period",
-      "description": "Admin closes the period and rolls forward",
+      "description": "Admin marks locations ready, closes the period, and creates a new one",
       "items": [
         {
-          "id": "p8-1",
-          "label": "Login as Admin"
+          "id": "p7-1",
+          "label": "Login as Admin (admin@foodstock.local / Admin@123)"
         },
         {
-          "id": "p8-2",
+          "id": "p7-2",
+          "label": "Navigate to Reconciliations - Kitchen"
+        },
+        {
+          "id": "p7-3",
+          "label": "Mark Kitchen as 'Ready' for period close"
+        },
+        {
+          "id": "p7-4",
+          "label": "Switch to Store reconciliation"
+        },
+        {
+          "id": "p7-5",
+          "label": "Mark Store as 'Ready' for period close"
+        },
+        {
+          "id": "p7-6",
           "label": "Navigate to Period Close"
         },
         {
-          "id": "p8-3",
+          "id": "p7-7",
           "label": "Verify both locations show 'READY' status"
         },
         {
-          "id": "p8-4",
+          "id": "p7-8",
           "label": "Click 'Close Period'"
         },
         {
-          "id": "p8-5",
+          "id": "p7-9",
           "label": "Confirm in modal"
         },
         {
-          "id": "p8-6",
+          "id": "p7-10",
           "label": "Verify period status changes to 'CLOSED'"
         },
         {
-          "id": "p8-7",
+          "id": "p7-11",
           "label": "Verify success toast notification"
         },
         {
-          "id": "p8-8",
+          "id": "p7-12",
           "label": "Navigate to Periods"
         },
         {
-          "id": "p8-9",
-          "label": "Click 'Roll Forward' on closed period"
+          "id": "p7-13",
+          "label": "Create a new period for next month"
         },
         {
-          "id": "p8-10",
-          "label": "Verify new period created for next month"
+          "id": "p7-14",
+          "label": "Set prices for new period (same or updated prices)"
         },
         {
-          "id": "p8-11",
-          "label": "Verify prices copied from previous period"
-        },
-        {
-          "id": "p8-12",
+          "id": "p7-15",
           "label": "Open the new period"
         },
         {
-          "id": "p8-13",
+          "id": "p7-16",
           "label": "Logout as Admin"
         }
       ]
     },
     {
-      "id": "phase-9",
+      "id": "phase-8",
       "title": "Operator - New Period Operations",
       "description": "Operator verifies carried-forward data and posts in new period",
       "items": [
         {
-          "id": "p9-1",
-          "label": "Login as Mike Williams"
+          "id": "p8-1",
+          "label": "Login as Mike Williams (mike@foodstock.local / Mike@123)"
         },
         {
-          "id": "p9-2",
+          "id": "p8-2",
           "label": "Navigate to Stock Now"
         },
         {
-          "id": "p9-3",
+          "id": "p8-3",
           "label": "Verify opening stock equals previous period's closing stock"
         },
         {
-          "id": "p9-4",
+          "id": "p8-4",
           "label": "Verify WAC carried forward correctly"
         },
         {
-          "id": "p9-5",
+          "id": "p8-5",
           "label": "Create a test delivery in new period"
         },
         {
-          "id": "p9-6",
+          "id": "p8-6",
           "label": "Add: Chicken 30kg @ SAR 25.00"
         },
         {
-          "id": "p9-7",
+          "id": "p8-7",
           "label": "Submit delivery - Verify it works"
         },
         {
-          "id": "p9-8",
+          "id": "p8-8",
           "label": "Navigate to Stock Now - Verify stock updated"
         },
         {
-          "id": "p9-9",
+          "id": "p8-9",
           "label": "Logout as Mike"
         }
       ]
     },
     {
-      "id": "phase-10",
+      "id": "phase-9",
       "title": "Admin - Edit & Delete Operations",
       "description": "Admin tests editing and deleting records",
       "items": [
         {
-          "id": "p10-1",
-          "label": "Login as Admin"
+          "id": "p9-1",
+          "label": "Login as Admin (admin@foodstock.local / Admin@123)"
         },
         {
-          "id": "p10-2",
+          "id": "p9-2",
           "label": "Navigate to Items - Click on Chicken Breast"
         },
         {
-          "id": "p10-3",
+          "id": "p9-3",
           "label": "Click Edit - Change description"
         },
         {
-          "id": "p10-4",
+          "id": "p9-4",
           "label": "Save - Verify changes saved"
         },
         {
-          "id": "p10-5",
+          "id": "p9-5",
           "label": "Navigate to Suppliers - Edit Fresh Foods contact info"
         },
         {
-          "id": "p10-6",
+          "id": "p9-6",
           "label": "Save - Verify changes saved"
         },
         {
-          "id": "p10-7",
+          "id": "p9-7",
           "label": "Navigate to Locations - Edit Kitchen address"
         },
         {
-          "id": "p10-8",
+          "id": "p9-8",
           "label": "Save - Verify changes saved"
         },
         {
-          "id": "p10-9",
+          "id": "p9-9",
           "label": "Navigate to Users - Edit operator's name"
         },
         {
-          "id": "p10-10",
+          "id": "p9-10",
           "label": "Save - Verify changes saved"
         },
         {
-          "id": "p10-11",
+          "id": "p9-11",
           "label": "Create a new test item"
         },
         {
-          "id": "p10-12",
+          "id": "p9-12",
           "label": "Delete the test item - Verify deletion"
         },
         {
-          "id": "p10-13",
+          "id": "p9-13",
           "label": "Deactivate Emma's user account - Verify deactivation"
         },
         {
-          "id": "p10-14",
+          "id": "p9-14",
           "label": "Reactivate Emma's user account - Verify reactivation"
         }
       ]

@@ -9,11 +9,16 @@
  * This component only renders the main app content after initialization.
  */
 const appInit = useAppInit();
+
+// Configure toast notifications position
+const toaster = {
+  position: "bottom-center" as const,
+};
 </script>
 
 <template>
   <!-- Main App Content - renders after app initialization -->
-  <UApp v-if="appInit.isReady.value">
+  <UApp v-if="appInit.isReady.value" :toaster="toaster">
     <OfflineBanner />
     <NuxtLayout>
       <NuxtPage />

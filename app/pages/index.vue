@@ -207,6 +207,10 @@ const metricCards = computed(() => {
 
   const { totals } = dashboardData.value;
 
+  // Calculate mandays cost (total issues / total mandays)
+  const mandaysCost =
+    totals.total_mandays > 0 ? totals.total_issues / totals.total_mandays : 0;
+
   return [
     {
       label: "Total Receipts",
@@ -227,6 +231,12 @@ const metricCards = computed(() => {
       color: "success" as const,
     },
     {
+      label: "Mandays Cost",
+      value: formatCurrency(mandaysCost),
+      icon: "wallet",
+      color: "warning" as const,
+    },
+    {
       label: "Days Left in Period",
       value: (totals.days_left || 0).toString(),
       icon: "calendar-days",
@@ -240,6 +250,12 @@ const consolidatedMetricCards = computed(() => {
   if (!consolidatedData.value?.global_totals) return [];
 
   const { global_totals } = consolidatedData.value;
+
+  // Calculate mandays cost (total issues / total mandays)
+  const mandaysCost =
+    global_totals.total_mandays > 0
+      ? global_totals.total_issues / global_totals.total_mandays
+      : 0;
 
   return [
     {
@@ -259,6 +275,12 @@ const consolidatedMetricCards = computed(() => {
       value: (global_totals.total_mandays || 0).toString(),
       icon: "users",
       color: "success" as const,
+    },
+    {
+      label: "Mandays Cost",
+      value: formatCurrency(mandaysCost),
+      icon: "wallet",
+      color: "warning" as const,
     },
     {
       label: "Days Left in Period",
@@ -505,40 +527,8 @@ const navigateToLocation = (locationId: string) => {
 
     <!-- Single Location Dashboard Content -->
     <template v-if="viewMode === 'location' && dashboardData && !loading">
-      <!-- Quick Actions -->
-      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-        <div class="flex items-center gap-2 mb-4">
-          <UIcon name="i-lucide-zap" class="w-5 h-5 text-primary" />
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Quick Actions</h2>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <button
-            v-for="action in quickActions"
-            :key="action.route"
-            class="group relative overflow-hidden rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 text-left smooth-transition hover:shadow-md hover:border-[var(--ui-border-accented)] focus:outline-none focus-ring cursor-pointer"
-            @click="handleQuickAction(action.route)"
-          >
-            <div class="relative z-10">
-              <div
-                class="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg mb-3 sm:mb-4 bg-gradient-to-br smooth-transition"
-                :class="action.gradient"
-              >
-                <UIcon :name="`i-lucide-${action.icon}`" class="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <h3 class="text-base sm:text-lg font-semibold text-[var(--ui-text-highlighted)] mb-1">
-                {{ action.label }}
-              </h3>
-              <p class="text-xs sm:text-sm text-[var(--ui-text-muted)]">
-                {{ action.description }}
-              </p>
-            </div>
-          </button>
-        </div>
-      </UCard>
-
       <!-- Metric Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <DashboardMetricCard
           v-for="(card, index) in metricCards"
           :key="index"
@@ -568,12 +558,44 @@ const navigateToLocation = (locationId: string) => {
           view-all-route="/issues"
         />
       </div>
+
+      <!-- Quick Actions -->
+      <UCard class="card-elevated" :ui="{ body: 'p-3' }">
+        <div class="flex items-center gap-2 mb-3">
+          <UIcon name="i-lucide-zap" class="w-4 h-4 text-primary" />
+          <h2 class="text-base font-semibold text-[var(--ui-text)]">Quick Actions</h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button
+            v-for="action in quickActions"
+            :key="action.route"
+            class="group flex items-center gap-2 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-2.5 text-left smooth-transition hover:shadow-sm hover:border-[var(--ui-border-accented)] focus:outline-none focus-ring cursor-pointer"
+            @click="handleQuickAction(action.route)"
+          >
+            <div
+              class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-md bg-gradient-to-br"
+              :class="action.gradient"
+            >
+              <UIcon :name="`i-lucide-${action.icon}`" class="w-4 h-4 text-white" />
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-sm font-medium text-[var(--ui-text-highlighted)] truncate">
+                {{ action.label }}
+              </h3>
+              <p class="text-xs text-[var(--ui-text-muted)] truncate hidden sm:block">
+                {{ action.description }}
+              </p>
+            </div>
+          </button>
+        </div>
+      </UCard>
     </template>
 
     <!-- Consolidated Dashboard Content -->
     <template v-if="viewMode === 'consolidated' && consolidatedData && !loading">
       <!-- Global Metric Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <DashboardMetricCard
           v-for="(card, index) in consolidatedMetricCards"
           :key="index"

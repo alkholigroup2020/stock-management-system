@@ -358,8 +358,8 @@ const formattedDateRange = computed(() => {
         class="cursor-pointer rounded-full px-3 sm:px-6"
         to="/reconciliations/consolidated"
       >
-        <span class="hidden sm:inline">View Consolidated</span>
-        <span class="sm:hidden">All</span>
+        <span class="hidden sm:inline">Consolidated Reconciliation</span>
+        <span class="sm:hidden">Consolidated</span>
       </UButton>
     </div>
 
