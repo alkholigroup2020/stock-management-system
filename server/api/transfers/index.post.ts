@@ -21,7 +21,6 @@
 
 import prisma from "../../utils/prisma";
 import { z } from "zod";
-import { validateAndThrowIfInsufficientStock } from "../../utils/stockValidation";
 import type { UserRole } from "@prisma/client";
 
 // User session type
@@ -116,10 +115,45 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check if from location exists
-    const fromLocation = await prisma.location.findUnique({
-      where: { id: data.from_location_id },
-    });
+    // Extract item IDs for batch query
+    const itemIds = data.lines.map((line) => line.item_id);
+
+    // OPTIMIZATION: Batch all validation queries into a single parallel fetch
+    const [fromLocation, toLocation, userLocation, items, stockRecords] = await Promise.all([
+      // Check if from location exists
+      prisma.location.findUnique({
+        where: { id: data.from_location_id },
+      }),
+      // Check if to location exists
+      prisma.location.findUnique({
+        where: { id: data.to_location_id },
+      }),
+      // For operators, check location access
+      user.role === "OPERATOR"
+        ? prisma.userLocation.findUnique({
+            where: {
+              user_id_location_id: {
+                user_id: user.id,
+                location_id: data.from_location_id,
+              },
+            },
+          })
+        : Promise.resolve({ location_id: data.from_location_id }), // Non-null for admins/supervisors
+      // Verify items exist and are active
+      prisma.item.findMany({
+        where: {
+          id: { in: itemIds },
+          is_active: true,
+        },
+      }),
+      // Get stock levels and WACs for all items at source location
+      prisma.locationStock.findMany({
+        where: {
+          location_id: data.from_location_id,
+          item_id: { in: itemIds },
+        },
+      }),
+    ]);
 
     if (!fromLocation) {
       throw createError({
@@ -131,11 +165,6 @@ export default defineEventHandler(async (event) => {
         },
       });
     }
-
-    // Check if to location exists
-    const toLocation = await prisma.location.findUnique({
-      where: { id: data.to_location_id },
-    });
 
     if (!toLocation) {
       throw createError({
@@ -149,37 +178,17 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check user has access to source location (Operators need explicit assignment)
-    if (user.role === "OPERATOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: data.from_location_id,
-          },
+    if (user.role === "OPERATOR" && !userLocation) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        data: {
+          code: "LOCATION_ACCESS_DENIED",
+          message: "You do not have access to the source location",
         },
       });
-
-      if (!userLocation) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden",
-          data: {
-            code: "LOCATION_ACCESS_DENIED",
-            message: "You do not have access to the source location",
-          },
-        });
-      }
     }
     // Admins and Supervisors have implicit access to all locations
-
-    // Verify all items exist
-    const itemIds = data.lines.map((line) => line.item_id);
-    const items = await prisma.item.findMany({
-      where: {
-        id: { in: itemIds },
-        is_active: true,
-      },
-    });
 
     if (items.length !== itemIds.length) {
       throw createError({
@@ -193,21 +202,36 @@ export default defineEventHandler(async (event) => {
     }
 
     // Validate sufficient stock for all items at source location
-    await validateAndThrowIfInsufficientStock(
-      data.from_location_id,
-      data.lines.map((line) => ({
-        itemId: line.item_id,
-        quantity: line.quantity,
-      }))
-    );
-
-    // Get stock levels and WACs for all items at source location
-    const stockRecords = await prisma.locationStock.findMany({
-      where: {
-        location_id: data.from_location_id,
-        item_id: { in: itemIds },
-      },
+    // Use the already-fetched stockRecords instead of making another DB call
+    const stockMap = new Map<string, number>();
+    stockRecords.forEach((stock) => {
+      stockMap.set(stock.item_id, parseFloat(stock.on_hand.toString()));
     });
+
+    const insufficientStock: Array<{ item: string; requested: number; available: number }> = [];
+    for (const line of data.lines) {
+      const available = stockMap.get(line.item_id) || 0;
+      if (line.quantity > available) {
+        const item = items.find((i) => i.id === line.item_id);
+        insufficientStock.push({
+          item: item?.name || line.item_id,
+          requested: line.quantity,
+          available,
+        });
+      }
+    }
+
+    if (insufficientStock.length > 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "INSUFFICIENT_STOCK",
+          message: "Insufficient stock for one or more items",
+          details: insufficientStock,
+        },
+      });
+    }
 
     // Create a map of item_id -> WAC
     const wacMap = new Map<string, number>();

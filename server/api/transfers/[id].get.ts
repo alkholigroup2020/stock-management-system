@@ -54,8 +54,9 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Fetch transfer with all related data
-    const transfer = await prisma.transfer.findUnique({
+    // OPTIMIZATION: Fetch transfer and user's location access in parallel
+    // For operators, pre-fetch their location assignments
+    const transferPromise = prisma.transfer.findUnique({
       where: { id: transferId },
       include: {
         from_location: {
@@ -103,14 +104,22 @@ export default defineEventHandler(async (event) => {
               },
             },
           },
-          orderBy: {
-            item: {
-              name: "asc",
-            },
-          },
+          // NOTE: Removed nested orderBy on item.name for performance
+          // Sorting is done in JavaScript below
         },
       },
     });
+
+    // For operators, also fetch their location assignments in parallel
+    const userLocationsPromise =
+      user.role !== "ADMIN" && user.role !== "SUPERVISOR"
+        ? prisma.userLocation.findMany({
+            where: { user_id: user.id },
+            select: { location_id: true },
+          })
+        : Promise.resolve([]);
+
+    const [transfer, userLocations] = await Promise.all([transferPromise, userLocationsPromise]);
 
     if (!transfer) {
       throw createError({
@@ -126,16 +135,13 @@ export default defineEventHandler(async (event) => {
     // Check if user has access to at least one of the transfer's locations
     // Admin and Supervisor have access to all transfers
     if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
-      const userLocations = await prisma.userLocation.findMany({
-        where: {
-          user_id: user.id,
-          location_id: {
-            in: [transfer.from_location_id, transfer.to_location_id],
-          },
-        },
-      });
+      const hasAccess = userLocations.some(
+        (ul) =>
+          ul.location_id === transfer.from_location_id ||
+          ul.location_id === transfer.to_location_id
+      );
 
-      if (userLocations.length === 0) {
+      if (!hasAccess) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",
@@ -164,13 +170,16 @@ export default defineEventHandler(async (event) => {
         to_location: transfer.to_location,
         requester: transfer.requester,
         approver: transfer.approver,
-        lines: transfer.transfer_lines.map((line) => ({
-          id: line.id,
-          item: line.item,
-          quantity: line.quantity,
-          wac_at_transfer: line.wac_at_transfer,
-          line_value: line.line_value,
-        })),
+        // Sort transfer lines by item name in JavaScript (faster than nested SQL ordering)
+        lines: [...transfer.transfer_lines]
+          .sort((a, b) => (a.item?.name || "").localeCompare(b.item?.name || ""))
+          .map((line) => ({
+            id: line.id,
+            item: line.item,
+            quantity: line.quantity,
+            wac_at_transfer: line.wac_at_transfer,
+            line_value: line.line_value,
+          })),
         summary: {
           total_lines: transfer.transfer_lines.length,
           total_items: transfer.transfer_lines.reduce(

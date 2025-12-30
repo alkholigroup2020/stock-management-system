@@ -69,19 +69,29 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const data = bodySchema.parse(body);
 
-    // Fetch existing NCR
-    const ncr = await prisma.nCR.findUnique({
-      where: { id },
-      include: {
-        location: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
+    // OPTIMIZATION: Fetch NCR and user's location access in parallel
+    const [ncr, userLocation] = await Promise.all([
+      // Fetch existing NCR
+      prisma.nCR.findUnique({
+        where: { id },
+        include: {
+          location: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+            },
           },
         },
-      },
-    });
+      }),
+      // For operators, check location access
+      user.role === "OPERATOR"
+        ? prisma.userLocation.findMany({
+            where: { user_id: user.id },
+            select: { location_id: true },
+          })
+        : Promise.resolve([]),
+    ]);
 
     if (!ncr) {
       throw createError({
@@ -96,16 +106,9 @@ export default defineEventHandler(async (event) => {
 
     // Check if user has access to the NCR's location (Operators need explicit assignment)
     if (user.role === "OPERATOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: ncr.location_id,
-          },
-        },
-      });
+      const hasLocationAccess = userLocation.some((ul) => ul.location_id === ncr.location_id);
 
-      if (!userLocation) {
+      if (!hasLocationAccess) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",

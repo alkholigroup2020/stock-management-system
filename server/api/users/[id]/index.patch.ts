@@ -91,10 +91,30 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const validatedData = updateUserSchema.parse(body);
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // OPTIMIZATION: Batch all validation queries into a single parallel fetch
+    const [existingUser, emailCheck, locationCheck] = await Promise.all([
+      // Check if user exists
+      prisma.user.findUnique({
+        where: { id: userId },
+      }),
+      // If email is being updated, check if it's already taken
+      validatedData.email
+        ? prisma.user.findUnique({
+            where: { email: validatedData.email },
+            select: { id: true, email: true },
+          })
+        : Promise.resolve(null),
+      // If default_location_id is provided, verify it exists
+      validatedData.default_location_id
+        ? prisma.location.findUnique({
+            where: {
+              id: validatedData.default_location_id,
+              is_active: true,
+            },
+            select: { id: true },
+          })
+        : Promise.resolve({ id: "skip" }), // Non-null placeholder for "not checking"
+    ]);
 
     if (!existingUser) {
       throw createError({
@@ -107,43 +127,28 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // If email is being updated, check if it's already taken by another user
-    if (validatedData.email && validatedData.email !== existingUser.email) {
-      const emailExists = await prisma.user.findUnique({
-        where: { email: validatedData.email },
-      });
-
-      if (emailExists) {
-        throw createError({
-          statusCode: 409,
-          statusMessage: "Conflict",
-          data: {
-            code: "EMAIL_EXISTS",
-            message: "Email is already registered",
-          },
-        });
-      }
-    }
-
-    // If default_location_id is provided, verify it exists
-    if (validatedData.default_location_id) {
-      const locationExists = await prisma.location.findUnique({
-        where: {
-          id: validatedData.default_location_id,
-          is_active: true,
+    // Check email uniqueness (only if email changed)
+    if (validatedData.email && validatedData.email !== existingUser.email && emailCheck) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: "Conflict",
+        data: {
+          code: "EMAIL_EXISTS",
+          message: "Email is already registered",
         },
       });
+    }
 
-      if (!locationExists) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Not Found",
-          data: {
-            code: "LOCATION_NOT_FOUND",
-            message: "Default location not found or inactive",
-          },
-        });
-      }
+    // Check location exists (only if location was provided)
+    if (validatedData.default_location_id && !locationCheck) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Not Found",
+        data: {
+          code: "LOCATION_NOT_FOUND",
+          message: "Default location not found or inactive",
+        },
+      });
     }
 
     // Prepare update data

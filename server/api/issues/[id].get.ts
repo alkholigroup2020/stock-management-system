@@ -42,8 +42,9 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Fetch issue with all related data
-    const issue = await prisma.issue.findUnique({
+    // OPTIMIZATION: Fetch issue and user's location access in parallel
+    // For operators, pre-fetch their location assignments
+    const issuePromise = prisma.issue.findUnique({
       where: { id: issueId },
       include: {
         location: {
@@ -90,6 +91,17 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // For operators, also fetch their location assignments in parallel
+    const userLocationsPromise =
+      user.role !== "ADMIN" && user.role !== "SUPERVISOR"
+        ? prisma.userLocation.findMany({
+            where: { user_id: user.id },
+            select: { location_id: true },
+          })
+        : Promise.resolve([]);
+
+    const [issue, userLocations] = await Promise.all([issuePromise, userLocationsPromise]);
+
     if (!issue) {
       throw createError({
         statusCode: 404,
@@ -104,16 +116,9 @@ export default defineEventHandler(async (event) => {
     // Check if user has access to the issue's location
     // Admin and Supervisor have access to all locations
     if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: issue.location_id,
-          },
-        },
-      });
+      const hasLocationAccess = userLocations.some((ul) => ul.location_id === issue.location_id);
 
-      if (!userLocation) {
+      if (!hasLocationAccess) {
         throw createError({
           statusCode: 403,
           statusMessage: "Forbidden",

@@ -66,10 +66,26 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check if item exists
-    const item = await prisma.item.findUnique({
-      where: { id: itemId },
-    });
+    // Parse and validate request body
+    const body = await readBody(event);
+    const { price, period_id } = updatePriceSchema.parse(body);
+
+    // OPTIMIZATION: Batch item and period queries into parallel fetch
+    const [item, period] = await Promise.all([
+      // Check if item exists
+      prisma.item.findUnique({
+        where: { id: itemId },
+      }),
+      // Get period (use provided or find current open period)
+      period_id
+        ? prisma.period.findUnique({
+            where: { id: period_id },
+          })
+        : prisma.period.findFirst({
+            where: { status: "OPEN" },
+            orderBy: { start_date: "desc" },
+          }),
+    ]);
 
     if (!item) {
       throw createError({
@@ -90,24 +106,6 @@ export default defineEventHandler(async (event) => {
           code: "ITEM_INACTIVE",
           message: "Cannot set price for inactive item",
         },
-      });
-    }
-
-    // Parse and validate request body
-    const body = await readBody(event);
-    const { price, period_id } = updatePriceSchema.parse(body);
-
-    // Get period (use provided or find current open period)
-    let period;
-    if (period_id) {
-      period = await prisma.period.findUnique({
-        where: { id: period_id },
-      });
-    } else {
-      // Find current open period
-      period = await prisma.period.findFirst({
-        where: { status: "OPEN" },
-        orderBy: { start_date: "desc" },
       });
     }
 

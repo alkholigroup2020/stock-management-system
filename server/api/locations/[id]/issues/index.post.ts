@@ -116,10 +116,46 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const data = bodySchema.parse(body);
 
-    // Check if location exists
-    const location = await prisma.location.findUnique({
-      where: { id: locationId },
-    });
+    // Extract item IDs for batch query
+    const itemIds = data.lines.map((line) => line.item_id);
+
+    // OPTIMIZATION: Batch all validation queries into a single parallel fetch
+    const [location, userLocation, currentPeriod, items, currentStocks] = await Promise.all([
+      // Fetch location
+      prisma.location.findUnique({
+        where: { id: locationId },
+      }),
+      // For operators, check location access
+      user.role === "OPERATOR"
+        ? prisma.userLocation.findUnique({
+            where: {
+              user_id_location_id: {
+                user_id: user.id,
+                location_id: locationId,
+              },
+            },
+          })
+        : Promise.resolve({ location_id: locationId }), // Non-null for admins/supervisors
+      // Get current open period
+      prisma.period.findFirst({
+        where: { status: "OPEN" },
+        orderBy: { start_date: "desc" },
+      }),
+      // Verify items exist and are active
+      prisma.item.findMany({
+        where: {
+          id: { in: itemIds },
+          is_active: true,
+        },
+      }),
+      // Get current stock levels
+      prisma.locationStock.findMany({
+        where: {
+          location_id: locationId,
+          item_id: { in: itemIds },
+        },
+      }),
+    ]);
 
     if (!location) {
       throw createError({
@@ -133,34 +169,17 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check user has access to location (Operators need explicit assignment)
-    if (user.role === "OPERATOR") {
-      const userLocation = await prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: locationId,
-          },
+    if (user.role === "OPERATOR" && !userLocation) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        data: {
+          code: "LOCATION_ACCESS_DENIED",
+          message: "You do not have access to this location",
         },
       });
-
-      if (!userLocation) {
-        throw createError({
-          statusCode: 403,
-          statusMessage: "Forbidden",
-          data: {
-            code: "LOCATION_ACCESS_DENIED",
-            message: "You do not have access to this location",
-          },
-        });
-      }
     }
     // Admins and Supervisors have implicit access to all locations
-
-    // Get current open period (required for issues)
-    const currentPeriod = await prisma.period.findFirst({
-      where: { status: "OPEN" },
-      orderBy: { start_date: "desc" },
-    });
 
     if (!currentPeriod) {
       throw createError({
@@ -173,15 +192,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Verify all items exist and are active
-    const itemIds = data.lines.map((line) => line.item_id);
-    const items = await prisma.item.findMany({
-      where: {
-        id: { in: itemIds },
-        is_active: true,
-      },
-    });
-
     if (items.length !== itemIds.length) {
       throw createError({
         statusCode: 400,
@@ -192,14 +202,6 @@ export default defineEventHandler(async (event) => {
         },
       });
     }
-
-    // Get current stock levels for all items
-    const currentStocks = await prisma.locationStock.findMany({
-      where: {
-        location_id: locationId,
-        item_id: { in: itemIds },
-      },
-    });
 
     const stockMap = new Map<string, { on_hand: number; wac: number }>();
     currentStocks.forEach((stock) => {

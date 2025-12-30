@@ -116,7 +116,7 @@ export default defineEventHandler(async (event) => {
       is_active: user.is_active,
       created_at: user.created_at,
       default_location: user.default_location,
-      locations: user.user_locations.map((ul: any) => ({
+      locations: user.user_locations.map((ul) => ({
         location_id: ul.location_id,
         location: ul.location,
       })),

@@ -73,10 +73,20 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Check if user exists
-    const userToDelete = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // OPTIMIZATION: Batch user existence check and admin count into parallel fetch
+    const [userToDelete, adminCount] = await Promise.all([
+      // Check if user exists
+      prisma.user.findUnique({
+        where: { id: userId },
+      }),
+      // Get admin count (needed to prevent deleting last admin)
+      prisma.user.count({
+        where: {
+          role: "ADMIN",
+          is_active: true,
+        },
+      }),
+    ]);
 
     if (!userToDelete) {
       throw createError({
@@ -90,24 +100,15 @@ export default defineEventHandler(async (event) => {
     }
 
     // Prevent deleting the last admin
-    if (userToDelete.role === "ADMIN") {
-      const adminCount = await prisma.user.count({
-        where: {
-          role: "ADMIN",
-          is_active: true,
+    if (userToDelete.role === "ADMIN" && adminCount <= 1) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "CANNOT_DELETE_LAST_ADMIN",
+          message: "Cannot delete the last active admin user",
         },
       });
-
-      if (adminCount <= 1) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Bad Request",
-          data: {
-            code: "CANNOT_DELETE_LAST_ADMIN",
-            message: "Cannot delete the last active admin user",
-          },
-        });
-      }
     }
 
     // Delete user (this will cascade delete user_locations)
