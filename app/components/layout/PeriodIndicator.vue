@@ -43,27 +43,14 @@ const statusText = computed(() => {
     </div>
 
     <!-- Period Info -->
-    <div v-else-if="periodStore.currentPeriod" class="flex items-center gap-2">
-      <!-- Desktop & Tablet: Show period name and status only -->
-      <div class="hidden md:flex items-center gap-2">
-        <UIcon name="i-heroicons-calendar" class="text-muted" />
-        <span class="text-label font-medium">
-          {{ periodStore.periodName }}
-        </span>
-        <UBadge :color="badgeColor" variant="soft" size="xs">
-          {{ statusText }}
-        </UBadge>
-      </div>
-
-      <!-- Mobile: Just show icon with tooltip -->
-      <UTooltip :text="`${periodStore.periodName} - ${statusText}`" class="md:hidden">
-        <UButton
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-calendar"
-          :aria-label="periodStore.periodName"
-        />
-      </UTooltip>
+    <div v-else-if="periodStore.currentPeriod" class="flex items-center gap-1 sm:gap-2">
+      <UIcon name="i-heroicons-calendar" class="text-muted w-4 h-4" />
+      <span class="text-label font-medium text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">
+        {{ periodStore.periodName }}
+      </span>
+      <UBadge :color="badgeColor" variant="soft" size="xs" class="hidden sm:inline-flex">
+        {{ statusText }}
+      </UBadge>
     </div>
 
     <!-- No Period State -->

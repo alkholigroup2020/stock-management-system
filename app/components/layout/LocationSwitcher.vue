@@ -107,30 +107,21 @@ const currentLocationIcon = computed(() => {
     <UDropdownMenu
       v-else-if="currentLocation"
       :items="locationItems"
-      :content="{ side: 'bottom', align: 'start' }"
+      :content="{ side: 'bottom', align: 'center' }"
     >
       <template #default>
-        <!-- Desktop: Show full name -->
         <UButton
           color="neutral"
           variant="ghost"
-          :label="currentLocation.name"
           trailing-icon="i-lucide-chevron-down"
-          class="hidden sm:flex text-label"
+          class="cursor-pointer text-label"
         >
           <template #leading>
             <UIcon :name="currentLocationIcon" class="w-4 h-4" />
           </template>
+          <!-- Show name on all screen sizes -->
+          <span class="truncate max-w-[100px] sm:max-w-none">{{ currentLocation.name }}</span>
         </UButton>
-
-        <!-- Mobile: Just show icon -->
-        <UButton
-          color="neutral"
-          variant="ghost"
-          :icon="currentLocationIcon"
-          :aria-label="currentLocation.name"
-          class="sm:hidden"
-        />
       </template>
 
       <template #item="{ item }">

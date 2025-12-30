@@ -303,21 +303,46 @@ onUnmounted(() => {
     >
       <!-- Logo Header -->
       <template #header="{ collapsed }">
+        <!-- Expanded: Logo + Text -->
         <NuxtLink
+          v-if="!collapsed"
           to="/"
           aria-label="Go to dashboard"
-          class="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
+          class="group flex items-center gap-3 px-2 py-3 rounded-lg transition-all duration-200 cursor-pointer hover:bg-elevated/50"
         >
-          <img
-            src="~/assets/css/icons/app-icon.svg"
-            alt="Stock Management System"
-            class="w-10 h-10 rounded-lg"
-          />
-          <div v-if="!collapsed" class="flex flex-col min-w-0">
-            <span class="text-label truncate">Stock</span>
-            <span class="text-caption truncate">Management</span>
+          <div class="relative flex-shrink-0 w-11 h-11">
+            <img
+              src="~/assets/css/icons/app-icon.svg"
+              alt="Stock Management System"
+              class="w-full h-full object-cover rounded-xl"
+            />
+          </div>
+          <div class="flex flex-col min-w-0 flex-1">
+            <span
+              class="text-base font-bold text-primary truncate group-hover:text-emerald-400 transition-colors duration-200"
+            >
+              Stock Management
+            </span>
+            <span class="text-xs text-muted truncate">Inventory System</span>
           </div>
         </NuxtLink>
+
+        <!-- Collapsed: Logo only, centered -->
+        <div v-else class="flex justify-center w-full px-0">
+          <NuxtLink
+            to="/"
+            aria-label="Go to dashboard"
+            class="group p-2 rounded-lg transition-all duration-200 cursor-pointer hover:bg-elevated/50"
+          >
+            <div class="relative w-10 h-10">
+              <img
+                src="~/assets/css/icons/app-icon.svg"
+                alt="Stock Management System"
+                class="w-full h-full object-cover rounded-xl"
+              />
+            </div>
+          </NuxtLink>
+        </div>
       </template>
 
       <!-- Navigation Menu -->
@@ -342,7 +367,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Center section: Location and Period indicators -->
-          <div class="hidden md:flex items-center gap-4 flex-1 justify-center">
+          <div class="flex items-center gap-2 sm:gap-4 flex-1 justify-center">
             <!-- Location Switcher -->
             <LayoutLocationSwitcher />
 
