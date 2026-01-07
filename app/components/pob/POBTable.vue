@@ -37,16 +37,16 @@ const columns = [
   {
     key: "date",
     label: "Date",
-    class: "font-medium",
+    class: "font-medium text-left",
   },
   {
     key: "crew_count",
-    label: "Crew Count",
+    label: "Mandays",
     class: "text-center",
   },
   {
     key: "extra_count",
-    label: "Extra Count",
+    label: "Visitors Meals",
     class: "text-center",
   },
   {
@@ -119,7 +119,7 @@ function handleChange(dateStr: string) {
               :key="column.key"
               scope="col"
               :class="[
-                'px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider',
+                'px-4 py-3 text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider',
                 column.class,
               ]"
             >
@@ -153,7 +153,7 @@ function handleChange(dateStr: string) {
             <!-- Crew Count -->
             <td class="px-4 py-3 whitespace-nowrap text-center">
               <label :for="`crew-${dateStr}`" class="sr-only">
-                Crew count for {{ formatDateForLabel(dateStr) }}
+                Mandays for {{ formatDateForLabel(dateStr) }}
               </label>
               <UInput
                 :id="`crew-${dateStr}`"
@@ -173,7 +173,7 @@ function handleChange(dateStr: string) {
             <!-- Extra Count -->
             <td class="px-4 py-3 whitespace-nowrap text-center">
               <label :for="`extra-${dateStr}`" class="sr-only">
-                Extra count for {{ formatDateForLabel(dateStr) }}
+                Visitors Meals for {{ formatDateForLabel(dateStr) }}
               </label>
               <UInput
                 :id="`extra-${dateStr}`"
