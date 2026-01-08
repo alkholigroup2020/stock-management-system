@@ -150,80 +150,6 @@ watch(
       </div>
     </section>
 
-    <!-- PRF/PO Approval Section -->
-    <section
-      id="supervisor-section-prf"
-      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
-    >
-      <button
-        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
-        @click="toggleSection('prf')"
-      >
-        <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-clipboard-document-check" class="text-[var(--ui-primary)] text-xl" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">PRF & Purchase Orders</span>
-        </span>
-        <UIcon
-          :name="isExpanded('prf') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
-          class="text-[var(--ui-text-muted)]"
-        />
-      </button>
-      <div v-if="isExpanded('prf')" class="p-4 space-y-4">
-        <!-- Section Introduction -->
-        <p class="text-sm text-[var(--ui-text-muted)]">
-          Purchase Requisition Forms (PRFs) are requests from locations to procure items. Operators
-          create PRFs when stock is needed. Supervisors review and approve PRFs, then convert them
-          into Purchase Orders (POs) that can be sent to suppliers. This workflow ensures proper
-          authorization before any purchasing commitment is made.
-        </p>
-
-        <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Workflow</h4>
-          <div class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)] flex-wrap mb-2">
-            <UBadge color="neutral" variant="subtle">DRAFT</UBadge>
-            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
-            <UBadge color="warning" variant="subtle">PENDING</UBadge>
-            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
-            <UBadge color="success" variant="subtle">APPROVED</UBadge>
-            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
-            <UBadge color="primary" variant="subtle">PO CREATED</UBadge>
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Reviewing PRFs</h4>
-          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>PRF</strong> in the left menu</li>
-            <li>Filter by status <strong>Pending</strong></li>
-            <li>Click on a PRF to view details</li>
-            <li>Review requested items, quantities, and justification</li>
-            <li>Check current stock levels to verify need</li>
-          </ol>
-        </div>
-
-        <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Creating a Purchase Order</h4>
-          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
-            After approving a PRF, convert it to a PO to formalize the purchase:
-          </p>
-          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Open the approved PRF</li>
-            <li>Click <strong>Create PO</strong></li>
-            <li>Select the <strong>Supplier</strong></li>
-            <li>Verify or adjust quantities and prices</li>
-            <li>Click <strong>Create Purchase Order</strong></li>
-          </ol>
-        </div>
-
-        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
-          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
-            <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
-            <span>POs can be printed or exported to send to suppliers. When goods arrive, create a Delivery referencing the PO for tracking.</span>
-          </p>
-        </div>
-      </div>
-    </section>
-
     <!-- Reconciliations Section -->
     <section
       id="supervisor-section-reconciliations"
@@ -301,15 +227,15 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Marking Location Ready</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Confirming Reconciliation</h4>
           <p class="text-sm text-[var(--ui-text-muted)] mb-2">
-            When reconciliation is complete and adjustments are entered, mark the location as ready
+            When reconciliation is complete and adjustments are entered, confirm the reconciliation
             for period close:
           </p>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Verify all transactions are posted (no drafts)</li>
             <li>Verify all adjustments are entered and explained</li>
-            <li>Click <strong>Mark Ready</strong></li>
+            <li>Click <strong>Confirm Reconciliation</strong></li>
           </ol>
           <div class="mt-2 p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
             <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">

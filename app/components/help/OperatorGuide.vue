@@ -198,7 +198,7 @@ watch(
             <li>Select the <strong>Issue Date</strong></li>
             <li>Select the <strong>Cost Centre</strong> (where the stock is going)</li>
             <li>Add items with quantities to issue</li>
-            <li>Review and click <strong>Post Issue</strong> to finalize</li>
+            <li>Review and click <strong>Create Issue</strong> to finalize</li>
           </ol>
         </div>
 
@@ -273,7 +273,7 @@ watch(
             <li>Select <strong>Destination Location</strong> (where stock goes to)</li>
             <li>Add items with quantities to transfer</li>
             <li>Add a <strong>Reason</strong> explaining why the transfer is needed</li>
-            <li>Click <strong>Submit for Approval</strong></li>
+            <li>Click <strong>Create Transfer</strong></li>
           </ol>
         </div>
 
@@ -386,15 +386,15 @@ watch(
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Understanding POB Fields</h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Crew Count:</strong> Regular staff/crew present at the location for that day.
+              <strong>Mandays:</strong> Regular staff/crew present at the location for that day.
             </li>
             <li>
-              <strong>Extra Count:</strong> Additional personnel such as visitors, contractors, or
+              <strong>Visitors Meals:</strong> Additional personnel such as visitors, contractors, or
               temporary staff who consume meals/resources.
             </li>
             <li>
-              <strong>Total:</strong> Automatically calculated as Crew + Extra. This is the number
-              used for mandays calculation.
+              <strong>Total:</strong> Automatically calculated as Mandays + Visitors Meals. This is the number
+              used for cost-per-person calculations.
             </li>
           </ul>
         </div>
@@ -404,8 +404,8 @@ watch(
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Click <strong>POB</strong> in the left menu</li>
             <li>Find the date you want to enter (current month is shown)</li>
-            <li>Enter <strong>Crew Count</strong> for that day</li>
-            <li>Enter <strong>Extra Count</strong> if applicable (or leave as 0)</li>
+            <li>Enter <strong>Mandays</strong> for that day</li>
+            <li>Enter <strong>Visitors Meals</strong> if applicable (or leave as 0)</li>
             <li>Total is calculated automatically</li>
             <li>Move to the next field - entries <strong>auto-save</strong></li>
           </ol>
@@ -604,7 +604,7 @@ watch(
       <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
-          <span>Enter today's POB count (Crew + Extra)</span>
+          <span>Enter today's POB count (Mandays + Visitors Meals)</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />

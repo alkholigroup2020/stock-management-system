@@ -133,7 +133,7 @@ const searchableContent = computed(() => {
       targetSection: "",
       title: "Permissions Matrix",
       content:
-        "View the complete permissions matrix showing what features you can access. Dashboard, POB, Items, Deliveries, Issues, NCR, Stock, Reconciliations, Transfers, PRF, PO, Period Prices, Period Close, User management, Location management.",
+        "View the complete permissions matrix showing what features you can access. Dashboard, POB, Items, Deliveries, Issues, NCR, Stock, Reconciliations, Transfers, Period Prices, Period Close, User management, Location management.",
       icon: "i-heroicons-shield-check",
     });
   }
@@ -158,7 +158,7 @@ const searchableContent = computed(() => {
         targetSection: "issues",
         title: "Issues and Stock Usage",
         content:
-          "Create new issue by clicking Issues menu, then New Issue. Select issue date and cost centre. Add items with quantities. Cannot issue more than available stock. Post issue to finalize and deduct from inventory.",
+          "Create new issue by clicking Issues menu, then Create Issue. Select issue date and cost centre. Add items with quantities. Cannot issue more than available stock. Submit to finalize and deduct from inventory.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -188,7 +188,7 @@ const searchableContent = computed(() => {
         targetSection: "pob",
         title: "POB Entry",
         content:
-          "Enter daily crew counts by clicking POB menu. Enter crew count and extra count for each day. Total calculated automatically. Entries auto-save when moving to next field. View period totals at top of page.",
+          "Enter daily counts by clicking POB menu. Enter mandays and visitors meals for each day. Total calculated automatically. Entries auto-save when moving to next field. View period totals at top of page.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -225,16 +225,6 @@ const searchableContent = computed(() => {
         title: "Transfer Management",
         content:
           "Review pending transfers by clicking Transfers menu. Filter by Pending Approval status. Approve transfer to move stock immediately between locations. Reject transfer with reason if not appropriate. Transfer workflow: Draft, Pending Approval, Approved or Rejected, Completed.",
-        icon: "i-heroicons-clipboard-document-check",
-      },
-      {
-        id: "sup-prf",
-        section: "Supervisor Guide",
-        sectionId: "supervisor-guide",
-        targetSection: "prf",
-        title: "PRF and Purchase Orders",
-        content:
-          "Review and approve Purchase Requisition Forms. Create Purchase Orders from approved PRFs. Select supplier, verify quantities and prices. Track PO status and link to deliveries when goods arrive.",
         icon: "i-heroicons-clipboard-document-check",
       },
       {

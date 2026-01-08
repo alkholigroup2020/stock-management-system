@@ -39,10 +39,6 @@
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>Approve purchase requisitions (PRF) and create POs</span>
-        </li>
-        <li class="flex items-center gap-2">
-          <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
           <span>All Operator tasks (deliveries, issues, POB, etc.)</span>
         </li>
       </ul>
@@ -112,18 +108,6 @@
               <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
             </tr>
             <tr>
-              <td class="p-3 text-[var(--ui-text)]">PRF (create)</td>
-              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">PRF (approve)</td>
-              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">PO (create)</td>
-              <td class="p-3 text-center"><UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" /></td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
               <td class="p-3 text-[var(--ui-text)]">Set Period Prices</td>
               <td class="p-3 text-center"><UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" /></td>
             </tr>
