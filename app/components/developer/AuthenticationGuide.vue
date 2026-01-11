@@ -485,7 +485,11 @@ async login(email, password) {
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Client-Side Login</h4>
-          <DeveloperCodeBlock :code="codeExamples.loginUsage" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.loginUsage"
+            language="typescript"
+            filename="app/pages/login.vue"
+          />
         </div>
 
         <div>
@@ -862,7 +866,11 @@ async login(email, password) {
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Post-Login Loading</h4>
-          <DeveloperCodeBlock :code="codeExamples.postLoginLoading" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.postLoginLoading"
+            language="typescript"
+            filename="app/stores/auth.ts"
+          />
         </div>
 
         <div class="space-y-3">

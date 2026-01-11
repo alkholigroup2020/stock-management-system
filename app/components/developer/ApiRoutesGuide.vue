@@ -305,7 +305,11 @@ export default defineEventHandler(async (event) => {
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Route Handler Example</h4>
-          <DeveloperCodeBlock :code="codeExamples.routeHandler" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.routeHandler"
+            language="typescript"
+            filename="server/api/items/index.get.ts"
+          />
         </div>
       </div>
     </section>

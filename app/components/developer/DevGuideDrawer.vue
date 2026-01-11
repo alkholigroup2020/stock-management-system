@@ -695,6 +695,11 @@ const navSections = [
     icon: "i-heroicons-rocket-launch",
   },
   {
+    id: "authentication",
+    label: "Authentication",
+    icon: "i-heroicons-lock-closed",
+  },
+  {
     id: "architecture",
     label: "Architecture",
     icon: "i-heroicons-squares-2x2",
@@ -713,11 +718,6 @@ const navSections = [
     id: "stores",
     label: "Stores",
     icon: "i-heroicons-circle-stack",
-  },
-  {
-    id: "authentication",
-    label: "Authentication",
-    icon: "i-heroicons-lock-closed",
   },
   {
     id: "api-routes",
@@ -825,11 +825,11 @@ const highlightMatch = (text: string, query: string): string => {
   <USlideover
     :open="props.open"
     side="right"
-    :ui="{ content: 'w-full lg:!w-[50vw] !max-w-none' }"
+    :ui="{ content: 'w-full lg:!w-[65vw] !max-w-none' }"
     @update:open="emit('update:open', $event)"
   >
     <template #content>
-      <div class="flex h-full w-full flex-col bg-[var(--ui-bg)]">
+      <div class="guide-content flex h-full w-full flex-col bg-[var(--ui-bg)]">
         <!-- Header -->
         <div
           class="flex items-center justify-between border-b border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] px-4 py-3"

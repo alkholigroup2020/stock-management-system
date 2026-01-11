@@ -536,7 +536,7 @@ const highlightMatch = (text: string, query: string): string => {
     @update:open="emit('update:open', $event)"
   >
     <template #content>
-      <div class="flex h-full flex-col bg-[var(--ui-bg)] w-full">
+      <div class="guide-content flex h-full flex-col bg-[var(--ui-bg)] w-full">
         <!-- Header -->
         <div
           class="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3 bg-[var(--ui-bg-elevated)]"

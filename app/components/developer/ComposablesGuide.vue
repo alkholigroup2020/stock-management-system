@@ -169,7 +169,11 @@ const newItem = await create({
           Provides authentication state and role checking:
         </p>
 
-        <DeveloperCodeBlock :code="codeExamples.useAuth" language="typescript" />
+        <DeveloperCodeBlock
+            :code="codeExamples.useAuth"
+            language="typescript"
+            filename="app/composables/useAuth.ts"
+          />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage Example</h4>
@@ -201,7 +205,11 @@ const newItem = await create({
           Role-based permission checks for features:
         </p>
 
-        <DeveloperCodeBlock :code="codeExamples.usePermissions" language="typescript" />
+        <DeveloperCodeBlock
+            :code="codeExamples.usePermissions"
+            language="typescript"
+            filename="app/composables/usePermissions.ts"
+          />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage in Navigation</h4>
@@ -231,7 +239,11 @@ const newItem = await create({
       <div v-if="isExpanded('toast')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">Toast notification system with semantic colors:</p>
 
-        <DeveloperCodeBlock :code="codeExamples.useAppToast" language="typescript" />
+        <DeveloperCodeBlock
+            :code="codeExamples.useAppToast"
+            language="typescript"
+            filename="app/composables/useAppToast.ts"
+          />
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
@@ -263,7 +275,11 @@ const newItem = await create({
       <div v-if="isExpanded('error')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">Centralized error handling with user-friendly messages:</p>
 
-        <DeveloperCodeBlock :code="codeExamples.useErrorHandler" language="typescript" />
+        <DeveloperCodeBlock
+            :code="codeExamples.useErrorHandler"
+            language="typescript"
+            filename="app/composables/useErrorHandler.ts"
+          />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Error Code Mapping</h4>
@@ -302,12 +318,20 @@ const newItem = await create({
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">useOnlineStatus</h4>
-          <DeveloperCodeBlock :code="codeExamples.useOnlineStatus" language="vue" />
+          <DeveloperCodeBlock
+            :code="codeExamples.useOnlineStatus"
+            language="vue"
+            filename="app/composables/useOnlineStatus.ts"
+          />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">useOfflineGuard</h4>
-          <DeveloperCodeBlock :code="codeExamples.useOfflineGuard" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.useOfflineGuard"
+            language="typescript"
+            filename="app/composables/useOfflineGuard.ts"
+          />
         </div>
       </div>
     </section>
@@ -333,7 +357,11 @@ const newItem = await create({
       <div v-if="isExpanded('cache')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">Client-side caching for master data:</p>
 
-        <DeveloperCodeBlock :code="codeExamples.useCache" language="typescript" />
+        <DeveloperCodeBlock
+          :code="codeExamples.useCache"
+          language="typescript"
+          filename="app/composables/useCache.ts"
+        />
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">

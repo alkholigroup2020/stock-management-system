@@ -189,7 +189,11 @@ function hasErrorCode(err: unknown, code: string): boolean {
           The project uses TypeScript strict mode with additional checks:
         </p>
 
-        <DeveloperCodeBlock :code="codeExamples.tsconfig" language="json" />
+        <DeveloperCodeBlock
+          :code="codeExamples.tsconfig"
+          language="json"
+          filename="tsconfig.json"
+        />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Requirements</h4>
@@ -259,7 +263,11 @@ function hasErrorCode(err: unknown, code: string): boolean {
           backend:
         </p>
 
-        <DeveloperCodeBlock :code="codeExamples.interfaces" language="typescript" />
+        <DeveloperCodeBlock
+          :code="codeExamples.interfaces"
+          language="typescript"
+          filename="shared/types/entities.ts"
+        />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Common Patterns</h4>

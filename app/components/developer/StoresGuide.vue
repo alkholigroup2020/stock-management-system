@@ -125,7 +125,11 @@ uiStore.sidebarCollapsed = !uiStore.sidebarCollapsed;`,
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <DeveloperCodeBlock :code="codeExamples.authState" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.authState"
+            language="typescript"
+            filename="app/stores/auth.ts"
+          />
         </div>
 
         <div>
@@ -183,7 +187,11 @@ uiStore.sidebarCollapsed = !uiStore.sidebarCollapsed;`,
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <DeveloperCodeBlock :code="codeExamples.locationState" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.locationState"
+            language="typescript"
+            filename="app/stores/location.ts"
+          />
         </div>
 
         <div>
@@ -233,7 +241,11 @@ uiStore.sidebarCollapsed = !uiStore.sidebarCollapsed;`,
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <DeveloperCodeBlock :code="codeExamples.periodState" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.periodState"
+            language="typescript"
+            filename="app/stores/period.ts"
+          />
         </div>
 
         <div>
@@ -291,12 +303,20 @@ uiStore.sidebarCollapsed = !uiStore.sidebarCollapsed;`,
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <DeveloperCodeBlock :code="codeExamples.uiState" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.uiState"
+            language="typescript"
+            filename="app/stores/ui.ts"
+          />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage</h4>
-          <DeveloperCodeBlock :code="codeExamples.uiUsage" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.uiUsage"
+            language="typescript"
+            filename="app/stores/ui.ts"
+          />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">

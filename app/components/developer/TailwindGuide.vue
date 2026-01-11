@@ -117,7 +117,11 @@ const codeExamples = {
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
             Configuration Location
           </h4>
-          <DeveloperCodeBlock :code="codeExamples.themeConfig" language="css" />
+          <DeveloperCodeBlock
+            :code="codeExamples.themeConfig"
+            language="css"
+            filename="app/assets/css/main.css"
+          />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
@@ -296,7 +300,11 @@ const codeExamples = {
           Dark mode is implemented via <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">.dark</code> class on the html element:
         </p>
 
-        <DeveloperCodeBlock :code="codeExamples.darkMode" language="css" />
+        <DeveloperCodeBlock
+          :code="codeExamples.darkMode"
+          language="css"
+          filename="app/assets/css/main.css"
+        />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">How It Works</h4>
