@@ -259,20 +259,37 @@ const openHelpDrawer = () => {
   helpDrawerOpen.value = true;
 };
 
+// Developer Guide drawer state (dev mode only)
+const devDrawerOpen = ref(false);
+
+const openDevDrawer = () => {
+  devDrawerOpen.value = true;
+};
+
+// Show dev tools only in development mode
+const showDevTools = computed(() => import.meta.dev);
+
 // Testing plan state
 const { isPanelOpen, isLargeScreen, togglePanel, closePanel } = useTestingPlanProgress();
 
-// Keyboard shortcut for help (? or F1)
+// Keyboard shortcut for help (? or F1) and developer guide (Ctrl+Shift+D)
 const handleGlobalKeydown = (event: KeyboardEvent) => {
-  // Check for ? key (Shift + /) or F1
+  // Don't trigger if user is typing in an input
+  const target = event.target as HTMLElement;
+  if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+    return;
+  }
+
+  // Check for ? key (Shift + /) or F1 for help
   if ((event.key === "?" && !event.ctrlKey && !event.altKey) || event.key === "F1") {
-    // Don't trigger if user is typing in an input
-    const target = event.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
-      return;
-    }
     event.preventDefault();
     openHelpDrawer();
+  }
+
+  // Check for Ctrl+Shift+D for developer guide (dev mode only)
+  if (event.key === "D" && event.ctrlKey && event.shiftKey && showDevTools.value) {
+    event.preventDefault();
+    openDevDrawer();
   }
 };
 
@@ -391,6 +408,17 @@ onUnmounted(() => {
             <!-- Testing Plan Toggle -->
             <TestingPlanToggle @click="togglePanel" />
 
+            <!-- Developer Guide (dev mode only) -->
+            <UButton
+              v-if="showDevTools"
+              icon="i-heroicons-code-bracket"
+              color="neutral"
+              variant="ghost"
+              aria-label="Developer Guide (Ctrl+Shift+D)"
+              class="cursor-pointer"
+              @click="openDevDrawer"
+            />
+
             <!-- Help -->
             <UButton
               icon="i-heroicons-question-mark-circle"
@@ -496,6 +524,9 @@ onUnmounted(() => {
 
   <!-- Help Drawer -->
   <LayoutHelpDrawer v-model:open="helpDrawerOpen" />
+
+  <!-- Developer Guide Drawer (dev mode only) -->
+  <DeveloperDevGuideDrawer v-if="showDevTools" v-model:open="devDrawerOpen" />
 
   <!-- Testing Plan Panel (lg+ screens) -->
   <TestingPlanPanel
