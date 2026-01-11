@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Highlight.js theme - GitHub style */
+@import "highlight.js/styles/github.css";
+
 /* Global font size scale - reduces all text by one step */
 html {
   font-size: 100%;
@@ -174,14 +177,7 @@ html {
   /* ===== Utility Tokens ===== */
   --ui-radius: 0.5rem; /* Default border radius */
 
-  /* ===== Shiki Syntax Highlighting Tokens (Light Mode) ===== */
-  /* GitHub Light theme colors */
-  --shiki-light: #24292f;
-  --shiki-dark: #c9d1d9;
-  --shiki-light-bg: transparent;
-  --shiki-dark-bg: #0c1220;
-
-  /* Token colors for syntax highlighting */
+  /* Token colors for syntax highlighting (Light Mode) */
   --code-text: #24292f;
   --code-comment: #6e7781;
   --code-keyword: #cf222e;
@@ -264,12 +260,7 @@ html {
 
   --ui-variance-detected: var(--color-amber-400);
 
-  /* ===== Shiki Syntax Highlighting Tokens (Dark Mode) ===== */
-  /* GitHub Dark theme colors */
-  --shiki-light: #c9d1d9;
-  --shiki-dark: #c9d1d9;
-
-  /* Token colors for syntax highlighting */
+  /* Token colors for syntax highlighting (Dark Mode) */
   --code-text: #c9d1d9;
   --code-comment: #8b949e;
   --code-keyword: #ff7b72;
@@ -748,17 +739,18 @@ button.border {
 }
 
 /* ============================================
-   CODE BLOCK STYLING (SHIKI)
+   CODE BLOCK STYLING (HIGHLIGHT.JS)
    ============================================ */
 
-/* Shiki-generated code blocks */
-.shiki {
+/* Base highlight.js styles */
+.hljs {
   background-color: transparent !important;
   margin: 0;
   padding: 0;
 }
 
-.shiki code {
+pre.hljs code,
+.hljs code {
   display: block;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
@@ -769,52 +761,103 @@ button.border {
   tab-size: 2;
 }
 
-/* Line styling */
-.shiki .line {
-  display: block;
-  min-height: 1.6em;
+/* Code block dark mode - consistent #0d1117 background */
+html.dark .code-header,
+html.dark .code-content {
+  --ui-bg-elevated: #0d1117 !important;
+  --ui-bg: #0d1117 !important;
+  background-color: #0d1117 !important;
 }
 
-/* Line numbers */
-.code-block-with-lines .shiki code {
-  counter-reset: line;
+/* Highlight.js dark mode theme (GitHub Dark) */
+html.dark .hljs {
+  color: #c9d1d9;
+  background: transparent !important;
 }
 
-.code-block-with-lines .shiki .line::before {
-  counter-increment: line;
-  content: counter(line);
-  display: inline-block;
-  width: 2rem;
-  margin-right: 1rem;
-  text-align: right;
-  color: var(--ui-text-dimmed);
-  user-select: none;
+html.dark .hljs-doctag,
+html.dark .hljs-keyword,
+html.dark .hljs-meta .hljs-keyword,
+html.dark .hljs-template-tag,
+html.dark .hljs-template-variable,
+html.dark .hljs-type,
+html.dark .hljs-variable.language_ {
+  color: #ff7b72;
 }
 
-/* Highlighted lines */
-.shiki .line.highlighted {
-  background-color: var(--ui-bg-accented);
-  margin: 0 -0.75rem;
-  padding: 0 0.75rem;
+html.dark .hljs-title,
+html.dark .hljs-title.class_,
+html.dark .hljs-title.class_.inherited__,
+html.dark .hljs-title.function_ {
+  color: #d2a8ff;
 }
 
-/* Dark mode theme switching */
-html:not(.dark) .shiki {
-  color: var(--shiki-light) !important;
-  background-color: var(--shiki-light-bg) !important;
+html.dark .hljs-attr,
+html.dark .hljs-attribute,
+html.dark .hljs-literal,
+html.dark .hljs-meta,
+html.dark .hljs-number,
+html.dark .hljs-operator,
+html.dark .hljs-selector-attr,
+html.dark .hljs-selector-class,
+html.dark .hljs-selector-id,
+html.dark .hljs-variable {
+  color: #79c0ff;
 }
 
-html:not(.dark) .shiki span {
-  color: var(--shiki-light) !important;
-  background-color: transparent !important;
+html.dark .hljs-meta .hljs-string,
+html.dark .hljs-regexp,
+html.dark .hljs-string {
+  color: #a5d6ff;
 }
 
-html.dark .shiki {
-  color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
+html.dark .hljs-built_in,
+html.dark .hljs-symbol {
+  color: #ffa657;
 }
 
-html.dark .shiki span {
-  color: var(--shiki-dark) !important;
-  background-color: transparent !important;
+html.dark .hljs-code,
+html.dark .hljs-comment,
+html.dark .hljs-formula {
+  color: #8b949e;
+}
+
+html.dark .hljs-name,
+html.dark .hljs-quote,
+html.dark .hljs-selector-pseudo,
+html.dark .hljs-selector-tag {
+  color: #7ee787;
+}
+
+html.dark .hljs-subst {
+  color: #c9d1d9;
+}
+
+html.dark .hljs-section {
+  color: #1f6feb;
+  font-weight: bold;
+}
+
+html.dark .hljs-bullet {
+  color: #f2cc60;
+}
+
+html.dark .hljs-emphasis {
+  color: #c9d1d9;
+  font-style: italic;
+}
+
+html.dark .hljs-strong {
+  color: #c9d1d9;
+  font-weight: bold;
+}
+
+html.dark .hljs-addition {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+
+html.dark .hljs-deletion {
+  color: #ffdcd7;
+  background-color: #67060c;
 }
