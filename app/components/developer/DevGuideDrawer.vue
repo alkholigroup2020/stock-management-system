@@ -305,6 +305,90 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Authentication content
+  content.push(
+    {
+      id: "auth-overview",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "overview",
+      title: "Authentication Overview",
+      content:
+        "nuxt-auth-utils with JWT in httpOnly cookies. Session-based authentication. Pinia auth store for client state. Server middleware protects API routes. App initialization coordinates auth, location, and period loading.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-login",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "login-flow",
+      title: "Login Flow",
+      content:
+        "Login page with Zod validation. POST /api/auth/login verifies credentials with bcrypt. setUserSession creates httpOnly session cookie. Post-login loads locations and period. Redirects to intended destination or dashboard.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-logout",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "logout-flow",
+      title: "Logout Flow",
+      content:
+        "useAuth().logout() clears session. clearUserSession on server removes httpOnly cookie. Resets location and period stores. App re-initializes for login page.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-useauth",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "useauth-composable",
+      title: "useAuth Composable",
+      content:
+        "user, isAuthenticated, loading, error state. isAdmin, isSupervisor, isOperator role checks. hasRole, hasAnyRole for flexible checks. hasLocationAccess, canPostAtLocation for location permissions. login, logout, fetchSession actions.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-middleware",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "middleware",
+      title: "Route Protection Middleware",
+      content:
+        "auth.global.ts runs on every navigation. Redirects unauthenticated users to /login with redirect param. role.ts middleware for role-based access. definePageMeta with roleRequired or minRole. Server auth middleware protects /api/* routes.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-roles",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "roles-permissions",
+      title: "Roles & Permissions",
+      content:
+        "OPERATOR basic operations at assigned locations. SUPERVISOR approvals and reconciliations at all locations. ADMIN full system access including user management. usePermissions composable for granular checks. Role hierarchy for minRole checks.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-password",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "password-security",
+      title: "Password Security",
+      content:
+        "Minimum 8 characters. Requires uppercase, lowercase, number, special character. bcrypt with 10 salt rounds. validatePasswordStrength function returns strength level. Change password with current password verification.",
+      icon: "i-heroicons-lock-closed",
+    },
+    {
+      id: "auth-init",
+      section: "Authentication",
+      sectionId: "authentication",
+      targetSection: "app-initialization",
+      title: "App Initialization",
+      content:
+        "auth.client.ts plugin runs on startup. useAppInit coordinates loading sequence. Fetches session, then locations and period in parallel. isReady computed for app loading state. Post-login loading with setLoadingForPostLogin.",
+      icon: "i-heroicons-lock-closed",
+    }
+  );
+
   // API Routes content
   content.push(
     {
@@ -631,6 +715,11 @@ const navSections = [
     icon: "i-heroicons-circle-stack",
   },
   {
+    id: "authentication",
+    label: "Authentication",
+    icon: "i-heroicons-lock-closed",
+  },
+  {
     id: "api-routes",
     label: "API Routes",
     icon: "i-heroicons-server",
@@ -671,6 +760,9 @@ const contentComponents: Record<string, Component> = {
   components: defineAsyncComponent(() => import("~/components/developer/ComponentPatterns.vue")),
   composables: defineAsyncComponent(() => import("~/components/developer/ComposablesGuide.vue")),
   stores: defineAsyncComponent(() => import("~/components/developer/StoresGuide.vue")),
+  authentication: defineAsyncComponent(
+    () => import("~/components/developer/AuthenticationGuide.vue")
+  ),
   "api-routes": defineAsyncComponent(() => import("~/components/developer/ApiRoutesGuide.vue")),
   "ui-patterns": defineAsyncComponent(() => import("~/components/developer/UIPatternsGuide.vue")),
   tailwind: defineAsyncComponent(() => import("~/components/developer/TailwindGuide.vue")),
