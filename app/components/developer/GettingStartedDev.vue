@@ -35,6 +35,18 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  clone: `git clone <repository-url>
+cd stock-management-system`,
+
+  install: `pnpm install`,
+
+  envSetup: `cp .env.example .env`,
+
+  runDev: `pnpm dev`,
+};
 </script>
 
 <template>
@@ -141,32 +153,25 @@ watch(
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">1. Clone the Repository</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>git clone &lt;repository-url&gt;
-cd stock-management-system</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.clone" language="bash" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">2. Install Dependencies</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>pnpm install</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.install" language="bash" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
             3. Set Up Environment Variables
           </h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>cp .env.example .env</code></pre>
-          <p class="mt-2 text-sm text-[var(--ui-text-muted)]">Then edit <code>.env</code> with:</p>
+          <DeveloperCodeBlock :code="codeExamples.envSetup" language="bash" />
+          <p class="mt-2 text-sm text-[var(--ui-text-muted)]">Then edit <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">.env</code> with:</p>
           <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><code>DATABASE_URL</code> - PostgreSQL connection string (Supabase port 6543)</li>
-            <li><code>AUTH_SECRET</code> - Random secret for JWT signing</li>
-            <li><code>NUXT_PUBLIC_SITE_URL</code> - http://localhost:3000 for dev</li>
-            <li><code>NUXT_PUBLIC_CURRENCY</code> - SAR</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">DATABASE_URL</code> - PostgreSQL connection string (Supabase port 6543)</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">AUTH_SECRET</code> - Random secret for JWT signing</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">NUXT_PUBLIC_SITE_URL</code> - http://localhost:3000 for dev</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">NUXT_PUBLIC_CURRENCY</code> - SAR</li>
           </ul>
         </div>
 
@@ -174,11 +179,9 @@ cd stock-management-system</code></pre>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
             4. Start Development Server
           </h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>pnpm dev</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.runDev" language="bash" />
           <p class="mt-2 text-sm text-[var(--ui-text-muted)]">
-            Open <code>http://localhost:3000</code> in your browser.
+            Open <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">http://localhost:3000</code> in your browser.
           </p>
         </div>
       </div>
@@ -343,7 +346,7 @@ cd stock-management-system</code></pre>
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
               <strong>Never use db:push in production.</strong> Always use
-              <code>pnpm db:migrate deploy</code> for production deployments.
+              <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">pnpm db:migrate deploy</code> for production deployments.
             </span>
           </p>
         </div>

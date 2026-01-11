@@ -35,6 +35,30 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  folderStructure: `/app/                   # Frontend (Nuxt 4)
+  /assets/css/          # Tailwind CSS v4 theme config
+  /components/          # Auto-imported Vue components
+  /composables/         # Auto-imported composables
+  /layouts/             # Layout templates
+  /middleware/          # Client-side route guards
+  /pages/               # Auto-routing pages
+  /plugins/             # Vue plugins
+  /stores/              # Pinia stores
+  /utils/               # Client utilities
+  app.vue               # Root component
+
+/server/                # Backend (Nitro/H3)
+  /api/                 # API endpoints (RESTful routes)
+  /middleware/          # Server middleware
+  /utils/               # Server utilities
+
+/shared/types/          # Shared TypeScript types
+/prisma/                # Database schema & migrations
+/project-docs/          # Documentation`,
+};
 </script>
 
 <template>
@@ -127,28 +151,7 @@ watch(
         />
       </button>
       <div v-if="isExpanded('folders')" class="space-y-4 p-4">
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>/app/                   # Frontend (Nuxt 4)
-  /assets/css/          # Tailwind CSS v4 theme config
-  /components/          # Auto-imported Vue components
-  /composables/         # Auto-imported composables
-  /layouts/             # Layout templates
-  /middleware/          # Client-side route guards
-  /pages/               # Auto-routing pages
-  /plugins/             # Vue plugins
-  /stores/              # Pinia stores
-  /utils/               # Client utilities
-  app.vue               # Root component
-
-/server/                # Backend (Nitro/H3)
-  /api/                 # API endpoints (RESTful routes)
-  /middleware/          # Server middleware
-  /utils/               # Server utilities
-
-/shared/types/          # Shared TypeScript types
-/prisma/                # Database schema & migrations
-/project-docs/          # Documentation</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.folderStructure" language="plaintext" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Key Directories</h4>

@@ -35,6 +35,105 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  useAuth: `const {
+  user,           // Current user object
+  isAuthenticated,// Boolean - logged in?
+  isAdmin,        // Boolean - admin role?
+  isSupervisor,   // Boolean - supervisor role?
+  isOperator,     // Boolean - operator role?
+  login,          // (credentials) => Promise
+  logout,         // () => Promise
+  refreshSession  // () => Promise
+} = useAuth();`,
+
+  useAuthUsage: `<script setup>
+const { user, isAdmin } = useAuth();
+<\/script>
+
+<template>
+  <div v-if="isAdmin">Admin Panel</div>
+  <p>Welcome, {{ user?.name }}</p>
+</template>`,
+
+  usePermissions: `const permissions = usePermissions();
+
+// Transaction permissions
+permissions.canPostDeliveries()  // Operator, Supervisor, Admin
+permissions.canPostIssues()      // Operator, Supervisor, Admin
+permissions.canCreateTransfer()  // Operator, Supervisor, Admin
+permissions.canApproveTransfers()// Supervisor, Admin
+
+// Management permissions
+permissions.canManageUsers()     // Admin only
+permissions.canManageItems()     // Admin only
+permissions.canManageLocations() // Admin only
+permissions.canManageSuppliers() // Admin only
+
+// Period permissions
+permissions.canClosePeriod()     // Admin only
+permissions.canViewStock()       // All roles`,
+
+  usePermissionsUsage: `<li v-if="permissions.canManageUsers()">
+  <NuxtLink to="/users">Users</NuxtLink>
+</li>`,
+
+  useAppToast: `const toast = useAppToast();
+
+toast.showSuccess("Item created successfully");
+toast.showError("Failed to save changes");
+toast.showWarning("Connection unstable");
+toast.showInfo("New version available");`,
+
+  useErrorHandler: `const { handleError } = useErrorHandler();
+
+try {
+  await $fetch("/api/items", { method: "POST", body });
+} catch (err) {
+  // Extracts message, maps error codes, shows toast
+  handleError(err, "Failed to create item");
+}`,
+
+  useOnlineStatus: `const { isOnline } = useOnlineStatus();
+
+<UButton :disabled="!isOnline" label="Save" />
+<OfflineBanner v-if="!isOnline" />`,
+
+  useOfflineGuard: `const { guardAction } = useOfflineGuard();
+
+const handleSave = () => {
+  guardAction(async () => {
+    await saveData();
+  });
+  // Shows warning toast if offline
+};`,
+
+  useCache: `const cache = useCache();
+
+// Get cached data
+const items = cache.getCached<Item[]>("items");
+
+// Set cached data with TTL
+cache.setCached("items", itemsData, 5 * 60 * 1000); // 5 min
+
+// Invalidate cache
+cache.invalidate("items");`,
+
+  useApiComposables: `const { fetchAll, create } = useItems();
+
+// Fetch all items (cached)
+const items = await fetchAll();
+
+// Create new item
+const newItem = await create({
+  code: "ITM001",
+  name: "New Item",
+  unit: "KG",
+  category: "FOOD"
+});`,
+};
 </script>
 
 <template>
@@ -70,31 +169,11 @@ watch(
           Provides authentication state and role checking:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>const {
-  user,           // Current user object
-  isAuthenticated,// Boolean - logged in?
-  isAdmin,        // Boolean - admin role?
-  isSupervisor,   // Boolean - supervisor role?
-  isOperator,     // Boolean - operator role?
-  login,          // (credentials) => Promise
-  logout,         // () => Promise
-  refreshSession  // () => Promise
-} = useAuth();</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.useAuth" language="typescript" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage Example</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;script setup&gt;
-const { user, isAdmin } = useAuth();
-&lt;/script&gt;
-
-&lt;template&gt;
-  &lt;div v-if="isAdmin"&gt;Admin Panel&lt;/div&gt;
-  &lt;p&gt;Welcome, &#123;&#123; user?.name &#125;&#125;&lt;/p&gt;
-&lt;/template&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.useAuthUsage" language="vue" />
         </div>
       </div>
     </section>
@@ -122,33 +201,11 @@ const { user, isAdmin } = useAuth();
           Role-based permission checks for features:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>const permissions = usePermissions();
-
-// Transaction permissions
-permissions.canPostDeliveries()  // Operator, Supervisor, Admin
-permissions.canPostIssues()      // Operator, Supervisor, Admin
-permissions.canCreateTransfer()  // Operator, Supervisor, Admin
-permissions.canApproveTransfers()// Supervisor, Admin
-
-// Management permissions
-permissions.canManageUsers()     // Admin only
-permissions.canManageItems()     // Admin only
-permissions.canManageLocations() // Admin only
-permissions.canManageSuppliers() // Admin only
-
-// Period permissions
-permissions.canClosePeriod()     // Admin only
-permissions.canViewStock()       // All roles</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.usePermissions" language="typescript" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage in Navigation</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;li v-if="permissions.canManageUsers()"&gt;
-  &lt;NuxtLink to="/users"&gt;Users&lt;/NuxtLink&gt;
-&lt;/li&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.usePermissionsUsage" language="vue" />
         </div>
       </div>
     </section>
@@ -174,14 +231,7 @@ permissions.canViewStock()       // All roles</code></pre>
       <div v-if="isExpanded('toast')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">Toast notification system with semantic colors:</p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>const toast = useAppToast();
-
-toast.showSuccess("Item created successfully");
-toast.showError("Failed to save changes");
-toast.showWarning("Connection unstable");
-toast.showInfo("New version available");</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.useAppToast" language="typescript" />
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
@@ -213,24 +263,15 @@ toast.showInfo("New version available");</code></pre>
       <div v-if="isExpanded('error')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">Centralized error handling with user-friendly messages:</p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>const { handleError } = useErrorHandler();
-
-try {
-  await $fetch("/api/items", { method: "POST", body });
-} catch (err) {
-  // Extracts message, maps error codes, shows toast
-  handleError(err, "Failed to create item");
-}</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.useErrorHandler" language="typescript" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Error Code Mapping</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><code>INSUFFICIENT_STOCK</code> → "Not enough stock available"</li>
-            <li><code>LOCATION_ACCESS_DENIED</code> → "You don't have access to this location"</li>
-            <li><code>PERIOD_CLOSED</code> → "Cannot modify a closed period"</li>
-            <li><code>VALIDATION_ERROR</code> → Shows specific field errors</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">INSUFFICIENT_STOCK</code> → "Not enough stock available"</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">LOCATION_ACCESS_DENIED</code> → "You don't have access to this location"</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">PERIOD_CLOSED</code> → "Cannot modify a closed period"</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">VALIDATION_ERROR</code> → Shows specific field errors</li>
           </ul>
         </div>
       </div>
@@ -261,26 +302,12 @@ try {
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">useOnlineStatus</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>const { isOnline } = useOnlineStatus();
-
-&lt;UButton :disabled="!isOnline" label="Save" /&gt;
-&lt;OfflineBanner v-if="!isOnline" /&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.useOnlineStatus" language="vue" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">useOfflineGuard</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>const { guardAction } = useOfflineGuard();
-
-const handleSave = () => {
-  guardAction(async () => {
-    await saveData();
-  });
-  // Shows warning toast if offline
-};</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.useOfflineGuard" language="typescript" />
         </div>
       </div>
     </section>
@@ -306,18 +333,7 @@ const handleSave = () => {
       <div v-if="isExpanded('cache')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">Client-side caching for master data:</p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>const cache = useCache();
-
-// Get cached data
-const items = cache.getCached&lt;Item[]&gt;("items");
-
-// Set cached data with TTL
-cache.setCached("items", itemsData, 5 * 60 * 1000); // 5 min
-
-// Invalidate cache
-cache.invalidate("items");</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.useCache" language="typescript" />
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
@@ -396,20 +412,7 @@ cache.invalidate("items");</code></pre>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage Example</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>const { fetchAll, create } = useItems();
-
-// Fetch all items (cached)
-const items = await fetchAll();
-
-// Create new item
-const newItem = await create({
-  code: "ITM001",
-  name: "New Item",
-  unit: "KG",
-  category: "FOOD"
-});</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.useApiComposables" language="typescript" />
         </div>
       </div>
     </section>

@@ -35,6 +35,48 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  themeConfig: `/* app/assets/css/main.css */
+
+@import "tailwindcss";
+
+@theme {
+  /* Define custom colors */
+  --color-navy-500: #1e4d8c;
+  --color-emerald-500: #2eb860;
+
+  /* Custom font sizes (shifted down) */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+}`,
+
+  tokenUsage: `<!-- Use with var() in classes -->
+<div class="bg-[var(--ui-bg-elevated)] text-[var(--ui-text)]">
+  <h2 class="text-[var(--ui-text-highlighted)]">Title</h2>
+  <p class="text-[var(--ui-text-muted)]">Description</p>
+</div>`,
+
+  typography: `<!-- Typography helper classes -->
+<h1 class="text-display">Large heading</h1>
+<h2 class="text-heading">Section heading</h2>
+<h3 class="text-subheading">Subsection</h3>
+<label class="text-label">Form label</label>
+<p class="text-body">Body text</p>
+<span class="text-caption">Small caption</span>`,
+
+  darkMode: `/* main.css - Dark mode tokens */
+.dark {
+  --ui-bg: #0c1220;
+  --ui-bg-elevated: #151c2c;
+  --ui-text: #f4f4f5;
+  --ui-text-highlighted: #ffffff;
+  --ui-border: #2d3a50;
+  /* ... other dark mode tokens */
+}`,
+};
 </script>
 
 <template>
@@ -75,22 +117,7 @@ watch(
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
             Configuration Location
           </h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>/* app/assets/css/main.css */
-
-@import "tailwindcss";
-
-@theme {
-  /* Define custom colors */
-  --color-navy-500: #1e4d8c;
-  --color-emerald-500: #2eb860;
-
-  /* Custom font sizes (shifted down) */
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-}</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.themeConfig" language="css" />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
@@ -98,7 +125,7 @@ watch(
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
               <strong>Important:</strong> All theme customization happens in
-              <code>main.css</code>, not in a config file.
+              <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">main.css</code>, not in a config file.
             </span>
           </p>
         </div>
@@ -132,52 +159,46 @@ watch(
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Background Tokens</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>--ui-bg</code> - Page background</li>
-              <li><code>--ui-bg-elevated</code> - Cards, sidebar</li>
-              <li><code>--ui-bg-muted</code> - Table headers</li>
-              <li><code>--ui-bg-accented</code> - Hover states</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-bg</code> - Page background</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-bg-elevated</code> - Cards, sidebar</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-bg-muted</code> - Table headers</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-bg-accented</code> - Hover states</li>
             </ul>
           </div>
 
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Text Tokens</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>--ui-text</code> - Default text</li>
-              <li><code>--ui-text-highlighted</code> - Headings</li>
-              <li><code>--ui-text-muted</code> - Secondary text</li>
-              <li><code>--ui-text-dimmed</code> - Captions</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-text</code> - Default text</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-text-highlighted</code> - Headings</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-text-muted</code> - Secondary text</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-text-dimmed</code> - Captions</li>
             </ul>
           </div>
 
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Semantic Colors</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>--ui-primary</code> - Navy blue brand</li>
-              <li><code>--ui-success</code> - Green actions</li>
-              <li><code>--ui-warning</code> - Amber cautions</li>
-              <li><code>--ui-error</code> - Red errors</li>
-              <li><code>--ui-info</code> - Blue info</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-primary</code> - Navy blue brand</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-success</code> - Green actions</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-warning</code> - Amber cautions</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-error</code> - Red errors</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-info</code> - Blue info</li>
             </ul>
           </div>
 
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Border Tokens</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>--ui-border</code> - Default borders</li>
-              <li><code>--ui-border-muted</code> - Subtle borders</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-border</code> - Default borders</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">--ui-border-muted</code> - Subtle borders</li>
             </ul>
           </div>
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage Pattern</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;!-- Use with var() in classes --&gt;
-&lt;div class="bg-[var(--ui-bg-elevated)] text-[var(--ui-text)]"&gt;
-  &lt;h2 class="text-[var(--ui-text-highlighted)]"&gt;Title&lt;/h2&gt;
-  &lt;p class="text-[var(--ui-text-muted)]"&gt;Description&lt;/p&gt;
-&lt;/div&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.tokenUsage" language="vue" />
         </div>
       </div>
     </section>
@@ -202,60 +223,52 @@ watch(
       </button>
       <div v-if="isExpanded('utilities')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          Custom utility classes are defined with <code>@utility</code> directive:
+          Custom utility classes are defined with <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">@utility</code> directive:
         </p>
 
         <div class="grid gap-4 md:grid-cols-2">
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Background Utilities</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>bg-default</code></li>
-              <li><code>bg-elevated</code></li>
-              <li><code>bg-muted</code></li>
-              <li><code>bg-accented</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">bg-default</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">bg-elevated</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">bg-muted</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">bg-accented</code></li>
             </ul>
           </div>
 
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Text Utilities</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>text-default</code></li>
-              <li><code>text-primary</code></li>
-              <li><code>text-muted</code></li>
-              <li><code>text-dimmed</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">text-default</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">text-primary</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">text-muted</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">text-dimmed</code></li>
             </ul>
           </div>
 
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Border Utilities</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>border-default</code></li>
-              <li><code>border-muted</code></li>
-              <li><code>divide-default</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">border-default</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">border-muted</code></li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">divide-default</code></li>
             </ul>
           </div>
 
           <div>
             <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Other Utilities</h4>
             <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-              <li><code>focus-ring</code> - Focus ring styling</li>
-              <li><code>smooth-transition</code> - 200ms ease</li>
-              <li><code>hover-lift</code> - Subtle lift on hover</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">focus-ring</code> - Focus ring styling</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">smooth-transition</code> - 200ms ease</li>
+              <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">hover-lift</code> - Subtle lift on hover</li>
             </ul>
           </div>
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Typography Classes</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;!-- Typography helper classes --&gt;
-&lt;h1 class="text-display"&gt;Large heading&lt;/h1&gt;
-&lt;h2 class="text-heading"&gt;Section heading&lt;/h2&gt;
-&lt;h3 class="text-subheading"&gt;Subsection&lt;/h3&gt;
-&lt;label class="text-label"&gt;Form label&lt;/label&gt;
-&lt;p class="text-body"&gt;Body text&lt;/p&gt;
-&lt;span class="text-caption"&gt;Small caption&lt;/span&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.typography" language="vue" />
         </div>
       </div>
     </section>
@@ -280,20 +293,10 @@ watch(
       </button>
       <div v-if="isExpanded('dark')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          Dark mode is implemented via <code>.dark</code> class on the html element:
+          Dark mode is implemented via <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">.dark</code> class on the html element:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>/* main.css - Dark mode tokens */
-.dark {
-  --ui-bg: #0c1220;
-  --ui-bg-elevated: #151c2c;
-  --ui-text: #f4f4f5;
-  --ui-text-highlighted: #ffffff;
-  --ui-border: #2d3a50;
-  /* ... other dark mode tokens */
-}</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.darkMode" language="css" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">How It Works</h4>
@@ -326,7 +329,7 @@ watch(
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              Always use <code>var(--ui-*)</code> tokens instead of hardcoded colors to ensure dark
+              Always use <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">var(--ui-*)</code> tokens instead of hardcoded colors to ensure dark
               mode compatibility.
             </span>
           </p>

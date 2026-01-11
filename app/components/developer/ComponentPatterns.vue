@@ -35,6 +35,44 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  pageHeader: `<LayoutPageHeader title="Items" icon="i-heroicons-cube">
+  <template #actions>
+    <UButton
+      label="New Item"
+      icon="i-heroicons-plus"
+      class="cursor-pointer"
+      @click="goToCreate"
+    />
+  </template>
+</LayoutPageHeader>`,
+
+  emptyState: `<EmptyState
+  v-if="items.length === 0"
+  icon="i-heroicons-inbox"
+  title="No items yet"
+  description="Create your first item to get started"
+  action-label="Create Item"
+  @action="goToCreate"
+/>`,
+
+  loadingState: `<LoadingSpinner v-if="loading" text="Loading items..." />
+<ErrorAlert v-else-if="error" :message="error" @retry="fetchData" />
+<div v-else>
+  <!-- Content -->
+</div>`,
+
+  confirmModal: `<UiConfirmModal
+  v-model="showDeleteModal"
+  title="Delete Item"
+  message="Are you sure? This cannot be undone."
+  variant="danger"
+  confirm-label="Delete"
+  @confirm="handleDelete"
+/>`,
+};
 </script>
 
 <template>
@@ -316,60 +354,25 @@ watch(
           <p class="mb-2 text-sm text-[var(--ui-text-muted)]">
             Use for page titles with optional action buttons:
           </p>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;LayoutPageHeader title="Items" icon="i-heroicons-cube"&gt;
-  &lt;template #actions&gt;
-    &lt;UButton
-      label="New Item"
-      icon="i-heroicons-plus"
-      class="cursor-pointer"
-      @click="goToCreate"
-    /&gt;
-  &lt;/template&gt;
-&lt;/LayoutPageHeader&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.pageHeader" language="vue" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">EmptyState Pattern</h4>
           <p class="mb-2 text-sm text-[var(--ui-text-muted)]">Use when there's no data to display:</p>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;EmptyState
-  v-if="items.length === 0"
-  icon="i-heroicons-inbox"
-  title="No items yet"
-  description="Create your first item to get started"
-  action-label="Create Item"
-  @action="goToCreate"
-/&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.emptyState" language="vue" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Loading State Pattern</h4>
           <p class="mb-2 text-sm text-[var(--ui-text-muted)]">Use LoadingSpinner during data fetch:</p>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;LoadingSpinner v-if="loading" text="Loading items..." /&gt;
-&lt;ErrorAlert v-else-if="error" :message="error" @retry="fetchData" /&gt;
-&lt;div v-else&gt;
-  &lt;!-- Content --&gt;
-&lt;/div&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.loadingState" language="vue" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">ConfirmModal Pattern</h4>
           <p class="mb-2 text-sm text-[var(--ui-text-muted)]">Use for destructive actions:</p>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>&lt;UiConfirmModal
-  v-model="showDeleteModal"
-  title="Delete Item"
-  message="Are you sure? This cannot be undone."
-  variant="danger"
-  confirm-label="Delete"
-  @confirm="handleDelete"
-/&gt;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.confirmModal" language="vue" />
         </div>
       </div>
     </section>

@@ -35,6 +35,12 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  formatCommands: `pnpm format        # Format all files
+pnpm format:check  # Check formatting (CI)`,
+};
 </script>
 
 <template>
@@ -128,10 +134,7 @@ watch(
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Commands</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>pnpm format        # Format all files
-pnpm format:check  # Check formatting (CI)</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.formatCommands" language="bash" />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">

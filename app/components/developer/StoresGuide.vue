@@ -35,6 +35,58 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  authState: `interface AuthState {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: "ADMIN" | "SUPERVISOR" | "OPERATOR";
+  } | null;
+}`,
+
+  locationState: `interface LocationState {
+  activeLocation: {
+    id: string;
+    name: string;
+    code: string;
+    type: "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
+  } | null;
+  userLocations: Location[];
+}`,
+
+  locationUsage: `const locationStore = useLocationStore();
+
+// Get active location
+const locationId = locationStore.getActiveLocationId;
+
+// Switch location
+locationStore.setActiveLocation(newLocation);`,
+
+  periodState: `interface PeriodState {
+  currentPeriod: {
+    id: string;
+    name: string;        // e.g., "January 2024"
+    startDate: string;
+    endDate: string;
+    status: "DRAFT" | "OPEN" | "PENDING_CLOSE" | "CLOSED";
+  } | null;
+  loading: boolean;
+  error: string | null;
+}`,
+
+  uiState: `interface UIState {
+  sidebarCollapsed: boolean;
+  // Additional UI state as needed
+}`,
+
+  uiUsage: `const uiStore = useUIStore();
+
+// Toggle sidebar
+uiStore.sidebarCollapsed = !uiStore.sidebarCollapsed;`,
+};
 </script>
 
 <template>
@@ -73,40 +125,31 @@ watch(
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>interface AuthState {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: "ADMIN" | "SUPERVISOR" | "OPERATOR";
-  } | null;
-}</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.authState" language="typescript" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Getters</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><code>isAuthenticated</code> - Boolean, true if user is logged in</li>
-            <li><code>isAdmin</code> - Boolean, true if user role is ADMIN</li>
-            <li><code>isSupervisor</code> - Boolean, true if user role is SUPERVISOR</li>
-            <li><code>isOperator</code> - Boolean, true if user role is OPERATOR</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isAuthenticated</code> - Boolean, true if user is logged in</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isAdmin</code> - Boolean, true if user role is ADMIN</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isSupervisor</code> - Boolean, true if user role is SUPERVISOR</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isOperator</code> - Boolean, true if user role is OPERATOR</li>
           </ul>
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Actions</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><code>setUser(user)</code> - Set the current user</li>
-            <li><code>clearUser()</code> - Clear user on logout</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">setUser(user)</code> - Set the current user</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">clearUser()</code> - Clear user on logout</li>
           </ul>
         </div>
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
-            <span>Use <code>useAuth()</code> composable instead of accessing the store directly.</span>
+            <span>Use <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">useAuth()</code> composable instead of accessing the store directly.</span>
           </p>
         </div>
       </div>
@@ -140,17 +183,7 @@ watch(
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>interface LocationState {
-  activeLocation: {
-    id: string;
-    name: string;
-    code: string;
-    type: "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
-  } | null;
-  userLocations: Location[];
-}</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.locationState" language="typescript" />
         </div>
 
         <div>
@@ -169,15 +202,7 @@ watch(
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>const locationStore = useLocationStore();
-
-// Get active location
-const locationId = locationStore.getActiveLocationId;
-
-// Switch location
-locationStore.setActiveLocation(newLocation);</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.locationUsage" language="typescript" />
         </div>
       </div>
     </section>
@@ -208,35 +233,23 @@ locationStore.setActiveLocation(newLocation);</code></pre>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>interface PeriodState {
-  currentPeriod: {
-    id: string;
-    name: string;        // e.g., "January 2024"
-    startDate: string;
-    endDate: string;
-    status: "DRAFT" | "OPEN" | "PENDING_CLOSE" | "CLOSED";
-  } | null;
-  loading: boolean;
-  error: string | null;
-}</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.periodState" language="typescript" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Getters</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><code>isOpen</code> - Boolean, true if period status is OPEN</li>
-            <li><code>isPendingClose</code> - Boolean, true if PENDING_CLOSE</li>
-            <li><code>isClosed</code> - Boolean, true if CLOSED</li>
-            <li><code>periodName</code> - Formatted period name</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isOpen</code> - Boolean, true if period status is OPEN</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isPendingClose</code> - Boolean, true if PENDING_CLOSE</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isClosed</code> - Boolean, true if CLOSED</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">periodName</code> - Formatted period name</li>
           </ul>
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Actions</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><code>fetchCurrentPeriod()</code> - Load current open period from API</li>
+            <li><code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">fetchCurrentPeriod()</code> - Load current open period from API</li>
           </ul>
         </div>
 
@@ -244,7 +257,7 @@ locationStore.setActiveLocation(newLocation);</code></pre>
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              Always check <code>isOpen</code> before allowing transactions. Closed periods cannot
+              Always check <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">isOpen</code> before allowing transactions. Closed periods cannot
               be modified.
             </span>
           </p>
@@ -278,22 +291,12 @@ locationStore.setActiveLocation(newLocation);</code></pre>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">State</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>interface UIState {
-  sidebarCollapsed: boolean;
-  // Additional UI state as needed
-}</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.uiState" language="typescript" />
         </div>
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Usage</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>const uiStore = useUIStore();
-
-// Toggle sidebar
-uiStore.sidebarCollapsed = !uiStore.sidebarCollapsed;</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.uiUsage" language="typescript" />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">

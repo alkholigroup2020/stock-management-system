@@ -35,6 +35,36 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  nestedRoutes: `/api/locations/[id]/deliveries     # Deliveries for location
+/api/locations/[id]/issues          # Issues for location
+/api/locations/[id]/pob             # POB for location`,
+
+  errorResponse: `throw createError({
+  statusCode: 400,
+  statusMessage: "Bad Request",
+  data: {
+    code: "VALIDATION_ERROR",
+    message: "Invalid item quantity",
+    details: { field: "quantity", reason: "Must be positive" }
+  }
+});`,
+
+  routeHandler: `// server/api/items/index.get.ts
+export default defineEventHandler(async (event) => {
+  const user = event.context.user;
+
+  if (!user) {
+    throw createError({ statusCode: 401 });
+  }
+
+  // User is authenticated
+  const items = await prisma.item.findMany();
+  return items;
+});`,
+};
 </script>
 
 <template>
@@ -138,11 +168,7 @@ watch(
           <p class="mb-2 text-sm text-[var(--ui-text-muted)]">
             Location-scoped resources use nested routes:
           </p>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>/api/locations/[id]/deliveries     # Deliveries for location
-/api/locations/[id]/issues          # Issues for location
-/api/locations/[id]/pob             # POB for location</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.nestedRoutes" language="bash" />
         </div>
       </div>
     </section>
@@ -170,17 +196,7 @@ watch(
           Use <code>createError</code> from H3 for consistent error responses:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>throw createError({
-  statusCode: 400,
-  statusMessage: "Bad Request",
-  data: {
-    code: "VALIDATION_ERROR",
-    message: "Invalid item quantity",
-    details: { field: "quantity", reason: "Must be positive" }
-  }
-});</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.errorResponse" language="typescript" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Standard Error Codes</h4>
@@ -289,20 +305,7 @@ watch(
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Route Handler Example</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>// server/api/items/index.get.ts
-export default defineEventHandler(async (event) => {
-  const user = event.context.user;
-
-  if (!user) {
-    throw createError({ statusCode: 401 });
-  }
-
-  // User is authenticated
-  const items = await prisma.item.findMany();
-  return items;
-});</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.routeHandler" language="typescript" />
         </div>
       </div>
     </section>

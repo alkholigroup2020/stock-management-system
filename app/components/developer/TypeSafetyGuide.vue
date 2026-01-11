@@ -35,6 +35,125 @@ watch(
   },
   { immediate: true }
 );
+
+// Code examples
+const codeExamples = {
+  tsconfig: `// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true
+  }
+}`,
+
+  interfaces: `// shared/types/entities.ts
+export interface Item {
+  id: string;
+  code: string;
+  name: string;
+  unit: "KG" | "EA" | "LTR" | "BOX" | "CASE" | "PACK";
+  category: string;
+  minimumStock: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Delivery {
+  id: string;
+  locationId: string;
+  supplierId: string;
+  periodId: string;
+  invoiceNumber: string;
+  deliveryDate: string;
+  status: "DRAFT" | "POSTED";
+  totalValue: number;
+  lines: DeliveryLine[];
+}`,
+
+  zod: `import { z } from "zod";
+
+// Define schema
+const createItemSchema = z.object({
+  code: z.string().min(1).max(20),
+  name: z.string().min(1).max(100),
+  unit: z.enum(["KG", "EA", "LTR", "BOX", "CASE", "PACK"]),
+  category: z.string().min(1),
+  minimumStock: z.number().min(0).default(0),
+});
+
+// Infer TypeScript type from schema
+type CreateItemInput = z.infer<typeof createItemSchema>;
+
+// Validate in API route
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event);
+
+  const result = createItemSchema.safeParse(body);
+  if (!result.success) {
+    throw createError({
+      statusCode: 400,
+      data: {
+        code: "VALIDATION_ERROR",
+        message: "Invalid input",
+        details: result.error.flatten(),
+      },
+    });
+  }
+
+  // result.data is typed as CreateItemInput
+  return await prisma.item.create({ data: result.data });
+});`,
+
+  prismaDecimal: `import { Decimal } from "@prisma/client/runtime/library";
+
+// Converting Prisma Decimal to JavaScript number
+const quantity = item.quantity.toNumber();
+
+// Converting to string for display
+const displayValue = item.price.toString();
+
+// Creating Decimal from number
+const price = new Decimal(19.99);
+
+// Precise arithmetic with Decimal.js
+const total = quantity.mul(price);`,
+
+  errorGuard: `// Error type guard pattern
+try {
+  await $fetch("/api/items", { method: "POST", body });
+} catch (err) {
+  // Type assertion for error handling
+  const error = err as {
+    data?: {
+      code?: string;
+      message?: string;
+      details?: Record<string, string[]>;
+    };
+  };
+
+  if (error.data?.code === "VALIDATION_ERROR") {
+    // Handle validation error
+  } else if (error.data?.code === "INSUFFICIENT_STOCK") {
+    // Handle stock error
+  } else {
+    // Generic error handling
+    toast.showError(error.data?.message || "An error occurred");
+  }
+}`,
+
+  typeGuards: `// Check if value is defined
+function isDefined<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
+}
+
+// Check specific error code
+function hasErrorCode(err: unknown, code: string): boolean {
+  return (err as { data?: { code?: string } }).data?.code === code;
+}`,
+};
 </script>
 
 <template>
@@ -70,17 +189,7 @@ watch(
           The project uses TypeScript strict mode with additional checks:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>// tsconfig.json
-{
-  "compilerOptions": {
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true
-  }
-}</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.tsconfig" language="json" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Requirements</h4>
@@ -118,7 +227,7 @@ watch(
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Required:</strong> <code>pnpm typecheck</code> must pass with zero errors
+              <strong>Required:</strong> <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">pnpm typecheck</code> must pass with zero errors
               before any PR.
             </span>
           </p>
@@ -146,36 +255,11 @@ watch(
       </button>
       <div v-if="isExpanded('interfaces')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          Define interfaces in <code>/shared/types/</code> for shared types between frontend and
+          Define interfaces in <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">/shared/types/</code> for shared types between frontend and
           backend:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>// shared/types/entities.ts
-export interface Item {
-  id: string;
-  code: string;
-  name: string;
-  unit: "KG" | "EA" | "LTR" | "BOX" | "CASE" | "PACK";
-  category: string;
-  minimumStock: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Delivery {
-  id: string;
-  locationId: string;
-  supplierId: string;
-  periodId: string;
-  invoiceNumber: string;
-  deliveryDate: string;
-  status: "DRAFT" | "POSTED";
-  totalValue: number;
-  lines: DeliveryLine[];
-}</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.interfaces" language="typescript" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Common Patterns</h4>
@@ -214,47 +298,13 @@ export interface Delivery {
           Use Zod for runtime validation in API routes:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>import { z } from "zod";
-
-// Define schema
-const createItemSchema = z.object({
-  code: z.string().min(1).max(20),
-  name: z.string().min(1).max(100),
-  unit: z.enum(["KG", "EA", "LTR", "BOX", "CASE", "PACK"]),
-  category: z.string().min(1),
-  minimumStock: z.number().min(0).default(0),
-});
-
-// Infer TypeScript type from schema
-type CreateItemInput = z.infer&lt;typeof createItemSchema&gt;;
-
-// Validate in API route
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-
-  const result = createItemSchema.safeParse(body);
-  if (!result.success) {
-    throw createError({
-      statusCode: 400,
-      data: {
-        code: "VALIDATION_ERROR",
-        message: "Invalid input",
-        details: result.error.flatten(),
-      },
-    });
-  }
-
-  // result.data is typed as CreateItemInput
-  return await prisma.item.create({ data: result.data });
-});</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.zod" language="typescript" />
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              Use <code>z.infer&lt;typeof schema&gt;</code> to derive TypeScript types from Zod
+              Use <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">z.infer&lt;typeof schema&gt;</code> to derive TypeScript types from Zod
               schemas - no need to define types twice.
             </span>
           </p>
@@ -285,27 +335,13 @@ export default defineEventHandler(async (event) => {
           Prisma Decimal type requires special handling - it's not a plain number:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>import { Decimal } from "@prisma/client/runtime/library";
-
-// Converting Prisma Decimal to JavaScript number
-const quantity = item.quantity.toNumber();
-
-// Converting to string for display
-const displayValue = item.price.toString();
-
-// Creating Decimal from number
-const price = new Decimal(19.99);
-
-// Precise arithmetic with Decimal.js
-const total = quantity.mul(price);</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.prismaDecimal" language="typescript" />
 
         <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Important:</strong> Always use <code>.toNumber()</code> when sending Decimal
+              <strong>Important:</strong> Always use <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">.toNumber()</code> when sending Decimal
               values to the frontend, as they cannot be JSON serialized directly.
             </span>
           </p>
@@ -336,51 +372,18 @@ const total = quantity.mul(price);</code></pre>
           Use type guards for safe error handling:
         </p>
 
-        <pre
-          class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-        ><code>// Error type guard pattern
-try {
-  await $fetch("/api/items", { method: "POST", body });
-} catch (err) {
-  // Type assertion for error handling
-  const error = err as {
-    data?: {
-      code?: string;
-      message?: string;
-      details?: Record&lt;string, string[]&gt;;
-    };
-  };
-
-  if (error.data?.code === "VALIDATION_ERROR") {
-    // Handle validation error
-  } else if (error.data?.code === "INSUFFICIENT_STOCK") {
-    // Handle stock error
-  } else {
-    // Generic error handling
-    toast.showError(error.data?.message || "An error occurred");
-  }
-}</code></pre>
+        <DeveloperCodeBlock :code="codeExamples.errorGuard" language="typescript" />
 
         <div>
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Common Type Guards</h4>
-          <pre
-            class="overflow-x-auto rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-muted)] p-3 text-xs"
-          ><code>// Check if value is defined
-function isDefined&lt;T&gt;(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined;
-}
-
-// Check specific error code
-function hasErrorCode(err: unknown, code: string): boolean {
-  return (err as { data?: { code?: string } }).data?.code === code;
-}</code></pre>
+          <DeveloperCodeBlock :code="codeExamples.typeGuards" language="typescript" />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-error)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Never use bare <code>any</code>:</strong> Always use proper type assertions
+              <strong>Never use bare <code class="rounded bg-[var(--ui-bg-muted)] px-1 py-0.5 text-xs">any</code>:</strong> Always use proper type assertions
               or type guards.
             </span>
           </p>
