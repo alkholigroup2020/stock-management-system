@@ -143,168 +143,6 @@ const searchableContent = computed(() => {
     }
   );
 
-  // Components content
-  content.push(
-    {
-      id: "comp-naming",
-      section: "Components",
-      sectionId: "components",
-      targetSection: "naming",
-      title: "Component Naming",
-      content:
-        "Nuxt 4 auto-imports components. Subdirectory names become prefixes. layout/AppNavbar.vue becomes LayoutAppNavbar. delivery/LineItem.vue becomes DeliveryLineItem. Root components have no prefix.",
-      icon: "i-heroicons-puzzle-piece",
-    },
-    {
-      id: "comp-pages",
-      section: "Components",
-      sectionId: "components",
-      targetSection: "pages",
-      title: "Pages Overview",
-      content:
-        "43 pages implemented. Dashboard, Deliveries (4 pages), Issues (3 pages), Transfers (3 pages), Stock Now, Periods (3 pages), Period Close, NCRs (3 pages), Items (4 pages), Locations (4 pages), Suppliers (3 pages), Users (4 pages), Profile, POB, Reports (4 pages).",
-      icon: "i-heroicons-puzzle-piece",
-    },
-    {
-      id: "comp-list",
-      section: "Components",
-      sectionId: "components",
-      targetSection: "list",
-      title: "Component Categories",
-      content:
-        "39 components organized by feature. Layout: PageHeader, HierarchicalNav, LocationSwitcher, PeriodIndicator, HelpDrawer. Dashboard: MetricCard, RecentActivity. Forms: TransferForm, POBTable, AdjustmentsForm. Modals: ConfirmModal. Approval: ApprovalRequest, ApprovalStatus. Status: ErrorAlert, LoadingSpinner, EmptyState, OfflineBanner.",
-      icon: "i-heroicons-puzzle-piece",
-    },
-    {
-      id: "comp-patterns",
-      section: "Components",
-      sectionId: "components",
-      targetSection: "patterns",
-      title: "Common Patterns",
-      content:
-        "PageHeader component for page titles with actions. EmptyState for no-data scenarios. LoadingOverlay for async operations. ConfirmModal for destructive actions. ErrorAlert for displaying errors with retry option.",
-      icon: "i-heroicons-puzzle-piece",
-    }
-  );
-
-  // Composables content
-  content.push(
-    {
-      id: "comp-auth",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "auth",
-      title: "useAuth Composable",
-      content:
-        "Provides authentication state. user reactive ref for current user. isAuthenticated computed boolean. isAdmin, isSupervisor, isOperator for role checks. login, logout, refreshSession methods.",
-      icon: "i-heroicons-link",
-    },
-    {
-      id: "comp-permissions",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "permissions",
-      title: "usePermissions Composable",
-      content:
-        "Role-based permission checks. canPostDeliveries, canPostIssues, canApproveTransfers, canClosePeriod, canManageUsers, canManageItems, canManageLocations, canManageSuppliers, canViewStock, canCreateTransfer.",
-      icon: "i-heroicons-link",
-    },
-    {
-      id: "comp-toast",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "toast",
-      title: "useAppToast Composable",
-      content:
-        "Toast notification system. showSuccess, showError, showWarning, showInfo methods. Automatically styled with semantic colors. Duration configurable. Uses Nuxt UI toast under the hood.",
-      icon: "i-heroicons-link",
-    },
-    {
-      id: "comp-error",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "error",
-      title: "useErrorHandler Composable",
-      content:
-        "Centralized error handling. handleError method extracts message from error objects. Maps API error codes to user-friendly messages. Supports retry callbacks. Works with createError responses.",
-      icon: "i-heroicons-link",
-    },
-    {
-      id: "comp-offline",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "offline",
-      title: "useOnlineStatus & useOfflineGuard",
-      content:
-        "useOnlineStatus provides isOnline reactive ref. useOfflineGuard wraps actions to prevent when offline. Shows toast warning when attempting offline action. Used to disable buttons when offline.",
-      icon: "i-heroicons-link",
-    },
-    {
-      id: "comp-cache",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "cache",
-      title: "useCache Composable",
-      content:
-        "Client-side data caching. getCached, setCached, invalidate methods. Used for items, suppliers, locations master data. Reduces API calls for frequently accessed data.",
-      icon: "i-heroicons-link",
-    },
-    {
-      id: "comp-api",
-      section: "Composables",
-      sectionId: "composables",
-      targetSection: "api",
-      title: "API Composables",
-      content:
-        "useItems, useSuppliers, useLocations for master data operations. Provide fetchAll, fetchById, create, update, delete methods. Handle caching and error handling. useCurrentPeriod fetches current open period.",
-      icon: "i-heroicons-link",
-    }
-  );
-
-  // Stores content
-  content.push(
-    {
-      id: "store-auth",
-      section: "Stores",
-      sectionId: "stores",
-      targetSection: "auth",
-      title: "Auth Store",
-      content:
-        "Pinia store for authentication. user state with id, name, email, role. isAuthenticated getter. setUser, clearUser actions. Persisted to sessionStorage. Used by useAuth composable.",
-      icon: "i-heroicons-circle-stack",
-    },
-    {
-      id: "store-location",
-      section: "Stores",
-      sectionId: "stores",
-      targetSection: "location",
-      title: "Location Store",
-      content:
-        "Pinia store for active location. activeLocation state. userLocations array of accessible locations. setActiveLocation action. getActiveLocationId getter. Used by LocationSwitcher component.",
-      icon: "i-heroicons-circle-stack",
-    },
-    {
-      id: "store-period",
-      section: "Stores",
-      sectionId: "stores",
-      targetSection: "period",
-      title: "Period Store",
-      content:
-        "Pinia store for current accounting period. currentPeriod state with id, startDate, endDate, status. fetchCurrentPeriod action. isOpen, isPendingClose getters. Used by PeriodIndicator.",
-      icon: "i-heroicons-circle-stack",
-    },
-    {
-      id: "store-ui",
-      section: "Stores",
-      sectionId: "stores",
-      targetSection: "ui",
-      title: "UI Store",
-      content:
-        "Pinia store for global UI state. sidebarCollapsed boolean. modalOpen states. Theme preference. Used for coordinating UI across components.",
-      icon: "i-heroicons-circle-stack",
-    }
-  );
-
   // Authentication content
   content.push(
     {
@@ -389,253 +227,87 @@ const searchableContent = computed(() => {
     }
   );
 
-  // API Routes content
+  // Database content
   content.push(
     {
-      id: "api-conventions",
-      section: "API Routes",
-      sectionId: "api-routes",
-      targetSection: "conventions",
-      title: "RESTful Conventions",
+      id: "db-overview",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-overview",
+      title: "Database Overview",
       content:
-        "GET for fetching, POST for creating, PATCH for updating, DELETE for removing. Plural nouns for resources: /api/items, /api/deliveries. Nested routes for relationships: /api/locations/[id]/deliveries.",
-      icon: "i-heroicons-server",
+        "PostgreSQL 15+ hosted on Supabase. Prisma ORM for type-safe database access. Connection pooling via Supabase Transaction Mode port 6543. Schema with 21 models and 14 enums.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "api-errors",
-      section: "API Routes",
-      sectionId: "api-routes",
-      targetSection: "errors",
-      title: "Error Response Format",
+      id: "db-connection",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-connection",
+      title: "Connection Configuration",
       content:
-        "Use createError with statusCode and data object. data contains code (string) and message (string). Standard codes: VALIDATION_ERROR, INSUFFICIENT_STOCK, LOCATION_ACCESS_DENIED, PERIOD_CLOSED, PRICE_VARIANCE, NOT_FOUND, UNAUTHORIZED.",
-      icon: "i-heroicons-server",
+        "DATABASE_URL uses port 6543 for runtime with pgbouncer. DIRECT_URL uses port 5432 for migrations. Supabase Transaction pooler required for Prisma. SSL mode required.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "api-auth",
-      section: "API Routes",
-      sectionId: "api-routes",
-      targetSection: "auth",
-      title: "Authentication",
+      id: "db-prisma-singleton",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-prisma-singleton",
+      title: "Prisma Client Singleton",
       content:
-        "All /api/* routes auto-protected except /api/auth/*. Access user via event.context.user. JWT stored in httpOnly cookie. Refresh token handling automatic.",
-      icon: "i-heroicons-server",
+        "Global singleton pattern in server/utils/prisma.ts prevents multiple instances during hot reloads. Development logging includes query, error, warn. Production logs errors only.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "api-endpoints",
-      section: "API Routes",
-      sectionId: "api-routes",
-      targetSection: "endpoints",
-      title: "Endpoints Overview",
+      id: "db-schema",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-schema",
+      title: "Schema Overview",
       content:
-        "70 endpoints. Auth (6), Locations (9), Deliveries (6), Issues (4), Transfers (5), Periods (10), Items (6), Suppliers (5), NCRs (4), Reconciliations (2), Reports (4), Users (4), Stock (2), Dashboard (1), Health (1).",
-      icon: "i-heroicons-server",
-    }
-  );
-
-  // UI Patterns content
-  content.push(
-    {
-      id: "ui-cards",
-      section: "UI Patterns",
-      sectionId: "ui-patterns",
-      targetSection: "cards",
-      title: "Card Patterns",
-      content:
-        "card-elevated class for primary cards with navy shadow. card-muted class for secondary content. UCard component with header, default, footer slots. Rounded corners with rounded-xl.",
-      icon: "i-heroicons-paint-brush",
+        "21 Prisma models: User, Location, UserLocation, Item, Supplier, Period, PeriodLocation, ItemPrice, LocationStock, PRF, PO, Delivery, DeliveryLine, Issue, IssueLine, Transfer, TransferLine, NCR, POB, Reconciliation, Approval. 14 enums for type safety.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "ui-forms",
-      section: "UI Patterns",
-      sectionId: "ui-patterns",
-      targetSection: "forms",
-      title: "Form Patterns",
+      id: "db-key-models",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-key-models",
+      title: "Key Domain Models",
       content:
-        "Two-column grid layout with grid-cols-1 md:grid-cols-2. form-label class for labels. form-input class for inputs. UInput, USelectMenu, UTextarea components. Validation with computed disabled state.",
-      icon: "i-heroicons-paint-brush",
+        "LocationStock composite key (location_id, item_id) with on_hand and WAC. ItemPrice locks prices per period. DeliveryLine stores unit_price and period_price for variance detection. Transfer tracks multi-location stock movement.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "ui-tables",
-      section: "UI Patterns",
-      sectionId: "ui-patterns",
-      targetSection: "tables",
-      title: "Table Patterns",
+      id: "db-utilities",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-utilities",
+      title: "Business Logic Utilities",
       content:
-        "Custom HTML tables preferred over UTable for complex layouts. thead with bg-muted. tbody with divide-y. Responsive with overflow-x-auto wrapper. Action buttons in last column.",
-      icon: "i-heroicons-paint-brush",
+        "calculateWAC in server/utils/wac.ts for weighted average cost. checkPriceVariance in priceVariance.ts detects price differences. calculateConsumption in reconciliation.ts for period-end calculations. WAC formula and business rules.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "ui-modals",
-      section: "UI Patterns",
-      sectionId: "ui-patterns",
-      targetSection: "modals",
-      title: "Modal Patterns",
+      id: "db-api-patterns",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-api-patterns",
+      title: "API Access Patterns",
       content:
-        "UModal with v-model binding. ConfirmModal component for destructive actions. Variants: danger, warning, success, info. Icon with colored background. Cancel and confirm buttons in footer.",
-      icon: "i-heroicons-paint-brush",
+        "Import prisma from server/utils/prisma. Use $transaction for batched reads and atomic writes. Interactive transactions with timeout for complex operations. Upsert for LocationStock updates. Include relations in queries. Error handling with Prisma error codes.",
+      icon: "i-heroicons-server-stack",
     },
     {
-      id: "ui-buttons",
-      section: "UI Patterns",
-      sectionId: "ui-patterns",
-      targetSection: "buttons",
-      title: "Button Patterns",
+      id: "db-commands",
+      section: "Database",
+      sectionId: "database",
+      targetSection: "db-commands",
+      title: "Database Commands",
       content:
-        "All buttons must have cursor-pointer class. Primary actions use color primary. Cancel uses color neutral. Destructive uses color error. Loading state with :loading prop. Icon buttons with icon prop.",
-      icon: "i-heroicons-paint-brush",
-    },
-    {
-      id: "ui-badges",
-      section: "UI Patterns",
-      sectionId: "ui-patterns",
-      targetSection: "badges",
-      title: "Badge Patterns",
-      content:
-        "UBadge with color and variant props. Status badges: badge-pending, badge-approved, badge-rejected, badge-draft. Stock badges: badge-stock-healthy, badge-stock-low, badge-stock-critical.",
-      icon: "i-heroicons-paint-brush",
-    }
-  );
-
-  // Tailwind content
-  content.push(
-    {
-      id: "tw-theme",
-      section: "Tailwind CSS",
-      sectionId: "tailwind",
-      targetSection: "theme",
-      title: "@theme Directive",
-      content:
-        "Tailwind CSS v4 uses @theme in main.css instead of tailwind.config.ts. Define colors with --color-navy-500: #1e4d8c. Define custom utilities with @utility directive. CSS-first configuration.",
-      icon: "i-heroicons-swatch",
-    },
-    {
-      id: "tw-tokens",
-      section: "Tailwind CSS",
-      sectionId: "tailwind",
-      targetSection: "tokens",
-      title: "Semantic Tokens",
-      content:
-        "--ui-primary for brand navy blue. --ui-bg, --ui-bg-elevated, --ui-bg-muted for backgrounds. --ui-text, --ui-text-muted, --ui-text-dimmed for text. --ui-border for borders. --ui-success, --ui-error, --ui-warning, --ui-info for semantic colors.",
-      icon: "i-heroicons-swatch",
-    },
-    {
-      id: "tw-utilities",
-      section: "Tailwind CSS",
-      sectionId: "tailwind",
-      targetSection: "utilities",
-      title: "Custom Utilities",
-      content:
-        "bg-default, bg-elevated, bg-muted for backgrounds. text-default, text-primary, text-muted for text. border-default, border-muted for borders. focus-ring for focus states. smooth-transition for animations.",
-      icon: "i-heroicons-swatch",
-    },
-    {
-      id: "tw-dark",
-      section: "Tailwind CSS",
-      sectionId: "tailwind",
-      targetSection: "dark",
-      title: "Dark Mode",
-      content:
-        "Dark mode via .dark class on html element. All tokens have dark mode variants. Deep navy backgrounds in dark mode. Adjusted text colors for contrast. Automatic via Nuxt UI color mode.",
-      icon: "i-heroicons-swatch",
-    }
-  );
-
-  // Type Safety content
-  content.push(
-    {
-      id: "ts-strict",
-      section: "Type Safety",
-      sectionId: "type-safety",
-      targetSection: "strict",
-      title: "TypeScript Strict Mode",
-      content:
-        "Strict mode enabled in tsconfig. No implicit any allowed. Strict null checks. Always define return types for functions. Use interfaces for object shapes.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "ts-interfaces",
-      section: "Type Safety",
-      sectionId: "type-safety",
-      targetSection: "interfaces",
-      title: "Interface Definitions",
-      content:
-        "Define interfaces in /shared/types/. Entity interfaces: User, Location, Item, Delivery, Issue, Transfer, Period, NCR. API response interfaces. Form data interfaces. Props interfaces for components.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "ts-zod",
-      section: "Type Safety",
-      sectionId: "type-safety",
-      targetSection: "zod",
-      title: "Zod Validation",
-      content:
-        "Use Zod for runtime validation. Define schemas for API request bodies. Use z.infer to derive TypeScript types. Validate in API routes before processing. Return detailed validation errors.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "ts-prisma",
-      section: "Type Safety",
-      sectionId: "type-safety",
-      targetSection: "prisma",
-      title: "Prisma Decimal Handling",
-      content:
-        "Prisma Decimal type requires special handling. Convert to number with .toNumber() for calculations. Convert to string with .toString() for display. Use Decimal.js for precise arithmetic.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "ts-guards",
-      section: "Type Safety",
-      sectionId: "type-safety",
-      targetSection: "guards",
-      title: "Type Guards",
-      content:
-        "Use type guards for error handling. Pattern: (err as { data?: { code?: string } }). Check for specific error codes. Narrow types in conditionals. Never use bare any type.",
-      icon: "i-heroicons-shield-check",
-    }
-  );
-
-  // Best Practices content
-  content.push(
-    {
-      id: "bp-formatting",
-      section: "Best Practices",
-      sectionId: "best-practices",
-      targetSection: "formatting",
-      title: "Code Formatting",
-      content:
-        "Prettier configured. Double quotes required. Semicolons required. 2-space indentation. 100 character line width. Arrow function parentheses always. ES5 trailing commas. Run pnpm format before commit.",
-      icon: "i-heroicons-star",
-    },
-    {
-      id: "bp-checklist",
-      section: "Best Practices",
-      sectionId: "best-practices",
-      targetSection: "checklist",
-      title: "Pre-Commit Checklist",
-      content:
-        "pnpm typecheck must show zero errors. No any types in code. All error handlers use type guards. All interfaces properly defined. API responses properly typed. Prisma Decimal handled correctly.",
-      icon: "i-heroicons-star",
-    },
-    {
-      id: "bp-pitfalls",
-      section: "Best Practices",
-      sectionId: "best-practices",
-      targetSection: "pitfalls",
-      title: "Common Pitfalls",
-      content:
-        "Never allow negative stock. Never modify closed periods. Never skip location context. Never change WAC on issues. Never use db:push in production. Never bypass approval workflows. Never forget audit trail. Never expose service keys.",
-      icon: "i-heroicons-star",
-    },
-    {
-      id: "bp-currency",
-      section: "Best Practices",
-      sectionId: "best-practices",
-      targetSection: "currency",
-      title: "Currency & Dates",
-      content:
-        "Currency: SAR (Saudi Riyal). Format: SAR 1,234.56. 2 decimal places for currency. Up to 4 for quantities. Date display: DD/MM/YYYY. Date API: ISO 8601. Timezone: Asia/Riyadh.",
-      icon: "i-heroicons-star",
+        "pnpm db:push syncs schema without migrations (dev only). pnpm db:migrate dev creates migrations. pnpm db:studio opens Prisma GUI. pnpm db:seed seeds test data. Never use db:push in production.",
+      icon: "i-heroicons-server-stack",
     }
   );
 
@@ -695,54 +367,19 @@ const navSections = [
     icon: "i-heroicons-rocket-launch",
   },
   {
-    id: "authentication",
-    label: "Authentication",
-    icon: "i-heroicons-lock-closed",
-  },
-  {
     id: "architecture",
     label: "Architecture",
     icon: "i-heroicons-squares-2x2",
   },
   {
-    id: "components",
-    label: "Components",
-    icon: "i-heroicons-puzzle-piece",
+    id: "database",
+    label: "Database",
+    icon: "i-heroicons-server-stack",
   },
   {
-    id: "composables",
-    label: "Composables",
-    icon: "i-heroicons-link",
-  },
-  {
-    id: "stores",
-    label: "Stores",
-    icon: "i-heroicons-circle-stack",
-  },
-  {
-    id: "api-routes",
-    label: "API Routes",
-    icon: "i-heroicons-server",
-  },
-  {
-    id: "ui-patterns",
-    label: "UI Patterns",
-    icon: "i-heroicons-paint-brush",
-  },
-  {
-    id: "tailwind",
-    label: "Tailwind CSS",
-    icon: "i-heroicons-swatch",
-  },
-  {
-    id: "type-safety",
-    label: "Type Safety",
-    icon: "i-heroicons-shield-check",
-  },
-  {
-    id: "best-practices",
-    label: "Best Practices",
-    icon: "i-heroicons-star",
+    id: "authentication",
+    label: "Authentication",
+    icon: "i-heroicons-lock-closed",
   },
 ];
 
@@ -757,18 +394,9 @@ const contentComponents: Record<string, Component> = {
   architecture: defineAsyncComponent(
     () => import("~/components/developer/ArchitectureOverview.vue")
   ),
-  components: defineAsyncComponent(() => import("~/components/developer/ComponentPatterns.vue")),
-  composables: defineAsyncComponent(() => import("~/components/developer/ComposablesGuide.vue")),
-  stores: defineAsyncComponent(() => import("~/components/developer/StoresGuide.vue")),
+  database: defineAsyncComponent(() => import("~/components/developer/DatabaseGuide.vue")),
   authentication: defineAsyncComponent(
     () => import("~/components/developer/AuthenticationGuide.vue")
-  ),
-  "api-routes": defineAsyncComponent(() => import("~/components/developer/ApiRoutesGuide.vue")),
-  "ui-patterns": defineAsyncComponent(() => import("~/components/developer/UIPatternsGuide.vue")),
-  tailwind: defineAsyncComponent(() => import("~/components/developer/TailwindGuide.vue")),
-  "type-safety": defineAsyncComponent(() => import("~/components/developer/TypeSafetyGuide.vue")),
-  "best-practices": defineAsyncComponent(
-    () => import("~/components/developer/BestPracticesGuide.vue")
   ),
 };
 
