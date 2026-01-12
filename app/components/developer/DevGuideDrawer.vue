@@ -489,6 +489,80 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Multi-Location content
+  content.push(
+    {
+      id: "ml-location-model",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "location-model",
+      title: "Location Model & Types",
+      content:
+        "Location model is central entity with KITCHEN, STORE, CENTRAL, WAREHOUSE types. Each location has code, name, type, address, timezone. Relations to deliveries, issues, transfers, location_stock, user_locations.",
+      icon: "i-heroicons-map-pin",
+    },
+    {
+      id: "ml-location-stock",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "location-stock",
+      title: "LocationStock (Per-Location Inventory)",
+      content:
+        "LocationStock maintains per-location inventory with composite key location_id, item_id. Fields: on_hand quantity, wac (Weighted Average Cost), min_stock, max_stock thresholds. Stock is isolated per location.",
+      icon: "i-heroicons-map-pin",
+    },
+    {
+      id: "ml-user-location",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "user-location",
+      title: "User-Location Assignment",
+      content:
+        "UserLocation table controls access. OPERATOR only access assigned locations. SUPERVISOR and ADMIN have implicit access to all locations. assigned_at, assigned_by fields track who assigned access.",
+      icon: "i-heroicons-map-pin",
+    },
+    {
+      id: "ml-location-switching",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "location-switching",
+      title: "Location Switching UI",
+      content:
+        "Location Store manages activeLocationId, userLocations with 5-minute cache. LocationSwitcher component with type-specific icons and colors. switchLocation action. refreshNuxtData after switching.",
+      icon: "i-heroicons-map-pin",
+    },
+    {
+      id: "ml-location-context",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "location-context",
+      title: "Location Context in API Routes",
+      content:
+        "Server routes receive location context from middleware via event.context.locationId. All database operations scoped to location. Delivery, issue, transfer APIs use location context for stock updates.",
+      icon: "i-heroicons-map-pin",
+    },
+    {
+      id: "ml-access-middleware",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "access-middleware",
+      title: "Location Access Middleware",
+      content:
+        "location-access.ts middleware protects /api/locations/[id]/* routes. ADMIN/SUPERVISOR auto-access. OPERATOR checked via UserLocation table. Error codes: LOCATION_ACCESS_DENIED, LOCATION_NOT_FOUND, LOCATION_INACTIVE.",
+      icon: "i-heroicons-map-pin",
+    },
+    {
+      id: "ml-scoped-queries",
+      section: "Multi-Location",
+      sectionId: "multi-location",
+      targetSection: "scoped-queries",
+      title: "Location-Scoped Queries",
+      content:
+        "All queries scoped by location_id. LocationStock composite key queries. Delivery, issue filtered by location. Transfer has from_location_id and to_location_id. Database indexes optimize location queries.",
+      icon: "i-heroicons-map-pin",
+    }
+  );
+
   return content;
 });
 
@@ -569,6 +643,11 @@ const navSections = [
     label: "Caching System",
     icon: "i-heroicons-square-3-stack-3d",
   },
+  {
+    id: "multi-location",
+    label: "Multi-Location",
+    icon: "i-heroicons-map-pin",
+  },
 ];
 
 // Active section
@@ -591,6 +670,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "caching-system": defineAsyncComponent(
     () => import("~/components/developer/CachingSystemGuide.vue")
+  ),
+  "multi-location": defineAsyncComponent(
+    () => import("~/components/developer/MultiLocationGuide.vue")
   ),
 };
 
