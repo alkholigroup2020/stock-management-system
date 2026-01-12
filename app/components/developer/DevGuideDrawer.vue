@@ -855,90 +855,6 @@ const searchableContent = computed(() => {
     }
   );
 
-  // Approval Workflows content
-  content.push(
-    {
-      id: "aw-approval-model",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "approval-model",
-      title: "Generic Approval Model",
-      content:
-        "Approval model provides generic approval system for all entity types. Links to entities via entity_type and entity_id. ApprovalStatus: PENDING, APPROVED, REJECTED. Tracks requester, reviewer, timestamps, and comments.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-approval-types",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "approval-types",
-      title: "Approval Types & Permissions",
-      content:
-        "ApprovalEntityType: PRF, PO, TRANSFER, PERIOD_CLOSE. Different types have different approval requirements. PRF, PO, Transfer require Supervisor. Period Close requires Admin only. Permission matrix for request and approve.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-approval-request",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "approval-request",
-      title: "Approval Request Flow",
-      content:
-        "Create approval request when submitting entity. Validate entity status DRAFT, user permissions, pre-submission data. Create PENDING approval record. Update entity to PENDING_APPROVAL status. createApprovalRequest utility.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-approve-reject",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "approve-reject",
-      title: "Approve/Reject Actions",
-      content:
-        "processApproval utility for approve or reject. Approval triggers post-approval action (stock movement, PO creation). Rejection requires reason in comments. Rejection is final and reverts entity status.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-role-requirements",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "role-requirements",
-      title: "Role Requirements",
-      content:
-        "Operator can request PRF, PO, Transfer. Supervisor can request all plus Period Close. Supervisor can approve PRF, PO, Transfer. Admin can approve all including Period Close. canApprove and canRequest utilities.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-ui-components",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "ui-components",
-      title: "UI Components",
-      content:
-        "ApprovalStatusBadge component for status display. ApprovalActions component with approve/reject buttons and rejection modal. PendingApprovalsList component for dashboard widget showing pending approvals for reviewers.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-api-endpoints",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "api-endpoints",
-      title: "API Endpoints",
-      content:
-        "GET /api/approvals/pending list pending. PATCH /api/approvals/:id/approve approve request. PATCH /api/approvals/:id/reject reject with reason. Entity submit endpoints for Transfer, PRF, PO, Period Close.",
-      icon: "i-heroicons-shield-check",
-    },
-    {
-      id: "aw-business-rules",
-      section: "Approval Workflows",
-      sectionId: "approval-workflows",
-      targetSection: "business-rules",
-      title: "Business Rules Summary",
-      content:
-        "One approval per entity. Rejection requires reason. Period close Admin-only. Approval/Rejection final. Post-approval actions atomic in transaction. Full audit trail with requester, reviewer, timestamps, comments.",
-      icon: "i-heroicons-shield-check",
-    }
-  );
-
   // Period Management content
   content.push(
     {
@@ -1128,11 +1044,6 @@ const navSections = [
     label: "Transfers",
     icon: "i-heroicons-arrows-right-left",
   },
-  {
-    id: "approval-workflows",
-    label: "Approval Workflows",
-    icon: "i-heroicons-shield-check",
-  },
 ];
 
 // Active section
@@ -1167,9 +1078,6 @@ const contentComponents: Record<string, Component> = {
   ),
   issues: defineAsyncComponent(() => import("~/components/developer/IssuesGuide.vue")),
   transfers: defineAsyncComponent(() => import("~/components/developer/TransfersGuide.vue")),
-  "approval-workflows": defineAsyncComponent(
-    () => import("~/components/developer/ApprovalWorkflowsGuide.vue")
-  ),
 };
 
 // Get current component
