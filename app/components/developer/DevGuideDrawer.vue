@@ -855,6 +855,80 @@ const searchableContent = computed(() => {
     }
   );
 
+  // NCR (Non-Conformance Reports) content
+  content.push(
+    {
+      id: "ncr-model",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "ncr-model",
+      title: "NCR Model & Types",
+      content:
+        "NCR model for non-conformance reports. MANUAL for user-created NCRs, PRICE_VARIANCE for auto-generated from delivery price mismatch. ncr_no auto-generated NCR-YYYY-NNN. auto_generated flag distinguishes system vs user created.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "ncr-status-workflow",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "status-workflow",
+      title: "Status Workflow",
+      content:
+        "NCR status workflow: OPEN initial state, SENT to supplier, CREDITED supplier issued credit, REJECTED supplier rejected claim, RESOLVED internally resolved. Can skip SENT and go directly to RESOLVED.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "ncr-auto-generation",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "auto-generation",
+      title: "Auto-Generation (Price Variance)",
+      content:
+        "Automatic NCR creation when delivery price differs from period-locked price. checkPriceVariance compares unit_price vs period_price. ANY variance triggers NCR creation. createPriceVarianceNCR captures variance details.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "ncr-manual-creation",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "manual-ncr",
+      title: "Creating Manual NCRs",
+      content:
+        "POST /api/ncrs endpoint for manual NCR creation. User provides location, reason, value. Optional delivery link. Validates location access. Operators need explicit assignment. Supervisors and Admins have full access.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "ncr-resolution",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "ncr-resolution",
+      title: "NCR Resolution",
+      content:
+        "PATCH /api/ncrs/:id for status updates. Valid transitions enforced. CREDITED, REJECTED, RESOLVED are final states. resolved_at timestamp auto-set. resolution_notes for audit trail.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "ncr-api-frontend",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "api-frontend",
+      title: "API & Frontend",
+      content:
+        "GET /api/ncrs list NCRs, POST /api/ncrs create manual NCR, GET /api/ncrs/:id details, PATCH /api/ncrs/:id update status. NCR number format NCR-YYYY-NNN. afterNCR cache invalidation pattern.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "ncr-business-rules",
+      section: "NCR",
+      sectionId: "ncr",
+      targetSection: "business-rules",
+      title: "Business Rules Summary",
+      content:
+        "Business rules: ANY price variance creates NCR. Auto-generated NCRs always link to delivery. Final states cannot be changed. resolved_at auto-set. Location access required. NCR number unique per year.",
+      icon: "i-heroicons-exclamation-triangle",
+    }
+  );
+
   // Period Management content
   content.push(
     {
@@ -1044,6 +1118,11 @@ const navSections = [
     label: "Transfers",
     icon: "i-heroicons-arrows-right-left",
   },
+  {
+    id: "ncr",
+    label: "NCR",
+    icon: "i-heroicons-exclamation-triangle",
+  },
 ];
 
 // Active section
@@ -1078,6 +1157,7 @@ const contentComponents: Record<string, Component> = {
   ),
   issues: defineAsyncComponent(() => import("~/components/developer/IssuesGuide.vue")),
   transfers: defineAsyncComponent(() => import("~/components/developer/TransfersGuide.vue")),
+  ncr: defineAsyncComponent(() => import("~/components/developer/NCRGuide.vue")),
 };
 
 // Get current component
