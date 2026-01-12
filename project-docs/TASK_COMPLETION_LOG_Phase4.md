@@ -265,3 +265,91 @@ The application is now successfully deployed and fully functional at:
 4. **Transitive Dependencies:** If your code directly imports a module, add it as a direct dependency even if it's available transitively.
 
 5. **Manual Chunk Splitting:** Avoid custom `manualChunks` configuration unless absolutely necessary - it can cause circular dependency issues that are hard to debug.
+
+---
+
+## Developer Guide: Issues (Stock Deductions) Section
+
+**Completed:** 2026-01-12
+
+---
+
+### Overview
+
+Added a comprehensive new section to the Developer Guide covering Issues (Stock Deductions) - the 10th section in the guide. This section explains the complete end-to-end flow of issuing stock from inventory, including the Issue model structure, cost centre tracking, WAC capture at issue time, stock validation to prevent negative inventory, and the posting flow.
+
+---
+
+### Files Created
+
+| File | Description |
+|------|-------------|
+| `app/components/developer/IssuesGuide.vue` | New Developer Guide component (545 lines) |
+
+---
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `app/components/developer/DevGuideDrawer.vue` | Added navigation entry, component mapping, and 9 searchable content entries |
+| `project-docs/DEVELOPER_GUIDE_TOPICS.md` | Marked Issues section as completed, updated summary table |
+
+---
+
+### Topics Covered in the New Section
+
+The IssuesGuide.vue component covers these key topics with code examples, diagrams, and business rules:
+
+1. **Issue Model & IssueLine** - Prisma schema definitions, key fields, auto-generated issue numbers (ISS-YYYY-NNN)
+
+2. **Cost Centre Tracking** - FOOD, CLEAN, OTHER categories for consumption analysis and reporting
+
+3. **WAC at Issue Capture** - Why and how WAC is captured at issue time (not recalculated like deliveries)
+
+4. **Stock Validation (No Negative)** - Critical business rule with validation function that checks all items before processing any
+
+5. **Issue Posting Flow** - Complete data flow diagram and posting steps in an atomic transaction
+
+6. **Stock Update Pattern** - How issues decrement stock vs. how deliveries increment (key difference: WAC unchanged)
+
+7. **API & Frontend** - Recommended composable patterns, form components, error codes, cache invalidation
+
+8. **Reconciliation Impact** - How issues fit into the period-end reconciliation formula
+
+9. **Business Rules Summary** - All critical rules consolidated
+
+---
+
+### Search Index Entries Added
+
+Nine new searchable entries were added to DevGuideDrawer.vue for the Issues section:
+
+- Issue Model
+- Cost Centre Tracking
+- WAC at Issue Capture
+- Stock Validation (No Negative)
+- Issue Posting Flow
+- Stock Update Pattern
+- API & Frontend
+- Reconciliation Impact
+- Business Rules Summary
+
+---
+
+### Developer Guide Progress
+
+With this addition, the Developer Guide now has **10 implemented sections** covering:
+
+1. Getting Started
+2. Architecture Overview
+3. Database Guide
+4. Authentication Guide
+5. State Management (Pinia)
+6. Caching System
+7. Multi-Location System
+8. Period Management
+9. Deliveries & WAC
+10. **Issues (Stock Deductions)** ← NEW
+
+**15 topics remaining** to comprehensively cover all development aspects.

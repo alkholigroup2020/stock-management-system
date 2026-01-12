@@ -667,6 +667,100 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Issues (Stock Deductions) content
+  content.push(
+    {
+      id: "iss-issue-model",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "issue-model",
+      title: "Issue Model",
+      content:
+        "Issue model for outbound stock deductions. IssueLine stores item quantities, wac_at_issue, line_value. issue_no auto-generated ISS-YYYY-NNN. cost_centre for FOOD, CLEAN, or OTHER tracking.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-cost-centre",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "cost-centre",
+      title: "Cost Centre Tracking",
+      content:
+        "Cost centre tracking for consumption analysis. FOOD for food-related consumption, CLEAN for cleaning supplies, OTHER for miscellaneous. Enables reporting by category and cost per manday calculations.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-wac-at-issue",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "wac-at-issue",
+      title: "WAC at Issue Capture",
+      content:
+        "WAC captured at time of issue in wac_at_issue field. Issues do NOT recalculate WAC. line_value equals quantity times wac_at_issue. Preserves accurate cost for reporting and reconciliation.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-stock-validation",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "stock-validation",
+      title: "Stock Validation (No Negative)",
+      content:
+        "Critical business rule: never allow negative stock. Validate requestedQty less than or equal to on_hand. Check ALL items before processing ANY. Return specific item IDs that fail. INSUFFICIENT_STOCK error code.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-posting-flow",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "posting-flow",
+      title: "Issue Posting Flow",
+      content:
+        "Issue posting flow: validate period OPEN, start transaction, validate stock, generate issue number, create header, process lines, decrement stock, update totals. No draft state - all issues immediately posted.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-stock-update",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "stock-update",
+      title: "Stock Update Pattern",
+      content:
+        "Issues decrement stock with UPDATE operation. WAC remains unchanged. Different from deliveries which use UPSERT and recalculate WAC. Stock record must exist before issue. Atomic within transaction.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-api-frontend",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "api-frontend",
+      title: "API & Frontend",
+      content:
+        "POST /api/locations/:id/issues endpoint. useIssues composable pattern. IssueForm component with cost centre select, date picker, line items. afterIssue() cache invalidation. Error codes: INSUFFICIENT_STOCK, NO_OPEN_PERIOD.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-reconciliation",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "reconciliation",
+      title: "Reconciliation Impact",
+      content:
+        "Issues are key component of period-end reconciliation. Formula: Opening + Receipts + TransfersIn - TransfersOut - Issues - Adjustments = Closing. Issue totals by cost centre for reporting.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    },
+    {
+      id: "iss-business-rules",
+      section: "Issues",
+      sectionId: "issues",
+      targetSection: "business-rules",
+      title: "Business Rules Summary",
+      content:
+        "Business rules: Never allow negative stock. Issues do NOT recalculate WAC. Period must be OPEN. Immediate posting, no draft state. Cost centre required. Audit trail with posted_by, posted_at, issue_no.",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+    }
+  );
+
   // Period Management content
   content.push(
     {
@@ -846,6 +940,11 @@ const navSections = [
     label: "Deliveries & WAC",
     icon: "i-heroicons-truck",
   },
+  {
+    id: "issues",
+    label: "Issues",
+    icon: "i-heroicons-arrow-right-on-rectangle",
+  },
 ];
 
 // Active section
@@ -878,6 +977,7 @@ const contentComponents: Record<string, Component> = {
   "deliveries-wac": defineAsyncComponent(
     () => import("~/components/developer/DeliveriesWACGuide.vue")
   ),
+  issues: defineAsyncComponent(() => import("~/components/developer/IssuesGuide.vue")),
 };
 
 // Get current component
