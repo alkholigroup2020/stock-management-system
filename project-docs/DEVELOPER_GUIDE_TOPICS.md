@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (10 sections, 75 subsections)
+## Currently Implemented Topics (11 sections, 84 subsections)
 
 ### 1. Getting Started
 - Prerequisites
@@ -97,18 +97,20 @@
 - Reconciliation Impact
 - Business Rules Summary
 
+### 11. Transfers (Inter-Location Stock Movement)
+- Transfer Model & TransferLine
+- Status Workflow (DRAFT → PENDING_APPROVAL → APPROVED/REJECTED → COMPLETED)
+- Approval Requirements (Supervisor/Admin)
+- Transfer Creation Flow
+- Stock Updates on Both Locations
+- WAC Handling (Source capture, Destination recalculation)
+- API & Frontend Patterns
+- Reconciliation Impact
+- Business Rules Summary
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
-
-### 11. Transfers
-**End-to-end guide for inter-location transfers**
-- Transfer Model & TransferLine
-- Status workflow (DRAFT → PENDING_APPROVAL → APPROVED → COMPLETED)
-- Approval requirements
-- Source/destination location handling
-- Transfer posting (atomic execution)
-- Stock updates on both locations
 
 ### 12. Approval Workflows
 **End-to-end guide for approval system**
@@ -242,7 +244,7 @@
 2. ~~**Period Management** - Accounting period lifecycle~~ ✅
 3. ~~**Deliveries & WAC** - Receiving inventory with cost calculation~~ ✅
 4. ~~**Issues (Stock Deductions)** - Issuing inventory~~ ✅
-5. **Transfers** - Inter-location moves with approval
+5. ~~**Transfers** - Inter-location moves with approval~~ ✅
 6. **Approval Workflows** - Generic approval pattern
 
 ### Phase 2: Supporting Business Features
@@ -276,10 +278,10 @@
 |----------|-------------|--------|-------|
 | Core Setup | 2 (Getting Started, Architecture) | 0 | 2 |
 | Data Layer | 4 (Database, Auth, State Management, Caching) | 1 (Data Fetching) | 5 |
-| Business Features | 4 (Multi-Location, Period Management, Deliveries & WAC, Issues) | 5 (Transfer, Approval, NCR, Reconciliation, POB) | 9 |
+| Business Features | 5 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers) | 4 (Approval, NCR, Reconciliation, POB) | 9 |
 | API & Backend | 0 | 2 (API Patterns, Error Handling) | 2 |
 | UI & Components | 0 | 3 (Components, Forms, Tables) | 3 |
 | Operations | 0 | 4 (PWA, Testing, Performance, Deployment) | 4 |
-| **TOTAL** | **10** | **15** | **25** |
+| **TOTAL** | **11** | **14** | **25** |
 
-15 additional topics needed to comprehensively cover all development aspects.
+14 additional topics needed to comprehensively cover all development aspects.

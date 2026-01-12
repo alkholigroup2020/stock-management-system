@@ -761,6 +761,100 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Transfers (Inter-Location Stock Movement) content
+  content.push(
+    {
+      id: "trf-transfer-model",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "transfer-model",
+      title: "Transfer Model",
+      content:
+        "Transfer model for inter-location stock movements. TransferLine stores item quantities, wac_at_transfer, line_value. transfer_no auto-generated TRF-YYYY-NNN. Tracks from_location, to_location, requester, approver.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-status-workflow",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "status-workflow",
+      title: "Status Workflow",
+      content:
+        "Transfer status workflow: DRAFT, PENDING_APPROVAL, APPROVED, REJECTED, COMPLETED. Approval immediately executes stock movement. Only Supervisor or Admin can approve or reject transfers.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-approval-requirements",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "approval-requirements",
+      title: "Approval Requirements",
+      content:
+        "Only Supervisor or Admin can approve or reject transfers. Operators can create transfers for assigned locations. Transfer must be in PENDING_APPROVAL status. Approval executes atomic stock movement.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-transfer-creation",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "transfer-creation",
+      title: "Transfer Creation Flow",
+      content:
+        "Transfer creation validates locations are different, user access, items active, stock availability. Creates in PENDING_APPROVAL status. Stock validated at creation and re-validated at approval.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-stock-update",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "stock-update",
+      title: "Stock Updates",
+      content:
+        "Upon approval, stock atomically moved from source to destination. Source WAC unchanged, only quantity decremented. Destination WAC recalculated or set to source WAC if no existing stock.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-wac-handling",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "wac-handling",
+      title: "WAC Handling",
+      content:
+        "Source WAC captured at transfer creation in wac_at_transfer field. Source location WAC unchanged. Destination WAC recalculated using standard WAC formula with source WAC as receipt price.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-api-frontend",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "api-frontend",
+      title: "API & Frontend",
+      content:
+        "POST /api/transfers creates transfer. PATCH /api/transfers/:id/approve approves and executes. PATCH /api/transfers/:id/reject rejects. afterTransfer() cache invalidation for both locations.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-reconciliation",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "reconciliation",
+      title: "Reconciliation Impact",
+      content:
+        "Transfers affect reconciliation for both locations. TransfersIn added to destination. TransfersOut deducted from source. Formula: Opening + Receipts + TransfersIn - TransfersOut - Issues - Adjustments = Closing.",
+      icon: "i-heroicons-arrows-right-left",
+    },
+    {
+      id: "trf-business-rules",
+      section: "Transfers",
+      sectionId: "transfers",
+      targetSection: "business-rules",
+      title: "Business Rules Summary",
+      content:
+        "Business rules: Cannot transfer to same location. Stock validated at creation AND approval. Only Supervisor/Admin can approve. Source WAC unchanged. Atomic stock movement. Rejection is final.",
+      icon: "i-heroicons-arrows-right-left",
+    }
+  );
+
   // Period Management content
   content.push(
     {
@@ -945,6 +1039,11 @@ const navSections = [
     label: "Issues",
     icon: "i-heroicons-arrow-right-on-rectangle",
   },
+  {
+    id: "transfers",
+    label: "Transfers",
+    icon: "i-heroicons-arrows-right-left",
+  },
 ];
 
 // Active section
@@ -978,6 +1077,7 @@ const contentComponents: Record<string, Component> = {
     () => import("~/components/developer/DeliveriesWACGuide.vue")
   ),
   issues: defineAsyncComponent(() => import("~/components/developer/IssuesGuide.vue")),
+  transfers: defineAsyncComponent(() => import("~/components/developer/TransfersGuide.vue")),
 };
 
 // Get current component
