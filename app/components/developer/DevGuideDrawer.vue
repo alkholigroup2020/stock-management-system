@@ -563,6 +563,110 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Deliveries & WAC content
+  content.push(
+    {
+      id: "dw-delivery-model",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "delivery-model",
+      title: "Delivery Model",
+      content:
+        "Delivery model for inbound stock from suppliers. DeliveryLine stores item quantities, unit_price, period_price, price_variance. Status DRAFT or POSTED. delivery_no auto-generated DEL-YYYY-NNN. has_variance flag for price variances.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-delivery-flow",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "delivery-flow",
+      title: "Delivery Creation Flow",
+      content:
+        "Deliveries can be DRAFT (editable, no stock impact) or POSTED (finalized with stock and WAC updates). DRAFT: no stock impact, can edit/delete, invoice_no optional. POSTED: stock updated, WAC recalculated, invoice_no required, period must be OPEN.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-wac-calculation",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "wac-calculation",
+      title: "Weighted Average Cost (WAC)",
+      content:
+        "WAC calculation formula: newWAC = (currentQty × currentWAC + receivedQty × receiptPrice) / (currentQty + receivedQty). calculateWAC utility in server/utils/wac.ts. Only deliveries recalculate WAC. Issues deduct at current WAC.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-price-variance",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "price-variance",
+      title: "Price Variance Detection",
+      content:
+        "Price variance detection compares unit_price (invoice) vs period_price (locked). checkPriceVariance utility in server/utils/priceVariance.ts. ANY variance triggers NCR creation (threshold = 0). Calculates variance, variancePercent, varianceAmount.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-auto-ncr",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "auto-ncr",
+      title: "Auto-NCR Generation",
+      content:
+        "Automatic NCR creation for price variance. createPriceVarianceNCR utility. NCR type: PRICE_VARIANCE, auto_generated: true, status: OPEN. Links to delivery_id and delivery_line_id. NCR number format: NCR-YYYY-NNN.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-posting-flow",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "posting-flow",
+      title: "Delivery Posting Flow",
+      content:
+        "Posting flow: validate inputs, batch fetch period prices and current stocks, process in $transaction. For each line: calculate WAC, check variance, create line, update stock (upsert), create NCR if variance. Transaction timeout 30 seconds.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-stock-update",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "stock-update",
+      title: "Stock Update on Receipt",
+      content:
+        "Stock updated using Prisma upsert pattern. LocationStock: increment on_hand, update WAC. First receipt creates record with WAC = receipt price. Subsequent receipts update existing record with recalculated WAC. Atomic within transaction.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-api-endpoint",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "api-endpoint",
+      title: "API Endpoint",
+      content:
+        "POST /api/locations/:id/deliveries endpoint. Zod validation for request body. Error codes: VALIDATION_ERROR, NO_OPEN_PERIOD, LOCATION_ACCESS_DENIED, SUPPLIER_NOT_FOUND, INVALID_ITEMS. Returns delivery with lines and auto-generated NCRs.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-frontend",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "frontend",
+      title: "Frontend Integration",
+      content:
+        "Frontend patterns for delivery management. afterDelivery() from useSmartCacheInvalidation() is implemented. Recommended patterns for useDeliveries composable and DeliveryForm component with period validation, supplier select, line items.",
+      icon: "i-heroicons-truck",
+    },
+    {
+      id: "dw-business-rules",
+      section: "Deliveries & WAC",
+      sectionId: "deliveries-wac",
+      targetSection: "business-rules",
+      title: "Business Rules Summary",
+      content:
+        "Business rules: Deliveries update WAC (recalculate). Issues deduct at current WAC (no recalc). ANY price variance creates NCR. Posted deliveries immutable. Period must be OPEN for posting. DRAFT only visible to creator.",
+      icon: "i-heroicons-truck",
+    }
+  );
+
   // Period Management content
   content.push(
     {
@@ -737,6 +841,11 @@ const navSections = [
     label: "Period Management",
     icon: "i-heroicons-calendar-days",
   },
+  {
+    id: "deliveries-wac",
+    label: "Deliveries & WAC",
+    icon: "i-heroicons-truck",
+  },
 ];
 
 // Active section
@@ -765,6 +874,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "period-management": defineAsyncComponent(
     () => import("~/components/developer/PeriodManagementGuide.vue")
+  ),
+  "deliveries-wac": defineAsyncComponent(
+    () => import("~/components/developer/DeliveriesWACGuide.vue")
   ),
 };
 

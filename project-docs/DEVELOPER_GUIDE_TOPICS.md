@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (8 sections, 56 subsections)
+## Currently Implemented Topics (9 sections, 66 subsections)
 
 ### 1. Getting Started
 - Prerequisites
@@ -74,19 +74,21 @@
 - Roll-Forward to New Period
 - Period Indicator UI
 
+### 9. Deliveries & WAC
+- Delivery Model & DeliveryLine
+- Delivery Creation Flow (DRAFT vs POSTED)
+- Weighted Average Cost (WAC) Calculation
+- Price Variance Detection
+- Auto-NCR Generation
+- Delivery Posting Flow
+- Stock Update on Receipt
+- API Endpoint
+- Frontend Integration
+- Business Rules Summary
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
-
-### 9. Deliveries & WAC
-**End-to-end guide for receiving inventory**
-- Delivery Model & DeliveryLine
-- Creating deliveries (API + UI)
-- Weighted Average Cost (WAC) calculation
-- Price Variance Detection
-- Auto-NCR generation
-- Delivery posting flow
-- Stock update on receipt
 
 ### 10. Issues (Stock Deductions)
 **End-to-end guide for issuing stock**
@@ -234,9 +236,9 @@
 ## Implementation Priority Order (Business Features First)
 
 ### Phase 1: Core Business Features
-1. ~~**Multi-Location System** - Foundation for all operations~~ ✅ DONE
-2. ~~**Period Management** - Accounting period lifecycle~~ ✅ DONE
-3. **Deliveries & WAC** - Receiving inventory with cost calculation
+1. ~~**Multi-Location System** - Foundation for all operations~~ ✅
+2. ~~**Period Management** - Accounting period lifecycle~~ ✅
+3. ~~**Deliveries & WAC** - Receiving inventory with cost calculation~~ ✅
 4. **Issues (Stock Deductions)** - Issuing inventory
 5. **Transfers** - Inter-location moves with approval
 6. **Approval Workflows** - Generic approval pattern
@@ -272,10 +274,10 @@
 |----------|-------------|--------|-------|
 | Core Setup | 2 (Getting Started, Architecture) | 0 | 2 |
 | Data Layer | 4 (Database, Auth, State Management, Caching) | 1 (Data Fetching) | 5 |
-| Business Features | 2 (Multi-Location, Period Management) | 7 (Delivery, Issue, Transfer, Approval, NCR, Reconciliation, POB) | 9 |
+| Business Features | 3 (Multi-Location, Period Management, Deliveries & WAC) | 6 (Issue, Transfer, Approval, NCR, Reconciliation, POB) | 9 |
 | API & Backend | 0 | 2 (API Patterns, Error Handling) | 2 |
 | UI & Components | 0 | 3 (Components, Forms, Tables) | 3 |
 | Operations | 0 | 4 (PWA, Testing, Performance, Deployment) | 4 |
-| **TOTAL** | **8** | **17** | **25** |
+| **TOTAL** | **9** | **16** | **25** |
 
-17 additional topics needed to comprehensively cover all development aspects.
+16 additional topics needed to comprehensively cover all development aspects.
