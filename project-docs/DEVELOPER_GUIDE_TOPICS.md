@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (11 sections, 84 subsections)
+## Currently Implemented Topics (12 sections, 92 subsections)
 
 ### 1. Getting Started
 - Prerequisites
@@ -108,20 +108,21 @@
 - Reconciliation Impact
 - Business Rules Summary
 
+### 12. Approval Workflows
+- Generic Approval Model
+- Approval Types & Permissions (PRF, PO, TRANSFER, PERIOD_CLOSE)
+- Approval Request Flow
+- Approve/Reject Actions
+- Role Requirements (Supervisor, Admin)
+- UI Components (ApprovalStatusBadge, ApprovalActions, PendingApprovalsList)
+- API Endpoints
+- Business Rules Summary
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
 
-### 12. Approval Workflows
-**End-to-end guide for approval system**
-- Generic Approval model
-- Approval types: PRF, PO, PERIOD_CLOSE, TRANSFER
-- Approval request flow
-- Approve/Reject actions
-- Role requirements (Supervisor, Admin)
-- UI components: ApprovalRequest, ApprovalStatus, ApprovalActions
-
-### 13. NCR (Non-Conformance Reports)
+### 14. NCR (Non-Conformance Reports)
 **End-to-end guide for NCR management**
 - NCR Model & Types (MANUAL, PRICE_VARIANCE)
 - Auto-generation from price variance
@@ -129,7 +130,7 @@
 - Creating manual NCRs
 - NCR resolution
 
-### 14. Reconciliation
+### 15. Reconciliation
 **End-to-end guide for period-end reconciliation**
 - Reconciliation Model
 - Calculation formula: Opening + Receipts + Transfers In - Transfers Out - Issues - Adjustments = Closing
@@ -137,14 +138,14 @@
 - Consolidated view
 - Reconciliation report
 
-### 15. POB (Persons on Board)
+### 16. POB (Persons on Board)
 **End-to-end guide for crew count tracking**
 - POB Model
 - Daily POB entry
 - Mandays calculation
 - Cost per manday reporting
 
-### 16. Server API Patterns
+### 17. Server API Patterns
 **End-to-end guide for API route development**
 - API Route conventions (`/server/api/`)
 - defineEventHandler patterns
@@ -155,7 +156,7 @@
 - Prisma transactions in routes
 - Auth context (`event.context.user`)
 
-### 17. Data Fetching Composables
+### 18. Data Fetching Composables
 **End-to-end guide for frontend data fetching**
 - Composable patterns: useItems, useLocations, useSuppliers, usePeriods
 - useAsyncData hooks with caching
@@ -164,7 +165,7 @@
 - Refresh patterns
 - Cache integration
 
-### 18. Component Patterns
+### 19. Component Patterns
 **End-to-end guide for component development**
 - Component naming conventions (Nuxt 4 auto-import)
 - Layout components (AppNavbar, PageHeader, LocationSwitcher)
@@ -173,7 +174,7 @@
 - Props & Emits TypeScript patterns
 - Slot patterns
 
-### 19. Forms & Validation
+### 20. Forms & Validation
 **End-to-end guide for form handling**
 - Nuxt UI form components (UInput, USelect, UTextarea)
 - Zod schema validation
@@ -182,7 +183,7 @@
 - Loading states on submit
 - Form state management
 
-### 20. Tables & Lists
+### 21. Tables & Lists
 **End-to-end guide for data display**
 - UTable component patterns
 - Column definitions
@@ -192,7 +193,7 @@
 - Empty states
 - Loading states
 
-### 21. Error Handling
+### 22. Error Handling
 **End-to-end guide for error management**
 - Server error patterns (createError)
 - Client error handling (useErrorHandler)
@@ -202,7 +203,7 @@
 - Network errors
 - Type guards for error types
 
-### 22. PWA & Offline
+### 23. PWA & Offline
 **End-to-end guide for PWA features**
 - PWA configuration (@vite-pwa/nuxt)
 - useOnlineStatus composable
@@ -211,7 +212,7 @@
 - Disabling actions when offline
 - Service worker caching
 
-### 23. Testing
+### 24. Testing
 **End-to-end guide for testing**
 - Unit tests (WAC calculations, reconciliation math)
 - API tests (Deliveries, Issues, Transfers, Period close)
@@ -219,7 +220,7 @@
 - Database reset for testing
 - Manual testing checklist
 
-### 24. Performance
+### 25. Performance
 **End-to-end guide for performance**
 - Performance middleware
 - Response time SLAs
@@ -228,7 +229,7 @@
 - Batch operations
 - Client-side caching
 
-### 25. Deployment
+### 26. Deployment
 **End-to-end guide for deployment**
 - Vercel deployment
 - Environment variables
@@ -245,7 +246,7 @@
 3. ~~**Deliveries & WAC** - Receiving inventory with cost calculation~~ ✅
 4. ~~**Issues (Stock Deductions)** - Issuing inventory~~ ✅
 5. ~~**Transfers** - Inter-location moves with approval~~ ✅
-6. **Approval Workflows** - Generic approval pattern
+6. ~~**Approval Workflows** - Generic approval pattern~~ ✅
 
 ### Phase 2: Supporting Business Features
 7. **NCR (Non-Conformance Reports)** - Price variance handling
@@ -278,10 +279,10 @@
 |----------|-------------|--------|-------|
 | Core Setup | 2 (Getting Started, Architecture) | 0 | 2 |
 | Data Layer | 4 (Database, Auth, State Management, Caching) | 1 (Data Fetching) | 5 |
-| Business Features | 5 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers) | 4 (Approval, NCR, Reconciliation, POB) | 9 |
+| Business Features | 6 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, Approval Workflows) | 3 (NCR, Reconciliation, POB) | 9 |
 | API & Backend | 0 | 2 (API Patterns, Error Handling) | 2 |
 | UI & Components | 0 | 3 (Components, Forms, Tables) | 3 |
 | Operations | 0 | 4 (PWA, Testing, Performance, Deployment) | 4 |
-| **TOTAL** | **11** | **14** | **25** |
+| **TOTAL** | **12** | **13** | **25** |
 
-14 additional topics needed to comprehensively cover all development aspects.
+13 additional topics needed to comprehensively cover all development aspects.
