@@ -395,6 +395,100 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Caching System content
+  content.push(
+    {
+      id: "cache-overview",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "cache-overview",
+      title: "Cache Architecture Overview",
+      content:
+        "Nuxt payload-based caching with useAsyncData. Time-based cache expiration. Filter-aware cache keys. Manual and smart invalidation. getCachedData function for custom TTL.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-categories",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "cache-categories",
+      title: "Cache Categories",
+      content:
+        "Locations, items, periods, suppliers, stock, transactions, dashboard cache categories. Cache key patterns. TTL values: 20 seconds for most data, 10 seconds for current period.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-useAsyncData",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "useAsyncData-pattern",
+      title: "useAsyncData with Timestamps",
+      content:
+        "useAsyncData getCachedData function. Timestamp-based cache validation. nuxtApp.payload.data storage. Filter-aware unique cache keys. Automatic refetch on filter change.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-useCache",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "useCache",
+      title: "useCache Composable",
+      content:
+        "Centralized cache management. invalidateLocations, invalidateItems, invalidatePeriods, invalidateStock, invalidateTransactions, invalidateDashboard. invalidateAll nuclear option. getCacheStats debugging.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-smart",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "smart-cache",
+      title: "Smart Cache Invalidation",
+      content:
+        "useSmartCacheInvalidation composable. afterDelivery, afterIssue, afterTransfer, afterPeriodClose, afterLocationReady, afterPriceChange, afterReconciliation. Automatic related cache invalidation.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-strategies",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "invalidation-strategies",
+      title: "Cache Invalidation Strategies",
+      content:
+        "When to invalidate caches. Category invalidation for master data CRUD. Smart invalidation for business operations. Call refresh after invalidation. Avoid invalidateAll unless necessary.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-period",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "period-cache",
+      title: "Current Period Cache",
+      content:
+        "Shorter TTL for critical data. 10 second expiration for current period. Auto-refresh option with interval. isPeriodOpen check before transactions. Period status validation.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-crud",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "crud-example",
+      title: "Complete CRUD Example",
+      content:
+        "Full CRUD with cache invalidation. Create, update, delete with invalidateLocationsCache. Smart invalidation with afterDelivery. Migration guide from direct $fetch to caching composables.",
+      icon: "i-heroicons-square-3-stack-3d",
+    },
+    {
+      id: "cache-debugging",
+      section: "Caching System",
+      sectionId: "caching-system",
+      targetSection: "debugging",
+      title: "Debugging Cache",
+      content:
+        "getCacheStats for cache statistics. Inspect nuxtApp.payload.data. Check cache age with timestamps. Common issues: stale data, data not updating, wrong data for filters, too many API calls.",
+      icon: "i-heroicons-square-3-stack-3d",
+    }
+  );
+
   return content;
 });
 
@@ -470,6 +564,11 @@ const navSections = [
     label: "State Management",
     icon: "i-heroicons-cube-transparent",
   },
+  {
+    id: "caching-system",
+    label: "Caching System",
+    icon: "i-heroicons-square-3-stack-3d",
+  },
 ];
 
 // Active section
@@ -489,6 +588,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "state-management": defineAsyncComponent(
     () => import("~/components/developer/StateManagementGuide.vue")
+  ),
+  "caching-system": defineAsyncComponent(
+    () => import("~/components/developer/CachingSystemGuide.vue")
   ),
 };
 
