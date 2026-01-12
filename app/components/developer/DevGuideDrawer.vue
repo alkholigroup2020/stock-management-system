@@ -311,6 +311,90 @@ const searchableContent = computed(() => {
     }
   );
 
+  // State Management content
+  content.push(
+    {
+      id: "sm-overview",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "pinia-overview",
+      title: "Pinia Overview",
+      content:
+        "Pinia state management library for Vue 3. Auto-imported from /app/stores/. Composition API setup function pattern. defineStore with reactive refs, computed getters, and function actions.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-auth-store",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "auth-store",
+      title: "Auth Store",
+      content:
+        "User authentication state with SessionUser interface. Role checks: isAdmin, isSupervisor, isOperator. Location access: hasLocationAccess, canPostAtLocation. Actions: login, logout, fetchSession.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-location-store",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "location-store",
+      title: "Location Store",
+      content:
+        "Multi-location context with 5-minute cache. activeLocation, userLocations state. fetchUserLocations with caching. switchLocation action. LocationWithAccess interface for access levels.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-period-store",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "period-store",
+      title: "Period Store",
+      content:
+        "Accounting period management with 10-minute cache. isPeriodOpen status check. periodDateRange formatted display. daysRemaining calculation. fetchCurrentPeriod with caching.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-ui-store",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "ui-store",
+      title: "UI Store",
+      content:
+        "Application UI state: toasts, modals, sidebar. showSuccess, showError, showWarning, showInfo toast methods. openModal, closeModal for dialogs. toggleSidebar, toggleMobileSidebar for navigation.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-composition",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "store-composition",
+      title: "Store Composition",
+      content:
+        "Cross-store communication patterns. Auth store coordinates Location and Period on login/logout. Parallel data loading with Promise.all. Store dependencies diagram. Reset pattern on logout.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-reactive",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "reactive-patterns",
+      title: "Reactive Patterns",
+      content:
+        "storeToRefs for reactive destructuring. Computed properties from store state. Watching store changes. Common mistake: losing reactivity without storeToRefs. Actions don't need storeToRefs.",
+      icon: "i-heroicons-cube-transparent",
+    },
+    {
+      id: "sm-initialization",
+      section: "State Management",
+      sectionId: "state-management",
+      targetSection: "app-initialization",
+      title: "Store Initialization",
+      content:
+        "useAppInit composable flow. auth.client.ts plugin runs on startup. Fetches session then locations and period in parallel. Post-login loading pattern. Cache invalidation strategies.",
+      icon: "i-heroicons-cube-transparent",
+    }
+  );
+
   return content;
 });
 
@@ -381,6 +465,11 @@ const navSections = [
     label: "Authentication",
     icon: "i-heroicons-lock-closed",
   },
+  {
+    id: "state-management",
+    label: "State Management",
+    icon: "i-heroicons-cube-transparent",
+  },
 ];
 
 // Active section
@@ -397,6 +486,9 @@ const contentComponents: Record<string, Component> = {
   database: defineAsyncComponent(() => import("~/components/developer/DatabaseGuide.vue")),
   authentication: defineAsyncComponent(
     () => import("~/components/developer/AuthenticationGuide.vue")
+  ),
+  "state-management": defineAsyncComponent(
+    () => import("~/components/developer/StateManagementGuide.vue")
   ),
 };
 
