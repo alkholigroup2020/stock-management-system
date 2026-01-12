@@ -563,6 +563,90 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Period Management content
+  content.push(
+    {
+      id: "pm-period-lifecycle",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "period-lifecycle",
+      title: "Period Lifecycle",
+      content:
+        "Period lifecycle: DRAFT created not active, OPEN active for transactions, PENDING_CLOSE all locations ready, APPROVED admin approved close, CLOSED no more transactions. Period model with start_date, end_date, status, approval_id.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-period-location",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "period-location",
+      title: "PeriodLocation Status Tracking",
+      content:
+        "PeriodLocation tracks per-location period status: OPEN allows transactions, READY marked for close, CLOSED with snapshot. Composite key period_id, location_id. Stores opening_value, closing_value, snapshot_data.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-price-locking",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "price-locking",
+      title: "Price Locking Mechanism",
+      content:
+        "ItemPrice locks prices at period start. DeliveryLine compares unit_price vs period_price. Price variance auto-generates NCR with type PRICE_VARIANCE and auto_generated true. Unique constraint on item_id, period_id.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-period-store",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "period-store",
+      title: "Current Period Store",
+      content:
+        "Period Store with 10-minute cache. Getters: hasPeriod, isPeriodOpen, periodName, periodStatus, periodDateRange, daysRemaining. Actions: fetchCurrentPeriod, refresh, invalidateCache, reset.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-period-validation",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "period-validation",
+      title: "Period Validation in Transactions",
+      content:
+        "Validate period status before posting. validatePeriodOpen checks period.status OPEN. validateLocationPeriodOpen checks periodLocation.status. Error codes: PERIOD_CLOSED, LOCATION_PERIOD_CLOSED, PERIOD_NOT_FOUND.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-period-close",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "period-close",
+      title: "Period Close Workflow",
+      content:
+        "Period close workflow: locations mark READY, all locations ready triggers PENDING_CLOSE, admin approves, atomic close captures snapshots. Approval entity_type PERIOD_CLOSE. Coordinated close across all locations.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-roll-forward",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "roll-forward",
+      title: "Roll-Forward to New Period",
+      content:
+        "Roll-forward creates new period from closed period. closing_value becomes opening_value. Copies ItemPrice records. New period in DRAFT, admin activates to OPEN. Ensures continuity between periods.",
+      icon: "i-heroicons-calendar-days",
+    },
+    {
+      id: "pm-period-indicator",
+      section: "Period Management",
+      sectionId: "period-management",
+      targetSection: "period-indicator",
+      title: "Period Indicator UI",
+      content:
+        "PeriodIndicator component displays current period name, date range, status badge, days remaining. Uses periodStore getters. Badge color varies by status: success for OPEN, warning for PENDING_CLOSE.",
+      icon: "i-heroicons-calendar-days",
+    }
+  );
+
   return content;
 });
 
@@ -648,6 +732,11 @@ const navSections = [
     label: "Multi-Location",
     icon: "i-heroicons-map-pin",
   },
+  {
+    id: "period-management",
+    label: "Period Management",
+    icon: "i-heroicons-calendar-days",
+  },
 ];
 
 // Active section
@@ -673,6 +762,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "multi-location": defineAsyncComponent(
     () => import("~/components/developer/MultiLocationGuide.vue")
+  ),
+  "period-management": defineAsyncComponent(
+    () => import("~/components/developer/PeriodManagementGuide.vue")
   ),
 };
 

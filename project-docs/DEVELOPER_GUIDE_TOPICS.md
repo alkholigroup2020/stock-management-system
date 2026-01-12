@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (7 sections, 48 subsections)
+## Currently Implemented Topics (8 sections, 56 subsections)
 
 ### 1. Getting Started
 - Prerequisites
@@ -64,20 +64,19 @@
 - Location Access Middleware
 - Location-Scoped Queries
 
+### 8. Period Management
+- Period Lifecycle (DRAFT → OPEN → PENDING_CLOSE → APPROVED → CLOSED)
+- PeriodLocation Status Tracking
+- Price Locking Mechanism
+- Current Period Store
+- Period Validation in Transactions
+- Period Close Workflow
+- Roll-Forward to New Period
+- Period Indicator UI
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
-
-### 8. Period Management
-**End-to-end guide for accounting periods**
-- Period Lifecycle (DRAFT → OPEN → PENDING_CLOSE → APPROVED → CLOSED)
-- PeriodLocation status tracking
-- Price Locking mechanism
-- ItemPrice model
-- Current Period composable
-- Period Close workflow
-- Roll-forward to new period
-- Period validation in transactions
 
 ### 9. Deliveries & WAC
 **End-to-end guide for receiving inventory**
@@ -132,7 +131,14 @@
 - Consolidated view
 - Reconciliation report
 
-### 15. Server API Patterns
+### 15. POB (Persons on Board)
+**End-to-end guide for crew count tracking**
+- POB Model
+- Daily POB entry
+- Mandays calculation
+- Cost per manday reporting
+
+### 16. Server API Patterns
 **End-to-end guide for API route development**
 - API Route conventions (`/server/api/`)
 - defineEventHandler patterns
@@ -143,7 +149,7 @@
 - Prisma transactions in routes
 - Auth context (`event.context.user`)
 
-### 16. Data Fetching Composables
+### 17. Data Fetching Composables
 **End-to-end guide for frontend data fetching**
 - Composable patterns: useItems, useLocations, useSuppliers, usePeriods
 - useAsyncData hooks with caching
@@ -152,7 +158,7 @@
 - Refresh patterns
 - Cache integration
 
-### 17. Component Patterns
+### 18. Component Patterns
 **End-to-end guide for component development**
 - Component naming conventions (Nuxt 4 auto-import)
 - Layout components (AppNavbar, PageHeader, LocationSwitcher)
@@ -161,7 +167,7 @@
 - Props & Emits TypeScript patterns
 - Slot patterns
 
-### 18. Forms & Validation
+### 19. Forms & Validation
 **End-to-end guide for form handling**
 - Nuxt UI form components (UInput, USelect, UTextarea)
 - Zod schema validation
@@ -170,7 +176,7 @@
 - Loading states on submit
 - Form state management
 
-### 19. Tables & Lists
+### 20. Tables & Lists
 **End-to-end guide for data display**
 - UTable component patterns
 - Column definitions
@@ -180,7 +186,7 @@
 - Empty states
 - Loading states
 
-### 20. Error Handling
+### 21. Error Handling
 **End-to-end guide for error management**
 - Server error patterns (createError)
 - Client error handling (useErrorHandler)
@@ -190,7 +196,7 @@
 - Network errors
 - Type guards for error types
 
-### 21. PWA & Offline
+### 22. PWA & Offline
 **End-to-end guide for PWA features**
 - PWA configuration (@vite-pwa/nuxt)
 - useOnlineStatus composable
@@ -199,7 +205,7 @@
 - Disabling actions when offline
 - Service worker caching
 
-### 22. Testing
+### 23. Testing
 **End-to-end guide for testing**
 - Unit tests (WAC calculations, reconciliation math)
 - API tests (Deliveries, Issues, Transfers, Period close)
@@ -207,7 +213,7 @@
 - Database reset for testing
 - Manual testing checklist
 
-### 23. Performance
+### 24. Performance
 **End-to-end guide for performance**
 - Performance middleware
 - Response time SLAs
@@ -216,7 +222,7 @@
 - Batch operations
 - Client-side caching
 
-### 24. Deployment
+### 25. Deployment
 **End-to-end guide for deployment**
 - Vercel deployment
 - Environment variables
@@ -229,7 +235,7 @@
 
 ### Phase 1: Core Business Features
 1. ~~**Multi-Location System** - Foundation for all operations~~ ✅ DONE
-2. **Period Management** - Accounting period lifecycle
+2. ~~**Period Management** - Accounting period lifecycle~~ ✅ DONE
 3. **Deliveries & WAC** - Receiving inventory with cost calculation
 4. **Issues (Stock Deductions)** - Issuing inventory
 5. **Transfers** - Inter-location moves with approval
@@ -238,7 +244,7 @@
 ### Phase 2: Supporting Business Features
 7. **NCR (Non-Conformance Reports)** - Price variance handling
 8. **Reconciliation** - Period-end reconciliation
-9. **POB (Place of Business)** - Crew count tracking
+9. **POB (Persons on Board)** - Crew count tracking
 
 ### Phase 3: Core Development Patterns
 10. **Server API Patterns** - API route conventions
@@ -255,7 +261,8 @@
 ### Phase 5: Operations
 18. **PWA & Offline** - Offline awareness
 19. **Testing** - Test patterns
-20. **Deployment** - Vercel deployment
+20. **Performance** - Performance optimization
+21. **Deployment** - Vercel deployment
 
 ---
 
@@ -265,10 +272,10 @@
 |----------|-------------|--------|-------|
 | Core Setup | 2 (Getting Started, Architecture) | 0 | 2 |
 | Data Layer | 4 (Database, Auth, State Management, Caching) | 1 (Data Fetching) | 5 |
-| Business Features | 1 (Multi-Location) | 8 (Period, Delivery, Issue, Transfer, Approval, NCR, Reconciliation, POB) | 9 |
+| Business Features | 2 (Multi-Location, Period Management) | 7 (Delivery, Issue, Transfer, Approval, NCR, Reconciliation, POB) | 9 |
 | API & Backend | 0 | 2 (API Patterns, Error Handling) | 2 |
 | UI & Components | 0 | 3 (Components, Forms, Tables) | 3 |
-| Operations | 0 | 4 (PWA, Testing, Deployment, Performance) | 4 |
-| **TOTAL** | **7** | **17** | **24** |
+| Operations | 0 | 4 (PWA, Testing, Performance, Deployment) | 4 |
+| **TOTAL** | **8** | **17** | **25** |
 
 17 additional topics needed to comprehensively cover all development aspects.
