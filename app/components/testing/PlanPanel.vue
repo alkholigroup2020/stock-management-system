@@ -58,6 +58,5 @@ const progress = computed(() => getOverallProgress(planData.phases));
     <div class="flex-1 overflow-y-auto p-4">
       <TestingPlanContent />
     </div>
-
   </aside>
 </template>

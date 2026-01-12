@@ -32,12 +32,12 @@ A web application managing stock across **multiple locations**. Core operations 
 
 ## 2) Actors & Roles
 
-| Role           | Main Actions                                                  | Location Scope          |
-| -------------- | ------------------------------------------------------------- | ----------------------- |
-| **Operator**   | Post Deliveries & Issues; view Stock Now                      | Assigned locations only |
-| **Supervisor** | Approve PRFs & Transfers; manage Reconciliations              | All locations           |
-| **Admin**      | Manage Items; Approve Period Close; configure system          | All locations           |
-| **System**     | Auto-generate price variance NCRs; enforce rules              | All locations           |
+| Role           | Main Actions                                         | Location Scope          |
+| -------------- | ---------------------------------------------------- | ----------------------- |
+| **Operator**   | Post Deliveries & Issues; view Stock Now             | Assigned locations only |
+| **Supervisor** | Approve PRFs & Transfers; manage Reconciliations     | All locations           |
+| **Admin**      | Manage Items; Approve Period Close; configure system | All locations           |
+| **System**     | Auto-generate price variance NCRs; enforce rules     | All locations           |
 
 ## 3) System Context - Multi-Location Architecture
 

@@ -20,33 +20,29 @@ Located in `/app/composables/`, these composables use Nuxt's `useAsyncData` with
 
 ### Cache TTLs by Composable
 
-| Composable | TTL | File |
-|------------|-----|------|
+| Composable         | TTL        | File                  |
+| ------------------ | ---------- | --------------------- |
 | `useCurrentPeriod` | 10 seconds | `useCurrentPeriod.ts` |
-| `useItems` | 20 seconds | `useItems.ts` |
-| `useLocations` | 20 seconds | `useLocations.ts` |
-| `useSuppliers` | 20 seconds | `useSuppliers.ts` |
+| `useItems`         | 20 seconds | `useItems.ts`         |
+| `useLocations`     | 20 seconds | `useLocations.ts`     |
+| `useSuppliers`     | 20 seconds | `useSuppliers.ts`     |
 
 ### How It Works
 
 ```typescript
 // Example from useItems.ts
-const { data, refresh } = useAsyncData(
-  cacheKey,
-  () => $fetch('/api/items', { query: filters }),
-  {
-    getCachedData(key, nuxtApp) {
-      const cached = nuxtApp.payload.data[key];
-      const cacheTime = nuxtApp.payload.data[`${key}:time`];
+const { data, refresh } = useAsyncData(cacheKey, () => $fetch("/api/items", { query: filters }), {
+  getCachedData(key, nuxtApp) {
+    const cached = nuxtApp.payload.data[key];
+    const cacheTime = nuxtApp.payload.data[`${key}:time`];
 
-      // Return cached data if within TTL (20 seconds)
-      if (cached && cacheTime && Date.now() - cacheTime < 20000) {
-        return cached;
-      }
-      return null; // Force refetch
+    // Return cached data if within TTL (20 seconds)
+    if (cached && cacheTime && Date.now() - cacheTime < 20000) {
+      return cached;
     }
-  }
-);
+    return null; // Force refetch
+  },
+});
 ```
 
 ### Features
@@ -63,10 +59,10 @@ Located in `/app/stores/`, these stores maintain global state with built-in cach
 
 ### Cache TTLs by Store
 
-| Store | TTL | File |
-|-------|-----|------|
-| `useLocationStore` | 5 minutes (300,000ms) | `location.ts` |
-| `usePeriodStore` | 10 minutes (600,000ms) | `period.ts` |
+| Store              | TTL                    | File          |
+| ------------------ | ---------------------- | ------------- |
+| `useLocationStore` | 5 minutes (300,000ms)  | `location.ts` |
+| `usePeriodStore`   | 10 minutes (600,000ms) | `period.ts`   |
 
 ### How It Works
 
@@ -96,30 +92,30 @@ Located in `/app/composables/useCache.ts`, this utility provides operation-based
 
 ### Granular Invalidation Functions
 
-| Function | Invalidates |
-|----------|-------------|
-| `invalidateLocations()` | All location caches |
-| `invalidateLocation(id)` | Single location cache |
-| `invalidateItems()` | All item caches |
-| `invalidateItem(id)` | Single item cache |
-| `invalidatePeriods()` | Period caches |
-| `invalidateSuppliers()` | Supplier caches |
-| `invalidateStock(locationId?)` | Stock-related caches |
-| `invalidateTransactions(type?)` | Delivery/issue/transfer caches |
-| `invalidateDashboard(locationId?)` | Dashboard caches |
-| `invalidateAll()` | Everything except auth |
+| Function                           | Invalidates                    |
+| ---------------------------------- | ------------------------------ |
+| `invalidateLocations()`            | All location caches            |
+| `invalidateLocation(id)`           | Single location cache          |
+| `invalidateItems()`                | All item caches                |
+| `invalidateItem(id)`               | Single item cache              |
+| `invalidatePeriods()`              | Period caches                  |
+| `invalidateSuppliers()`            | Supplier caches                |
+| `invalidateStock(locationId?)`     | Stock-related caches           |
+| `invalidateTransactions(type?)`    | Delivery/issue/transfer caches |
+| `invalidateDashboard(locationId?)` | Dashboard caches               |
+| `invalidateAll()`                  | Everything except auth         |
 
 ### Operation-Based Invalidation (useSmartCacheInvalidation)
 
-| Function | Use Case | What Gets Invalidated |
-|----------|----------|----------------------|
-| `afterDelivery(locationId)` | After posting a delivery | Stock, transactions, dashboard, periods |
-| `afterIssue(locationId)` | After posting an issue | Stock, transactions, dashboard, periods |
-| `afterTransfer(from, to)` | After completing a transfer | Both locations' stock, transactions, dashboard |
-| `afterPeriodClose()` | After closing a period | Full cache invalidation |
-| `afterLocationReady()` | After marking location ready | Periods |
-| `afterPriceChange()` | After updating prices | Items, periods |
-| `afterReconciliation(locationId)` | After saving reconciliation | Stock, dashboard, periods |
+| Function                          | Use Case                     | What Gets Invalidated                          |
+| --------------------------------- | ---------------------------- | ---------------------------------------------- |
+| `afterDelivery(locationId)`       | After posting a delivery     | Stock, transactions, dashboard, periods        |
+| `afterIssue(locationId)`          | After posting an issue       | Stock, transactions, dashboard, periods        |
+| `afterTransfer(from, to)`         | After completing a transfer  | Both locations' stock, transactions, dashboard |
+| `afterPeriodClose()`              | After closing a period       | Full cache invalidation                        |
+| `afterLocationReady()`            | After marking location ready | Periods                                        |
+| `afterPriceChange()`              | After updating prices        | Items, periods                                 |
+| `afterReconciliation(locationId)` | After saving reconciliation  | Stock, dashboard, periods                      |
 
 ### Debug Utility
 
@@ -140,29 +136,29 @@ Located in `/server/utils/performance.ts`, the `setCacheHeaders` utility sets br
 
 ```typescript
 setCacheHeaders(event, {
-  maxAge: 2,              // Browser caches for 2 seconds
-  staleWhileRevalidate: 2 // Can use stale data for 2 seconds while revalidating
+  maxAge: 2, // Browser caches for 2 seconds
+  staleWhileRevalidate: 2, // Can use stale data for 2 seconds while revalidating
 });
 ```
 
 ### Endpoints Using Cache Headers
 
-| Endpoint | File |
-|----------|------|
-| `/api/periods/current` | `periods/current.get.ts` |
-| `/api/periods` | `periods/index.get.ts` |
-| `/api/items` | `items/index.get.ts` |
-| `/api/locations` | `locations/index.get.ts` |
-| `/api/suppliers` | `suppliers/index.get.ts` |
-| `/api/user/locations` | `user/locations.get.ts` |
-| `/api/ncrs` | `ncrs/index.get.ts` |
-| `/api/transfers` | `transfers/index.get.ts` |
-| `/api/stock/consolidated` | `stock/consolidated.get.ts` |
+| Endpoint                            | File                                  |
+| ----------------------------------- | ------------------------------------- |
+| `/api/periods/current`              | `periods/current.get.ts`              |
+| `/api/periods`                      | `periods/index.get.ts`                |
+| `/api/items`                        | `items/index.get.ts`                  |
+| `/api/locations`                    | `locations/index.get.ts`              |
+| `/api/suppliers`                    | `suppliers/index.get.ts`              |
+| `/api/user/locations`               | `user/locations.get.ts`               |
+| `/api/ncrs`                         | `ncrs/index.get.ts`                   |
+| `/api/transfers`                    | `transfers/index.get.ts`              |
+| `/api/stock/consolidated`           | `stock/consolidated.get.ts`           |
 | `/api/reconciliations/consolidated` | `reconciliations/consolidated.get.ts` |
-| `/api/reports/deliveries` | `reports/deliveries.get.ts` |
-| `/api/reports/issues` | `reports/issues.get.ts` |
-| `/api/reports/stock-now` | `reports/stock-now.get.ts` |
-| `/api/reports/reconciliation` | `reports/reconciliation.get.ts` |
+| `/api/reports/deliveries`           | `reports/deliveries.get.ts`           |
+| `/api/reports/issues`               | `reports/issues.get.ts`               |
+| `/api/reports/stock-now`            | `reports/stock-now.get.ts`            |
+| `/api/reports/reconciliation`       | `reports/reconciliation.get.ts`       |
 
 ### Default Value
 
@@ -182,10 +178,10 @@ Configured in `nuxt.config.ts` under the `pwa` section.
 
 ### External Resources
 
-| Resource | TTL | Strategy | Max Entries |
-|----------|-----|----------|-------------|
-| Google Fonts (googleapis.com) | 1 year | CacheFirst | 10 |
-| Google Static Fonts (gstatic.com) | 1 year | CacheFirst | 10 |
+| Resource                          | TTL    | Strategy   | Max Entries |
+| --------------------------------- | ------ | ---------- | ----------- |
+| Google Fonts (googleapis.com)     | 1 year | CacheFirst | 10          |
+| Google Static Fonts (gstatic.com) | 1 year | CacheFirst | 10          |
 
 ### API Routes
 
@@ -210,18 +206,18 @@ pwa: {
 
 ## Cache TTL Summary Table
 
-| Cache Type | TTL | Storage | Scope |
-|------------|-----|---------|-------|
-| Items (useAsyncData) | 20 sec | nuxtApp.payload.data | Per filter combo |
-| Locations (useAsyncData) | 20 sec | nuxtApp.payload.data | Per filter combo |
-| Suppliers (useAsyncData) | 20 sec | nuxtApp.payload.data | Per filter combo |
-| Current Period (useAsyncData) | 10 sec | nuxtApp.payload.data | Global |
-| All Periods (useAsyncData) | 20 sec | nuxtApp.payload.data | Global |
-| Location Store (Pinia) | 5 min | Pinia state | Global |
-| Period Store (Pinia) | 10 min | Pinia state | Global |
-| HTTP Cache-Control | 2 sec | Browser HTTP cache | Per request |
-| Google Fonts | 1 year | Service Worker cache | Static |
-| Theme Preference | Persistent | localStorage | User preference |
+| Cache Type                    | TTL        | Storage              | Scope            |
+| ----------------------------- | ---------- | -------------------- | ---------------- |
+| Items (useAsyncData)          | 20 sec     | nuxtApp.payload.data | Per filter combo |
+| Locations (useAsyncData)      | 20 sec     | nuxtApp.payload.data | Per filter combo |
+| Suppliers (useAsyncData)      | 20 sec     | nuxtApp.payload.data | Per filter combo |
+| Current Period (useAsyncData) | 10 sec     | nuxtApp.payload.data | Global           |
+| All Periods (useAsyncData)    | 20 sec     | nuxtApp.payload.data | Global           |
+| Location Store (Pinia)        | 5 min      | Pinia state          | Global           |
+| Period Store (Pinia)          | 10 min     | Pinia state          | Global           |
+| HTTP Cache-Control            | 2 sec      | Browser HTTP cache   | Per request      |
+| Google Fonts                  | 1 year     | Service Worker cache | Static           |
+| Theme Preference              | Persistent | localStorage         | User preference  |
 
 ---
 
@@ -291,13 +287,13 @@ The HTTP Cache-Control has been set to **2 seconds** across all endpoints. This 
 
 4. **Consider Tiered Caching Strategy**
 
-   | Data Type | Suggested HTTP Cache | Rationale |
-   |-----------|---------------------|-----------|
-   | Current Period | 2-5 sec | Critical, changes rarely |
-   | Stock Levels | 2-5 sec | Frequently updated |
-   | Items/Suppliers | 30 sec | Master data, rarely changes |
-   | Reports | 30-60 sec | Point-in-time, expensive to compute |
-   | Locations | 60 sec | Very static data |
+   | Data Type       | Suggested HTTP Cache | Rationale                           |
+   | --------------- | -------------------- | ----------------------------------- |
+   | Current Period  | 2-5 sec              | Critical, changes rarely            |
+   | Stock Levels    | 2-5 sec              | Frequently updated                  |
+   | Items/Suppliers | 30 sec               | Master data, rarely changes         |
+   | Reports         | 30-60 sec            | Point-in-time, expensive to compute |
+   | Locations       | 60 sec               | Very static data                    |
 
 5. **Use ETags for Conditional Requests**
 
@@ -307,20 +303,20 @@ The HTTP Cache-Control has been set to **2 seconds** across all endpoints. This 
 
 ## Files Reference
 
-| Purpose | Location |
-|---------|----------|
-| Cache Composables | `/app/composables/useCache.ts` |
-| Item Caching | `/app/composables/useItems.ts` |
-| Location Caching | `/app/composables/useLocations.ts` |
-| Supplier Caching | `/app/composables/useSuppliers.ts` |
-| Period Caching | `/app/composables/useCurrentPeriod.ts` |
-| Location Store | `/app/stores/location.ts` |
-| Period Store | `/app/stores/period.ts` |
-| HTTP Cache Utility | `/server/utils/performance.ts` |
-| PWA Config | `/nuxt.config.ts` (pwa section) |
-| SW Cleanup Plugin | `/app/plugins/sw-cleanup.client.ts` |
-| App Initialization | `/app/composables/useAppInit.ts` |
+| Purpose            | Location                               |
+| ------------------ | -------------------------------------- |
+| Cache Composables  | `/app/composables/useCache.ts`         |
+| Item Caching       | `/app/composables/useItems.ts`         |
+| Location Caching   | `/app/composables/useLocations.ts`     |
+| Supplier Caching   | `/app/composables/useSuppliers.ts`     |
+| Period Caching     | `/app/composables/useCurrentPeriod.ts` |
+| Location Store     | `/app/stores/location.ts`              |
+| Period Store       | `/app/stores/period.ts`                |
+| HTTP Cache Utility | `/server/utils/performance.ts`         |
+| PWA Config         | `/nuxt.config.ts` (pwa section)        |
+| SW Cleanup Plugin  | `/app/plugins/sw-cleanup.client.ts`    |
+| App Initialization | `/app/composables/useAppInit.ts`       |
 
 ---
 
-*Last updated: December 2024*
+_Last updated: December 2024_

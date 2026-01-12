@@ -629,7 +629,9 @@ if (!locationStore.isCacheValid) {
       <div v-if="isExpanded('pinia-overview')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
           Pinia is the official state management library for Vue 3. In Nuxt 4, stores are
-          auto-imported from <code class="code-inline">/app/stores/</code> and available globally.
+          auto-imported from
+          <code class="code-inline">/app/stores/</code>
+          and available globally.
         </p>
 
         <div>
@@ -679,9 +681,7 @@ if (!locationStore.isCacheValid) {
                 <UIcon name="i-heroicons-window" class="text-[var(--ui-primary)]" />
                 <span class="font-medium text-[var(--ui-text-highlighted)]">UI Store</span>
               </div>
-              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
-                Toasts, modals, sidebar state
-              </p>
+              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">Toasts, modals, sidebar state</p>
             </div>
           </div>
         </div>
@@ -734,8 +734,9 @@ if (!locationStore.isCacheValid) {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              See the <strong>Authentication Guide</strong> for detailed login/logout flows and
-              middleware configuration.
+              See the
+              <strong>Authentication Guide</strong>
+              for detailed login/logout flows and middleware configuration.
             </span>
           </p>
         </div>
@@ -795,8 +796,9 @@ if (!locationStore.isCacheValid) {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              Always call <code class="code-inline">refreshNuxtData()</code> after switching
-              locations to update page data.
+              Always call
+              <code class="code-inline">refreshNuxtData()</code>
+              after switching locations to update page data.
             </span>
           </p>
         </div>
@@ -859,8 +861,10 @@ if (!locationStore.isCacheValid) {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical:</strong> Always check
-              <code class="code-inline">isPeriodOpen</code> before allowing transaction posts.
+              <strong>Critical:</strong>
+              Always check
+              <code class="code-inline">isPeriodOpen</code>
+              before allowing transaction posts.
             </span>
           </p>
         </div>
@@ -963,20 +967,22 @@ if (!locationStore.isCacheValid) {
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Login:</strong> Auth store fetches Location and Period data in parallel
+                <strong>Login:</strong>
+                Auth store fetches Location and Period data in parallel
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Logout:</strong> Auth store resets all dependent stores
+                <strong>Logout:</strong>
+                Auth store resets all dependent stores
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Location Switch:</strong> May require period refresh for location-specific
-                data
+                <strong>Location Switch:</strong>
+                May require period refresh for location-specific data
               </span>
             </li>
           </ul>
@@ -1032,9 +1038,10 @@ if (!locationStore.isCacheValid) {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Common Mistake:</strong> Destructuring state without
-              <code class="code-inline">storeToRefs()</code> loses reactivity. Actions don't need
-              it.
+              <strong>Common Mistake:</strong>
+              Destructuring state without
+              <code class="code-inline">storeToRefs()</code>
+              loses reactivity. Actions don't need it.
             </span>
           </p>
         </div>
@@ -1056,9 +1063,7 @@ if (!locationStore.isCacheValid) {
         </span>
         <UIcon
           :name="
-            isExpanded('app-initialization')
-              ? 'i-heroicons-chevron-up'
-              : 'i-heroicons-chevron-down'
+            isExpanded('app-initialization') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
           "
           class="text-[var(--ui-text-muted)]"
         />
@@ -1103,12 +1108,14 @@ if (!locationStore.isCacheValid) {
           <ol class="list-inside list-decimal space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>App starts, auth.client.ts plugin runs</li>
             <li>
-              <code class="code-inline">useAppInit().initialize()</code> called
+              <code class="code-inline">useAppInit().initialize()</code>
+              called
             </li>
             <li>Auth session fetched from server</li>
             <li>If authenticated: Location and Period fetched in parallel</li>
             <li>
-              <code class="code-inline">isReady = true</code>, app renders
+              <code class="code-inline">isReady = true</code>
+              , app renders
             </li>
             <li>On login: Same flow with loading screen</li>
             <li>On logout: All stores reset</li>

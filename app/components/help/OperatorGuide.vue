@@ -48,9 +48,7 @@ watch(
   <div class="space-y-6">
     <!-- Header -->
     <div class="pb-4 border-b border-[var(--ui-border)]">
-      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">
-        Operator Guide
-      </h2>
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Operator Guide</h2>
       <p class="text-sm text-[var(--ui-text-muted)] mt-1">
         Quick reference for day-to-day stock operations
       </p>
@@ -77,14 +75,16 @@ watch(
       <div v-if="isExpanded('deliveries')" class="p-4 space-y-4">
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
-          Deliveries record stock received from suppliers. When you post a delivery, the system
-          adds the received quantities to your location's inventory and recalculates the Weighted
-          Average Cost (WAC) for each item. Accurate delivery entry is critical because it directly
-          affects stock levels, valuation, and period-end reconciliation.
+          Deliveries record stock received from suppliers. When you post a delivery, the system adds
+          the received quantities to your location's inventory and recalculates the Weighted Average
+          Cost (WAC) for each item. Accurate delivery entry is critical because it directly affects
+          stock levels, valuation, and period-end reconciliation.
         </p>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">What Happens When You Post</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            What Happens When You Post
+          </h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-plus-circle" class="text-[var(--ui-success)]" />
@@ -106,15 +106,41 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Creating a New Delivery</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Creating a New Delivery
+          </h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>Deliveries</strong> in the left menu</li>
-            <li>Click the <strong>New Delivery</strong> button</li>
-            <li>Select the <strong>Supplier</strong> from the dropdown</li>
-            <li>Enter the <strong>Invoice Number</strong> (from supplier's document)</li>
-            <li>Enter the <strong>Delivery Date</strong> (when goods were received)</li>
+            <li>
+              Click
+              <strong>Deliveries</strong>
+              in the left menu
+            </li>
+            <li>
+              Click the
+              <strong>New Delivery</strong>
+              button
+            </li>
+            <li>
+              Select the
+              <strong>Supplier</strong>
+              from the dropdown
+            </li>
+            <li>
+              Enter the
+              <strong>Invoice Number</strong>
+              (from supplier's document)
+            </li>
+            <li>
+              Enter the
+              <strong>Delivery Date</strong>
+              (when goods were received)
+            </li>
             <li>Add line items: select item, enter quantity received, enter unit price</li>
-            <li>Review totals and click <strong>Post Delivery</strong> to finalize</li>
+            <li>
+              Review totals and click
+              <strong>Post Delivery</strong>
+              to finalize
+            </li>
           </ol>
         </div>
 
@@ -122,12 +148,14 @@ watch(
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Draft vs Posted</h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Save as Draft:</strong> Use when you need to pause entry or verify details.
-              The delivery can be edited or deleted. Stock is NOT updated until posted.
+              <strong>Save as Draft:</strong>
+              Use when you need to pause entry or verify details. The delivery can be edited or
+              deleted. Stock is NOT updated until posted.
             </li>
             <li>
-              <strong>Post Delivery:</strong> Finalizes the delivery. Stock levels update immediately.
-              The delivery is locked and becomes part of the permanent record.
+              <strong>Post Delivery:</strong>
+              Finalizes the delivery. Stock levels update immediately. The delivery is locked and
+              becomes part of the permanent record.
             </li>
           </ul>
         </div>
@@ -135,7 +163,11 @@ watch(
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30">
           <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
             <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
-            <span><strong>Price Variance:</strong> If the delivery price differs from the locked period price, an NCR is automatically created. This is normal and expected - it helps track price changes.</span>
+            <span>
+              <strong>Price Variance:</strong>
+              If the delivery price differs from the locked period price, an NCR is automatically
+              created. This is normal and expected - it helps track price changes.
+            </span>
           </p>
         </div>
       </div>
@@ -163,13 +195,16 @@ watch(
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
           Issues record stock consumption - items leaving your location for use. Each issue is
-          assigned to a Cost Centre (department or purpose) for expense tracking and reporting.
-          When posted, stock quantities decrease and the value is calculated using the current WAC.
-          Issues are essential for tracking where stock goes and calculating cost-per-person metrics.
+          assigned to a Cost Centre (department or purpose) for expense tracking and reporting. When
+          posted, stock quantities decrease and the value is calculated using the current WAC.
+          Issues are essential for tracking where stock goes and calculating cost-per-person
+          metrics.
         </p>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">What Happens When You Post</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            What Happens When You Post
+          </h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-minus-circle" class="text-[var(--ui-error)]" />
@@ -193,12 +228,31 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Creating a New Issue</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>Issues</strong> in the left menu</li>
-            <li>Click the <strong>New Issue</strong> button</li>
-            <li>Select the <strong>Issue Date</strong></li>
-            <li>Select the <strong>Cost Centre</strong> (where the stock is going)</li>
+            <li>
+              Click
+              <strong>Issues</strong>
+              in the left menu
+            </li>
+            <li>
+              Click the
+              <strong>New Issue</strong>
+              button
+            </li>
+            <li>
+              Select the
+              <strong>Issue Date</strong>
+            </li>
+            <li>
+              Select the
+              <strong>Cost Centre</strong>
+              (where the stock is going)
+            </li>
             <li>Add items with quantities to issue</li>
-            <li>Review and click <strong>Create Issue</strong> to finalize</li>
+            <li>
+              Review and click
+              <strong>Create Issue</strong>
+              to finalize
+            </li>
           </ol>
         </div>
 
@@ -214,7 +268,11 @@ watch(
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-error)]/30">
           <p class="text-sm text-[var(--ui-error)] flex items-start gap-2">
             <UIcon name="i-heroicons-x-circle" class="shrink-0 mt-0.5" />
-            <span><strong>Important:</strong> You cannot issue more than available stock. The system will prevent posting if any item exceeds the on-hand quantity. Check stock levels first.</span>
+            <span>
+              <strong>Important:</strong>
+              You cannot issue more than available stock. The system will prevent posting if any
+              item exceeds the on-hand quantity. Check stock levels first.
+            </span>
           </p>
         </div>
       </div>
@@ -242,9 +300,9 @@ watch(
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
           Transfers move stock between locations within the organization. As an Operator, you can
-          create transfer requests to bring stock to your location from another, or send stock
-          from your location elsewhere. All transfers require Supervisor approval before stock
-          actually moves. This ensures proper oversight and prevents unauthorized stock movements.
+          create transfer requests to bring stock to your location from another, or send stock from
+          your location elsewhere. All transfers require Supervisor approval before stock actually
+          moves. This ensures proper oversight and prevents unauthorized stock movements.
         </p>
 
         <div>
@@ -265,22 +323,52 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Creating a Transfer Request</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Creating a Transfer Request
+          </h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>Transfers</strong> in the left menu</li>
-            <li>Click <strong>New Transfer</strong></li>
-            <li>Select <strong>Source Location</strong> (where stock comes from)</li>
-            <li>Select <strong>Destination Location</strong> (where stock goes to)</li>
+            <li>
+              Click
+              <strong>Transfers</strong>
+              in the left menu
+            </li>
+            <li>
+              Click
+              <strong>New Transfer</strong>
+            </li>
+            <li>
+              Select
+              <strong>Source Location</strong>
+              (where stock comes from)
+            </li>
+            <li>
+              Select
+              <strong>Destination Location</strong>
+              (where stock goes to)
+            </li>
             <li>Add items with quantities to transfer</li>
-            <li>Add a <strong>Reason</strong> explaining why the transfer is needed</li>
-            <li>Click <strong>Create Transfer</strong></li>
+            <li>
+              Add a
+              <strong>Reason</strong>
+              explaining why the transfer is needed
+            </li>
+            <li>
+              Click
+              <strong>Create Transfer</strong>
+            </li>
           </ol>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
           <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
-            <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
-            <span>Provide a clear reason for the transfer. This helps Supervisors approve quickly and creates a good audit trail.</span>
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              Provide a clear reason for the transfer. This helps Supervisors approve quickly and
+              creates a good audit trail.
+            </span>
           </p>
         </div>
       </div>
@@ -307,8 +395,8 @@ watch(
       <div v-if="isExpanded('stock')" class="p-4 space-y-4">
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The Stock Now page shows current inventory levels at your location in real-time. Use it
-          to check available quantities before creating issues, identify low stock items that need
+          The Stock Now page shows current inventory levels at your location in real-time. Use it to
+          check available quantities before creating issues, identify low stock items that need
           reordering, and understand the value of inventory on hand. Stock levels update immediately
           after deliveries, issues, and approved transfers.
         </p>
@@ -316,7 +404,11 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Viewing Current Stock</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>Stock Now</strong> in the left menu</li>
+            <li>
+              Click
+              <strong>Stock Now</strong>
+              in the left menu
+            </li>
             <li>View all items with their quantities and values</li>
             <li>Use the search box to find specific items quickly</li>
             <li>Filter by category to focus on specific item types</li>
@@ -325,31 +417,43 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Understanding Stock Values</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Understanding Stock Values
+          </h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>On Hand:</strong> The physical quantity currently available at your location.
-              This is what you can issue or transfer out.
+              <strong>On Hand:</strong>
+              The physical quantity currently available at your location. This is what you can issue
+              or transfer out.
             </li>
             <li>
-              <strong>WAC (Weighted Average Cost):</strong> The average cost per unit, calculated
-              from all purchases. Updated each time a delivery is posted.
+              <strong>WAC (Weighted Average Cost):</strong>
+              The average cost per unit, calculated from all purchases. Updated each time a delivery
+              is posted.
             </li>
             <li>
-              <strong>Total Value:</strong> On Hand quantity multiplied by WAC. Represents the
-              monetary value of that item's inventory.
+              <strong>Total Value:</strong>
+              On Hand quantity multiplied by WAC. Represents the monetary value of that item's
+              inventory.
             </li>
             <li>
-              <strong>Min Stock:</strong> The minimum quantity threshold. Items below this level
-              are flagged as "Low Stock" and may need reordering.
+              <strong>Min Stock:</strong>
+              The minimum quantity threshold. Items below this level are flagged as "Low Stock" and
+              may need reordering.
             </li>
           </ul>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
           <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
-            <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
-            <span>Check stock levels before creating issues to avoid errors. The system prevents issuing more than available, but checking first saves time.</span>
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              Check stock levels before creating issues to avoid errors. The system prevents issuing
+              more than available, but checking first saves time.
+            </span>
           </p>
         </div>
       </div>
@@ -378,23 +482,28 @@ watch(
         <p class="text-sm text-[var(--ui-text-muted)]">
           POB (Persons On Board) tracks daily headcount at your location. This data is used to
           calculate mandays (total person-days) for the period, which enables cost-per-person
-          reporting. Accurate POB entry is essential for meaningful food cost analysis and budgeting.
-          Enter counts daily to maintain accurate records.
+          reporting. Accurate POB entry is essential for meaningful food cost analysis and
+          budgeting. Enter counts daily to maintain accurate records.
         </p>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Understanding POB Fields</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Understanding POB Fields
+          </h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Mandays:</strong> Regular staff/crew present at the location for that day.
+              <strong>Mandays:</strong>
+              Regular staff/crew present at the location for that day.
             </li>
             <li>
-              <strong>Visitors Meals:</strong> Additional personnel such as visitors, contractors, or
-              temporary staff who consume meals/resources.
+              <strong>Visitors Meals:</strong>
+              Additional personnel such as visitors, contractors, or temporary staff who consume
+              meals/resources.
             </li>
             <li>
-              <strong>Total:</strong> Automatically calculated as Mandays + Visitors Meals. This is the number
-              used for cost-per-person calculations.
+              <strong>Total:</strong>
+              Automatically calculated as Mandays + Visitors Meals. This is the number used for
+              cost-per-person calculations.
             </li>
           </ul>
         </div>
@@ -402,28 +511,49 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Entering Daily Counts</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>POB</strong> in the left menu</li>
+            <li>
+              Click
+              <strong>POB</strong>
+              in the left menu
+            </li>
             <li>Find the date you want to enter (current month is shown)</li>
-            <li>Enter <strong>Mandays</strong> for that day</li>
-            <li>Enter <strong>Visitors Meals</strong> if applicable (or leave as 0)</li>
+            <li>
+              Enter
+              <strong>Mandays</strong>
+              for that day
+            </li>
+            <li>
+              Enter
+              <strong>Visitors Meals</strong>
+              if applicable (or leave as 0)
+            </li>
             <li>Total is calculated automatically</li>
-            <li>Move to the next field - entries <strong>auto-save</strong></li>
+            <li>
+              Move to the next field - entries
+              <strong>auto-save</strong>
+            </li>
           </ol>
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">How Mandays Are Calculated</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            How Mandays Are Calculated
+          </h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            Mandays = Sum of all daily totals for the period. For example, if you have 50 people
-            for 30 days, that's 1,500 mandays. This is used to calculate cost-per-person metrics
-            like "food cost per manday."
+            Mandays = Sum of all daily totals for the period. For example, if you have 50 people for
+            30 days, that's 1,500 mandays. This is used to calculate cost-per-person metrics like
+            "food cost per manday."
           </p>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-success)]/30">
           <p class="text-sm text-[var(--ui-success)] flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="shrink-0 mt-0.5" />
-            <span><strong>Auto-save enabled:</strong> No need to click a save button. Your entries save automatically when you move to the next field or click elsewhere.</span>
+            <span>
+              <strong>Auto-save enabled:</strong>
+              No need to click a save button. Your entries save automatically when you move to the
+              next field or click elsewhere.
+            </span>
           </p>
         </div>
       </div>
@@ -440,7 +570,9 @@ watch(
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-document-text" class="text-[var(--ui-primary)] text-xl" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">NCR (Non-Conformance Reports)</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            NCR (Non-Conformance Reports)
+          </span>
         </span>
         <UIcon
           :name="isExpanded('ncr') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
@@ -461,13 +593,14 @@ watch(
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Types of NCRs</h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Auto-Generated (Price Variance):</strong> Created automatically when you post
-              a delivery with a price different from the period price. These are normal and help
-              track price fluctuations.
+              <strong>Auto-Generated (Price Variance):</strong>
+              Created automatically when you post a delivery with a price different from the period
+              price. These are normal and help track price fluctuations.
             </li>
             <li>
-              <strong>Manual:</strong> Created by Supervisors for quality issues like damaged goods,
-              short shipments, or expired products. Report these issues to your Supervisor.
+              <strong>Manual:</strong>
+              Created by Supervisors for quality issues like damaged goods, short shipments, or
+              expired products. Report these issues to your Supervisor.
             </li>
           </ul>
         </div>
@@ -475,7 +608,11 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Viewing NCRs</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>NCR</strong> in the left menu</li>
+            <li>
+              Click
+              <strong>NCR</strong>
+              in the left menu
+            </li>
             <li>View NCRs for your location</li>
             <li>Click on an NCR to see details</li>
             <li>NCRs marked "Auto-generated" were created from price variances</li>
@@ -513,8 +650,14 @@ watch(
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
           <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
-            <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
-            <span>As an Operator, you can view NCRs but cannot create manual NCRs. Contact your Supervisor to report quality issues - they will create the NCR.</span>
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              As an Operator, you can view NCRs but cannot create manual NCRs. Contact your
+              Supervisor to report quality issues - they will create the NCR.
+            </span>
           </p>
         </div>
       </div>
@@ -541,21 +684,31 @@ watch(
       <div v-if="isExpanded('profile')" class="p-4 space-y-4">
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
-          Your profile contains your account information and security settings. All actions you
-          take in the system are recorded with your username for audit purposes. Keeping your
-          password secure and changing it periodically helps protect the system and your account.
-          Never share your login credentials with others.
+          Your profile contains your account information and security settings. All actions you take
+          in the system are recorded with your username for audit purposes. Keeping your password
+          secure and changing it periodically helps protect the system and your account. Never share
+          your login credentials with others.
         </p>
 
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Changing Your Password</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Click your name in the top right corner</li>
-            <li>Select <strong>Profile</strong></li>
-            <li>Go to the <strong>Change Password</strong> section</li>
+            <li>
+              Select
+              <strong>Profile</strong>
+            </li>
+            <li>
+              Go to the
+              <strong>Change Password</strong>
+              section
+            </li>
             <li>Enter your current password</li>
             <li>Enter your new password (twice to confirm)</li>
-            <li>Click <strong>Update Password</strong></li>
+            <li>
+              Click
+              <strong>Update Password</strong>
+            </li>
           </ol>
         </div>
 
@@ -588,7 +741,11 @@ watch(
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30">
           <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
             <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
-            <span><strong>Security Reminder:</strong> Never share your password. If you suspect someone else has access to your account, change your password immediately and notify your administrator.</span>
+            <span>
+              <strong>Security Reminder:</strong>
+              Never share your password. If you suspect someone else has access to your account,
+              change your password immediately and notify your administrator.
+            </span>
           </p>
         </div>
       </div>

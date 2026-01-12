@@ -903,9 +903,9 @@ const periodWarning = computed(() => {
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-map-pin" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >PeriodLocation Status Tracking</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            PeriodLocation Status Tracking
+          </span>
         </span>
         <UIcon
           :name="
@@ -956,8 +956,9 @@ const periodWarning = computed(() => {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Coordinated Close:</strong> All locations must be READY before the period can
-              move to PENDING_CLOSE. This ensures all transactions are complete.
+              <strong>Coordinated Close:</strong>
+              All locations must be READY before the period can move to PENDING_CLOSE. This ensures
+              all transactions are complete.
             </span>
           </p>
         </div>
@@ -975,10 +976,14 @@ const periodWarning = computed(() => {
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-lock-closed" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Price Locking Mechanism</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Price Locking Mechanism
+          </span>
         </span>
         <UIcon
-          :name="isExpanded('price-locking') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('price-locking') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -1017,9 +1022,10 @@ const periodWarning = computed(() => {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical Business Rule:</strong> Price variances automatically generate NCRs
-              with <code class="code-inline">auto_generated: true</code>. This ensures all price
-              discrepancies are tracked and resolved.
+              <strong>Critical Business Rule:</strong>
+              Price variances automatically generate NCRs with
+              <code class="code-inline">auto_generated: true</code>
+              . This ensures all price discrepancies are tracked and resolved.
             </span>
           </p>
         </div>
@@ -1091,9 +1097,9 @@ const periodWarning = computed(() => {
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-shield-check" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Period Validation in Transactions</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Period Validation in Transactions
+          </span>
         </span>
         <UIcon
           :name="
@@ -1124,20 +1130,22 @@ const periodWarning = computed(() => {
             <div class="flex items-start gap-2">
               <UBadge color="error" variant="soft" size="xs">400</UBadge>
               <span class="text-[var(--ui-text-muted)]">
-                <code class="code-inline">PERIOD_CLOSED</code> - Period is not OPEN
+                <code class="code-inline">PERIOD_CLOSED</code>
+                - Period is not OPEN
               </span>
             </div>
             <div class="flex items-start gap-2">
               <UBadge color="error" variant="soft" size="xs">400</UBadge>
               <span class="text-[var(--ui-text-muted)]">
-                <code class="code-inline">LOCATION_PERIOD_CLOSED</code> - Location period is READY or
-                CLOSED
+                <code class="code-inline">LOCATION_PERIOD_CLOSED</code>
+                - Location period is READY or CLOSED
               </span>
             </div>
             <div class="flex items-start gap-2">
               <UBadge color="warning" variant="soft" size="xs">404</UBadge>
               <span class="text-[var(--ui-text-muted)]">
-                <code class="code-inline">PERIOD_NOT_FOUND</code> - No period exists with given ID
+                <code class="code-inline">PERIOD_NOT_FOUND</code>
+                - No period exists with given ID
               </span>
             </div>
           </div>
@@ -1173,22 +1181,24 @@ const periodWarning = computed(() => {
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Close Process Steps</h4>
           <ol class="list-inside list-decimal space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Location Supervisors:</strong> Mark each location as READY when reconciliation
-              is complete
+              <strong>Location Supervisors:</strong>
+              Mark each location as READY when reconciliation is complete
             </li>
             <li>
-              <strong>System Check:</strong> When all locations are READY, period moves to
-              PENDING_CLOSE
+              <strong>System Check:</strong>
+              When all locations are READY, period moves to PENDING_CLOSE
             </li>
             <li>
-              <strong>Approval Request:</strong> System creates PERIOD_CLOSE approval for admin
+              <strong>Approval Request:</strong>
+              System creates PERIOD_CLOSE approval for admin
             </li>
             <li>
-              <strong>Admin Review:</strong> Admin reviews reconciliations and approves
+              <strong>Admin Review:</strong>
+              Admin reviews reconciliations and approves
             </li>
             <li>
-              <strong>Close Execution:</strong> Atomic transaction captures snapshots and closes all
-              locations
+              <strong>Close Execution:</strong>
+              Atomic transaction captures snapshots and closes all locations
             </li>
           </ol>
         </div>
@@ -1202,8 +1212,9 @@ const periodWarning = computed(() => {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Important:</strong> Period close is an atomic operation. All locations close
-              simultaneously with snapshots. If any part fails, the entire close is rolled back.
+              <strong>Important:</strong>
+              Period close is an atomic operation. All locations close simultaneously with
+              snapshots. If any part fails, the entire close is rolled back.
             </span>
           </p>
         </div>
@@ -1221,9 +1232,9 @@ const periodWarning = computed(() => {
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-arrow-right-circle" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Roll-Forward to New Period</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Roll-Forward to New Period
+          </span>
         </span>
         <UIcon
           :name="isExpanded('roll-forward') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
@@ -1278,7 +1289,10 @@ const periodWarning = computed(() => {
         @click="toggleSection('period-indicator')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-presentation-chart-bar" class="text-xl text-[var(--ui-primary)]" />
+          <UIcon
+            name="i-heroicons-presentation-chart-bar"
+            class="text-xl text-[var(--ui-primary)]"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Period Indicator UI</span>
         </span>
         <UIcon

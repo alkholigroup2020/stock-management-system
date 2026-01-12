@@ -398,8 +398,11 @@ pnpm build          # Runs: prisma generate && nuxt build
       </button>
       <div v-if="isExpanded('db-overview')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The Stock Management System uses <strong>PostgreSQL</strong> hosted on Supabase with
-          <strong>Prisma ORM</strong> for type-safe database access.
+          The Stock Management System uses
+          <strong>PostgreSQL</strong>
+          hosted on Supabase with
+          <strong>Prisma ORM</strong>
+          for type-safe database access.
         </p>
 
         <DeveloperCodeBlock :code="codeExamples.dbStack" language="typescript" />
@@ -410,24 +413,30 @@ pnpm build          # Runs: prisma generate && nuxt build
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Type Safety:</strong> Full TypeScript types generated from schema
+                <strong>Type Safety:</strong>
+                Full TypeScript types generated from schema
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Connection Pooling:</strong> PgBouncer via Supabase for scalability
+                <strong>Connection Pooling:</strong>
+                PgBouncer via Supabase for scalability
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Migrations:</strong> Version-controlled schema changes
+                <strong>Migrations:</strong>
+                Version-controlled schema changes
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span><strong>Prisma Studio:</strong> Visual database browser for debugging</span>
+              <span>
+                <strong>Prisma Studio:</strong>
+                Visual database browser for debugging
+              </span>
             </li>
           </ul>
         </div>
@@ -479,9 +488,9 @@ pnpm build          # Runs: prisma generate && nuxt build
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical:</strong> Port 6543 (Transaction Pooler) is required for runtime.
-              Port 5432 (Direct) is only for migrations. Using the wrong port will cause connection
-              errors.
+              <strong>Critical:</strong>
+              Port 6543 (Transaction Pooler) is required for runtime. Port 5432 (Direct) is only for
+              migrations. Using the wrong port will cause connection errors.
             </span>
           </p>
         </div>
@@ -510,7 +519,8 @@ pnpm build          # Runs: prisma generate && nuxt build
               </div>
               <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
                 Direct PostgreSQL connection. Used only for migrations via
-                <code class="code-inline">directUrl</code>.
+                <code class="code-inline">directUrl</code>
+                .
               </p>
             </div>
           </div>
@@ -576,7 +586,8 @@ pnpm build          # Runs: prisma generate && nuxt build
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              Import with: <code class="code-inline">import prisma from "~/server/utils/prisma"</code>
+              Import with:
+              <code class="code-inline">import prisma from "~/server/utils/prisma"</code>
             </span>
           </p>
         </div>
@@ -603,8 +614,11 @@ pnpm build          # Runs: prisma generate && nuxt build
       </button>
       <div v-if="isExpanded('db-schema')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The schema contains <strong>21 models</strong> and <strong>14 enums</strong> covering all
-          aspects of inventory management.
+          The schema contains
+          <strong>21 models</strong>
+          and
+          <strong>14 enums</strong>
+          covering all aspects of inventory management.
         </p>
 
         <div>
@@ -685,8 +699,9 @@ pnpm build          # Runs: prisma generate && nuxt build
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Business Rule:</strong> When a delivery price differs from the ItemPrice, the
-              system automatically creates a Price Variance NCR.
+              <strong>Business Rule:</strong>
+              When a delivery price differs from the ItemPrice, the system automatically creates a
+              Price Variance NCR.
             </span>
           </p>
         </div>
@@ -695,15 +710,16 @@ pnpm build          # Runs: prisma generate && nuxt build
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Data Precision</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <code class="code-inline">Decimal(15, 4)</code> - Quantities, WAC (up to 4 decimals)
+              <code class="code-inline">Decimal(15, 4)</code>
+              - Quantities, WAC (up to 4 decimals)
             </li>
             <li>
-              <code class="code-inline">Decimal(15, 2)</code> - Currency values (SAR with 2
-              decimals)
+              <code class="code-inline">Decimal(15, 2)</code>
+              - Currency values (SAR with 2 decimals)
             </li>
             <li>
-              <code class="code-inline">Timestamptz(6)</code> - All timestamps with timezone
-              (Asia/Riyadh)
+              <code class="code-inline">Timestamptz(6)</code>
+              - All timestamps with timezone (Asia/Riyadh)
             </li>
           </ul>
         </div>
@@ -745,7 +761,9 @@ pnpm build          # Runs: prisma generate && nuxt build
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Price Variance Detection</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Price Variance Detection
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.priceVariance"
             language="typescript"
@@ -759,25 +777,29 @@ pnpm build          # Runs: prisma generate && nuxt build
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Deliveries:</strong> Recalculate WAC based on new receipts
+                <strong>Deliveries:</strong>
+                Recalculate WAC based on new receipts
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Issues:</strong> Deduct at current WAC (no recalculation)
+                <strong>Issues:</strong>
+                Deduct at current WAC (no recalculation)
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Transfers:</strong> Move stock at current WAC from source location
+                <strong>Transfers:</strong>
+                Move stock at current WAC from source location
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Price Variance:</strong> Any difference from period price creates NCR
+                <strong>Price Variance:</strong>
+                Any difference from period price creates NCR
               </span>
             </li>
           </ul>
@@ -829,16 +851,20 @@ pnpm build          # Runs: prisma generate && nuxt build
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Key Patterns</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <code class="code-inline">$transaction([])</code> - Batch reads for performance
+              <code class="code-inline">$transaction([])</code>
+              - Batch reads for performance
             </li>
             <li>
-              <code class="code-inline">$transaction(async tx)</code> - Atomic writes with rollback
+              <code class="code-inline">$transaction(async tx)</code>
+              - Atomic writes with rollback
             </li>
             <li>
-              <code class="code-inline">upsert</code> - Insert or update in single operation
+              <code class="code-inline">upsert</code>
+              - Insert or update in single operation
             </li>
             <li>
-              <code class="code-inline">include</code> - Eager load relations
+              <code class="code-inline">include</code>
+              - Eager load relations
             </li>
           </ul>
         </div>
@@ -874,8 +900,10 @@ pnpm build          # Runs: prisma generate && nuxt build
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-x-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Never use db:push in production!</strong> It can cause data loss. Always use
-              migrations (<code class="code-inline">db:migrate:deploy</code>) for production.
+              <strong>Never use db:push in production!</strong>
+              It can cause data loss. Always use migrations (
+              <code class="code-inline">db:migrate:deploy</code>
+              ) for production.
             </span>
           </p>
         </div>

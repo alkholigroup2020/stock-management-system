@@ -137,57 +137,57 @@ export default defineEventHandler(async (event) => {
     const [total, deliveries] = await prisma.$transaction([
       prisma.delivery.count({ where }),
       prisma.delivery.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { delivery_date: "desc" },
-      include: {
-        supplier: {
-          select: {
-            id: true,
-            code: true,
-            name: true,
-          },
-        },
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            full_name: true,
-          },
-        },
-        period: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            delivery_lines: true,
-            ncrs: true,
-          },
-        },
-        ...(includeLines && {
-          delivery_lines: {
+        where,
+        skip,
+        take: limit,
+        orderBy: { delivery_date: "desc" },
+        include: {
+          supplier: {
             select: {
               id: true,
-              quantity: true,
-              unit_price: true,
-              line_value: true,
-              item: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                  unit: true,
+              code: true,
+              name: true,
+            },
+          },
+          creator: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+            },
+          },
+          period: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              delivery_lines: true,
+              ncrs: true,
+            },
+          },
+          ...(includeLines && {
+            delivery_lines: {
+              select: {
+                id: true,
+                quantity: true,
+                unit_price: true,
+                line_value: true,
+                item: {
+                  select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    unit: true,
+                  },
                 },
               },
             },
-          },
-        }),
-      },
-    }),
+          }),
+        },
+      }),
     ]);
 
     return {

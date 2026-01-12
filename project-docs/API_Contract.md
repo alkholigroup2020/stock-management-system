@@ -185,11 +185,11 @@ PATCH /api/auth/profile
 
 ### Role Permissions
 
-| Role           | Permissions                                      |
-| -------------- | ------------------------------------------------ |
-| **OPERATOR**   | View/Post at assigned locations only             |
-| **SUPERVISOR** | All locations, approve transfers, manage NCRs    |
-| **ADMIN**      | Full system access, period close, user management|
+| Role           | Permissions                                       |
+| -------------- | ------------------------------------------------- |
+| **OPERATOR**   | View/Post at assigned locations only              |
+| **SUPERVISOR** | All locations, approve transfers, manage NCRs     |
+| **ADMIN**      | Full system access, period close, user management |
 
 ### Middleware Protection
 
@@ -428,7 +428,7 @@ POST /api/periods/{periodId}/prices
 ```json
 {
   "prices": [
-    { "item_id": "uuid", "price": 25.50 },
+    { "item_id": "uuid", "price": 25.5 },
     { "item_id": "uuid", "price": 18.75 }
   ]
 }
@@ -618,7 +618,7 @@ PATCH /api/items/{itemId}/price
 
 ```json
 {
-  "price": 28.50,
+  "price": 28.5,
   "periodId": "uuid"
 }
 ```
@@ -712,7 +712,7 @@ POST /api/locations/{id}/deliveries
     {
       "item_id": "uuid",
       "quantity": 100,
-      "unit_price": 26.00
+      "unit_price": 26.0
     }
   ]
 }
@@ -818,7 +818,7 @@ POST /api/locations/{id}/issues
     {
       "item": { "id": "uuid", "code": "PRO-001", "name": "Chicken Breast" },
       "quantity": 15.5,
-      "wac": 25.50,
+      "wac": 25.5,
       "value": 395.25
     }
   ]
@@ -957,7 +957,7 @@ POST /api/ncrs
     {
       "item_id": "uuid",
       "quantity": 5,
-      "value": 127.50
+      "value": 127.5
     }
   ]
 }
@@ -1102,10 +1102,10 @@ POST /api/reconciliations
 {
   "periodId": "uuid",
   "locationId": "uuid",
-  "back_charges": 1000.00,
-  "credits": 500.00,
-  "condemnations": 200.00,
-  "adjustments": 0.00
+  "back_charges": 1000.0,
+  "credits": 500.0,
+  "condemnations": 200.0,
+  "adjustments": 0.0
 }
 ```
 
@@ -1347,19 +1347,19 @@ throw createError({
 
 ### Error Codes
 
-| Code                       | HTTP Status | Description                              |
-| -------------------------- | ----------- | ---------------------------------------- |
-| `NOT_AUTHENTICATED`        | 401         | User not logged in                       |
-| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action          |
-| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location            |
-| `VALIDATION_ERROR`         | 400         | Zod validation failed                    |
-| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer      |
-| `PERIOD_CLOSED`            | 400         | Cannot post to closed period             |
-| `NO_OPEN_PERIOD`           | 400         | No open period exists                    |
-| `INVALID_STATUS`           | 400         | Entity status doesn't allow action       |
-| `NOT_FOUND`                | 404         | Resource not found                       |
-| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number        |
-| `INTERNAL_ERROR`           | 500         | Unexpected server error                  |
+| Code                       | HTTP Status | Description                         |
+| -------------------------- | ----------- | ----------------------------------- |
+| `NOT_AUTHENTICATED`        | 401         | User not logged in                  |
+| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action     |
+| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location       |
+| `VALIDATION_ERROR`         | 400         | Zod validation failed               |
+| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer |
+| `PERIOD_CLOSED`            | 400         | Cannot post to closed period        |
+| `NO_OPEN_PERIOD`           | 400         | No open period exists               |
+| `INVALID_STATUS`           | 400         | Entity status doesn't allow action  |
+| `NOT_FOUND`                | 404         | Resource not found                  |
+| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number   |
+| `INTERNAL_ERROR`           | 500         | Unexpected server error             |
 
 ### Validation Errors (Zod)
 
@@ -1412,14 +1412,14 @@ throw createError({
 
 ## Performance SLAs
 
-| Operation              | Target Response Time |
-| ---------------------- | -------------------- |
-| GET single record      | < 200ms              |
-| GET list (paginated)   | < 500ms              |
-| POST delivery/issue    | < 1000ms             |
-| Transfer execution     | < 1500ms             |
-| Location stock report  | < 2000ms             |
-| Consolidated reports   | < 5000ms             |
+| Operation             | Target Response Time |
+| --------------------- | -------------------- |
+| GET single record     | < 200ms              |
+| GET list (paginated)  | < 500ms              |
+| POST delivery/issue   | < 1000ms             |
+| Transfer execution    | < 1500ms             |
+| Location stock report | < 2000ms             |
+| Consolidated reports  | < 5000ms             |
 
 ---
 

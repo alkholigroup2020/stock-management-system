@@ -726,7 +726,10 @@ INTERNAL_ERROR        // Unexpected server error
         @click="toggleSection('issue-model')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-arrow-right-on-rectangle" class="text-xl text-[var(--ui-primary)]" />
+          <UIcon
+            name="i-heroicons-arrow-right-on-rectangle"
+            class="text-xl text-[var(--ui-primary)]"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Issue Model</span>
         </span>
         <UIcon
@@ -781,9 +784,7 @@ INTERNAL_ERROR        // Unexpected server error
               <div class="flex items-center gap-2">
                 <UBadge color="primary" variant="soft" size="xs">wac_at_issue</UBadge>
               </div>
-              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
-                WAC captured at time of issue
-              </p>
+              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">WAC captured at time of issue</p>
             </div>
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="flex items-center gap-2">
@@ -876,9 +877,7 @@ INTERNAL_ERROR        // Unexpected server error
           <span class="font-semibold text-[var(--ui-text-highlighted)]">WAC at Issue Capture</span>
         </span>
         <UIcon
-          :name="
-            isExpanded('wac-at-issue') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
-          "
+          :name="isExpanded('wac-at-issue') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -897,8 +896,9 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Key Rule:</strong> Issues deduct stock at current WAC but do NOT recalculate
-              WAC. Only deliveries recalculate WAC.
+              <strong>Key Rule:</strong>
+              Issues deduct stock at current WAC but do NOT recalculate WAC. Only deliveries
+              recalculate WAC.
             </span>
           </p>
         </div>
@@ -938,9 +938,9 @@ INTERNAL_ERROR        // Unexpected server error
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-shield-check" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Stock Validation (No Negative)</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Stock Validation (No Negative)
+          </span>
         </span>
         <UIcon
           :name="
@@ -970,8 +970,9 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical Business Rule:</strong> NEVER allow negative stock. Validate ALL
-              items before processing ANY. This prevents partial issues.
+              <strong>Critical Business Rule:</strong>
+              NEVER allow negative stock. Validate ALL items before processing ANY. This prevents
+              partial issues.
             </span>
           </p>
         </div>
@@ -981,7 +982,11 @@ INTERNAL_ERROR        // Unexpected server error
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span>Check <code class="code-inline">requestedQty <= on_hand</code> for each item</span>
+              <span>
+                Check
+                <code class="code-inline">requestedQty <= on_hand</code>
+                for each item
+              </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
@@ -1020,8 +1025,8 @@ INTERNAL_ERROR        // Unexpected server error
       </button>
       <div v-if="isExpanded('posting-flow')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The issue posting flow validates inputs, checks stock availability, and processes all
-          line items atomically in a database transaction.
+          The issue posting flow validates inputs, checks stock availability, and processes all line
+          items atomically in a database transaction.
         </p>
 
         <div>
@@ -1042,28 +1047,36 @@ INTERNAL_ERROR        // Unexpected server error
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Posting Steps</h4>
           <ol class="list-inside list-decimal space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Validate period:</strong> Ensure an OPEN period exists
+              <strong>Validate period:</strong>
+              Ensure an OPEN period exists
             </li>
             <li>
-              <strong>Start transaction:</strong> Begin atomic database transaction
+              <strong>Start transaction:</strong>
+              Begin atomic database transaction
             </li>
             <li>
-              <strong>Validate stock:</strong> Check all items have sufficient stock
+              <strong>Validate stock:</strong>
+              Check all items have sufficient stock
             </li>
             <li>
-              <strong>Generate issue number:</strong> Create unique ISS-YYYY-NNN
+              <strong>Generate issue number:</strong>
+              Create unique ISS-YYYY-NNN
             </li>
             <li>
-              <strong>Create issue header:</strong> Insert issue record with metadata
+              <strong>Create issue header:</strong>
+              Insert issue record with metadata
             </li>
             <li>
-              <strong>For each line:</strong> Capture WAC, calculate value, create line
+              <strong>For each line:</strong>
+              Capture WAC, calculate value, create line
             </li>
             <li>
-              <strong>Decrement stock:</strong> Update LocationStock.on_hand
+              <strong>Decrement stock:</strong>
+              Update LocationStock.on_hand
             </li>
             <li>
-              <strong>Update totals:</strong> Set total_value on issue header
+              <strong>Update totals:</strong>
+              Set total_value on issue header
             </li>
           </ol>
         </div>
@@ -1072,8 +1085,9 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>No Draft State:</strong> Unlike deliveries, issues are immediately posted.
-              There is no draft/posted status distinction for issues.
+              <strong>No Draft State:</strong>
+              Unlike deliveries, issues are immediately posted. There is no draft/posted status
+              distinction for issues.
             </span>
           </p>
         </div>
@@ -1100,8 +1114,8 @@ INTERNAL_ERROR        // Unexpected server error
       </button>
       <div v-if="isExpanded('stock-update')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          Issues decrement stock but do NOT change WAC. This is different from deliveries which
-          both increment stock and recalculate WAC.
+          Issues decrement stock but do NOT change WAC. This is different from deliveries which both
+          increment stock and recalculate WAC.
         </p>
 
         <div>
@@ -1112,7 +1126,9 @@ INTERNAL_ERROR        // Unexpected server error
         </div>
 
         <div class="space-y-3">
-          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Issue vs Delivery Stock Updates</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">
+            Issue vs Delivery Stock Updates
+          </h4>
           <div class="grid gap-3 sm:grid-cols-2">
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="mb-2 flex items-center gap-2">
@@ -1168,22 +1184,27 @@ INTERNAL_ERROR        // Unexpected server error
       <div v-if="isExpanded('api-frontend')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
           Recommended patterns for API endpoints and frontend components. The
-          <code class="code-inline">afterIssue()</code> function from
-          <code class="code-inline">useSmartCacheInvalidation()</code> is implemented.
+          <code class="code-inline">afterIssue()</code>
+          function from
+          <code class="code-inline">useSmartCacheInvalidation()</code>
+          is implemented.
         </p>
 
         <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Note:</strong> The composable and form patterns below are recommended
-              implementations. The cache invalidation is already implemented.
+              <strong>Note:</strong>
+              The composable and form patterns below are recommended implementations. The cache
+              invalidation is already implemented.
             </span>
           </p>
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Issue Number Generation</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Issue Number Generation
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.generateIssueNumber"
             language="typescript"
@@ -1214,10 +1235,12 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Cache Invalidation:</strong> Always call
-              <code class="code-inline">afterIssue()</code> from
-              <code class="code-inline">useSmartCacheInvalidation()</code> after creating an issue
-              to refresh stock and transaction caches.
+              <strong>Cache Invalidation:</strong>
+              Always call
+              <code class="code-inline">afterIssue()</code>
+              from
+              <code class="code-inline">useSmartCacheInvalidation()</code>
+              after creating an issue to refresh stock and transaction caches.
             </span>
           </p>
         </div>
@@ -1251,9 +1274,7 @@ INTERNAL_ERROR        // Unexpected server error
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
-            Reconciliation Formula
-          </h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Reconciliation Formula</h4>
           <DeveloperCodeBlock :code="codeExamples.reconciliationImpact" language="plaintext" />
         </div>
 
@@ -1262,8 +1283,9 @@ INTERNAL_ERROR        // Unexpected server error
             Reconciliation Formula
           </h5>
           <code class="text-sm text-[var(--ui-text-highlighted)]">
-            Opening + Receipts + TransfersIn - TransfersOut - <strong>Issues</strong> - Adjustments
-            = Closing
+            Opening + Receipts + TransfersIn - TransfersOut -
+            <strong>Issues</strong>
+            - Adjustments = Closing
           </code>
         </div>
       </div>
@@ -1283,7 +1305,9 @@ INTERNAL_ERROR        // Unexpected server error
             name="i-heroicons-clipboard-document-list"
             class="text-xl text-[var(--ui-primary)]"
           />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Business Rules Summary</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Business Rules Summary
+          </span>
         </span>
         <UIcon
           :name="
@@ -1307,31 +1331,36 @@ INTERNAL_ERROR        // Unexpected server error
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Never allow negative stock</strong> - Always validate before issue
+                <strong>Never allow negative stock</strong>
+                - Always validate before issue
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Issues do NOT recalculate WAC</strong> - Only capture current WAC
+                <strong>Issues do NOT recalculate WAC</strong>
+                - Only capture current WAC
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Period must be OPEN</strong> - Cannot issue to closed periods
+                <strong>Period must be OPEN</strong>
+                - Cannot issue to closed periods
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Immediate posting</strong> - No draft state, all issues are final
+                <strong>Immediate posting</strong>
+                - No draft state, all issues are final
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Cost centre required</strong> - Track FOOD, CLEAN, or OTHER
+                <strong>Cost centre required</strong>
+                - Track FOOD, CLEAN, or OTHER
               </span>
             </div>
           </div>

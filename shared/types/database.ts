@@ -17,12 +17,7 @@ export type LocationType = "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
 
 export type Unit = "KG" | "EA" | "LTR" | "BOX" | "CASE" | "PACK";
 
-export type PeriodStatus =
-  | "DRAFT"
-  | "OPEN"
-  | "PENDING_CLOSE"
-  | "APPROVED"
-  | "CLOSED";
+export type PeriodStatus = "DRAFT" | "OPEN" | "PENDING_CLOSE" | "APPROVED" | "CLOSED";
 
 export type PeriodLocationStatus = "OPEN" | "READY" | "CLOSED";
 
@@ -34,12 +29,7 @@ export type DeliveryStatus = "DRAFT" | "POSTED";
 
 export type CostCentre = "FOOD" | "CLEAN" | "OTHER";
 
-export type TransferStatus =
-  | "DRAFT"
-  | "PENDING_APPROVAL"
-  | "APPROVED"
-  | "REJECTED"
-  | "COMPLETED";
+export type TransferStatus = "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "COMPLETED";
 
 export type NCRType = "MANUAL" | "PRICE_VARIANCE";
 

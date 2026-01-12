@@ -28,14 +28,14 @@ As a **Supervisor**, you have oversight responsibilities across all locations. Y
 
 ### What You Can Do That Operators Cannot
 
-| Capability | Supervisor | Operator |
-|------------|------------|----------|
-| View all locations | Yes | Assigned only |
-| Approve/Reject transfers | Yes | No |
-| Edit reconciliations | Yes | No |
-| View consolidated reports | Yes | No |
-| Create manual NCRs | Yes | No |
-| Mark location ready for close | Yes | No |
+| Capability                    | Supervisor | Operator      |
+| ----------------------------- | ---------- | ------------- |
+| View all locations            | Yes        | Assigned only |
+| Approve/Reject transfers      | Yes        | No            |
+| Edit reconciliations          | Yes        | No            |
+| View consolidated reports     | Yes        | No            |
+| Create manual NCRs            | Yes        | No            |
+| Mark location ready for close | Yes        | No            |
 
 ---
 
@@ -64,12 +64,12 @@ DRAFT → PENDING_APPROVAL → APPROVED → COMPLETED
                         ↘ REJECTED
 ```
 
-| Status | Meaning |
-|--------|---------|
-| **DRAFT** | Transfer is being prepared, not yet submitted |
-| **PENDING_APPROVAL** | Waiting for Supervisor review |
-| **APPROVED** | Approved and stock has been moved |
-| **REJECTED** | Denied, no stock movement |
+| Status               | Meaning                                       |
+| -------------------- | --------------------------------------------- |
+| **DRAFT**            | Transfer is being prepared, not yet submitted |
+| **PENDING_APPROVAL** | Waiting for Supervisor review                 |
+| **APPROVED**         | Approved and stock has been moved             |
+| **REJECTED**         | Denied, no stock movement                     |
 
 ### Viewing Pending Transfers
 
@@ -78,6 +78,7 @@ DRAFT → PENDING_APPROVAL → APPROVED → COMPLETED
 3. You'll see all transfers waiting for your review
 
 Each transfer shows:
+
 - **Transfer Number**
 - **From Location** (source)
 - **To Location** (destination)
@@ -103,6 +104,7 @@ Each transfer shows:
 4. Confirm in the dialog box
 
 **What happens when you approve:**
+
 - Stock is immediately deducted from the source location
 - Stock is immediately added to the destination location
 - Stock transfers at the source location's WAC (Weighted Average Cost)
@@ -117,6 +119,7 @@ Each transfer shows:
 5. Confirm in the dialog box
 
 **What happens when you reject:**
+
 - No stock movement occurs
 - The requester is notified
 - The transfer status changes to REJECTED
@@ -147,16 +150,16 @@ Reconciliations verify stock levels and calculate consumption at period end.
 
 A reconciliation compares:
 
-| Component | Description |
-|-----------|-------------|
-| **Opening Stock** | Value at period start |
-| **+ Receipts** | Deliveries received during period |
-| **+ Transfers In** | Stock transferred to this location |
-| **- Transfers Out** | Stock transferred from this location |
-| **- Issues** | Stock used during period |
-| **= Expected Closing** | What stock should be |
-| **vs Actual Closing** | Physical count |
-| **= Variance** | Difference to explain |
+| Component              | Description                          |
+| ---------------------- | ------------------------------------ |
+| **Opening Stock**      | Value at period start                |
+| **+ Receipts**         | Deliveries received during period    |
+| **+ Transfers In**     | Stock transferred to this location   |
+| **- Transfers Out**    | Stock transferred from this location |
+| **- Issues**           | Stock used during period             |
+| **= Expected Closing** | What stock should be                 |
+| **vs Actual Closing**  | Physical count                       |
+| **= Variance**         | Difference to explain                |
 
 ### Viewing Location Reconciliation
 
@@ -166,6 +169,7 @@ A reconciliation compares:
 4. View the reconciliation summary
 
 The page shows:
+
 - Opening and closing values
 - All movements (receipts, issues, transfers)
 - Automatic calculations
@@ -208,6 +212,7 @@ To see all locations together:
 3. View the summary across all locations
 
 The consolidated view shows:
+
 - Each location's reconciliation status
 - Combined opening and closing values
 - Total consumption across all locations
@@ -222,6 +227,7 @@ NCRs (Non-Conformance Reports) track quality issues and corrections.
 ### When to Create a Manual NCR
 
 Create a manual NCR for:
+
 - **Damaged goods** - Items damaged during delivery
 - **Short shipments** - Supplier delivered less than invoiced
 - **Quality issues** - Items don't meet specifications
@@ -247,19 +253,20 @@ Create a manual NCR for:
 ### Linking NCR to a Delivery
 
 When you link an NCR to a delivery:
+
 - The item list filters to show only items from that delivery
 - Unit values auto-fill from the delivery
 - The NCR references the delivery for tracking
 
 ### NCR Status Workflow
 
-| Status | Meaning | Next Steps |
-|--------|---------|------------|
-| **OPEN** | Just created | Send to supplier |
-| **SENT** | Sent to supplier | Wait for response |
-| **CREDITED** | Supplier provided credit | Close the loop |
-| **REJECTED** | Supplier denied claim | Escalate or close |
-| **RESOLVED** | Issue resolved | Complete |
+| Status       | Meaning                  | Next Steps        |
+| ------------ | ------------------------ | ----------------- |
+| **OPEN**     | Just created             | Send to supplier  |
+| **SENT**     | Sent to supplier         | Wait for response |
+| **CREDITED** | Supplier provided credit | Close the loop    |
+| **REJECTED** | Supplier denied claim    | Escalate or close |
+| **RESOLVED** | Issue resolved           | Complete          |
 
 ---
 
@@ -285,6 +292,7 @@ Shows current inventory levels across locations.
 4. Click **Export CSV** to download
 
 **Report includes:**
+
 - Item code and name
 - Quantity on hand
 - Unit value (WAC)
@@ -305,6 +313,7 @@ Shows delivery history with supplier analysis.
 4. Export to CSV if needed
 
 **Report includes:**
+
 - Delivery numbers and dates
 - Supplier information
 - Items received with quantities
@@ -324,6 +333,7 @@ Shows stock consumption by cost centre.
 3. View the report
 
 **Report includes:**
+
 - Issue dates and numbers
 - Cost centre breakdown
 - Items consumed with quantities
@@ -340,6 +350,7 @@ Shows period-end reconciliation details.
 4. View the report
 
 **Report includes:**
+
 - Opening and closing values
 - Movement summary
 - Adjustments
@@ -361,18 +372,19 @@ All reports support CSV export:
 
 ### Navigation
 
-| Task | Path |
-|------|------|
-| Review transfers | Transfers > Filter by "Pending Approval" |
-| Approve transfer | Transfers > Click transfer > Approve |
-| View reconciliation | Reconciliations > Select location |
-| Consolidated view | Reconciliations > View Consolidated |
-| Create manual NCR | NCR > New NCR |
-| Access reports | Reports > Select report type |
+| Task                | Path                                     |
+| ------------------- | ---------------------------------------- |
+| Review transfers    | Transfers > Filter by "Pending Approval" |
+| Approve transfer    | Transfers > Click transfer > Approve     |
+| View reconciliation | Reconciliations > Select location        |
+| Consolidated view   | Reconciliations > View Consolidated      |
+| Create manual NCR   | NCR > New NCR                            |
+| Access reports      | Reports > Select report type             |
 
 ### Approval Checklist
 
 Before approving a transfer, verify:
+
 - [ ] Source location has sufficient stock
 - [ ] Destination location is correct
 - [ ] Item quantities are reasonable
@@ -382,6 +394,7 @@ Before approving a transfer, verify:
 ### Reconciliation Checklist
 
 Before marking location ready:
+
 - [ ] All deliveries posted
 - [ ] All issues posted
 - [ ] All transfers completed
@@ -399,6 +412,7 @@ Before marking location ready:
 ### Getting Help
 
 If you encounter problems:
+
 1. Check the period is OPEN
 2. Verify your internet connection
 3. For system issues, contact Admin
@@ -406,4 +420,4 @@ If you encounter problems:
 
 ---
 
-*Document Version: 1.0 | Last Updated: December 2025*
+_Document Version: 1.0 | Last Updated: December 2025_

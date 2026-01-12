@@ -208,8 +208,7 @@ const metricCards = computed(() => {
   const { totals } = dashboardData.value;
 
   // Calculate mandays cost (total issues / total mandays)
-  const mandaysCost =
-    totals.total_mandays > 0 ? totals.total_issues / totals.total_mandays : 0;
+  const mandaysCost = totals.total_mandays > 0 ? totals.total_issues / totals.total_mandays : 0;
 
   return [
     {
@@ -253,9 +252,7 @@ const consolidatedMetricCards = computed(() => {
 
   // Calculate mandays cost (total issues / total mandays)
   const mandaysCost =
-    global_totals.total_mandays > 0
-      ? global_totals.total_issues / global_totals.total_mandays
-      : 0;
+    global_totals.total_mandays > 0 ? global_totals.total_issues / global_totals.total_mandays : 0;
 
   return [
     {

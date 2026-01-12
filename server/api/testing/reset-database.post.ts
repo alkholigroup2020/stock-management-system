@@ -13,7 +13,6 @@ import { hash } from "bcrypt";
 import prisma from "../../utils/prisma";
 
 export default defineEventHandler(async () => {
-
   try {
     // Delete in reverse dependency order to respect foreign key constraints
 

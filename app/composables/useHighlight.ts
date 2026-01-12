@@ -67,10 +67,7 @@ export function useHighlight() {
   const highlight = async (code: string, lang: string): Promise<string> => {
     // Handle plaintext as a special case - return pre-formatted HTML
     if (lang === "plaintext" || lang === "text") {
-      const escaped = code
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+      const escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return `<pre class="hljs"><code>${escaped}</code></pre>`;
     }
 
@@ -85,10 +82,7 @@ export function useHighlight() {
       return `<pre class="hljs"><code>${result.value}</code></pre>`;
     } catch {
       // Fallback to plaintext if highlighting fails
-      const escaped = code
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+      const escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return `<pre class="hljs"><code>${escaped}</code></pre>`;
     }
   };

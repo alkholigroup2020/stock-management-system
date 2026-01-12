@@ -91,30 +91,35 @@ const codeExamples = {
       </button>
       <div v-if="isExpanded('nuxt4')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          This project uses <strong>Nuxt 4</strong>, the latest version of the Nuxt framework. Key
-          differences from Nuxt 3:
+          This project uses
+          <strong>Nuxt 4</strong>
+          , the latest version of the Nuxt framework. Key differences from Nuxt 3:
         </p>
 
         <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-folder" class="mt-0.5 shrink-0 text-[var(--ui-primary)]" />
             <span>
-              <strong>/app/ directory</strong> - Frontend code lives in /app/ instead of the root.
-              This includes pages, components, composables, and stores.
+              <strong>/app/ directory</strong>
+              - Frontend code lives in /app/ instead of the root. This includes pages, components,
+              composables, and stores.
             </span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-document" class="mt-0.5 shrink-0 text-[var(--ui-primary)]" />
             <span>
-              <strong>SPA Mode</strong> - Running with <code>ssr: false</code> for client-side
-              rendering only. No server-side rendering.
+              <strong>SPA Mode</strong>
+              - Running with
+              <code>ssr: false</code>
+              for client-side rendering only. No server-side rendering.
             </span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-server" class="mt-0.5 shrink-0 text-[var(--ui-primary)]" />
             <span>
-              <strong>Nitro Server</strong> - API routes in /server/api/ are handled by Nitro and
-              deployed as serverless functions.
+              <strong>Nitro Server</strong>
+              - API routes in /server/api/ are handled by Nitro and deployed as serverless
+              functions.
             </span>
           </li>
         </ul>
@@ -123,9 +128,11 @@ const codeExamples = {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              Always check <strong>Nuxt 4</strong> documentation at
-              <a href="https://nuxt.com/docs" target="_blank" class="underline">nuxt.com/docs</a>,
-              not older Nuxt 3 resources.
+              Always check
+              <strong>Nuxt 4</strong>
+              documentation at
+              <a href="https://nuxt.com/docs" target="_blank" class="underline">nuxt.com/docs</a>
+              , not older Nuxt 3 resources.
             </span>
           </p>
         </div>
@@ -157,16 +164,20 @@ const codeExamples = {
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Key Directories</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>/app/pages/</strong> - File-based routing. /pages/items/[id].vue becomes
-              /items/:id
+              <strong>/app/pages/</strong>
+              - File-based routing. /pages/items/[id].vue becomes /items/:id
             </li>
             <li>
-              <strong>/app/components/</strong> - Auto-imported. Subdirectory names become prefixes.
+              <strong>/app/components/</strong>
+              - Auto-imported. Subdirectory names become prefixes.
             </li>
-            <li><strong>/server/api/</strong> - API routes. Follows RESTful conventions.</li>
             <li>
-              <strong>/shared/types/</strong> - TypeScript interfaces shared between frontend and
-              backend.
+              <strong>/server/api/</strong>
+              - API routes. Follows RESTful conventions.
+            </li>
+            <li>
+              <strong>/shared/types/</strong>
+              - TypeScript interfaces shared between frontend and backend.
             </li>
           </ul>
         </div>
@@ -195,28 +206,31 @@ const codeExamples = {
       </button>
       <div v-if="isExpanded('monolithic')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          This is a <strong>single Nuxt application</strong> that contains both frontend and
-          backend:
+          This is a
+          <strong>single Nuxt application</strong>
+          that contains both frontend and backend:
         </p>
 
         <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-window" class="mt-0.5 shrink-0 text-[var(--ui-info)]" />
             <span>
-              <strong>Frontend</strong> - SPA pages in /app/pages/, components in /app/components/
+              <strong>Frontend</strong>
+              - SPA pages in /app/pages/, components in /app/components/
             </span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-server" class="mt-0.5 shrink-0 text-[var(--ui-success)]" />
             <span>
-              <strong>Backend</strong> - API routes in /server/api/, server middleware in
-              /server/middleware/
+              <strong>Backend</strong>
+              - API routes in /server/api/, server middleware in /server/middleware/
             </span>
           </li>
           <li class="flex items-start gap-2">
             <UIcon name="i-heroicons-share" class="mt-0.5 shrink-0 text-[var(--ui-warning)]" />
             <span>
-              <strong>Shared</strong> - Composables in /app/composables/, types in /shared/types/
+              <strong>Shared</strong>
+              - Composables in /app/composables/, types in /shared/types/
             </span>
           </li>
         </ul>
@@ -287,7 +301,9 @@ const codeExamples = {
               </tr>
               <tr>
                 <td class="px-4 py-2 font-medium">Database</td>
-                <td class="px-4 py-2 text-[var(--ui-text-muted)]">PostgreSQL via Supabase + Prisma</td>
+                <td class="px-4 py-2 text-[var(--ui-text-muted)]">
+                  PostgreSQL via Supabase + Prisma
+                </td>
               </tr>
               <tr>
                 <td class="px-4 py-2 font-medium">Auth</td>

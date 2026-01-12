@@ -85,6 +85,7 @@ pnpm format:check  # Check formatting (CI)
 When adding or editing code snippets in the Developer Guide (`app/components/developer/*.vue`), **always include the file path** in the CodeBlock `filename` prop when the code represents a real file in the codebase.
 
 **Example:**
+
 ```vue
 <DeveloperCodeBlock
   :code="codeExamples.loginServer"
@@ -94,6 +95,7 @@ When adding or editing code snippets in the Developer Guide (`app/components/dev
 ```
 
 **Rules:**
+
 - All code snippets that represent actual files must have the `filename` prop
 - Use the relative path from project root (e.g., `server/api/auth/login.post.ts`, `app/composables/useAuth.ts`)
 - Generic examples or conceptual code (not tied to specific files) may omit the filename

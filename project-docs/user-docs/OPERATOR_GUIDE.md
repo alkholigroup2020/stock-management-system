@@ -92,16 +92,17 @@ If the price you enter differs from the expected **Period Price**, you'll see a 
 > **Price Variance Detected:** The entered price differs from the locked period price.
 
 This means:
+
 - An NCR (Non-Conformance Report) will be automatically created
 - The supplier will need to be notified about the price difference
 - You can still post the delivery
 
 ### Saving vs Posting
 
-| Action | What Happens |
-|--------|--------------|
+| Action            | What Happens                                                                      |
+| ----------------- | --------------------------------------------------------------------------------- |
 | **Save as Draft** | Delivery is saved but not finalized. You can edit it later. Stock is NOT updated. |
-| **Post Delivery** | Delivery is finalized and locked. Stock IS updated. Cannot be edited. |
+| **Post Delivery** | Delivery is finalized and locked. Stock IS updated. Cannot be edited.             |
 
 ### Viewing Delivery History
 
@@ -179,11 +180,11 @@ If you try to enter a quantity greater than what's available, you'll see a warni
 
 ### Understanding Stock Values
 
-| Term | Meaning |
-|------|---------|
-| **On Hand** | Physical quantity available at your location |
-| **WAC** | Weighted Average Cost - the average cost of the item |
-| **Total Value** | On Hand x WAC = Total worth of that item |
+| Term            | Meaning                                              |
+| --------------- | ---------------------------------------------------- |
+| **On Hand**     | Physical quantity available at your location         |
+| **WAC**         | Weighted Average Cost - the average cost of the item |
+| **Total Value** | On Hand x WAC = Total worth of that item             |
 
 > **Note:** Stock values are in SAR (Saudi Riyal).
 
@@ -270,11 +271,12 @@ When you post a delivery with a price different from the period price:
 6. Click **Update Password**
 
 **Password Requirements:**
+
 - At least 8 characters
 - Include uppercase letter (A-Z)
 - Include lowercase letter (a-z)
 - Include number (0-9)
-- Include special character (@$!%*?&)
+- Include special character (@$!%\*?&)
 
 ---
 
@@ -282,15 +284,15 @@ When you post a delivery with a price different from the period price:
 
 ### Key Shortcuts
 
-| Action | Navigation |
-|--------|------------|
-| Dashboard | Click logo or "Dashboard" |
+| Action       | Navigation                |
+| ------------ | ------------------------- |
+| Dashboard    | Click logo or "Dashboard" |
 | New Delivery | Deliveries > New Delivery |
-| New Issue | Issues > New Issue |
-| View Stock | Stock Now |
-| Enter POB | POB |
-| View NCRs | NCR |
-| My Profile | Click name > Profile |
+| New Issue    | Issues > New Issue        |
+| View Stock   | Stock Now                 |
+| Enter POB    | POB                       |
+| View NCRs    | NCR                       |
+| My Profile   | Click name > Profile      |
 
 ### Important Rules to Remember
 
@@ -303,6 +305,7 @@ When you post a delivery with a price different from the period price:
 ### Getting Help
 
 If you encounter problems:
+
 1. Check that you're at the correct location
 2. Check that the period is OPEN
 3. Check your internet connection
@@ -310,4 +313,4 @@ If you encounter problems:
 
 ---
 
-*Document Version: 1.0 | Last Updated: December 2025*
+_Document Version: 1.0 | Last Updated: December 2025_

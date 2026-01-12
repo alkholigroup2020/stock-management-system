@@ -47,12 +47,13 @@ In the Vercel dashboard, go to **Settings > Environment Variables** and add the 
 
 ### Database Configuration
 
-| Variable | Description | Example |
-|----------|-------------|---------|
+| Variable       | Description                                              | Example                                                                                                                    |
+| -------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL` | Prisma connection string (Transaction pooler, port 6543) | `postgresql://postgres.[PROJECT]:[PASSWORD]@aws-[REGION].pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true` |
-| `DIRECT_URL` | Direct connection for migrations (port 5432) | `postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres?sslmode=require` |
+| `DIRECT_URL`   | Direct connection for migrations (port 5432)             | `postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres?sslmode=require`                                  |
 
 **Getting these values from Supabase:**
+
 1. Go to your Supabase project dashboard
 2. Navigate to **Settings > Database**
 3. Copy the **Transaction** connection string for `DATABASE_URL`
@@ -60,25 +61,25 @@ In the Vercel dashboard, go to **Settings > Environment Variables** and add the 
 
 ### Supabase Configuration
 
-| Variable | Description | Where to find |
-|----------|-------------|---------------|
-| `SUPABASE_URL` | Project URL | Settings > API > Project URL |
-| `SUPABASE_ANON_KEY` | Anonymous key (public) | Settings > API > anon public |
+| Variable               | Description                | Where to find                        |
+| ---------------------- | -------------------------- | ------------------------------------ |
+| `SUPABASE_URL`         | Project URL                | Settings > API > Project URL         |
+| `SUPABASE_ANON_KEY`    | Anonymous key (public)     | Settings > API > anon public         |
 | `SUPABASE_SERVICE_KEY` | Service role key (secret!) | Settings > API > service_role secret |
 
 ### Authentication
 
-| Variable | Description | How to generate |
-|----------|-------------|-----------------|
-| `AUTH_SECRET` | JWT signing secret (32+ chars) | `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
-| `NUXT_SESSION_PASSWORD` | Session encryption (32+ chars) | `node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"` |
+| Variable                | Description                    | How to generate                                                               |
+| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------- |
+| `AUTH_SECRET`           | JWT signing secret (32+ chars) | `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+| `NUXT_SESSION_PASSWORD` | Session encryption (32+ chars) | `node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"`    |
 
 ### Application Settings
 
-| Variable | Value |
-|----------|-------|
+| Variable               | Value                                                            |
+| ---------------------- | ---------------------------------------------------------------- |
 | `NUXT_PUBLIC_SITE_URL` | Your Vercel domain (e.g., `https://stock-management.vercel.app`) |
-| `NUXT_PUBLIC_CURRENCY` | `SAR` |
+| `NUXT_PUBLIC_CURRENCY` | `SAR`                                                            |
 
 ---
 
@@ -97,6 +98,7 @@ pnpm db:push
 ```
 
 **Note:** If `db:push` fails with connection errors:
+
 1. Ensure your Supabase project is not paused (check dashboard)
 2. If behind a firewall, you may need the IPv4 add-on in Supabase
 3. Try running from a different network
@@ -178,6 +180,7 @@ To use a custom domain:
 ### Supabase Monitoring
 
 In Supabase dashboard:
+
 - **Database > Query Performance** - Slow query analysis
 - **Logs > Postgres** - Database logs
 - **Settings > Database** - Connection pool status
@@ -189,19 +192,23 @@ In Supabase dashboard:
 ### Build Fails
 
 **Prisma client errors:**
+
 ```
 "promisify" is not exported by "__vite-browser-external"
 ```
+
 - Ensure Prisma is only imported in `/server/` directories
 - Check that no client components import Prisma
 
 **Module not found:**
+
 - Run `pnpm install` locally first
 - Check `package.json` dependencies
 
 ### Database Connection Fails
 
 **Error: Can't reach database server**
+
 1. Check Supabase project is not paused
 2. Verify connection string format (port 6543 for pooler)
 3. Enable IPv4 add-on if behind restrictive firewall
@@ -240,28 +247,31 @@ This instantly rolls back to the previous version.
 
 ## Environment-Specific Settings
 
-| Setting | Development | Production |
-|---------|-------------|------------|
-| `NUXT_PUBLIC_SITE_URL` | `http://localhost:3000` | `https://your-app.vercel.app` |
-| Database | Can use same Supabase or local | Production Supabase |
-| PWA | Disabled in dev | Enabled |
-| SSL | Optional | Required |
+| Setting                | Development                    | Production                    |
+| ---------------------- | ------------------------------ | ----------------------------- |
+| `NUXT_PUBLIC_SITE_URL` | `http://localhost:3000`        | `https://your-app.vercel.app` |
+| Database               | Can use same Supabase or local | Production Supabase           |
+| PWA                    | Disabled in dev                | Enabled                       |
+| SSL                    | Optional                       | Required                      |
 
 ---
 
 ## Cost Considerations
 
 ### Vercel (Free Tier)
+
 - 100GB bandwidth/month
 - Serverless function invocations: 100,000/month
 - Suitable for small-medium workloads
 
 ### Supabase (Free Tier)
+
 - 500MB database storage
 - 2GB bandwidth/month
 - Pauses after 1 week of inactivity
 
 For production use, consider:
+
 - Vercel Pro ($20/user/month)
 - Supabase Pro ($25/month)
 

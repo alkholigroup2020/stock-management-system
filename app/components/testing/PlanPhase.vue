@@ -38,11 +38,7 @@ const progressColor = computed(() => {
         </span>
       </div>
       <div class="flex items-center gap-2 flex-shrink-0 ml-2">
-        <UBadge
-          :color="progressColor"
-          variant="subtle"
-          size="xs"
-        >
+        <UBadge :color="progressColor" variant="subtle" size="xs">
           {{ progress.completed }}/{{ progress.total }}
         </UBadge>
       </div>
@@ -65,11 +61,7 @@ const progressColor = computed(() => {
           >
             {{ phase.description }}
           </p>
-          <TestingPlanItem
-            v-for="item in phase.items"
-            :key="item.id"
-            :item="item"
-          />
+          <TestingPlanItem v-for="item in phase.items" :key="item.id" :item="item" />
         </div>
       </div>
     </Transition>

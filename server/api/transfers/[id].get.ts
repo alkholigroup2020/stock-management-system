@@ -137,8 +137,7 @@ export default defineEventHandler(async (event) => {
     if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
       const hasAccess = userLocations.some(
         (ul) =>
-          ul.location_id === transfer.from_location_id ||
-          ul.location_id === transfer.to_location_id
+          ul.location_id === transfer.from_location_id || ul.location_id === transfer.to_location_id
       );
 
       if (!hasAccess) {

@@ -162,9 +162,7 @@ export default defineEventHandler(async (event) => {
 
     // Check user has access to location (Operators need explicit assignment)
     if (user.role === "OPERATOR") {
-      const hasLocationAccess = userLocations.some(
-        (ul) => ul.location_id === delivery.location_id
-      );
+      const hasLocationAccess = userLocations.some((ul) => ul.location_id === delivery.location_id);
 
       if (!hasLocationAccess) {
         throw createError({

@@ -621,16 +621,20 @@ cache.invalidateAll();`,
           </span>
         </span>
         <UIcon
-          :name="isExpanded('cache-overview') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('cache-overview') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
       <div v-if="isExpanded('cache-overview')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
           The caching system uses Nuxt's
-          <code class="code-inline">useAsyncData</code> with
-          <code class="code-inline">nuxtApp.payload.data</code> for client-side caching. Each cache
-          entry stores both the data and a timestamp for time-based expiration.
+          <code class="code-inline">useAsyncData</code>
+          with
+          <code class="code-inline">nuxtApp.payload.data</code>
+          for client-side caching. Each cache entry stores both the data and a timestamp for
+          time-based expiration.
         </p>
 
         <div>
@@ -790,7 +794,8 @@ cache.invalidateAll();`,
       <div v-if="isExpanded('useAsyncData-pattern')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
           Data fetching composables use Nuxt's
-          <code class="code-inline">useAsyncData</code> with a custom
+          <code class="code-inline">useAsyncData</code>
+          with a custom
           <code class="code-inline">getCachedData</code>
           function to implement time-based caching.
         </p>
@@ -810,7 +815,10 @@ cache.invalidateAll();`,
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
             Fetching Composable Pattern
           </h4>
-          <DeveloperCodeBlock :code="codeExamples.fetchingComposablePattern" language="typescript" />
+          <DeveloperCodeBlock
+            :code="codeExamples.fetchingComposablePattern"
+            language="typescript"
+          />
         </div>
 
         <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
@@ -845,8 +853,9 @@ cache.invalidateAll();`,
       </button>
       <div v-if="isExpanded('useCache')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The <code class="code-inline">useCache()</code> composable provides centralized cache
-          management and invalidation utilities.
+          The
+          <code class="code-inline">useCache()</code>
+          composable provides centralized cache management and invalidation utilities.
         </p>
 
         <div>
@@ -873,39 +882,50 @@ cache.invalidateAll();`,
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <code class="code-inline">invalidateLocations()</code> - All location caches
-              </span>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span><code class="code-inline">invalidateItems()</code> - All item caches</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span><code class="code-inline">invalidatePeriods()</code> - All period caches</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span>
-                <code class="code-inline">invalidateStock(locationId?)</code> - Stock caches
+                <code class="code-inline">invalidateLocations()</code>
+                - All location caches
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <code class="code-inline">invalidateTransactions(type?)</code> - Transaction caches
+                <code class="code-inline">invalidateItems()</code>
+                - All item caches
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <code class="code-inline">invalidateAll()</code> - Nuclear option (except auth)
+                <code class="code-inline">invalidatePeriods()</code>
+                - All period caches
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <code class="code-inline">getCacheStats()</code> - Debug cache statistics
+                <code class="code-inline">invalidateStock(locationId?)</code>
+                - Stock caches
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>
+                <code class="code-inline">invalidateTransactions(type?)</code>
+                - Transaction caches
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>
+                <code class="code-inline">invalidateAll()</code>
+                - Nuclear option (except auth)
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>
+                <code class="code-inline">getCacheStats()</code>
+                - Debug cache statistics
               </span>
             </li>
           </ul>
@@ -935,9 +955,10 @@ cache.invalidateAll();`,
       </button>
       <div v-if="isExpanded('smart-cache')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The <code class="code-inline">useSmartCacheInvalidation()</code> composable automatically
-          invalidates related caches based on the operation type. Use this after business operations
-          to ensure all affected data is refreshed.
+          The
+          <code class="code-inline">useSmartCacheInvalidation()</code>
+          composable automatically invalidates related caches based on the operation type. Use this
+          after business operations to ensure all affected data is refreshed.
         </p>
 
         <div>
@@ -962,8 +983,9 @@ cache.invalidateAll();`,
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Always use smart invalidation</strong> after business operations (deliveries,
-              issues, transfers, etc.) to avoid stale data in related views.
+              <strong>Always use smart invalidation</strong>
+              after business operations (deliveries, issues, transfers, etc.) to avoid stale data in
+              related views.
             </span>
           </p>
         </div>
@@ -1018,27 +1040,29 @@ cache.invalidateAll();`,
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Use smart invalidation</strong> for business operations (deliveries, issues,
-                transfers)
+                <strong>Use smart invalidation</strong>
+                for business operations (deliveries, issues, transfers)
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Use category invalidation</strong> for master data CRUD (locations, items,
-                suppliers)
+                <strong>Use category invalidation</strong>
+                for master data CRUD (locations, items, suppliers)
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Call refresh()</strong> after invalidation to update the current view
+                <strong>Call refresh()</strong>
+                after invalidation to update the current view
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-x-circle" class="mt-0.5 text-[var(--ui-error)]" />
               <span>
-                <strong>Avoid invalidateAll()</strong> unless necessary (logout, major state change)
+                <strong>Avoid invalidateAll()</strong>
+                unless necessary (logout, major state change)
               </span>
             </li>
           </ul>
@@ -1083,9 +1107,11 @@ cache.invalidateAll();`,
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical:</strong> Always check
-              <code class="code-inline">isPeriodOpen</code> before allowing transaction posts. A
-              closed period means no new transactions can be recorded.
+              <strong>Critical:</strong>
+              Always check
+              <code class="code-inline">isPeriodOpen</code>
+              before allowing transaction posts. A closed period means no new transactions can be
+              recorded.
             </span>
           </p>
         </div>
@@ -1103,9 +1129,7 @@ cache.invalidateAll();`,
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-document-text" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">
-            Complete CRUD Example
-          </span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Complete CRUD Example</span>
         </span>
         <UIcon
           :name="isExpanded('crud-example') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
@@ -1164,31 +1188,45 @@ cache.invalidateAll();`,
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Common Issues</h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 text-[var(--ui-warning)]" />
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="mt-0.5 text-[var(--ui-warning)]"
+              />
               <span>
-                <strong>Stale data:</strong> Forgot to invalidate cache after mutation. Use smart
-                invalidation.
+                <strong>Stale data:</strong>
+                Forgot to invalidate cache after mutation. Use smart invalidation.
               </span>
             </li>
             <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 text-[var(--ui-warning)]" />
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="mt-0.5 text-[var(--ui-warning)]"
+              />
               <span>
-                <strong>Data not updating:</strong> Called invalidation but not
-                <code class="code-inline">refresh()</code>. Always refresh after invalidation.
+                <strong>Data not updating:</strong>
+                Called invalidation but not
+                <code class="code-inline">refresh()</code>
+                . Always refresh after invalidation.
               </span>
             </li>
             <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 text-[var(--ui-warning)]" />
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="mt-0.5 text-[var(--ui-warning)]"
+              />
               <span>
-                <strong>Wrong data for filters:</strong> Filters changed but cache key didn't
-                include filters. Use filter-aware keys.
+                <strong>Wrong data for filters:</strong>
+                Filters changed but cache key didn't include filters. Use filter-aware keys.
               </span>
             </li>
             <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 text-[var(--ui-warning)]" />
+              <UIcon
+                name="i-heroicons-exclamation-triangle"
+                class="mt-0.5 text-[var(--ui-warning)]"
+              />
               <span>
-                <strong>Too many API calls:</strong> Cache TTL too short or not using caching
-                composables. Check cache stats.
+                <strong>Too many API calls:</strong>
+                Cache TTL too short or not using caching composables. Check cache stats.
               </span>
             </li>
           </ul>

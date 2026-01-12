@@ -97,7 +97,9 @@ const handleReset = async () => {
         <div class="p-6 space-y-4">
           <!-- Header -->
           <div class="flex items-center gap-3">
-            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+            <div
+              class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"
+            >
               <UIcon
                 name="i-heroicons-exclamation-triangle"
                 class="w-5 h-5 text-red-600 dark:text-red-400"
@@ -107,14 +109,14 @@ const handleReset = async () => {
               <h3 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
                 Reset Database & Progress
               </h3>
-              <p class="text-sm text-[var(--ui-text-muted)]">
-                This action cannot be undone
-              </p>
+              <p class="text-sm text-[var(--ui-text-muted)]">This action cannot be undone</p>
             </div>
           </div>
 
           <!-- Warning Content -->
-          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 space-y-3">
+          <div
+            class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 space-y-3"
+          >
             <p class="text-sm text-red-800 dark:text-red-200 font-medium">
               This will perform the following actions:
             </p>
@@ -128,10 +130,15 @@ const handleReset = async () => {
           </div>
 
           <!-- Info -->
-          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+          <div
+            class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3"
+          >
             <p class="text-sm text-blue-800 dark:text-blue-200">
-              <span class="font-medium">After reset:</span> You'll need to log in again with
-              <span class="font-mono bg-blue-100 dark:bg-blue-800 px-1 rounded">admin@foodstock.local</span>
+              <span class="font-medium">After reset:</span>
+              You'll need to log in again with
+              <span class="font-mono bg-blue-100 dark:bg-blue-800 px-1 rounded">
+                admin@foodstock.local
+              </span>
               and password
               <span class="font-mono bg-blue-100 dark:bg-blue-800 px-1 rounded">Admin@123</span>
             </p>

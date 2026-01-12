@@ -471,9 +471,7 @@ const contentComponents: Record<string, Component> = {
   "supervisor-permissions": defineAsyncComponent(
     () => import("~/components/help/SupervisorPermissions.vue")
   ),
-  "admin-permissions": defineAsyncComponent(
-    () => import("~/components/help/AdminPermissions.vue")
-  ),
+  "admin-permissions": defineAsyncComponent(() => import("~/components/help/AdminPermissions.vue")),
   "operator-guide": defineAsyncComponent(() => import("~/components/help/OperatorGuide.vue")),
   "supervisor-guide": defineAsyncComponent(() => import("~/components/help/SupervisorGuide.vue")),
   "admin-guide": defineAsyncComponent(() => import("~/components/help/AdminGuide.vue")),

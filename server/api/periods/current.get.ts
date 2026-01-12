@@ -70,60 +70,65 @@ export default defineEventHandler(async (event) => {
     // Fetch counts in parallel using Promise.all for better performance
     // Note: Using Promise.all instead of $transaction because groupBy queries
     // with the same structure execute efficiently in parallel
-    const [deliveryCounts, issueCounts, transferFromCounts, reconciliationCounts, transferToCounts] =
-      await Promise.all([
-        // Deliveries per location
-        prisma.delivery.groupBy({
-          by: ["location_id"],
-          where: {
-            period_id: currentPeriod.id,
-            location_id: { in: locationIds },
+    const [
+      deliveryCounts,
+      issueCounts,
+      transferFromCounts,
+      reconciliationCounts,
+      transferToCounts,
+    ] = await Promise.all([
+      // Deliveries per location
+      prisma.delivery.groupBy({
+        by: ["location_id"],
+        where: {
+          period_id: currentPeriod.id,
+          location_id: { in: locationIds },
+        },
+        _count: { id: true },
+      }),
+      // Issues per location
+      prisma.issue.groupBy({
+        by: ["location_id"],
+        where: {
+          period_id: currentPeriod.id,
+          location_id: { in: locationIds },
+        },
+        _count: { id: true },
+      }),
+      // Transfers per location (from) - filter by date range since transfers don't have period_id
+      prisma.transfer.groupBy({
+        by: ["from_location_id"],
+        where: {
+          from_location_id: { in: locationIds },
+          request_date: {
+            gte: currentPeriod.start_date,
+            lte: currentPeriod.end_date,
           },
-          _count: { id: true },
-        }),
-        // Issues per location
-        prisma.issue.groupBy({
-          by: ["location_id"],
-          where: {
-            period_id: currentPeriod.id,
-            location_id: { in: locationIds },
+        },
+        _count: { _all: true },
+      }),
+      // Reconciliations per location
+      prisma.reconciliation.groupBy({
+        by: ["location_id"],
+        where: {
+          period_id: currentPeriod.id,
+          location_id: { in: locationIds },
+        },
+        _count: { id: true },
+      }),
+      // Transfers per location (to) for accurate per-location counts
+      prisma.transfer.groupBy({
+        by: ["to_location_id"],
+        where: {
+          to_location_id: { in: locationIds },
+          request_date: {
+            gte: currentPeriod.start_date,
+            lte: currentPeriod.end_date,
           },
-          _count: { id: true },
-        }),
-        // Transfers per location (from) - filter by date range since transfers don't have period_id
-        prisma.transfer.groupBy({
-          by: ["from_location_id"],
-          where: {
-            from_location_id: { in: locationIds },
-            request_date: {
-              gte: currentPeriod.start_date,
-              lte: currentPeriod.end_date,
-            },
-          },
-          _count: { _all: true },
-        }),
-        // Reconciliations per location
-        prisma.reconciliation.groupBy({
-          by: ["location_id"],
-          where: {
-            period_id: currentPeriod.id,
-            location_id: { in: locationIds },
-          },
-          _count: { id: true },
-        }),
-        // Transfers per location (to) for accurate per-location counts
-        prisma.transfer.groupBy({
-          by: ["to_location_id"],
-          where: {
-            to_location_id: { in: locationIds },
-            request_date: {
-              gte: currentPeriod.start_date,
-              lte: currentPeriod.end_date,
-            },
-          },
-          _count: { _all: true },
-        }),
-      ]);
+        },
+        _count: { _all: true },
+      }),
+    ]);
 
     // Build lookup maps for quick access
     const deliveryMap = new Map(deliveryCounts.map((d) => [d.location_id, d._count.id]));

@@ -140,8 +140,7 @@ export const useTestingPlanProgress = () => {
   ): { completed: number; total: number; percentage: number } => {
     const total = phases.reduce((sum, phase) => sum + phase.items.length, 0);
     const completed = phases.reduce(
-      (sum, phase) =>
-        sum + phase.items.filter((item) => completedItems.value.has(item.id)).length,
+      (sum, phase) => sum + phase.items.filter((item) => completedItems.value.has(item.id)).length,
       0
     );
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;

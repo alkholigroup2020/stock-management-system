@@ -793,7 +793,9 @@ INTERNAL_ERROR        // Unexpected server error
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Delivery Model</span>
         </span>
         <UIcon
-          :name="isExpanded('delivery-model') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('delivery-model') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -872,10 +874,14 @@ INTERNAL_ERROR        // Unexpected server error
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-arrow-path" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Delivery Creation Flow</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Delivery Creation Flow
+          </span>
         </span>
         <UIcon
-          :name="isExpanded('delivery-flow') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('delivery-flow') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -933,9 +939,9 @@ INTERNAL_ERROR        // Unexpected server error
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-calculator" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Weighted Average Cost (WAC)</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Weighted Average Cost (WAC)
+          </span>
         </span>
         <UIcon
           :name="
@@ -951,7 +957,9 @@ INTERNAL_ERROR        // Unexpected server error
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">WAC Calculation Utility</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            WAC Calculation Utility
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.wacCalculationUtil"
             language="typescript"
@@ -968,8 +976,9 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Key Rule:</strong> Only deliveries recalculate WAC. Issues deduct at current
-              WAC, and transfers move stock at source location's WAC.
+              <strong>Key Rule:</strong>
+              Only deliveries recalculate WAC. Issues deduct at current WAC, and transfers move
+              stock at source location's WAC.
             </span>
           </p>
         </div>
@@ -997,9 +1006,9 @@ INTERNAL_ERROR        // Unexpected server error
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-exclamation-triangle" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Price Variance Detection</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Price Variance Detection
+          </span>
         </span>
         <UIcon
           :name="
@@ -1034,8 +1043,9 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical Business Rule:</strong> ANY price difference triggers NCR creation.
-              There is no tolerance threshold - even SAR 0.01 variance creates an NCR.
+              <strong>Critical Business Rule:</strong>
+              ANY price difference triggers NCR creation. There is no tolerance threshold - even SAR
+              0.01 variance creates an NCR.
             </span>
           </p>
         </div>
@@ -1076,7 +1086,9 @@ INTERNAL_ERROR        // Unexpected server error
         </div>
 
         <div class="space-y-3">
-          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Auto-Generated NCR Properties</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">
+            Auto-Generated NCR Properties
+          </h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-start gap-2">
               <UBadge color="warning" variant="soft" size="xs">type</UBadge>
@@ -1136,28 +1148,36 @@ INTERNAL_ERROR        // Unexpected server error
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Posting Steps</h4>
           <ol class="list-inside list-decimal space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Validate inputs:</strong> Check invoice_no, verify period is OPEN
+              <strong>Validate inputs:</strong>
+              Check invoice_no, verify period is OPEN
             </li>
             <li>
-              <strong>Batch fetch data:</strong> Get period prices and current stock levels
+              <strong>Batch fetch data:</strong>
+              Get period prices and current stock levels
             </li>
             <li>
-              <strong>Start transaction:</strong> Ensure atomic operations
+              <strong>Start transaction:</strong>
+              Ensure atomic operations
             </li>
             <li>
-              <strong>Create delivery header:</strong> Generate delivery_no, set metadata
+              <strong>Create delivery header:</strong>
+              Generate delivery_no, set metadata
             </li>
             <li>
-              <strong>For each line:</strong> Calculate WAC, check variance, create line
+              <strong>For each line:</strong>
+              Calculate WAC, check variance, create line
             </li>
             <li>
-              <strong>Update stock:</strong> Upsert LocationStock with new quantity and WAC
+              <strong>Update stock:</strong>
+              Upsert LocationStock with new quantity and WAC
             </li>
             <li>
-              <strong>Create NCRs:</strong> Auto-generate for any price variances
+              <strong>Create NCRs:</strong>
+              Auto-generate for any price variances
             </li>
             <li>
-              <strong>Update totals:</strong> Set total_amount and has_variance on delivery
+              <strong>Update totals:</strong>
+              Set total_amount and has_variance on delivery
             </li>
           </ol>
         </div>
@@ -1166,8 +1186,9 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Transaction Timeout:</strong> Set to 30 seconds for large deliveries with many
-              line items. If timeout occurs, the entire delivery rolls back.
+              <strong>Transaction Timeout:</strong>
+              Set to 30 seconds for large deliveries with many line items. If timeout occurs, the
+              entire delivery rolls back.
             </span>
           </p>
         </div>
@@ -1185,7 +1206,9 @@ INTERNAL_ERROR        // Unexpected server error
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-cube" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Stock Update on Receipt</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Stock Update on Receipt
+          </span>
         </span>
         <UIcon
           :name="isExpanded('stock-update') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
@@ -1295,19 +1318,23 @@ INTERNAL_ERROR        // Unexpected server error
       <div v-if="isExpanded('frontend')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
           Recommended patterns for frontend composables and components. The
-          <code class="code-inline">afterDelivery()</code> function from
-          <code class="code-inline">useSmartCacheInvalidation()</code> is implemented; the
-          composable and form patterns below are recommended implementations.
+          <code class="code-inline">afterDelivery()</code>
+          function from
+          <code class="code-inline">useSmartCacheInvalidation()</code>
+          is implemented; the composable and form patterns below are recommended implementations.
         </p>
 
         <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Note:</strong> The <code class="code-inline">useDeliveries</code> composable
-              and <code class="code-inline">DeliveryForm</code> component shown below are
-              recommended patterns to be implemented. The API endpoints and cache invalidation are
-              already implemented.
+              <strong>Note:</strong>
+              The
+              <code class="code-inline">useDeliveries</code>
+              composable and
+              <code class="code-inline">DeliveryForm</code>
+              component shown below are recommended patterns to be implemented. The API endpoints
+              and cache invalidation are already implemented.
             </span>
           </p>
         </div>
@@ -1316,10 +1343,7 @@ INTERNAL_ERROR        // Unexpected server error
           <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
             Data Fetching Composable (Pattern)
           </h4>
-          <DeveloperCodeBlock
-            :code="codeExamples.useDeliveriesComposable"
-            language="typescript"
-          />
+          <DeveloperCodeBlock :code="codeExamples.useDeliveriesComposable" language="typescript" />
         </div>
 
         <div>
@@ -1333,10 +1357,12 @@ INTERNAL_ERROR        // Unexpected server error
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Cache Invalidation:</strong> Always call
-              <code class="code-inline">afterDelivery()</code> from
-              <code class="code-inline">useSmartCacheInvalidation()</code> after creating a
-              delivery to refresh stock and transaction caches.
+              <strong>Cache Invalidation:</strong>
+              Always call
+              <code class="code-inline">afterDelivery()</code>
+              from
+              <code class="code-inline">useSmartCacheInvalidation()</code>
+              after creating a delivery to refresh stock and transaction caches.
             </span>
           </p>
         </div>
@@ -1353,8 +1379,13 @@ INTERNAL_ERROR        // Unexpected server error
         @click="toggleSection('business-rules')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Business Rules Summary</span>
+          <UIcon
+            name="i-heroicons-clipboard-document-list"
+            class="text-xl text-[var(--ui-primary)]"
+          />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Business Rules Summary
+          </span>
         </span>
         <UIcon
           :name="
@@ -1378,31 +1409,36 @@ INTERNAL_ERROR        // Unexpected server error
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Deliveries update WAC</strong> - Recalculated from new receipts
+                <strong>Deliveries update WAC</strong>
+                - Recalculated from new receipts
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Issues deduct at current WAC</strong> - No recalculation
+                <strong>Issues deduct at current WAC</strong>
+                - No recalculation
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>ANY price variance creates NCR</strong> - No tolerance threshold
+                <strong>ANY price variance creates NCR</strong>
+                - No tolerance threshold
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Posted deliveries are immutable</strong> - Cannot edit or delete
+                <strong>Posted deliveries are immutable</strong>
+                - Cannot edit or delete
               </span>
             </div>
             <div class="flex items-start gap-2 text-sm">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span class="text-[var(--ui-text-muted)]">
-                <strong>Period must be OPEN</strong> - Required for posting
+                <strong>Period must be OPEN</strong>
+                - Required for posting
               </span>
             </div>
           </div>

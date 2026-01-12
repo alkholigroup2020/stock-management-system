@@ -854,10 +854,14 @@ const canManageStock = computed(() =>
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-map-pin" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Location Model & Types</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Location Model & Types
+          </span>
         </span>
         <UIcon
-          :name="isExpanded('location-model') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('location-model') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -936,9 +940,9 @@ const canManageStock = computed(() =>
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-cube-transparent" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >LocationStock (Per-Location Inventory)</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            LocationStock (Per-Location Inventory)
+          </span>
         </span>
         <UIcon
           :name="
@@ -971,8 +975,9 @@ const canManageStock = computed(() =>
           <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
             <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Critical:</strong> Stock is completely isolated per location. An item with 100
-              units at Kitchen A has no relationship to the same item at Store B.
+              <strong>Critical:</strong>
+              Stock is completely isolated per location. An item with 100 units at Kitchen A has no
+              relationship to the same item at Store B.
             </span>
           </p>
         </div>
@@ -990,9 +995,9 @@ const canManageStock = computed(() =>
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-user-group" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >User-Location Assignment</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            User-Location Assignment
+          </span>
         </span>
         <UIcon
           :name="
@@ -1060,9 +1065,7 @@ const canManageStock = computed(() =>
         </span>
         <UIcon
           :name="
-            isExpanded('location-switching')
-              ? 'i-heroicons-chevron-up'
-              : 'i-heroicons-chevron-down'
+            isExpanded('location-switching') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
           "
           class="text-[var(--ui-text-muted)]"
         />
@@ -1074,7 +1077,9 @@ const canManageStock = computed(() =>
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Location Store Interface</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Location Store Interface
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.locationStoreInterface"
             language="typescript"
@@ -1092,7 +1097,9 @@ const canManageStock = computed(() =>
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">LocationSwitcher Component</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            LocationSwitcher Component
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.locationSwitcherComponent"
             language="vue"
@@ -1104,9 +1111,10 @@ const canManageStock = computed(() =>
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Important:</strong> Always call
-              <code class="code-inline">refreshNuxtData()</code> after switching locations to update
-              page data with the new location context.
+              <strong>Important:</strong>
+              Always call
+              <code class="code-inline">refreshNuxtData()</code>
+              after switching locations to update page data with the new location context.
             </span>
           </p>
         </div>
@@ -1124,9 +1132,9 @@ const canManageStock = computed(() =>
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-server" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Location Context in API Routes</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Location Context in API Routes
+          </span>
         </span>
         <UIcon
           :name="
@@ -1179,9 +1187,9 @@ const canManageStock = computed(() =>
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-shield-check" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Location Access Middleware</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Location Access Middleware
+          </span>
         </span>
         <UIcon
           :name="
@@ -1197,7 +1205,9 @@ const canManageStock = computed(() =>
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Middleware Implementation</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Middleware Implementation
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.locationAccessMiddleware"
             language="typescript"
@@ -1211,20 +1221,22 @@ const canManageStock = computed(() =>
             <div class="flex items-start gap-2">
               <UBadge color="error" variant="soft" size="xs">403</UBadge>
               <span class="text-[var(--ui-text-muted)]">
-                <code class="code-inline">LOCATION_ACCESS_DENIED</code> - User lacks access to
-                location
+                <code class="code-inline">LOCATION_ACCESS_DENIED</code>
+                - User lacks access to location
               </span>
             </div>
             <div class="flex items-start gap-2">
               <UBadge color="warning" variant="soft" size="xs">404</UBadge>
               <span class="text-[var(--ui-text-muted)]">
-                <code class="code-inline">LOCATION_NOT_FOUND</code> - Location doesn't exist
+                <code class="code-inline">LOCATION_NOT_FOUND</code>
+                - Location doesn't exist
               </span>
             </div>
             <div class="flex items-start gap-2">
               <UBadge color="warning" variant="soft" size="xs">400</UBadge>
               <span class="text-[var(--ui-text-muted)]">
-                <code class="code-inline">LOCATION_INACTIVE</code> - Location is deactivated
+                <code class="code-inline">LOCATION_INACTIVE</code>
+                - Location is deactivated
               </span>
             </div>
           </div>
@@ -1248,7 +1260,9 @@ const canManageStock = computed(() =>
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-circle-stack" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Location-Scoped Queries</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Location-Scoped Queries
+          </span>
         </span>
         <UIcon
           :name="
@@ -1260,7 +1274,8 @@ const canManageStock = computed(() =>
       <div v-if="isExpanded('scoped-queries')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
           All major queries should be scoped to the active location using the
-          <code class="code-inline">location_id</code> field.
+          <code class="code-inline">location_id</code>
+          field.
         </p>
 
         <div>
@@ -1281,20 +1296,25 @@ const canManageStock = computed(() =>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <code class="code-inline">@@index([location_id, status])</code> on Delivery
+              <code class="code-inline">@@index([location_id, status])</code>
+              on Delivery
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <code class="code-inline">@@index([location_id, issue_date])</code> on Issue
+              <code class="code-inline">@@index([location_id, issue_date])</code>
+              on Issue
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <code class="code-inline">@@index([location_id])</code> on LocationStock
+              <code class="code-inline">@@index([location_id])</code>
+              on LocationStock
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <code class="code-inline">@@index([from_location_id])</code> and
-              <code class="code-inline">@@index([to_location_id])</code> on Transfer
+              <code class="code-inline">@@index([from_location_id])</code>
+              and
+              <code class="code-inline">@@index([to_location_id])</code>
+              on Transfer
             </li>
           </ul>
         </div>

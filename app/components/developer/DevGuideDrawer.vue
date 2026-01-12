@@ -929,6 +929,100 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Reconciliation content
+  content.push(
+    {
+      id: "rec-reconciliation-model",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "reconciliation-model",
+      title: "Reconciliation Model",
+      content:
+        "Reconciliation model stores period-end stock movement data per location. Tracks opening_stock, receipts, transfers_in, transfers_out, issues, closing_stock, and adjustment values. Composite unique key on period_id and location_id.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-consumption-formula",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "consumption-formula",
+      title: "Consumption Formula",
+      content:
+        "Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing + Adjustments. MandayCost = Consumption / TotalMandays. Key KPI for kitchen and store efficiency. Target manday cost helps budget planning.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-adjustment-types",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "adjustment-types",
+      title: "Adjustment Types",
+      content:
+        "Back-charges add to consumption (supplier owes). Credits reduce consumption (refund expected). Condemnations reduce consumption (written off stock). Other adjustments can be positive or negative for miscellaneous corrections.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-auto-calculation",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "auto-calculation",
+      title: "Auto-Calculation",
+      content:
+        "When no saved reconciliation exists, values are auto-calculated from transactions. Opening from previous period closing, receipts from deliveries, transfers from completed transfers, closing from current LocationStock. Auto-calculated records must be confirmed.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-consolidated-view",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "consolidated-view",
+      title: "Consolidated View",
+      content:
+        "GET /api/reconciliations/consolidated returns all locations for a period. Includes grand totals, average manday cost, summary of saved vs auto-calculated. SUPERVISOR/ADMIN only. Optimized with batched queries and lookup maps.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-reconciliation-report",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "reconciliation-report",
+      title: "Reconciliation Report",
+      content:
+        "GET /api/reports/reconciliation generates management report. OPERATOR sees assigned locations only. SUPERVISOR/ADMIN see all locations. Includes consumption analysis, manday costs, grand totals.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-api-frontend",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "api-frontend",
+      title: "API & Frontend",
+      content:
+        "POST /api/reconciliations saves adjustments. ReconciliationSummary component displays stock movement. AdjustmentsForm component for entering back-charges, credits, condemnations. afterReconciliation cache invalidation.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-period-close-integration",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "period-close-integration",
+      title: "Period Close Integration",
+      content:
+        "Reconciliation must be confirmed before marking location READY for period close. Closing values captured in PeriodLocation snapshots. Roll-forward carries closing_stock to next period opening_stock.",
+      icon: "i-heroicons-calculator",
+    },
+    {
+      id: "rec-business-rules",
+      section: "Reconciliation",
+      sectionId: "reconciliation",
+      targetSection: "business-rules",
+      title: "Business Rules Summary",
+      content:
+        "Business rules: Opening stock auto-calculated from previous period. Closing stock is real-time from LocationStock. Adjustments must be non-negative. Only SUPERVISOR/ADMIN can save. Period must be OPEN to modify. Confirmation required before period close.",
+      icon: "i-heroicons-calculator",
+    }
+  );
+
   // Period Management content
   content.push(
     {
@@ -1123,6 +1217,11 @@ const navSections = [
     label: "NCR",
     icon: "i-heroicons-exclamation-triangle",
   },
+  {
+    id: "reconciliation",
+    label: "Reconciliation",
+    icon: "i-heroicons-calculator",
+  },
 ];
 
 // Active section
@@ -1158,6 +1257,9 @@ const contentComponents: Record<string, Component> = {
   issues: defineAsyncComponent(() => import("~/components/developer/IssuesGuide.vue")),
   transfers: defineAsyncComponent(() => import("~/components/developer/TransfersGuide.vue")),
   ncr: defineAsyncComponent(() => import("~/components/developer/NCRGuide.vue")),
+  reconciliation: defineAsyncComponent(
+    () => import("~/components/developer/ReconciliationGuide.vue")
+  ),
 };
 
 // Get current component

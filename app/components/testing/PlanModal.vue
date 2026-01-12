@@ -35,7 +35,9 @@ const handleOpenChange = (value: boolean) => {
     <template #content>
       <div class="flex flex-col h-full bg-[var(--ui-bg)]">
         <!-- Header -->
-        <div class="flex-shrink-0 border-b border-[var(--ui-border)] p-4 bg-[var(--ui-bg-elevated)]">
+        <div
+          class="flex-shrink-0 border-b border-[var(--ui-border)] p-4 bg-[var(--ui-bg-elevated)]"
+        >
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
               <UIcon
@@ -74,7 +76,6 @@ const handleOpenChange = (value: boolean) => {
         <div class="flex-1 overflow-y-auto p-4">
           <TestingPlanContent />
         </div>
-
       </div>
     </template>
   </UModal>

@@ -295,7 +295,9 @@ export default defineEventHandler(async (event) => {
     // OPTIMIZATION 3: Build lookup maps for O(1) access
     const preFetchedData: PreFetchedData = {
       savedReconciliations: new Map(savedReconciliations.map((r) => [r.location_id, r])),
-      previousPeriodReconciliations: new Map(previousReconciliations.map((r) => [r.location_id, r])),
+      previousPeriodReconciliations: new Map(
+        previousReconciliations.map((r) => [r.location_id, r])
+      ),
       deliveryTotals: new Map(
         deliveryAggregates.map((d) => [d.location_id, new Decimal(d._sum.total_amount || 0)])
       ),

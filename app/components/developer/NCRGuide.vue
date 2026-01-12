@@ -746,10 +746,7 @@ async function handleCreateNCR(data: NCRFormData) {
         @click="toggleSection('ncr-model')"
       >
         <span class="flex items-center gap-3">
-          <UIcon
-            name="i-heroicons-exclamation-triangle"
-            class="text-xl text-[var(--ui-primary)]"
-          />
+          <UIcon name="i-heroicons-exclamation-triangle" class="text-xl text-[var(--ui-primary)]" />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">NCR Model & Types</span>
         </span>
         <UIcon
@@ -844,7 +841,9 @@ async function handleCreateNCR(data: NCRFormData) {
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Status Workflow Diagram</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Status Workflow Diagram
+          </h4>
           <DeveloperCodeBlock :code="codeExamples.statusWorkflowDiagram" language="plaintext" />
         </div>
 
@@ -1005,7 +1004,9 @@ async function handleCreateNCR(data: NCRFormData) {
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Manual NCR Creation API</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Manual NCR Creation API
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.manualNCRCreation"
             language="typescript"

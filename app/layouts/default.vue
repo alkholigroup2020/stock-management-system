@@ -529,15 +529,8 @@ onUnmounted(() => {
   <DeveloperDevGuideDrawer v-if="showDevTools" v-model:open="devDrawerOpen" />
 
   <!-- Testing Plan Panel (lg+ screens) -->
-  <TestingPlanPanel
-    v-if="isPanelOpen && isLargeScreen"
-    @close="closePanel"
-  />
+  <TestingPlanPanel v-if="isPanelOpen && isLargeScreen" @close="closePanel" />
 
   <!-- Testing Plan Modal (smaller screens) -->
-  <TestingPlanModal
-    v-if="isPanelOpen && !isLargeScreen"
-    :open="isPanelOpen"
-    @close="closePanel"
-  />
+  <TestingPlanModal v-if="isPanelOpen && !isLargeScreen" :open="isPanelOpen" @close="closePanel" />
 </template>

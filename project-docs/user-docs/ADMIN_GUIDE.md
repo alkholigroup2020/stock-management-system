@@ -30,17 +30,17 @@ As an **Admin**, you have complete system control. Your key duties include:
 
 ### Full System Access Overview
 
-| Capability | Admin | Supervisor | Operator |
-|------------|-------|------------|----------|
-| Create/manage users | Yes | No | No |
-| Create/manage locations | Yes | No | No |
-| Create/manage suppliers | Yes | No | No |
-| Create/manage items | Yes | No | No |
-| Set period prices | Yes | No | No |
-| Execute period close | Yes | No | No |
-| Approve transfers | Yes | Yes | No |
-| Edit reconciliations | Yes | Yes | No |
-| Post deliveries/issues | Yes | Yes | Yes |
+| Capability              | Admin | Supervisor | Operator |
+| ----------------------- | ----- | ---------- | -------- |
+| Create/manage users     | Yes   | No         | No       |
+| Create/manage locations | Yes   | No         | No       |
+| Create/manage suppliers | Yes   | No         | No       |
+| Create/manage items     | Yes   | No         | No       |
+| Set period prices       | Yes   | No         | No       |
+| Execute period close    | Yes   | No         | No       |
+| Approve transfers       | Yes   | Yes        | No       |
+| Edit reconciliations    | Yes   | Yes        | No       |
+| Post deliveries/issues  | Yes   | Yes        | Yes      |
 
 ---
 
@@ -75,18 +75,21 @@ As an Admin, you can perform all Supervisor tasks:
 3. Fill in the user information:
 
 **Basic Information:**
+
 - **Full Name** - User's complete name
 - **Username** - Unique login identifier (no spaces)
 - **Email** - Unique email address
 - **Password** - Initial password (user can change later)
 
 **Role Assignment:**
+
 - **Role** - Select one:
   - **Operator** - Basic data entry at assigned locations
   - **Supervisor** - Approval authority and all locations
   - **Admin** - Full system control
 
 **Location Assignment (for Operators):**
+
 - **Assigned Locations** - Check the locations this user can access
 - **Default Location** - Primary location for this user
 
@@ -114,6 +117,7 @@ Deactivating prevents login while preserving the user's history.
 3. Confirm the action
 
 **What happens:**
+
 - User cannot log in
 - User's transactions remain in the system
 - User can be reactivated later
@@ -239,12 +243,14 @@ Items are products or materials tracked in inventory.
 3. Fill in the details:
 
 **Basic Information:**
+
 - **Item Code** - Unique identifier (e.g., "BEEF-001")
 - **Item Name** - Descriptive name
 - **Category** - Select or create category
 - **Unit of Measure** - KG, EA, LTR, BOX, CASE, or PACK
 
 **Optional Settings:**
+
 - **Minimum Stock Level** - Low stock warning threshold
 - **Description** - Additional details
 - **Status** - Active or Inactive
@@ -282,12 +288,12 @@ Periods are accounting cycles (typically monthly) that organize transactions.
 
 ### Understanding Period Status
 
-| Status | Meaning | What Can Be Done |
-|--------|---------|------------------|
-| **DRAFT** | Period created but not started | Set prices, configure |
-| **OPEN** | Active period for transactions | Post deliveries, issues, transfers |
-| **PENDING_CLOSE** | Close requested, awaiting approval | Review, approve/reject close |
-| **CLOSED** | Period ended, locked | View only, no changes |
+| Status            | Meaning                            | What Can Be Done                   |
+| ----------------- | ---------------------------------- | ---------------------------------- |
+| **DRAFT**         | Period created but not started     | Set prices, configure              |
+| **OPEN**          | Active period for transactions     | Post deliveries, issues, transfers |
+| **PENDING_CLOSE** | Close requested, awaiting approval | Review, approve/reject close       |
+| **CLOSED**        | Period ended, locked               | View only, no changes              |
 
 ### Viewing Periods
 
@@ -353,11 +359,11 @@ Before initiating period close, ensure:
 
 The table shows each location's status:
 
-| Status | Meaning |
-|--------|---------|
-| **OPEN** | Transactions ongoing, not ready |
-| **READY** | Reconciliation complete, waiting for close |
-| **CLOSED** | Period is closed for this location |
+| Status     | Meaning                                    |
+| ---------- | ------------------------------------------ |
+| **OPEN**   | Transactions ongoing, not ready            |
+| **READY**  | Reconciliation complete, waiting for close |
+| **CLOSED** | Period is closed for this location         |
 
 ### Executing Period Close
 
@@ -386,6 +392,7 @@ When you execute period close:
 ### After Period Close
 
 Once closed:
+
 - View the closed period in Reports
 - Opening balances appear in the new period
 - Historical transactions remain viewable but not editable
@@ -397,19 +404,20 @@ Once closed:
 
 ### Navigation
 
-| Task | Path |
-|------|------|
-| Manage users | Users |
-| Create user | Users > Create User |
-| Manage locations | Locations |
-| Manage suppliers | Suppliers |
-| Manage items | Items |
+| Task              | Path                               |
+| ----------------- | ---------------------------------- |
+| Manage users      | Users                              |
+| Create user       | Users > Create User                |
+| Manage locations  | Locations                          |
+| Manage suppliers  | Suppliers                          |
+| Manage items      | Items                              |
 | Set period prices | Periods > [Period] > Manage Prices |
-| Period close | Period Close |
+| Period close      | Period Close                       |
 
 ### User Setup Checklist
 
 When creating a new user:
+
 - [ ] Full name and email entered
 - [ ] Username is unique
 - [ ] Role selected (Operator/Supervisor/Admin)
@@ -420,6 +428,7 @@ When creating a new user:
 ### Period Close Checklist
 
 Before closing a period:
+
 - [ ] All drafts posted
 - [ ] All pending transfers resolved
 - [ ] All reconciliations complete
@@ -436,17 +445,18 @@ Before closing a period:
 
 ### Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| Can't close period | Check all locations are READY |
-| Location not ready | Complete reconciliation first |
-| User can't log in | Check status is Active |
-| Operator sees no data | Check location assignments |
-| Price variance NCRs | Normal - review and process |
+| Issue                 | Solution                      |
+| --------------------- | ----------------------------- |
+| Can't close period    | Check all locations are READY |
+| Location not ready    | Complete reconciliation first |
+| User can't log in     | Check status is Active        |
+| Operator sees no data | Check location assignments    |
+| Price variance NCRs   | Normal - review and process   |
 
 ### Emergency Contacts
 
 For system issues that cannot be resolved:
+
 1. Check internet connection
 2. Try logging out and back in
 3. Contact IT support
@@ -454,4 +464,4 @@ For system issues that cannot be resolved:
 
 ---
 
-*Document Version: 1.0 | Last Updated: December 2025*
+_Document Version: 1.0 | Last Updated: December 2025_

@@ -131,7 +131,8 @@ watch([() => state.email, () => state.password], () => {
         <div
           class="absolute inset-0 opacity-10"
           style="
-            background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+            background-image:
+              radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
               radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
           "
         />
@@ -177,9 +178,7 @@ watch([() => state.email, () => state.password], () => {
               </div>
               <div>
                 <h3 class="text-white font-semibold mb-0.5">Smart Transfers</h3>
-                <p class="text-sm text-white/70">
-                  Seamless stock movement with approval workflows
-                </p>
+                <p class="text-sm text-white/70">Seamless stock movement with approval workflows</p>
               </div>
             </div>
 
@@ -199,9 +198,7 @@ watch([() => state.email, () => state.password], () => {
       </div>
 
       <!-- RIGHT PANEL: Login Form -->
-      <div
-        class="flex-1 relative flex items-center justify-center bg-slate-100 dark:bg-[#0a0f1a]"
-      >
+      <div class="flex-1 relative flex items-center justify-center bg-slate-100 dark:bg-[#0a0f1a]">
         <!-- Mobile background decorations -->
         <div class="absolute inset-0 lg:hidden">
           <div
@@ -366,7 +363,8 @@ watch([() => state.email, () => state.password], () => {
 
 /* Gentle breathing animation - very subtle */
 @keyframes gentle-breathe {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(0.9);
   }

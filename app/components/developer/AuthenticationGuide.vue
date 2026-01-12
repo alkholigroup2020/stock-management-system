@@ -407,8 +407,9 @@ async login(email, password) {
       </button>
       <div v-if="isExpanded('overview')" class="space-y-4 p-4">
         <p class="text-sm text-[var(--ui-text-muted)]">
-          The authentication system uses <strong>nuxt-auth-utils</strong> for session management
-          with JWT tokens stored in httpOnly cookies for security.
+          The authentication system uses
+          <strong>nuxt-auth-utils</strong>
+          for session management with JWT tokens stored in httpOnly cookies for security.
         </p>
 
         <DeveloperCodeBlock :code="codeExamples.authStack" language="typescript" />
@@ -419,28 +420,29 @@ async login(email, password) {
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>httpOnly Cookies:</strong> JWT tokens stored securely, not accessible via
-                JavaScript (XSS protection)
+                <strong>httpOnly Cookies:</strong>
+                JWT tokens stored securely, not accessible via JavaScript (XSS protection)
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Pinia Auth Store:</strong> Client-side state with user info, role, and
-                permissions
+                <strong>Pinia Auth Store:</strong>
+                Client-side state with user info, role, and permissions
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Server Middleware:</strong> Protects all /api/* routes (except auth
-                endpoints)
+                <strong>Server Middleware:</strong>
+                Protects all /api/* routes (except auth endpoints)
               </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
               <span>
-                <strong>Client Middleware:</strong> Redirects unauthenticated users to login page
+                <strong>Client Middleware:</strong>
+                Redirects unauthenticated users to login page
               </span>
             </li>
           </ul>
@@ -507,9 +509,15 @@ async login(email, password) {
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Login Sequence</h4>
           <ol class="list-inside list-decimal space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>User enters email/username and password on login page</li>
-            <li>Client calls <code class="code-inline">useAuth().login()</code></li>
+            <li>
+              Client calls
+              <code class="code-inline">useAuth().login()</code>
+            </li>
             <li>Server verifies credentials with bcrypt</li>
-            <li>Server creates session with <code class="code-inline">setUserSession()</code></li>
+            <li>
+              Server creates session with
+              <code class="code-inline">setUserSession()</code>
+            </li>
             <li>Client receives user data, stores in Pinia</li>
             <li>App fetches locations and current period</li>
             <li>User redirected to dashboard (or original URL)</li>
@@ -564,7 +572,10 @@ async login(email, password) {
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">Logout Sequence</h4>
           <ol class="list-inside list-decimal space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>User clicks logout (in navbar dropdown)</li>
-            <li>Client calls <code class="code-inline">useAuth().logout()</code></li>
+            <li>
+              Client calls
+              <code class="code-inline">useAuth().logout()</code>
+            </li>
             <li>Server clears httpOnly session cookie</li>
             <li>Client resets auth store (user = null)</li>
             <li>Client resets location and period stores</li>
@@ -666,9 +677,7 @@ async login(email, password) {
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
-            Server API Middleware
-          </h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Server API Middleware</h4>
           <DeveloperCodeBlock
             :code="codeExamples.serverMiddleware"
             language="typescript"
@@ -760,8 +769,9 @@ async login(email, password) {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
             <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Important:</strong> Operators are restricted to their assigned locations.
-              Admin and Supervisor have implicit access to all locations.
+              <strong>Important:</strong>
+              Operators are restricted to their assigned locations. Admin and Supervisor have
+              implicit access to all locations.
             </span>
           </p>
         </div>
@@ -834,9 +844,7 @@ async login(email, password) {
         </span>
         <UIcon
           :name="
-            isExpanded('app-initialization')
-              ? 'i-heroicons-chevron-up'
-              : 'i-heroicons-chevron-down'
+            isExpanded('app-initialization') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
           "
           class="text-[var(--ui-text-muted)]"
         />
@@ -856,7 +864,9 @@ async login(email, password) {
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Initialization Sequence</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Initialization Sequence
+          </h4>
           <DeveloperCodeBlock
             :code="codeExamples.appInitSequence"
             language="typescript"
@@ -877,16 +887,25 @@ async login(email, password) {
           <h4 class="font-medium text-[var(--ui-text-highlighted)]">State Flags</h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <code class="code-inline">isInitializing</code> - Currently loading essential data
+              <code class="code-inline">isInitializing</code>
+              - Currently loading essential data
             </li>
             <li>
-              <code class="code-inline">isReady</code> - Safe to render pages (all data loaded)
+              <code class="code-inline">isReady</code>
+              - Safe to render pages (all data loaded)
             </li>
-            <li><code class="code-inline">authLoaded</code> - Session fetch completed</li>
             <li>
-              <code class="code-inline">locationsLoaded</code> - User locations fetched
+              <code class="code-inline">authLoaded</code>
+              - Session fetch completed
             </li>
-            <li><code class="code-inline">periodLoaded</code> - Current period fetched</li>
+            <li>
+              <code class="code-inline">locationsLoaded</code>
+              - User locations fetched
+            </li>
+            <li>
+              <code class="code-inline">periodLoaded</code>
+              - Current period fetched
+            </li>
           </ul>
         </div>
       </div>

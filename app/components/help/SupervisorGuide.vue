@@ -48,9 +48,7 @@ watch(
   <div class="space-y-6">
     <!-- Header -->
     <div class="pb-4 border-b border-[var(--ui-border)]">
-      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">
-        Supervisor Guide
-      </h2>
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Supervisor Guide</h2>
       <p class="text-sm text-[var(--ui-text-muted)] mt-1">
         Oversight and approval responsibilities
       </p>
@@ -96,18 +94,39 @@ watch(
             <UBadge color="error" variant="subtle">REJECTED</UBadge>
           </div>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><strong>DRAFT:</strong> Transfer created but not yet submitted for approval</li>
-            <li><strong>PENDING_APPROVAL:</strong> Submitted and waiting for supervisor review</li>
-            <li><strong>APPROVED:</strong> Stock moved successfully between locations</li>
-            <li><strong>REJECTED:</strong> Transfer denied - no stock movement occurs</li>
+            <li>
+              <strong>DRAFT:</strong>
+              Transfer created but not yet submitted for approval
+            </li>
+            <li>
+              <strong>PENDING_APPROVAL:</strong>
+              Submitted and waiting for supervisor review
+            </li>
+            <li>
+              <strong>APPROVED:</strong>
+              Stock moved successfully between locations
+            </li>
+            <li>
+              <strong>REJECTED:</strong>
+              Transfer denied - no stock movement occurs
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Reviewing Pending Transfers</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Reviewing Pending Transfers
+          </h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>Transfers</strong> in the left menu</li>
-            <li>Filter by status <strong>Pending Approval</strong></li>
+            <li>
+              Click
+              <strong>Transfers</strong>
+              in the left menu
+            </li>
+            <li>
+              Filter by status
+              <strong>Pending Approval</strong>
+            </li>
             <li>Click on a transfer to view details</li>
             <li>Review source/destination locations and items</li>
             <li>Check that quantities are reasonable and justified</li>
@@ -117,13 +136,17 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Approving a Transfer</h4>
           <p class="text-sm text-[var(--ui-text-muted)] mb-2">
-            When you approve a transfer, stock moves immediately. Verify everything is correct first.
+            When you approve a transfer, stock moves immediately. Verify everything is correct
+            first.
           </p>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Open the pending transfer</li>
             <li>Verify the source location has sufficient stock</li>
             <li>Verify the destination location is correct</li>
-            <li>Click <strong>Approve</strong></li>
+            <li>
+              Click
+              <strong>Approve</strong>
+            </li>
             <li>Stock moves immediately between locations</li>
           </ol>
         </div>
@@ -135,7 +158,10 @@ watch(
           </p>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Open the pending transfer</li>
-            <li>Click <strong>Reject</strong></li>
+            <li>
+              Click
+              <strong>Reject</strong>
+            </li>
             <li>Enter a reason for rejection (required for audit trail)</li>
             <li>No stock movement occurs</li>
           </ol>
@@ -144,7 +170,11 @@ watch(
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30">
           <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
             <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
-            <span><strong>Important:</strong> All pending transfers must be completed (approved or rejected) before period close. The system will block period close if transfers are pending.</span>
+            <span>
+              <strong>Important:</strong>
+              All pending transfers must be completed (approved or rejected) before period close.
+              The system will block period close if transfers are pending.
+            </span>
           </p>
         </div>
       </div>
@@ -164,7 +194,9 @@ watch(
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Reconciliations</span>
         </span>
         <UIcon
-          :name="isExpanded('reconciliations') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('reconciliations') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -179,7 +211,9 @@ watch(
         </p>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">The Reconciliation Formula</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            The Reconciliation Formula
+          </h4>
           <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
             <p class="text-sm text-[var(--ui-text-muted)] font-mono">
               Opening Stock + Receipts + Transfers In - Transfers Out - Issues = Expected Closing
@@ -195,10 +229,20 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Viewing Location Reconciliation</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Viewing Location Reconciliation
+          </h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>Reconciliations</strong> in the left menu</li>
-            <li>Select the <strong>Location</strong> to review</li>
+            <li>
+              Click
+              <strong>Reconciliations</strong>
+              in the left menu
+            </li>
+            <li>
+              Select the
+              <strong>Location</strong>
+              to review
+            </li>
             <li>View the reconciliation summary showing all items</li>
             <li>Items with variances are highlighted for attention</li>
           </ol>
@@ -210,24 +254,42 @@ watch(
             Adjustments explain variances and are recorded for audit purposes:
           </p>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
-            <li><strong>Back Charges:</strong> Charges to suppliers for quality issues or shortages</li>
-            <li><strong>Credits:</strong> Credits received from suppliers</li>
-            <li><strong>Condemnations:</strong> Stock written off due to damage, expiry, or spoilage</li>
+            <li>
+              <strong>Back Charges:</strong>
+              Charges to suppliers for quality issues or shortages
+            </li>
+            <li>
+              <strong>Credits:</strong>
+              Credits received from suppliers
+            </li>
+            <li>
+              <strong>Condemnations:</strong>
+              Stock written off due to damage, expiry, or spoilage
+            </li>
           </ul>
         </div>
 
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Entering Adjustments</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Scroll to the <strong>Adjustments</strong> section</li>
+            <li>
+              Scroll to the
+              <strong>Adjustments</strong>
+              section
+            </li>
             <li>Enter values for: Back Charges, Credits, Condemnations</li>
             <li>Add notes explaining the adjustment reason</li>
-            <li>Click <strong>Save Adjustments</strong></li>
+            <li>
+              Click
+              <strong>Save Adjustments</strong>
+            </li>
           </ol>
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Confirming Reconciliation</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Confirming Reconciliation
+          </h4>
           <p class="text-sm text-[var(--ui-text-muted)] mb-2">
             When reconciliation is complete and adjustments are entered, confirm the reconciliation
             for period close:
@@ -235,12 +297,21 @@ watch(
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Verify all transactions are posted (no drafts)</li>
             <li>Verify all adjustments are entered and explained</li>
-            <li>Click <strong>Confirm Reconciliation</strong></li>
+            <li>
+              Click
+              <strong>Confirm Reconciliation</strong>
+            </li>
           </ol>
           <div class="mt-2 p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
             <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
-              <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
-              <span>Only an Admin can execute the final period close after all locations are marked READY.</span>
+              <UIcon
+                name="i-heroicons-information-circle"
+                class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+              />
+              <span>
+                Only an Admin can execute the final period close after all locations are marked
+                READY.
+              </span>
             </p>
           </div>
         </div>
@@ -248,9 +319,10 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Consolidated View</h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            Click <strong>View Consolidated</strong> to see a summary across all locations. This
-            helps identify organization-wide trends and ensures all locations are reconciled before
-            period close.
+            Click
+            <strong>View Consolidated</strong>
+            to see a summary across all locations. This helps identify organization-wide trends and
+            ensures all locations are reconciled before period close.
           </p>
         </div>
       </div>
@@ -288,19 +360,22 @@ watch(
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">NCR Types</h4>
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
-              <strong>Auto-Generated (Price Variance):</strong> Created automatically when a delivery
-              line has a different price than the locked period price. These help track price
-              fluctuations and unexpected cost changes.
+              <strong>Auto-Generated (Price Variance):</strong>
+              Created automatically when a delivery line has a different price than the locked
+              period price. These help track price fluctuations and unexpected cost changes.
             </li>
             <li>
-              <strong>Manual:</strong> Created by Supervisors for quality issues, damages, short
-              shipments, or other supplier-related problems that need documentation.
+              <strong>Manual:</strong>
+              Created by Supervisors for quality issues, damages, short shipments, or other
+              supplier-related problems that need documentation.
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">When to Create Manual NCRs</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            When to Create Manual NCRs
+          </h4>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-exclamation-circle" class="text-[var(--ui-warning)]" />
@@ -328,21 +403,52 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Creating a Manual NCR</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Click <strong>NCR</strong> in the left menu</li>
-            <li>Click <strong>New NCR</strong></li>
-            <li>Select Type: <strong>MANUAL</strong></li>
-            <li>Select the <strong>Location</strong> where the issue occurred</li>
-            <li>(Optional) Link to a <strong>Delivery</strong> if applicable</li>
-            <li>Enter a detailed <strong>Reason</strong> describing the issue</li>
+            <li>
+              Click
+              <strong>NCR</strong>
+              in the left menu
+            </li>
+            <li>
+              Click
+              <strong>New NCR</strong>
+            </li>
+            <li>
+              Select Type:
+              <strong>MANUAL</strong>
+            </li>
+            <li>
+              Select the
+              <strong>Location</strong>
+              where the issue occurred
+            </li>
+            <li>
+              (Optional) Link to a
+              <strong>Delivery</strong>
+              if applicable
+            </li>
+            <li>
+              Enter a detailed
+              <strong>Reason</strong>
+              describing the issue
+            </li>
             <li>Add affected items with quantities</li>
-            <li>Click <strong>Create NCR</strong></li>
+            <li>
+              Click
+              <strong>Create NCR</strong>
+            </li>
           </ol>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
           <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
-            <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5 text-[var(--ui-info)]" />
-            <span>NCRs linked to suppliers help build a history of supplier performance. Use this data when evaluating suppliers or negotiating contracts.</span>
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              NCRs linked to suppliers help build a history of supplier performance. Use this data
+              when evaluating suppliers or negotiating contracts.
+            </span>
           </p>
         </div>
       </div>
@@ -370,8 +476,8 @@ watch(
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
           Reports provide visibility into stock levels, transactions, and trends across all
-          locations. As a Supervisor, you have access to all locations and can generate reports
-          for management review, cost analysis, and operational planning. Reports can be filtered,
+          locations. As a Supervisor, you have access to all locations and can generate reports for
+          management review, cost analysis, and operational planning. Reports can be filtered,
           sorted, and exported for further analysis in spreadsheet applications.
         </p>
 
@@ -381,30 +487,33 @@ watch(
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-chart-bar" class="text-[var(--ui-primary)] mt-0.5" />
               <div>
-                <strong>Stock Now:</strong> Current inventory levels at each location. Shows on-hand
-                quantities, WAC values, and total stock value. Use to identify low stock items.
+                <strong>Stock Now:</strong>
+                Current inventory levels at each location. Shows on-hand quantities, WAC values, and
+                total stock value. Use to identify low stock items.
               </div>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-truck" class="text-[var(--ui-primary)] mt-0.5" />
               <div>
-                <strong>Deliveries:</strong> History of all deliveries with supplier info, items,
-                quantities, and any price variances. Use to track receiving patterns and supplier
-                performance.
+                <strong>Deliveries:</strong>
+                History of all deliveries with supplier info, items, quantities, and any price
+                variances. Use to track receiving patterns and supplier performance.
               </div>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-arrow-up-tray" class="text-[var(--ui-primary)] mt-0.5" />
               <div>
-                <strong>Issues:</strong> Stock consumption by cost centre. Shows what items were
-                issued, when, and to which department. Use for consumption analysis and budgeting.
+                <strong>Issues:</strong>
+                Stock consumption by cost centre. Shows what items were issued, when, and to which
+                department. Use for consumption analysis and budgeting.
               </div>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-calculator" class="text-[var(--ui-primary)] mt-0.5" />
               <div>
-                <strong>Reconciliation:</strong> Period-end summary showing opening stock, movements,
-                closing stock, and variances for each location. Use for period-end review.
+                <strong>Reconciliation:</strong>
+                Period-end summary showing opening stock, movements, closing stock, and variances
+                for each location. Use for period-end review.
               </div>
             </li>
           </ul>
@@ -415,7 +524,12 @@ watch(
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Navigate to the relevant report page</li>
             <li>Set filters (date range, location, category, etc.)</li>
-            <li>Click <strong>Generate</strong> or <strong>Apply Filters</strong></li>
+            <li>
+              Click
+              <strong>Generate</strong>
+              or
+              <strong>Apply Filters</strong>
+            </li>
             <li>Review results on screen</li>
           </ol>
         </div>
@@ -424,7 +538,10 @@ watch(
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Exporting Reports</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>Generate the report with desired filters</li>
-            <li>Click <strong>Export CSV</strong></li>
+            <li>
+              Click
+              <strong>Export CSV</strong>
+            </li>
             <li>Open in Excel or Google Sheets for further analysis</li>
             <li>Use pivot tables for deeper insights</li>
           </ol>
