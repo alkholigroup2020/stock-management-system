@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (16 sections, 131 subsections)
+## Currently Implemented Topics (17 sections, 141 subsections)
 
 ### 1. Getting Started
 
@@ -181,11 +181,24 @@
 - Migration Guide (Manual $fetch → composable)
 - Best Practices (Do's and Don'ts)
 
+### 17. Component Patterns
+
+- Naming Conventions (Nuxt 4 auto-import rules)
+- Layout Components (PageHeader, LocationSwitcher, PeriodIndicator, HierarchicalNav)
+- Common UI Components (EmptyState, ErrorAlert)
+- Loading States (LoadingSpinner)
+- Modal Components (ConfirmModal)
+- Feature-Specific Components (TransferStatusBadge, MetricCard, LocationCard)
+- Props TypeScript Pattern (defineProps, withDefaults, union types)
+- Emits TypeScript Pattern (defineEmits, payload types, v-model)
+- Slot Patterns (named slots, scoped slots, defineSlots)
+- Best Practices Summary
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
 
-### 17. Approval Workflows
+### 18. Approval Workflows
 
 **End-to-end guide for approval system**
 
@@ -195,17 +208,6 @@
 - Approve/Reject actions
 - Role requirements (Supervisor, Admin)
 - UI components: ApprovalRequest, ApprovalStatus, ApprovalActions
-
-### 18. Component Patterns
-
-**End-to-end guide for component development**
-
-- Component naming conventions (Nuxt 4 auto-import)
-- Layout components (AppNavbar, PageHeader, LocationSwitcher)
-- Common UI components (EmptyState, ErrorAlert, LoadingSpinner)
-- Feature-specific components patterns
-- Props & Emits TypeScript patterns
-- Slot patterns
 
 ### 19. Forms & Validation
 
@@ -293,8 +295,8 @@
 | Data Layer        | 5 (Database, Auth, State Management, Caching, Data Fetching)                                         | 0                                         | 5      |
 | Business Features | 8 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, NCR, Reconciliation, POB) | 1 (Approval)                              | 9      |
 | API & Backend     | 1 (Server API Patterns)                                                                              | 1 (Error Handling)                        | 2      |
-| UI & Components   | 0                                                                                                    | 3 (Components, Forms, Tables)             | 3      |
+| UI & Components   | 1 (Component Patterns)                                                                               | 2 (Forms, Tables)                         | 3      |
 | Operations        | 0                                                                                                    | 4 (PWA, Testing, Performance, Deployment) | 4      |
-| **TOTAL**         | **16**                                                                                               | **9**                                     | **25** |
+| **TOTAL**         | **17**                                                                                               | **8**                                     | **25** |
 
-9 additional topics needed to comprehensively cover all development aspects.
+8 additional topics needed to comprehensively cover all development aspects.

@@ -1429,6 +1429,110 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Component Patterns content
+  content.push(
+    {
+      id: "cp-naming-conventions",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "naming-conventions",
+      title: "Naming Conventions",
+      content:
+        "Nuxt 4 component auto-import naming. Subdirectory components combine folder path + filename. layout/AppNavbar.vue becomes LayoutAppNavbar. Root components use name directly. PascalCase for files. Feature grouping in subdirectories.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-layout-components",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "layout-components",
+      title: "Layout Components",
+      content:
+        "PageHeader with title, subtitle, location/period context, action slot. LocationSwitcher dropdown for switching active location with refreshNuxtData. PeriodIndicator shows period name, status badge, days remaining. HierarchicalNav for sidebar navigation.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-common-components",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "common-components",
+      title: "Common UI Components",
+      content:
+        "EmptyState with icon, title, description, action button. ErrorAlert for error, warning, info, success messages with retry and dismiss. LoadingSpinner with text, size, color, fullScreen options. Reusable across the application.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-loading-states",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "loading-states",
+      title: "Loading States",
+      content:
+        "LoadingSpinner sizes sm, md, lg, xl. Colors primary, secondary, neutral. Full screen overlay option. Center content vertically. Custom icon support. Loading text display. Always provide feedback for operations over 300ms.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-modal-components",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "modal-components",
+      title: "Modal Components",
+      content:
+        "ConfirmModal for confirmation dialogs. Variants: danger, warning, info, success. v-model support for open state. Loading state during async operations. Always use for destructive actions like delete, reject.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-feature-components",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "feature-components",
+      title: "Feature-Specific Components",
+      content:
+        "TransferStatusBadge with semantic color mapping. MetricCard for dashboard KPIs with trend indicator. LocationCard with type-specific styling. ReconciliationSummary for stock movement. Status to color/icon/label mapping pattern.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-props-pattern",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "props-pattern",
+      title: "Props TypeScript Pattern",
+      content:
+        "TypeScript interface for props. defineProps with Props interface. withDefaults for default values. Union types for constrained values sm, md, lg. Factory functions for default arrays/objects. Boolean props without is prefix.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-emits-pattern",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "emits-pattern",
+      title: "Emits TypeScript Pattern",
+      content:
+        "defineEmits with TypeScript types. Payload types for each event. update:modelValue for v-model support. Computed get/set pattern for two-way binding. Descriptive event names: submit, cancel, not onSubmit.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-slot-patterns",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "slot-patterns",
+      title: "Slot Patterns",
+      content:
+        "Named slots: header, actions, footer. Default slot for main content. Fallback content for optional slots. $slots.name for conditional rendering. Scoped slots with defineSlots for typed props. Passing data to slot content.",
+      icon: "i-heroicons-cube",
+    },
+    {
+      id: "cp-best-practices",
+      section: "Component Patterns",
+      sectionId: "component-patterns",
+      targetSection: "best-practices",
+      title: "Best Practices Summary",
+      content:
+        "PascalCase files. TypeScript interfaces for props. withDefaults for defaults. Union types for constraints. Fallback content for slots. cursor-pointer on buttons. Semantic color variables. Single responsibility components. Confirmation modals for destructive actions.",
+      icon: "i-heroicons-cube",
+    }
+  );
+
   return content;
 });
 
@@ -1559,6 +1663,11 @@ const navSections = [
     label: "Data Fetching",
     icon: "i-heroicons-cloud-arrow-down",
   },
+  {
+    id: "component-patterns",
+    label: "Component Patterns",
+    icon: "i-heroicons-cube",
+  },
 ];
 
 // Active section
@@ -1603,6 +1712,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "data-fetching-composables": defineAsyncComponent(
     () => import("~/components/developer/DataFetchingComposablesGuide.vue")
+  ),
+  "component-patterns": defineAsyncComponent(
+    () => import("~/components/developer/ComponentPatternsGuide.vue")
   ),
 };
 
