@@ -1107,6 +1107,80 @@ const searchableContent = computed(() => {
     }
   );
 
+  // POB (Persons on Board) content
+  content.push(
+    {
+      id: "pob-model",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "pob-model",
+      title: "POB Model",
+      content:
+        "POB model for tracking daily personnel counts per location. crew_count for regular personnel, extra_count for visitors and guests. Unique constraint on period_id, location_id, date. Used for manday cost calculations in reconciliation.",
+      icon: "i-heroicons-users",
+    },
+    {
+      id: "pob-mandays-calculation",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "mandays-calculation",
+      title: "Mandays Calculation",
+      content:
+        "Total Mandays = SUM(crew_count + extra_count) for all days in period. Daily Total = crew_count + extra_count. Used for cost-per-manday KPI. crew_count for employees, extra_count for visitors and additional meals.",
+      icon: "i-heroicons-users",
+    },
+    {
+      id: "pob-cost-per-manday",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "cost-per-manday",
+      title: "Cost Per Manday",
+      content:
+        "MandayCost = Consumption / TotalMandays. Key performance indicator for kitchen and store efficiency. calculateMandayCost function in server/utils/reconciliation.ts. TotalMandays must be greater than zero.",
+      icon: "i-heroicons-users",
+    },
+    {
+      id: "pob-daily-entry",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "daily-entry",
+      title: "Daily POB Entry",
+      content:
+        "POB page for entering daily personnel counts. Auto-save on blur for seamless UX. Pre-populated dates for entire period. Live summary updates after each save. Period must be OPEN for editing.",
+      icon: "i-heroicons-users",
+    },
+    {
+      id: "pob-api-endpoints",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "api-endpoints",
+      title: "POB API Endpoints",
+      content:
+        "GET /api/locations/:id/pob fetches entries. POST /api/locations/:id/pob creates or updates entries using upsert pattern. PATCH /api/pob/:id updates single entry. Error codes: DATE_OUT_OF_PERIOD, PERIOD_CLOSED, NO_OPEN_PERIOD.",
+      icon: "i-heroicons-users",
+    },
+    {
+      id: "pob-frontend-components",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "frontend-components",
+      title: "POB Frontend Components",
+      content:
+        "POBTable component for date-by-date entry with auto-save. POBSummary component displays period info and total mandays. Saving indicator per row. Disabled state when period is not open.",
+      icon: "i-heroicons-users",
+    },
+    {
+      id: "pob-business-rules",
+      section: "POB",
+      sectionId: "pob",
+      targetSection: "business-rules",
+      title: "POB Business Rules",
+      content:
+        "One entry per location per day per period. Period must be OPEN for create/update. Date must be within period range. Non-negative integers only. Operators need UserLocation assignment. Upsert pattern handles create-or-update.",
+      icon: "i-heroicons-users",
+    }
+  );
+
   return content;
 });
 
@@ -1222,6 +1296,11 @@ const navSections = [
     label: "Reconciliation",
     icon: "i-heroicons-calculator",
   },
+  {
+    id: "pob",
+    label: "POB",
+    icon: "i-heroicons-users",
+  },
 ];
 
 // Active section
@@ -1260,6 +1339,7 @@ const contentComponents: Record<string, Component> = {
   reconciliation: defineAsyncComponent(
     () => import("~/components/developer/ReconciliationGuide.vue")
   ),
+  pob: defineAsyncComponent(() => import("~/components/developer/POBGuide.vue")),
 };
 
 // Get current component

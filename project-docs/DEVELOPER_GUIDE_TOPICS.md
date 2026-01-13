@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (13 sections, 100 subsections)
+## Currently Implemented Topics (14 sections, 107 subsections)
 
 ### 1. Getting Started
 
@@ -141,11 +141,21 @@
 - Period Close Integration
 - Business Rules Summary
 
+### 14. POB (Persons on Board)
+
+- POB Model
+- Mandays Calculation
+- Cost Per Manday
+- Daily POB Entry
+- API Endpoints (GET, POST, PATCH)
+- Frontend Components (POBTable, POBSummary)
+- Business Rules Summary
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
 
-### 14. Approval Workflows
+### 15. Approval Workflows
 
 **End-to-end guide for approval system**
 
@@ -155,15 +165,6 @@
 - Approve/Reject actions
 - Role requirements (Supervisor, Admin)
 - UI components: ApprovalRequest, ApprovalStatus, ApprovalActions
-
-### 15. POB (Persons on Board)
-
-**End-to-end guide for crew count tracking**
-
-- POB Model
-- Daily POB entry
-- Mandays calculation
-- Cost per manday reporting
 
 ### 16. Server API Patterns
 
@@ -178,7 +179,7 @@
 - Prisma transactions in routes
 - Auth context (`event.context.user`)
 
-### 16. Data Fetching Composables
+### 17. Data Fetching Composables
 
 **End-to-end guide for frontend data fetching**
 
@@ -189,7 +190,7 @@
 - Refresh patterns
 - Cache integration
 
-### 17. Component Patterns
+### 18. Component Patterns
 
 **End-to-end guide for component development**
 
@@ -200,7 +201,7 @@
 - Props & Emits TypeScript patterns
 - Slot patterns
 
-### 18. Forms & Validation
+### 19. Forms & Validation
 
 **End-to-end guide for form handling**
 
@@ -211,7 +212,7 @@
 - Loading states on submit
 - Form state management
 
-### 19. Tables & Lists
+### 20. Tables & Lists
 
 **End-to-end guide for data display**
 
@@ -223,7 +224,7 @@
 - Empty states
 - Loading states
 
-### 20. Error Handling
+### 21. Error Handling
 
 **End-to-end guide for error management**
 
@@ -235,7 +236,7 @@
 - Network errors
 - Type guards for error types
 
-### 21. PWA & Offline
+### 22. PWA & Offline
 
 **End-to-end guide for PWA features**
 
@@ -246,7 +247,7 @@
 - Disabling actions when offline
 - Service worker caching
 
-### 22. Testing
+### 23. Testing
 
 **End-to-end guide for testing**
 
@@ -256,7 +257,7 @@
 - Database reset for testing
 - Manual testing checklist
 
-### 23. Performance
+### 24. Performance
 
 **End-to-end guide for performance**
 
@@ -267,7 +268,7 @@
 - Batch operations
 - Client-side caching
 
-### 24. Deployment
+### 25. Deployment
 
 **End-to-end guide for deployment**
 
@@ -280,14 +281,14 @@
 
 ## Summary
 
-| Category          | Implemented                                                                                  | Needed                                    | Total  |
-| ----------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------- | ------ |
-| Core Setup        | 2 (Getting Started, Architecture)                                                            | 0                                         | 2      |
-| Data Layer        | 4 (Database, Auth, State Management, Caching)                                                | 1 (Data Fetching)                         | 5      |
-| Business Features | 7 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, NCR, Reconciliation) | 2 (Approval, POB)                         | 9      |
-| API & Backend     | 0                                                                                            | 2 (API Patterns, Error Handling)          | 2      |
-| UI & Components   | 0                                                                                            | 3 (Components, Forms, Tables)             | 3      |
-| Operations        | 0                                                                                            | 4 (PWA, Testing, Performance, Deployment) | 4      |
-| **TOTAL**         | **13**                                                                                       | **12**                                    | **25** |
+| Category          | Implemented                                                                                       | Needed                                    | Total  |
+| ----------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------ |
+| Core Setup        | 2 (Getting Started, Architecture)                                                                 | 0                                         | 2      |
+| Data Layer        | 4 (Database, Auth, State Management, Caching)                                                     | 1 (Data Fetching)                         | 5      |
+| Business Features | 8 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, NCR, Reconciliation, POB) | 1 (Approval)                              | 9      |
+| API & Backend     | 0                                                                                                 | 2 (API Patterns, Error Handling)          | 2      |
+| UI & Components   | 0                                                                                                 | 3 (Components, Forms, Tables)             | 3      |
+| Operations        | 0                                                                                                 | 4 (PWA, Testing, Performance, Deployment) | 4      |
+| **TOTAL**         | **14**                                                                                            | **11**                                    | **25** |
 
-12 additional topics needed to comprehensively cover all development aspects.
+11 additional topics needed to comprehensively cover all development aspects.
