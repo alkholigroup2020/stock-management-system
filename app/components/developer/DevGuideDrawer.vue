@@ -1181,6 +1181,120 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Server API Patterns content
+  content.push(
+    {
+      id: "sap-route-conventions",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "route-conventions",
+      title: "API Route Conventions",
+      content:
+        "Server API routes follow Nitro/H3 file-based routing. File names determine HTTP method and URL path. index.get.ts for collections, [id].patch.ts for dynamic params, login.post.ts for actions. Nested folders create nested URL paths.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-event-handler",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "event-handler",
+      title: "defineEventHandler Patterns",
+      content:
+        "All API routes export defineEventHandler with event object. Access user via event.context.user. Get route params with getRouterParam. Read query with getQuery. Parse body with readBody. Return JSON responses directly.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-zod-validation",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "zod-validation",
+      title: "Request Validation with Zod",
+      content:
+        "All request bodies validated with Zod schemas. Use transform for normalization like uppercase codes. Add custom error messages. Use uuid for IDs, enum for predefined values. Catch ZodError and throw VALIDATION_ERROR.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-create-error",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "create-error",
+      title: "Error Handling with createError",
+      content:
+        "Use createError from H3 for structured errors. Include statusCode, statusMessage, data.code, data.message, and optional data.details. Common codes: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 409 Conflict, 500 Internal Error.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-error-codes",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "error-codes",
+      title: "Standard Error Codes",
+      content:
+        "Consistent error codes: NOT_AUTHENTICATED, INSUFFICIENT_PERMISSIONS, LOCATION_ACCESS_DENIED, VALIDATION_ERROR, INSUFFICIENT_STOCK, PERIOD_CLOSED, NO_OPEN_PERIOD, PRICE_VARIANCE, NOT_FOUND, DUPLICATE_CODE, INTERNAL_ERROR.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-response-format",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "response-format",
+      title: "Response Format Standards",
+      content:
+        "Success responses include resource and message. Lists include pagination with page, limit, total. Complex operations include side effects like auto-created NCRs. Error responses use createError with code and message.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-transactions",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "transactions",
+      title: "Prisma Transactions in Routes",
+      content:
+        "Use $transaction([]) for batched reads in single round-trip. Use $transaction(async tx) for atomic writes with rollback. Set timeout for complex operations. Use upsert for insert-or-update patterns.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-auth-context",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "auth-context",
+      title: "Auth Context (event.context.user)",
+      content:
+        "Auth middleware attaches user to event.context.user. Access user.id, user.username, user.email, user.role (OPERATOR, SUPERVISOR, ADMIN), user.default_location_id. Check role hierarchy for permissions.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-auth-middleware",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "auth-middleware",
+      title: "Auth Middleware",
+      content:
+        "Auth middleware protects all /api/* routes automatically. Public routes excluded: /api/auth/login, /api/auth/logout, /api/auth/session, /api/health. Uses getUserSession from nuxt-auth-utils. Throws 401 if not authenticated.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-location-middleware",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "location-middleware",
+      title: "Location Access Middleware",
+      content:
+        "Location middleware controls access to /api/locations/[id]/* routes. ADMIN and SUPERVISOR have access to all locations implicitly. OPERATOR requires UserLocation assignment. Throws LOCATION_ACCESS_DENIED error.",
+      icon: "i-heroicons-server",
+    },
+    {
+      id: "sap-complete-example",
+      section: "Server API Patterns",
+      sectionId: "server-api-patterns",
+      targetSection: "complete-example",
+      title: "Complete API Example",
+      content:
+        "Complete API handler flow: check authentication, check authorization, validate request body with Zod, business logic validation, database operation, return success response, handle Zod errors, re-throw known errors, catch unexpected errors.",
+      icon: "i-heroicons-server",
+    }
+  );
+
   return content;
 });
 
@@ -1301,6 +1415,11 @@ const navSections = [
     label: "POB",
     icon: "i-heroicons-users",
   },
+  {
+    id: "server-api-patterns",
+    label: "Server API Patterns",
+    icon: "i-heroicons-server",
+  },
 ];
 
 // Active section
@@ -1340,6 +1459,9 @@ const contentComponents: Record<string, Component> = {
     () => import("~/components/developer/ReconciliationGuide.vue")
   ),
   pob: defineAsyncComponent(() => import("~/components/developer/POBGuide.vue")),
+  "server-api-patterns": defineAsyncComponent(
+    () => import("~/components/developer/ServerApiPatternsGuide.vue")
+  ),
 };
 
 // Get current component
