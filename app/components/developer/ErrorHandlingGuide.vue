@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
-
 const expandedSections = ref<string[]>([]);
 
 const toggleSection = (section: string) => {
@@ -180,7 +178,8 @@ const deleteItem = async (itemId: string) => {
     handleError(error, { context: "deleting item" });
   }
 };
-</script>`,
+<\/script>
+`,
 
   clientErrorAdvanced: `<script setup lang="ts">
 const { handleError, handleSuccess, getErrorMessage } = useErrorHandler();
@@ -238,7 +237,7 @@ const postDelivery = async () => {
     showPostConfirmation.value = false;
   }
 };
-</script>`,
+<\/script>`,
 
   toastBasic: `<script setup lang="ts">
 const toast = useAppToast();
@@ -270,7 +269,7 @@ const onInfo = () => {
     description: "The current period will close in 2 days",
   });
 };
-</script>`,
+<\/script>`,
 
   toastAdvanced: `<script setup lang="ts">
 const toast = useAppToast();
@@ -297,7 +296,7 @@ toast.info("New NCR Created", {
 
 // Clear all toasts
 toast.clear();
-</script>`,
+<\/script>`,
 
   typeGuards: `/**
  * Type guard for H3 error format (from Nuxt server)
@@ -420,7 +419,7 @@ function validateForm(): boolean {
     return false;
   }
 }
-</script>
+<\/script>
 
 <template>
   <div>
@@ -468,7 +467,7 @@ const fetchData = async () => {
     }
   }
 };
-</script>`,
+<\/script>`,
 
   offlineGuard: `<script setup lang="ts">
 const { isOnline, guardAction, checkOnline } = useOfflineGuard();
@@ -497,7 +496,7 @@ const startProcess = () => {
   // Continue with the process
   showModal.value = true;
 };
-</script>
+<\/script>
 
 <template>
   <div>
@@ -666,7 +665,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['server-errors'];
+            expandedSections.value = ['server-errors'];
             nextTick(() =>
               document
                 .getElementById('dev-section-server-errors')
@@ -691,7 +690,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['client-errors'];
+            expandedSections.value = ['client-errors'];
             nextTick(() =>
               document
                 .getElementById('dev-section-client-errors')
@@ -716,7 +715,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['toast-notifications'];
+            expandedSections.value = ['toast-notifications'];
             nextTick(() =>
               document
                 .getElementById('dev-section-toast-notifications')
@@ -741,7 +740,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['validation-errors'];
+            expandedSections.value = ['validation-errors'];
             nextTick(() =>
               document
                 .getElementById('dev-section-validation-errors')
@@ -766,7 +765,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['network-errors'];
+            expandedSections.value = ['network-errors'];
             nextTick(() =>
               document
                 .getElementById('dev-section-network-errors')
@@ -791,7 +790,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['type-guards'];
+            expandedSections.value = ['type-guards'];
             nextTick(() =>
               document
                 .getElementById('dev-section-type-guards')
@@ -816,7 +815,7 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
         class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
         @click="
           () => {
-            expandedSections = ['error-codes'];
+            expandedSections.value = ['error-codes'];
             nextTick(() =>
               document
                 .getElementById('dev-section-error-codes')
@@ -959,7 +958,11 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
           <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Usage</h4>
         </div>
 
-        <DeveloperCodeBlock :code="codeExamples.clientErrorBasic" language="vue" />
+        <DeveloperCodeBlock
+          :code="codeExamples.clientErrorBasic"
+          language="vue"
+          filename="app/pages/items/[id].vue"
+        />
 
         <div class="prose prose-sm max-w-none">
           <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Advanced Usage</h4>
@@ -1029,13 +1032,21 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
           <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Usage</h4>
         </div>
 
-        <DeveloperCodeBlock :code="codeExamples.toastBasic" language="vue" />
+        <DeveloperCodeBlock
+          :code="codeExamples.toastBasic"
+          language="vue"
+          filename="app/pages/items/create.vue"
+        />
 
         <div class="prose prose-sm max-w-none">
           <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Advanced Features</h4>
         </div>
 
-        <DeveloperCodeBlock :code="codeExamples.toastAdvanced" language="vue" />
+        <DeveloperCodeBlock
+          :code="codeExamples.toastAdvanced"
+          language="vue"
+          filename="app/pages/transfers/[id].vue"
+        />
 
         <UAlert
           color="primary"
@@ -1161,7 +1172,11 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
           </h4>
         </div>
 
-        <DeveloperCodeBlock :code="codeExamples.networkErrors" language="vue" />
+        <DeveloperCodeBlock
+          :code="codeExamples.networkErrors"
+          language="vue"
+          filename="app/pages/items/index.vue"
+        />
 
         <div class="prose prose-sm max-w-none">
           <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
@@ -1223,7 +1238,11 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
           <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Type Guard Examples</h4>
         </div>
 
-        <DeveloperCodeBlock :code="codeExamples.typeGuards" language="typescript" />
+        <DeveloperCodeBlock
+          :code="codeExamples.typeGuards"
+          language="typescript"
+          filename="app/utils/errorTypeGuards.ts"
+        />
 
         <UAlert
           color="primary"
