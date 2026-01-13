@@ -1429,6 +1429,130 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Forms & Validation content
+  content.push(
+    {
+      id: "fv-forms-overview",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "forms-overview",
+      title: "Forms Overview",
+      content:
+        "Form handling with Nuxt UI components and Zod validation. Two patterns: Manual Validation (full control, field-by-field) and UForm Component (simplified, automatic). Both use Zod schemas matching API validation.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-nuxt-ui-components",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "nuxt-ui-components",
+      title: "Nuxt UI Form Components",
+      content:
+        "UInput for text input with size, icons, error states. USelectMenu for dropdowns with options array. UTextarea for multi-line text. UButton for submit with loading state. UForm wrapper with schema validation. UFormField with label, help text, error display.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-zod-validation",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "zod-validation",
+      title: "Zod Schema Validation",
+      content:
+        "Zod schemas for validation matching API rules. String min, max, optional. Enum for constrained values. Transform for automatic normalization like uppercase. Custom error messages. Schemas defined at component top level.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-manual-validation",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "manual-validation",
+      title: "Manual Validation Pattern",
+      content:
+        "Full control over validation timing. validateField on blur for single field. validateForm before submission. Reactive errors object. Used for complex forms with custom logic. Items and locations pages use this pattern.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-uform-pattern",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "uform-pattern",
+      title: "UForm Component Pattern",
+      content:
+        "Simplified form handling with UForm component. Automatic validation on submit. UFormField wrappers with built-in error display. No manual errors object needed. Less boilerplate. Used in suppliers and users pages.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-form-submission",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "form-submission",
+      title: "Form Submission Patterns",
+      content:
+        "Validate, set isSubmitting, prepare data, call API with $fetch, invalidate cache, show success toast, navigate to list, handle errors, reset isSubmitting in finally. Both patterns follow same flow.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-error-display",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "error-display",
+      title: "Error Display Patterns",
+      content:
+        "Field-level errors with red border and error text. Toast notifications for API errors. Map server VALIDATION_ERROR details to form fields. Handle specific error codes: DUPLICATE_CODE, INSUFFICIENT_PERMISSIONS. Type guards for error structure.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-loading-states",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "loading-states",
+      title: "Loading States",
+      content:
+        "Submit button with :loading prop for spinner. Change button text during submission. Disable submit button and all form fields during submission. Disable submit when form invalid. Use finally block to reset loading state.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-cancel-confirmation",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "cancel-confirmation",
+      title: "Cancel Confirmation",
+      content:
+        "Confirm before discarding unsaved changes. Check if form has been modified. Show UiConfirmModal with variant warning. Provide clear actions: Discard vs Keep Editing. Navigate immediately if form is pristine.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-form-state-management",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "form-state-management",
+      title: "Form State Management",
+      content:
+        "Use reactive() for form data and errors objects. Use ref() for isSubmitting boolean. Create computed isFormValid to enable/disable submit. Check both field presence and absence of errors. Reset errors on successful submission.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-field-specific-patterns",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "field-specific-patterns",
+      title: "Field-Specific Patterns",
+      content:
+        "Uppercase codes with @input transform or Zod transform. Required fields with red asterisk. Help text below field when no error. Icons on UInput for visual context. Size lg for better touch targets. Placeholder with example values.",
+      icon: "i-heroicons-document-text",
+    },
+    {
+      id: "fv-best-practices",
+      section: "Forms & Validation",
+      sectionId: "forms-validation",
+      targetSection: "best-practices",
+      title: "Best Practices Summary",
+      content:
+        "Match Zod schemas to API validation. Show field errors on blur. Disable submit when invalid. Show loading states. Disable fields during submission. Invalidate cache after mutations. Handle specific error codes. Confirm before discarding changes. Use cursor-pointer on buttons.",
+      icon: "i-heroicons-document-text",
+    }
+  );
+
   // Component Patterns content
   content.push(
     {
@@ -1668,6 +1792,11 @@ const navSections = [
     label: "Component Patterns",
     icon: "i-heroicons-cube",
   },
+  {
+    id: "forms-validation",
+    label: "Forms & Validation",
+    icon: "i-heroicons-document-text",
+  },
 ];
 
 // Active section
@@ -1715,6 +1844,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "component-patterns": defineAsyncComponent(
     () => import("~/components/developer/ComponentPatternsGuide.vue")
+  ),
+  "forms-validation": defineAsyncComponent(
+    () => import("~/components/developer/FormsValidationGuide.vue")
   ),
 };
 

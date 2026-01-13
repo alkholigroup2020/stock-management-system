@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (17 sections, 141 subsections)
+## Currently Implemented Topics (18 sections, 153 subsections)
 
 ### 1. Getting Started
 
@@ -194,11 +194,26 @@
 - Slot Patterns (named slots, scoped slots, defineSlots)
 - Best Practices Summary
 
+### 18. Forms & Validation
+
+- Forms Overview (Two patterns: Manual vs UForm)
+- Nuxt UI Form Components (UInput, USelectMenu, UTextarea, UButton, UForm, UFormField)
+- Zod Schema Validation (min, max, optional, enum, transform, custom messages)
+- Manual Validation Pattern (validateField, validateForm, errors object)
+- UForm Component Pattern (automatic validation, UFormField wrappers)
+- Form Submission Patterns (validate, submit, cache invalidation, navigation)
+- Error Display Patterns (field-level errors, API error handling, type guards)
+- Loading States (button loading, disabled fields, dynamic text)
+- Cancel Confirmation (unsaved changes detection, confirmation modal)
+- Form State Management (reactive, ref, computed isFormValid)
+- Field-Specific Patterns (uppercase transform, required asterisk, help text)
+- Best Practices Summary
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
 
-### 18. Approval Workflows
+### 19. Approval Workflows
 
 **End-to-end guide for approval system**
 
@@ -208,17 +223,6 @@
 - Approve/Reject actions
 - Role requirements (Supervisor, Admin)
 - UI components: ApprovalRequest, ApprovalStatus, ApprovalActions
-
-### 19. Forms & Validation
-
-**End-to-end guide for form handling**
-
-- Nuxt UI form components (UInput, USelect, UTextarea)
-- Zod schema validation
-- Form submission patterns
-- Error display
-- Loading states on submit
-- Form state management
 
 ### 20. Tables & Lists
 
@@ -295,8 +299,8 @@
 | Data Layer        | 5 (Database, Auth, State Management, Caching, Data Fetching)                                         | 0                                         | 5      |
 | Business Features | 8 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, NCR, Reconciliation, POB) | 1 (Approval)                              | 9      |
 | API & Backend     | 1 (Server API Patterns)                                                                              | 1 (Error Handling)                        | 2      |
-| UI & Components   | 1 (Component Patterns)                                                                               | 2 (Forms, Tables)                         | 3      |
+| UI & Components   | 2 (Component Patterns, Forms & Validation)                                                           | 1 (Tables)                                | 3      |
 | Operations        | 0                                                                                                    | 4 (PWA, Testing, Performance, Deployment) | 4      |
-| **TOTAL**         | **17**                                                                                               | **8**                                     | **25** |
+| **TOTAL**         | **18**                                                                                               | **7**                                     | **25** |
 
-8 additional topics needed to comprehensively cover all development aspects.
+7 additional topics needed to comprehensively cover all development aspects.
