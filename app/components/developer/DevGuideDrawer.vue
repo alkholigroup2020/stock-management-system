@@ -1553,6 +1553,130 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Tables & Lists content
+  content.push(
+    {
+      id: "tl-overview",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "tables-overview",
+      title: "Tables & Lists Overview",
+      content:
+        "Custom HTML tables for displaying tabular data. Wrapped in UCard with design system tokens. Clickable rows, pagination, filtering, search. Loading, empty, error states. Responsive design with column hiding. Grid/card layouts as alternative.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-custom-html",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "custom-html-table",
+      title: "Custom HTML Table Pattern",
+      content:
+        "HTML table wrapped in UCard with body p-0. Overflow-x-auto for horizontal scroll. min-w-full divide-y for structure. Header bg-elevated with text-label. Row hover with transition-colors. Full control over styling and behavior.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-structure",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "table-structure",
+      title: "Table Structure & Styling",
+      content:
+        "Header: bg-elevated, text-label, px-4 py-3. Cell: px-4 py-4, text color tokens, whitespace-nowrap for codes. Left-align text, right-align numbers. font-mono for codes, font-medium for emphasis. Badges in cells for status.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-columns",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "column-definitions",
+      title: "Column Definitions",
+      content:
+        "Code columns: font-mono, text-sm, left-aligned. Name columns: text color, left-aligned. Number columns: right-aligned, whitespace-nowrap. Currency: right-aligned, font-medium. Status: UBadge with color variants. Actions: right-aligned, buttons in flex.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-row-actions",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "row-actions",
+      title: "Row Actions & Navigation",
+      content:
+        "Clickable rows with cursor-pointer and @click handler. Action buttons with @click.stop to prevent row navigation. variant=ghost size=xs for table actions. Edit: color=primary. Delete: color=error. Always include cursor-pointer class.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-pagination",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "pagination-pattern",
+      title: "Pagination Pattern",
+      content:
+        "Server-side pagination with page controls. Pagination state: total, page, limit, totalPages, hasNext, hasPrev. Smart page numbers with ellipsis. Info text: Showing X to Y of Z items. Reset to page 1 on filter change. Default 50 per page.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-filtering",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "filtering-search",
+      title: "Filtering & Search",
+      content:
+        "Debounced search with 500ms delay using useDebounceFn or refDebounced. UDropdownMenu for status/category filters. Active indicator on selected option. Reset pagination on filter change. Search by name or code. Filter by status, category.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-sorting",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "sorting-pattern",
+      title: "Sorting Pattern",
+      content:
+        "Server-side sorting for large datasets with sort and order params. Client-side sorting for small datasets with computed property. Sort state: field and order. Click handlers on headers. Sort indicator icons: chevron-up, chevron-down.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-states",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "loading-empty-states",
+      title: "Loading & Empty States",
+      content:
+        "State priority: Loading with LoadingSpinner, Error with ErrorAlert and retry, Empty with EmptyState and CTA, Data. Use v-if chain for conditional rendering. Loading text with context. Error retry button. Empty message specific to reason.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-grid-layout",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "grid-card-layout",
+      title: "Grid/Card Layout Pattern",
+      content:
+        "Alternative to tables for rich metadata. grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3. card-elevated cursor-pointer. body p-6 for spacing. @click on card, @click.stop on buttons. truncate or line-clamp-2 for long text. Used on Suppliers page.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-responsive",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "responsive-tables",
+      title: "Responsive Design",
+      content:
+        "Horizontal scroll with overflow-x-auto. Hide columns with hidden md:table-cell. Stack filters with flex-col md:flex-row. Reduce padding on mobile. Icon-only buttons on mobile. Grid to single column. Mobile-first approach.",
+      icon: "i-heroicons-table-cells",
+    },
+    {
+      id: "tl-best-practices",
+      section: "Tables & Lists",
+      sectionId: "tables-lists",
+      targetSection: "best-practices-tables",
+      title: "Best Practices",
+      content:
+        "Wrap in UCard with body p-0. overflow-x-auto wrapper. hover bg-elevated with transition. text-label for headers. Left-align text, right-align numbers. cursor-pointer on clickable elements. @click.stop on action buttons. Server-side pagination for large data. Debounce search 500ms. Reset pagination on filter. Loading, error, empty states. Hide columns on mobile. cursor-pointer on all buttons.",
+      icon: "i-heroicons-table-cells",
+    }
+  );
+
   // Component Patterns content
   content.push(
     {
@@ -1797,6 +1921,11 @@ const navSections = [
     label: "Forms & Validation",
     icon: "i-heroicons-document-text",
   },
+  {
+    id: "tables-lists",
+    label: "Tables & Lists",
+    icon: "i-heroicons-table-cells",
+  },
 ];
 
 // Active section
@@ -1847,6 +1976,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "forms-validation": defineAsyncComponent(
     () => import("~/components/developer/FormsValidationGuide.vue")
+  ),
+  "tables-lists": defineAsyncComponent(
+    () => import("~/components/developer/TablesListsGuide.vue")
   ),
 };
 
