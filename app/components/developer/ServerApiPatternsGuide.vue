@@ -739,7 +739,9 @@ export default defineEventHandler(async (event) => {
           </span>
         </span>
         <UIcon
-          :name="isExpanded('event-handler') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('event-handler') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -769,15 +771,11 @@ export default defineEventHandler(async (event) => {
             </div>
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <code class="code-inline">getQuery(event)</code>
-              <span class="ml-2 text-sm text-[var(--ui-text-muted)]">
-                Get URL query parameters
-              </span>
+              <span class="ml-2 text-sm text-[var(--ui-text-muted)]">Get URL query parameters</span>
             </div>
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <code class="code-inline">await readBody(event)</code>
-              <span class="ml-2 text-sm text-[var(--ui-text-muted)]">
-                Read JSON request body
-              </span>
+              <span class="ml-2 text-sm text-[var(--ui-text-muted)]">Read JSON request body</span>
             </div>
           </div>
         </div>
@@ -827,9 +825,7 @@ export default defineEventHandler(async (event) => {
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span>
-                Add custom error messages for user-friendly validation feedback
-              </span>
+              <span>Add custom error messages for user-friendly validation feedback</span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />

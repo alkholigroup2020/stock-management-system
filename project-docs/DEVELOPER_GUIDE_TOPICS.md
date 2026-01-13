@@ -1,6 +1,6 @@
 # Developer Guide Topics Analysis
 
-## Currently Implemented Topics (15 sections, 118 subsections)
+## Currently Implemented Topics (16 sections, 131 subsections)
 
 ### 1. Getting Started
 
@@ -165,11 +165,27 @@
 - Location Access Middleware
 - Complete API Example
 
+### 16. Data Fetching Composables
+
+- Data Fetching Overview (Multi-layered architecture)
+- useItems Pattern (Standard composable implementation)
+- Available Composables (useItems, useSuppliers, useLocations, usePeriods, useCurrentPeriod)
+- useCurrentPeriod Advanced Features (Polling, helper methods)
+- CRUD with Composables (Reads + mutations pattern)
+- Direct $fetch Pattern (Manual state management)
+- When to Use What (Decision guide)
+- Cache Integration (Invalidation helpers)
+- Error Handling (useErrorHandler integration)
+- Pagination Pattern (Filter-based with watch)
+- Real-World Example (Complete items page)
+- Migration Guide (Manual $fetch → composable)
+- Best Practices (Do's and Don'ts)
+
 ---
 
 ## Topics Still Needed (organized by development aspect)
 
-### 16. Approval Workflows
+### 17. Approval Workflows
 
 **End-to-end guide for approval system**
 
@@ -179,17 +195,6 @@
 - Approve/Reject actions
 - Role requirements (Supervisor, Admin)
 - UI components: ApprovalRequest, ApprovalStatus, ApprovalActions
-
-### 17. Data Fetching Composables
-
-**End-to-end guide for frontend data fetching**
-
-- Composable patterns: useItems, useLocations, useSuppliers, usePeriods
-- useAsyncData hooks with caching
-- Loading states
-- Error handling
-- Refresh patterns
-- Cache integration
 
 ### 18. Component Patterns
 
@@ -282,14 +287,14 @@
 
 ## Summary
 
-| Category          | Implemented                                                                                           | Needed                                    | Total  |
-| ----------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------ |
-| Core Setup        | 2 (Getting Started, Architecture)                                                                     | 0                                         | 2      |
-| Data Layer        | 4 (Database, Auth, State Management, Caching)                                                         | 1 (Data Fetching)                         | 5      |
-| Business Features | 8 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, NCR, Reconciliation, POB)  | 1 (Approval)                              | 9      |
-| API & Backend     | 1 (Server API Patterns)                                                                               | 1 (Error Handling)                        | 2      |
-| UI & Components   | 0                                                                                                     | 3 (Components, Forms, Tables)             | 3      |
-| Operations        | 0                                                                                                     | 4 (PWA, Testing, Performance, Deployment) | 4      |
-| **TOTAL**         | **15**                                                                                                | **10**                                    | **25** |
+| Category          | Implemented                                                                                          | Needed                                    | Total  |
+| ----------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------ |
+| Core Setup        | 2 (Getting Started, Architecture)                                                                    | 0                                         | 2      |
+| Data Layer        | 5 (Database, Auth, State Management, Caching, Data Fetching)                                         | 0                                         | 5      |
+| Business Features | 8 (Multi-Location, Period Management, Deliveries & WAC, Issues, Transfers, NCR, Reconciliation, POB) | 1 (Approval)                              | 9      |
+| API & Backend     | 1 (Server API Patterns)                                                                              | 1 (Error Handling)                        | 2      |
+| UI & Components   | 0                                                                                                    | 3 (Components, Forms, Tables)             | 3      |
+| Operations        | 0                                                                                                    | 4 (PWA, Testing, Performance, Deployment) | 4      |
+| **TOTAL**         | **16**                                                                                               | **9**                                     | **25** |
 
-10 additional topics needed to comprehensively cover all development aspects.
+9 additional topics needed to comprehensively cover all development aspects.

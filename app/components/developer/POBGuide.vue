@@ -813,9 +813,7 @@ INTERNAL_ERROR               // Unexpected server error
   <div class="space-y-6">
     <!-- Header -->
     <div class="border-b border-[var(--ui-border)] pb-4">
-      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">
-        POB (Persons on Board)
-      </h2>
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">POB (Persons on Board)</h2>
       <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
         Daily personnel tracking, mandays calculation, and cost per manday reporting
       </p>
@@ -1033,9 +1031,7 @@ INTERNAL_ERROR               // Unexpected server error
               <div class="mb-2 flex items-center gap-2">
                 <UBadge color="primary" variant="soft">Example</UBadge>
               </div>
-              <p class="text-sm text-[var(--ui-text)]">
-                SAR 34,500 / 2,100 = SAR 16.43 per manday
-              </p>
+              <p class="text-sm text-[var(--ui-text)]">SAR 34,500 / 2,100 = SAR 16.43 per manday</p>
             </div>
           </div>
         </div>
@@ -1092,9 +1088,7 @@ INTERNAL_ERROR               // Unexpected server error
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="mb-2 flex items-center gap-2">
                 <UIcon name="i-heroicons-arrow-path" class="text-[var(--ui-primary)]" />
-                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
-                  Auto-Save
-                </span>
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">Auto-Save</span>
               </div>
               <p class="text-xs text-[var(--ui-text-muted)]">
                 Entries save automatically when field loses focus (blur event)

@@ -1295,6 +1295,140 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Data Fetching Composables content
+  content.push(
+    {
+      id: "dfc-overview",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "data-fetching-overview",
+      title: "Data Fetching Overview",
+      content:
+        "Multi-layered data fetching: useAsyncData composables for caching, Pinia stores for app state, direct $fetch for mutations. Automatic caching with 10-20s TTL, loading state management, filter-aware cache keys, integration with cache invalidation.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-useitems",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "useitems-pattern",
+      title: "useItems Pattern",
+      content:
+        "Standard composable pattern demonstrated by useItems. useAsyncData with custom getCachedData, filter-aware cache keys, timestamp-based TTL, watch option for reactive filters, loading/error state management, manual refresh capability.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-available",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "available-composables",
+      title: "Available Composables",
+      content:
+        "Pre-built composables: useItems (catalog with stock), useSuppliers (vendors), useLocations (locations), useCurrentPeriod (10s cache), usePeriods (all periods), usePeriod (single period). All follow same pattern with time-based caching.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-period-advanced",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "current-period-advanced",
+      title: "useCurrentPeriod Advanced",
+      content:
+        "Advanced period composable features: Shorter TTL (10s) for critical data, optional auto-refresh polling, helper methods isLocationReady/areAllLocationsReady/getLocationStatus, computed properties isPeriodOpen/arePricesLocked for status checks.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-crud",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "crud-composables",
+      title: "CRUD with Composables",
+      content:
+        "CRUD pattern: Use composables for reads (GET), direct $fetch for mutations (POST/PATCH/DELETE). Always invalidate cache after mutations with invalidateItemsCache() and refresh(). Use smart cache invalidation for business operations.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-direct-fetch",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "direct-fetch",
+      title: "Direct $fetch Pattern",
+      content:
+        "Manual $fetch for mutations, real-time data, custom logic. Manual state management with loading ref and try/catch. Use for POST/PATCH/DELETE operations, one-off fetches, frequently changing data, complex query logic.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-when-to-use",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "when-to-use",
+      title: "When to Use What",
+      content:
+        "Use composables for: list/master data with caching, automatic loading/error states, filter-based caching, cache integration. Use direct $fetch for: mutations, non-cacheable data, complex/conditional queries, one-off operations, form submissions.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-cache-integration",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "cache-integration-fetch",
+      title: "Cache Integration",
+      content:
+        "Composables export invalidation helpers: invalidateItemsCache() for all items, invalidateItemCache(id) for specific item. Integration with useSmartCacheInvalidation for related cache invalidation after business operations like deliveries, transfers.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-error-handling",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "error-handling-fetch",
+      title: "Error Handling",
+      content:
+        "All composables return error ref. Use with useErrorHandler for user-friendly messages. Watch error for toast notifications. Retry with refresh() function. Display error state in template with fallback UI and retry button.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-pagination",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "pagination-fetch",
+      title: "Pagination Pattern",
+      content:
+        "Include page/limit in filters. Use watch: true for automatic refetch on page change. Reset to page 1 when filters change. onPageChange updates filter, composable auto-refetches. Pagination meta returned in response.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-real-world",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "real-world-fetch",
+      title: "Real-World Example",
+      content:
+        "Complete items page implementation: useItems with watch: true, filters for search/pagination, CRUD operations with $fetch, cache invalidation after mutations, error handling with useErrorHandler, loading states, debounced search.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-migration",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "migration-fetch",
+      title: "Migration Guide",
+      content:
+        "Migrate from manual $fetch to composables: Remove manual loading/error refs, remove onMounted fetch call, remove watch for filters. Replace with single useItems(filters, { watch: true }). Reduces code from 20+ lines to 3 lines.",
+      icon: "i-heroicons-cloud-arrow-down",
+    },
+    {
+      id: "dfc-best-practices",
+      section: "Data Fetching",
+      sectionId: "data-fetching-composables",
+      targetSection: "best-practices-fetch",
+      title: "Best Practices",
+      content:
+        "Do: Use composables for list/master data, enable watch for reactive filters, call invalidation after mutations, use smart cache for operations. Don't: Use composables for mutations, forget cache invalidation, use for real-time data, forget watch: true for filters.",
+      icon: "i-heroicons-cloud-arrow-down",
+    }
+  );
+
   return content;
 });
 
@@ -1420,6 +1554,11 @@ const navSections = [
     label: "Server API Patterns",
     icon: "i-heroicons-server",
   },
+  {
+    id: "data-fetching-composables",
+    label: "Data Fetching",
+    icon: "i-heroicons-cloud-arrow-down",
+  },
 ];
 
 // Active section
@@ -1461,6 +1600,9 @@ const contentComponents: Record<string, Component> = {
   pob: defineAsyncComponent(() => import("~/components/developer/POBGuide.vue")),
   "server-api-patterns": defineAsyncComponent(
     () => import("~/components/developer/ServerApiPatternsGuide.vue")
+  ),
+  "data-fetching-composables": defineAsyncComponent(
+    () => import("~/components/developer/DataFetchingComposablesGuide.vue")
   ),
 };
 
