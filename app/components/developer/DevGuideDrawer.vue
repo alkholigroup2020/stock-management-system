@@ -1677,6 +1677,80 @@ const searchableContent = computed(() => {
     }
   );
 
+  // Error Handling content
+  content.push(
+    {
+      id: "eh-server-errors",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "server-errors",
+      title: "Server Error Patterns (createError)",
+      content:
+        "createError() from H3/Nuxt for standardized server errors. Include statusCode, statusMessage, data.code, data.message, data.details. Standard structure for programmatic handling. Error codes like INSUFFICIENT_STOCK, PERIOD_CLOSED, VALIDATION_ERROR. Always include user-friendly message.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "eh-client-errors",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "client-errors",
+      title: "Client Error Handling (useErrorHandler)",
+      content:
+        "useErrorHandler composable for centralized client error handling. handleError() displays toast with user-friendly message. getErrorMessage() parses errors. Maps error codes to messages with suggestions. Context parameter for operation-specific messages. handleSuccess, handleWarning, handleInfo for other notifications.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "eh-toast",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "toast-notifications",
+      title: "Toast Notifications (useAppToast)",
+      content:
+        "useAppToast wraps Nuxt UI toast with brand colors. Success: emerald, 5s. Error: red, 7s. Warning: amber, 6s. Info: primary navy, 5s. Custom icons, durations, actions. clear() removes all toasts. Description for context. Actions array for clickable buttons.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "eh-validation",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "validation-errors",
+      title: "Validation Errors (Zod)",
+      content:
+        "Zod schemas for type-safe validation. Field-level validation on blur. Form-level validation on submit. Server-side validation always required. Inline error display below inputs. Parse ZodError and map to field errors. Same schema client and server for consistency.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "eh-network",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "network-errors",
+      title: "Network Errors & Offline",
+      content:
+        "useOnlineStatus() detects offline state. useOfflineGuard() prevents actions when offline. guardAction() wraps async functions. checkOnline() for synchronous checks. Disable buttons with :disabled when offline. Network errors have no statusCode. Show user-friendly offline messages.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "eh-type-guards",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "type-guards",
+      title: "Type Guards for Errors",
+      content:
+        "isH3Error() checks Nuxt server error format. isZodError() for Zod validation errors. isError() for standard Error objects. Type guards narrow error types for TypeScript. Enable autocomplete and type checking. Use in catch blocks for type-safe error handling.",
+      icon: "i-heroicons-exclamation-triangle",
+    },
+    {
+      id: "eh-error-codes",
+      section: "Error Handling",
+      sectionId: "error-handling",
+      targetSection: "error-codes",
+      title: "Standard Error Codes",
+      content:
+        "Standardized error codes for consistent handling. Categories: Stock, Location, Period, Price, Validation, Permission, Approval, Network, Database, Business Logic. Each code maps to user-friendly message with suggestion. SCREAMING_SNAKE_CASE format. Documented in ERROR_MESSAGES object.",
+      icon: "i-heroicons-exclamation-triangle",
+    }
+  );
+
   // Component Patterns content
   content.push(
     {
@@ -1926,6 +2000,11 @@ const navSections = [
     label: "Tables & Lists",
     icon: "i-heroicons-table-cells",
   },
+  {
+    id: "error-handling",
+    label: "Error Handling",
+    icon: "i-heroicons-exclamation-triangle",
+  },
 ];
 
 // Active section
@@ -1979,6 +2058,9 @@ const contentComponents: Record<string, Component> = {
   ),
   "tables-lists": defineAsyncComponent(
     () => import("~/components/developer/TablesListsGuide.vue")
+  ),
+  "error-handling": defineAsyncComponent(
+    () => import("~/components/developer/ErrorHandlingGuide.vue")
   ),
 };
 
