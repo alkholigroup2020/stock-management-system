@@ -97,7 +97,7 @@ app/components/
   pageHeaderUsage: `// PageHeader Component - Standard page header with location/period context
 <script setup lang="ts">
 // PageHeader automatically pulls location/period from stores
-</script>
+<\/script>
 
 <template>
   <LayoutPageHeader
@@ -173,7 +173,7 @@ const getLocationIcon = (type: string) => {
   };
   return icons[type] || "i-lucide-map-pin";
 };
-</script>`,
+<\/script>`,
 
   emptyStateUsage: `// EmptyState - Friendly empty state with icon, title, description
 <template>
@@ -336,7 +336,7 @@ const handleDelete = async () => {
     deleting.value = false;
   }
 };
-</script>
+<\/script>
 
 <template>
   <!-- Danger variant for destructive actions -->
@@ -439,7 +439,7 @@ const statusIcon = computed(() => {
   };
   return iconMap[props.status];
 });
-</script>
+<\/script>
 
 <template>
   <UBadge :color="statusColor" :variant="variant" :size="size">
@@ -480,7 +480,7 @@ const colorClasses = computed(() => {
   };
   return classes[props.color];
 });
-</script>
+<\/script>
 
 <template>
   <UCard :ui="{ body: 'p-3 sm:p-4' }">
@@ -489,7 +489,7 @@ const colorClasses = computed(() => {
     </div>
     <div v-else class="flex items-center gap-4">
       <div v-if="icon" class="shrink-0 p-3 rounded-lg" :class="colorClasses">
-        <UIcon :name="\`i-lucide-\${icon}\`" class="w-6 h-6" />
+        <UIcon :name="'i-lucide-' + icon" class="w-6 h-6" />
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-sm text-muted">{{ label }}</p>
@@ -544,7 +544,7 @@ const props = withDefaults(defineProps<Props>(), {
 console.log(props.title);       // string
 console.log(props.size);        // "sm" | "md" | "lg"
 console.log(props.loading);     // boolean
-</script>`,
+<\/script>`,
 
   emitsPattern: `// TypeScript Emits Pattern
 <script setup lang="ts">
@@ -587,7 +587,7 @@ const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
 });
-</script>
+<\/script>
 
 <template>
   <button @click="emit('close')">Close</button>
@@ -602,8 +602,8 @@ defineSlots<{
   header(): unknown;
   actions(): unknown;
   footer(): unknown;
-}>();
-</script>
+}());
+<\/script>
 
 <template>
   <div class="card">
@@ -650,8 +650,8 @@ const props = defineProps<{
 defineSlots<{
   item(props: { item: Item; index: number }): unknown;
   empty(): unknown;
-}>();
-</script>
+}());
+<\/script>
 
 <template>
   <ul v-if="items.length > 0">
