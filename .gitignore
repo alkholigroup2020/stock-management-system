@@ -25,6 +25,7 @@ logs
 nul
 
 .playwright-mcp
+.claude/
 
 .mcp.json
 .vercel
