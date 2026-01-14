@@ -1,56 +1,42 @@
 <script setup lang="ts">
-import { ref, computed, inject } from "vue";
+import type { Ref } from "vue";
+
+// Collapsible sections state
+const expandedSections = ref<string[]>([]);
+
+const toggleSection = (section: string) => {
+  if (expandedSections.value.includes(section)) {
+    expandedSections.value = [];
+  } else {
+    expandedSections.value = [section];
+  }
+};
+
+const isExpanded = (section: string) => expandedSections.value.includes(section);
 
 // Inject the target section for deep linking
-const targetSection = inject<Ref<string | null>>("devTargetSection", ref(null));
+const targetSubSection = inject<Ref<string | null>>("devTargetSection", ref(null));
 
-// Active subsection
-const activeSubSection = ref("forms-overview");
-
-// Watch for deep link changes
 watch(
-  targetSection,
-  (newTarget) => {
-    if (newTarget && sections.value.some((s) => s.id === newTarget)) {
-      activeSubSection.value = newTarget;
-      // Clear the target after navigating
+  targetSubSection,
+  (newSection) => {
+    if (newSection) {
+      if (!expandedSections.value.includes(newSection)) {
+        expandedSections.value.push(newSection);
+      }
       nextTick(() => {
-        if (targetSection) {
-          targetSection.value = null;
+        const element = document.getElementById(`dev-section-${newSection}`);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (targetSubSection.value) {
+          targetSubSection.value = null;
         }
       });
     }
   },
   { immediate: true }
 );
-
-// Navigation sections
-const sections = computed(() => [
-  { id: "forms-overview", label: "Forms Overview", icon: "i-heroicons-document-text" },
-  { id: "nuxt-ui-components", label: "Nuxt UI Form Components", icon: "i-heroicons-squares-2x2" },
-  { id: "zod-validation", label: "Zod Schema Validation", icon: "i-heroicons-shield-check" },
-  {
-    id: "manual-validation",
-    label: "Manual Validation Pattern",
-    icon: "i-heroicons-adjustments-horizontal",
-  },
-  { id: "uform-pattern", label: "UForm Component Pattern", icon: "i-heroicons-rectangle-group" },
-  { id: "form-submission", label: "Form Submission Patterns", icon: "i-heroicons-paper-airplane" },
-  {
-    id: "error-display",
-    label: "Error Display Patterns",
-    icon: "i-heroicons-exclamation-triangle",
-  },
-  { id: "loading-states", label: "Loading States", icon: "i-heroicons-arrow-path" },
-  { id: "cancel-confirmation", label: "Cancel Confirmation", icon: "i-heroicons-x-circle" },
-  { id: "form-state-management", label: "Form State Management", icon: "i-heroicons-variable" },
-  {
-    id: "field-specific-patterns",
-    label: "Field-Specific Patterns",
-    icon: "i-heroicons-queue-list",
-  },
-  { id: "best-practices", label: "Best Practices Summary", icon: "i-heroicons-check-badge" },
-]);
 
 // Code examples
 const codeExamples = {
@@ -580,164 +566,188 @@ const schema = z.object({
   <div class="space-y-6">
     <!-- Header -->
     <div class="border-b border-[var(--ui-border)] pb-4">
-      <div class="flex items-center gap-3 mb-2">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--ui-primary)]/10"
-        >
-          <UIcon name="i-heroicons-document-text" class="text-xl text-[var(--ui-primary)]" />
-        </div>
-        <h1 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Forms & Validation</h1>
-      </div>
-      <p class="text-[var(--ui-text-muted)]">
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Forms & Validation</h2>
+      <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
         End-to-end guide for building forms with Nuxt UI components and Zod validation
       </p>
     </div>
 
-    <!-- Navigation Pills -->
-    <div class="flex flex-wrap gap-2">
+    <!-- Forms Overview -->
+    <section
+      id="dev-section-forms-overview"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
       <button
-        v-for="section in sections"
-        :key="section.id"
-        class="inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
-        :class="[
-          activeSubSection === section.id
-            ? 'bg-[var(--ui-primary)] text-white'
-            : 'bg-[var(--ui-bg-elevated)] text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-accented)] hover:text-[var(--ui-text)]',
-        ]"
-        @click="activeSubSection = section.id"
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('forms-overview')"
       >
-        <UIcon :name="section.icon" class="text-base" />
-        <span>{{ section.label }}</span>
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-document-text" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Forms Overview</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('forms-overview') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
       </button>
-    </div>
+      <div v-if="isExpanded('forms-overview')" class="space-y-4 p-4">
+        <div class="space-y-3 text-[var(--ui-text)]">
+          <p>
+            This guide covers form handling patterns in the Stock Management System, including Nuxt
+            UI form components, Zod validation, error handling, and loading states.
+          </p>
 
-    <!-- Content Sections -->
-    <div class="space-y-8">
-      <!-- Forms Overview -->
-      <section v-show="activeSubSection === 'forms-overview'" class="space-y-4">
-        <div>
-          <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
-            Forms Overview
-          </h2>
-          <div class="space-y-3 text-[var(--ui-text)]">
-            <p>
-              This guide covers form handling patterns in the Stock Management System, including
-              Nuxt UI form components, Zod validation, error handling, and loading states.
-            </p>
+          <div class="rounded-lg bg-[var(--ui-bg-elevated)] p-4">
+            <h3 class="mb-2 text-sm font-semibold text-[var(--ui-text-highlighted)]">
+              Two Form Patterns
+            </h3>
+            <ul class="ml-6 list-disc space-y-2 text-sm">
+              <li>
+                <strong>Manual Validation Pattern:</strong>
+                Full control over validation timing, field-by-field validation, custom error
+                handling. Used in items, locations pages.
+              </li>
+              <li>
+                <strong>UForm Component Pattern:</strong>
+                Simplified with automatic validation, UFormField wrappers, built-in error display.
+                Used in suppliers, users pages.
+              </li>
+            </ul>
+          </div>
 
-            <div class="rounded-lg bg-[var(--ui-bg-elevated)] p-4">
-              <h3 class="mb-2 text-sm font-semibold text-[var(--ui-text-highlighted)]">
-                Two Form Patterns
-              </h3>
-              <ul class="ml-6 list-disc space-y-2 text-sm">
-                <li>
-                  <strong>Manual Validation Pattern:</strong>
-                  Full control over validation timing, field-by-field validation, custom error
-                  handling. Used in items, locations pages.
-                </li>
-                <li>
-                  <strong>UForm Component Pattern:</strong>
-                  Simplified with automatic validation, UFormField wrappers, built-in error display.
-                  Used in suppliers, users pages.
-                </li>
-              </ul>
-            </div>
-
-            <div class="rounded-lg bg-blue-500/10 p-4">
-              <h3 class="mb-2 text-sm font-semibold text-blue-600 dark:text-blue-400">
-                Key Principles
-              </h3>
-              <ul class="ml-6 list-disc space-y-1 text-sm text-[var(--ui-text-muted)]">
-                <li>Use Zod schemas that match API validation</li>
-                <li>Show field-level errors immediately on blur</li>
-                <li>Disable submit button while form is invalid</li>
-                <li>Show loading states during submission</li>
-                <li>Handle API errors with user-friendly messages</li>
-                <li>Confirm before discarding unsaved changes</li>
-              </ul>
-            </div>
+          <div class="rounded-lg bg-blue-500/10 p-4">
+            <h3 class="mb-2 text-sm font-semibold text-blue-600 dark:text-blue-400">
+              Key Principles
+            </h3>
+            <ul class="ml-6 list-disc space-y-1 text-sm text-[var(--ui-text-muted)]">
+              <li>Use Zod schemas that match API validation</li>
+              <li>Show field-level errors immediately on blur</li>
+              <li>Disable submit button while form is invalid</li>
+              <li>Show loading states during submission</li>
+              <li>Handle API errors with user-friendly messages</li>
+              <li>Confirm before discarding unsaved changes</li>
+            </ul>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Nuxt UI Form Components -->
-      <section v-show="activeSubSection === 'nuxt-ui-components'" class="space-y-4">
-        <div>
-          <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
+    <!-- Nuxt UI Form Components -->
+    <section
+      id="dev-section-nuxt-ui-components"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('nuxt-ui-components')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-squares-2x2" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
             Nuxt UI Form Components
-          </h2>
-          <div class="space-y-3 text-[var(--ui-text)]">
-            <p>
-              Nuxt UI provides a comprehensive set of form components:
-              <code>UInput</code>
-              ,
-              <code>USelectMenu</code>
-              ,
-              <code>UTextarea</code>
-              ,
-              <code>UButton</code>
-              ,
-              <code>UForm</code>
-              , and
-              <code>UFormField</code>
-              .
-            </p>
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('nuxt-ui-components') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('nuxt-ui-components')" class="space-y-4 p-4">
+        <div class="space-y-3 text-[var(--ui-text)]">
+          <p>
+            Nuxt UI provides a comprehensive set of form components:
+            <code>UInput</code>
+            ,
+            <code>USelectMenu</code>
+            ,
+            <code>UTextarea</code>
+            ,
+            <code>UButton</code>
+            ,
+            <code>UForm</code>
+            , and
+            <code>UFormField</code>
+            .
+          </p>
 
-            <div class="rounded-lg bg-[var(--ui-bg-elevated)] p-4">
-              <h3 class="mb-2 text-sm font-semibold text-[var(--ui-text-highlighted)]">
-                Common Form Components
-              </h3>
-              <ul class="ml-6 list-disc space-y-2 text-sm">
-                <li>
-                  <strong>UInput:</strong>
-                  Text input with size variants, icons, error states, disabled state
-                </li>
-                <li>
-                  <strong>USelectMenu:</strong>
-                  Dropdown select with options array, value-key, placeholder
-                </li>
-                <li>
-                  <strong>UTextarea:</strong>
-                  Multi-line text input with rows prop
-                </li>
-                <li>
-                  <strong>UButton:</strong>
-                  Submit button with loading, disabled states, icons
-                </li>
-                <li>
-                  <strong>UForm:</strong>
-                  Form wrapper with schema validation (optional)
-                </li>
-                <li>
-                  <strong>UFormField:</strong>
-                  Field wrapper with label, help text, error display
-                </li>
-              </ul>
-            </div>
-
-            <h3 class="mt-4 text-lg font-semibold text-[var(--ui-text-highlighted)]">
-              USelectMenu Options
+          <div class="rounded-lg bg-[var(--ui-bg-elevated)] p-4">
+            <h3 class="mb-2 text-sm font-semibold text-[var(--ui-text-highlighted)]">
+              Common Form Components
             </h3>
-            <DeveloperCodeBlock
-              :code="codeExamples.selectMenuOptions"
-              language="typescript"
-              filename="app/pages/items/create.vue"
-            />
-
-            <h3 class="mt-4 text-lg font-semibold text-[var(--ui-text-highlighted)]">
-              UTextarea for Multi-line Input
-            </h3>
-            <DeveloperCodeBlock
-              :code="codeExamples.textareaField"
-              language="vue"
-              filename="app/pages/suppliers/create.vue"
-            />
+            <ul class="ml-6 list-disc space-y-2 text-sm">
+              <li>
+                <strong>UInput:</strong>
+                Text input with size variants, icons, error states, disabled state
+              </li>
+              <li>
+                <strong>USelectMenu:</strong>
+                Dropdown select with options array, value-key, placeholder
+              </li>
+              <li>
+                <strong>UTextarea:</strong>
+                Multi-line text input with rows prop
+              </li>
+              <li>
+                <strong>UButton:</strong>
+                Submit button with loading, disabled states, icons
+              </li>
+              <li>
+                <strong>UForm:</strong>
+                Form wrapper with schema validation (optional)
+              </li>
+              <li>
+                <strong>UFormField:</strong>
+                Field wrapper with label, help text, error display
+              </li>
+            </ul>
           </div>
-        </div>
-      </section>
 
-      <!-- Zod Schema Validation -->
-      <section v-show="activeSubSection === 'zod-validation'" class="space-y-4">
+          <h3 class="mt-4 text-lg font-semibold text-[var(--ui-text-highlighted)]">
+            USelectMenu Options
+          </h3>
+          <DeveloperCodeBlock
+            :code="codeExamples.selectMenuOptions"
+            language="typescript"
+            filename="app/pages/items/create.vue"
+          />
+
+          <h3 class="mt-4 text-lg font-semibold text-[var(--ui-text-highlighted)]">
+            UTextarea for Multi-line Input
+          </h3>
+          <DeveloperCodeBlock
+            :code="codeExamples.textareaField"
+            language="vue"
+            filename="app/pages/suppliers/create.vue"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Zod Schema Validation -->
+    <section
+      id="dev-section-zod-validation"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('zod-validation')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-shield-check" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Zod Schema Validation</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('zod-validation') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('zod-validation')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Zod Schema Validation
@@ -768,10 +778,35 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Manual Validation Pattern -->
-      <section v-show="activeSubSection === 'manual-validation'" class="space-y-4">
+    <!-- Manual Validation Pattern -->
+    <section
+      id="dev-section-manual-validation"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('manual-validation')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon
+            name="i-heroicons-adjustments-horizontal"
+            class="text-xl text-[var(--ui-primary)]"
+          />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Manual Validation Pattern
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('manual-validation') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('manual-validation')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Manual Validation Pattern
@@ -828,10 +863,32 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- UForm Component Pattern -->
-      <section v-show="activeSubSection === 'uform-pattern'" class="space-y-4">
+    <!-- UForm Component Pattern -->
+    <section
+      id="dev-section-uform-pattern"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('uform-pattern')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-rectangle-group" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            UForm Component Pattern
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('uform-pattern') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('uform-pattern')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             UForm Component Pattern
@@ -882,10 +939,32 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Form Submission Patterns -->
-      <section v-show="activeSubSection === 'form-submission'" class="space-y-4">
+    <!-- Form Submission Patterns -->
+    <section
+      id="dev-section-form-submission"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('form-submission')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-paper-airplane" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Form Submission Patterns
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('form-submission') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('form-submission')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Form Submission Patterns
@@ -932,10 +1011,32 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Error Display Patterns -->
-      <section v-show="activeSubSection === 'error-display'" class="space-y-4">
+    <!-- Error Display Patterns -->
+    <section
+      id="dev-section-error-display"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('error-display')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-exclamation-triangle" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Error Display Patterns
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('error-display') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('error-display')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Error Display Patterns
@@ -975,10 +1076,30 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Loading States -->
-      <section v-show="activeSubSection === 'loading-states'" class="space-y-4">
+    <!-- Loading States -->
+    <section
+      id="dev-section-loading-states"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('loading-states')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-arrow-path" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Loading States</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('loading-states') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('loading-states')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Loading States
@@ -1020,10 +1141,32 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Cancel Confirmation -->
-      <section v-show="activeSubSection === 'cancel-confirmation'" class="space-y-4">
+    <!-- Cancel Confirmation -->
+    <section
+      id="dev-section-cancel-confirmation"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('cancel-confirmation')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-x-circle" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Cancel Confirmation</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('cancel-confirmation')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('cancel-confirmation')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Cancel Confirmation
@@ -1066,10 +1209,32 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Form State Management -->
-      <section v-show="activeSubSection === 'form-state-management'" class="space-y-4">
+    <!-- Form State Management -->
+    <section
+      id="dev-section-form-state-management"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('form-state-management')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-variable" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Form State Management</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('form-state-management')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('form-state-management')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Form State Management
@@ -1110,10 +1275,34 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Field-Specific Patterns -->
-      <section v-show="activeSubSection === 'field-specific-patterns'" class="space-y-4">
+    <!-- Field-Specific Patterns -->
+    <section
+      id="dev-section-field-specific-patterns"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('field-specific-patterns')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-queue-list" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Field-Specific Patterns
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('field-specific-patterns')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('field-specific-patterns')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Field-Specific Patterns
@@ -1162,10 +1351,32 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Best Practices Summary -->
-      <section v-show="activeSubSection === 'best-practices'" class="space-y-4">
+    <!-- Best Practices Summary -->
+    <section
+      id="dev-section-best-practices"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('best-practices')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-check-badge" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Best Practices Summary
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('best-practices') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('best-practices')" class="space-y-4 p-4">
         <div>
           <h2 class="mb-3 text-xl font-semibold text-[var(--ui-text-highlighted)]">
             Best Practices Summary
@@ -1224,7 +1435,7 @@ const schema = z.object({
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   </div>
 </template>

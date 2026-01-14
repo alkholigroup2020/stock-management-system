@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "Move the dev guide to its own layout. Access via dev icon in main nav during development mode only. Replace side drawer with full documentation layout. Use Nuxt documentation template style. Consistent design across all sections."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Access Developer Guide (Priority: P1)
 
@@ -97,7 +97,7 @@ As a developer, I want to search within the documentation, so that I can quickly
 - What happens on mobile/tablet devices?
   - Sidebar should be collapsible/hidden with a toggle button; content takes full width
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -120,7 +120,7 @@ As a developer, I want to search within the documentation, so that I can quickly
 - **Documentation Navigation**: The hierarchical structure of all available documentation sections and their relationships.
 - **Search Index**: Collection of searchable content from all documentation sections with mappings to their locations.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

@@ -240,10 +240,10 @@ const navSections: DocSection[] = [
 
 ## URL Structure
 
-| URL Pattern | Example | Maps To |
-|-------------|---------|---------|
-| `/dev-guide` | `/dev-guide` | Getting Started (default) |
-| `/dev-guide/:section` | `/dev-guide/authentication` | Section component |
+| URL Pattern                       | Example                                | Maps To                        |
+| --------------------------------- | -------------------------------------- | ------------------------------ |
+| `/dev-guide`                      | `/dev-guide`                           | Getting Started (default)      |
+| `/dev-guide/:section`             | `/dev-guide/authentication`            | Section component              |
 | `/dev-guide/:section/:subsection` | `/dev-guide/authentication/login-flow` | Section + scroll to subsection |
 
 ## Route Parameters
@@ -287,9 +287,9 @@ SearchResult ──────────▶ DocSection (via sectionId)
 
 ## Validation Rules
 
-| Field | Rule |
-|-------|------|
-| `DocSection.id` | Must be URL-safe (lowercase, hyphens only) |
-| `DocSection.icon` | Must be valid Heroicons name |
-| `DocSection.component` | Must be imported Vue component |
-| `SearchResult.content` | Max 500 characters for display |
+| Field                  | Rule                                       |
+| ---------------------- | ------------------------------------------ |
+| `DocSection.id`        | Must be URL-safe (lowercase, hyphens only) |
+| `DocSection.icon`      | Must be valid Heroicons name               |
+| `DocSection.component` | Must be imported Vue component             |
+| `SearchResult.content` | Max 500 characters for display             |

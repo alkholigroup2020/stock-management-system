@@ -1,4 +1,17 @@
 <script setup lang="ts">
+/**
+ * @deprecated This component has been replaced by the /dev-guide dedicated page layout.
+ * The new layout provides better navigation, search, and responsive design.
+ * This drawer is kept for rollback capability only.
+ *
+ * New implementation:
+ * - Layout: app/layouts/docs.vue
+ * - Composable: app/composables/useDevGuideNav.ts
+ * - Pages: app/pages/dev-guide/[...slug].vue
+ *
+ * Access the new dev guide via the navbar icon or Ctrl+Shift+D.
+ */
+
 import type { Component } from "vue";
 
 // Props
@@ -2056,9 +2069,7 @@ const contentComponents: Record<string, Component> = {
   "forms-validation": defineAsyncComponent(
     () => import("~/components/developer/FormsValidationGuide.vue")
   ),
-  "tables-lists": defineAsyncComponent(
-    () => import("~/components/developer/TablesListsGuide.vue")
-  ),
+  "tables-lists": defineAsyncComponent(() => import("~/components/developer/TablesListsGuide.vue")),
   "error-handling": defineAsyncComponent(
     () => import("~/components/developer/ErrorHandlingGuide.vue")
   ),

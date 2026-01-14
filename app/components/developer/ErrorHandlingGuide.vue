@@ -650,688 +650,620 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
 </script>
 
 <template>
-  <div class="space-y-4">
-    <!-- Overview -->
-    <div class="prose prose-sm max-w-none">
-      <p class="text-body leading-relaxed">
-        This guide covers error handling patterns across the application, from server-side error
-        creation to client-side error handling with user-friendly notifications.
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="border-b border-[var(--ui-border)] pb-4">
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Error Handling</h2>
+      <p class="mt-1 text-sm text-[var(--ui-text-muted)]">
+        Patterns for server and client error handling, validation, type guards, and error codes
       </p>
     </div>
 
-    <!-- Navigation Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['server-errors'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-server-errors')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-server"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Server Error Patterns
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">createError() for API errors</p>
-      </button>
-
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['client-errors'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-client-errors')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-alert-circle"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Client Error Handling
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">useErrorHandler composable</p>
-      </button>
-
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['toast-notifications'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-toast-notifications')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-message-square"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Toast Notifications
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">useAppToast for user feedback</p>
-      </button>
-
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['validation-errors'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-validation-errors')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-shield-alert"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Validation Errors
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">Zod schema validation patterns</p>
-      </button>
-
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['network-errors'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-network-errors')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-wifi-off"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Network Errors
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">Offline detection & handling</p>
-      </button>
-
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['type-guards'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-type-guards')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-shield-check"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Type Guards
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">Type-safe error handling</p>
-      </button>
-
-      <button
-        class="p-4 rounded-lg border border-[var(--ui-border)] hover:border-primary hover:bg-[var(--ui-bg-elevated)] transition-all text-left group cursor-pointer"
-        @click="
-          () => {
-            expandedSections.value = ['error-codes'];
-            nextTick(() =>
-              document
-                .getElementById('dev-section-error-codes')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            );
-          }
-        "
-      >
-        <div class="flex items-center gap-3 mb-2">
-          <UIcon
-            name="i-lucide-list"
-            class="w-5 h-5 text-primary group-hover:scale-110 transition-transform"
-          />
-          <h3 class="font-semibold text-[var(--ui-text)] group-hover:text-primary transition-colors">
-            Standard Error Codes
-          </h3>
-        </div>
-        <p class="text-caption leading-relaxed">Consistent error code reference</p>
-      </button>
-    </div>
-
     <!-- 1. Server Error Patterns -->
-    <UCard id="dev-section-server-errors" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('server-errors')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-server" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Server Error Patterns (createError)</h3>
+    <section
+      id="dev-section-server-errors"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('server-errors')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-server" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Server Error Patterns</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('server-errors') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('server-errors')" class="space-y-4 p-4">
+        <div v-if="isExpanded('server-errors')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              Server routes use
+              <code>createError()</code>
+              from H3/Nuxt to throw standardized errors with consistent structure. All errors
+              include a
+              <code>code</code>
+              for programmatic handling and a user-friendly
+              <code>message</code>
+              .
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Error Structure</h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>statusCode:</strong>
+                HTTP status code (400, 401, 403, 404, 500, etc.)
+              </li>
+              <li>
+                <strong>statusMessage:</strong>
+                HTTP status text (e.g., "Bad Request")
+              </li>
+              <li>
+                <strong>data.code:</strong>
+                Application-specific error code (e.g., "INSUFFICIENT_STOCK")
+              </li>
+              <li>
+                <strong>data.message:</strong>
+                User-friendly error message
+              </li>
+              <li>
+                <strong>data.details:</strong>
+                Optional additional context (e.g., which items are out of stock)
+              </li>
+            </ul>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Example</h4>
           </div>
-          <UIcon
-            :name="isExpanded('server-errors') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.serverErrorBasic"
+            language="typescript"
+            filename="server/api/items/[id].get.ts"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('server-errors')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            Server routes use <code>createError()</code> from H3/Nuxt to throw standardized errors
-            with consistent structure. All errors include a <code>code</code> for programmatic
-            handling and a user-friendly <code>message</code>.
-          </p>
+          <div class="prose prose-sm max-w-none">
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Advanced Example with Details
+            </h4>
+          </div>
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Error Structure</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li>
-              <strong>statusCode:</strong> HTTP status code (400, 401, 403, 404, 500, etc.)
-            </li>
-            <li><strong>statusMessage:</strong> HTTP status text (e.g., "Bad Request")</li>
-            <li>
-              <strong>data.code:</strong> Application-specific error code (e.g.,
-              "INSUFFICIENT_STOCK")
-            </li>
-            <li><strong>data.message:</strong> User-friendly error message</li>
-            <li>
-              <strong>data.details:</strong> Optional additional context (e.g., which items are out
-              of stock)
-            </li>
-          </ul>
+          <DeveloperCodeBlock
+            :code="codeExamples.serverErrorAdvanced"
+            language="typescript"
+            filename="server/api/locations/[id]/issues/index.post.ts"
+          />
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Example</h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Best Practice"
+            description="Always include a code in data for programmatic error handling on the client. Use details to provide context-specific information like which items are insufficient."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.serverErrorBasic"
-          language="typescript"
-          filename="server/api/items/[id].get.ts"
-        />
-
-        <div class="prose prose-sm max-w-none">
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
-            Advanced Example with Details
-          </h4>
-        </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.serverErrorAdvanced"
-          language="typescript"
-          filename="server/api/locations/[id]/issues/index.post.ts"
-        />
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Best Practice"
-          description="Always include a code in data for programmatic error handling on the client. Use details to provide context-specific information like which items are insufficient."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- 2. Client Error Handling -->
-    <UCard id="dev-section-client-errors" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('client-errors')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-alert-circle" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Client Error Handling (useErrorHandler)</h3>
+    <section
+      id="dev-section-client-errors"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('client-errors')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-exclamation-circle" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Client Error Handling</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('client-errors') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('client-errors')" class="space-y-4 p-4">
+        <div v-if="isExpanded('client-errors')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              The
+              <code>useErrorHandler</code>
+              composable provides centralized error handling with automatic toast notifications and
+              user-friendly error messages. It maps standard error codes to user-friendly messages
+              with suggestions.
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Composable API</h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>handleError(error, options):</strong>
+                Display error with toast notification
+              </li>
+              <li>
+                <strong>handleSuccess(title, description):</strong>
+                Display success toast
+              </li>
+              <li>
+                <strong>handleWarning(title, options):</strong>
+                Display warning toast
+              </li>
+              <li>
+                <strong>handleInfo(title, description):</strong>
+                Display info toast
+              </li>
+              <li>
+                <strong>getErrorMessage(error):</strong>
+                Parse error and return formatted message
+              </li>
+              <li>
+                <strong>parseError(error):</strong>
+                Extract error details from various formats
+              </li>
+            </ul>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Usage</h4>
           </div>
-          <UIcon
-            :name="isExpanded('client-errors') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.clientErrorBasic"
+            language="vue"
+            filename="app/pages/items/[id].vue"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('client-errors')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            The <code>useErrorHandler</code> composable provides centralized error handling with
-            automatic toast notifications and user-friendly error messages. It maps standard error
-            codes to user-friendly messages with suggestions.
-          </p>
+          <div class="prose prose-sm max-w-none">
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Advanced Usage</h4>
+          </div>
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Composable API</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li>
-              <strong>handleError(error, options):</strong> Display error with toast notification
-            </li>
-            <li>
-              <strong>handleSuccess(title, description):</strong> Display success toast
-            </li>
-            <li>
-              <strong>handleWarning(title, options):</strong> Display warning toast
-            </li>
-            <li><strong>handleInfo(title, description):</strong> Display info toast</li>
-            <li>
-              <strong>getErrorMessage(error):</strong> Parse error and return formatted message
-            </li>
-            <li><strong>parseError(error):</strong> Extract error details from various formats</li>
-          </ul>
+          <DeveloperCodeBlock
+            :code="codeExamples.clientErrorAdvanced"
+            language="vue"
+            filename="app/pages/deliveries/create.vue"
+          />
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Usage</h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Error Context"
+            description="Always provide context when calling handleError() to help users understand what operation failed. Use { context: 'creating delivery' } to generate messages like 'Error creating delivery'."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.clientErrorBasic"
-          language="vue"
-          filename="app/pages/items/[id].vue"
-        />
-
-        <div class="prose prose-sm max-w-none">
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Advanced Usage</h4>
-        </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.clientErrorAdvanced"
-          language="vue"
-          filename="app/pages/deliveries/create.vue"
-        />
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Error Context"
-          description="Always provide context when calling handleError() to help users understand what operation failed. Use { context: 'creating delivery' } to generate messages like 'Error creating delivery'."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- 3. Toast Notifications -->
-    <UCard id="dev-section-toast-notifications" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('toast-notifications')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-message-square" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Toast Notifications (useAppToast)</h3>
+    <section
+      id="dev-section-toast-notifications"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('toast-notifications')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-bell" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Toast Notifications</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('toast-notifications')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('toast-notifications')" class="space-y-4 p-4">
+        <div v-if="isExpanded('toast-notifications')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              The
+              <code>useAppToast</code>
+              composable wraps Nuxt UI's toast system with predefined colors and icons for
+              consistent notifications across the app.
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Toast Types</h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>success:</strong>
+                Emerald color, check icon, 5s duration - for successful operations
+              </li>
+              <li>
+                <strong>error:</strong>
+                Red color, X icon, 7s duration - for errors (stays longer)
+              </li>
+              <li>
+                <strong>warning:</strong>
+                Amber color, triangle icon, 6s duration - for warnings
+              </li>
+              <li>
+                <strong>info:</strong>
+                Primary (navy) color, info icon, 5s duration - for informational messages
+              </li>
+            </ul>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Usage</h4>
           </div>
-          <UIcon
-            :name="
-              isExpanded('toast-notifications') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'
-            "
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.toastBasic"
+            language="vue"
+            filename="app/pages/items/create.vue"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('toast-notifications')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            The <code>useAppToast</code> composable wraps Nuxt UI's toast system with predefined
-            colors and icons for consistent notifications across the app.
-          </p>
+          <div class="prose prose-sm max-w-none">
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Advanced Features</h4>
+          </div>
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Toast Types</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li>
-              <strong>success:</strong> Emerald color, check icon, 5s duration - for successful
-              operations
-            </li>
-            <li>
-              <strong>error:</strong> Red color, X icon, 7s duration - for errors (stays longer)
-            </li>
-            <li>
-              <strong>warning:</strong> Amber color, triangle icon, 6s duration - for warnings
-            </li>
-            <li>
-              <strong>info:</strong> Primary (navy) color, info icon, 5s duration - for
-              informational messages
-            </li>
-          </ul>
+          <DeveloperCodeBlock
+            :code="codeExamples.toastAdvanced"
+            language="vue"
+            filename="app/pages/transfers/[id].vue"
+          />
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Basic Usage</h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Toast Best Practices"
+            description="Use success for confirmations, error for failures, warning for cautions, and info for neutral updates. Always provide a description for context. Keep messages concise and actionable."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.toastBasic"
-          language="vue"
-          filename="app/pages/items/create.vue"
-        />
-
-        <div class="prose prose-sm max-w-none">
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Advanced Features</h4>
-        </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.toastAdvanced"
-          language="vue"
-          filename="app/pages/transfers/[id].vue"
-        />
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Toast Best Practices"
-          description="Use success for confirmations, error for failures, warning for cautions, and info for neutral updates. Always provide a description for context. Keep messages concise and actionable."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- 4. Validation Errors -->
-    <UCard id="dev-section-validation-errors" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('validation-errors')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-shield-alert" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Validation Errors (Zod)</h3>
+    <section
+      id="dev-section-validation-errors"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('validation-errors')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-shield-exclamation" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Validation Errors</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('validation-errors') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('validation-errors')" class="space-y-4 p-4">
+        <div v-if="isExpanded('validation-errors')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              Validation errors use
+              <strong>Zod</strong>
+              schemas for type-safe validation on both client and server. Forms display field-level
+              errors inline, with general errors shown via toast.
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Validation Patterns
+            </h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>Field-level validation:</strong>
+                Run on blur to validate individual fields
+              </li>
+              <li>
+                <strong>Form-level validation:</strong>
+                Run on submit to validate entire form
+              </li>
+              <li>
+                <strong>Server-side validation:</strong>
+                Always validate in API routes with Zod
+              </li>
+              <li>
+                <strong>Error display:</strong>
+                Show inline errors below fields, toast for general errors
+              </li>
+            </ul>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Client-Side Validation
+            </h4>
           </div>
-          <UIcon
-            :name="
-              isExpanded('validation-errors') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'
-            "
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.validationErrors"
+            language="vue"
+            filename="app/pages/items/create.vue"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('validation-errors')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            Validation errors use <strong>Zod</strong> schemas for type-safe validation on both
-            client and server. Forms display field-level errors inline, with general errors shown
-            via toast.
-          </p>
+          <div class="prose prose-sm max-w-none">
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Server-Side Validation
+            </h4>
+            <p class="text-body leading-relaxed">
+              Always validate request bodies in API routes. Catch Zod errors and return a
+              standardized VALIDATION_ERROR response.
+            </p>
+          </div>
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Validation Patterns</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li><strong>Field-level validation:</strong> Run on blur to validate individual fields</li>
-            <li><strong>Form-level validation:</strong> Run on submit to validate entire form</li>
-            <li>
-              <strong>Server-side validation:</strong> Always validate in API routes with Zod
-            </li>
-            <li><strong>Error display:</strong> Show inline errors below fields, toast for general errors</li>
-          </ul>
+          <DeveloperCodeBlock
+            :code="codeExamples.apiErrorHandling"
+            language="typescript"
+            filename="server/api/items/[id].patch.ts"
+          />
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
-            Client-Side Validation
-          </h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Validation Best Practice"
+            description="Use the same Zod schema on both client and server for consistency. Validate on blur for immediate feedback, and on submit to catch any remaining errors. Always validate on the server even if client validation passes."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.validationErrors"
-          language="vue"
-          filename="app/pages/items/create.vue"
-        />
-
-        <div class="prose prose-sm max-w-none">
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
-            Server-Side Validation
-          </h4>
-          <p class="text-body leading-relaxed">
-            Always validate request bodies in API routes. Catch Zod errors and return a standardized
-            VALIDATION_ERROR response.
-          </p>
-        </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.apiErrorHandling"
-          language="typescript"
-          filename="server/api/items/[id].patch.ts"
-        />
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Validation Best Practice"
-          description="Use the same Zod schema on both client and server for consistency. Validate on blur for immediate feedback, and on submit to catch any remaining errors. Always validate on the server even if client validation passes."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- 5. Network Errors -->
-    <UCard id="dev-section-network-errors" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('network-errors')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-wifi-off" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Network Errors & Offline Handling</h3>
+    <section
+      id="dev-section-network-errors"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('network-errors')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-wifi" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Network Errors</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('network-errors') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('network-errors')" class="space-y-4 p-4">
+        <div v-if="isExpanded('network-errors')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              Network errors occur when the client cannot reach the server. The app uses
+              <code>useOnlineStatus()</code>
+              to detect offline state and
+              <code>useOfflineGuard()</code>
+              to prevent actions when offline.
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Network Error Types
+            </h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>Offline:</strong>
+                User has no internet connection (detected by browser)
+              </li>
+              <li>
+                <strong>Timeout:</strong>
+                Request took too long to complete
+              </li>
+              <li>
+                <strong>Connection Error:</strong>
+                Cannot reach the server (server down, DNS issues)
+              </li>
+              <li>
+                <strong>CORS Error:</strong>
+                Cross-origin request blocked
+              </li>
+            </ul>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Detecting Network Errors
+            </h4>
           </div>
-          <UIcon
-            :name="isExpanded('network-errors') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.networkErrors"
+            language="vue"
+            filename="app/pages/items/index.vue"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('network-errors')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            Network errors occur when the client cannot reach the server. The app uses
-            <code>useOnlineStatus()</code> to detect offline state and <code>useOfflineGuard()</code>
-            to prevent actions when offline.
-          </p>
+          <div class="prose prose-sm max-w-none">
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Using Offline Guard
+            </h4>
+          </div>
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Network Error Types</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li><strong>Offline:</strong> User has no internet connection (detected by browser)</li>
-            <li><strong>Timeout:</strong> Request took too long to complete</li>
-            <li><strong>Connection Error:</strong> Cannot reach the server (server down, DNS issues)</li>
-            <li><strong>CORS Error:</strong> Cross-origin request blocked</li>
-          </ul>
+          <DeveloperCodeBlock
+            :code="codeExamples.offlineGuard"
+            language="vue"
+            filename="app/composables/useOfflineGuard.ts"
+          />
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
-            Detecting Network Errors
-          </h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Offline Detection"
+            description="Use useOfflineGuard() to disable action buttons when offline. The composable automatically shows a toast when users try to perform actions while offline. Network errors have no statusCode in the error object."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.networkErrors"
-          language="vue"
-          filename="app/pages/items/index.vue"
-        />
-
-        <div class="prose prose-sm max-w-none">
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
-            Using Offline Guard
-          </h4>
-        </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.offlineGuard"
-          language="vue"
-          filename="app/composables/useOfflineGuard.ts"
-        />
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Offline Detection"
-          description="Use useOfflineGuard() to disable action buttons when offline. The composable automatically shows a toast when users try to perform actions while offline. Network errors have no statusCode in the error object."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- 6. Type Guards -->
-    <UCard id="dev-section-type-guards" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('type-guards')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-shield-check" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Type Guards for Error Types</h3>
+    <section
+      id="dev-section-type-guards"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('type-guards')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-shield-check" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Type Guards</span>
+        </span>
+        <UIcon
+          :name="isExpanded('type-guards') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('type-guards')" class="space-y-4 p-4">
+        <div v-if="isExpanded('type-guards')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              Type guards provide type-safe error handling by narrowing the error type. This enables
+              TypeScript to understand the error structure and provide autocomplete and type
+              checking.
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Common Error Types
+            </h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>H3Error:</strong>
+                Standard Nuxt server error with statusCode and data
+              </li>
+              <li>
+                <strong>ZodError:</strong>
+                Validation error from Zod schema
+              </li>
+              <li>
+                <strong>Error:</strong>
+                Standard JavaScript Error object
+              </li>
+              <li>
+                <strong>Unknown:</strong>
+                Catch-all for unexpected error formats
+              </li>
+            </ul>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Type Guard Examples
+            </h4>
           </div>
-          <UIcon
-            :name="isExpanded('type-guards') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.typeGuards"
+            language="typescript"
+            filename="app/utils/errorTypeGuards.ts"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('type-guards')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            Type guards provide type-safe error handling by narrowing the error type. This enables
-            TypeScript to understand the error structure and provide autocomplete and type checking.
-          </p>
-
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Common Error Types</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li>
-              <strong>H3Error:</strong> Standard Nuxt server error with statusCode and data
-            </li>
-            <li><strong>ZodError:</strong> Validation error from Zod schema</li>
-            <li><strong>Error:</strong> Standard JavaScript Error object</li>
-            <li><strong>Unknown:</strong> Catch-all for unexpected error formats</li>
-          </ul>
-
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Type Guard Examples</h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Type Safety"
+            description="Always use type guards when handling errors in catch blocks. This ensures TypeScript knows the error structure and prevents runtime errors from accessing non-existent properties."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.typeGuards"
-          language="typescript"
-          filename="app/utils/errorTypeGuards.ts"
-        />
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Type Safety"
-          description="Always use type guards when handling errors in catch blocks. This ensures TypeScript knows the error structure and prevents runtime errors from accessing non-existent properties."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- 7. Standard Error Codes -->
-    <UCard id="dev-section-error-codes" class="card-elevated">
-      <template #header>
-        <button
-          class="w-full flex items-center justify-between cursor-pointer hover:text-primary transition-colors"
-          @click="toggleSection('error-codes')"
-        >
-          <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-list" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">Standard Error Codes Reference</h3>
+    <section
+      id="dev-section-error-codes"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('error-codes')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-list-bullet" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Standard Error Codes</span>
+        </span>
+        <UIcon
+          :name="isExpanded('error-codes') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('error-codes')" class="space-y-4 p-4">
+        <div v-if="isExpanded('error-codes')" class="space-y-4">
+          <div class="prose prose-sm max-w-none">
+            <p class="text-body leading-relaxed">
+              The application uses standardized error codes for consistent error handling across
+              server and client. Each code maps to a user-friendly message with a helpful
+              suggestion.
+            </p>
+
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
+              Error Code Categories
+            </h4>
           </div>
-          <UIcon
-            :name="isExpanded('error-codes') ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-            class="w-5 h-5"
+
+          <DeveloperCodeBlock
+            :code="codeExamples.errorCodes"
+            language="typescript"
+            filename="app/composables/useErrorHandler.ts"
           />
-        </button>
-      </template>
 
-      <div v-if="isExpanded('error-codes')" class="space-y-4">
-        <div class="prose prose-sm max-w-none">
-          <p class="text-body leading-relaxed">
-            The application uses standardized error codes for consistent error handling across
-            server and client. Each code maps to a user-friendly message with a helpful suggestion.
-          </p>
+          <div class="prose prose-sm max-w-none">
+            <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Usage Guidelines</h4>
+            <ul class="list-disc list-inside space-y-2 text-body">
+              <li>
+                <strong>Server:</strong>
+                Always include a
+                <code>code</code>
+                in createError data
+              </li>
+              <li>
+                <strong>Client:</strong>
+                useErrorHandler automatically maps codes to user messages
+              </li>
+              <li>
+                <strong>New codes:</strong>
+                Add to ERROR_MESSAGES in useErrorHandler with title, description, and suggestion
+              </li>
+              <li>
+                <strong>Consistency:</strong>
+                Use existing codes where applicable before creating new ones
+              </li>
+            </ul>
+          </div>
 
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">
-            Error Code Categories
-          </h4>
+          <UAlert
+            color="primary"
+            variant="subtle"
+            title="Error Code Best Practice"
+            description="Use descriptive, SCREAMING_SNAKE_CASE error codes. Always provide a user-friendly message and actionable suggestion. Document new codes in useErrorHandler.ts."
+            icon="i-lucide-lightbulb"
+          />
         </div>
-
-        <DeveloperCodeBlock
-          :code="codeExamples.errorCodes"
-          language="typescript"
-          filename="app/composables/useErrorHandler.ts"
-        />
-
-        <div class="prose prose-sm max-w-none">
-          <h4 class="text-md font-semibold text-[var(--ui-text)] mt-6 mb-3">Usage Guidelines</h4>
-          <ul class="list-disc list-inside space-y-2 text-body">
-            <li>
-              <strong>Server:</strong> Always include a <code>code</code> in createError data
-            </li>
-            <li>
-              <strong>Client:</strong> useErrorHandler automatically maps codes to user messages
-            </li>
-            <li>
-              <strong>New codes:</strong> Add to ERROR_MESSAGES in useErrorHandler with title,
-              description, and suggestion
-            </li>
-            <li>
-              <strong>Consistency:</strong> Use existing codes where applicable before creating new
-              ones
-            </li>
-          </ul>
-        </div>
-
-        <UAlert
-          color="primary"
-          variant="subtle"
-          title="Error Code Best Practice"
-          description="Use descriptive, SCREAMING_SNAKE_CASE error codes. Always provide a user-friendly message and actionable suggestion. Document new codes in useErrorHandler.ts."
-          icon="i-lucide-lightbulb"
-        />
       </div>
-    </UCard>
+    </section>
 
     <!-- Best Practices Summary -->
-    <UCard class="card-elevated border-primary/20">
-      <template #header>
-        <div class="flex items-center gap-3">
-          <UIcon name="i-lucide-check-circle-2" class="w-5 h-5 text-success" />
-          <h3 class="text-lg font-semibold text-[var(--ui-text)]">
-            Error Handling Best Practices
-          </h3>
-        </div>
-      </template>
-
-      <div class="space-y-4">
+    <section
+      id="dev-section-best-practices"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('best-practices')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-check-badge" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Best Practices Summary
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('best-practices') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('best-practices')" class="space-y-4 p-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Do's -->
           <div>
@@ -1342,21 +1274,34 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
             <ul class="space-y-2 text-caption">
               <li class="flex items-start gap-2">
                 <UIcon name="i-lucide-check" class="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <span
-                  >Use <code>createError()</code> with standardized structure in server routes</span
-                >
+                <span>
+                  Use
+                  <code>createError()</code>
+                  with standardized structure in server routes
+                </span>
               </li>
               <li class="flex items-start gap-2">
                 <UIcon name="i-lucide-check" class="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Always include a <code>code</code> in error data for programmatic handling</span>
+                <span>
+                  Always include a
+                  <code>code</code>
+                  in error data for programmatic handling
+                </span>
               </li>
               <li class="flex items-start gap-2">
                 <UIcon name="i-lucide-check" class="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Use <code>useErrorHandler</code> for consistent client-side error handling</span>
+                <span>
+                  Use
+                  <code>useErrorHandler</code>
+                  for consistent client-side error handling
+                </span>
               </li>
               <li class="flex items-start gap-2">
                 <UIcon name="i-lucide-check" class="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                <span>Provide context when calling <code>handleError()</code></span>
+                <span>
+                  Provide context when calling
+                  <code>handleError()</code>
+                </span>
               </li>
               <li class="flex items-start gap-2">
                 <UIcon name="i-lucide-check" class="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
@@ -1393,49 +1338,79 @@ INVALID_STATUS_TRANSITION   // Invalid status change`,
             </h4>
             <ul class="space-y-2 text-caption">
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't expose sensitive information in error messages</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't show technical stack traces to end users</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't use generic messages like "An error occurred"</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't silently catch and ignore errors</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't skip server-side validation even if client validates</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't access error properties without type guards</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't create new error codes without adding to ERROR_MESSAGES</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't allow operations when offline without checking first</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't use toast for validation errors (use inline display)</span>
               </li>
               <li class="flex items-start gap-2">
-                <UIcon name="i-lucide-x" class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="w-4 h-4 text-[var(--ui-error)] mt-0.5 flex-shrink-0"
+                />
                 <span>Don't throw raw strings or objects from server routes</span>
               </li>
             </ul>
           </div>
         </div>
       </div>
-    </UCard>
+    </section>
   </div>
 </template>

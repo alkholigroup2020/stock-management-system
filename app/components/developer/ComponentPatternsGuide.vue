@@ -1053,9 +1053,9 @@ defineSlots<{
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-puzzle-piece" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Feature-Specific Components</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Feature-Specific Components
+          </span>
         </span>
         <UIcon
           :name="
@@ -1094,9 +1094,9 @@ defineSlots<{
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-arrows-right-left" class="text-[var(--ui-primary)]" />
-                <span class="font-medium text-[var(--ui-text-highlighted)]"
-                  >TransferStatusBadge</span
-                >
+                <span class="font-medium text-[var(--ui-text-highlighted)]">
+                  TransferStatusBadge
+                </span>
               </div>
               <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
                 Status badge with semantic colors and icons
@@ -1123,9 +1123,9 @@ defineSlots<{
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-calculator" class="text-[var(--ui-primary)]" />
-                <span class="font-medium text-[var(--ui-text-highlighted)]"
-                  >ReconciliationSummary</span
-                >
+                <span class="font-medium text-[var(--ui-text-highlighted)]">
+                  ReconciliationSummary
+                </span>
               </div>
               <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
                 Stock movement summary with calculations
@@ -1147,10 +1147,14 @@ defineSlots<{
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-arrow-down-tray" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Props TypeScript Pattern</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Props TypeScript Pattern
+          </span>
         </span>
         <UIcon
-          :name="isExpanded('props-pattern') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('props-pattern') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -1164,7 +1168,9 @@ defineSlots<{
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Props Definition Pattern</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Props Definition Pattern
+          </h4>
           <DeveloperCodeBlock :code="codeExamples.propsPattern" language="typescript" />
         </div>
 
@@ -1215,12 +1221,14 @@ defineSlots<{
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-arrow-up-tray" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]"
-            >Emits TypeScript Pattern</span
-          >
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Emits TypeScript Pattern
+          </span>
         </span>
         <UIcon
-          :name="isExpanded('emits-pattern') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('emits-pattern') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -1232,7 +1240,9 @@ defineSlots<{
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Emits Definition Pattern</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Emits Definition Pattern
+          </h4>
           <DeveloperCodeBlock :code="codeExamples.emitsPattern" language="typescript" />
         </div>
 
@@ -1258,7 +1268,10 @@ defineSlots<{
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span>Type all payloads, even empty ones with <code class="code-inline">[]</code></span>
+              <span>
+                Type all payloads, even empty ones with
+                <code class="code-inline">[]</code>
+              </span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
@@ -1283,7 +1296,9 @@ defineSlots<{
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Slot Patterns</span>
         </span>
         <UIcon
-          :name="isExpanded('slot-patterns') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('slot-patterns') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -1328,9 +1343,14 @@ defineSlots<{
             </li>
             <li class="flex items-start gap-2">
               <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
-              <span>Name slots descriptively: <code class="code-inline">header</code>,
-                <code class="code-inline">actions</code>,
-                <code class="code-inline">footer</code></span>
+              <span>
+                Name slots descriptively:
+                <code class="code-inline">header</code>
+                ,
+                <code class="code-inline">actions</code>
+                ,
+                <code class="code-inline">footer</code>
+              </span>
             </li>
           </ul>
         </div>
@@ -1348,7 +1368,9 @@ defineSlots<{
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-light-bulb" class="text-xl text-[var(--ui-primary)]" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Best Practices Summary</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Best Practices Summary
+          </span>
         </span>
         <UIcon
           :name="

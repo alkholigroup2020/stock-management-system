@@ -259,11 +259,9 @@ const openHelpDrawer = () => {
   helpDrawerOpen.value = true;
 };
 
-// Developer Guide drawer state (dev mode only)
-const devDrawerOpen = ref(false);
-
-const openDevDrawer = () => {
-  devDrawerOpen.value = true;
+// Developer Guide navigation (dev mode only)
+const navigateToDevGuide = () => {
+  navigateTo("/dev-guide");
 };
 
 // Show dev tools only in development mode
@@ -289,7 +287,7 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
   // Check for Ctrl+Shift+D for developer guide (dev mode only)
   if (event.key === "D" && event.ctrlKey && event.shiftKey && showDevTools.value) {
     event.preventDefault();
-    openDevDrawer();
+    navigateToDevGuide();
   }
 };
 
@@ -416,7 +414,7 @@ onUnmounted(() => {
               variant="ghost"
               aria-label="Developer Guide (Ctrl+Shift+D)"
               class="cursor-pointer"
-              @click="openDevDrawer"
+              @click="navigateToDevGuide"
             />
 
             <!-- Help -->
@@ -524,9 +522,6 @@ onUnmounted(() => {
 
   <!-- Help Drawer -->
   <LayoutHelpDrawer v-model:open="helpDrawerOpen" />
-
-  <!-- Developer Guide Drawer (dev mode only) -->
-  <DeveloperDevGuideDrawer v-if="showDevTools" v-model:open="devDrawerOpen" />
 
   <!-- Testing Plan Panel (lg+ screens) -->
   <TestingPlanPanel v-if="isPanelOpen && isLargeScreen" @close="closePanel" />

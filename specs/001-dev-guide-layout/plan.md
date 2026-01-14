@@ -21,20 +21,21 @@ Move the Developer Guide from a slide-over drawer (`USlideover`) to a dedicated 
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Data Integrity First | N/A | No stock transactions involved |
-| II. Type Safety Non-Negotiable | ✅ PASS | All interfaces defined, zero `any` types |
-| III. Location-Centric Architecture | N/A | No location context required |
-| IV. Approval Workflow Compliance | N/A | No approval workflows involved |
-| V. Accessible by Design | ✅ MUST COMPLY | Keyboard navigation, focus states, WCAG AA contrast |
-| VI. Offline-Aware UI | ✅ PARTIAL | Static docs work offline; search is client-side |
-| VII. Server-Side Security | N/A | Dev-mode only, no server routes |
-| VIII. Consistent Code Standards | ✅ MUST COMPLY | Prettier formatting, Nuxt 4 conventions |
+| Principle                          | Status         | Notes                                               |
+| ---------------------------------- | -------------- | --------------------------------------------------- |
+| I. Data Integrity First            | N/A            | No stock transactions involved                      |
+| II. Type Safety Non-Negotiable     | ✅ PASS        | All interfaces defined, zero `any` types            |
+| III. Location-Centric Architecture | N/A            | No location context required                        |
+| IV. Approval Workflow Compliance   | N/A            | No approval workflows involved                      |
+| V. Accessible by Design            | ✅ MUST COMPLY | Keyboard navigation, focus states, WCAG AA contrast |
+| VI. Offline-Aware UI               | ✅ PARTIAL     | Static docs work offline; search is client-side     |
+| VII. Server-Side Security          | N/A            | Dev-mode only, no server routes                     |
+| VIII. Consistent Code Standards    | ✅ MUST COMPLY | Prettier formatting, Nuxt 4 conventions             |
 
 **Key Constitution Requirements:**
+
 - All buttons MUST include `cursor-pointer` class
 - Dark mode MUST be fully supported
 - Keyboard navigation MUST work for sidebar and search
@@ -81,6 +82,7 @@ app/
 ```
 
 **Structure Decision**: Nuxt 4 monolithic structure with:
+
 - New `docs` layout for documentation pages
 - Page-based routing under `/dev-guide/` namespace
 - Reuse all existing documentation content components
@@ -91,8 +93,8 @@ app/
 
 > No violations detected. Implementation follows existing patterns.
 
-| Consideration | Decision | Rationale |
-|---------------|----------|-----------|
-| Separate layout vs. page | Separate `docs.vue` layout | Cleaner separation, reusable for future docs |
-| Dynamic routes vs. single page | Dynamic `[...slug].vue` | Enables deep linking per spec requirement |
-| Keep drawer vs. remove | Keep temporarily, mark deprecated | Allows rollback if issues discovered |
+| Consideration                  | Decision                          | Rationale                                    |
+| ------------------------------ | --------------------------------- | -------------------------------------------- |
+| Separate layout vs. page       | Separate `docs.vue` layout        | Cleaner separation, reusable for future docs |
+| Dynamic routes vs. single page | Dynamic `[...slug].vue`           | Enables deep linking per spec requirement    |
+| Keep drawer vs. remove         | Keep temporarily, mark deprecated | Allows rollback if issues discovered         |
