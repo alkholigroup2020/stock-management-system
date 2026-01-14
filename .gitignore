@@ -26,6 +26,7 @@ nul
 
 .playwright-mcp
 .claude/
+.codex/
 
 .mcp.json
 .vercel
