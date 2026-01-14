@@ -1,0 +1,400 @@
+openapi: 3.1.0
+info:
+  title: Items Import API
+  description: API endpoints for bulk importing items via Excel/CSV files
+  version: 1.0.0
+
+servers:
+  - url: /api
+    description: Nuxt server routes
+
+paths:
+  /items/import:
+    post:
+      operationId: importItems
+      summary: Import items from Excel or CSV file
+      description: |
+        Uploads and processes an Excel (.xlsx) or CSV file to create multiple items.
+        Performs validation on all rows and returns a summary of successes and failures.
+        Valid items are created even if some rows fail validation (partial import).
+      tags:
+        - Items
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Excel (.xlsx) or CSV file to import
+      responses:
+        "200":
+          description: Import completed (may include partial failures)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+              examples:
+                fullSuccess:
+                  summary: All items imported successfully
+                  value:
+                    success: true
+                    summary:
+                      totalRows: 50
+                      successCount: 50
+                      errorCount: 0
+                      fileName: items-batch-1.xlsx
+                      importedAt: "2026-01-14T10:30:00.000Z"
+                    errors: []
+                partialSuccess:
+                  summary: Some items failed validation
+                  value:
+                    success: true
+                    summary:
+                      totalRows: 50
+                      successCount: 48
+                      errorCount: 2
+                      fileName: items-batch-1.xlsx
+                      importedAt: "2026-01-14T10:30:00.000Z"
+                    errors:
+                      - row: 15
+                        field: unit
+                        message: "Invalid unit. Must be one of: KG, EA, LTR, BOX, CASE, PACK"
+                        code: INVALID_UNIT
+                      - row: 32
+                        field: code
+                        message: "Item code 'ITEM-001' already exists"
+                        code: DUPLICATE_CODE_IN_DATABASE
+        "400":
+          description: Invalid request (file format, size, or structure)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidFormat:
+                  summary: Invalid file format
+                  value:
+                    statusCode: 400
+                    statusMessage: Bad Request
+                    data:
+                      code: INVALID_FILE_FORMAT
+                      message: "Unable to parse file. Please ensure it is a valid Excel (.xlsx) or CSV file."
+                rowLimitExceeded:
+                  summary: Too many rows
+                  value:
+                    statusCode: 400
+                    statusMessage: Bad Request
+                    data:
+                      code: ROW_LIMIT_EXCEEDED
+                      message: "File contains 1500 rows. Maximum allowed is 1000 rows per import."
+                missingColumns:
+                  summary: Required columns missing
+                  value:
+                    statusCode: 400
+                    statusMessage: Bad Request
+                    data:
+                      code: MISSING_REQUIRED_COLUMNS
+                      message: "Invalid file format. Required columns not found: Code, Name, Unit"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Not authorized (missing item edit permission)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "413":
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                statusCode: 413
+                statusMessage: Payload Too Large
+                data:
+                  code: FILE_TOO_LARGE
+                  message: "File size exceeds maximum allowed (10MB)"
+
+  /items/import-template:
+    get:
+      operationId: getImportTemplate
+      summary: Download import template file
+      description: |
+        Downloads an Excel or CSV template with the correct column headers
+        and sample data to guide users in preparing their import file.
+      tags:
+        - Items
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: format
+          in: query
+          description: File format for template download
+          schema:
+            type: string
+            enum: [xlsx, csv]
+            default: xlsx
+      responses:
+        "200":
+          description: Template file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            text/csv:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: 'attachment; filename="items-import-template.xlsx"'
+        "401":
+          description: Not authenticated
+        "403":
+          description: Not authorized
+
+  /items/import/preview:
+    post:
+      operationId: previewImport
+      summary: Preview import file contents
+      description: |
+        Parses the uploaded file and returns a preview of the data
+        without creating any items. Used to validate the file structure
+        and let users review data before committing the import.
+      tags:
+        - Items
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Excel (.xlsx) or CSV file to preview
+      responses:
+        "200":
+          description: Preview of parsed file contents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportPreview"
+              example:
+                headers:
+                  - Code
+                  - Name
+                  - Unit
+                  - Category
+                  - Subcategory
+                rows:
+                  - code: ITEM-001
+                    name: Fresh Tomatoes
+                    unit: KG
+                    category: Produce
+                    sub_category: Vegetables
+                  - code: ITEM-002
+                    name: Dish Soap
+                    unit: EA
+                    category: Cleaning
+                    sub_category: null
+                totalRows: 50
+                hasRequiredColumns: true
+                missingColumns: []
+        "400":
+          description: Invalid file format or structure
+        "401":
+          description: Not authenticated
+        "403":
+          description: Not authorized
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: nuxt-session
+
+  schemas:
+    ImportResult:
+      type: object
+      required:
+        - success
+        - summary
+        - errors
+      properties:
+        success:
+          type: boolean
+          description: True if at least one item was imported
+        summary:
+          $ref: "#/components/schemas/ImportSummary"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportError"
+
+    ImportSummary:
+      type: object
+      required:
+        - totalRows
+        - successCount
+        - errorCount
+        - fileName
+        - importedAt
+      properties:
+        totalRows:
+          type: integer
+          description: Total data rows in file (excluding header)
+          example: 50
+        successCount:
+          type: integer
+          description: Number of items successfully imported
+          example: 48
+        errorCount:
+          type: integer
+          description: Number of rows that failed validation
+          example: 2
+        fileName:
+          type: string
+          description: Original filename
+          example: items-batch-1.xlsx
+        importedAt:
+          type: string
+          format: date-time
+          description: ISO timestamp of import completion
+          example: "2026-01-14T10:30:00.000Z"
+
+    ImportError:
+      type: object
+      required:
+        - row
+        - message
+        - code
+      properties:
+        row:
+          type: integer
+          description: Row number in spreadsheet (1-indexed, matches Excel)
+          example: 15
+        field:
+          type: string
+          description: Field that failed validation (if applicable)
+          example: unit
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid unit. Must be one of: KG, EA, LTR, BOX, CASE, PACK"
+        code:
+          $ref: "#/components/schemas/ImportErrorCode"
+
+    ImportErrorCode:
+      type: string
+      enum:
+        - MISSING_REQUIRED_FIELD
+        - INVALID_UNIT
+        - CODE_TOO_LONG
+        - NAME_TOO_LONG
+        - CATEGORY_TOO_LONG
+        - DUPLICATE_CODE_IN_FILE
+        - DUPLICATE_CODE_IN_DATABASE
+        - INVALID_FILE_FORMAT
+        - FILE_TOO_LARGE
+        - ROW_LIMIT_EXCEEDED
+        - EMPTY_FILE
+        - MISSING_REQUIRED_COLUMNS
+
+    ImportPreview:
+      type: object
+      required:
+        - headers
+        - rows
+        - totalRows
+        - hasRequiredColumns
+        - missingColumns
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+          description: Detected column headers from file
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportRow"
+          description: First 10 rows of parsed data for preview
+        totalRows:
+          type: integer
+          description: Total rows in file (for display)
+        hasRequiredColumns:
+          type: boolean
+          description: Whether all required columns were found
+        missingColumns:
+          type: array
+          items:
+            type: string
+          description: List of missing required columns
+
+    ImportRow:
+      type: object
+      required:
+        - code
+        - name
+        - unit
+      properties:
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 200
+        unit:
+          type: string
+        category:
+          type: string
+          maxLength: 50
+          nullable: true
+        sub_category:
+          type: string
+          maxLength: 50
+          nullable: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - statusCode
+        - statusMessage
+        - data
+      properties:
+        statusCode:
+          type: integer
+        statusMessage:
+          type: string
+        data:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
