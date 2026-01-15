@@ -12,18 +12,45 @@
           </p>
         </div>
       </div>
-      <!-- Mobile: shorter button text -->
-      <UButton
-        v-if="canEditItems()"
-        color="primary"
-        icon="i-lucide-plus"
-        size="lg"
-        class="cursor-pointer rounded-full px-3 sm:px-6"
-        @click="navigateTo('/items/create')"
-      >
-        <span class="hidden sm:inline">Create Item</span>
-        <span class="sm:hidden">Create</span>
-      </UButton>
+      <!-- Action Buttons -->
+      <div v-if="canEditItems()" class="flex items-center gap-2">
+        <!-- Import Button -->
+        <UTooltip v-if="!isOnline" text="Import requires internet connection">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-upload"
+            size="lg"
+            class="cursor-pointer rounded-full px-3 sm:px-5"
+            disabled
+          >
+            <span class="hidden sm:inline">Import</span>
+          </UButton>
+        </UTooltip>
+        <UButton
+          v-else
+          color="neutral"
+          variant="outline"
+          icon="i-lucide-upload"
+          size="lg"
+          class="cursor-pointer rounded-full px-3 sm:px-5"
+          @click="showImportDialog = true"
+        >
+          <span class="hidden sm:inline">Import</span>
+        </UButton>
+
+        <!-- Create Button -->
+        <UButton
+          color="primary"
+          icon="i-lucide-plus"
+          size="lg"
+          class="cursor-pointer rounded-full px-3 sm:px-6"
+          @click="navigateTo('/items/create')"
+        >
+          <span class="hidden sm:inline">Create Item</span>
+          <span class="sm:hidden">Create</span>
+        </UButton>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -272,6 +299,9 @@
         </div>
       </div>
     </UCard>
+
+    <!-- Import Dialog -->
+    <ItemsImportDialog v-model:open="showImportDialog" @success="handleImportSuccess" />
   </div>
 </template>
 
@@ -300,6 +330,10 @@ definePageMeta({
 const { canEditItems } = usePermissions();
 const locationStore = useLocationStore();
 const toast = useAppToast();
+const { isOnline } = useOnlineStatus();
+
+// Import dialog state
+const showImportDialog = ref(false);
 
 // Reactive state
 const items = ref<ItemWithStock[]>([]);
@@ -516,6 +550,14 @@ function formatCurrency(value: number): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+/**
+ * Handle successful import - refresh the items list
+ */
+function handleImportSuccess() {
+  // Refresh items list after successful import
+  fetchItems();
 }
 
 // Fetch items on mount

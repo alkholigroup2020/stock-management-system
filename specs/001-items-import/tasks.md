@@ -25,10 +25,10 @@
 
 **Purpose**: Install dependencies and create shared type definitions
 
-- [ ] T001 Install xlsx and papaparse dependencies: `pnpm add xlsx papaparse && pnpm add -D @types/papaparse`
-- [ ] T002 [P] Create shared import types in shared/types/import.ts (ImportRow, ImportError, ImportResult, ImportSummary, ImportPreview interfaces)
-- [ ] T003 [P] Create Zod validation schemas in server/utils/item-import-validator.ts (UnitSchema, ImportRowSchema)
-- [ ] T004 [P] Create column mapping constants in server/utils/item-import-validator.ts (COLUMN_MAPPINGS, REQUIRED_COLUMNS)
+- [x] T001 Install xlsx and papaparse dependencies: `pnpm add xlsx papaparse && pnpm add -D @types/papaparse`
+- [x] T002 [P] Create shared import types in shared/types/import.ts (ImportRow, ImportError, ImportResult, ImportSummary, ImportPreview interfaces)
+- [x] T003 [P] Create Zod validation schemas in server/utils/item-import-validator.ts (UnitSchema, ImportRowSchema)
+- [x] T004 [P] Create column mapping constants in server/utils/item-import-validator.ts (COLUMN_MAPPINGS, REQUIRED_COLUMNS)
 
 ---
 
@@ -38,12 +38,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create Excel parsing utility function in server/utils/file-parsers.ts (parseExcelFile using xlsx library)
-- [ ] T006 [P] Create CSV parsing utility function in server/utils/file-parsers.ts (parseCSVFile using papaparse)
-- [ ] T007 Create column header mapping function in server/utils/file-parsers.ts (mapHeaders with case-insensitive matching)
-- [ ] T008 Create file type detection function in server/utils/file-parsers.ts (detectFileType from extension and MIME type)
-- [ ] T009 Implement row validation function in server/utils/item-import-validator.ts (validateImportRows using Zod schema)
-- [ ] T010 Implement duplicate detection function in server/utils/item-import-validator.ts (findDuplicatesInFile for FR-006)
+- [x] T005 Create Excel parsing utility function in server/utils/file-parsers.ts (parseExcelFile using xlsx library)
+- [x] T006 [P] Create CSV parsing utility function in server/utils/file-parsers.ts (parseCSVFile using papaparse)
+- [x] T007 Create column header mapping function in server/utils/file-parsers.ts (mapHeaders with case-insensitive matching)
+- [x] T008 Create file type detection function in server/utils/file-parsers.ts (detectFileType from extension and MIME type)
+- [x] T009 Implement row validation function in server/utils/item-import-validator.ts (validateImportRows using Zod schema)
+- [x] T010 Implement duplicate detection function in server/utils/item-import-validator.ts (findDuplicatesInFile for FR-006)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -57,7 +57,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement POST /api/items/import endpoint in server/api/items/import.post.ts
+- [x] T011 [US1] Implement POST /api/items/import endpoint in server/api/items/import.post.ts
   - Auth check (Admin/Supervisor only)
   - File size validation (10MB max)
   - Row limit validation (1000 max per FR-012)
@@ -66,26 +66,26 @@
   - Check for existing codes in database (FR-005)
   - Bulk insert valid rows with Prisma transaction
   - Return ImportResult with summary and errors
-- [ ] T012 [P] [US1] Create useItemsImport composable in app/composables/useItemsImport.ts
+- [x] T012 [P] [US1] Create useItemsImport composable in app/composables/useItemsImport.ts
   - Reactive state for file, loading, results, errors
   - uploadFile() method calling /api/items/import
   - Error handling and toast notifications
   - Offline status check (FR offline-aware)
-- [ ] T013 [P] [US1] Create ItemsImportDialog component in app/components/items/ImportDialog.vue
+- [x] T013 [P] [US1] Create ItemsImportDialog component in app/components/items/ImportDialog.vue
   - UModal with file input accepting .xlsx and .csv
   - Upload button with loading state
   - Disable when offline with tooltip
   - cursor-pointer on all buttons
   - Dark mode support
-- [ ] T014 [US1] Create ItemsImportResults component in app/components/items/ImportResults.vue
+- [x] T014 [US1] Create ItemsImportResults component in app/components/items/ImportResults.vue
   - Display ImportSummary (total, success, errors)
   - List ImportError items with row numbers
   - Success/error color coding using semantic tokens
-- [ ] T015 [US1] Add Import button to Items page in app/pages/items/index.vue
+- [x] T015 [US1] Add Import button to Items page in app/pages/items/index.vue
   - Conditionally render for canEditItems() users
   - Trigger ImportDialog open
   - Refresh items list on successful import
-- [ ] T016 [US1] Run pnpm typecheck and pnpm format to verify code quality gates
+- [x] T016 [US1] Run pnpm typecheck and pnpm format to verify code quality gates
 
 **Checkpoint**: User Story 1 complete - users can import items from Excel/CSV files
 
@@ -99,18 +99,18 @@
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Implement GET /api/items/import-template endpoint in server/api/items/import-template.get.ts
+- [x] T017 [US2] Implement GET /api/items/import-template endpoint in server/api/items/import-template.get.ts
   - Accept ?format=xlsx|csv query parameter (default xlsx)
   - Generate template with xlsx library (for Excel) or manual CSV string
   - Include column headers: Code, Name, Unit, Category, Subcategory
   - Include 3 sample data rows
   - Set Content-Disposition header for download
   - Auth check (Admin/Supervisor only)
-- [ ] T018 [US2] Add Download Template link to ImportDialog in app/components/items/ImportDialog.vue
+- [x] T018 [US2] Add Download Template link to ImportDialog in app/components/items/ImportDialog.vue
   - Link/button to /api/items/import-template?format=xlsx
   - Opens in new tab for download
   - cursor-pointer styling
-- [ ] T019 [US2] Run pnpm typecheck and pnpm format to verify code quality gates
+- [x] T019 [US2] Run pnpm typecheck and pnpm format to verify code quality gates
 
 **Checkpoint**: User Story 2 complete - users can download template to prepare import files
 
@@ -124,20 +124,20 @@
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Enhance ItemsImportResults to display detailed error list in app/components/items/ImportResults.vue
+- [x] T020 [US3] Enhance ItemsImportResults to display detailed error list in app/components/items/ImportResults.vue
   - Scrollable error list with row numbers
   - Group errors by type (validation, duplicate, etc.)
   - Show field name and specific message for each error
   - Color-coded badges for error types
-- [ ] T021 [US3] Add error message constants to server/utils/item-import-validator.ts
+- [x] T021 [US3] Add error message constants to server/utils/item-import-validator.ts
   - Human-readable messages for each ImportErrorCode
   - Consistent formatting: "Row {n}: {field} - {message}"
-- [ ] T022 [US3] Enhance import.post.ts error collection in server/api/items/import.post.ts
+- [x] T022 [US3] Enhance import.post.ts error collection in server/api/items/import.post.ts
   - Collect validation errors with exact row numbers (1-indexed)
   - Collect duplicate-in-file errors with both row numbers
   - Collect duplicate-in-database errors with existing item reference
   - Return all errors even when some rows succeed
-- [ ] T023 [US3] Run pnpm typecheck and pnpm format to verify code quality gates
+- [x] T023 [US3] Run pnpm typecheck and pnpm format to verify code quality gates
 
 **Checkpoint**: User Story 3 complete - users see clear error messages for failed rows
 
@@ -151,27 +151,27 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Implement POST /api/items/import/preview endpoint in server/api/items/import/preview.post.ts
+- [x] T024 [US4] Implement POST /api/items/import-preview endpoint in server/api/items/import-preview.post.ts
   - Parse file without database insert
   - Return ImportPreview with headers, first 10 rows, total count
   - Validate required columns presence
   - Auth check (Admin/Supervisor only)
-- [ ] T025 [P] [US4] Create ItemsImportPreview component in app/components/items/ImportPreview.vue
+- [x] T025 [P] [US4] Create ItemsImportPreview component in app/components/items/ImportPreview.vue
   - Table showing parsed data (first 10 rows)
   - Column headers from file
   - Total row count display
   - Missing columns warning if applicable
-- [ ] T026 [US4] Update ImportDialog workflow in app/components/items/ImportDialog.vue
+- [x] T026 [US4] Update ImportDialog workflow in app/components/items/ImportDialog.vue
   - Step 1: File selection
   - Step 2: Preview display (call preview endpoint)
   - Step 3: Confirm button to proceed with import
   - Cancel button to return to step 1
   - Loading states for each step
-- [ ] T027 [US4] Update useItemsImport composable in app/composables/useItemsImport.ts
+- [x] T027 [US4] Update useItemsImport composable in app/composables/useItemsImport.ts
   - Add previewFile() method calling /api/items/import/preview
   - Track current step state (select → preview → importing → results)
   - Handle preview errors separately from import errors
-- [ ] T028 [US4] Run pnpm typecheck and pnpm format to verify code quality gates
+- [x] T028 [US4] Run pnpm typecheck and pnpm format to verify code quality gates
 
 **Checkpoint**: User Story 4 complete - users can preview data before import
 
@@ -181,11 +181,11 @@
 
 **Purpose**: Final improvements affecting all user stories
 
-- [ ] T029 [P] Verify dark mode compatibility across all import components
-- [ ] T030 [P] Verify keyboard navigation works for file input and all buttons
-- [ ] T031 Add console logging for import operations (file name, row count, success/error counts)
-- [ ] T032 Test with Playwright MCP: Navigate to /items, click Import, upload test file, verify results
-- [ ] T033 Run final pnpm typecheck and pnpm format:check to verify all gates pass
+- [x] T029 [P] Verify dark mode compatibility across all import components
+- [x] T030 [P] Verify keyboard navigation works for file input and all buttons
+- [x] T031 Add console logging for import operations (file name, row count, success/error counts)
+- [x] T032 Test with Playwright MCP: Navigate to /items, click Import, upload test file, verify results
+- [x] T033 Run final pnpm typecheck and pnpm format:check to verify all gates pass
 
 ---
 
@@ -215,32 +215,36 @@ Phase 7: Polish
 
 ### User Story Dependencies
 
-| Story | Depends On | Can Start After |
-|-------|-----------|-----------------|
-| US1 (P1) | Foundational only | Phase 2 complete |
+| Story    | Depends On                 | Can Start After  |
+| -------- | -------------------------- | ---------------- |
+| US1 (P1) | Foundational only          | Phase 2 complete |
 | US2 (P2) | US1 (adds to ImportDialog) | Phase 3 complete |
-| US3 (P2) | US1 (enhances results) | Phase 3 complete |
-| US4 (P3) | US1 (adds preview step) | Phase 3 complete |
+| US3 (P2) | US1 (enhances results)     | Phase 3 complete |
+| US4 (P3) | US1 (adds preview step)    | Phase 3 complete |
 
 ### Parallel Opportunities
 
 **Phase 1 (Setup)**:
+
 ```
 T002, T003, T004 can run in parallel (different files)
 ```
 
 **Phase 2 (Foundational)**:
+
 ```
 T005, T006 can run in parallel (same file, different functions)
 After T007: T009, T010 can run in parallel
 ```
 
 **Phase 3 (US1)**:
+
 ```
 T012, T013 can run in parallel (different files)
 ```
 
 **Phase 6 (US4)**:
+
 ```
 T024, T025 can run in parallel (server vs component)
 ```
@@ -259,27 +263,27 @@ T024, T025 can run in parallel (server vs component)
 
 ### Incremental Delivery
 
-| Milestone | Stories Complete | User Value |
-|-----------|-----------------|------------|
-| MVP | US1 | Users can import items |
-| v1.1 | US1 + US2 | Users have template to guide file preparation |
-| v1.2 | US1 + US2 + US3 | Users understand exactly what failed and why |
-| v1.3 | All | Users can preview before committing |
+| Milestone | Stories Complete | User Value                                    |
+| --------- | ---------------- | --------------------------------------------- |
+| MVP       | US1              | Users can import items                        |
+| v1.1      | US1 + US2        | Users have template to guide file preparation |
+| v1.2      | US1 + US2 + US3  | Users understand exactly what failed and why  |
+| v1.3      | All              | Users can preview before committing           |
 
 ---
 
 ## Task Summary
 
-| Phase | Tasks | Parallel Tasks |
-|-------|-------|----------------|
-| Setup | 4 | 3 |
-| Foundational | 6 | 2 |
-| US1 (P1) | 6 | 2 |
-| US2 (P2) | 3 | 0 |
-| US3 (P2) | 4 | 0 |
-| US4 (P3) | 5 | 2 |
-| Polish | 5 | 2 |
-| **Total** | **33** | **11** |
+| Phase        | Tasks  | Parallel Tasks |
+| ------------ | ------ | -------------- |
+| Setup        | 4      | 3              |
+| Foundational | 6      | 2              |
+| US1 (P1)     | 6      | 2              |
+| US2 (P2)     | 3      | 0              |
+| US3 (P2)     | 4      | 0              |
+| US4 (P3)     | 5      | 2              |
+| Polish       | 5      | 2              |
+| **Total**    | **33** | **11**         |
 
 ---
 

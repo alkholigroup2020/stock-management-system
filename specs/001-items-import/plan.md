@@ -25,66 +25,66 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### I. Data Integrity First
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Unique item codes enforced | ✅ PASS | FR-005 requires rejecting existing codes |
-| Audit trail for imports | ✅ PASS | Import operation logged with user, timestamp |
-| No negative stock impact | N/A | Import creates items only, no stock changes |
-| Period check required | N/A | Items are global entities, not period-scoped |
+| Gate                       | Status  | Notes                                        |
+| -------------------------- | ------- | -------------------------------------------- |
+| Unique item codes enforced | ✅ PASS | FR-005 requires rejecting existing codes     |
+| Audit trail for imports    | ✅ PASS | Import operation logged with user, timestamp |
+| No negative stock impact   | N/A     | Import creates items only, no stock changes  |
+| Period check required      | N/A     | Items are global entities, not period-scoped |
 
 ### II. Type Safety Non-Negotiable
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Zero `any` types | ✅ REQUIRED | All import data must be typed with interfaces |
-| Zod validation | ✅ REQUIRED | Validate parsed file data with Zod schemas |
-| API responses typed | ✅ REQUIRED | Import response interface defined |
-| `pnpm typecheck` passes | ✅ REQUIRED | Gate for task completion |
+| Gate                    | Status      | Notes                                         |
+| ----------------------- | ----------- | --------------------------------------------- |
+| Zero `any` types        | ✅ REQUIRED | All import data must be typed with interfaces |
+| Zod validation          | ✅ REQUIRED | Validate parsed file data with Zod schemas    |
+| API responses typed     | ✅ REQUIRED | Import response interface defined             |
+| `pnpm typecheck` passes | ✅ REQUIRED | Gate for task completion                      |
 
 ### III. Location-Centric Architecture
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Location context required | N/A | Items are global (not location-specific) |
+| Gate                      | Status | Notes                                    |
+| ------------------------- | ------ | ---------------------------------------- |
+| Location context required | N/A    | Items are global (not location-specific) |
 
 ### IV. Approval Workflow Compliance
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Approval required | N/A | Item import does not require approval workflow |
+| Gate              | Status | Notes                                          |
+| ----------------- | ------ | ---------------------------------------------- |
+| Approval required | N/A    | Item import does not require approval workflow |
 
 ### V. Accessible by Design
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| WCAG AA contrast | ✅ REQUIRED | Import dialog must meet contrast ratios |
-| Semantic design tokens | ✅ REQUIRED | Use `--ui-*` tokens |
-| Dark mode support | ✅ REQUIRED | Import dialog works in both modes |
-| Keyboard navigation | ✅ REQUIRED | File input, buttons navigable |
-| `cursor-pointer` on buttons | ✅ REQUIRED | All buttons include class |
+| Gate                        | Status      | Notes                                   |
+| --------------------------- | ----------- | --------------------------------------- |
+| WCAG AA contrast            | ✅ REQUIRED | Import dialog must meet contrast ratios |
+| Semantic design tokens      | ✅ REQUIRED | Use `--ui-*` tokens                     |
+| Dark mode support           | ✅ REQUIRED | Import dialog works in both modes       |
+| Keyboard navigation         | ✅ REQUIRED | File input, buttons navigable           |
+| `cursor-pointer` on buttons | ✅ REQUIRED | All buttons include class               |
 
 ### VI. Offline-Aware UI
 
-| Gate | Status | Notes |
-|------|--------|-------|
+| Gate              | Status      | Notes                              |
+| ----------------- | ----------- | ---------------------------------- |
 | Offline detection | ✅ REQUIRED | Disable import button when offline |
-| User feedback | ✅ REQUIRED | Tooltip on disabled button |
+| User feedback     | ✅ REQUIRED | Tooltip on disabled button         |
 
 ### VII. Server-Side Security
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Auth middleware | ✅ REQUIRED | API route protected |
+| Gate                | Status      | Notes                                       |
+| ------------------- | ----------- | ------------------------------------------- |
+| Auth middleware     | ✅ REQUIRED | API route protected                         |
 | Authorization check | ✅ REQUIRED | Only users with `canEditItems()` can import |
-| File validation | ✅ REQUIRED | Validate file type and size server-side |
+| File validation     | ✅ REQUIRED | Validate file type and size server-side     |
 
 ### VIII. Consistent Code Standards
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Prettier formatting | ✅ REQUIRED | Double quotes, semicolons, 2-space |
-| Nuxt 4 component naming | ✅ REQUIRED | Follow folder+file convention |
-| `pnpm format:check` passes | ✅ REQUIRED | Gate for task completion |
+| Gate                       | Status      | Notes                              |
+| -------------------------- | ----------- | ---------------------------------- |
+| Prettier formatting        | ✅ REQUIRED | Double quotes, semicolons, 2-space |
+| Nuxt 4 component naming    | ✅ REQUIRED | Follow folder+file convention      |
+| `pnpm format:check` passes | ✅ REQUIRED | Gate for task completion           |
 
 **Constitution Check Result**: ✅ ALL GATES PASS - No violations requiring justification.
 

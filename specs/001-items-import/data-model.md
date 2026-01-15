@@ -36,14 +36,14 @@ enum Unit {
 
 **Field Constraints for Import**:
 
-| Field | Required | Validation | Default |
-|-------|----------|------------|---------|
-| code | Yes | Unique, max 50 chars, trimmed | - |
-| name | Yes | Max 200 chars, trimmed | - |
-| unit | Yes | Must be valid Unit enum | - |
-| category | No | Max 50 chars, trimmed | null |
-| sub_category | No | Max 50 chars, trimmed | null |
-| is_active | No (auto) | - | true |
+| Field        | Required  | Validation                    | Default |
+| ------------ | --------- | ----------------------------- | ------- |
+| code         | Yes       | Unique, max 50 chars, trimmed | -       |
+| name         | Yes       | Max 200 chars, trimmed        | -       |
+| unit         | Yes       | Must be valid Unit enum       | -       |
+| category     | No        | Max 50 chars, trimmed         | null    |
+| sub_category | No        | Max 50 chars, trimmed         | null    |
+| is_active    | No (auto) | -                             | true    |
 
 ## New TypeScript Types (shared/types/import.ts)
 
@@ -77,9 +77,9 @@ export interface ValidatedImportRow {
  * Error details for a failed row
  */
 export interface ImportError {
-  row: number;           // 1-indexed row number (matches spreadsheet)
-  field?: string;        // Field that failed validation (optional)
-  message: string;       // Human-readable error message
+  row: number; // 1-indexed row number (matches spreadsheet)
+  field?: string; // Field that failed validation (optional)
+  message: string; // Human-readable error message
   code: ImportErrorCode; // Machine-readable error code
 }
 
@@ -113,20 +113,20 @@ export interface ImportResult {
  * Summary statistics for import
  */
 export interface ImportSummary {
-  totalRows: number;        // Total rows in file (excluding header)
-  successCount: number;     // Successfully imported items
-  errorCount: number;       // Failed rows
-  fileName: string;         // Original filename
-  importedAt: string;       // ISO timestamp
+  totalRows: number; // Total rows in file (excluding header)
+  successCount: number; // Successfully imported items
+  errorCount: number; // Failed rows
+  fileName: string; // Original filename
+  importedAt: string; // ISO timestamp
 }
 
 /**
  * Preview data returned after file parsing
  */
 export interface ImportPreview {
-  headers: string[];        // Detected column headers
-  rows: ImportRow[];        // First N rows of data
-  totalRows: number;        // Total rows in file
+  headers: string[]; // Detected column headers
+  rows: ImportRow[]; // First N rows of data
+  totalRows: number; // Total rows in file
   hasRequiredColumns: boolean;
   missingColumns: string[];
 }
@@ -156,11 +156,7 @@ export const UnitSchema = z.enum(["KG", "EA", "LTR", "BOX", "CASE", "PACK"]);
  * Single import row validation
  */
 export const ImportRowSchema = z.object({
-  code: z
-    .string()
-    .trim()
-    .min(1, "Code is required")
-    .max(50, "Code must be 50 characters or less"),
+  code: z.string().trim().min(1, "Code is required").max(50, "Code must be 50 characters or less"),
   name: z
     .string()
     .trim()
@@ -170,9 +166,11 @@ export const ImportRowSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .pipe(UnitSchema.catch(() => {
-      throw new Error("Invalid unit. Must be one of: KG, EA, LTR, BOX, CASE, PACK");
-    })),
+    .pipe(
+      UnitSchema.catch(() => {
+        throw new Error("Invalid unit. Must be one of: KG, EA, LTR, BOX, CASE, PACK");
+      })
+    ),
   category: z
     .string()
     .trim()
@@ -205,13 +203,7 @@ export const COLUMN_MAPPINGS: Record<string, string[]> = {
   name: ["name", "item name", "itemname", "item_name", "description", "item description"],
   unit: ["unit", "uom", "unit of measure", "units"],
   category: ["category", "cat", "item category"],
-  sub_category: [
-    "sub_category",
-    "subcategory",
-    "sub category",
-    "subcat",
-    "item subcategory",
-  ],
+  sub_category: ["sub_category", "subcategory", "sub category", "subcat", "item subcategory"],
 };
 
 export const REQUIRED_COLUMNS = ["code", "name", "unit"];
@@ -268,15 +260,16 @@ const existingCodes = await prisma.item.findMany({
 
 The downloadable template includes:
 
-| Column | Required | Description | Example |
-|--------|----------|-------------|---------|
-| Code | Yes | Unique item identifier | ITEM-001 |
-| Name | Yes | Item display name | Fresh Tomatoes |
-| Unit | Yes | KG, EA, LTR, BOX, CASE, or PACK | KG |
-| Category | No | Item category for grouping | Produce |
-| Subcategory | No | Further classification | Vegetables |
+| Column      | Required | Description                     | Example        |
+| ----------- | -------- | ------------------------------- | -------------- |
+| Code        | Yes      | Unique item identifier          | ITEM-001       |
+| Name        | Yes      | Item display name               | Fresh Tomatoes |
+| Unit        | Yes      | KG, EA, LTR, BOX, CASE, or PACK | KG             |
+| Category    | No       | Item category for grouping      | Produce        |
+| Subcategory | No       | Further classification          | Vegetables     |
 
 Sample data rows in template:
+
 ```
 ITEM-001, Fresh Tomatoes, KG, Produce, Vegetables
 ITEM-002, Dish Soap, EA, Cleaning, Chemicals

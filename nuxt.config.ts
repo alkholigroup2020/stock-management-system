@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   // SPA mode as per CLAUDE.md requirements
   ssr: false,
 
+  // Build configuration - fix Windows ESM loader path issue
+  build: {
+    transpile: ["@nuxt/image"],
+  },
+
   // Dev server configuration - hardcoded to port 3000
   devServer: {
     port: 3000,
@@ -28,14 +33,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: [
-    "@nuxt/eslint",
-    "@nuxt/image",
-    "@nuxt/ui",
-    "@pinia/nuxt",
-    "nuxt-auth-utils",
-    "@vite-pwa/nuxt",
-  ],
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@pinia/nuxt", "nuxt-auth-utils", "@vite-pwa/nuxt"],
 
   // PWA Configuration
   pwa: {
@@ -182,7 +180,7 @@ export default defineNuxtConfig({
     preset: process.env.VERCEL ? "vercel" : undefined,
     // Module bundling configuration
     moduleSideEffects: ["@prisma/client"],
-    // Custom rollup config to handle Prisma's .prisma internal module
+    // Custom rollup config to handle Prisma and fix Windows paths
     rollupConfig: {
       plugins: [
         {
@@ -193,6 +191,19 @@ export default defineNuxtConfig({
               return { id: source, external: true };
             }
             return null;
+          },
+        },
+        {
+          name: "fix-windows-imports",
+          renderChunk(code: string) {
+            // Fix bare Windows paths in generated code
+            return code.replace(
+              /from\s+['"]([A-Za-z]):\\\\([^'"]+)['"]/g,
+              (match: string, drive: string, path: string) => {
+                const normalizedPath = path.replace(/\\\\/g, "/");
+                return `from 'file:///${drive}:/${normalizedPath}'`;
+              }
+            );
           },
         },
       ],

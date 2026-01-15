@@ -78,8 +78,20 @@ export const ImportRowSchema = z.object({
   code: z.string().trim().min(1).max(50),
   name: z.string().trim().min(1).max(200),
   unit: z.string().trim().toUpperCase().pipe(UnitSchema),
-  category: z.string().trim().max(50).optional().nullable().transform((v) => v || null),
-  sub_category: z.string().trim().max(50).optional().nullable().transform((v) => v || null),
+  category: z
+    .string()
+    .trim()
+    .max(50)
+    .optional()
+    .nullable()
+    .transform((v) => v || null),
+  sub_category: z
+    .string()
+    .trim()
+    .max(50)
+    .optional()
+    .nullable()
+    .transform((v) => v || null),
 });
 ```
 
@@ -128,7 +140,9 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    summary: { /* ... */ },
+    summary: {
+      /* ... */
+    },
     errors: [],
   } satisfies ImportResult;
 });
@@ -152,34 +166,19 @@ Create `app/components/items/ImportDialog.vue`:
 
         <div class="space-y-4">
           <UFormField label="Select File">
-            <input
-              type="file"
-              accept=".xlsx,.csv"
-              class="w-full"
-              @change="onFileSelect"
-            />
+            <input type="file" accept=".xlsx,.csv" class="w-full" @change="onFileSelect" />
           </UFormField>
 
-          <p class="text-sm text-[var(--ui-text-muted)]">
-            Accepted formats: Excel (.xlsx) or CSV
-          </p>
+          <p class="text-sm text-[var(--ui-text-muted)]">Accepted formats: Excel (.xlsx) or CSV</p>
         </div>
 
         <template #footer>
           <div class="flex justify-between">
-            <UButton
-              variant="ghost"
-              class="cursor-pointer"
-              @click="downloadTemplate"
-            >
+            <UButton variant="ghost" class="cursor-pointer" @click="downloadTemplate">
               Download Template
             </UButton>
             <div class="flex gap-2">
-              <UButton
-                variant="outline"
-                class="cursor-pointer"
-                @click="isOpen = false"
-              >
+              <UButton variant="outline" class="cursor-pointer" @click="isOpen = false">
                 Cancel
               </UButton>
               <UButton
@@ -272,14 +271,14 @@ Update `app/pages/items/index.vue`:
 
 ### Test Cases
 
-| Test | Input | Expected |
-|------|-------|----------|
-| Valid Excel import | 10 valid rows | All 10 items created |
-| Valid CSV import | 10 valid rows | All 10 items created |
-| Invalid unit | Row with "GALLONS" | Row fails, others succeed |
-| Duplicate code | Existing code in file | Row fails with specific error |
-| Empty file | Headers only | Error: "No items to import" |
-| Too many rows | 1500 rows | Error: "Maximum 1000 rows" |
+| Test               | Input                 | Expected                      |
+| ------------------ | --------------------- | ----------------------------- |
+| Valid Excel import | 10 valid rows         | All 10 items created          |
+| Valid CSV import   | 10 valid rows         | All 10 items created          |
+| Invalid unit       | Row with "GALLONS"    | Row fails, others succeed     |
+| Duplicate code     | Existing code in file | Row fails with specific error |
+| Empty file         | Headers only          | Error: "No items to import"   |
+| Too many rows      | 1500 rows             | Error: "Maximum 1000 rows"    |
 
 ## File Structure
 
@@ -307,15 +306,18 @@ shared/types/
 ## Common Issues
 
 ### File parsing fails
+
 - Check file is not corrupted
 - Ensure correct file extension (.xlsx or .csv)
 - Verify file is not password protected
 
 ### Column not recognized
+
 - Check column header spelling (case-insensitive)
 - Remove extra spaces from headers
 - See `COLUMN_MAPPINGS` in data-model.md for accepted variants
 
 ### Import button disabled
+
 - Check online status (PWA offline mode)
 - Verify user has item edit permission (Admin/Supervisor)
