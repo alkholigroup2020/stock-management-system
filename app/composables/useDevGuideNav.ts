@@ -122,6 +122,12 @@ const navSections: DocSection[] = [
     componentName: "DeveloperTransfersGuide",
   },
   {
+    id: "items-management",
+    label: "Items Management",
+    icon: "i-heroicons-cube",
+    componentName: "DeveloperItemsManagementGuide",
+  },
+  {
     id: "ncr",
     label: "NCR",
     icon: "i-heroicons-exclamation-triangle",
@@ -189,8 +195,11 @@ export const useDevGuideNav = () => {
   const route = useRoute();
   const router = useRouter();
 
-  // Reactive state with localStorage persistence
+  // Desktop sidebar collapse state (persisted)
   const sidebarCollapsed = ref(false);
+
+  // Mobile menu open state (not persisted)
+  const mobileMenuOpen = ref(false);
 
   // Load sidebar state from localStorage
   onMounted(() => {
@@ -238,6 +247,14 @@ export const useDevGuideNav = () => {
     localStorage.setItem(SIDEBAR_STATE_KEY, String(sidebarCollapsed.value));
   };
 
+  const toggleMobileMenu = () => {
+    mobileMenuOpen.value = !mobileMenuOpen.value;
+  };
+
+  const closeMobileMenu = () => {
+    mobileMenuOpen.value = false;
+  };
+
   const clearSearch = () => {
     searchQuery.value = "";
   };
@@ -247,6 +264,7 @@ export const useDevGuideNav = () => {
     activeSection,
     activeSubsection,
     sidebarCollapsed,
+    mobileMenuOpen,
     searchQuery,
     isSearching,
     searchResults,
@@ -256,6 +274,8 @@ export const useDevGuideNav = () => {
     navigateToSection,
     navigateToSubsection,
     toggleSidebar,
+    toggleMobileMenu,
+    closeMobileMenu,
     clearSearch,
   };
 };

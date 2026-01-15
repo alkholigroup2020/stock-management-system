@@ -25,6 +25,7 @@ import DeveloperMultiLocationGuide from "~/components/developer/MultiLocationGui
 import DeveloperDeliveriesWACGuide from "~/components/developer/DeliveriesWACGuide.vue";
 import DeveloperIssuesGuide from "~/components/developer/IssuesGuide.vue";
 import DeveloperTransfersGuide from "~/components/developer/TransfersGuide.vue";
+import DeveloperItemsManagementGuide from "~/components/developer/ItemsManagementGuide.vue";
 import DeveloperNCRGuide from "~/components/developer/NCRGuide.vue";
 import DeveloperReconciliationGuide from "~/components/developer/ReconciliationGuide.vue";
 import DeveloperPeriodManagementGuide from "~/components/developer/PeriodManagementGuide.vue";
@@ -64,6 +65,7 @@ const componentMap: Record<string, Component> = {
   "deliveries-wac": DeveloperDeliveriesWACGuide,
   issues: DeveloperIssuesGuide,
   transfers: DeveloperTransfersGuide,
+  "items-management": DeveloperItemsManagementGuide,
   ncr: DeveloperNCRGuide,
   reconciliation: DeveloperReconciliationGuide,
   "period-management": DeveloperPeriodManagementGuide,
