@@ -124,12 +124,8 @@ const {
 } = useDevGuideNav();
 
 const handleBackToApp = () => {
-  // Try to go back in history, otherwise navigate to dashboard
-  if (window.history.length > 1) {
-    router.back();
-  } else {
-    navigateTo("/");
-  }
+  // Navigate directly to dashboard
+  navigateTo("/");
 };
 
 const handleMobileNavClick = (sectionId: string) => {

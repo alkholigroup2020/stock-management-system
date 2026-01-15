@@ -8,6 +8,8 @@
  * - Sidebar collapse state
  */
 
+import { devGuideSearchContent } from "~/data/devGuideSearchContent";
+
 /**
  * Represents a navigation section in the developer guide sidebar
  */
@@ -228,9 +230,12 @@ export const useDevGuideNav = () => {
     const query = searchQuery.value.trim().toLowerCase();
     if (!query) return [];
 
-    // Note: Searchable content would go here - moved to DevGuideDrawer.vue for now
-    // due to large size. In real implementation, extract to separate file or function.
-    return [];
+    return devGuideSearchContent.filter(
+      (item) =>
+        item.title.toLowerCase().includes(query) ||
+        item.content.toLowerCase().includes(query) ||
+        item.section.toLowerCase().includes(query)
+    );
   });
 
   // Navigation functions
