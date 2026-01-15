@@ -350,6 +350,46 @@ watch(
           </ol>
         </div>
 
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Bulk Import (Excel/CSV)
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            For adding or updating many items at once, use the Items Import feature. This is
+            especially useful during initial system setup or when receiving supplier catalog updates.
+          </p>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Items</strong>
+              in the left menu
+            </li>
+            <li>
+              Click
+              <strong>Import Items</strong>
+              (top right)
+            </li>
+            <li>
+              Download the template to get the correct format (includes all required columns)
+            </li>
+            <li>Fill in your items data following the template format</li>
+            <li>
+              Upload the file - the system validates all data and shows any errors or warnings
+            </li>
+            <li>Review the preview showing what will be created or updated</li>
+            <li>
+              Click
+              <strong>Import Items</strong>
+              to complete
+            </li>
+          </ol>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-2">
+            <strong>Note:</strong>
+            If an item code already exists, the import will update that item. Use this for bulk
+            price or category updates across many items.
+          </p>
+        </div>
+
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
           <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
             <UIcon

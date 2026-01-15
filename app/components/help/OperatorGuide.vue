@@ -173,6 +173,228 @@ watch(
       </div>
     </section>
 
+    <!-- Items Import Section -->
+    <section
+      id="operator-section-items-import"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('items-import')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-arrow-up-tray" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Items Import</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('items-import') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('items-import')" class="p-4 space-y-4">
+        <!-- Section Introduction -->
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          Items Import allows you to quickly add or update multiple items at once using an Excel or
+          CSV file. Instead of manually creating items one-by-one, you can prepare a spreadsheet
+          with all item details and import them in a single operation. The system validates all data
+          before importing and shows you a preview so you can review and fix any errors before
+          committing changes.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">When to Use Import</h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Initial Setup:</strong>
+              When first setting up the system and you have a large inventory list to add.
+            </li>
+            <li>
+              <strong>Bulk Updates:</strong>
+              When you need to update prices, categories, or minimum stock levels for many items at
+              once.
+            </li>
+            <li>
+              <strong>New Product Range:</strong>
+              When adding a new supplier's entire product catalog.
+            </li>
+            <li>
+              <strong>Regular Updates:</strong>
+              When receiving supplier price lists that need to be reflected in the system.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Preparing Your Import File
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Your file must include these columns (exact spelling required):
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span
+                ><strong>Item Code</strong> - Unique identifier (e.g., "RICE-001")</span
+              >
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span
+                ><strong>Name</strong> - Item description (e.g., "Basmati Rice 5KG")</span
+              >
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span
+                ><strong>Category</strong> - e.g., "Dry Goods", "Dairy", "Meat"</span
+              >
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span><strong>Unit</strong> - e.g., "KG", "EA", "LTR", "BOX"</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span><strong>Min Stock</strong> - Minimum quantity threshold</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span><strong>Active</strong> - "Yes" or "No"</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Importing Items Step-by-Step
+          </h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Items</strong>
+              in the left menu
+            </li>
+            <li>
+              Click the
+              <strong>Import Items</strong>
+              button (top right)
+            </li>
+            <li>
+              Click
+              <strong>Download Template</strong>
+              to get the correct format (optional but recommended)
+            </li>
+            <li>Prepare your Excel or CSV file with all required columns</li>
+            <li>
+              Click
+              <strong>Choose File</strong>
+              and select your prepared file
+            </li>
+            <li>Click <strong>Upload & Validate</strong></li>
+            <li>
+              Review the validation results - the system checks for errors and shows warnings for
+              any issues
+            </li>
+            <li>Fix any errors in your file and re-upload if needed</li>
+            <li>
+              When validation passes, review the preview showing what will be imported
+            </li>
+            <li>
+              Click
+              <strong>Import Items</strong>
+              to complete the process
+            </li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Understanding Validation Results
+          </h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong class="text-[var(--ui-success)]">Valid:</strong>
+              Item passes all checks and will be imported successfully.
+            </li>
+            <li>
+              <strong class="text-[var(--ui-error)]">Errors:</strong>
+              Critical issues that prevent import (e.g., missing required fields, invalid units).
+              You must fix these before importing.
+            </li>
+            <li>
+              <strong class="text-[var(--ui-warning)]">Warnings:</strong>
+              Non-critical issues (e.g., duplicate item codes will update existing items). Review
+              carefully but import can proceed.
+            </li>
+            <li>
+              <strong>Update vs Create:</strong>
+              If an item code already exists, the import will update that item. New codes create new
+              items.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Common Issues & Tips</h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Column Names:</strong>
+              Make sure column headers match exactly (case-sensitive). Download the template to
+              ensure correct format.
+            </li>
+            <li>
+              <strong>Item Codes:</strong>
+              Must be unique. If you import an existing code, it will update that item with new
+              data.
+            </li>
+            <li>
+              <strong>Units:</strong>
+              Only use valid units: KG, EA, LTR, BOX, CASE, PACK. Invalid units will cause errors.
+            </li>
+            <li>
+              <strong>Numbers:</strong>
+              Min Stock must be a positive number. Don't include currency symbols or commas.
+            </li>
+            <li>
+              <strong>Active Status:</strong>
+              Must be exactly "Yes" or "No" (case doesn't matter).
+            </li>
+            <li>
+              <strong>File Format:</strong>
+              Supports .xlsx (Excel) and .csv files. Excel is recommended for preserving formatting.
+            </li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-success)]/30">
+          <p class="text-sm text-[var(--ui-success)] flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="shrink-0 mt-0.5" />
+            <span>
+              <strong>Time Saver:</strong>
+              Use the template! Downloading the template ensures you have the correct column names
+              and format, reducing errors and saving time.
+            </span>
+          </p>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              The import preview shows exactly what will happen. Take time to review it carefully
+              before clicking Import Items. Once imported, changes are permanent.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- Issues Section -->
     <section
       id="operator-section-issues"

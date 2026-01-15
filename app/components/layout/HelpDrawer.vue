@@ -152,6 +152,16 @@ const searchableContent = computed(() => {
         icon: "i-heroicons-clipboard-document-list",
       },
       {
+        id: "op-items-import",
+        section: "Operator Guide",
+        sectionId: "operator-guide",
+        targetSection: "items-import",
+        title: "Items Import",
+        content:
+          "Bulk import items from Excel or CSV files. Click Items menu, then Import Items button. Download template for correct format. Prepare file with required columns: Item Code, Name, Category, Unit, Min Stock, Active. Upload file and validate. System checks for errors and shows preview. Fix any errors and re-upload if needed. Review validation results and import. Supports create new items and update existing items by code.",
+        icon: "i-heroicons-clipboard-document-list",
+      },
+      {
         id: "op-issues",
         section: "Operator Guide",
         sectionId: "operator-guide",
