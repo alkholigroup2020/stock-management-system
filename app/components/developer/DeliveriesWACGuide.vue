@@ -907,6 +907,7 @@ INTERNAL_ERROR        // Unexpected server error
                 <li>• No stock impact</li>
                 <li>• Can be edited or deleted</li>
                 <li>• invoice_no optional</li>
+                <li>• invoice_no must be unique when provided</li>
                 <li>• Period not required to be OPEN</li>
                 <li>• Only visible to creator</li>
               </ul>
@@ -919,6 +920,7 @@ INTERNAL_ERROR        // Unexpected server error
                 <li>• Stock updated (on_hand ↑)</li>
                 <li>• WAC recalculated</li>
                 <li>• invoice_no required</li>
+                <li>• invoice_no must be unique</li>
                 <li>• Period must be OPEN</li>
                 <li>• Price variance NCRs created</li>
               </ul>

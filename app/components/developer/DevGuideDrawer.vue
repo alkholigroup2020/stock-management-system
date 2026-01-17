@@ -595,7 +595,7 @@ const searchableContent = computed(() => {
       targetSection: "delivery-flow",
       title: "Delivery Creation Flow",
       content:
-        "Deliveries can be DRAFT (editable, no stock impact) or POSTED (finalized with stock and WAC updates). DRAFT: no stock impact, can edit/delete, invoice_no optional. POSTED: stock updated, WAC recalculated, invoice_no required, period must be OPEN.",
+        "Deliveries can be DRAFT (editable, no stock impact) or POSTED (finalized with stock and WAC updates). DRAFT: no stock impact, can edit/delete, invoice_no optional and must be unique when provided. POSTED: stock updated, WAC recalculated, invoice_no required and must be unique, period must be OPEN.",
       icon: "i-heroicons-truck",
     },
     {

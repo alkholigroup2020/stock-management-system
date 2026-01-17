@@ -190,6 +190,27 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    if (finalInvoiceNo) {
+      const existingInvoice = await prisma.delivery.findFirst({
+        where: {
+          invoice_no: finalInvoiceNo,
+          NOT: { id: deliveryId },
+        },
+        select: { id: true },
+      });
+
+      if (existingInvoice) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: "Conflict",
+          data: {
+            code: "DUPLICATE_INVOICE_NO",
+            message: "Invoice number already exists for another delivery",
+          },
+        });
+      }
+    }
+
     // Validate period exists for posting
     if (isPosting && !currentPeriod) {
       throw createError({

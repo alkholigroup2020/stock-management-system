@@ -148,7 +148,7 @@ const searchableContent = computed(() => {
         targetSection: "deliveries",
         title: "Deliveries",
         content:
-          "Create new delivery by clicking Deliveries menu, then New Delivery. Select supplier, enter invoice number and delivery date. Add line items with item, quantity, and unit price. Post delivery to finalize. Price variance warning if price differs from period price. Save as draft to edit later, post to finalize and update stock.",
+          "Create new delivery by clicking Deliveries menu, then New Delivery. Select supplier, enter a unique invoice number and delivery date. Add line items with item, quantity, and unit price. Post delivery to finalize. Price variance warning if price differs from period price. Save as draft to edit later, post to finalize and update stock.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {

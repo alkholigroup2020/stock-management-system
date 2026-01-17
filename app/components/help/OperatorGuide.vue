@@ -128,7 +128,7 @@ watch(
             <li>
               Enter the
               <strong>Invoice Number</strong>
-              (from supplier's document)
+              (from supplier's document, must be unique)
             </li>
             <li>
               Enter the

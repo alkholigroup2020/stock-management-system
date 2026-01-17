@@ -136,6 +136,26 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    if (data.invoice_no) {
+      const existingInvoice = await prisma.delivery.findFirst({
+        where: {
+          invoice_no: data.invoice_no,
+        },
+        select: { id: true },
+      });
+
+      if (existingInvoice) {
+        throw createError({
+          statusCode: 409,
+          statusMessage: "Conflict",
+          data: {
+            code: "DUPLICATE_INVOICE_NO",
+            message: "Invoice number already exists for another delivery",
+          },
+        });
+      }
+    }
+
     // Verify all items exist (for drafts, just check they exist; for posting, check they're active)
     const itemIds = data.lines.map((line) => line.item_id);
 

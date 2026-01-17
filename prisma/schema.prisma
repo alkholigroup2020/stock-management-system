@@ -250,7 +250,7 @@ model Delivery {
   location_id    String         @db.Uuid
   supplier_id    String         @db.Uuid
   po_id          String?        @db.Uuid
-  invoice_no     String?        @db.VarChar(100)
+  invoice_no     String?        @db.VarChar(100) @unique
   delivery_note  String?
   delivery_date  DateTime       @db.Date
   total_amount   Decimal        @default(0) @db.Decimal(15, 2)
