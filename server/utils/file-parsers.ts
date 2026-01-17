@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import Papa from "papaparse";
+import { parseCSV } from "./csv-parser";
 import type { ImportRow, ImportError } from "~~/shared/types/import";
 import { COLUMN_MAPPINGS, REQUIRED_COLUMNS } from "./item-import-validator";
 
@@ -232,11 +232,9 @@ export function parseExcelFile(buffer: Buffer): ParseResult {
  */
 export function parseCSVFile(content: string): ParseResult {
   try {
-    // Parse CSV with papaparse (auto-detects delimiter)
-    const result = Papa.parse<string[]>(content, {
-      header: false,
+    // Parse CSV with custom parser (auto-detects delimiter)
+    const result = parseCSV(content, {
       skipEmptyLines: true,
-      delimiter: "", // Auto-detect
     });
 
     if (result.errors.length > 0) {

@@ -1132,7 +1132,7 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">Supported Formats</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
             <li><strong>Excel (.xlsx, .xls)</strong> - Parsed using XLSX library</li>
-            <li><strong>CSV</strong> - Parsed using PapaParse with auto-delimiter detection</li>
+            <li><strong>CSV</strong> - Parsed with auto-delimiter detection</li>
           </ul>
         </div>
 

@@ -180,6 +180,10 @@ export default defineNuxtConfig({
     preset: process.env.VERCEL ? "vercel" : undefined,
     // Module bundling configuration
     moduleSideEffects: ["@prisma/client"],
+    // Force bundle xlsx with all its dependencies including cpexcel.js
+    externals: {
+      inline: ["xlsx"],
+    },
     // Custom rollup config to handle Prisma and fix Windows paths
     rollupConfig: {
       plugins: [
