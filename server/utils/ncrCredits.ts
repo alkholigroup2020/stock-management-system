@@ -5,9 +5,9 @@
  * All queries filter by period and location to ensure accurate reconciliation calculations.
  */
 
-import { PrismaClient, type Prisma } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import type { Prisma } from "@prisma/client";
+import { createError } from "h3";
+import prisma from "~~/server/utils/prisma";
 
 /**
  * NCR Summary Item - Represents a single NCR in a summary
@@ -406,7 +406,14 @@ async function getPeriodStartDate(periodId: string): Promise<Date> {
   });
 
   if (!period) {
-    throw new Error(`Period not found: ${periodId}`);
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Not Found",
+      data: {
+        code: "PERIOD_NOT_FOUND",
+        message: `Period not found: ${periodId}`,
+      },
+    });
   }
 
   return period.start_date;
@@ -422,7 +429,14 @@ async function getPeriodEndDate(periodId: string): Promise<Date> {
   });
 
   if (!period) {
-    throw new Error(`Period not found: ${periodId}`);
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Not Found",
+      data: {
+        code: "PERIOD_NOT_FOUND",
+        message: `Period not found: ${periodId}`,
+      },
+    });
   }
 
   return period.end_date;
