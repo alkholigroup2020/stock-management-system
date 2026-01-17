@@ -1,8 +1,8 @@
 <template>
-  <div class="docs-layout flex flex-col">
+  <div class="docs-layout flex flex-col h-screen">
     <!-- Header -->
     <header
-      class="sticky top-0 z-10 border-b border-default bg-elevated"
+      class="flex-shrink-0 sticky top-0 z-10 border-b border-default bg-elevated"
     >
       <div class="flex items-center justify-between px-6 py-3 gap-4">
         <!-- Left: App Brand + Mobile Menu -->
@@ -136,7 +136,6 @@ const handleMobileNavClick = (sectionId: string) => {
 
 <style scoped>
 .docs-layout {
-  min-height: 100vh;
   background-color: var(--ui-bg);
 }
 </style>

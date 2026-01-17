@@ -71,10 +71,9 @@ watch(activeSection, (newSection) => {
 <style scoped>
 .docs-sidebar {
   width: 280px;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
 }
 
 /* Hide sidebar on mobile - mobile uses USlideover drawer instead */
