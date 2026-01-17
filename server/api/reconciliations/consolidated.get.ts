@@ -303,6 +303,8 @@ export default defineEventHandler(async (event) => {
         adjustments: Decimal;
         back_charges: Decimal;
         credits: Decimal;
+        ncr_credits: Decimal;
+        ncr_losses: Decimal;
         condemnations: Decimal;
         last_updated: Date;
       };
@@ -323,6 +325,8 @@ export default defineEventHandler(async (event) => {
           adjustments: savedRec.adjustments,
           back_charges: savedRec.back_charges,
           credits: savedRec.credits,
+          ncr_credits: savedRec.ncr_credits,
+          ncr_losses: savedRec.ncr_losses,
           condemnations: savedRec.condemnations,
           last_updated: savedRec.last_updated,
         };
@@ -344,6 +348,8 @@ export default defineEventHandler(async (event) => {
           adjustments: new Decimal(0),
           back_charges: new Decimal(0),
           credits: new Decimal(0),
+          ncr_credits: new Decimal(0),
+          ncr_losses: new Decimal(0),
           condemnations: new Decimal(0),
           last_updated: new Date(),
         };
@@ -364,6 +370,8 @@ export default defineEventHandler(async (event) => {
         adjustments: reconciliationData.adjustments,
         backCharges: reconciliationData.back_charges,
         credits: reconciliationData.credits,
+        ncrCredits: reconciliationData.ncr_credits,
+        ncrLosses: reconciliationData.ncr_losses,
         condemnations: reconciliationData.condemnations,
       });
 
@@ -394,6 +402,8 @@ export default defineEventHandler(async (event) => {
           adjustments: reconciliationData.adjustments.toNumber(),
           back_charges: reconciliationData.back_charges.toNumber(),
           credits: reconciliationData.credits.toNumber(),
+          ncr_credits: reconciliationData.ncr_credits.toNumber(),
+          ncr_losses: reconciliationData.ncr_losses.toNumber(),
           condemnations: reconciliationData.condemnations.toNumber(),
           last_updated: reconciliationData.last_updated,
         },
@@ -420,6 +430,8 @@ export default defineEventHandler(async (event) => {
           adjustments: totals.adjustments + item.reconciliation.adjustments,
           back_charges: totals.back_charges + item.reconciliation.back_charges,
           credits: totals.credits + item.reconciliation.credits,
+          ncr_credits: totals.ncr_credits + item.reconciliation.ncr_credits,
+          ncr_losses: totals.ncr_losses + item.reconciliation.ncr_losses,
           condemnations: totals.condemnations + item.reconciliation.condemnations,
           consumption: totals.consumption + item.calculations.consumption,
           total_mandays: totals.total_mandays + item.calculations.total_mandays,
@@ -435,6 +447,8 @@ export default defineEventHandler(async (event) => {
         adjustments: 0,
         back_charges: 0,
         credits: 0,
+        ncr_credits: 0,
+        ncr_losses: 0,
         condemnations: 0,
         consumption: 0,
         total_mandays: 0,

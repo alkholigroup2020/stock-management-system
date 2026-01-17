@@ -1,9 +1,7 @@
 <template>
   <div class="docs-layout flex flex-col h-screen">
     <!-- Header -->
-    <header
-      class="flex-shrink-0 sticky top-0 z-10 border-b border-default bg-elevated"
-    >
+    <header class="flex-shrink-0 sticky top-0 z-10 border-b border-default bg-elevated">
       <div class="flex items-center justify-between px-6 py-3 gap-4">
         <!-- Left: App Brand + Mobile Menu -->
         <div class="flex items-center gap-4">
@@ -37,9 +35,7 @@
         <!-- Center: Dev Guide Title -->
         <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
           <UIcon name="i-heroicons-code-bracket" class="text-xl text-primary" />
-          <span class="text-lg font-semibold text-default hidden sm:inline">
-            Developer Guide
-          </span>
+          <span class="text-lg font-semibold text-default hidden sm:inline">Developer Guide</span>
         </div>
 
         <!-- Right: Search Component -->
@@ -67,14 +63,10 @@
       <template #content>
         <div class="flex flex-col h-full bg-elevated">
           <!-- Drawer Header -->
-          <div
-            class="flex items-center justify-between p-4 border-b border-default"
-          >
+          <div class="flex items-center justify-between p-4 border-b border-default">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-code-bracket" class="text-xl text-primary" />
-              <span class="text-lg font-semibold text-default">
-                Developer Guide
-              </span>
+              <span class="text-lg font-semibold text-default">Developer Guide</span>
             </div>
             <UButton
               icon="i-heroicons-x-mark"

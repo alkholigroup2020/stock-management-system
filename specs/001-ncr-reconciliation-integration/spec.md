@@ -8,6 +8,7 @@
 ## Overview
 
 Non-Conformance Reports (NCRs) track issues with deliveries such as price variances, quality defects, or quantity discrepancies. This feature integrates NCRs into the Reconciliation workflow so that:
+
 - NCR credits (supplier refunds/credits) are automatically included in period reconciliations
 - NCR losses (rejected claims) are tracked as unrecovered costs
 - Users have visibility into pending NCRs before closing periods
@@ -15,13 +16,13 @@ Non-Conformance Reports (NCRs) track issues with deliveries such as price varian
 
 ### NCR Status to Reconciliation Impact
 
-| NCR Status   | Reconciliation Impact                                                |
-| ------------ | -------------------------------------------------------------------- |
-| **OPEN**     | Warning shown (non-blocking)                                         |
-| **SENT**     | Display as "Pending Credits" (informational)                         |
-| **CREDITED** | Auto-sum to `ncr_credits` field                                      |
-| **REJECTED** | Auto-sum to `ncr_losses` field                                       |
-| **RESOLVED** | Based on user-selected `financial_impact` (CREDIT, LOSS, or NONE)    |
+| NCR Status   | Reconciliation Impact                                             |
+| ------------ | ----------------------------------------------------------------- |
+| **OPEN**     | Warning shown (non-blocking)                                      |
+| **SENT**     | Display as "Pending Credits" (informational)                      |
+| **CREDITED** | Auto-sum to `ncr_credits` field                                   |
+| **REJECTED** | Auto-sum to `ncr_losses` field                                    |
+| **RESOLVED** | Based on user-selected `financial_impact` (CREDIT, LOSS, or NONE) |
 
 ## Clarifications
 

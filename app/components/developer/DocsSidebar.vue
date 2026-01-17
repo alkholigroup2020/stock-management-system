@@ -1,8 +1,5 @@
 <template>
-  <aside
-    class="docs-sidebar border-r border-default bg-elevated"
-    @keydown="handleKeyDown"
-  >
+  <aside class="docs-sidebar border-r border-default bg-elevated" @keydown="handleKeyDown">
     <nav class="p-4">
       <ul class="space-y-1" role="menu">
         <li v-for="(section, index) in navSections" :key="section.id" role="none">

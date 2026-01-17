@@ -6,6 +6,7 @@
 ## Summary
 
 Integrate NCR (Non-Conformance Report) financial data into the Reconciliation workflow. NCRs track delivery issues (price variances, quality defects) and their resolution impacts reconciliation calculations. This feature:
+
 - Auto-calculates `ncr_credits` (CREDITED + RESOLVED/CREDIT) and `ncr_losses` (REJECTED + RESOLVED/LOSS)
 - Displays "Pending Credits" for SENT NCRs
 - Shows non-blocking warnings for OPEN NCRs during period close
@@ -27,16 +28,16 @@ Integrate NCR (Non-Conformance Report) financial data into the Reconciliation wo
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Data Integrity First | PASS | NCR calculations are read-only aggregations; no stock mutations. Audit trail maintained via existing NCR fields. |
-| II. Type Safety Non-Negotiable | PASS | New enum `NCRFinancialImpact` and interfaces will be fully typed. Zod validation for API inputs. |
-| III. Location-Centric Architecture | PASS | All NCR queries filter by `location_id`. NCR-period association uses `delivery.period_id` or date fallback. |
-| IV. Approval Workflow Compliance | PASS | No new approval workflows. Period close remains Admin-only with existing approval flow. |
-| V. Accessible by Design | PASS | New UI uses existing Nuxt UI components with semantic tokens. NCR sections read-only in adjustments form. |
-| VI. Offline-Aware UI | PASS | NCR sections in reconciliation are read-only display. RESOLVED status update respects `useOnlineStatus()`. |
-| VII. Server-Side Security | PASS | NCR PATCH API already validates role and location access. New summary endpoint follows same pattern. |
-| VIII. Consistent Code Standards | PASS | Prettier formatting, Nuxt 4 component naming, TypeScript strict mode. |
+| Principle                          | Status | Notes                                                                                                            |
+| ---------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------- |
+| I. Data Integrity First            | PASS   | NCR calculations are read-only aggregations; no stock mutations. Audit trail maintained via existing NCR fields. |
+| II. Type Safety Non-Negotiable     | PASS   | New enum `NCRFinancialImpact` and interfaces will be fully typed. Zod validation for API inputs.                 |
+| III. Location-Centric Architecture | PASS   | All NCR queries filter by `location_id`. NCR-period association uses `delivery.period_id` or date fallback.      |
+| IV. Approval Workflow Compliance   | PASS   | No new approval workflows. Period close remains Admin-only with existing approval flow.                          |
+| V. Accessible by Design            | PASS   | New UI uses existing Nuxt UI components with semantic tokens. NCR sections read-only in adjustments form.        |
+| VI. Offline-Aware UI               | PASS   | NCR sections in reconciliation are read-only display. RESOLVED status update respects `useOnlineStatus()`.       |
+| VII. Server-Side Security          | PASS   | NCR PATCH API already validates role and location access. New summary endpoint follows same pattern.             |
+| VIII. Consistent Code Standards    | PASS   | Prettier formatting, Nuxt 4 component naming, TypeScript strict mode.                                            |
 
 **Gate Result**: PASS - No violations. Proceed to Phase 0.
 

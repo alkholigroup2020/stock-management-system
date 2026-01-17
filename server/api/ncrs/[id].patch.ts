@@ -31,10 +31,30 @@ interface AuthUser {
 }
 
 // Request body schema
-const bodySchema = z.object({
-  status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
-  resolution_notes: z.string().optional(),
-});
+const bodySchema = z
+  .object({
+    status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
+    resolution_notes: z.string().optional(),
+    resolution_type: z.string().max(200).optional(),
+    financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(),
+  })
+  .refine(
+    (data) => {
+      // When status is RESOLVED, both resolution_type and financial_impact are required
+      if (data.status === "RESOLVED") {
+        return (
+          data.resolution_type !== undefined &&
+          data.resolution_type.trim() !== "" &&
+          data.financial_impact !== undefined
+        );
+      }
+      return true;
+    },
+    {
+      message: "resolution_type and financial_impact are required when status is RESOLVED",
+      path: ["status"],
+    }
+  );
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user as AuthUser | undefined;
@@ -170,6 +190,21 @@ export default defineEventHandler(async (event) => {
       updateData.resolution_notes = data.resolution_notes;
     }
 
+    // Add resolution_type and financial_impact when provided
+    if (data.resolution_type !== undefined) {
+      updateData.resolution_type = data.resolution_type.trim() || null;
+    }
+
+    if (data.financial_impact !== undefined) {
+      updateData.financial_impact = data.financial_impact;
+    }
+
+    // Clear resolution fields when status changes away from RESOLVED
+    if (data.status && data.status !== "RESOLVED" && ncr.status === "RESOLVED") {
+      updateData.resolution_type = null;
+      updateData.financial_impact = null;
+    }
+
     // Update NCR
     const updatedNCR = await prisma.nCR.update({
       where: { id },
@@ -242,6 +277,8 @@ export default defineEventHandler(async (event) => {
         created_at: updatedNCR.created_at,
         resolved_at: updatedNCR.resolved_at,
         resolution_notes: updatedNCR.resolution_notes,
+        resolution_type: updatedNCR.resolution_type,
+        financial_impact: updatedNCR.financial_impact,
       },
     };
   } catch (error) {

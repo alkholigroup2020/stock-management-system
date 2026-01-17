@@ -16,17 +16,18 @@ This feature integrates Non-Conformance Reports (NCRs) into the Reconciliation s
 
 ### NCR Status → Reconciliation Impact
 
-| Status | Impact on Reconciliation |
-|--------|--------------------------|
-| OPEN | Warning only (non-blocking) |
-| SENT | "Pending Credits" display |
-| CREDITED | Adds to `ncr_credits` |
-| REJECTED | Adds to `ncr_losses` |
+| Status   | Impact on Reconciliation              |
+| -------- | ------------------------------------- |
+| OPEN     | Warning only (non-blocking)           |
+| SENT     | "Pending Credits" display             |
+| CREDITED | Adds to `ncr_credits`                 |
+| REJECTED | Adds to `ncr_losses`                  |
 | RESOLVED | Based on `financial_impact` selection |
 
 ### When Resolving an NCR
 
 When marking an NCR as RESOLVED, you must specify:
+
 - **Resolution Type**: Free text (e.g., "Replacement", "Writeoff", "Price Adjustment")
 - **Financial Impact**:
   - `NONE` - No financial adjustment (replacement received, no money exchanged)
@@ -120,6 +121,7 @@ pnpm db:migrate dev --name ncr-reconciliation-integration
 ```
 
 This creates migration for:
+
 - `NCRFinancialImpact` enum
 - `NCR.resolution_type` (nullable string)
 - `NCR.financial_impact` (nullable enum)
@@ -131,6 +133,7 @@ This creates migration for:
 1. **NCR-Period Association**: NCRs link to periods via `delivery.period_id`, or by `created_at` date range for manual NCRs
 
 2. **Consumption Formula**:
+
    ```
    TotalAdjustments = BackCharges - Credits - Condemnations + Adjustments + NCR_Losses - NCR_Credits
    Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing + TotalAdjustments

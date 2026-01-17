@@ -35,6 +35,8 @@ export type NCRType = "MANUAL" | "PRICE_VARIANCE";
 
 export type NCRStatus = "OPEN" | "SENT" | "CREDITED" | "REJECTED" | "RESOLVED";
 
+export type NCRFinancialImpact = "NONE" | "CREDIT" | "LOSS";
+
 export type ApprovalEntityType = "PRF" | "PO" | "PERIOD_CLOSE" | "TRANSFER";
 
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
@@ -288,6 +290,8 @@ export interface NCR {
   created_at: Date | string;
   resolved_at: Date | string | null;
   resolution_notes: string | null;
+  resolution_type: string | null;
+  financial_impact: NCRFinancialImpact | null;
 }
 
 export interface POB {
@@ -315,6 +319,8 @@ export interface Reconciliation {
   adjustments: DecimalValue;
   back_charges: DecimalValue;
   credits: DecimalValue;
+  ncr_credits: DecimalValue;
+  ncr_losses: DecimalValue;
   condemnations: DecimalValue;
   last_updated: Date | string;
 }

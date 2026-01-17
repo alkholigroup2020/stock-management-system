@@ -4,9 +4,9 @@
 
 If production already has schema changes (manual SQL or out-of-band updates), do not reset. Instead:
 
-1) Ensure the change exists in DB (apply SQL manually if needed).
-2) Create a matching Prisma migration file in `prisma/migrations/`.
-3) Mark migrations as applied with `pnpm prisma migrate resolve --applied <migration_name>`.
+1. Ensure the change exists in DB (apply SQL manually if needed).
+2. Create a matching Prisma migration file in `prisma/migrations/`.
+3. Mark migrations as applied with `pnpm prisma migrate resolve --applied <migration_name>`.
 
 This keeps Prisma migration history aligned without dropping data.
 

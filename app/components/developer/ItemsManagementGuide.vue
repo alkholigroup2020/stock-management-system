@@ -582,18 +582,18 @@ const updateItemSchema = z.object({
 
       <div v-if="isExpanded('overview')" class="space-y-4 border-t border-[var(--ui-border)] p-4">
         <p>
-          Items are the foundation of the inventory management system. They represent physical
-          goods tracked across multiple locations with independent stock levels, weighted average
-          costing (WAC), and period-based pricing.
+          Items are the foundation of the inventory management system. They represent physical goods
+          tracked across multiple locations with independent stock levels, weighted average costing
+          (WAC), and period-based pricing.
         </p>
 
         <div class="rounded-lg bg-[var(--ui-bg-muted)] p-4">
           <h5 class="mb-2 font-semibold">What are Items?</h5>
           <p class="text-sm">
             Items are master data records that define inventory products. Each item has a unique
-            code, name, unit of measure, and optional categorization. Items are central to all
-            stock operations (deliveries, issues, transfers) and maintain per-location stock levels
-            and pricing information.
+            code, name, unit of measure, and optional categorization. Items are central to all stock
+            operations (deliveries, issues, transfers) and maintain per-location stock levels and
+            pricing information.
           </p>
         </div>
 
@@ -601,24 +601,25 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">Key Concepts</h5>
           <ul class="list-inside list-disc space-y-2 text-sm">
             <li>
-              <strong>Item Master Data:</strong> Central repository of item definitions (code, name,
-              unit, category)
+              <strong>Item Master Data:</strong>
+              Central repository of item definitions (code, name, unit, category)
             </li>
             <li>
-              <strong>LocationStock:</strong> Per-location inventory tracking (quantity on-hand,
-              WAC)
+              <strong>LocationStock:</strong>
+              Per-location inventory tracking (quantity on-hand, WAC)
             </li>
             <li>
-              <strong>ItemPrice:</strong> Period-based pricing locked at period start to prevent
-              unauthorized price changes
+              <strong>ItemPrice:</strong>
+              Period-based pricing locked at period start to prevent unauthorized price changes
             </li>
             <li>
-              <strong>Multi-location:</strong> Same item can exist at Kitchen, Store, Central, and
-              Warehouse with independent stock levels
+              <strong>Multi-location:</strong>
+              Same item can exist at Kitchen, Store, Central, and Warehouse with independent stock
+              levels
             </li>
             <li>
-              <strong>WAC (Weighted Average Cost):</strong> Automatically calculated per location on
-              deliveries
+              <strong>WAC (Weighted Average Cost):</strong>
+              Automatically calculated per location on deliveries
             </li>
           </ul>
         </div>
@@ -626,13 +627,21 @@ const updateItemSchema = z.object({
         <div class="rounded-lg bg-[var(--ui-bg-muted)] p-4">
           <h5 class="mb-2 font-semibold">Role Requirements</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
-            <li><strong>View Items:</strong> All authenticated users (Operator, Supervisor, Admin)</li>
             <li>
-              <strong>Create/Update/Delete Items:</strong> Admin only (master data management)
+              <strong>View Items:</strong>
+              All authenticated users (Operator, Supervisor, Admin)
             </li>
-            <li><strong>Set Prices:</strong> Admin only (requires open period)</li>
             <li>
-              <strong>Import Items:</strong> Admin or Supervisor (bulk operations with validation)
+              <strong>Create/Update/Delete Items:</strong>
+              Admin only (master data management)
+            </li>
+            <li>
+              <strong>Set Prices:</strong>
+              Admin only (requires open period)
+            </li>
+            <li>
+              <strong>Import Items:</strong>
+              Admin or Supervisor (bulk operations with validation)
             </li>
           </ul>
         </div>
@@ -658,10 +667,7 @@ const updateItemSchema = z.object({
         />
       </button>
 
-      <div
-        v-if="isExpanded('data-model')"
-        class="space-y-4 border-t border-[var(--ui-border)] p-4"
-      >
+      <div v-if="isExpanded('data-model')" class="space-y-4 border-t border-[var(--ui-border)] p-4">
         <p>
           The Item data model consists of three core tables: Item (master data), LocationStock
           (per-location inventory), and ItemPrice (period-based pricing).
@@ -677,11 +683,26 @@ const updateItemSchema = z.object({
         <div class="rounded-lg bg-[var(--ui-bg-muted)] p-4">
           <h5 class="mb-2 font-semibold">Field Constraints</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
-            <li><strong>code:</strong> Unique, max 50 chars, auto-uppercase, cannot be changed after creation</li>
-            <li><strong>name:</strong> Required, max 200 chars</li>
-            <li><strong>unit:</strong> Required enum (KG, EA, LTR, BOX, CASE, PACK)</li>
-            <li><strong>category/sub_category:</strong> Optional, max 50 chars each</li>
-            <li><strong>is_active:</strong> Boolean flag for soft deletion (defaults to true)</li>
+            <li>
+              <strong>code:</strong>
+              Unique, max 50 chars, auto-uppercase, cannot be changed after creation
+            </li>
+            <li>
+              <strong>name:</strong>
+              Required, max 200 chars
+            </li>
+            <li>
+              <strong>unit:</strong>
+              Required enum (KG, EA, LTR, BOX, CASE, PACK)
+            </li>
+            <li>
+              <strong>category/sub_category:</strong>
+              Optional, max 50 chars each
+            </li>
+            <li>
+              <strong>is_active:</strong>
+              Boolean flag for soft deletion (defaults to true)
+            </li>
           </ul>
         </div>
 
@@ -730,14 +751,10 @@ const updateItemSchema = z.object({
       >
         <div class="flex items-center gap-3">
           <UIcon name="i-heroicons-funnel" class="size-5 text-[var(--ui-primary)]" />
-          <h4 class="font-semibold text-[var(--ui-text-highlighted)]">
-            Items List & Filtering
-          </h4>
+          <h4 class="font-semibold text-[var(--ui-text-highlighted)]">Items List & Filtering</h4>
         </div>
         <UIcon
-          :name="
-            isExpanded('list-filter') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
-          "
+          :name="isExpanded('list-filter') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
           class="size-5 text-[var(--ui-text-muted)]"
         />
       </button>
@@ -765,7 +782,8 @@ const updateItemSchema = z.object({
             Items are cached for 20 seconds using Nuxt's useAsyncData. Each unique filter
             combination creates a separate cache key. Cache is automatically invalidated when items
             are created, updated, or deleted using the
-            <code class="code-inline">invalidateItemsCache()</code> function.
+            <code class="code-inline">invalidateItemsCache()</code>
+            function.
           </p>
         </div>
 
@@ -780,24 +798,28 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">Query Parameters</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
             <li>
-              <code class="code-inline">category</code> - Filter by category (exact match)
+              <code class="code-inline">category</code>
+              - Filter by category (exact match)
             </li>
             <li>
-              <code class="code-inline">search</code> - Search by name or code (case-insensitive
-              partial match)
+              <code class="code-inline">search</code>
+              - Search by name or code (case-insensitive partial match)
             </li>
             <li>
-              <code class="code-inline">locationId</code> - Include stock data for specific location
-              (requires location access)
+              <code class="code-inline">locationId</code>
+              - Include stock data for specific location (requires location access)
             </li>
             <li>
-              <code class="code-inline">is_active</code> - Filter by active status (true/false)
+              <code class="code-inline">is_active</code>
+              - Filter by active status (true/false)
             </li>
             <li>
-              <code class="code-inline">page</code> - Page number (default: 1)
+              <code class="code-inline">page</code>
+              - Page number (default: 1)
             </li>
             <li>
-              <code class="code-inline">limit</code> - Items per page (default: 50, max: 200)
+              <code class="code-inline">limit</code>
+              - Items per page (default: 50, max: 200)
             </li>
           </ul>
         </div>
@@ -806,9 +828,10 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">Location Access Control</h5>
           <p class="text-sm">
             Operators can only view stock data for locations they have access to. The API validates
-            the <code class="code-inline">locationId</code> parameter against the user's assigned
-            locations before including stock data. Admins and Supervisors have access to all
-            locations.
+            the
+            <code class="code-inline">locationId</code>
+            parameter against the user's assigned locations before including stock data. Admins and
+            Supervisors have access to all locations.
           </p>
         </div>
       </div>
@@ -851,9 +874,14 @@ const updateItemSchema = z.object({
             filename="server/api/items/index.post.ts"
           />
           <div class="mt-2 rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Validation:</strong> Zod schema validates all fields<br />
-            <strong>Duplicate Check:</strong> Returns 409 Conflict if code already exists
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Validation:</strong>
+            Zod schema validates all fields
+            <br />
+            <strong>Duplicate Check:</strong>
+            Returns 409 Conflict if code already exists
           </div>
         </div>
 
@@ -870,10 +898,16 @@ const updateItemSchema = z.object({
             filename="server/api/items/[id].patch.ts"
           />
           <div class="mt-2 rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Immutable Field:</strong> Item code cannot be changed after creation<br />
-            <strong>Soft Delete:</strong> Set <code class="code-inline">is_active: false</code> to
-            deactivate
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Immutable Field:</strong>
+            Item code cannot be changed after creation
+            <br />
+            <strong>Soft Delete:</strong>
+            Set
+            <code class="code-inline">is_active: false</code>
+            to deactivate
           </div>
         </div>
 
@@ -881,16 +915,20 @@ const updateItemSchema = z.object({
         <div class="rounded-lg border border-[var(--ui-border)] p-4">
           <h5 class="mb-2 font-semibold text-[var(--ui-error)]">Delete Item</h5>
           <p class="mb-2 text-sm">
-            Hard delete is restricted. Use <code class="code-inline">is_active: false</code> for
-            soft deletion instead. Hard delete endpoint (DELETE /api/items/:id) is only for cleanup
-            of unused items.
+            Hard delete is restricted. Use
+            <code class="code-inline">is_active: false</code>
+            for soft deletion instead. Hard delete endpoint (DELETE /api/items/:id) is only for
+            cleanup of unused items.
           </p>
           <div class="mt-2 rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Recommendation:</strong> Use soft delete (is_active: false) for items with
-            transaction history<br />
-            <strong>Cascade:</strong> Hard delete cascades to LocationStock, ItemPrice, and related
-            transaction lines
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Recommendation:</strong>
+            Use soft delete (is_active: false) for items with transaction history
+            <br />
+            <strong>Cascade:</strong>
+            Hard delete cascades to LocationStock, ItemPrice, and related transaction lines
           </div>
         </div>
       </div>
@@ -949,9 +987,10 @@ const updateItemSchema = z.object({
           <p class="text-sm">
             When a delivery arrives with a unit price different from the locked period price, a
             price variance NCR is automatically created with
-            <code class="code-inline">type: PRICE_VARIANCE</code> and
-            <code class="code-inline">auto_generated: true</code>. This requires Supervisor or Admin
-            approval before the delivery can be finalized.
+            <code class="code-inline">type: PRICE_VARIANCE</code>
+            and
+            <code class="code-inline">auto_generated: true</code>
+            . This requires Supervisor or Admin approval before the delivery can be finalized.
           </p>
         </div>
 
@@ -1001,21 +1040,24 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">LocationStock Fields</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
             <li>
-              <strong>on_hand:</strong> Current quantity available at this location (Decimal 15,4)
+              <strong>on_hand:</strong>
+              Current quantity available at this location (Decimal 15,4)
             </li>
             <li>
-              <strong>wac:</strong> Weighted Average Cost per unit at this location (Decimal 15,4)
+              <strong>wac:</strong>
+              Weighted Average Cost per unit at this location (Decimal 15,4)
             </li>
             <li>
-              <strong>min_stock:</strong> Optional minimum stock level for alerts (not enforced in
-              MVP)
+              <strong>min_stock:</strong>
+              Optional minimum stock level for alerts (not enforced in MVP)
             </li>
             <li>
-              <strong>max_stock:</strong> Optional maximum stock level for alerts (not enforced in
-              MVP)
+              <strong>max_stock:</strong>
+              Optional maximum stock level for alerts (not enforced in MVP)
             </li>
             <li>
-              <strong>last_counted:</strong> Timestamp of last physical count (for reconciliation)
+              <strong>last_counted:</strong>
+              Timestamp of last physical count (for reconciliation)
             </li>
           </ul>
         </div>
@@ -1036,16 +1078,21 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">Stock Operations Impact</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
             <li>
-              <strong>Delivery:</strong> Increases on_hand, recalculates WAC based on receipt price
-            </li>
-            <li><strong>Issue:</strong> Decreases on_hand, WAC unchanged</li>
-            <li>
-              <strong>Transfer:</strong> Decreases source location on_hand (WAC unchanged),
-              increases destination on_hand (recalculates WAC)
+              <strong>Delivery:</strong>
+              Increases on_hand, recalculates WAC based on receipt price
             </li>
             <li>
-              <strong>Reconciliation:</strong> Adjusts on_hand to match physical count, may adjust
-              WAC if variance detected
+              <strong>Issue:</strong>
+              Decreases on_hand, WAC unchanged
+            </li>
+            <li>
+              <strong>Transfer:</strong>
+              Decreases source location on_hand (WAC unchanged), increases destination on_hand
+              (recalculates WAC)
+            </li>
+            <li>
+              <strong>Reconciliation:</strong>
+              Adjusts on_hand to match physical count, may adjust WAC if variance detected
             </li>
           </ul>
         </div>
@@ -1075,9 +1122,7 @@ const updateItemSchema = z.object({
           <h4 class="font-semibold text-[var(--ui-text-highlighted)]">Bulk Import</h4>
         </div>
         <UIcon
-          :name="
-            isExpanded('bulk-import') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
-          "
+          :name="isExpanded('bulk-import') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
           class="size-5 text-[var(--ui-text-muted)]"
         />
       </button>
@@ -1103,20 +1148,24 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold">Workflow Steps</h5>
           <ol class="list-inside list-decimal space-y-2 text-sm">
             <li>
-              <strong>SELECT:</strong> User selects a file via drag-drop or file picker. Can
-              download template.
+              <strong>SELECT:</strong>
+              User selects a file via drag-drop or file picker. Can download template.
             </li>
             <li>
-              <strong>PREVIEWING:</strong> Loading state while file is parsed server-side.
+              <strong>PREVIEWING:</strong>
+              Loading state while file is parsed server-side.
             </li>
             <li>
-              <strong>PREVIEW:</strong> User reviews first 10 rows with validation warnings. Can go
-              back.
+              <strong>PREVIEW:</strong>
+              User reviews first 10 rows with validation warnings. Can go back.
             </li>
-            <li><strong>IMPORTING:</strong> Loading state while items are inserted.</li>
             <li>
-              <strong>RESULTS:</strong> Success/failure summary with error details. Can import
-              another file.
+              <strong>IMPORTING:</strong>
+              Loading state while items are inserted.
+            </li>
+            <li>
+              <strong>RESULTS:</strong>
+              Success/failure summary with error details. Can import another file.
             </li>
           </ol>
         </div>
@@ -1131,17 +1180,32 @@ const updateItemSchema = z.object({
         <div class="rounded-lg bg-[var(--ui-bg-muted)] p-4">
           <h5 class="mb-2 font-semibold">Supported Formats</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
-            <li><strong>Excel (.xlsx, .xls)</strong> - Parsed using XLSX library</li>
-            <li><strong>CSV</strong> - Parsed with auto-delimiter detection</li>
+            <li>
+              <strong>Excel (.xlsx, .xls)</strong>
+              - Parsed using XLSX library
+            </li>
+            <li>
+              <strong>CSV</strong>
+              - Parsed with auto-delimiter detection
+            </li>
           </ul>
         </div>
 
         <div class="rounded-lg bg-[var(--ui-bg-muted)] p-4">
           <h5 class="mb-2 font-semibold">Import Limits</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
-            <li><strong>File Size:</strong> Maximum 10MB</li>
-            <li><strong>Row Limit:</strong> Maximum 1,000 rows per import</li>
-            <li><strong>Preview:</strong> First 10 rows shown before confirmation</li>
+            <li>
+              <strong>File Size:</strong>
+              Maximum 10MB
+            </li>
+            <li>
+              <strong>Row Limit:</strong>
+              Maximum 1,000 rows per import
+            </li>
+            <li>
+              <strong>Preview:</strong>
+              First 10 rows shown before confirmation
+            </li>
           </ul>
         </div>
 
@@ -1189,25 +1253,34 @@ const updateItemSchema = z.object({
         v-if="isExpanded('composables')"
         class="space-y-4 border-t border-[var(--ui-border)] p-4"
       >
-        <p>Items management provides three main composables for data fetching and import workflows.</p>
+        <p>
+          Items management provides three main composables for data fetching and import workflows.
+        </p>
 
         <!-- useItems -->
         <div class="rounded-lg border border-[var(--ui-border)] p-4">
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">
             useItems()
-            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]"
-              >app/composables/useItems.ts</span
-            >
+            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]">
+              app/composables/useItems.ts
+            </span>
           </h5>
           <p class="mb-2 text-sm">
             Fetch items list with pagination, filtering, and built-in caching (20 seconds).
           </p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Parameters:</strong><br />
-            - <code class="code-inline">filters</code>: Ref or object with category, search,
-            locationId, is_active, page, limit<br />
-            - <code class="code-inline">options</code>: { immediate, watch }<br />
-            <strong>Returns:</strong> { items, pagination, loading, error, refresh, execute }
+            <strong>Parameters:</strong>
+            <br />
+            -
+            <code class="code-inline">filters</code>
+            : Ref or object with category, search, locationId, is_active, page, limit
+            <br />
+            -
+            <code class="code-inline">options</code>
+            : { immediate, watch }
+            <br />
+            <strong>Returns:</strong>
+            { items, pagination, loading, error, refresh, execute }
           </div>
         </div>
 
@@ -1215,15 +1288,20 @@ const updateItemSchema = z.object({
         <div class="rounded-lg border border-[var(--ui-border)] p-4">
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">
             useItem()
-            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]"
-              >app/composables/useItems.ts</span
-            >
+            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]">
+              app/composables/useItems.ts
+            </span>
           </h5>
           <p class="mb-2 text-sm">Fetch a single item by ID with caching (20 seconds).</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Parameters:</strong><br />
-            - <code class="code-inline">itemId</code>: Ref or string (item UUID)<br />
-            <strong>Returns:</strong> { item, loading, error, refresh }
+            <strong>Parameters:</strong>
+            <br />
+            -
+            <code class="code-inline">itemId</code>
+            : Ref or string (item UUID)
+            <br />
+            <strong>Returns:</strong>
+            { item, loading, error, refresh }
           </div>
         </div>
 
@@ -1231,16 +1309,19 @@ const updateItemSchema = z.object({
         <div class="rounded-lg border border-[var(--ui-border)] p-4">
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">
             useItemsImport()
-            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]"
-              >app/composables/useItemsImport.ts</span
-            >
+            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]">
+              app/composables/useItemsImport.ts
+            </span>
           </h5>
-          <p class="mb-2 text-sm">Manage bulk import workflow (file selection, preview, execution).</p>
+          <p class="mb-2 text-sm">
+            Manage bulk import workflow (file selection, preview, execution).
+          </p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>State:</strong> selectedFile, currentStep, loading, result, preview, error,
-            isOnline<br />
-            <strong>Actions:</strong> setFile(), previewFile(), uploadFile(), downloadTemplate(),
-            reset()
+            <strong>State:</strong>
+            selectedFile, currentStep, loading, result, preview, error, isOnline
+            <br />
+            <strong>Actions:</strong>
+            setFile(), previewFile(), uploadFile(), downloadTemplate(), reset()
           </div>
         </div>
 
@@ -1248,9 +1329,9 @@ const updateItemSchema = z.object({
         <div class="rounded-lg border border-[var(--ui-border)] p-4">
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">
             invalidateItemsCache()
-            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]"
-              >app/composables/useItems.ts</span
-            >
+            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]">
+              app/composables/useItems.ts
+            </span>
           </h5>
           <p class="mb-2 text-sm">
             Invalidates all items caches. Call after creating, updating, or deleting items to force
@@ -1261,9 +1342,9 @@ const updateItemSchema = z.object({
         <div class="rounded-lg border border-[var(--ui-border)] p-4">
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">
             invalidateItemCache(itemId)
-            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]"
-              >app/composables/useItems.ts</span
-            >
+            <span class="ml-2 text-xs font-normal text-[var(--ui-text-muted)]">
+              app/composables/useItems.ts
+            </span>
           </h5>
           <p class="mb-2 text-sm">
             Invalidates a specific item cache by ID. Also invalidates the items list cache.
@@ -1304,10 +1385,17 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-success)]">GET /api/items</h5>
           <p class="mb-2 text-sm">Fetch items with filters and pagination</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Query:</strong> category, search, locationId, is_active, page, limit<br />
-            <strong>Returns:</strong> { items, pagination }<br />
-            <strong>Permission:</strong> All authenticated users<br />
-            <strong>Cache:</strong> Server: 2s, Client: 20s
+            <strong>Query:</strong>
+            category, search, locationId, is_active, page, limit
+            <br />
+            <strong>Returns:</strong>
+            { items, pagination }
+            <br />
+            <strong>Permission:</strong>
+            All authenticated users
+            <br />
+            <strong>Cache:</strong>
+            Server: 2s, Client: 20s
           </div>
         </div>
 
@@ -1316,10 +1404,17 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">POST /api/items</h5>
           <p class="mb-2 text-sm">Create a new item</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Body:</strong> { code, name, unit, category?, sub_category? }<br />
-            <strong>Returns:</strong> { item, message }<br />
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Errors:</strong> 409 if code already exists
+            <strong>Body:</strong>
+            { code, name, unit, category?, sub_category? }
+            <br />
+            <strong>Returns:</strong>
+            { item, message }
+            <br />
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Errors:</strong>
+            409 if code already exists
           </div>
         </div>
 
@@ -1328,9 +1423,14 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-success)]">GET /api/items/:id</h5>
           <p class="mb-2 text-sm">Fetch a single item by ID</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Returns:</strong> { item }<br />
-            <strong>Permission:</strong> All authenticated users<br />
-            <strong>Errors:</strong> 404 if item not found
+            <strong>Returns:</strong>
+            { item }
+            <br />
+            <strong>Permission:</strong>
+            All authenticated users
+            <br />
+            <strong>Errors:</strong>
+            404 if item not found
           </div>
         </div>
 
@@ -1339,10 +1439,17 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-info)]">PATCH /api/items/:id</h5>
           <p class="mb-2 text-sm">Update an existing item (all fields optional except ID)</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Body:</strong> { name?, unit?, category?, sub_category?, is_active? }<br />
-            <strong>Returns:</strong> { item, message }<br />
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Note:</strong> Code cannot be changed
+            <strong>Body:</strong>
+            { name?, unit?, category?, sub_category?, is_active? }
+            <br />
+            <strong>Returns:</strong>
+            { item, message }
+            <br />
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Note:</strong>
+            Code cannot be changed
           </div>
         </div>
 
@@ -1353,9 +1460,14 @@ const updateItemSchema = z.object({
             Hard delete an item (use soft delete with is_active: false instead)
           </p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Returns:</strong> { message }<br />
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Cascade:</strong> Deletes LocationStock, ItemPrice, and transaction lines
+            <strong>Returns:</strong>
+            { message }
+            <br />
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Cascade:</strong>
+            Deletes LocationStock, ItemPrice, and transaction lines
           </div>
         </div>
 
@@ -1364,10 +1476,17 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-info)]">PATCH /api/items/:itemId/price</h5>
           <p class="mb-2 text-sm">Update item price for current period</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Body:</strong> { price, period_id? }<br />
-            <strong>Returns:</strong> { item_price, message }<br />
-            <strong>Permission:</strong> Admin only<br />
-            <strong>Errors:</strong> 400 if period is CLOSED or item is inactive
+            <strong>Body:</strong>
+            { price, period_id? }
+            <br />
+            <strong>Returns:</strong>
+            { item_price, message }
+            <br />
+            <strong>Permission:</strong>
+            Admin only
+            <br />
+            <strong>Errors:</strong>
+            400 if period is CLOSED or item is inactive
           </div>
         </div>
 
@@ -1378,9 +1497,14 @@ const updateItemSchema = z.object({
           </h5>
           <p class="mb-2 text-sm">Download import template file</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Query:</strong> format=xlsx|csv (default: xlsx)<br />
-            <strong>Returns:</strong> File download<br />
-            <strong>Permission:</strong> Admin or Supervisor
+            <strong>Query:</strong>
+            format=xlsx|csv (default: xlsx)
+            <br />
+            <strong>Returns:</strong>
+            File download
+            <br />
+            <strong>Permission:</strong>
+            Admin or Supervisor
           </div>
         </div>
 
@@ -1389,11 +1513,17 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-info)]">POST /api/items/import-preview</h5>
           <p class="mb-2 text-sm">Preview import file without database changes</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Body:</strong> FormData with file<br />
-            <strong>Returns:</strong> { fileName, headers, rows, totalRows, previewCount,
-            missingColumns, warnings }<br />
-            <strong>Permission:</strong> Admin or Supervisor<br />
-            <strong>Limits:</strong> 10MB file, 1000 rows max
+            <strong>Body:</strong>
+            FormData with file
+            <br />
+            <strong>Returns:</strong>
+            { fileName, headers, rows, totalRows, previewCount, missingColumns, warnings }
+            <br />
+            <strong>Permission:</strong>
+            Admin or Supervisor
+            <br />
+            <strong>Limits:</strong>
+            10MB file, 1000 rows max
           </div>
         </div>
 
@@ -1402,10 +1532,17 @@ const updateItemSchema = z.object({
           <h5 class="mb-2 font-semibold text-[var(--ui-primary)]">POST /api/items/import</h5>
           <p class="mb-2 text-sm">Execute full import with validation</p>
           <div class="rounded bg-[var(--ui-bg-muted)] p-2 text-sm">
-            <strong>Body:</strong> FormData with file<br />
-            <strong>Returns:</strong> { success, summary, errors }<br />
-            <strong>Permission:</strong> Admin or Supervisor<br />
-            <strong>Validation:</strong> Duplicates, Zod schema, existing codes
+            <strong>Body:</strong>
+            FormData with file
+            <br />
+            <strong>Returns:</strong>
+            { success, summary, errors }
+            <br />
+            <strong>Permission:</strong>
+            Admin or Supervisor
+            <br />
+            <strong>Validation:</strong>
+            Duplicates, Zod schema, existing codes
           </div>
         </div>
       </div>
@@ -1450,12 +1587,30 @@ const updateItemSchema = z.object({
         <div class="rounded-lg bg-[var(--ui-bg-muted)] p-4">
           <h5 class="mb-2 font-semibold">Unit Enum Values</h5>
           <ul class="list-inside list-disc space-y-1 text-sm">
-            <li><code class="code-inline">KG</code> - Kilograms</li>
-            <li><code class="code-inline">EA</code> - Each (individual items)</li>
-            <li><code class="code-inline">LTR</code> - Liters</li>
-            <li><code class="code-inline">BOX</code> - Box</li>
-            <li><code class="code-inline">CASE</code> - Case</li>
-            <li><code class="code-inline">PACK</code> - Pack</li>
+            <li>
+              <code class="code-inline">KG</code>
+              - Kilograms
+            </li>
+            <li>
+              <code class="code-inline">EA</code>
+              - Each (individual items)
+            </li>
+            <li>
+              <code class="code-inline">LTR</code>
+              - Liters
+            </li>
+            <li>
+              <code class="code-inline">BOX</code>
+              - Box
+            </li>
+            <li>
+              <code class="code-inline">CASE</code>
+              - Case
+            </li>
+            <li>
+              <code class="code-inline">PACK</code>
+              - Pack
+            </li>
           </ul>
         </div>
 

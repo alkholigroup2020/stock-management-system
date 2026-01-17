@@ -25,6 +25,7 @@ import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import { getAllNCRSummaryForPeriod } from "../../utils/ncrCredits";
 
 // User session type
 interface AuthUser {
@@ -241,6 +242,11 @@ export default defineEventHandler(async (event) => {
       return sum.add(stockValue);
     }, new Decimal(0));
 
+    // Calculate NCR credits and losses
+    const ncrSummary = await getAllNCRSummaryForPeriod(periodId, locationId);
+    const ncrCredits = new Decimal(ncrSummary.credited.total);
+    const ncrLosses = new Decimal(ncrSummary.losses.total);
+
     // Upsert reconciliation record
     const reconciliation = await prisma.reconciliation.upsert({
       where: {
@@ -260,6 +266,8 @@ export default defineEventHandler(async (event) => {
         closing_stock: closingStock,
         back_charges: new Decimal(back_charges),
         credits: new Decimal(credits),
+        ncr_credits: ncrCredits,
+        ncr_losses: ncrLosses,
         condemnations: new Decimal(condemnations),
         adjustments: new Decimal(adjustments),
       },
@@ -272,13 +280,22 @@ export default defineEventHandler(async (event) => {
         closing_stock: closingStock,
         back_charges: new Decimal(back_charges),
         credits: new Decimal(credits),
+        ncr_credits: ncrCredits,
+        ncr_losses: ncrLosses,
         condemnations: new Decimal(condemnations),
         adjustments: new Decimal(adjustments),
       },
     });
 
     // Calculate consumption for response
-    const totalAdjustments = back_charges - credits + condemnations + adjustments;
+    // Formula: BackCharges - Credits - NCRCredits + NCRLosses - Condemnations + Adjustments
+    const totalAdjustments =
+      back_charges -
+      credits -
+      parseFloat(ncrCredits.toString()) +
+      parseFloat(ncrLosses.toString()) -
+      condemnations +
+      adjustments;
     const consumption =
       parseFloat(openingStock.toString()) +
       parseFloat(receipts.toString()) +
@@ -302,6 +319,8 @@ export default defineEventHandler(async (event) => {
         closing_stock: parseFloat(reconciliation.closing_stock.toString()),
         back_charges: parseFloat(reconciliation.back_charges.toString()),
         credits: parseFloat(reconciliation.credits.toString()),
+        ncr_credits: parseFloat(reconciliation.ncr_credits.toString()),
+        ncr_losses: parseFloat(reconciliation.ncr_losses.toString()),
         condemnations: parseFloat(reconciliation.condemnations.toString()),
         adjustments: parseFloat(reconciliation.adjustments.toString()),
         last_updated: reconciliation.last_updated,
@@ -309,6 +328,12 @@ export default defineEventHandler(async (event) => {
       calculations: {
         consumption: Math.round(consumption * 100) / 100,
         total_adjustments: Math.round(totalAdjustments * 100) / 100,
+      },
+      ncr_breakdown: {
+        credited: { total: ncrSummary.credited.total, count: ncrSummary.credited.count },
+        losses: { total: ncrSummary.losses.total, count: ncrSummary.losses.count },
+        pending: { total: ncrSummary.pending.total, count: ncrSummary.pending.count },
+        open: { count: ncrSummary.open.count },
       },
     };
   } catch (error) {

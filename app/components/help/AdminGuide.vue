@@ -356,7 +356,8 @@ watch(
           </h4>
           <p class="text-sm text-[var(--ui-text-muted)] mb-2">
             For adding or updating many items at once, use the Items Import feature. This is
-            especially useful during initial system setup or when receiving supplier catalog updates.
+            especially useful during initial system setup or when receiving supplier catalog
+            updates.
           </p>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>
@@ -369,9 +370,7 @@ watch(
               <strong>Import Items</strong>
               (top right)
             </li>
-            <li>
-              Download the template to get the correct format (includes all required columns)
-            </li>
+            <li>Download the template to get the correct format (includes all required columns)</li>
             <li>Fill in your items data following the template format</li>
             <li>
               Upload the file - the system validates all data and shows any errors or warnings

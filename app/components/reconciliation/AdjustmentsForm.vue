@@ -12,9 +12,25 @@
  */
 
 // Props
+interface PendingNCRItem {
+  id: string;
+  ncr_no: string;
+  value: number;
+  reason: string;
+}
+
+interface PendingNCRsData {
+  total: number;
+  count: number;
+  ncrs: PendingNCRItem[];
+}
+
 interface Props {
   backCharges?: number;
   credits?: number;
+  ncrCredits?: number;
+  ncrLosses?: number;
+  pendingNCRs?: PendingNCRsData | null;
   condemnations?: number;
   adjustments?: number;
   readOnly?: boolean;
@@ -25,6 +41,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   backCharges: 0,
   credits: 0,
+  ncrCredits: 0,
+  ncrLosses: 0,
+  pendingNCRs: null,
   condemnations: 0,
   adjustments: 0,
   readOnly: false,
@@ -129,6 +148,18 @@ function formatCurrency(value: number): string {
     maximumFractionDigits: 2,
   })}`;
 }
+
+/**
+ * Pending NCRs expansion state
+ */
+const pendingNCRsExpanded = ref(false);
+
+/**
+ * Navigate to NCR detail page
+ */
+function goToNCR(ncrId: string) {
+  navigateTo(`/ncrs/${ncrId}`);
+}
 </script>
 
 <template>
@@ -211,6 +242,115 @@ function formatCurrency(value: number): string {
           class="w-full"
         />
         <p class="text-xs text-[var(--ui-text-muted)] mt-1">Miscellaneous adjustments</p>
+      </div>
+    </div>
+
+    <!-- Pending Credits Section (Informational) -->
+    <div
+      v-if="pendingNCRs && pendingNCRs.count > 0"
+      class="mt-6 pt-6 border-t border-[var(--ui-border)]"
+    >
+      <div class="flex items-center gap-2 mb-4">
+        <h4 class="text-sm font-semibold text-[var(--ui-text)]">Pending Credits</h4>
+        <UBadge color="warning" variant="soft" size="xs">Informational</UBadge>
+      </div>
+
+      <UAlert icon="i-lucide-clock" color="warning" variant="soft" class="mb-4">
+        <template #description>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm">
+                <strong>{{ pendingNCRs.count }}</strong>
+                NCR(s) sent to suppliers
+              </span>
+              <span class="text-sm font-semibold">{{ formatCurrency(pendingNCRs.total) }}</span>
+            </div>
+            <p class="text-xs text-[var(--ui-text-muted)]">
+              Awaiting supplier response. These values do not affect current reconciliation
+              calculations.
+            </p>
+
+            <!-- Expandable NCR List -->
+            <div v-if="pendingNCRs.ncrs.length > 0" class="mt-3">
+              <button
+                @click="pendingNCRsExpanded = !pendingNCRsExpanded"
+                class="flex items-center gap-1 text-xs font-medium text-[var(--ui-text)] hover:text-[var(--ui-primary)] transition-colors cursor-pointer"
+                :aria-expanded="pendingNCRsExpanded"
+                aria-controls="pending-ncrs-list"
+              >
+                <UIcon
+                  :name="pendingNCRsExpanded ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+                  class="h-3 w-3"
+                />
+                {{ pendingNCRsExpanded ? "Hide" : "Show" }} NCR Details
+              </button>
+
+              <div
+                v-if="pendingNCRsExpanded"
+                id="pending-ncrs-list"
+                class="mt-2 space-y-1.5 max-h-48 overflow-y-auto"
+              >
+                <div
+                  v-for="ncr in pendingNCRs.ncrs"
+                  :key="ncr.id"
+                  class="flex items-start justify-between gap-2 p-2 rounded bg-[var(--ui-bg-muted)] hover:bg-[var(--ui-bg-elevated)] transition-colors"
+                >
+                  <div class="flex-1 min-w-0">
+                    <button
+                      @click="goToNCR(ncr.id)"
+                      class="text-xs font-medium text-primary hover:underline cursor-pointer"
+                    >
+                      {{ ncr.ncr_no }}
+                    </button>
+                    <p class="text-xs text-[var(--ui-text-muted)] mt-0.5 line-clamp-1">
+                      {{ ncr.reason }}
+                    </p>
+                  </div>
+                  <span class="text-xs font-semibold text-warning whitespace-nowrap">
+                    {{ formatCurrency(ncr.value) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </UAlert>
+    </div>
+
+    <!-- NCR Adjustments Section (Read-only) -->
+    <div
+      v-if="ncrCredits > 0 || ncrLosses > 0"
+      class="mt-6 pt-6 border-t border-[var(--ui-border)]"
+    >
+      <div class="flex items-center gap-2 mb-4">
+        <h4 class="text-sm font-semibold text-[var(--ui-text)]">NCR Adjustments</h4>
+        <UBadge color="primary" variant="soft" size="xs">Auto-calculated</UBadge>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- NCR Credits (Deducted from consumption) -->
+        <div v-if="ncrCredits > 0">
+          <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
+            NCR Credits
+            <span class="text-[var(--ui-text-muted)] font-normal ml-1">(SAR)</span>
+          </label>
+          <UInput :model-value="formatCurrency(ncrCredits)" disabled class="w-full" readonly />
+          <p class="text-xs text-[var(--ui-text-muted)] mt-1">
+            Credits from CREDITED and RESOLVED/CREDIT NCRs
+          </p>
+        </div>
+
+        <!-- NCR Losses (Added to consumption) -->
+        <div v-if="ncrLosses > 0">
+          <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
+            NCR Losses
+            <span class="text-[var(--ui-text-muted)] font-normal ml-1">(SAR)</span>
+          </label>
+          <UInput :model-value="formatCurrency(ncrLosses)" disabled class="w-full" readonly />
+          <p class="text-xs text-[var(--ui-text-muted)] mt-1">
+            Losses from REJECTED and RESOLVED/LOSS NCRs
+          </p>
+        </div>
       </div>
     </div>
 

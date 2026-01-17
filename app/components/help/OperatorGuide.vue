@@ -187,9 +187,7 @@ watch(
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Items Import</span>
         </span>
         <UIcon
-          :name="
-            isExpanded('items-import') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
-          "
+          :name="isExpanded('items-import') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -236,33 +234,45 @@ watch(
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span
-                ><strong>Item Code</strong> - Unique identifier (e.g., "RICE-001")</span
-              >
+              <span>
+                <strong>Item Code</strong>
+                - Unique identifier (e.g., "RICE-001")
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span
-                ><strong>Name</strong> - Item description (e.g., "Basmati Rice 5KG")</span
-              >
+              <span>
+                <strong>Name</strong>
+                - Item description (e.g., "Basmati Rice 5KG")
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span
-                ><strong>Category</strong> - e.g., "Dry Goods", "Dairy", "Meat"</span
-              >
+              <span>
+                <strong>Category</strong>
+                - e.g., "Dry Goods", "Dairy", "Meat"
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span><strong>Unit</strong> - e.g., "KG", "EA", "LTR", "BOX"</span>
+              <span>
+                <strong>Unit</strong>
+                - e.g., "KG", "EA", "LTR", "BOX"
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span><strong>Min Stock</strong> - Minimum quantity threshold</span>
+              <span>
+                <strong>Min Stock</strong>
+                - Minimum quantity threshold
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span><strong>Active</strong> - "Yes" or "No"</span>
+              <span>
+                <strong>Active</strong>
+                - "Yes" or "No"
+              </span>
             </li>
           </ul>
         </div>
@@ -293,15 +303,16 @@ watch(
               <strong>Choose File</strong>
               and select your prepared file
             </li>
-            <li>Click <strong>Upload & Validate</strong></li>
+            <li>
+              Click
+              <strong>Upload & Validate</strong>
+            </li>
             <li>
               Review the validation results - the system checks for errors and shows warnings for
               any issues
             </li>
             <li>Fix any errors in your file and re-upload if needed</li>
-            <li>
-              When validation passes, review the preview showing what will be imported
-            </li>
+            <li>When validation passes, review the preview showing what will be imported</li>
             <li>
               Click
               <strong>Import Items</strong>

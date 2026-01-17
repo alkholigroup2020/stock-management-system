@@ -12,6 +12,7 @@ This document defines the API contracts for NCR-Reconciliation integration. It i
 ## 1. PATCH /api/ncrs/:id (MODIFIED)
 
 ### Purpose
+
 Update an NCR's status with optional resolution fields. Extended to support `resolution_type` and `financial_impact` when status is RESOLVED.
 
 ### Request
@@ -22,6 +23,7 @@ Update an NCR's status with optional resolution fields. Extended to support `res
 | `id` | UUID | Yes | NCR ID |
 
 **Body**:
+
 ```typescript
 {
   status?: "OPEN" | "SENT" | "CREDITED" | "REJECTED" | "RESOLVED";
@@ -34,29 +36,32 @@ Update an NCR's status with optional resolution fields. Extended to support `res
 ### Validation Rules
 
 ```typescript
-const bodySchema = z.object({
-  status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
-  resolution_notes: z.string().max(1000).optional(),
-  resolution_type: z.string().min(1).max(200).optional(),
-  financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(),
-}).refine(
-  (data) => {
-    // If status is RESOLVED, require resolution_type and financial_impact
-    if (data.status === "RESOLVED") {
-      return !!data.resolution_type && !!data.financial_impact;
+const bodySchema = z
+  .object({
+    status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
+    resolution_notes: z.string().max(1000).optional(),
+    resolution_type: z.string().min(1).max(200).optional(),
+    financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(),
+  })
+  .refine(
+    (data) => {
+      // If status is RESOLVED, require resolution_type and financial_impact
+      if (data.status === "RESOLVED") {
+        return !!data.resolution_type && !!data.financial_impact;
+      }
+      return true;
+    },
+    {
+      message: "resolution_type and financial_impact are required when status is RESOLVED",
+      path: ["resolution_type"],
     }
-    return true;
-  },
-  {
-    message: "resolution_type and financial_impact are required when status is RESOLVED",
-    path: ["resolution_type"],
-  }
-);
+  );
 ```
 
 ### Response
 
 **Success (200)**:
+
 ```json
 {
   "message": "NCR updated successfully",
@@ -69,8 +74,8 @@ const bodySchema = z.object({
     "delivery": null,
     "delivery_line": null,
     "reason": "Quality issue with received goods",
-    "quantity": 10.0000,
-    "value": 500.00,
+    "quantity": 10.0,
+    "value": 500.0,
     "status": "RESOLVED",
     "creator": { "id": "uuid", "username": "john.doe", "full_name": "John Doe" },
     "created_at": "2026-01-15T10:00:00Z",
@@ -84,18 +89,19 @@ const bodySchema = z.object({
 
 **Error Responses**:
 
-| Code | Error Code | Description |
-|------|------------|-------------|
-| 400 | `RESOLUTION_FIELDS_REQUIRED` | resolution_type and financial_impact required for RESOLVED status |
-| 400 | `INVALID_STATUS_TRANSITION` | Invalid status transition |
-| 403 | `LOCATION_ACCESS_DENIED` | User lacks access to NCR's location |
-| 404 | `NCR_NOT_FOUND` | NCR not found |
+| Code | Error Code                   | Description                                                       |
+| ---- | ---------------------------- | ----------------------------------------------------------------- |
+| 400  | `RESOLUTION_FIELDS_REQUIRED` | resolution_type and financial_impact required for RESOLVED status |
+| 400  | `INVALID_STATUS_TRANSITION`  | Invalid status transition                                         |
+| 403  | `LOCATION_ACCESS_DENIED`     | User lacks access to NCR's location                               |
+| 404  | `NCR_NOT_FOUND`              | NCR not found                                                     |
 
 ---
 
 ## 2. GET /api/ncrs/summary (NEW)
 
 ### Purpose
+
 Retrieve NCR summary by period and location, categorized by status for reconciliation display.
 
 ### Request
@@ -109,16 +115,17 @@ Retrieve NCR summary by period and location, categorized by status for reconcili
 ### Response
 
 **Success (200)**:
+
 ```json
 {
   "credited": {
-    "total": 500.00,
+    "total": 500.0,
     "count": 2,
     "ncrs": [
       {
         "id": "uuid",
         "ncr_no": "NCR-2026-0001",
-        "value": 300.00,
+        "value": 300.0,
         "delivery_no": "DEL-2026-0042",
         "item_name": "Olive Oil",
         "reason": "Price variance - supplier credited"
@@ -126,7 +133,7 @@ Retrieve NCR summary by period and location, categorized by status for reconcili
       {
         "id": "uuid",
         "ncr_no": "NCR-2026-0003",
-        "value": 200.00,
+        "value": 200.0,
         "delivery_no": null,
         "item_name": null,
         "reason": "Quality issue - credit received"
@@ -134,13 +141,13 @@ Retrieve NCR summary by period and location, categorized by status for reconcili
     ]
   },
   "losses": {
-    "total": 150.00,
+    "total": 150.0,
     "count": 1,
     "ncrs": [
       {
         "id": "uuid",
         "ncr_no": "NCR-2026-0002",
-        "value": 150.00,
+        "value": 150.0,
         "delivery_no": "DEL-2026-0045",
         "item_name": "Fresh Vegetables",
         "reason": "Supplier rejected claim"
@@ -148,13 +155,13 @@ Retrieve NCR summary by period and location, categorized by status for reconcili
     ]
   },
   "pending": {
-    "total": 200.00,
+    "total": 200.0,
     "count": 1,
     "ncrs": [
       {
         "id": "uuid",
         "ncr_no": "NCR-2026-0004",
-        "value": 200.00,
+        "value": 200.0,
         "delivery_no": "DEL-2026-0048",
         "item_name": "Dairy Products",
         "reason": "Price variance - awaiting supplier response"
@@ -167,7 +174,7 @@ Retrieve NCR summary by period and location, categorized by status for reconcili
       {
         "id": "uuid",
         "ncr_no": "NCR-2026-0005",
-        "value": 100.00,
+        "value": 100.0,
         "delivery_no": null,
         "item_name": null,
         "reason": "Quality defect - pending investigation"
@@ -178,6 +185,7 @@ Retrieve NCR summary by period and location, categorized by status for reconcili
 ```
 
 **Query Logic**:
+
 ```typescript
 // Credited: CREDITED status OR (RESOLVED with CREDIT impact)
 credited = NCRs WHERE (status = 'CREDITED')
@@ -196,37 +204,40 @@ open = NCRs WHERE status = 'OPEN'
 
 **Error Responses**:
 
-| Code | Error Code | Description |
-|------|------------|-------------|
-| 400 | `MISSING_PARAMETERS` | periodId or locationId missing |
-| 403 | `LOCATION_ACCESS_DENIED` | User lacks access to location |
-| 404 | `PERIOD_NOT_FOUND` | Period not found |
-| 404 | `LOCATION_NOT_FOUND` | Location not found |
+| Code | Error Code               | Description                    |
+| ---- | ------------------------ | ------------------------------ |
+| 400  | `MISSING_PARAMETERS`     | periodId or locationId missing |
+| 403  | `LOCATION_ACCESS_DENIED` | User lacks access to location  |
+| 404  | `PERIOD_NOT_FOUND`       | Period not found               |
+| 404  | `LOCATION_NOT_FOUND`     | Location not found             |
 
 ---
 
 ## 3. POST /api/reconciliations (MODIFIED)
 
 ### Purpose
+
 Save or update reconciliation adjustments. Extended to calculate and store NCR credits/losses.
 
 ### Request
 
 **Body** (unchanged):
+
 ```typescript
 {
-  periodId: string;      // UUID
-  locationId: string;    // UUID
-  back_charges: number;  // >= 0
-  credits: number;       // >= 0 (manual credits, NOT ncr_credits)
+  periodId: string; // UUID
+  locationId: string; // UUID
+  back_charges: number; // >= 0
+  credits: number; // >= 0 (manual credits, NOT ncr_credits)
   condemnations: number; // >= 0
-  adjustments: number;   // >= 0
+  adjustments: number; // >= 0
 }
 ```
 
 ### Response
 
 **Success (200)** (extended):
+
 ```json
 {
   "success": true,
@@ -235,34 +246,35 @@ Save or update reconciliation adjustments. Extended to calculate and store NCR c
     "id": "uuid",
     "period_id": "uuid",
     "location_id": "uuid",
-    "opening_stock": 125000.00,
-    "receipts": 45000.00,
-    "transfers_in": 5000.00,
-    "transfers_out": 3000.00,
-    "issues": 35000.00,
-    "closing_stock": 137000.00,
-    "back_charges": 1000.00,
-    "credits": 500.00,
-    "ncr_credits": 500.00,
-    "ncr_losses": 150.00,
-    "condemnations": 1000.00,
-    "adjustments": 0.00,
+    "opening_stock": 125000.0,
+    "receipts": 45000.0,
+    "transfers_in": 5000.0,
+    "transfers_out": 3000.0,
+    "issues": 35000.0,
+    "closing_stock": 137000.0,
+    "back_charges": 1000.0,
+    "credits": 500.0,
+    "ncr_credits": 500.0,
+    "ncr_losses": 150.0,
+    "condemnations": 1000.0,
+    "adjustments": 0.0,
     "last_updated": "2026-01-17T15:00:00Z"
   },
   "calculations": {
-    "consumption": 34150.00,
-    "total_adjustments": 150.00
+    "consumption": 34150.0,
+    "total_adjustments": 150.0
   },
   "ncr_breakdown": {
-    "credited": { "total": 500.00, "count": 2 },
-    "losses": { "total": 150.00, "count": 1 },
-    "pending": { "total": 200.00, "count": 1 },
+    "credited": { "total": 500.0, "count": 2 },
+    "losses": { "total": 150.0, "count": 1 },
+    "pending": { "total": 200.0, "count": 1 },
     "open": { "count": 3 }
   }
 }
 ```
 
 **Consumption Calculation** (updated):
+
 ```typescript
 // NCR impact on adjustments
 const ncrImpact = ncr_losses - ncr_credits;
@@ -271,8 +283,8 @@ const ncrImpact = ncr_losses - ncr_credits;
 const totalAdjustments = back_charges - credits - condemnations + adjustments + ncrImpact;
 
 // Consumption formula (unchanged structure)
-const consumption = openingStock + receipts + transfersIn
-                  - transfersOut - closingStock + totalAdjustments;
+const consumption =
+  openingStock + receipts + transfersIn - transfersOut - closingStock + totalAdjustments;
 ```
 
 ---
@@ -280,6 +292,7 @@ const consumption = openingStock + receipts + transfersIn
 ## 4. POST /api/periods/:periodId/close (MODIFIED)
 
 ### Purpose
+
 Request period close. Extended to include OPEN NCR warning in response.
 
 ### Request (unchanged)
@@ -292,6 +305,7 @@ Request period close. Extended to include OPEN NCR warning in response.
 ### Response
 
 **Success (200)** (extended):
+
 ```json
 {
   "approval": {
@@ -308,21 +322,21 @@ Request period close. Extended to include OPEN NCR warning in response.
   "warnings": {
     "openNCRs": {
       "count": 5,
-      "totalValue": 1500.00,
+      "totalValue": 1500.0,
       "byLocation": [
         {
           "locationId": "uuid",
           "locationCode": "KIT",
           "locationName": "Kitchen",
           "count": 3,
-          "value": 800.00
+          "value": 800.0
         },
         {
           "locationId": "uuid",
           "locationCode": "STR",
           "locationName": "Store",
           "count": 2,
-          "value": 700.00
+          "value": 700.0
         }
       ]
     }
@@ -338,6 +352,7 @@ Request period close. Extended to include OPEN NCR warning in response.
 ## 5. GET /api/reconciliations/consolidated (MODIFIED)
 
 ### Purpose
+
 Retrieve consolidated reconciliation data across all locations. Extended to include NCR data.
 
 ### Response (extended fields only)
@@ -348,14 +363,14 @@ Retrieve consolidated reconciliation data across all locations. Extended to incl
     {
       "location": { "id": "uuid", "code": "KIT", "name": "Kitchen" },
       "reconciliation": {
-        "ncr_credits": 500.00,
-        "ncr_losses": 150.00
+        "ncr_credits": 500.0,
+        "ncr_losses": 150.0
       }
     }
   ],
   "totals": {
-    "ncr_credits": 1200.00,
-    "ncr_losses": 350.00
+    "ncr_credits": 1200.0,
+    "ncr_losses": 350.0
   }
 }
 ```
@@ -364,19 +379,19 @@ Retrieve consolidated reconciliation data across all locations. Extended to incl
 
 ## Error Code Reference
 
-| Code | HTTP | Description |
-|------|------|-------------|
-| `NOT_AUTHENTICATED` | 401 | User not logged in |
-| `INSUFFICIENT_PERMISSIONS` | 403 | User role insufficient |
-| `LOCATION_ACCESS_DENIED` | 403 | User lacks location access |
-| `MISSING_PARAMETERS` | 400 | Required parameters missing |
-| `VALIDATION_ERROR` | 400 | Request body validation failed |
-| `RESOLUTION_FIELDS_REQUIRED` | 400 | resolution_type/financial_impact required for RESOLVED |
-| `INVALID_STATUS_TRANSITION` | 400 | Invalid NCR status transition |
-| `NCR_NOT_FOUND` | 404 | NCR not found |
-| `PERIOD_NOT_FOUND` | 404 | Period not found |
-| `LOCATION_NOT_FOUND` | 404 | Location not found |
-| `PERIOD_CLOSED` | 400 | Cannot modify closed period |
+| Code                         | HTTP | Description                                            |
+| ---------------------------- | ---- | ------------------------------------------------------ |
+| `NOT_AUTHENTICATED`          | 401  | User not logged in                                     |
+| `INSUFFICIENT_PERMISSIONS`   | 403  | User role insufficient                                 |
+| `LOCATION_ACCESS_DENIED`     | 403  | User lacks location access                             |
+| `MISSING_PARAMETERS`         | 400  | Required parameters missing                            |
+| `VALIDATION_ERROR`           | 400  | Request body validation failed                         |
+| `RESOLUTION_FIELDS_REQUIRED` | 400  | resolution_type/financial_impact required for RESOLVED |
+| `INVALID_STATUS_TRANSITION`  | 400  | Invalid NCR status transition                          |
+| `NCR_NOT_FOUND`              | 404  | NCR not found                                          |
+| `PERIOD_NOT_FOUND`           | 404  | Period not found                                       |
+| `LOCATION_NOT_FOUND`         | 404  | Location not found                                     |
+| `PERIOD_CLOSED`              | 400  | Cannot modify closed period                            |
 
 ---
 
@@ -384,10 +399,10 @@ Retrieve consolidated reconciliation data across all locations. Extended to incl
 
 All endpoints require authentication (`event.context.user`).
 
-| Endpoint | Allowed Roles | Location Check |
-|----------|---------------|----------------|
-| PATCH /api/ncrs/:id | OPERATOR, SUPERVISOR, ADMIN | Operators need explicit location access |
-| GET /api/ncrs/summary | SUPERVISOR, ADMIN | Validates user has location access |
-| POST /api/reconciliations | SUPERVISOR, ADMIN | Validates user has location access |
-| POST /api/periods/:periodId/close | ADMIN only | N/A (all locations) |
-| GET /api/reconciliations/consolidated | SUPERVISOR, ADMIN | Returns all locations user can access |
+| Endpoint                              | Allowed Roles               | Location Check                          |
+| ------------------------------------- | --------------------------- | --------------------------------------- |
+| PATCH /api/ncrs/:id                   | OPERATOR, SUPERVISOR, ADMIN | Operators need explicit location access |
+| GET /api/ncrs/summary                 | SUPERVISOR, ADMIN           | Validates user has location access      |
+| POST /api/reconciliations             | SUPERVISOR, ADMIN           | Validates user has location access      |
+| POST /api/periods/:periodId/close     | ADMIN only                  | N/A (all locations)                     |
+| GET /api/reconciliations/consolidated | SUPERVISOR, ADMIN           | Returns all locations user can access   |

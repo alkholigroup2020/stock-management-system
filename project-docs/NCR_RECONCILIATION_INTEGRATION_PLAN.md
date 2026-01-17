@@ -4,12 +4,12 @@
 
 Comprehensive NCR integration into the Reconciliation system:
 
-| NCR Status | Reconciliation Impact |
-|------------|----------------------|
-| **OPEN** | Warning shown (non-blocking) |
-| **SENT** | Display as "Pending Credits" (informational) |
-| **CREDITED** | Auto-sum to `ncr_credits` field |
-| **REJECTED** | Auto-sum to `ncr_losses` field |
+| NCR Status   | Reconciliation Impact                                             |
+| ------------ | ----------------------------------------------------------------- |
+| **OPEN**     | Warning shown (non-blocking)                                      |
+| **SENT**     | Display as "Pending Credits" (informational)                      |
+| **CREDITED** | Auto-sum to `ncr_credits` field                                   |
+| **REJECTED** | Auto-sum to `ncr_losses` field                                    |
 | **RESOLVED** | Based on user-selected `financial_impact` (CREDIT, LOSS, or NONE) |
 
 ---
@@ -56,12 +56,14 @@ model Reconciliation {
 **New File:** `server/utils/ncrCredits.ts`
 
 Functions:
+
 - `getCreditedNCRsForPeriod(periodId, locationId)` - NCRs with status=CREDITED OR (status=RESOLVED AND financial_impact=CREDIT)
 - `getLostNCRsForPeriod(periodId, locationId)` - NCRs with status=REJECTED OR (status=RESOLVED AND financial_impact=LOSS)
 - `getPendingNCRsForPeriod(periodId, locationId)` - NCRs with status=SENT
 - `getOpenNCRsForPeriod(periodId, locationId)` - NCRs with status=OPEN
 
 **NCR-Period Filtering Logic:**
+
 - Primary: NCRs linked to deliveries in the period (`delivery.period_id = periodId`)
 - Fallback: Manual NCRs without delivery, created within period date range
 
@@ -72,6 +74,7 @@ Functions:
 **File:** `server/api/ncrs/[id].patch.ts`
 
 When status changes to RESOLVED:
+
 - Require `resolution_type` (free text)
 - Require `financial_impact` (NONE, CREDIT, LOSS)
 - Store both fields
@@ -80,13 +83,13 @@ When status changes to RESOLVED:
 const bodySchema = z.object({
   status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
   resolution_notes: z.string().optional(),
-  resolution_type: z.string().optional(),    // NEW: Required when RESOLVED
+  resolution_type: z.string().optional(), // NEW: Required when RESOLVED
   financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(), // NEW: Required when RESOLVED
 });
 
 // Validation: If status is RESOLVED, require resolution_type and financial_impact
 if (status === "RESOLVED" && (!resolution_type || !financial_impact)) {
-  throw createError({ ... "Resolution type and financial impact required" });
+  throw createError({ ..."Resolution type and financial impact required" });
 }
 ```
 
@@ -97,6 +100,7 @@ if (status === "RESOLVED" && (!resolution_type || !financial_impact)) {
 **File:** `server/api/reconciliations/index.post.ts`
 
 Changes:
+
 1. Import NCR query utilities
 2. Calculate `ncr_credits` = CREDITED + RESOLVED(CREDIT)
 3. Calculate `ncr_losses` = REJECTED + RESOLVED(LOSS)
@@ -131,6 +135,7 @@ ncr_breakdown: {
 **File:** `server/utils/reconciliation.ts`
 
 Updated formula:
+
 ```
 Total Credits = Manual Credits + NCR Credits
 Total Losses = Condemnations + NCR Losses
@@ -140,6 +145,7 @@ Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing
 ```
 
 Or if NCR losses should increase consumption (representing unrecovered costs):
+
 ```
 Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing
             + BackCharges - Total Credits + NCR Losses - Condemnations + Adjustments
@@ -164,6 +170,7 @@ Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing
 **File:** `app/pages/ncrs/[id].vue`
 
 When updating status to RESOLVED, show additional fields:
+
 - Resolution Type (text input): "Replacement", "Writeoff", "Price Adjustment", etc.
 - Financial Impact (select): NONE / CREDIT / LOSS
 - Validation: Both required for RESOLVED status
@@ -173,6 +180,7 @@ When updating status to RESOLVED, show additional fields:
 **File:** `app/components/reconciliation/AdjustmentsForm.vue`
 
 Add NCR sections:
+
 - **NCR Credits** (read-only): Sum of CREDITED + RESOLVED(CREDIT)
 - **NCR Losses** (read-only): Sum of REJECTED + RESOLVED(LOSS)
 - **Pending Credits** (informational): Sum of SENT NCRs
@@ -183,6 +191,7 @@ Add NCR sections:
 **File:** `app/components/reconciliation/ReconciliationSummary.vue`
 
 Display:
+
 - NCR Credits breakdown
 - NCR Losses breakdown
 - Pending Credits (with note: "awaiting supplier response")
@@ -204,6 +213,7 @@ Display:
 Query params: `periodId`, `locationId`
 
 Returns:
+
 ```json
 {
   "credited": { "total": 500.00, "count": 2, "ncrs": [...] },
@@ -217,23 +227,23 @@ Returns:
 
 ## Files to Modify
 
-| File | Change |
-|------|--------|
-| `prisma/schema.prisma` | Add `NCRFinancialImpact` enum, NCR fields, Reconciliation fields |
-| `server/utils/ncrCredits.ts` | NEW - NCR query utilities (4 functions) |
-| `server/utils/reconciliation.ts` | Update consumption formula |
-| `server/api/ncrs/[id].patch.ts` | Add resolution_type and financial_impact handling |
-| `server/api/reconciliations/index.post.ts` | Calculate ncr_credits and ncr_losses |
-| `server/api/reports/reconciliation.get.ts` | Include NCR data in report |
-| `server/api/reconciliations/consolidated.get.ts` | Include NCR data |
-| `server/api/periods/[periodId]/close.post.ts` | Add OPEN NCR warning |
-| `server/api/ncrs/summary.get.ts` | NEW - NCR summary endpoint |
-| `shared/types/database.ts` | Add NCRFinancialImpact type |
-| `app/pages/ncrs/[id].vue` | Add resolution fields for RESOLVED status |
-| `app/components/reconciliation/AdjustmentsForm.vue` | Display NCR credits/losses |
-| `app/components/reconciliation/ReconciliationSummary.vue` | NCR breakdown display |
-| `app/components/reconciliation/OpenNCRWarning.vue` | NEW - Warning component |
-| `app/pages/reconciliations/index.vue` | Pass NCR data to components |
+| File                                                      | Change                                                           |
+| --------------------------------------------------------- | ---------------------------------------------------------------- |
+| `prisma/schema.prisma`                                    | Add `NCRFinancialImpact` enum, NCR fields, Reconciliation fields |
+| `server/utils/ncrCredits.ts`                              | NEW - NCR query utilities (4 functions)                          |
+| `server/utils/reconciliation.ts`                          | Update consumption formula                                       |
+| `server/api/ncrs/[id].patch.ts`                           | Add resolution_type and financial_impact handling                |
+| `server/api/reconciliations/index.post.ts`                | Calculate ncr_credits and ncr_losses                             |
+| `server/api/reports/reconciliation.get.ts`                | Include NCR data in report                                       |
+| `server/api/reconciliations/consolidated.get.ts`          | Include NCR data                                                 |
+| `server/api/periods/[periodId]/close.post.ts`             | Add OPEN NCR warning                                             |
+| `server/api/ncrs/summary.get.ts`                          | NEW - NCR summary endpoint                                       |
+| `shared/types/database.ts`                                | Add NCRFinancialImpact type                                      |
+| `app/pages/ncrs/[id].vue`                                 | Add resolution fields for RESOLVED status                        |
+| `app/components/reconciliation/AdjustmentsForm.vue`       | Display NCR credits/losses                                       |
+| `app/components/reconciliation/ReconciliationSummary.vue` | NCR breakdown display                                            |
+| `app/components/reconciliation/OpenNCRWarning.vue`        | NEW - Warning component                                          |
+| `app/pages/reconciliations/index.vue`                     | Pass NCR data to components                                      |
 
 ---
 

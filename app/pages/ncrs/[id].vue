@@ -72,6 +72,8 @@ interface NCR {
   created_at: string;
   resolved_at: string | null;
   resolution_notes: string | null;
+  resolution_type: string | null;
+  financial_impact: "NONE" | "CREDIT" | "LOSS" | null;
 }
 
 // State
@@ -85,6 +87,8 @@ const showUpdateModal = ref(false);
 const statusUpdateForm = ref({
   status: "",
   resolution_notes: "",
+  resolution_type: "",
+  financial_impact: "",
 });
 
 // Computed
@@ -164,6 +168,28 @@ function getStatusLabel(status: NCR["status"]) {
   return statusLabels[status] || status;
 }
 
+function getFinancialImpactLabel(impact: "NONE" | "CREDIT" | "LOSS" | null) {
+  if (!impact) return "";
+  const impactLabels = {
+    NONE: "No Financial Impact",
+    CREDIT: "Credit Recovered",
+    LOSS: "Loss Incurred",
+  };
+  return impactLabels[impact] || impact;
+}
+
+function getFinancialImpactColor(
+  impact: "NONE" | "CREDIT" | "LOSS" | null
+): "neutral" | "success" | "error" {
+  if (!impact) return "neutral";
+  const impactColors = {
+    NONE: "neutral" as const,
+    CREDIT: "success" as const,
+    LOSS: "error" as const,
+  };
+  return impactColors[impact] || "neutral";
+}
+
 function getTypeLabel(type: NCR["type"]) {
   return type === "MANUAL" ? "Manual" : "Price Variance";
 }
@@ -185,6 +211,8 @@ async function fetchNCR() {
     // Initialize status update form
     statusUpdateForm.value.status = response.ncr.status;
     statusUpdateForm.value.resolution_notes = response.ncr.resolution_notes || "";
+    statusUpdateForm.value.resolution_type = response.ncr.resolution_type || "";
+    statusUpdateForm.value.financial_impact = response.ncr.financial_impact || "";
   } catch (err: unknown) {
     const fetchError = err as { statusCode?: number; data?: { message?: string } };
     error.value = fetchError?.data?.message || "Failed to fetch NCR details";
@@ -214,6 +242,22 @@ async function handleUpdateStatus() {
     return;
   }
 
+  // Validate resolution fields when status is RESOLVED
+  if (statusUpdateForm.value.status === "RESOLVED") {
+    if (!statusUpdateForm.value.resolution_type || !statusUpdateForm.value.resolution_type.trim()) {
+      toast.warning("Resolution Type Required", {
+        description: "Please provide a resolution type when marking NCR as RESOLVED",
+      });
+      return;
+    }
+    if (!statusUpdateForm.value.financial_impact) {
+      toast.warning("Financial Impact Required", {
+        description: "Please select the financial impact when marking NCR as RESOLVED",
+      });
+      return;
+    }
+  }
+
   updateLoading.value = true;
 
   // Close modal immediately when save starts - loading overlay will show progress
@@ -225,6 +269,14 @@ async function handleUpdateStatus() {
       body: {
         status: statusUpdateForm.value.status,
         resolution_notes: statusUpdateForm.value.resolution_notes || undefined,
+        resolution_type:
+          statusUpdateForm.value.status === "RESOLVED"
+            ? statusUpdateForm.value.resolution_type
+            : undefined,
+        financial_impact:
+          statusUpdateForm.value.status === "RESOLVED"
+            ? statusUpdateForm.value.financial_impact
+            : undefined,
       },
     });
 
@@ -272,6 +324,8 @@ function openUpdateModal() {
   if (ncr.value) {
     statusUpdateForm.value.status = ""; // Force user to select a valid next status
     statusUpdateForm.value.resolution_notes = ""; // Clear notes - each update should have fresh notes
+    statusUpdateForm.value.resolution_type = ""; // Clear resolution type
+    statusUpdateForm.value.financial_impact = ""; // Clear financial impact
   }
   showUpdateModal.value = true;
 }
@@ -506,10 +560,38 @@ onMounted(async () => {
         <div class="text-body whitespace-pre-wrap">{{ ncr.reason }}</div>
       </UCard>
 
-      <!-- Resolution Notes Card (if available) -->
-      <UCard v-if="ncr.resolution_notes" class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-        <h2 class="text-lg font-semibold mb-4">Resolution Notes</h2>
-        <div class="text-body whitespace-pre-wrap">{{ ncr.resolution_notes }}</div>
+      <!-- Resolution Details Card (if resolved) -->
+      <UCard
+        v-if="ncr.resolution_notes || ncr.resolution_type || ncr.financial_impact"
+        class="card-elevated"
+        :ui="{ body: 'p-3 sm:p-4' }"
+      >
+        <div class="flex items-center gap-2 mb-4">
+          <UIcon name="i-lucide-check-circle" class="h-5 w-5 text-success" />
+          <h2 class="text-lg font-semibold">Resolution Details</h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Resolution Type (if RESOLVED status) -->
+          <div v-if="ncr.resolution_type">
+            <label class="form-label">Resolution Type</label>
+            <p class="text-body font-medium">{{ ncr.resolution_type }}</p>
+          </div>
+
+          <!-- Financial Impact (if RESOLVED status) -->
+          <div v-if="ncr.financial_impact">
+            <label class="form-label">Financial Impact</label>
+            <UBadge :color="getFinancialImpactColor(ncr.financial_impact)" variant="soft" size="lg">
+              {{ getFinancialImpactLabel(ncr.financial_impact) }}
+            </UBadge>
+          </div>
+
+          <!-- Resolution Notes -->
+          <div v-if="ncr.resolution_notes">
+            <label class="form-label">Resolution Notes</label>
+            <div class="text-body whitespace-pre-wrap">{{ ncr.resolution_notes }}</div>
+          </div>
+        </div>
       </UCard>
 
       <!-- Status Update Card (if user can update) -->
@@ -583,6 +665,40 @@ onMounted(async () => {
               />
             </div>
 
+            <!-- Resolution Type (only show when status is RESOLVED) -->
+            <div v-if="statusUpdateForm.status === 'RESOLVED'">
+              <label class="form-label">Resolution Type *</label>
+              <UInput
+                v-model="statusUpdateForm.resolution_type"
+                placeholder="e.g., Replacement, Writeoff, Price Adjustment"
+                size="lg"
+                class="w-full"
+              />
+              <p class="mt-1 text-caption text-muted">
+                Specify how this NCR was resolved (e.g., Replacement, Writeoff, Price Adjustment)
+              </p>
+            </div>
+
+            <!-- Financial Impact (only show when status is RESOLVED) -->
+            <div v-if="statusUpdateForm.status === 'RESOLVED'">
+              <label class="form-label">Financial Impact *</label>
+              <USelectMenu
+                v-model="statusUpdateForm.financial_impact"
+                :items="[
+                  { value: 'NONE', label: 'No Financial Impact' },
+                  { value: 'CREDIT', label: 'Credit Recovered' },
+                  { value: 'LOSS', label: 'Loss Incurred' },
+                ]"
+                value-key="value"
+                placeholder="Select financial impact"
+                size="lg"
+                class="w-full"
+              />
+              <p class="mt-1 text-caption text-muted">
+                Select how this resolution affects reconciliation calculations
+              </p>
+            </div>
+
             <!-- Resolution Notes -->
             <div>
               <label class="form-label">Resolution Notes</label>
@@ -598,6 +714,16 @@ onMounted(async () => {
             </div>
 
             <UAlert
+              v-if="statusUpdateForm.status === 'RESOLVED'"
+              icon="i-lucide-info"
+              color="warning"
+              variant="subtle"
+              title="Resolution Required"
+              description="When marking as RESOLVED, you must specify the resolution type and financial impact. This determines how the NCR affects reconciliation calculations."
+            />
+
+            <UAlert
+              v-else
               icon="i-lucide-info"
               color="primary"
               variant="subtle"

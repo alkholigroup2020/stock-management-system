@@ -17,6 +17,8 @@ interface Props {
     transfers_out: number;
     issues: number;
     closing_stock: number;
+    ncr_credits?: number;
+    ncr_losses?: number;
   };
   calculations: {
     consumption: number;
@@ -183,6 +185,24 @@ function formatCurrency(value: number | null): string {
             <span class="text-[var(--ui-text-muted)]">Total Adjustments:</span>
             <span class="font-medium text-[var(--ui-text)]">
               {{ formatCurrency(calculations.total_adjustments) }}
+            </span>
+          </div>
+          <div
+            v-if="reconciliation.ncr_credits && reconciliation.ncr_credits > 0"
+            class="flex justify-between pl-4"
+          >
+            <span class="text-[var(--ui-text-muted)] text-xs">NCR Credits:</span>
+            <span class="font-medium text-[var(--ui-success)] text-xs">
+              -{{ formatCurrency(reconciliation.ncr_credits) }}
+            </span>
+          </div>
+          <div
+            v-if="reconciliation.ncr_losses && reconciliation.ncr_losses > 0"
+            class="flex justify-between pl-4"
+          >
+            <span class="text-[var(--ui-text-muted)] text-xs">NCR Losses:</span>
+            <span class="font-medium text-[var(--ui-error)] text-xs">
+              +{{ formatCurrency(reconciliation.ncr_losses) }}
             </span>
           </div>
           <div class="flex justify-between">

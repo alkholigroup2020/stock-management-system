@@ -42,6 +42,10 @@ export interface ConsumptionInput {
   backCharges?: number | Decimal;
   /** Credits to be deducted from consumption */
   credits?: number | Decimal;
+  /** NCR credits to be deducted from consumption (auto-calculated) */
+  ncrCredits?: number | Decimal;
+  /** NCR losses to be added to consumption (auto-calculated) */
+  ncrLosses?: number | Decimal;
   /** Condemnations to be deducted from consumption */
   condemnations?: number | Decimal;
 }
@@ -64,6 +68,8 @@ export interface ConsumptionResult {
     adjustments: number;
     backCharges: number;
     credits: number;
+    ncrCredits: number;
+    ncrLosses: number;
     condemnations: number;
   };
 }
@@ -152,6 +158,8 @@ export function calculateConsumption(input: ConsumptionInput): ConsumptionResult
   const adjustments = toNumber(input.adjustments || 0);
   const backCharges = toNumber(input.backCharges || 0);
   const credits = toNumber(input.credits || 0);
+  const ncrCredits = toNumber(input.ncrCredits || 0);
+  const ncrLosses = toNumber(input.ncrLosses || 0);
   const condemnations = toNumber(input.condemnations || 0);
 
   // Input validation
@@ -179,6 +187,12 @@ export function calculateConsumption(input: ConsumptionInput): ConsumptionResult
   if (!Number.isFinite(credits)) {
     throw new Error("Invalid credits: must be a finite number");
   }
+  if (!Number.isFinite(ncrCredits)) {
+    throw new Error("Invalid ncrCredits: must be a finite number");
+  }
+  if (!Number.isFinite(ncrLosses)) {
+    throw new Error("Invalid ncrLosses: must be a finite number");
+  }
   if (!Number.isFinite(condemnations)) {
     throw new Error("Invalid condemnations: must be a finite number");
   }
@@ -201,7 +215,9 @@ export function calculateConsumption(input: ConsumptionInput): ConsumptionResult
   }
 
   // Calculate total adjustments
-  const totalAdjustments = backCharges - credits - condemnations + adjustments;
+  // Formula: BackCharges - Credits - NCRCredits + NCRLosses - Condemnations + Adjustments
+  const totalAdjustments =
+    backCharges - credits - ncrCredits + ncrLosses - condemnations + adjustments;
 
   // Calculate consumption
   // Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing + TotalAdjustments
@@ -224,6 +240,8 @@ export function calculateConsumption(input: ConsumptionInput): ConsumptionResult
       adjustments: Math.round(adjustments * 100) / 100,
       backCharges: Math.round(backCharges * 100) / 100,
       credits: Math.round(credits * 100) / 100,
+      ncrCredits: Math.round(ncrCredits * 100) / 100,
+      ncrLosses: Math.round(ncrLosses * 100) / 100,
       condemnations: Math.round(condemnations * 100) / 100,
     },
   };

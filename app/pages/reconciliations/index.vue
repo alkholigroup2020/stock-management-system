@@ -27,6 +27,8 @@ interface LocationReconciliation {
     adjustments: number;
     back_charges: number;
     credits: number;
+    ncr_credits?: number;
+    ncr_losses?: number;
     condemnations: number;
   };
   calculations: {
@@ -68,6 +70,8 @@ interface ReconciliationData {
     adjustments: number;
     back_charges: number;
     credits: number;
+    ncr_credits?: number;
+    ncr_losses?: number;
     condemnations: number;
   };
   location: {
@@ -430,6 +434,8 @@ const formattedDateRange = computed(() => {
       <ReconciliationAdjustmentsForm
         :back-charges="adjustments.back_charges"
         :credits="adjustments.credits"
+        :ncr-credits="reconciliationData.reconciliation.ncr_credits"
+        :ncr-losses="reconciliationData.reconciliation.ncr_losses"
         :condemnations="adjustments.condemnations"
         :adjustments="adjustments.adjustments"
         :read-only="!isSupervisorOrAdmin"
