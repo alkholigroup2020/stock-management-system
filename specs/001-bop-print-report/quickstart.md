@@ -69,10 +69,22 @@ const formattedDateRange = computed(() => {
       <h1 class="text-xl font-bold">{{ companyName }}</h1>
       <h2 class="text-lg font-semibold mt-2">Personnel On Board Report</h2>
       <div class="mt-4 text-sm">
-        <p><strong>Location:</strong> {{ location.name }} ({{ location.code }})</p>
-        <p><strong>Period:</strong> {{ period.name }}</p>
-        <p><strong>Date Range:</strong> {{ formattedDateRange }}</p>
-        <p class="mt-2 text-lg"><strong>Total Mandays:</strong> {{ summary.total_mandays.toLocaleString() }}</p>
+        <p>
+          <strong>Location:</strong>
+          {{ location.name }} ({{ location.code }})
+        </p>
+        <p>
+          <strong>Period:</strong>
+          {{ period.name }}
+        </p>
+        <p>
+          <strong>Date Range:</strong>
+          {{ formattedDateRange }}
+        </p>
+        <p class="mt-2 text-lg">
+          <strong>Total Mandays:</strong>
+          {{ summary.total_mandays.toLocaleString() }}
+        </p>
       </div>
     </header>
 
@@ -255,11 +267,11 @@ Add the print component at the end of the template:
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
+| File                                    | Purpose                       |
+| --------------------------------------- | ----------------------------- |
 | `app/components/pob/POBPrintReport.vue` | Print-optimized report layout |
-| `app/pages/pob.vue` | Parent page with print button |
-| `app/assets/css/main.css` | Print media query styles |
+| `app/pages/pob.vue`                     | Parent page with print button |
+| `app/assets/css/main.css`               | Print media query styles      |
 
 ---
 

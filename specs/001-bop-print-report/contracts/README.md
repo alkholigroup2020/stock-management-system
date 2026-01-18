@@ -16,6 +16,7 @@ GET /api/locations/{locationId}/pob
 ```
 
 **Response Structure** (existing):
+
 ```typescript
 interface POBData {
   location?: {

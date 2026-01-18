@@ -1334,9 +1334,7 @@ if (!stock || stock.on_hand <= 0) {
         </span>
         <UIcon
           :name="
-            isExpanded('sync-stock-feature')
-              ? 'i-heroicons-chevron-up'
-              : 'i-heroicons-chevron-down'
+            isExpanded('sync-stock-feature') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
           "
           class="text-[var(--ui-text-muted)]"
         />
@@ -1392,9 +1390,7 @@ if (!stock || stock.on_hand <= 0) {
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
-            Button Implementation
-          </h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Button Implementation</h4>
           <DeveloperCodeBlock
             :code="codeExamples.syncStockButton"
             language="vue"
@@ -1403,9 +1399,7 @@ if (!stock || stock.on_hand <= 0) {
         </div>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
-            Sync Stock Function
-          </h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Sync Stock Function</h4>
           <DeveloperCodeBlock
             :code="codeExamples.syncStockFunction"
             language="typescript"

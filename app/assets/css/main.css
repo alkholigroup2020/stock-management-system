@@ -923,3 +923,61 @@ html.dark .hljs-deletion {
 .guide-content input[type="text"] {
   font-size: 1rem;
 }
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-report {
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100%;
+  }
+
+  body:has(.print-report) #__nuxt {
+    display: none !important;
+  }
+
+  header[aria-label="Page header"],
+  footer[aria-label="Site footer"],
+  nav,
+  aside {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  .print-header {
+    break-after: avoid;
+  }
+
+  .print-table tr {
+    break-inside: avoid;
+  }
+
+  .print-signatures {
+    break-before: avoid;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

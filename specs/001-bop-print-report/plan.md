@@ -25,31 +25,31 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### Pre-Design Check (Phase 0)
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Data Integrity First | N/A | Read-only feature, no data mutations |
-| II. Type Safety Non-Negotiable | PASS | Will type all props/interfaces, run typecheck |
-| III. Location-Centric Architecture | PASS | Uses existing location context from POB page |
-| IV. Approval Workflow Compliance | N/A | No approval workflow for printing |
-| V. Accessible by Design | PASS | Print button needs focus state, cursor-pointer |
-| VI. Offline-Aware UI | PASS | Button disabled when no data available |
-| VII. Server-Side Security | N/A | Client-side only, no new API endpoints |
-| VIII. Consistent Code Standards | PASS | Follow Prettier, component naming conventions |
+| Principle                          | Status | Notes                                          |
+| ---------------------------------- | ------ | ---------------------------------------------- |
+| I. Data Integrity First            | N/A    | Read-only feature, no data mutations           |
+| II. Type Safety Non-Negotiable     | PASS   | Will type all props/interfaces, run typecheck  |
+| III. Location-Centric Architecture | PASS   | Uses existing location context from POB page   |
+| IV. Approval Workflow Compliance   | N/A    | No approval workflow for printing              |
+| V. Accessible by Design            | PASS   | Print button needs focus state, cursor-pointer |
+| VI. Offline-Aware UI               | PASS   | Button disabled when no data available         |
+| VII. Server-Side Security          | N/A    | Client-side only, no new API endpoints         |
+| VIII. Consistent Code Standards    | PASS   | Follow Prettier, component naming conventions  |
 
 **Pre-Design Gate Status**: PASSED
 
 ### Post-Design Check (Phase 1)
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Data Integrity First | N/A | Confirmed: no data mutations in design |
-| II. Type Safety Non-Negotiable | PASS | Interfaces defined in data-model.md |
-| III. Location-Centric Architecture | PASS | Props require location object |
-| IV. Approval Workflow Compliance | N/A | Confirmed: no approvals needed |
-| V. Accessible by Design | PASS | Button has cursor-pointer, disabled states |
-| VI. Offline-Aware UI | PASS | Button disabled when loading or no data |
-| VII. Server-Side Security | N/A | Confirmed: no server changes |
-| VIII. Consistent Code Standards | PASS | Component follows Nuxt 4 naming conventions |
+| Principle                          | Status | Notes                                       |
+| ---------------------------------- | ------ | ------------------------------------------- |
+| I. Data Integrity First            | N/A    | Confirmed: no data mutations in design      |
+| II. Type Safety Non-Negotiable     | PASS   | Interfaces defined in data-model.md         |
+| III. Location-Centric Architecture | PASS   | Props require location object               |
+| IV. Approval Workflow Compliance   | N/A    | Confirmed: no approvals needed              |
+| V. Accessible by Design            | PASS   | Button has cursor-pointer, disabled states  |
+| VI. Offline-Aware UI               | PASS   | Button disabled when loading or no data     |
+| VII. Server-Side Security          | N/A    | Confirmed: no server changes                |
+| VIII. Consistent Code Standards    | PASS   | Component follows Nuxt 4 naming conventions |
 
 **Post-Design Gate Status**: PASSED - Design complies with all applicable principles.
 
@@ -93,5 +93,5 @@ tests/
 > No Constitution Check violations requiring justification.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|--------------------------------------|
-| None | - | - |
+| --------- | ---------- | ------------------------------------ |
+| None      | -          | -                                    |

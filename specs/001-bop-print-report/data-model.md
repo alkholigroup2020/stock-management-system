@@ -18,49 +18,49 @@ These entities already exist in the codebase and are documented for reference.
 
 Represents a single day's personnel count.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string? | Database ID (optional for new entries) |
-| date | string | ISO date string (YYYY-MM-DD) |
-| crew_count | number | Number of crew members (mandays) |
-| extra_count | number | Number of visitor meals |
-| total_count | number | Sum of crew_count + extra_count |
-| enterer | object? | User who entered the data |
-| entered_at | string? | ISO timestamp of entry |
-| updated_at | string? | ISO timestamp of last update |
+| Field       | Type    | Description                            |
+| ----------- | ------- | -------------------------------------- |
+| id          | string? | Database ID (optional for new entries) |
+| date        | string  | ISO date string (YYYY-MM-DD)           |
+| crew_count  | number  | Number of crew members (mandays)       |
+| extra_count | number  | Number of visitor meals                |
+| total_count | number  | Sum of crew_count + extra_count        |
+| enterer     | object? | User who entered the data              |
+| entered_at  | string? | ISO timestamp of entry                 |
+| updated_at  | string? | ISO timestamp of last update           |
 
 ### POBSummary
 
 Aggregated totals for the period.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| total_crew_count | number | Sum of all crew counts |
-| total_extra_count | number | Sum of all visitor meals |
-| total_mandays | number | Total mandays (crew + extra) |
-| entries_count | number | Number of days with entries |
+| Field             | Type   | Description                  |
+| ----------------- | ------ | ---------------------------- |
+| total_crew_count  | number | Sum of all crew counts       |
+| total_extra_count | number | Sum of all visitor meals     |
+| total_mandays     | number | Total mandays (crew + extra) |
+| entries_count     | number | Number of days with entries  |
 
 ### Period
 
 The accounting period context.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string | Database ID |
-| name | string | Period display name (e.g., "January 2026") |
-| start_date | string | ISO date string |
-| end_date | string | ISO date string |
-| status | string | "OPEN" or "CLOSED" |
+| Field      | Type   | Description                                |
+| ---------- | ------ | ------------------------------------------ |
+| id         | string | Database ID                                |
+| name       | string | Period display name (e.g., "January 2026") |
+| start_date | string | ISO date string                            |
+| end_date   | string | ISO date string                            |
+| status     | string | "OPEN" or "CLOSED"                         |
 
 ### Location
 
 The site/location context.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string | Database ID |
-| code | string | Short location code |
-| name | string | Full location name |
+| Field | Type   | Description         |
+| ----- | ------ | ------------------- |
+| id    | string | Database ID         |
+| code  | string | Short location code |
+| name  | string | Full location name  |
 
 ---
 
@@ -121,6 +121,7 @@ interface SignatureBlock {
 ```
 
 Default signature blocks:
+
 1. `{ label: "Operator Signature", showDate: true }`
 2. `{ label: "Manager Signature", showDate: true }`
 3. `{ label: "Client Signature", showDate: true }`
@@ -157,12 +158,12 @@ Default signature blocks:
 
 Since this is a read-only display component, validation is minimal:
 
-| Rule | Implementation |
-|------|----------------|
+| Rule                      | Implementation                             |
+| ------------------------- | ------------------------------------------ |
 | Entries must be non-empty | Disable print button if entries.size === 0 |
-| Period must be defined | Disable print button if !period |
-| Location must be defined | Disable print button if !location |
-| Summary must be defined | Disable print button if !summary |
+| Period must be defined    | Disable print button if !period            |
+| Location must be defined  | Disable print button if !location          |
+| Summary must be defined   | Disable print button if !summary           |
 
 These validations already exist in the parent `pob.vue` page; the print button simply respects the same conditions.
 
@@ -177,6 +178,7 @@ No state transitions for this feature. The print report is a static snapshot of 
 ## No New Database Schema
 
 This feature does not require any database changes. All data comes from existing POB API endpoints:
+
 - `GET /api/locations/{locationId}/pob` - Existing endpoint
 
 ---

@@ -496,8 +496,8 @@ watch(
           <p class="text-sm text-[var(--ui-text-muted)] mb-3">
             The Sync Stock button is a time-saving feature that allows you to quickly load all items
             that have stock at your location into the Issue Items table at once, instead of manually
-            adding items one-by-one. This is especially useful when issuing multiple items or most of
-            your inventory.
+            adding items one-by-one. This is especially useful when issuing multiple items or most
+            of your inventory.
           </p>
 
           <div class="mb-3">

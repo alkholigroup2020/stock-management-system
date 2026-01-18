@@ -2,6 +2,7 @@
 // Explicit component imports
 import POBSummary from "~/components/pob/POBSummary.vue";
 import POBTable from "~/components/pob/POBTable.vue";
+import POBPrintReport from "~/components/pob/POBPrintReport.vue";
 
 // SEO
 useSeoMeta({
@@ -61,6 +62,15 @@ const savingDates = ref<Set<string>>(new Set());
 const activeLocationId = computed(() => locationStore.activeLocationId);
 const currentPeriod = computed(() => periodStore.currentPeriod);
 const isPeriodOpen = computed(() => periodStore.isPeriodOpen);
+const printLocation = computed(() => pobData.value?.location || locationStore.activeLocation);
+const canPrint = computed(
+  () =>
+    !loading.value &&
+    !!currentPeriod.value &&
+    !!printLocation.value &&
+    !!pobData.value?.summary &&
+    editableEntries.value.size > 0
+);
 
 // Watch for location changes
 watch(activeLocationId, async (newLocationId) => {
@@ -238,10 +248,14 @@ function handleBlur(dateStr: string) {
 function handleChange(dateStr: string) {
   updateTotal(dateStr);
 }
+
+function handlePrint() {
+  window.print();
+}
 </script>
 
 <template>
-  <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
+  <div class="screen-only px-0 py-0 md:px-4 md:py-1 space-y-3">
     <!-- Page Header -->
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 sm:gap-4">
@@ -256,6 +270,16 @@ function handleChange(dateStr: string) {
           </p>
         </div>
       </div>
+      <UButton
+        icon="i-lucide-printer"
+        color="primary"
+        variant="soft"
+        class="cursor-pointer"
+        :disabled="!canPrint"
+        @click="handlePrint"
+      >
+        Print Report
+      </UButton>
     </div>
 
     <!-- Loading State -->
@@ -376,4 +400,16 @@ function handleChange(dateStr: string) {
       />
     </template>
   </div>
+
+  <Teleport
+    v-if="printLocation && currentPeriod && pobData?.summary && editableEntries.size > 0"
+    to="body"
+  >
+    <POBPrintReport
+      :location="printLocation"
+      :period="currentPeriod"
+      :entries="editableEntries"
+      :summary="pobData.summary"
+    />
+  </Teleport>
 </template>
