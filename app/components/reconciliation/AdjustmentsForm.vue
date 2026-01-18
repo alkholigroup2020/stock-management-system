@@ -317,43 +317,6 @@ function goToNCR(ncrId: string) {
       </UAlert>
     </div>
 
-    <!-- NCR Adjustments Section (Read-only) -->
-    <div
-      v-if="ncrCredits > 0 || ncrLosses > 0"
-      class="mt-6 pt-6 border-t border-[var(--ui-border)]"
-    >
-      <div class="flex items-center gap-2 mb-4">
-        <h4 class="text-sm font-semibold text-[var(--ui-text)]">NCR Adjustments</h4>
-        <UBadge color="primary" variant="soft" size="xs">Auto-calculated</UBadge>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- NCR Credits (Deducted from consumption) -->
-        <div v-if="ncrCredits > 0">
-          <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
-            NCR Credits
-            <span class="text-[var(--ui-text-muted)] font-normal ml-1">(SAR)</span>
-          </label>
-          <UInput :model-value="formatCurrency(ncrCredits)" disabled class="w-full" readonly />
-          <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-            Credits from CREDITED and RESOLVED/CREDIT NCRs
-          </p>
-        </div>
-
-        <!-- NCR Losses (Added to consumption) -->
-        <div v-if="ncrLosses > 0">
-          <label class="block text-sm font-medium text-[var(--ui-text)] mb-2">
-            NCR Losses
-            <span class="text-[var(--ui-text-muted)] font-normal ml-1">(SAR)</span>
-          </label>
-          <UInput :model-value="formatCurrency(ncrLosses)" disabled class="w-full" readonly />
-          <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-            Losses from REJECTED and RESOLVED/LOSS NCRs
-          </p>
-        </div>
-      </div>
-    </div>
-
     <!-- Total Adjustments Summary -->
     <div
       v-if="totalAdjustments > 0"

@@ -124,35 +124,67 @@ function formatCurrency(value: number | null): string {
         <h3 class="text-lg font-semibold text-[var(--ui-text)]">Consumption Analysis</h3>
       </template>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Total Consumption -->
-        <div>
-          <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Consumption</h4>
-          <p class="text-2xl font-bold text-[var(--ui-primary)] mt-1">
-            {{ formatCurrency(calculations.consumption) }}
-          </p>
+      <div class="space-y-6">
+        <!-- Row 1: NCR Credits, NCR Losses, Total Consumption -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- NCR Credits -->
+          <div v-if="reconciliation.ncr_credits && reconciliation.ncr_credits > 0">
+            <div class="flex items-center gap-1">
+              <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">NCR Credits</h4>
+              <UTooltip text="Credits from CREDITED and RESOLVED/CREDIT NCRs (reduces consumption)">
+                <UIcon name="i-lucide-info" class="w-3.5 h-3.5 text-[var(--ui-text-muted)]" />
+              </UTooltip>
+            </div>
+            <p class="text-2xl font-bold text-[var(--ui-success)] mt-1">
+              {{ formatCurrency(reconciliation.ncr_credits) }}
+            </p>
+          </div>
+
+          <!-- NCR Losses -->
+          <div v-if="reconciliation.ncr_losses && reconciliation.ncr_losses > 0">
+            <div class="flex items-center gap-1">
+              <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">NCR Losses</h4>
+              <UTooltip text="Losses from REJECTED and RESOLVED/LOSS NCRs (increases consumption)">
+                <UIcon name="i-lucide-info" class="w-3.5 h-3.5 text-[var(--ui-text-muted)]" />
+              </UTooltip>
+            </div>
+            <p class="text-2xl font-bold text-[var(--ui-error)] mt-1">
+              {{ formatCurrency(reconciliation.ncr_losses) }}
+            </p>
+          </div>
+
+          <!-- Total Consumption -->
+          <div :class="{ 'md:col-start-3': !(reconciliation.ncr_credits && reconciliation.ncr_credits > 0) && !(reconciliation.ncr_losses && reconciliation.ncr_losses > 0) }">
+            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Consumption</h4>
+            <p class="text-2xl font-bold text-[var(--ui-primary)] mt-1">
+              {{ formatCurrency(calculations.consumption) }}
+            </p>
+          </div>
         </div>
 
-        <!-- Total Mandays -->
-        <div>
-          <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Mandays</h4>
-          <p class="text-2xl font-bold text-[var(--ui-text)] mt-1">
-            {{ calculations.total_mandays.toLocaleString() }}
-          </p>
-        </div>
+        <!-- Row 2: Total Mandays, Manday Cost -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Total Mandays -->
+          <div>
+            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Mandays</h4>
+            <p class="text-2xl font-bold text-[var(--ui-text)] mt-1">
+              {{ calculations.total_mandays.toLocaleString() }}
+            </p>
+          </div>
 
-        <!-- Manday Cost -->
-        <div>
-          <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Manday Cost</h4>
-          <p class="text-2xl font-bold text-[var(--ui-success)] mt-1">
-            {{ calculations.manday_cost ? formatCurrency(calculations.manday_cost) : "N/A" }}
-          </p>
-          <p
-            v-if="calculations.total_mandays === 0"
-            class="text-xs text-[var(--ui-text-muted)] mt-1"
-          >
-            No POB entries for this period
-          </p>
+          <!-- Manday Cost -->
+          <div>
+            <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Manday Cost</h4>
+            <p class="text-2xl font-bold text-[var(--ui-success)] mt-1">
+              {{ calculations.manday_cost ? formatCurrency(calculations.manday_cost) : "N/A" }}
+            </p>
+            <p
+              v-if="calculations.total_mandays === 0"
+              class="text-xs text-[var(--ui-text-muted)] mt-1"
+            >
+              No POB entries for this period
+            </p>
+          </div>
         </div>
       </div>
 

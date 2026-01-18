@@ -23,6 +23,7 @@
 import prisma from "../../utils/prisma";
 import { setCacheHeaders } from "../../utils/performance";
 import { calculateConsumption, calculateMandayCost } from "../../utils/reconciliation";
+import { getAllNCRSummaryForPeriod } from "../../utils/ncrCredits";
 import { z } from "zod";
 import type { UserRole, Period, Reconciliation } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
@@ -58,6 +59,8 @@ interface LocationReconciliationSummary {
     adjustments: number;
     back_charges: number;
     credits: number;
+    ncr_credits?: number;
+    ncr_losses?: number;
     condemnations: number;
   };
   calculations: {
@@ -79,6 +82,8 @@ interface PreFetchedData {
   issueTotals: Map<string, Decimal>;
   closingStockTotals: Map<string, Decimal>;
   pobTotals: Map<string, number>;
+  ncrCredits: Map<string, Decimal>;
+  ncrLosses: Map<string, Decimal>;
 }
 
 export default defineEventHandler(async (event) => {
@@ -206,6 +211,7 @@ export default defineEventHandler(async (event) => {
       issueAggregates,
       locationStocks,
       pobEntries,
+      ncrSummaries,
     ] = await Promise.all([
       // All saved reconciliations for this period
       prisma.reconciliation.findMany({
@@ -290,6 +296,13 @@ export default defineEventHandler(async (event) => {
           extra_count: true,
         },
       }),
+      // NCR summaries for all accessible locations
+      Promise.all(
+        accessibleLocationIds.map(async (locationId) => ({
+          locationId,
+          summary: await getAllNCRSummaryForPeriod(periodId, locationId),
+        }))
+      ),
     ]);
 
     // OPTIMIZATION 3: Build lookup maps for O(1) access
@@ -315,6 +328,12 @@ export default defineEventHandler(async (event) => {
       ),
       closingStockTotals: new Map(),
       pobTotals: new Map(),
+      ncrCredits: new Map(
+        ncrSummaries.map((ncr) => [ncr.locationId, new Decimal(ncr.summary.credited.total)])
+      ),
+      ncrLosses: new Map(
+        ncrSummaries.map((ncr) => [ncr.locationId, new Decimal(ncr.summary.losses.total)])
+      ),
     };
 
     // Calculate closing stock totals per location
@@ -345,6 +364,8 @@ export default defineEventHandler(async (event) => {
         adjustments: Decimal;
         back_charges: Decimal;
         credits: Decimal;
+        ncr_credits: Decimal;
+        ncr_losses: Decimal;
         condemnations: Decimal;
       };
       let isSaved = false;
@@ -361,6 +382,8 @@ export default defineEventHandler(async (event) => {
           adjustments: savedRec.adjustments,
           back_charges: savedRec.back_charges,
           credits: savedRec.credits,
+          ncr_credits: savedRec.ncr_credits,
+          ncr_losses: savedRec.ncr_losses,
           condemnations: savedRec.condemnations,
         };
         isSaved = true;
@@ -379,6 +402,8 @@ export default defineEventHandler(async (event) => {
           adjustments: new Decimal(0),
           back_charges: new Decimal(0),
           credits: new Decimal(0),
+          ncr_credits: preFetchedData.ncrCredits.get(location.id) || new Decimal(0),
+          ncr_losses: preFetchedData.ncrLosses.get(location.id) || new Decimal(0),
           condemnations: new Decimal(0),
         };
       }
@@ -397,6 +422,8 @@ export default defineEventHandler(async (event) => {
         adjustments: recData.adjustments,
         backCharges: recData.back_charges,
         credits: recData.credits,
+        ncrCredits: recData.ncr_credits,
+        ncrLosses: recData.ncr_losses,
         condemnations: recData.condemnations,
       });
 
@@ -422,6 +449,8 @@ export default defineEventHandler(async (event) => {
           adjustments: Math.round(parseFloat(recData.adjustments.toString()) * 100) / 100,
           back_charges: Math.round(parseFloat(recData.back_charges.toString()) * 100) / 100,
           credits: Math.round(parseFloat(recData.credits.toString()) * 100) / 100,
+          ncr_credits: Math.round(parseFloat(recData.ncr_credits.toString()) * 100) / 100,
+          ncr_losses: Math.round(parseFloat(recData.ncr_losses.toString()) * 100) / 100,
           condemnations: Math.round(parseFloat(recData.condemnations.toString()) * 100) / 100,
         },
         calculations: {
