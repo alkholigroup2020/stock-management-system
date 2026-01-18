@@ -25,9 +25,9 @@
 
 **Purpose**: Verify development environment and understand existing code
 
-- [ ] T001 Verify dev server runs with `pnpm dev` at http://localhost:3000
-- [ ] T002 Navigate to `/issues/create` and confirm existing page loads correctly
-- [ ] T003 Read and understand existing code in `app/pages/issues/create.vue` (lines 1-601)
+- [x] T001 Verify dev server runs with `pnpm dev` at http://localhost:3000
+- [x] T002 Navigate to `/issues/create` and confirm existing page loads correctly
+- [x] T003 Read and understand existing code in `app/pages/issues/create.vue` (lines 1-601)
 
 ---
 
@@ -37,8 +37,8 @@
 
 **⚠️ CRITICAL**: Complete these before any user story implementation
 
-- [ ] T004 Add `syncing` ref for loading state in script section of `app/pages/issues/create.vue`
-- [ ] T005 Run `pnpm typecheck` to verify no type errors introduced
+- [x] T004 Add `syncing` ref for loading state in script section of `app/pages/issues/create.vue`
+- [x] T005 Run `pnpm typecheck` to verify no type errors introduced
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -52,13 +52,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Add "Sync Stock" button to card header template before "Add Item" button in `app/pages/issues/create.vue` (line ~78-90)
-- [ ] T007 [US1] Implement `syncStock()` function that filters items with positive stock in `app/pages/issues/create.vue`
-- [ ] T008 [US1] In `syncStock()`, transform filtered items to IssueLine array with correct fields (id, item_id, quantity, wac, line_value, on_hand, has_insufficient_stock)
-- [ ] T009 [US1] In `syncStock()`, replace `lines.value` with new synced lines array (not append)
-- [ ] T010 [US1] Handle empty stock edge case: show toast via `handleError()` when no items have positive stock
-- [ ] T011 [US1] Run `pnpm typecheck` to verify no type errors
-- [ ] T012 [US1] Test manually: click "Sync Stock" and verify table populates with all stocked items
+- [x] T006 [US1] Add "Sync Stock" button to card header template before "Add Item" button in `app/pages/issues/create.vue` (line ~78-90)
+- [x] T007 [US1] Implement `syncStock()` function that filters items with positive stock in `app/pages/issues/create.vue`
+- [x] T008 [US1] In `syncStock()`, transform filtered items to IssueLine array with correct fields (id, item_id, quantity, wac, line_value, on_hand, has_insufficient_stock)
+- [x] T009 [US1] In `syncStock()`, replace `lines.value` with new synced lines array (not append)
+- [x] T010 [US1] Handle empty stock edge case: show toast via `handleError()` when no items have positive stock
+- [x] T011 [US1] Run `pnpm typecheck` to verify no type errors
+- [x] T012 [US1] Test manually: click "Sync Stock" and verify table populates with all stocked items
 
 **Checkpoint**: User Story 1 complete - sync button populates table with stock data
 
@@ -72,10 +72,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Verify existing `updateLineCalculations()` watcher handles synced items correctly in `app/pages/issues/create.vue`
-- [ ] T014 [US2] Test manually: sync items, edit a quantity, verify Line Value recalculates
-- [ ] T015 [US2] Test manually: reduce quantity below on-hand, verify no insufficient stock warning
-- [ ] T016 [US2] Test manually: increase quantity above on-hand, verify insufficient stock warning appears
+- [x] T013 [US2] Verify existing `updateLineCalculations()` watcher handles synced items correctly in `app/pages/issues/create.vue`
+- [x] T014 [US2] Test manually: sync items, edit a quantity, verify Line Value recalculates
+- [x] T015 [US2] Test manually: reduce quantity below on-hand, verify no insufficient stock warning
+- [x] T016 [US2] Test manually: increase quantity above on-hand, verify insufficient stock warning appears
 
 **Checkpoint**: User Story 2 complete - editing synced quantities works correctly
 
@@ -89,10 +89,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Verify existing `removeLine()` function works with synced items in `app/pages/issues/create.vue`
-- [ ] T018 [US3] Test manually: sync items, delete an item, verify it's removed from table
-- [ ] T019 [US3] Test manually: delete items until one remains, verify delete button is disabled
-- [ ] T020 [US3] Test manually: verify Total Value recalculates after deletions
+- [x] T017 [US3] Verify existing `removeLine()` function works with synced items in `app/pages/issues/create.vue`
+- [x] T018 [US3] Test manually: sync items, delete an item, verify it's removed from table
+- [x] T019 [US3] Test manually: delete items until one remains, verify delete button is disabled
+- [x] T020 [US3] Test manually: verify Total Value recalculates after deletions
 
 **Checkpoint**: User Story 3 complete - deleting synced items works correctly
 
@@ -106,11 +106,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T021 [US4] Add `:loading="syncing"` prop to "Sync Stock" button in `app/pages/issues/create.vue`
-- [ ] T022 [US4] Set `syncing.value = true` at start of `syncStock()` function
-- [ ] T023 [US4] Set `syncing.value = false` in finally block of `syncStock()` function
-- [ ] T024 [US4] Add `:disabled="!isOnline || syncing"` to disable button when offline or loading
-- [ ] T025 [US4] Test manually: click "Sync Stock" and verify spinner appears during operation
+- [x] T021 [US4] Add `:loading="syncing"` prop to "Sync Stock" button in `app/pages/issues/create.vue`
+- [x] T022 [US4] Set `syncing.value = true` at start of `syncStock()` function
+- [x] T023 [US4] Set `syncing.value = false` in finally block of `syncStock()` function
+- [x] T024 [US4] Add `:disabled="!isOnline || syncing"` to disable button when offline or loading
+- [x] T025 [US4] Test manually: click "Sync Stock" and verify spinner appears during operation
 
 **Checkpoint**: User Story 4 complete - loading state shows during sync
 
@@ -120,12 +120,12 @@
 
 **Purpose**: Final verification and code quality checks
 
-- [ ] T026 Run `pnpm typecheck` - must pass with zero errors
-- [ ] T027 Run `pnpm format` to ensure code follows Prettier rules
-- [ ] T028 Verify button has `cursor-pointer` class per project standards
-- [ ] T029 Test offline behavior: go offline (DevTools > Network > Offline), verify button is disabled
-- [ ] T030 Test full workflow: sync → edit quantities → delete items → submit issue
-- [ ] T031 Run validation using Playwright MCP at http://localhost:3000/issues/create
+- [x] T026 Run `pnpm typecheck` - must pass with zero errors
+- [x] T027 Run `pnpm format` to ensure code follows Prettier rules
+- [x] T028 Verify button has `cursor-pointer` class per project standards
+- [x] T029 Test offline behavior: go offline (DevTools > Network > Offline), verify button is disabled
+- [x] T030 Test full workflow: sync → edit quantities → delete items → submit issue
+- [x] T031 Run validation using Playwright MCP at http://localhost:3000/issues/create
 
 ---
 
@@ -156,9 +156,11 @@
 Since all tasks modify the same file (`app/pages/issues/create.vue`), parallel execution is limited.
 
 **Can run in parallel (different sections of file):**
+
 - T006 (template) can start while T007-T010 (script) are in progress conceptually
 
 **Recommended sequential approach:**
+
 - Complete one user story fully before starting next
 - US1 first (core functionality), then US4 (loading state), then US2/US3 (verification of existing code)
 
@@ -169,6 +171,7 @@ Since all tasks modify the same file (`app/pages/issues/create.vue`), parallel e
 This feature modifies a single file, so parallel task execution is not applicable.
 
 **Recommended execution order:**
+
 ```text
 T001 → T002 → T003 (Setup - understand existing code)
 T004 → T005 (Foundational - add syncing ref)

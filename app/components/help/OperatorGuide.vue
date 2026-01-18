@@ -862,8 +862,8 @@ watch(
             </li>
             <li>
               <strong>RESOLVED:</strong>
-              Resolved internally. The Supervisor specifies whether it resulted in a credit, loss, or
-              no financial impact.
+              Resolved internally. The Supervisor specifies whether it resulted in a credit, loss,
+              or no financial impact.
             </li>
           </ul>
         </div>

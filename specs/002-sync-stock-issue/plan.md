@@ -23,16 +23,16 @@ Add a "Sync Stock" button to the New Issue page that fetches all items with posi
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Data Integrity First | ✅ PASS | No data mutations - uses existing stock data read-only; existing validation for issue creation unchanged |
-| II. Type Safety Non-Negotiable | ✅ PASS | Will use existing typed interfaces; no `any` types; `pnpm typecheck` required |
-| III. Location-Centric Architecture | ✅ PASS | Uses `locationStore.activeLocation` for all operations; location context explicit |
-| IV. Approval Workflow Compliance | ✅ PASS | Issues have no approval workflow (documented exception) |
-| V. Accessible by Design | ✅ PASS | Button follows existing patterns; uses Nuxt UI components with built-in accessibility |
-| VI. Offline-Aware UI | ✅ PASS | FR-011 requires button disabled when offline; uses existing `useOfflineGuard` composable |
-| VII. Server-Side Security | ✅ PASS | Uses existing authenticated API endpoints; no new security requirements |
-| VIII. Consistent Code Standards | ✅ PASS | Will follow Prettier config; `cursor-pointer` on button; existing component patterns |
+| Principle                          | Status  | Notes                                                                                                    |
+| ---------------------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| I. Data Integrity First            | ✅ PASS | No data mutations - uses existing stock data read-only; existing validation for issue creation unchanged |
+| II. Type Safety Non-Negotiable     | ✅ PASS | Will use existing typed interfaces; no `any` types; `pnpm typecheck` required                            |
+| III. Location-Centric Architecture | ✅ PASS | Uses `locationStore.activeLocation` for all operations; location context explicit                        |
+| IV. Approval Workflow Compliance   | ✅ PASS | Issues have no approval workflow (documented exception)                                                  |
+| V. Accessible by Design            | ✅ PASS | Button follows existing patterns; uses Nuxt UI components with built-in accessibility                    |
+| VI. Offline-Aware UI               | ✅ PASS | FR-011 requires button disabled when offline; uses existing `useOfflineGuard` composable                 |
+| VII. Server-Side Security          | ✅ PASS | Uses existing authenticated API endpoints; no new security requirements                                  |
+| VIII. Consistent Code Standards    | ✅ PASS | Will follow Prettier config; `cursor-pointer` on button; existing component patterns                     |
 
 **Gate Status**: ✅ All gates pass - proceed to Phase 0
 

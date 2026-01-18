@@ -15,15 +15,15 @@ This feature does not introduce new database entities. It reuses existing entiti
 
 The feature reads stock levels from the existing `LocationStock` table via the `/api/items` endpoint.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| location_id | UUID | Foreign key to Location |
-| item_id | UUID | Foreign key to Item |
-| on_hand | Decimal | Current quantity in stock |
-| wac | Decimal | Weighted Average Cost |
-| min_stock | Decimal? | Minimum stock level (optional) |
-| max_stock | Decimal? | Maximum stock level (optional) |
-| last_counted | DateTime? | Last physical count date |
+| Field        | Type      | Description                    |
+| ------------ | --------- | ------------------------------ |
+| location_id  | UUID      | Foreign key to Location        |
+| item_id      | UUID      | Foreign key to Item            |
+| on_hand      | Decimal   | Current quantity in stock      |
+| wac          | Decimal   | Weighted Average Cost          |
+| min_stock    | Decimal?  | Minimum stock level (optional) |
+| max_stock    | Decimal?  | Maximum stock level (optional) |
+| last_counted | DateTime? | Last physical count date       |
 
 **Access Pattern**: Read via `/api/items?locationId={id}` which includes `location_stock` relation
 
@@ -33,13 +33,13 @@ The feature reads stock levels from the existing `LocationStock` table via the `
 
 The feature reads item master data alongside stock levels.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| id | UUID | Primary key |
-| code | String | Item code |
-| name | String | Item display name |
-| unit | String | Unit of measure |
-| is_active | Boolean | Active status |
+| Field          | Type            | Description              |
+| -------------- | --------------- | ------------------------ |
+| id             | UUID            | Primary key              |
+| code           | String          | Item code                |
+| name           | String          | Item display name        |
+| unit           | String          | Unit of measure          |
+| is_active      | Boolean         | Active status            |
 | location_stock | LocationStock[] | Stock levels by location |
 
 **Access Pattern**: Read via `/api/items?locationId={id}&is_active=true&limit=200`
@@ -54,13 +54,13 @@ The feature populates the existing `lines` reactive array with synced items.
 
 ```typescript
 interface IssueLine {
-  id: string;           // Generated UUID for tracking
-  item_id: string;      // Selected item ID
-  quantity: string;     // User-editable quantity (string for input binding)
-  wac: number;          // WAC from stock data
-  line_value: number;   // Calculated: quantity × wac
-  on_hand: number;      // Current stock level
-  has_insufficient_stock: boolean;  // quantity > on_hand
+  id: string; // Generated UUID for tracking
+  item_id: string; // Selected item ID
+  quantity: string; // User-editable quantity (string for input binding)
+  wac: number; // WAC from stock data
+  line_value: number; // Calculated: quantity × wac
+  on_hand: number; // Current stock level
+  has_insufficient_stock: boolean; // quantity > on_hand
 }
 ```
 
@@ -95,11 +95,11 @@ const stockLevels = ref<Record<string, { on_hand: number; wac: number }>>({});
 │  Transform to IssueLine[] array:                                     │
 │  - id: crypto.randomUUID()                                           │
 │  - item_id: item.id                                                  │
-│  - quantity: stockLevels[item.id].on_hand.toString()                │
+│  - quantity: "0"                                                     │
 │  - wac: stockLevels[item.id].wac                                    │
-│  - line_value: on_hand × wac                                        │
+│  - line_value: 0                                                     │
 │  - on_hand: stockLevels[item.id].on_hand                            │
-│  - has_insufficient_stock: false (quantity === on_hand)             │
+│  - has_insufficient_stock: false                                     │
 └─────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -114,6 +114,7 @@ const stockLevels = ref<Record<string, { on_hand: number; wac: number }>>({});
 ## No Database Changes Required
 
 This feature is purely a UI enhancement. All data access uses existing:
+
 - Database tables: `Item`, `LocationStock`
 - API endpoints: `GET /api/items`
 - UI state structures: `lines`, `stockLevels`, `items`

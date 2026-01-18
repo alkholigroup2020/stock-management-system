@@ -77,16 +77,30 @@
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-[var(--ui-text)]">Issue Items</h2>
-            <UButton
-              icon="i-lucide-plus"
-              color="primary"
-              variant="soft"
-              size="sm"
-              class="cursor-pointer"
-              @click="addLine"
-            >
-              Add Item
-            </UButton>
+            <div class="flex items-center gap-2">
+              <UButton
+                icon="i-lucide-refresh-cw"
+                color="primary"
+                variant="outline"
+                size="sm"
+                class="cursor-pointer"
+                :loading="syncing"
+                :disabled="!isOnline || syncing"
+                @click="syncStock"
+              >
+                Sync Stock
+              </UButton>
+              <UButton
+                icon="i-lucide-plus"
+                color="primary"
+                variant="soft"
+                size="sm"
+                class="cursor-pointer"
+                @click="addLine"
+              >
+                Add Item
+              </UButton>
+            </div>
           </div>
         </template>
 
@@ -299,6 +313,7 @@ const { handleError, handleSuccess } = useErrorHandler();
 // State
 const loading = ref(false);
 const submitting = ref(false);
+const syncing = ref(false);
 const showDiscardModal = ref(false);
 const items = ref<
   Array<{
@@ -454,6 +469,40 @@ const fetchItems = async () => {
     });
   } catch (error: unknown) {
     handleError(error, { context: "fetching items" });
+  }
+};
+
+// Sync stock - populate lines with all items that have positive stock
+const syncStock = async () => {
+  syncing.value = true;
+  try {
+    // Filter items with positive stock
+    const itemsWithStock = items.value.filter((item) => {
+      const stock = stockLevels.value[item.id];
+      return stock && stock.on_hand > 0;
+    });
+
+    // Handle empty stock edge case
+    if (itemsWithStock.length === 0) {
+      handleError({ data: { message: "No items with stock to sync" } });
+      return;
+    }
+
+    // Transform to IssueLine array and replace existing lines
+    lines.value = itemsWithStock.map((item) => {
+      const stock = stockLevels.value[item.id]!;
+      return {
+        id: crypto.randomUUID(),
+        item_id: item.id,
+        quantity: "0",
+        wac: stock.wac,
+        line_value: 0,
+        on_hand: stock.on_hand,
+        has_insufficient_stock: false,
+      };
+    });
+  } finally {
+    syncing.value = false;
   }
 };
 

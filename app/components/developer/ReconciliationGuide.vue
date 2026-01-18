@@ -1069,7 +1069,9 @@ INTERNAL_ERROR               // Unexpected server error
         </div>
 
         <div class="space-y-3">
-          <h4 class="font-medium text-[var(--ui-text-highlighted)]">NCR Impact on Reconciliation</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">
+            NCR Impact on Reconciliation
+          </h4>
           <div class="grid gap-3 sm:grid-cols-2">
             <div class="rounded-lg border border-[var(--ui-success)]/30 bg-[var(--ui-bg)] p-3">
               <div class="mb-2 flex items-center gap-2">
@@ -1136,8 +1138,8 @@ INTERNAL_ERROR               // Unexpected server error
               <strong>OpenNCRWarning Component:</strong>
               The
               <code class="code-inline">app/components/reconciliation/OpenNCRWarning.vue</code>
-              component displays a collapsible warning grouped by location when unresolved NCRs exist
-              during period close.
+              component displays a collapsible warning grouped by location when unresolved NCRs
+              exist during period close.
             </span>
           </p>
         </div>

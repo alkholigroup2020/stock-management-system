@@ -14,11 +14,13 @@ This feature requires minimal research as it builds entirely on existing pattern
 **Decision**: Reuse existing `/api/items` endpoint with `locationId` parameter
 
 **Rationale**:
+
 - The `fetchItems()` function in `create.vue` already fetches items with `location_stock` data
 - The existing endpoint returns `location_stock` array with `on_hand` and `wac` for each item
 - No new API endpoint needed - the data is already available
 
 **Alternatives Considered**:
+
 - `/api/reports/stock-now` - Returns same data but structured for reports, includes additional metadata not needed for this feature
 - New dedicated endpoint - Unnecessary complexity when existing endpoint provides all required data
 
@@ -31,11 +33,13 @@ This feature requires minimal research as it builds entirely on existing pattern
 **Decision**: Position "Sync Stock" button before "Add Item" button using outline variant
 
 **Rationale**:
+
 - Screenshot shows button positioned left of "Add Item"
 - Using `variant="outline"` distinguishes it from primary "Add Item" action while maintaining visual hierarchy
 - Consistent with existing button patterns in the application
 
 **Alternatives Considered**:
+
 - Same styling as "Add Item" - Would create visual confusion about which button does what
 - Dropdown/menu approach - Over-engineered for single action
 
@@ -48,12 +52,14 @@ This feature requires minimal research as it builds entirely on existing pattern
 **Decision**: Replace existing lines (not append) when syncing
 
 **Rationale**:
+
 - FR-005 explicitly requires replacement, not append
 - Cleaner UX - users expect "sync" to mean "refresh with current state"
 - Prevents duplicate items if user syncs multiple times
 - Matches user mental model from screenshot description
 
 **Alternatives Considered**:
+
 - Append mode - Creates duplicates and confusion
 - Confirmation dialog before replace - Over-engineered for the use case; users can re-add items if needed
 
@@ -61,16 +67,18 @@ This feature requires minimal research as it builds entirely on existing pattern
 
 ## Decision 4: Quantity Pre-fill Strategy
 
-**Decision**: Pre-fill quantity with full on-hand amount
+**Decision**: Pre-fill quantity with zero (user enters values)
 
 **Rationale**:
-- FR-004 specifies pre-fill with current on-hand amount
-- Enables "full stock issue" workflow with single click
-- Users can reduce quantities as needed (common workflow per spec)
-- Validation already exists for quantities exceeding on-hand
+
+- User requirement: quantities start at zero for manual entry
+- Sync populates the item list, user enters needed quantities
+- Prevents accidental submission of full stock amounts
+- Users have full control over quantities being issued
 
 **Alternatives Considered**:
-- Pre-fill with zero - Defeats purpose of sync feature; requires manual entry
+
+- Pre-fill with on-hand - Could lead to accidental full stock issues
 - Pre-fill with 1 - Arbitrary and not useful for stock issue workflow
 
 ---
@@ -80,11 +88,13 @@ This feature requires minimal research as it builds entirely on existing pattern
 **Decision**: Show toast notification when no items have positive stock
 
 **Rationale**:
+
 - FR-012 requires informative message when no stock to sync
 - Toast is non-intrusive and follows existing error handling patterns
 - No need to modify table state if nothing to sync
 
 **Alternatives Considered**:
+
 - Alert dialog - Too disruptive for this scenario
 - Inline message in table - Requires additional UI state management
 
@@ -97,11 +107,13 @@ This feature requires minimal research as it builds entirely on existing pattern
 **Decision**: Use `loading` prop on UButton during fetch
 
 **Rationale**:
+
 - Nuxt UI's `UButton` has built-in `:loading` prop
 - Automatically shows spinner and disables button
 - Matches existing patterns in the codebase
 
 **Alternatives Considered**:
+
 - LoadingOverlay component - Too heavy for single button action; reserved for full-page operations
 - Custom spinner - Unnecessary when Nuxt UI provides this out of the box
 
@@ -110,6 +122,7 @@ This feature requires minimal research as it builds entirely on existing pattern
 ## Existing Code Patterns to Follow
 
 ### Items Fetch Pattern
+
 ```typescript
 // From create.vue - existing pattern
 const data = await $fetch<{ items: Array<ItemType> }>("/api/items", {
@@ -122,6 +135,7 @@ const data = await $fetch<{ items: Array<ItemType> }>("/api/items", {
 ```
 
 ### Stock Levels Extraction Pattern
+
 ```typescript
 // From create.vue - existing pattern
 items.value.forEach((item) => {
@@ -136,6 +150,7 @@ items.value.forEach((item) => {
 ```
 
 ### Button in Card Header Pattern
+
 ```vue
 <!-- From create.vue - existing pattern -->
 <template #header>

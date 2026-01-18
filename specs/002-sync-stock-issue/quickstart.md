@@ -57,6 +57,7 @@ app/pages/issues/create.vue
 ### Key Patterns to Follow
 
 **Button in Header** (from existing code):
+
 ```vue
 <UButton
   icon="i-lucide-refresh-cw"
@@ -73,6 +74,7 @@ app/pages/issues/create.vue
 ```
 
 **Sync Handler** (new function):
+
 ```typescript
 const syncing = ref(false);
 
@@ -94,9 +96,9 @@ const syncStock = async () => {
     return {
       id: crypto.randomUUID(),
       item_id: item.id,
-      quantity: stock.on_hand.toString(),
+      quantity: "0",
       wac: stock.wac,
-      line_value: stock.on_hand * stock.wac,
+      line_value: 0,
       on_hand: stock.on_hand,
       has_insufficient_stock: false,
     };
@@ -154,14 +156,17 @@ After implementation, verify with Playwright MCP:
 ## Common Issues
 
 ### Items not appearing after sync
+
 - Check that `fetchItems()` has completed (wait for `onMounted`)
 - Verify `stockLevels` map is populated
 - Check browser console for API errors
 
 ### Quantities showing as zero
+
 - Ensure `stock.on_hand` is being converted to number correctly
 - Check Prisma Decimal handling (`Number(stock.on_hand)`)
 
 ### Button not disabling offline
+
 - Verify `useOfflineGuard` composable is imported
 - Check `isOnline` is destructured from composable

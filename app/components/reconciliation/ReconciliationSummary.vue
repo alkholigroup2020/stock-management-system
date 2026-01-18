@@ -154,7 +154,13 @@ function formatCurrency(value: number | null): string {
           </div>
 
           <!-- Total Consumption -->
-          <div :class="{ 'md:col-start-3': !(reconciliation.ncr_credits && reconciliation.ncr_credits > 0) && !(reconciliation.ncr_losses && reconciliation.ncr_losses > 0) }">
+          <div
+            :class="{
+              'md:col-start-3':
+                !(reconciliation.ncr_credits && reconciliation.ncr_credits > 0) &&
+                !(reconciliation.ncr_losses && reconciliation.ncr_losses > 0),
+            }"
+          >
             <h4 class="text-sm font-medium text-[var(--ui-text-muted)]">Total Consumption</h4>
             <p class="text-2xl font-bold text-[var(--ui-primary)] mt-1">
               {{ formatCurrency(calculations.consumption) }}
