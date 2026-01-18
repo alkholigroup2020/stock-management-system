@@ -77,8 +77,8 @@ const formattedDateRange = computed(() => {
             {{ summary.total_mandays.toLocaleString() }}
           </p>
           <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-            {{ summary.total_crew_count.toLocaleString() }} crew +
-            {{ summary.total_extra_count.toLocaleString() }} extra
+            {{ summary.total_crew_count.toLocaleString() }} Mandays +
+            {{ summary.total_extra_count.toLocaleString() }} Visitors
           </p>
         </div>
       </div>
