@@ -701,6 +701,162 @@ INTERNAL_ERROR        // Unexpected server error
 // │ CLEAN       │ SAR 2,500    │
 // │ OTHER       │ SAR 500      │
 // └─────────────┴──────────────┘`,
+
+  syncStockButton: `<!-- Sync Stock Button Implementation -->
+<!-- File: app/pages/issues/create.vue -->
+
+<template>
+  <UCard class="card-elevated">
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-[var(--ui-text)]">Issue Items</h2>
+        <div class="flex items-center gap-2">
+          <!-- Sync Stock Button -->
+          <UButton
+            icon="i-lucide-refresh-cw"
+            color="primary"
+            variant="outline"
+            size="sm"
+            class="cursor-pointer"
+            :loading="syncing"
+            :disabled="!isOnline || syncing"
+            @click="syncStock"
+          >
+            Sync Stock
+          </UButton>
+          <UButton
+            icon="i-lucide-plus"
+            color="primary"
+            variant="soft"
+            size="sm"
+            class="cursor-pointer"
+            @click="addLine"
+          >
+            Add Item
+          </UButton>
+        </div>
+      </div>
+    </template>
+    <!-- Table content... -->
+  </UCard>
+</template>`,
+
+  syncStockFunction: `// Sync Stock Function Implementation
+// File: app/pages/issues/create.vue
+
+// Sync stock - populate lines with all items that have positive stock
+const syncStock = async () => {
+  syncing.value = true;
+  try {
+    // Filter items with positive stock
+    const itemsWithStock = items.value.filter((item) => {
+      const stock = stockLevels.value[item.id];
+      return stock && stock.on_hand > 0;
+    });
+
+    // Handle empty stock edge case
+    if (itemsWithStock.length === 0) {
+      handleError({ data: { message: "No items with stock to sync" } });
+      return;
+    }
+
+    // Transform to IssueLine array and replace existing lines
+    lines.value = itemsWithStock.map((item) => {
+      const stock = stockLevels.value[item.id]!;
+      return {
+        id: crypto.randomUUID(),
+        item_id: item.id,
+        quantity: "0",
+        wac: stock.wac,
+        line_value: 0,
+        on_hand: stock.on_hand,
+        has_insufficient_stock: false,
+      };
+    });
+  } finally {
+    syncing.value = false;
+  }
+};`,
+
+  syncStockDataFlow: `// Sync Stock Data Flow
+//
+// ┌─────────────────────────────────────────────────────────────────┐
+// │                     SYNC STOCK WORKFLOW                          │
+// └─────────────────────────────────────────────────────────────────┘
+//
+//  ┌──────────────┐     ┌─────────────────┐     ┌─────────────────┐
+//  │ USER CLICKS  │────►│ FILTER ITEMS    │────►│ TRANSFORM TO    │
+//  │ SYNC BUTTON  │     │ WITH STOCK > 0  │     │ ISSUE LINES     │
+//  └──────────────┘     └─────────────────┘     └─────────────────┘
+//        │                     │                        │
+//        │                     │                        │
+//        ▼                     ▼                        ▼
+//  • Set syncing=true   • Check on_hand > 0      • Map to IssueLine
+//  • Disable button     • Use existing data      • quantity = "0"
+//  • Show spinner       • No API calls           • capture WAC
+//                       • Handle empty case      • Replace lines[]
+//
+// Key Benefits:
+// ─────────────
+// ┌─────────────────────────────────────────────────────────────────┐
+// │ 1. No Additional API Calls                                       │
+// │    - Reuses items and stockLevels already loaded                │
+// │    - Instant response, no network latency                       │
+// │                                                                  │
+// │ 2. User-Friendly Data Entry                                     │
+// │    - Populate all items at once vs manual selection             │
+// │    - User enters only quantities (starts at 0)                  │
+// │    - Delete unwanted items easily                               │
+// │                                                                  │
+// │ 3. Seamless Integration                                         │
+// │    - Works with existing form validation                        │
+// │    - Respects offline state (button disabled)                   │
+// │    - Compatible with edit/delete functionality                  │
+// └─────────────────────────────────────────────────────────────────┘`,
+
+  syncStockEdgeCases: `// Sync Stock Edge Cases & Error Handling
+//
+// Edge Case 1: No Items Have Stock
+// ─────────────────────────────────
+if (itemsWithStock.length === 0) {
+  handleError({ data: { message: "No items with stock to sync" } });
+  return;
+}
+
+// Edge Case 2: Offline State
+// ──────────────────────────
+<UButton
+  :disabled="!isOnline || syncing"
+  @click="syncStock"
+>
+  Sync Stock
+</UButton>
+
+// Edge Case 3: Already Syncing
+// ────────────────────────────
+const syncing = ref(false);
+
+const syncStock = async () => {
+  syncing.value = true;  // Prevents double-clicks
+  try {
+    // ... sync logic
+  } finally {
+    syncing.value = false;  // Always reset
+  }
+};
+
+// Edge Case 4: Replacing Existing Lines
+// ──────────────────────────────────────
+// lines.value = itemsWithStock.map(...)
+// Note: REPLACES (not appends) to prevent duplicates
+// User loses unsaved manual entries - this is intentional
+
+// Edge Case 5: Items Without Stock Records
+// ─────────────────────────────────────────
+const stock = stockLevels.value[item.id];
+if (!stock || stock.on_hand <= 0) {
+  // Item is excluded from sync
+}`,
 };
 </script>
 
@@ -1157,6 +1313,206 @@ INTERNAL_ERROR        // Unexpected server error
                 <li>Operation: UPSERT</li>
                 <li>Creates stock if missing</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sync Stock Feature Section -->
+    <section
+      id="dev-section-sync-stock-feature"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('sync-stock-feature')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-arrow-path" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Sync Stock Feature</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('sync-stock-feature')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('sync-stock-feature')" class="space-y-4 p-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          The Sync Stock feature allows operators to quickly populate the Issue Items table with all
+          items that have stock at the current location. This eliminates manual item-by-item
+          selection when issuing multiple items, significantly improving data entry efficiency.
+        </p>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Feature Overview</h4>
+          <DeveloperCodeBlock :code="codeExamples.syncStockDataFlow" language="plaintext" />
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Key Implementation Details</h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>
+                Button uses
+                <code class="code-inline">outline</code>
+                variant (less prominent than "Add Item")
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>
+                Loading state managed by
+                <code class="code-inline">syncing</code>
+                ref
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>Disabled when offline or during sync operation</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>
+                Icon:
+                <code class="code-inline">i-lucide-refresh-cw</code>
+                (refresh/sync icon)
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span>Quantities pre-filled to "0" - user must enter actual amounts</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Button Implementation
+          </h4>
+          <DeveloperCodeBlock
+            :code="codeExamples.syncStockButton"
+            language="vue"
+            filename="app/pages/issues/create.vue"
+          />
+        </div>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Sync Stock Function
+          </h4>
+          <DeveloperCodeBlock
+            :code="codeExamples.syncStockFunction"
+            language="typescript"
+            filename="app/pages/issues/create.vue"
+          />
+        </div>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Edge Cases & Error Handling
+          </h4>
+          <DeveloperCodeBlock :code="codeExamples.syncStockEdgeCases" language="typescript" />
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
+            <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>No Additional API Calls:</strong>
+              The feature reuses existing
+              <code class="code-inline">items</code>
+              and
+              <code class="code-inline">stockLevels</code>
+              refs that are already loaded on page mount. This provides instant response with no
+              network latency.
+            </span>
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
+            <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Important:</strong>
+              Quantities are pre-filled to "0" and must be entered manually by the user. This
+              prevents accidental issues with default quantities.
+            </span>
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-success)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-success)]">
+            <UIcon name="i-heroicons-check-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Seamless Integration:</strong>
+              The feature works seamlessly with existing form validation, edit/delete functionality,
+              and respects the offline state via the
+              <code class="code-inline">isOnline</code>
+              ref.
+            </span>
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Integration Points</h4>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-database" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
+                  Existing Data
+                </span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Uses existing
+                <code class="code-inline">items</code>
+                and
+                <code class="code-inline">stockLevels</code>
+                refs
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-arrow-path" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
+                  Replace Lines
+                </span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Replaces (not appends) existing
+                <code class="code-inline">lines</code>
+                array
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-pencil" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
+                  Form Integration
+                </span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Compatible with existing edit/delete functionality
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-wifi" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
+                  Offline Aware
+                </span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Respects
+                <code class="code-inline">isOnline</code>
+                state
+              </p>
             </div>
           </div>
         </div>

@@ -490,6 +490,85 @@ watch(
         </div>
 
         <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Using the Sync Stock Button
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-3">
+            The Sync Stock button is a time-saving feature that allows you to quickly load all items
+            that have stock at your location into the Issue Items table at once, instead of manually
+            adding items one-by-one. This is especially useful when issuing multiple items or most of
+            your inventory.
+          </p>
+
+          <div class="mb-3">
+            <p class="text-sm font-medium text-[var(--ui-text-highlighted)] mb-1">
+              When to Use the Sync Stock Button
+            </p>
+            <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+              <li class="flex items-center gap-2">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+                <span>When issuing most or all items at your location</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+                <span>Creating end-of-day or end-of-shift issues</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+                <span>Bulk transfers to kitchen or restaurant</span>
+              </li>
+              <li class="flex items-center gap-2">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+                <span>Any scenario where you need to issue many items at once</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-3">
+            <p class="text-sm font-medium text-[var(--ui-text-highlighted)] mb-1">How to Use</p>
+            <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+              <li>
+                On the Issue Items card, click the
+                <strong>Sync Stock</strong>
+                button
+              </li>
+              <li>Wait for items to load (all items with stock appear in the table)</li>
+              <li>Review the synced items (shows On Hand, WAC, Line Value)</li>
+              <li>
+                <strong>Enter quantities</strong>
+                for each item you want to issue
+              </li>
+              <li>Delete any unneeded items using the delete button</li>
+              <li>Proceed to select Cost Centre and create the issue</li>
+            </ol>
+          </div>
+
+          <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-info)]/30 mb-3">
+            <p class="text-sm text-[var(--ui-info)] flex items-start gap-2">
+              <UIcon name="i-heroicons-information-circle" class="shrink-0 mt-0.5" />
+              <span>
+                <strong>Important:</strong>
+                After syncing, all quantities start at 0. You must enter the actual quantities you
+                want to issue for each item. Only items with available stock are synced - items with
+                zero stock are excluded.
+              </span>
+            </p>
+          </div>
+
+          <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-success)]/30">
+            <p class="text-sm text-[var(--ui-success)] flex items-start gap-2">
+              <UIcon name="i-heroicons-check-circle" class="shrink-0 mt-0.5" />
+              <span>
+                <strong>Tip:</strong>
+                The Sync Stock button is especially useful when issuing most items at your location.
+                You can quickly load everything, then delete the few items you don't need. This is
+                much faster than manually adding many items one-by-one.
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Cost Centres</h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
             Cost Centres represent departments or purposes that consume stock. Common examples

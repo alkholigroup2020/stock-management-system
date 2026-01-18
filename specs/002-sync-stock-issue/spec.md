@@ -17,7 +17,7 @@ As an Operator creating a new stock issue, I want to quickly populate the Issue 
 
 **Acceptance Scenarios**:
 
-1. **Given** I am on the New Issue page with an active location selected, **When** I click the "Sync Stock" button, **Then** all items with stock greater than zero at the current location are added to the Issue Items table with their quantities pre-filled to their current on-hand values.
+1. **Given** I am on the New Issue page with an active location selected, **When** I click the "Sync Stock" button, **Then** all items with stock greater than zero at the current location are added to the Issue Items table with their quantities pre-filled to zero (user enters quantities manually).
 
 2. **Given** the Issue Items table already has some items, **When** I click the "Sync Stock" button, **Then** the existing items are replaced with all items from the current stock.
 
@@ -37,7 +37,7 @@ As an Operator, after syncing stock items, I want to edit the quantity for each 
 
 1. **Given** items have been synced from stock, **When** I edit the quantity field of an item, **Then** the Line Value recalculates based on the new quantity multiplied by the WAC.
 
-2. **Given** items have been synced with full on-hand quantities, **When** I reduce the quantity to less than the on-hand amount, **Then** no insufficient stock warning is shown.
+2. **Given** items have been synced, **When** I enter a quantity less than or equal to the on-hand amount, **Then** no insufficient stock warning is shown.
 
 3. **Given** items have been synced, **When** I increase the quantity above the on-hand amount, **Then** an insufficient stock warning is displayed for that line.
 
@@ -91,7 +91,7 @@ As an Operator, when I click the "Sync Stock" button, I want to see a loading in
 - **FR-001**: System MUST display a "Sync Stock" button in the Issue Items card header, positioned before the existing "Add Item" button.
 - **FR-002**: System MUST fetch all items with positive stock (on_hand > 0) from the current active location when the button is clicked.
 - **FR-003**: System MUST populate the Issue Items table with one row per stocked item, showing item name, on-hand quantity, WAC, and calculated line value.
-- **FR-004**: System MUST pre-fill the quantity field with the current on-hand amount for each synced item.
+- **FR-004**: System MUST pre-fill the quantity field with zero for each synced item to prevent accidental full-stock submissions (user enters quantities manually).
 - **FR-005**: System MUST replace any existing items in the table when sync is performed (not append).
 - **FR-006**: System MUST allow users to edit the quantity of any synced item.
 - **FR-007**: System MUST allow users to delete any synced item using the existing delete action.
