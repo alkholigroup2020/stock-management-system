@@ -839,6 +839,36 @@ watch(
         </div>
 
         <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">NCR Status Meanings</h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Understanding what each NCR status means for the business:
+          </p>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>OPEN:</strong>
+              Newly created, awaiting action. These appear as warnings during period close.
+            </li>
+            <li>
+              <strong>SENT:</strong>
+              Claim sent to supplier. Shown as "Pending Credits" on reconciliation.
+            </li>
+            <li>
+              <strong>CREDITED:</strong>
+              Supplier issued credit. This reduces the location's consumption in reconciliation.
+            </li>
+            <li>
+              <strong>REJECTED:</strong>
+              Supplier rejected the claim. This adds to the location's consumption as a loss.
+            </li>
+            <li>
+              <strong>RESOLVED:</strong>
+              Resolved internally. The Supervisor specifies whether it resulted in a credit, loss, or
+              no financial impact.
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Viewing NCRs</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>

@@ -42,25 +42,27 @@ const codeExamples = {
 // File: prisma/schema.prisma
 
 model NCR {
-  id               String        @id @default(uuid()) @db.Uuid
-  ncr_no           String        @unique @db.VarChar(50)
-  location_id      String        @db.Uuid
-  type             NCRType       @default(MANUAL)
-  auto_generated   Boolean       @default(false)
-  delivery_id      String?       @db.Uuid
-  delivery_line_id String?       @db.Uuid
+  id               String              @id @default(uuid()) @db.Uuid
+  ncr_no           String              @unique @db.VarChar(50)
+  location_id      String              @db.Uuid
+  type             NCRType             @default(MANUAL)
+  auto_generated   Boolean             @default(false)
+  delivery_id      String?             @db.Uuid
+  delivery_line_id String?             @db.Uuid
   reason           String
-  quantity         Decimal?      @db.Decimal(15, 4)
-  value            Decimal       @db.Decimal(15, 2)
-  status           NCRStatus     @default(OPEN)
-  created_by       String        @db.Uuid
-  created_at       DateTime      @default(now()) @db.Timestamptz(6)
-  resolved_at      DateTime?     @db.Timestamptz(6)
+  quantity         Decimal?            @db.Decimal(15, 4)
+  value            Decimal             @db.Decimal(15, 2)
+  status           NCRStatus           @default(OPEN)
+  created_by       String              @db.Uuid
+  created_at       DateTime            @default(now()) @db.Timestamptz(6)
+  resolved_at      DateTime?           @db.Timestamptz(6)
   resolution_notes String?
-  creator          User          @relation("NCRCreator", ...)
-  delivery         Delivery?     @relation(...)
-  delivery_line    DeliveryLine? @relation(...)
-  location         Location      @relation(...)
+  resolution_type  String?             @db.VarChar(200)  // How NCR was resolved
+  financial_impact NCRFinancialImpact? // Reconciliation treatment
+  creator          User                @relation("NCRCreator", ...)
+  delivery         Delivery?           @relation(...)
+  delivery_line    DeliveryLine?       @relation(...)
+  location         Location            @relation(...)
 
   @@index([location_id])
   @@index([type])
@@ -85,7 +87,14 @@ enum NCRStatus {
   SENT      // Sent to supplier for review
   CREDITED  // Supplier issued credit note
   REJECTED  // Supplier rejected the claim
-  RESOLVED  // Internally resolved without credit
+  RESOLVED  // Internally resolved (uses financial_impact)
+}
+
+// NCR Financial Impact Enum (for reconciliation)
+enum NCRFinancialImpact {
+  NONE    // No financial adjustment (e.g., replacement received)
+  CREDIT  // Value recovered as credit (reduces consumption)
+  LOSS    // Value lost (increases consumption)
 }`,
 
   statusWorkflowDiagram: `// NCR Status Workflow
@@ -388,6 +397,8 @@ export default defineEventHandler(async (event) => {
 const bodySchema = z.object({
   status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
   resolution_notes: z.string().optional(),
+  resolution_type: z.string().max(200).optional(),  // Required for RESOLVED
+  financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(), // Required for RESOLVED
 });
 
 export default defineEventHandler(async (event) => {
@@ -418,6 +429,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // When moving to RESOLVED, require resolution_type and financial_impact
+  if (data.status === "RESOLVED") {
+    if (!data.resolution_type) {
+      throw createError({
+        statusCode: 400,
+        data: { code: "RESOLUTION_TYPE_REQUIRED" },
+      });
+    }
+    if (!data.financial_impact) {
+      throw createError({
+        statusCode: 400,
+        data: { code: "FINANCIAL_IMPACT_REQUIRED" },
+      });
+    }
+  }
+
   // Build update data
   const updateData: Record<string, unknown> = {};
 
@@ -432,6 +459,12 @@ export default defineEventHandler(async (event) => {
 
   if (data.resolution_notes !== undefined) {
     updateData.resolution_notes = data.resolution_notes;
+  }
+  if (data.resolution_type !== undefined) {
+    updateData.resolution_type = data.resolution_type;
+  }
+  if (data.financial_impact !== undefined) {
+    updateData.financial_impact = data.financial_impact;
   }
 
   const updatedNCR = await prisma.nCR.update({
@@ -573,7 +606,129 @@ INTERNAL_ERROR               // Unexpected server error
 // ─────────────────
 // • Manual NCR: User specifies value
 // • Price Variance NCR: System calculates |variance| × quantity
-// • Used for reporting and reconciliation impact`,
+// • Used for reporting and reconciliation impact
+//
+// 9. Reconciliation Integration
+// ─────────────────────────────
+// • NCRs with CREDITED status reduce consumption (credits)
+// • NCRs with REJECTED status increase consumption (losses)
+// • RESOLVED NCRs use financial_impact: CREDIT, LOSS, or NONE
+// • When status = RESOLVED, resolution_type and financial_impact are required
+// • SENT NCRs appear as "Pending Credits" (informational)
+// • OPEN NCRs trigger warnings during period close (non-blocking)`,
+
+  ncrReconciliationImpact: `// NCR Status to Reconciliation Impact
+//
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │                  NCR RECONCILIATION IMPACT                                   │
+// └─────────────────────────────────────────────────────────────────────────────┘
+//
+// NCR status and financial_impact determine how NCRs affect reconciliation:
+//
+// ┌─────────────────┬─────────────────────┬─────────────────────────────────────┐
+// │   NCR Status    │  Financial Impact   │        Reconciliation Effect        │
+// ├─────────────────┼─────────────────────┼─────────────────────────────────────┤
+// │   CREDITED      │       (auto)        │  → ncr_credits (reduces consumption)│
+// │   REJECTED      │       (auto)        │  → ncr_losses (increases consumption)│
+// │   RESOLVED      │      CREDIT         │  → ncr_credits (reduces consumption)│
+// │   RESOLVED      │       LOSS          │  → ncr_losses (increases consumption)│
+// │   RESOLVED      │       NONE          │  → No financial effect              │
+// │   SENT          │       N/A           │  → Pending Credits (informational)  │
+// │   OPEN          │       N/A           │  → Warning during period close      │
+// └─────────────────┴─────────────────────┴─────────────────────────────────────┘
+//
+// Updated Consumption Formula:
+// ────────────────────────────
+// Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing
+//             + Adjustments - NCRCredits + NCRLosses
+//
+// Where:
+// • NCRCredits = Sum of CREDITED NCRs + RESOLVED with CREDIT impact
+// • NCRLosses  = Sum of REJECTED NCRs + RESOLVED with LOSS impact
+//
+// Key Points:
+// • NCR Credits REDUCE consumption (money recovered from suppliers)
+// • NCR Losses INCREASE consumption (unrecovered costs absorbed by business)
+// • SENT NCRs shown as "Pending Credits" but don't affect calculation
+// • OPEN NCRs generate non-blocking warning during period close`,
+
+  ncrCreditsUtility: `// NCR Credit Utilities
+// File: server/utils/ncrCredits.ts
+
+/**
+ * Get NCRs with CREDITED status OR RESOLVED with CREDIT impact.
+ * These NCRs reduce the reconciliation consumption (money recovered).
+ */
+export async function getCreditedNCRsForPeriod(
+  periodId: string,
+  locationId: string
+): Promise<NCRSummaryCategory> {
+  const ncrs = await prisma.nCR.findMany({
+    where: {
+      location_id: locationId,
+      AND: [
+        {
+          OR: [
+            { status: "CREDITED" },
+            { status: "RESOLVED", financial_impact: "CREDIT" },
+          ],
+        },
+        // Period association via delivery or creation date
+        {
+          OR: [
+            { delivery: { period_id: periodId } },
+            { delivery_id: null, created_at: { gte: periodStart, lte: periodEnd } },
+          ],
+        },
+      ],
+    },
+  });
+
+  return {
+    total: ncrs.reduce((sum, ncr) => sum + Number(ncr.value), 0),
+    count: ncrs.length,
+    ncrs: ncrs.map(ncr => ({ id: ncr.id, ncr_no: ncr.ncr_no, value: Number(ncr.value) })),
+  };
+}
+
+/**
+ * Get NCRs with REJECTED status OR RESOLVED with LOSS impact.
+ * These NCRs increase the reconciliation consumption (unrecovered costs).
+ */
+export async function getLostNCRsForPeriod(
+  periodId: string,
+  locationId: string
+): Promise<NCRSummaryCategory> {
+  // Similar query with status: "REJECTED" or financial_impact: "LOSS"
+}
+
+/**
+ * Get NCRs with SENT status (pending supplier response).
+ * Displayed as "Pending Credits" - informational only.
+ */
+export async function getPendingNCRsForPeriod(...): Promise<NCRSummaryCategory> { }
+
+/**
+ * Get OPEN NCRs (unresolved).
+ * Triggers warning during period close.
+ */
+export async function getOpenNCRsForPeriod(...): Promise<{ count: number; ncrs: NCRSummaryItem[] }> { }
+
+/**
+ * Get complete NCR summary for reconciliation display.
+ */
+export async function getAllNCRSummaryForPeriod(
+  periodId: string,
+  locationId: string
+): Promise<NCRSummaryResponse> {
+  const [credited, losses, pending, open] = await Promise.all([
+    getCreditedNCRsForPeriod(periodId, locationId),
+    getLostNCRsForPeriod(periodId, locationId),
+    getPendingNCRsForPeriod(periodId, locationId),
+    getOpenNCRsForPeriod(periodId, locationId),
+  ]);
+  return { credited, losses, pending, open };
+}`,
 
   frontendPattern: `// Frontend Component Pattern for NCRs (RECOMMENDED)
 // File: app/components/ncr/NCRForm.vue
@@ -1149,6 +1304,114 @@ async function handleCreateNCR(data: NCRFormData) {
       </div>
     </section>
 
+    <!-- NCR Reconciliation Impact Section -->
+    <section
+      id="dev-section-ncr-reconciliation-impact"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('ncr-reconciliation-impact')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-calculator" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            NCR Reconciliation Impact
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('ncr-reconciliation-impact')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('ncr-reconciliation-impact')" class="space-y-4 p-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          NCR status and financial impact determine how NCRs affect period reconciliation
+          calculations. Credits reduce consumption (money recovered), while losses increase
+          consumption (unrecovered costs absorbed by the business).
+        </p>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Status to Reconciliation Mapping
+          </h4>
+          <DeveloperCodeBlock :code="codeExamples.ncrReconciliationImpact" language="plaintext" />
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Impact Categories</h4>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-success)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="success" variant="soft">NCR Credits</UBadge>
+                <span class="text-xs text-[var(--ui-success)]">- Reduces consumption</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                NCRs with CREDITED status or RESOLVED with CREDIT impact. Money recovered from
+                suppliers reduces the location's consumption.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-error)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="error" variant="soft">NCR Losses</UBadge>
+                <span class="text-xs text-[var(--ui-error)]">+ Increases consumption</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                NCRs with REJECTED status or RESOLVED with LOSS impact. Unrecovered costs are
+                absorbed by the business, increasing consumption.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="info" variant="soft">Pending Credits</UBadge>
+                <span class="text-xs text-[var(--ui-text-muted)]">Informational</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                NCRs with SENT status are displayed as pending credits. These don't affect
+                calculations until supplier responds.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="warning" variant="soft">Open NCRs</UBadge>
+                <span class="text-xs text-[var(--ui-warning)]">Warning</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                NCRs with OPEN status trigger a non-blocking warning during period close. Recommend
+                resolving before closing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            NCR Credits Utility Functions
+          </h4>
+          <DeveloperCodeBlock
+            :code="codeExamples.ncrCreditsUtility"
+            language="typescript"
+            filename="server/utils/ncrCredits.ts"
+          />
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
+            <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Period Association:</strong>
+              NCRs are associated with periods via their linked delivery's period_id. Manual NCRs
+              without a delivery link use their creation date to determine the period.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- API & Frontend Section -->
     <section
       id="dev-section-api-frontend"
@@ -1206,12 +1469,19 @@ async function handleCreateNCR(data: NCRFormData) {
                   <td class="px-2 py-2 font-mono text-xs">/api/ncrs/:id</td>
                   <td class="px-2 py-2">Get NCR details</td>
                 </tr>
-                <tr>
+                <tr class="border-b border-[var(--ui-border)]">
                   <td class="px-2 py-2">
                     <UBadge color="warning" variant="soft" size="xs">PATCH</UBadge>
                   </td>
                   <td class="px-2 py-2 font-mono text-xs">/api/ncrs/:id</td>
                   <td class="px-2 py-2">Update NCR status/notes</td>
+                </tr>
+                <tr>
+                  <td class="px-2 py-2">
+                    <UBadge color="info" variant="soft" size="xs">GET</UBadge>
+                  </td>
+                  <td class="px-2 py-2 font-mono text-xs">/api/ncrs/summary</td>
+                  <td class="px-2 py-2">NCR summary for period/location</td>
                 </tr>
               </tbody>
             </table>

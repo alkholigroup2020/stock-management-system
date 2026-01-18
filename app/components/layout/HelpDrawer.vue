@@ -242,9 +242,9 @@ const searchableContent = computed(() => {
         section: "Supervisor Guide",
         sectionId: "supervisor-guide",
         targetSection: "reconciliations",
-        title: "Reconciliations",
+        title: "Reconciliations with NCR Integration",
         content:
-          "View reconciliation by clicking Reconciliations menu. Opening stock plus receipts plus transfers in minus transfers out minus issues equals expected closing. Enter adjustments for back charges, credits, condemnations. Mark location ready when reconciliation complete. View consolidated reconciliation for all locations.",
+          "View reconciliation by clicking Reconciliations menu. Opening stock plus receipts plus transfers in minus transfers out minus issues equals expected closing. NCR Credits reduce consumption (money recovered). NCR Losses increase consumption (unrecovered costs). Pending credits from SENT NCRs shown as informational. Open NCR warnings displayed during period close. Enter adjustments for back charges, credits, condemnations. Mark location ready when reconciliation complete.",
         icon: "i-heroicons-clipboard-document-check",
       },
       {
@@ -252,9 +252,9 @@ const searchableContent = computed(() => {
         section: "Supervisor Guide",
         sectionId: "supervisor-guide",
         targetSection: "ncr",
-        title: "Manual NCR Creation",
+        title: "NCR Resolution and Financial Impact",
         content:
-          "Create manual NCR for damaged goods, short shipments, quality issues, expired products. Click NCR menu, New NCR, select Manual type. Link to delivery if related. Enter reason and affected items with quantities.",
+          "Create and resolve NCRs. When resolving to RESOLVED status, specify resolution_type (how it was resolved) and financial_impact (CREDIT reduces consumption, LOSS increases consumption, NONE for no effect). NCR credits appear on reconciliation page. Open NCRs trigger warnings during period close. Create manual NCR for damaged goods, short shipments, quality issues, expired products.",
         icon: "i-heroicons-clipboard-document-check",
       },
       {

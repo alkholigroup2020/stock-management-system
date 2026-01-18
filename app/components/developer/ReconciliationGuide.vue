@@ -54,6 +54,8 @@ model Reconciliation {
   adjustments   Decimal  @default(0) @db.Decimal(15, 2)
   back_charges  Decimal  @default(0) @db.Decimal(15, 2)
   credits       Decimal  @default(0) @db.Decimal(15, 2)
+  ncr_credits   Decimal  @default(0) @db.Decimal(15, 2) // Auto-calculated from NCRs
+  ncr_losses    Decimal  @default(0) @db.Decimal(15, 2) // Auto-calculated from NCRs
   condemnations Decimal  @default(0) @db.Decimal(15, 2)
   last_updated  DateTime @updatedAt @db.Timestamptz(6)
   location      Location @relation(fields: [location_id], references: [id], onDelete: Cascade)
@@ -73,7 +75,8 @@ model Reconciliation {
 //
 // Core Formula:
 // ──────────────
-// Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing + Adjustments
+// Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing
+//             + Adjustments - NCRCredits + NCRLosses
 //
 // Where:
 // - Opening     = Closing stock from previous period (carry-forward)
@@ -82,6 +85,8 @@ model Reconciliation {
 // - TransfersOut= Sum of completed transfers FROM this location
 // - Closing     = Current stock value (on_hand × WAC for all items)
 // - Adjustments = BackCharges - Credits - Condemnations + GeneralAdjustments
+// - NCRCredits  = Sum of CREDITED NCRs + RESOLVED with CREDIT impact (reduces consumption)
+// - NCRLosses   = Sum of REJECTED NCRs + RESOLVED with LOSS impact (increases consumption)
 //
 // Adjustment Types:
 // ─────────────────
@@ -89,6 +94,11 @@ model Reconciliation {
 // Credits       = Credits due from suppliers (reduces consumption)
 // Condemnations = Value of condemned/spoiled stock (reduces consumption)
 // Adjustments   = General/miscellaneous adjustments (can be +/-)
+//
+// NCR Impact (Auto-Calculated):
+// ─────────────────────────────
+// NCRCredits    = Money recovered from suppliers (CREDITED or RESOLVED+CREDIT) → REDUCES consumption
+// NCRLosses     = Unrecovered costs (REJECTED or RESOLVED+LOSS) → INCREASES consumption
 //
 // Example:
 // ────────
@@ -100,8 +110,10 @@ model Reconciliation {
 // + Back-charges:   SAR   1,000
 // - Credits:        SAR     500
 // - Condemnations:  SAR   1,000
+// - NCR Credits:    SAR   2,500  // Money recovered from suppliers
+// + NCR Losses:     SAR     800  // Unrecovered costs absorbed
 // ─────────────────────────────
-// = Consumption:    SAR  34,500`,
+// = Consumption:    SAR  32,800`,
 
   mandayCostFormula: `// Manday Cost Calculation
 //
@@ -150,9 +162,12 @@ export function calculateConsumption(input: ConsumptionInput): ConsumptionResult
   const backCharges = toNumber(input.backCharges || 0);
   const credits = toNumber(input.credits || 0);
   const condemnations = toNumber(input.condemnations || 0);
+  const ncrCredits = toNumber(input.ncrCredits || 0);  // Auto-calculated from NCRs
+  const ncrLosses = toNumber(input.ncrLosses || 0);    // Auto-calculated from NCRs
 
-  // Calculate total adjustments
-  const totalAdjustments = backCharges - credits - condemnations + adjustments;
+  // Calculate total adjustments (includes NCR impact)
+  const totalAdjustments = backCharges - credits - condemnations + adjustments
+                         - ncrCredits + ncrLosses;
 
   // Calculate consumption
   const consumption =
@@ -239,7 +254,49 @@ export function calculateMandayCost(
 // │  Credits         │  - (decreases) │  -credits        │
 // │  Condemnations   │  - (decreases) │  -condemnations  │
 // │  Other           │  +/- (varies)  │  +adjustments    │
+// │  NCR Credits     │  - (decreases) │  -ncrCredits     │
+// │  NCR Losses      │  + (increases) │  +ncrLosses      │
 // └──────────────────┴────────────────┴──────────────────┘`,
+
+  ncrIntegration: `// NCR Integration with Reconciliation
+//
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │                    NCR RECONCILIATION INTEGRATION                            │
+// └─────────────────────────────────────────────────────────────────────────────┘
+//
+// NCR Status to Reconciliation Mapping:
+// ─────────────────────────────────────
+// ┌─────────────────┬─────────────────────┬─────────────────────────────────────┐
+// │   NCR Status    │  Financial Impact   │        Reconciliation Field         │
+// ├─────────────────┼─────────────────────┼─────────────────────────────────────┤
+// │   CREDITED      │       (auto)        │  → ncr_credits (reduces consumption)│
+// │   REJECTED      │       (auto)        │  → ncr_losses (increases consumption)│
+// │   RESOLVED      │      CREDIT         │  → ncr_credits (reduces consumption)│
+// │   RESOLVED      │       LOSS          │  → ncr_losses (increases consumption)│
+// │   RESOLVED      │       NONE          │  → No financial effect              │
+// │   SENT          │       N/A           │  → "Pending Credits" (informational)│
+// │   OPEN          │       N/A           │  → Warning during period close      │
+// └─────────────────┴─────────────────────┴─────────────────────────────────────┘
+//
+// NCR Summary API:
+// ────────────────
+// GET /api/ncrs/summary?periodId=xxx&locationId=xxx
+//
+// Returns: {
+//   credited: { total: number, count: number, ncrs: [...] },
+//   losses:   { total: number, count: number, ncrs: [...] },
+//   pending:  { total: number, count: number, ncrs: [...] },  // SENT status
+//   open:     { count: number, ncrs: [...] }                  // OPEN status
+// }
+//
+// Key Points:
+// ───────────
+// • ncr_credits and ncr_losses are AUTO-CALCULATED when saving reconciliation
+// • NCR Credits REDUCE consumption (money recovered from suppliers)
+// • NCR Losses INCREASE consumption (unrecovered costs absorbed)
+// • SENT NCRs shown as "Pending Credits" but don't affect calculation
+// • OPEN NCRs trigger non-blocking warning during period close
+// • OpenNCRWarning component displays grouped warnings by location`,
 
   saveAdjustmentsApi: `// Save Reconciliation Adjustments
 // File: server/api/reconciliations/index.post.ts
@@ -283,6 +340,11 @@ export default defineEventHandler(async (event) => {
   const transfersOut = await sumTransfersOut(period, locationId);
   const closingStock = await sumLocationStock(locationId);
 
+  // Auto-calculate NCR credits and losses from NCR status
+  const ncrSummary = await getAllNCRSummaryForPeriod(periodId, locationId);
+  const ncrCredits = ncrSummary.credited.total;  // CREDITED or RESOLVED+CREDIT
+  const ncrLosses = ncrSummary.losses.total;     // REJECTED or RESOLVED+LOSS
+
   // Upsert reconciliation record
   const reconciliation = await prisma.reconciliation.upsert({
     where: {
@@ -300,6 +362,8 @@ export default defineEventHandler(async (event) => {
       credits: new Decimal(credits),
       condemnations: new Decimal(condemnations),
       adjustments: new Decimal(adjustments),
+      ncr_credits: new Decimal(ncrCredits),    // Auto-calculated
+      ncr_losses: new Decimal(ncrLosses),      // Auto-calculated
     },
     update: { /* same fields */ },
   });
@@ -966,6 +1030,116 @@ INTERNAL_ERROR               // Unexpected server error
               </p>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NCR Integration Section -->
+    <section
+      id="dev-section-ncr-integration"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('ncr-integration')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-document-text" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">NCR Integration</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('ncr-integration') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('ncr-integration')" class="space-y-4 p-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          NCRs (Non-Conformance Reports) now directly impact reconciliation calculations. Credits
+          from resolved NCRs reduce consumption, while losses increase consumption as unrecovered
+          costs absorbed by the business.
+        </p>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            NCR Status to Reconciliation Mapping
+          </h4>
+          <DeveloperCodeBlock :code="codeExamples.ncrIntegration" language="plaintext" />
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">NCR Impact on Reconciliation</h4>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-success)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="success" variant="soft">ncr_credits</UBadge>
+                <span class="text-xs text-[var(--ui-success)]">- Reduces consumption</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Sum of CREDITED NCRs + RESOLVED with CREDIT impact. Money recovered from suppliers.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-error)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="error" variant="soft">ncr_losses</UBadge>
+                <span class="text-xs text-[var(--ui-error)]">+ Increases consumption</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Sum of REJECTED NCRs + RESOLVED with LOSS impact. Unrecovered costs absorbed.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Additional NCR Categories</h4>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="info" variant="soft">Pending Credits</UBadge>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                NCRs with SENT status. Displayed as informational but don't affect calculation until
+                supplier responds.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="warning" variant="soft">Open NCRs Warning</UBadge>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                NCRs with OPEN status trigger non-blocking warning during period close. Recommend
+                resolving first.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
+            <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Auto-Calculation:</strong>
+              When saving a reconciliation, ncr_credits and ncr_losses are automatically calculated
+              from current NCR statuses using the
+              <code class="code-inline">getAllNCRSummaryForPeriod()</code>
+              utility.
+            </span>
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-warning)]">
+            <UIcon name="i-heroicons-exclamation-triangle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>OpenNCRWarning Component:</strong>
+              The
+              <code class="code-inline">app/components/reconciliation/OpenNCRWarning.vue</code>
+              component displays a collapsible warning grouped by location when unresolved NCRs exist
+              during period close.
+            </span>
+          </p>
         </div>
       </div>
     </section>

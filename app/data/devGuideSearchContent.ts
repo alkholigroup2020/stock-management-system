@@ -859,7 +859,7 @@ export const devGuideSearchContent: SearchResult[] = [
     targetSection: "ncr-model",
     title: "NCR Model & Types",
     content:
-      "NCR model for non-conformance reports. MANUAL for user-created NCRs, PRICE_VARIANCE for auto-generated from delivery price mismatch. ncr_no auto-generated NCR-YYYY-NNN. auto_generated flag distinguishes system vs user created.",
+      "NCR model for non-conformance reports. MANUAL for user-created NCRs, PRICE_VARIANCE for auto-generated from delivery price mismatch. ncr_no auto-generated NCR-YYYY-NNN. auto_generated flag distinguishes system vs user created. resolution_type and financial_impact fields for reconciliation integration.",
     icon: "i-heroicons-exclamation-triangle",
   },
   {
@@ -899,8 +899,38 @@ export const devGuideSearchContent: SearchResult[] = [
     targetSection: "ncr-resolution",
     title: "NCR Resolution",
     content:
-      "PATCH /api/ncrs/:id for status updates. Valid transitions enforced. CREDITED, REJECTED, RESOLVED are final states. resolved_at timestamp auto-set. resolution_notes for audit trail.",
+      "PATCH /api/ncrs/:id for status updates. Valid transitions enforced. CREDITED, REJECTED, RESOLVED are final states. resolved_at timestamp auto-set. resolution_notes for audit trail. When resolving to RESOLVED status, resolution_type and financial_impact are required. financial_impact determines reconciliation treatment: CREDIT reduces consumption, LOSS increases consumption, NONE has no effect.",
     icon: "i-heroicons-exclamation-triangle",
+  },
+  {
+    id: "ncr-reconciliation-impact",
+    section: "NCR",
+    sectionId: "ncr",
+    targetSection: "ncr-reconciliation-impact",
+    title: "NCR Reconciliation Impact",
+    content:
+      "NCR status and financial_impact determine reconciliation treatment. CREDITED status or RESOLVED with CREDIT impact reduces consumption (credits). REJECTED status or RESOLVED with LOSS impact increases consumption (losses). SENT NCRs shown as pending credits. OPEN NCRs generate non-blocking warnings during period close. ncrCredits.ts utility calculates NCR summaries for periods.",
+    icon: "i-heroicons-calculator",
+  },
+  {
+    id: "ncr-financial-impact-enum",
+    section: "NCR",
+    sectionId: "ncr",
+    targetSection: "ncr-reconciliation-impact",
+    title: "NCRFinancialImpact Enum",
+    content:
+      "NCRFinancialImpact enum values: NONE for no financial adjustment, CREDIT for value recovered from supplier (reduces consumption), LOSS for value lost and absorbed (increases consumption). Required when resolving NCR to RESOLVED status.",
+    icon: "i-heroicons-tag",
+  },
+  {
+    id: "ncr-summary-api",
+    section: "NCR",
+    sectionId: "ncr",
+    targetSection: "api-frontend",
+    title: "NCR Summary API",
+    content:
+      "GET /api/ncrs/summary endpoint returns categorized NCR breakdown for period and location. Categories: credited (CREDITED or RESOLVED+CREDIT), losses (REJECTED or RESOLVED+LOSS), pending (SENT status), open (OPEN status). Used by reconciliation to show NCR credits and losses. Query params: periodId, locationId.",
+    icon: "i-heroicons-chart-pie",
   },
   {
     id: "ncr-api-frontend",
@@ -933,7 +963,7 @@ export const devGuideSearchContent: SearchResult[] = [
     targetSection: "reconciliation-model",
     title: "Reconciliation Model",
     content:
-      "Reconciliation model stores period-end stock movement data per location. Tracks opening_stock, receipts, transfers_in, transfers_out, issues, closing_stock, and adjustment values. Composite unique key on period_id and location_id.",
+      "Reconciliation model stores period-end stock movement data per location. Tracks opening_stock, receipts, transfers_in, transfers_out, issues, closing_stock, and adjustment values. New fields ncr_credits and ncr_losses track NCR financial impact. Composite unique key on period_id and location_id.",
     icon: "i-heroicons-calculator",
   },
   {
@@ -955,6 +985,16 @@ export const devGuideSearchContent: SearchResult[] = [
     content:
       "Back-charges add to consumption (supplier owes). Credits reduce consumption (refund expected). Condemnations reduce consumption (written off stock). Other adjustments can be positive or negative for miscellaneous corrections.",
     icon: "i-heroicons-calculator",
+  },
+  {
+    id: "rec-ncr-integration",
+    section: "Reconciliation",
+    sectionId: "reconciliation",
+    targetSection: "ncr-integration",
+    title: "NCR Integration in Reconciliation",
+    content:
+      "NCR credits and losses are now included in reconciliation calculations. NCR credits (from CREDITED or RESOLVED+CREDIT NCRs) reduce consumption. NCR losses (from REJECTED or RESOLVED+LOSS NCRs) increase consumption. Updated formula: Consumption = Opening + Receipts + TransfersIn - TransfersOut - Closing + Adjustments - NCRCredits + NCRLosses. OpenNCRWarning component displays warnings about unresolved NCRs during period close.",
+    icon: "i-heroicons-link",
   },
   {
     id: "rec-auto-calculation",

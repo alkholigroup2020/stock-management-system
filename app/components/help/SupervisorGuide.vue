@@ -270,6 +270,45 @@ watch(
         </div>
 
         <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">NCR Credits and Losses</h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            NCR outcomes now appear automatically in your reconciliation:
+          </p>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>NCR Credits:</strong>
+              Money recovered from suppliers (CREDITED NCRs or RESOLVED with CREDIT impact). This
+              <strong>reduces</strong>
+              your consumption.
+            </li>
+            <li>
+              <strong>NCR Losses:</strong>
+              Unrecovered costs absorbed by the business (REJECTED NCRs or RESOLVED with LOSS
+              impact). This
+              <strong>increases</strong>
+              your consumption.
+            </li>
+            <li>
+              <strong>Pending Credits:</strong>
+              NCRs with SENT status are shown as informational. These may become credits or losses
+              once the supplier responds.
+            </li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30">
+          <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
+            <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
+            <span>
+              <strong>Open NCR Warning:</strong>
+              During period close, you may see a warning about unresolved NCRs. While this is
+              non-blocking, it's recommended to resolve all NCRs before closing the period for
+              accurate financial reporting.
+            </span>
+          </p>
+        </div>
+
+        <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Entering Adjustments</h4>
           <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
             <li>
@@ -437,6 +476,58 @@ watch(
               <strong>Create NCR</strong>
             </li>
           </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Resolving NCRs with Financial Impact
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            When resolving an NCR to RESOLVED status, you must specify how it affects the
+            reconciliation:
+          </p>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Resolution Type:</strong>
+              Free-text describing how the NCR was resolved (e.g., "Replacement received", "Written
+              off as loss", "Partial credit received")
+            </li>
+            <li>
+              <strong>Financial Impact:</strong>
+              <ul class="ml-4 mt-1 space-y-1">
+                <li>
+                  <strong>CREDIT:</strong>
+                  Value was recovered from supplier (reduces consumption)
+                </li>
+                <li>
+                  <strong>LOSS:</strong>
+                  Value was lost and absorbed by the business (increases consumption)
+                </li>
+                <li>
+                  <strong>NONE:</strong>
+                  No financial adjustment needed (e.g., replacement received in kind)
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">NCR Status Outcomes</h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>CREDITED:</strong>
+              Supplier issued credit note. Automatically reduces your location's consumption.
+            </li>
+            <li>
+              <strong>REJECTED:</strong>
+              Supplier rejected the claim. Automatically increases your consumption as a loss.
+            </li>
+            <li>
+              <strong>RESOLVED:</strong>
+              Internally resolved. You choose the financial impact (CREDIT, LOSS, or NONE).
+            </li>
+          </ul>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
