@@ -72,23 +72,23 @@
 
 ### Implementation for User Story 1
 
-- [ ] T027 [P] [US1] Create PRF list API endpoint in `server/api/prfs/index.get.ts`
-- [ ] T028 [P] [US1] Create PRF create API endpoint in `server/api/prfs/index.post.ts`
-- [ ] T029 [P] [US1] Create PRF get API endpoint in `server/api/prfs/[id].get.ts`
-- [ ] T030 [P] [US1] Create PRF update API endpoint in `server/api/prfs/[id].patch.ts`
-- [ ] T031 [P] [US1] Create PRF delete API endpoint in `server/api/prfs/[id].delete.ts`
-- [ ] T032 [US1] Create PRF submit API endpoint in `server/api/prfs/[id]/submit.patch.ts`
-- [ ] T033 [US1] Create `app/composables/usePRFs.ts` with list, get, create, update, delete, submit functions
-- [ ] T034 [P] [US1] Create PRF line items table component in `app/components/orders/PRFLineItemsTable.vue`
-- [ ] T035 [P] [US1] Create stock levels reference table in `app/components/orders/StockLevelsTable.vue`
-- [ ] T036 [US1] Create PRF form component in `app/components/orders/PRFForm.vue` with line item management
-- [ ] T037 [US1] Create PRF create page in `app/pages/orders/prfs/create.vue`
-- [ ] T038 [US1] Create PRF detail page in `app/pages/orders/prfs/[id].vue` with edit/submit capabilities
-- [ ] T039 [US1] Update Orders index page PRFs tab with list view in `app/pages/orders/index.vue`
-- [ ] T040 [US1] Add Zod validation schemas for PRF create/update in `server/api/prfs/index.post.ts`
-- [ ] T041 [US1] Implement auto-generation of PRF numbers (PRF-001 format) in create endpoint
+- [x] T027 [P] [US1] Create PRF list API endpoint in `server/api/prfs/index.get.ts`
+- [x] T028 [P] [US1] Create PRF create API endpoint in `server/api/prfs/index.post.ts`
+- [x] T029 [P] [US1] Create PRF get API endpoint in `server/api/prfs/[id].get.ts`
+- [x] T030 [P] [US1] Create PRF update API endpoint in `server/api/prfs/[id].patch.ts`
+- [x] T031 [P] [US1] Create PRF delete API endpoint in `server/api/prfs/[id].delete.ts`
+- [x] T032 [US1] Create PRF submit API endpoint in `server/api/prfs/[id]/submit.patch.ts`
+- [x] T033 [US1] Create `app/composables/usePRFs.ts` with list, get, create, update, delete, submit functions
+- [x] T034 [P] [US1] Create PRF line items table component in `app/components/orders/PRFLineItemsTable.vue`
+- [x] T035 [P] [US1] Create stock levels reference table in `app/components/orders/StockLevelsTable.vue`
+- [x] T036 [US1] Create PRF form component in `app/components/orders/PRFForm.vue` with line item management
+- [x] T037 [US1] Create PRF create page in `app/pages/orders/prfs/create.vue`
+- [x] T038 [US1] Create PRF detail page in `app/pages/orders/prfs/[id].vue` with edit/submit capabilities
+- [x] T039 [US1] Update Orders index page PRFs tab with list view in `app/pages/orders/index.vue`
+- [x] T040 [US1] Add Zod validation schemas for PRF create/update in `server/api/prfs/index.post.ts`
+- [x] T041 [US1] Implement auto-generation of PRF numbers (PRF-001 format) in create endpoint
 
-**Checkpoint**: User Story 1 complete - PRFs can be created, edited, and submitted for approval
+**Checkpoint**: User Story 1 complete - PRFs can be created, edited, and submitted for approval ✅
 
 ---
 
