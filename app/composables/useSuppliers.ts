@@ -11,6 +11,11 @@ export interface SupplierItem {
   code: string;
   name: string;
   contact: string | null;
+  emails: string[];
+  phone: string | null;
+  mobile: string | null;
+  vat_reg_no: string | null;
+  address: string | null;
   is_active: boolean;
   created_at: Date;
 }

@@ -70,22 +70,91 @@
               />
             </UFormField>
 
+            <!-- Phone -->
+            <UFormField label="Phone" name="phone">
+              <UInput
+                v-model="formData.phone"
+                placeholder="Enter phone number (e.g., +966 12 345 6789)"
+                icon="i-lucide-phone"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Mobile -->
+            <UFormField label="Mobile" name="mobile">
+              <UInput
+                v-model="formData.mobile"
+                placeholder="Enter mobile number (e.g., +966 50 123 4567)"
+                icon="i-lucide-smartphone"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- VAT Registration Number -->
+            <UFormField label="VAT Registration No." name="vat_reg_no">
+              <UInput
+                v-model="formData.vat_reg_no"
+                placeholder="Enter VAT registration number"
+                icon="i-lucide-file-text"
+                size="lg"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Address -->
+            <UFormField label="Address" name="address">
+              <UTextarea
+                v-model="formData.address"
+                placeholder="Enter full mailing address"
+                :rows="2"
+                :disabled="submitting"
+                class="w-full"
+              />
+            </UFormField>
+
             <!-- Contact Information - Full width -->
             <UFormField
-              label="Contact Information"
+              label="Contact Person / Notes"
               name="contact"
-              help="Optional: Contact details including name, phone, email, address"
+              help="Optional: Additional contact details or notes"
               class="lg:col-span-2"
             >
               <UTextarea
                 v-model="formData.contact"
-                placeholder="Enter contact details (e.g., Contact: Ali Hassan, Phone: +966 50 123 4567, Email: ali@example.com)"
-                :rows="4"
+                placeholder="Enter contact person details or notes"
+                :rows="3"
                 :disabled="submitting"
                 class="w-full"
               />
             </UFormField>
           </div>
+        </UCard>
+
+        <!-- Email Addresses Section -->
+        <UCard class="card-elevated mb-6" :ui="{ body: 'p-6' }">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-mail" class="w-5 h-5 text-primary" />
+              <h2 class="text-lg font-semibold text-[var(--ui-text-highlighted)]">
+                Email Addresses
+              </h2>
+            </div>
+            <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+              Add email addresses that will receive PO notifications
+            </p>
+          </template>
+
+          <FormEmailListInput
+            v-model="formData.emails"
+            :disabled="submitting"
+            :max-emails="10"
+            help="These email addresses will receive notifications when a Purchase Order is created for this supplier."
+          />
         </UCard>
 
         <!-- Action Buttons -->
@@ -176,13 +245,33 @@ const formData = reactive({
   code: "",
   name: "",
   contact: "",
+  emails: [] as string[],
+  phone: "",
+  mobile: "",
+  vat_reg_no: "",
+  address: "",
 });
+
+// Email validation regex
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Validation schema
 const schema = z.object({
   code: z.string().min(1, "Code is required").max(50, "Code must be at most 50 characters"),
   name: z.string().min(1, "Name is required").max(200, "Name must be at most 200 characters"),
   contact: z.string().max(1000, "Contact must be at most 1000 characters").optional(),
+  emails: z
+    .array(
+      z.string().refine((email) => emailRegex.test(email), {
+        message: "Invalid email format",
+      })
+    )
+    .max(10, "Maximum 10 email addresses allowed")
+    .optional(),
+  phone: z.string().max(50, "Phone must be at most 50 characters").optional(),
+  mobile: z.string().max(50, "Mobile must be at most 50 characters").optional(),
+  vat_reg_no: z.string().max(50, "VAT registration must be at most 50 characters").optional(),
+  address: z.string().max(500, "Address must be at most 500 characters").optional(),
 });
 
 // Submit handler
@@ -194,6 +283,11 @@ const onSubmit = async () => {
       code: formData.code.toUpperCase(),
       name: formData.name,
       contact: formData.contact || undefined,
+      emails: formData.emails.length > 0 ? formData.emails : undefined,
+      phone: formData.phone || undefined,
+      mobile: formData.mobile || undefined,
+      vat_reg_no: formData.vat_reg_no || undefined,
+      address: formData.address || undefined,
     };
 
     await $fetch("/api/suppliers", {
@@ -225,7 +319,15 @@ const onSubmit = async () => {
 
 // Handle cancel
 const handleCancel = () => {
-  const hasData = formData.code || formData.name || formData.contact;
+  const hasData =
+    formData.code ||
+    formData.name ||
+    formData.contact ||
+    formData.emails.length > 0 ||
+    formData.phone ||
+    formData.mobile ||
+    formData.vat_reg_no ||
+    formData.address;
 
   if (hasData) {
     isCancelModalOpen.value = true;

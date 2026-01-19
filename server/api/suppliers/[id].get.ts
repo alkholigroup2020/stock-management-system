@@ -56,6 +56,11 @@ export default defineEventHandler(async (event) => {
         code: true,
         name: true,
         contact: true,
+        emails: true,
+        phone: true,
+        mobile: true,
+        vat_reg_no: true,
+        address: true,
         is_active: true,
         created_at: true,
         _count: {

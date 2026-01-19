@@ -204,13 +204,13 @@
 
 ### Implementation for User Story 7
 
-- [ ] T081 [P] [US7] Update supplier API to support emails array in `server/api/suppliers/[id].patch.ts`
-- [ ] T082 [P] [US7] Add email array validation (format check) in supplier API
-- [ ] T083 [US7] Update supplier create/edit pages with multi-email input in `app/pages/suppliers/`
-- [ ] T084 [US7] Create email list input component for supplier form
-- [ ] T085 [US7] Update `app/composables/useSuppliers.ts` to handle emails array
+- [x] T081 [P] [US7] Update supplier API to support emails array in `server/api/suppliers/[id].patch.ts`
+- [x] T082 [P] [US7] Add email array validation (format check) in supplier API
+- [x] T083 [US7] Update supplier create/edit pages with multi-email input in `app/pages/suppliers/`
+- [x] T084 [US7] Create email list input component for supplier form
+- [x] T085 [US7] Update `app/composables/useSuppliers.ts` to handle emails array
 
-**Checkpoint**: User Story 7 complete - Suppliers can have multiple email addresses
+**Checkpoint**: User Story 7 complete - Suppliers can have multiple email addresses ✅
 
 ---
 

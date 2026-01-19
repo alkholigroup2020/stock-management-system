@@ -10,6 +10,11 @@
  * - code: Unique supplier code (required)
  * - name: Supplier name (required)
  * - contact: Contact information (optional)
+ * - emails: Array of email addresses for PO notifications (optional)
+ * - phone: Office phone number (optional)
+ * - mobile: Mobile phone number (optional)
+ * - vat_reg_no: VAT registration number (optional)
+ * - address: Mailing address (optional)
  */
 
 import prisma from "../../utils/prisma";
@@ -25,11 +30,27 @@ interface AuthUser {
   default_location_id: string | null;
 }
 
+// Email validation regex - standard email format
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // Request body schema for validation
 const createSupplierSchema = z.object({
   code: z.string().min(1).max(50).toUpperCase(),
   name: z.string().min(1).max(200),
   contact: z.string().optional(),
+  emails: z
+    .array(
+      z.string().refine((email) => emailRegex.test(email), {
+        message: "Invalid email format",
+      })
+    )
+    .max(10, "Maximum 10 email addresses allowed")
+    .optional()
+    .default([]),
+  phone: z.string().max(50).optional().nullable(),
+  mobile: z.string().max(50).optional().nullable(),
+  vat_reg_no: z.string().max(50).optional().nullable(),
+  address: z.string().optional().nullable(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -69,6 +90,11 @@ export default defineEventHandler(async (event) => {
         code: data.code,
         name: data.name,
         contact: data.contact,
+        emails: data.emails,
+        phone: data.phone,
+        mobile: data.mobile,
+        vat_reg_no: data.vat_reg_no,
+        address: data.address,
         is_active: true,
       },
     });

@@ -9,6 +9,11 @@
  * Request Body (all fields optional):
  * - name: Supplier name
  * - contact: Contact information
+ * - emails: Array of email addresses for PO notifications
+ * - phone: Office phone number
+ * - mobile: Mobile phone number
+ * - vat_reg_no: VAT registration number
+ * - address: Mailing address
  * - is_active: Active status
  */
 
@@ -25,10 +30,25 @@ interface AuthUser {
   default_location_id: string | null;
 }
 
+// Email validation regex - standard email format
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // Request body schema for validation
 const updateSupplierSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   contact: z.string().optional().nullable(),
+  emails: z
+    .array(
+      z.string().refine((email) => emailRegex.test(email), {
+        message: "Invalid email format",
+      })
+    )
+    .max(10, "Maximum 10 email addresses allowed")
+    .optional(),
+  phone: z.string().max(50).optional().nullable(),
+  mobile: z.string().max(50).optional().nullable(),
+  vat_reg_no: z.string().max(50).optional().nullable(),
+  address: z.string().optional().nullable(),
   is_active: z.boolean().optional(),
 });
 
@@ -100,6 +120,11 @@ export default defineEventHandler(async (event) => {
       data: {
         ...(data.name && { name: data.name }),
         ...(data.contact !== undefined && { contact: data.contact }),
+        ...(data.emails !== undefined && { emails: data.emails }),
+        ...(data.phone !== undefined && { phone: data.phone }),
+        ...(data.mobile !== undefined && { mobile: data.mobile }),
+        ...(data.vat_reg_no !== undefined && { vat_reg_no: data.vat_reg_no }),
+        ...(data.address !== undefined && { address: data.address }),
         ...(data.is_active !== undefined && { is_active: data.is_active }),
       },
     });
