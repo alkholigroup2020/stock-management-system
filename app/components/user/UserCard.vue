@@ -240,6 +240,7 @@ const roleBadgeColor = computed(
       ADMIN: "error",
       SUPERVISOR: "warning",
       OPERATOR: "success",
+      PROCUREMENT_SPECIALIST: "info",
     };
     return colors[props.user.role] || "neutral";
   }
@@ -247,10 +248,11 @@ const roleBadgeColor = computed(
 
 // Format role for display
 const formatRole = (role: UserRole) => {
-  const labels = {
+  const labels: Record<UserRole, string> = {
     ADMIN: "Admin",
     SUPERVISOR: "Supervisor",
     OPERATOR: "Operator",
+    PROCUREMENT_SPECIALIST: "Procurement",
   };
   return labels[role] || role;
 };

@@ -79,6 +79,7 @@ const getRoleBadgeColor = (
     ADMIN: "error",
     SUPERVISOR: "warning",
     OPERATOR: "success",
+    PROCUREMENT_SPECIALIST: "info",
   };
   return colors[role];
 };

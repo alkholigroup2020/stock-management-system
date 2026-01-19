@@ -38,7 +38,7 @@ const schema = z
       ),
     confirm_password: z.string(),
     full_name: z.string().min(1, "Full name is required").max(100),
-    role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
+    role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN", "PROCUREMENT_SPECIALIST"]),
     default_location_id: z.string().uuid("Invalid location").optional(),
   })
   .refine((data) => data.password === data.confirm_password, {

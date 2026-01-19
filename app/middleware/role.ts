@@ -23,8 +23,10 @@
 import type { UserRole } from "~~/shared/types/database";
 
 // Define role hierarchy (higher number = more privileges)
+// PROCUREMENT_SPECIALIST is a special role with limited access, not part of main hierarchy
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   OPERATOR: 1,
+  PROCUREMENT_SPECIALIST: 1, // Same level as operator but different permissions
   SUPERVISOR: 2,
   ADMIN: 3,
 };

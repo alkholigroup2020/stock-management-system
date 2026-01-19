@@ -5,9 +5,10 @@
  * in the Stock Management System based on user roles and location access.
  *
  * Role Hierarchy:
- * - OPERATOR: Basic operations (deliveries, issues, POB entry)
+ * - OPERATOR: Basic operations (deliveries, issues, POB entry, PRF creation)
  * - SUPERVISOR: All operator functions + approvals, reconciliations, reports
  * - ADMIN: Full system access including items, prices, users, period close
+ * - PROCUREMENT_SPECIALIST: Limited access - PO management, deliveries (view)
  */
 
 // import type { UserRole } from "@prisma/client";
@@ -25,6 +26,7 @@ export function usePermissions() {
     isAdmin,
     isSupervisor,
     isOperator,
+    isProcurementSpecialist,
     locations,
   } = useAuth();
 
@@ -32,6 +34,11 @@ export function usePermissions() {
   // Used for navigation when no specific locationId is provided
   const operatorHasAnyLocation = (): boolean => {
     return isOperator.value && locations.value.length > 0;
+  };
+
+  // Helper: Check if Procurement Specialist has any assigned locations
+  const procurementSpecialistHasAnyLocation = (): boolean => {
+    return isProcurementSpecialist.value && locations.value.length > 0;
   };
 
   // ==================== DELIVERY PERMISSIONS ====================
@@ -459,6 +466,218 @@ export function usePermissions() {
     return hasLocationAccess(locationId);
   };
 
+  // ==================== PRF (PURCHASE REQUISITION FORM) PERMISSIONS ====================
+
+  /**
+   * Check if user can view PRFs
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - OPERATOR: Can view own PRFs
+   * - SUPERVISOR/ADMIN: Can view all PRFs
+   * - PROCUREMENT_SPECIALIST: Can view approved PRFs only
+   *
+   * @returns true if user can view PRFs
+   */
+  const canViewPRFs = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // All authenticated users can view PRFs (filtered by role on the backend)
+    return true;
+  };
+
+  /**
+   * Check if user can create a PRF
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - OPERATOR, SUPERVISOR, ADMIN can create PRFs
+   * - PROCUREMENT_SPECIALIST cannot create PRFs
+   *
+   * @param locationId - Location ID to check (optional)
+   * @returns true if user can create PRFs
+   */
+  const canCreatePRF = (locationId?: string): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot create PRFs
+    if (isProcurementSpecialist.value) return false;
+
+    // Admins and Supervisors have implicit access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
+
+    // Operators need to be assigned to the specific location
+    return hasLocationAccess(locationId);
+  };
+
+  /**
+   * Check if user can edit a PRF (only DRAFT status)
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - PRF must be in DRAFT status (checked by caller)
+   * - Only the requester or Admin can edit
+   *
+   * @returns true if user can edit PRFs (role-based check only)
+   */
+  const canEditPRF = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot edit PRFs
+    if (isProcurementSpecialist.value) return false;
+
+    // Admins, Supervisors, and Operators can edit their own PRFs
+    return true;
+  };
+
+  /**
+   * Check if user can submit a PRF for approval
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - Only the requester can submit (checked by caller with userId)
+   * - PROCUREMENT_SPECIALIST cannot submit
+   *
+   * @returns true if user can submit PRFs (role-based check only)
+   */
+  const canSubmitPRF = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot submit PRFs
+    if (isProcurementSpecialist.value) return false;
+
+    return true;
+  };
+
+  /**
+   * Check if user can approve or reject PRFs
+   *
+   * Requirements:
+   * - User must be SUPERVISOR or ADMIN
+   *
+   * @returns true if user can approve PRFs
+   */
+  const canApprovePRF = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return isSupervisor.value || isAdmin.value;
+  };
+
+  /**
+   * Check if user can clone a rejected PRF
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - PROCUREMENT_SPECIALIST cannot clone PRFs
+   *
+   * @returns true if user can clone PRFs
+   */
+  const canClonePRF = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot clone PRFs
+    if (isProcurementSpecialist.value) return false;
+
+    return true;
+  };
+
+  // ==================== PO (PURCHASE ORDER) PERMISSIONS ====================
+
+  /**
+   * Check if user can view POs
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - All roles can view POs
+   *
+   * @returns true if user can view POs
+   */
+  const canViewPOs = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return true;
+  };
+
+  /**
+   * Check if user can create a PO
+   *
+   * Requirements:
+   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   * - POs are created from approved PRFs
+   *
+   * @returns true if user can create POs
+   */
+  const canCreatePO = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return isProcurementSpecialist.value || isAdmin.value;
+  };
+
+  /**
+   * Check if user can edit a PO (only OPEN status)
+   *
+   * Requirements:
+   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   * - PO must be in OPEN status (checked by caller)
+   *
+   * @returns true if user can edit POs
+   */
+  const canEditPO = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return isProcurementSpecialist.value || isAdmin.value;
+  };
+
+  /**
+   * Check if user can close a PO
+   *
+   * Requirements:
+   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   *
+   * @returns true if user can close POs
+   */
+  const canClosePO = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return isProcurementSpecialist.value || isAdmin.value;
+  };
+
+  /**
+   * Check if user can resend PO email to supplier
+   *
+   * Requirements:
+   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   *
+   * @returns true if user can resend PO emails
+   */
+  const canResendPOEmail = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return isProcurementSpecialist.value || isAdmin.value;
+  };
+
+  // ==================== ORDERS PAGE PERMISSIONS ====================
+
+  /**
+   * Check if user can access the Orders page
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - All roles can access Orders page
+   *
+   * @returns true if user can access Orders page
+   */
+  const canAccessOrders = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    return true;
+  };
+
   // ==================== RETURN ALL PERMISSION FUNCTIONS ====================
 
   return {
@@ -511,5 +730,23 @@ export function usePermissions() {
 
     // Stock
     canViewStock,
+
+    // PRF (Purchase Requisition Form)
+    canViewPRFs,
+    canCreatePRF,
+    canEditPRF,
+    canSubmitPRF,
+    canApprovePRF,
+    canClonePRF,
+
+    // PO (Purchase Order)
+    canViewPOs,
+    canCreatePO,
+    canEditPO,
+    canClosePO,
+    canResendPOEmail,
+
+    // Orders Page
+    canAccessOrders,
   };
 }

@@ -94,11 +94,16 @@ export const useAuth = () => {
     isOperator: computed(() => authStore.isOperator),
 
     /**
+     * Check if user is a procurement specialist
+     */
+    isProcurementSpecialist: computed(() => authStore.isProcurementSpecialist),
+
+    /**
      * Check if user has a specific role
-     * @param role - Role to check ('ADMIN', 'SUPERVISOR', or 'OPERATOR')
+     * @param role - Role to check ('ADMIN', 'SUPERVISOR', 'OPERATOR', or 'PROCUREMENT_SPECIALIST')
      * @returns boolean
      */
-    hasRole: (role: "ADMIN" | "SUPERVISOR" | "OPERATOR"): boolean => {
+    hasRole: (role: "ADMIN" | "SUPERVISOR" | "OPERATOR" | "PROCUREMENT_SPECIALIST"): boolean => {
       return authStore.role === role;
     },
 
@@ -107,8 +112,12 @@ export const useAuth = () => {
      * @param roles - Array of roles to check
      * @returns boolean
      */
-    hasAnyRole: (roles: Array<"ADMIN" | "SUPERVISOR" | "OPERATOR">): boolean => {
-      return roles.includes(authStore.role as "ADMIN" | "SUPERVISOR" | "OPERATOR");
+    hasAnyRole: (
+      roles: Array<"ADMIN" | "SUPERVISOR" | "OPERATOR" | "PROCUREMENT_SPECIALIST">
+    ): boolean => {
+      return roles.includes(
+        authStore.role as "ADMIN" | "SUPERVISOR" | "OPERATOR" | "PROCUREMENT_SPECIALIST"
+      );
     },
 
     /**

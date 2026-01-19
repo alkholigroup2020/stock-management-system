@@ -8,7 +8,7 @@ export interface SessionUser {
   username: string;
   email: string;
   full_name: string;
-  role: "OPERATOR" | "SUPERVISOR" | "ADMIN";
+  role: "OPERATOR" | "SUPERVISOR" | "ADMIN" | "PROCUREMENT_SPECIALIST";
   default_location_id: string | null;
   default_location: {
     id: string;
@@ -16,7 +16,7 @@ export interface SessionUser {
     name: string;
     type: string;
   } | null;
-  // Array of location IDs (for Operators only)
+  // Array of location IDs (for Operators and Procurement Specialists)
   // Admins and Supervisors have implicit access to all locations
   locations: string[];
 }
@@ -48,7 +48,9 @@ export const useAuthStore = defineStore("auth", {
     /**
      * Get the user's role
      */
-    role: (state: AuthState): "OPERATOR" | "SUPERVISOR" | "ADMIN" | null => {
+    role: (
+      state: AuthState
+    ): "OPERATOR" | "SUPERVISOR" | "ADMIN" | "PROCUREMENT_SPECIALIST" | null => {
       return state.user?.role || null;
     },
 
@@ -79,6 +81,13 @@ export const useAuthStore = defineStore("auth", {
      */
     isOperator: (state: AuthState): boolean => {
       return state.user?.role === "OPERATOR";
+    },
+
+    /**
+     * Check if the user is a procurement specialist
+     */
+    isProcurementSpecialist: (state: AuthState): boolean => {
+      return state.user?.role === "PROCUREMENT_SPECIALIST";
     },
 
     /**

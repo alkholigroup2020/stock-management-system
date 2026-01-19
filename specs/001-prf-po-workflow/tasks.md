@@ -50,17 +50,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T018 Create email service utility in `server/utils/email.ts` with Resend integration
-- [ ] T019 [P] Add email service error handling and logging in `server/utils/email.ts`
-- [ ] T020 Update `app/composables/usePermissions.ts` with PROCUREMENT_SPECIALIST role checks
-- [ ] T021 [P] Add PRF permissions (canCreatePRF, canApprovePRF, canViewPRF) in `app/composables/usePermissions.ts`
-- [ ] T022 [P] Add PO permissions (canCreatePO, canEditPO, canClosePO) in `app/composables/usePermissions.ts`
-- [ ] T023 Create PRF status badge component in `app/components/orders/PRFStatusBadge.vue`
-- [ ] T024 [P] Create PO status badge component in `app/components/orders/POStatusBadge.vue`
-- [ ] T025 Create Orders index page shell in `app/pages/orders/index.vue` with tabs structure
-- [ ] T026 Add "Orders" menu item to navigation sidebar in `app/components/layout/AppNavbar.vue`
+- [x] T018 Create email service utility in `server/utils/email.ts` with Resend integration
+- [x] T019 [P] Add email service error handling and logging in `server/utils/email.ts`
+- [x] T020 Update `app/composables/usePermissions.ts` with PROCUREMENT_SPECIALIST role checks
+- [x] T021 [P] Add PRF permissions (canCreatePRF, canApprovePRF, canViewPRF) in `app/composables/usePermissions.ts`
+- [x] T022 [P] Add PO permissions (canCreatePO, canEditPO, canClosePO) in `app/composables/usePermissions.ts`
+- [x] T023 Create PRF status badge component in `app/components/orders/PRFStatusBadge.vue`
+- [x] T024 [P] Create PO status badge component in `app/components/orders/POStatusBadge.vue`
+- [x] T025 Create Orders index page shell in `app/pages/orders/index.vue` with tabs structure
+- [x] T026 Add "Orders" menu item to navigation sidebar in `app/layouts/default.vue`
 
-**Checkpoint**: Foundation ready - user story implementation can now begin
+**Checkpoint**: Foundation ready - user story implementation can now begin ✅
 
 ---
 

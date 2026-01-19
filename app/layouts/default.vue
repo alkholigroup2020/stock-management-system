@@ -31,7 +31,17 @@ const mainMenuItems = computed<NavItem[]>(() => {
     },
   ];
 
-  // 2. Master Data section (expandable)
+  // 2. Orders (PRF/PO Workflow)
+  if (permissions.canAccessOrders()) {
+    items.push({
+      label: "Orders",
+      icon: "i-heroicons-clipboard-document-list",
+      to: "/orders",
+      permission: true,
+    });
+  }
+
+  // 3. Master Data section (expandable)
   const masterDataChildren: NavItem[] = [];
   if (permissions.canManageLocations()) {
     masterDataChildren.push({
@@ -218,6 +228,13 @@ const pageTitleMap: Record<string, string> = {
   "period-close": "Period Close",
   pob: "POB",
   profile: "My Profile",
+  orders: "Orders",
+  "orders-prfs": "Purchase Requisitions",
+  "orders-prfs-create": "Create PRF",
+  "orders-prfs-id": "PRF Details",
+  "orders-pos": "Purchase Orders",
+  "orders-pos-create": "Create PO",
+  "orders-pos-id": "PO Details",
 };
 
 // Get page title from route

@@ -66,7 +66,7 @@ const schema = z
   .object({
     email: z.string().email("Invalid email address"),
     full_name: z.string().min(1, "Full name is required").max(100),
-    role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
+    role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN", "PROCUREMENT_SPECIALIST"]),
     is_active: z.boolean(),
     default_location_id: z.string().uuid("Invalid location").nullable().optional(),
     password: z
