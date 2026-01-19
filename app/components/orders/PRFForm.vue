@@ -160,9 +160,7 @@ const selectedLocation = computed(() => {
               <p class="text-sm font-medium text-[var(--ui-text)]">
                 {{ selectedLocation.name }}
               </p>
-              <p class="text-xs text-[var(--ui-text-muted)]">
-                Period: {{ currentPeriodName }}
-              </p>
+              <p class="text-xs text-[var(--ui-text-muted)]">Period: {{ currentPeriodName }}</p>
             </div>
           </div>
         </div>

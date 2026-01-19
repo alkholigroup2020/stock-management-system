@@ -133,7 +133,9 @@ export default defineEventHandler(async (event) => {
 
     // If lines are provided, validate item_ids
     if (data.lines) {
-      const itemIds = data.lines.filter((line) => line.item_id).map((line) => line.item_id as string);
+      const itemIds = data.lines
+        .filter((line) => line.item_id)
+        .map((line) => line.item_id as string);
 
       if (itemIds.length > 0) {
         const items = await prisma.item.findMany({
@@ -182,8 +184,10 @@ export default defineEventHandler(async (event) => {
           : null;
       }
       if (data.is_reimbursable !== undefined) updateData.is_reimbursable = data.is_reimbursable;
-      if (data.contact_person_name !== undefined) updateData.contact_person_name = data.contact_person_name;
-      if (data.contact_person_phone !== undefined) updateData.contact_person_phone = data.contact_person_phone;
+      if (data.contact_person_name !== undefined)
+        updateData.contact_person_name = data.contact_person_name;
+      if (data.contact_person_phone !== undefined)
+        updateData.contact_person_phone = data.contact_person_phone;
       if (data.receiver_name !== undefined) updateData.receiver_name = data.receiver_name;
       if (data.receiver_phone !== undefined) updateData.receiver_phone = data.receiver_phone;
       if (data.notes !== undefined) updateData.notes = data.notes;

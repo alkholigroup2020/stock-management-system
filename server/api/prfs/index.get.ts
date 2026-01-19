@@ -65,8 +65,17 @@ export default defineEventHandler(async (event) => {
   try {
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { page, limit, status, location_id, period_id, prf_type, category, requested_by, search } =
-      querySchema.parse(query);
+    const {
+      page,
+      limit,
+      status,
+      location_id,
+      period_id,
+      prf_type,
+      category,
+      requested_by,
+      search,
+    } = querySchema.parse(query);
 
     // Build where clause
     const where: Prisma.PRFWhereInput = {};

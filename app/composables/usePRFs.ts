@@ -5,12 +5,7 @@
  * Uses Nuxt's useAsyncData for built-in caching and SSR support.
  */
 
-import type {
-  PRFType,
-  PRFCategory,
-  PRFStatus,
-  Unit,
-} from "~~/shared/types/database";
+import type { PRFType, PRFCategory, PRFStatus, Unit } from "~~/shared/types/database";
 
 // Types
 export interface PRFListItem {
@@ -417,6 +412,66 @@ export function usePRFActions() {
     }
   }
 
+  /**
+   * Approve a pending PRF
+   */
+  async function approve(
+    id: string,
+    comments?: string
+  ): Promise<{ data: PRFDetail; email_sent: boolean; email_recipients?: number } | null> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await $fetch<{
+        data: PRFDetail;
+        message: string;
+        email_sent: boolean;
+        email_recipients?: number;
+      }>(`/api/prfs/${id}/approve`, {
+        method: "PATCH",
+        body: comments ? { comments } : {},
+      });
+
+      invalidatePRFCache(id);
+      return {
+        data: response.data,
+        email_sent: response.email_sent,
+        email_recipients: response.email_recipients,
+      };
+    } catch (err) {
+      const errorData = err as { data?: { message?: string } };
+      error.value = errorData.data?.message || "Failed to approve PRF";
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /**
+   * Reject a pending PRF
+   */
+  async function reject(id: string, rejectionReason: string): Promise<PRFDetail | null> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await $fetch<{ data: PRFDetail }>(`/api/prfs/${id}/reject`, {
+        method: "PATCH",
+        body: { rejection_reason: rejectionReason },
+      });
+
+      invalidatePRFCache(id);
+      return response.data;
+    } catch (err) {
+      const errorData = err as { data?: { message?: string } };
+      error.value = errorData.data?.message || "Failed to reject PRF";
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     loading,
     error,
@@ -424,6 +479,8 @@ export function usePRFActions() {
     update,
     remove,
     submit,
+    approve,
+    reject,
   };
 }
 

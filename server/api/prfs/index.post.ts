@@ -53,7 +53,9 @@ const bodySchema = z.object({
   period_id: z.string().uuid("Invalid period ID"),
   project_name: z.string().max(200).nullable().optional(),
   prf_type: z.enum(["URGENT", "DPA", "NORMAL"]).default("NORMAL"),
-  category: z.enum(["MATERIAL", "CONSUMABLES", "SPARE_PARTS", "ASSET", "SERVICES"]).default("MATERIAL"),
+  category: z
+    .enum(["MATERIAL", "CONSUMABLES", "SPARE_PARTS", "ASSET", "SERVICES"])
+    .default("MATERIAL"),
   expected_delivery_date: z.string().nullable().optional(),
   is_reimbursable: z.boolean().default(false),
   contact_person_name: z.string().max(100).nullable().optional(),

@@ -49,8 +49,7 @@ const filteredStocks = computed(() => {
   const query = localSearch.value.toLowerCase();
   return props.stocks.filter(
     (stock) =>
-      stock.item_code.toLowerCase().includes(query) ||
-      stock.item_name.toLowerCase().includes(query)
+      stock.item_code.toLowerCase().includes(query) || stock.item_name.toLowerCase().includes(query)
   );
 });
 
@@ -184,10 +183,7 @@ function handleItemClick(stock: StockItem) {
 
             <!-- On Hand -->
             <td class="px-4 py-3 text-right">
-              <span
-                class="text-sm font-medium"
-                :class="getStockStatusColor(getStockStatus(stock))"
-              >
+              <span class="text-sm font-medium" :class="getStockStatusColor(getStockStatus(stock))">
                 {{ formatNumber(stock.on_hand, 4) }}
               </span>
             </td>

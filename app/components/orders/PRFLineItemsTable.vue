@@ -201,7 +201,12 @@ function removeLine(id: string) {
                   clearable
                   class="min-w-[200px]"
                   :disabled="disabled"
-                  @update:model-value="(val: string | undefined) => { line.item_id = val ?? null; handleItemSelect(line); }"
+                  @update:model-value="
+                    (val: string | undefined) => {
+                      line.item_id = val ?? null;
+                      handleItemSelect(line);
+                    }
+                  "
                 >
                   <template #item="{ item }">
                     <div class="flex flex-col">

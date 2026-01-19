@@ -100,15 +100,15 @@
 
 ### Implementation for User Story 2
 
-- [ ] T042 [P] [US2] Create PRF approve API endpoint in `server/api/prfs/[id]/approve.patch.ts`
-- [ ] T043 [P] [US2] Create PRF reject API endpoint in `server/api/prfs/[id]/reject.patch.ts`
-- [ ] T044 [US2] Add approve/reject functions to `app/composables/usePRFs.ts`
-- [ ] T045 [US2] Create PRF approval actions component in `app/components/orders/PRFApprovalActions.vue`
-- [ ] T046 [US2] Add approval workflow UI to PRF detail page in `app/pages/orders/prfs/[id].vue`
-- [ ] T047 [US2] Implement email notification to PROCUREMENT_SPECIALIST users on approve in `server/api/prfs/[id]/approve.patch.ts`
-- [ ] T048 [US2] Add rejection reason validation (mandatory) in reject endpoint
+- [x] T042 [P] [US2] Create PRF approve API endpoint in `server/api/prfs/[id]/approve.patch.ts`
+- [x] T043 [P] [US2] Create PRF reject API endpoint in `server/api/prfs/[id]/reject.patch.ts`
+- [x] T044 [US2] Add approve/reject functions to `app/composables/usePRFs.ts`
+- [x] T045 [US2] Create PRF approval actions component in `app/components/orders/PRFApprovalActions.vue`
+- [x] T046 [US2] Add approval workflow UI to PRF detail page in `app/pages/orders/prfs/[id].vue`
+- [x] T047 [US2] Implement email notification to PROCUREMENT_SPECIALIST users on approve in `server/api/prfs/[id]/approve.patch.ts`
+- [x] T048 [US2] Add rejection reason validation (mandatory) in reject endpoint
 
-**Checkpoint**: User Story 2 complete - PRFs can be approved/rejected with email notifications
+**Checkpoint**: User Story 2 complete - PRFs can be approved/rejected with email notifications ✅
 
 ---
 

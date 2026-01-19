@@ -72,9 +72,7 @@ const isClosed = computed(() => prf.value?.status === "CLOSED");
 
 const canEdit = computed(() => {
   // Only draft PRFs can be edited by the requester
-  return (
-    isDraft.value && prf.value?.requested_by === user.value?.id && !isEditing.value
-  );
+  return isDraft.value && prf.value?.requested_by === user.value?.id && !isEditing.value;
 });
 
 const canSubmit = computed(() => {
@@ -317,6 +315,16 @@ function goBack() {
   router.push("/orders?tab=prfs");
 }
 
+// Handle PRF approved
+async function onPRFApproved(result: { email_sent: boolean; email_recipients?: number }) {
+  await refreshPRF();
+}
+
+// Handle PRF rejected
+async function onPRFRejected() {
+  await refreshPRF();
+}
+
 // Watch for PRF load
 watch(prf, (newPrf) => {
   if (newPrf && !isEditing.value) {
@@ -425,6 +433,16 @@ onMounted(async () => {
           >
             Submit for Approval
           </UButton>
+
+          <!-- Approval Actions (for pending PRFs) -->
+          <OrdersPRFApprovalActions
+            v-if="isPending && canApprovePRF()"
+            :prf-id="prfId"
+            :prf-no="prf?.prf_no || ''"
+            :disabled="deleting || submitting"
+            @approved="onPRFApproved"
+            @rejected="onPRFRejected"
+          />
         </template>
       </div>
     </div>
@@ -445,9 +463,7 @@ onMounted(async () => {
         <p class="text-[var(--ui-text-muted)] mb-4">
           The requested PRF does not exist or you don't have permission to view it.
         </p>
-        <UButton color="primary" class="cursor-pointer" @click="goBack">
-          Back to PRFs
-        </UButton>
+        <UButton color="primary" class="cursor-pointer" @click="goBack">Back to PRFs</UButton>
       </div>
     </UCard>
 

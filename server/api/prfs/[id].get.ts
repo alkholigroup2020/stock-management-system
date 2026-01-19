@@ -123,9 +123,7 @@ export default defineEventHandler(async (event) => {
         requested_by: prf.requested_by,
         approved_by: prf.approved_by,
         request_date: prf.request_date.toISOString().split("T")[0],
-        approval_date: prf.approval_date
-          ? prf.approval_date.toISOString().split("T")[0]
-          : null,
+        approval_date: prf.approval_date ? prf.approval_date.toISOString().split("T")[0] : null,
         rejection_reason: prf.rejection_reason,
         total_value: prf.total_value.toString(),
         contact_person_name: prf.contact_person_name,
