@@ -356,3 +356,56 @@ With this addition, the Developer Guide now has **10 implemented sections** cove
 10. **Issues (Stock Deductions)** ← NEW
 
 **15 topics remaining** to comprehensively cover all development aspects.
+
+---
+
+## PRF/PO Workflow - Phase 8: User Story 6 - Procurement Specialist Access Control
+
+**Completed:** 2026-01-19
+
+---
+
+### Overview
+
+This task implemented role-based access control for the PROCUREMENT_SPECIALIST role, ensuring they have limited access to only the pages and API endpoints relevant to their responsibilities (managing Purchase Orders and viewing deliveries).
+
+---
+
+### Implementation Summary
+
+**Files Modified:**
+
+1. **`app/composables/usePermissions.ts`** - Added new permission functions restricting PROCUREMENT_SPECIALIST from:
+   - Posting issues (`canPostIssues`)
+   - Creating transfers (`canCreateTransfer`)
+   - Viewing reconciliations (`canViewReconciliations`)
+   - Entering POB data (`canEnterPOB`)
+   - Creating NCRs (`canCreateNCR`)
+   - Viewing stock (`canViewStock`)
+   - Added new functions: `canViewDeliveries`, `canViewItems`, `canViewReportsPage`
+
+2. **`app/layouts/default.vue`** - Updated navigation to use new permission functions for menu visibility
+
+3. **`app/middleware/auth.global.ts`** - Added client-side route guards blocking PROCUREMENT_SPECIALIST from restricted pages (Items, Issues, Transfers, Reconciliations, POB, NCRs, Stock Now, Reports, Periods, Period Close, Locations, Suppliers, Users)
+
+4. **`server/middleware/role-access.ts`** - NEW FILE - Server-side middleware enforcing API endpoint access restrictions for PROCUREMENT_SPECIALIST
+
+5. **`app/pages/users/create.vue`** and **`app/pages/users/[id]/edit.vue`** - Added PROCUREMENT_SPECIALIST to role dropdown options
+
+---
+
+### Key Features
+
+- **Navigation Restrictions**: PROCUREMENT_SPECIALIST users only see Dashboard, Orders, and Deliveries (view only) in the navigation menu
+- **Client-Side Guards**: Route middleware prevents direct URL navigation to restricted pages
+- **Server-Side Enforcement**: API middleware blocks unauthorized API requests with proper 403 responses
+- **Role Dropdown**: Admins can now create and manage PROCUREMENT_SPECIALIST users through the UI
+
+---
+
+### Testing Notes
+
+The implementation was verified through:
+- TypeScript type checking passed
+- Code formatting verified with Prettier
+- Server middleware properly configured to reject unauthorized requests

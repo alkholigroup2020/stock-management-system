@@ -67,6 +67,11 @@ const roleOptions = [
     description: "Post transactions at assigned locations only",
   },
   {
+    value: "PROCUREMENT_SPECIALIST",
+    label: "Procurement Specialist",
+    description: "Limited access - manage POs and view deliveries only",
+  },
+  {
     value: "SUPERVISOR",
     label: "Supervisor",
     description: "All locations access - approve transfers & reconciliations",
@@ -78,8 +83,10 @@ const roleOptions = [
   },
 ];
 
-// Check if selected role is OPERATOR
-const isOperatorRole = computed(() => formData.role === "OPERATOR");
+// Check if selected role requires location assignment (OPERATOR or PROCUREMENT_SPECIALIST)
+const isOperatorRole = computed(
+  () => formData.role === "OPERATOR" || formData.role === "PROCUREMENT_SPECIALIST"
+);
 
 // Location options
 const locationOptions = computed(() => [

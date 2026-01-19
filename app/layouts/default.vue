@@ -64,7 +64,7 @@ const mainMenuItems = computed<NavItem[]>(() => {
       permission: true,
     });
   }
-  if (permissions.canViewStock()) {
+  if (permissions.canViewItems()) {
     masterDataChildren.push({
       label: "Items",
       to: "/items",
@@ -83,7 +83,7 @@ const mainMenuItems = computed<NavItem[]>(() => {
 
   // 3. Transactions section (expandable)
   const transactionChildren: NavItem[] = [];
-  if (permissions.canPostDeliveries()) {
+  if (permissions.canViewDeliveries()) {
     transactionChildren.push({
       label: "Deliveries",
       to: "/deliveries",
@@ -155,7 +155,7 @@ const mainMenuItems = computed<NavItem[]>(() => {
   }
 
   // 8. Reports (single item)
-  if (permissions.canViewStock()) {
+  if (permissions.canViewReportsPage()) {
     items.push({
       label: "Reports",
       icon: "i-heroicons-document-chart-bar",

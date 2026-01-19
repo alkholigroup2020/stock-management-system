@@ -186,13 +186,13 @@
 
 ### Implementation for User Story 6
 
-- [ ] T076 [P] [US6] Update navigation sidebar to show limited menu for PROCUREMENT_SPECIALIST in `app/components/layout/AppNavbar.vue`
-- [ ] T077 [P] [US6] Add client-side route guards for restricted pages in `app/middleware/auth.ts`
-- [ ] T078 [US6] Update server middleware to validate PROCUREMENT_SPECIALIST access in `server/middleware/`
-- [ ] T079 [US6] Test PROCUREMENT_SPECIALIST cannot access Master Data, Issues, Transfers, Reconciliations
-- [ ] T080 [US6] Ensure PROCUREMENT_SPECIALIST can view deliveries (PO-linked only)
+- [x] T076 [P] [US6] Update navigation sidebar to show limited menu for PROCUREMENT_SPECIALIST in `app/components/layout/AppNavbar.vue`
+- [x] T077 [P] [US6] Add client-side route guards for restricted pages in `app/middleware/auth.ts`
+- [x] T078 [US6] Update server middleware to validate PROCUREMENT_SPECIALIST access in `server/middleware/`
+- [x] T079 [US6] Test PROCUREMENT_SPECIALIST cannot access Master Data, Issues, Transfers, Reconciliations
+- [x] T080 [US6] Ensure PROCUREMENT_SPECIALIST can view deliveries (PO-linked only)
 
-**Checkpoint**: User Story 6 complete - Role-based access control enforced
+**Checkpoint**: User Story 6 complete - Role-based access control enforced ✅
 
 ---
 

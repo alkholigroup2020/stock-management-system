@@ -49,7 +49,8 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the location
-   * - All roles (OPERATOR, SUPERVISOR, ADMIN) can post deliveries
+   * - OPERATOR, SUPERVISOR, ADMIN can post deliveries
+   * - PROCUREMENT_SPECIALIST cannot post deliveries
    *
    * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can post deliveries at the location
@@ -57,11 +58,43 @@ export function usePermissions() {
   const canPostDeliveries = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
+    // Procurement Specialists cannot post deliveries
+    if (isProcurementSpecialist.value) return false;
+
     // Admins and Supervisors have implicit access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
 
     // If no specific location requested, check if operator has ANY assigned locations
     // This is used for navigation menu visibility
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
+
+    // Operators need to be assigned to the specific location
+    return hasLocationAccess(locationId);
+  };
+
+  /**
+   * Check if user can view deliveries (read-only access)
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - OPERATOR, SUPERVISOR, ADMIN can view deliveries
+   * - PROCUREMENT_SPECIALIST can view deliveries (PO-linked only, for tracking)
+   *
+   * @param locationId - Location ID to check (optional)
+   * @returns true if user can view deliveries
+   */
+  const canViewDeliveries = (locationId?: string): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists can view deliveries (for PO tracking)
+    if (isProcurementSpecialist.value) return true;
+
+    // Admins and Supervisors have implicit access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
+    // If no specific location requested, check if operator has ANY assigned locations
     if (!locationId) {
       return operatorHasAnyLocation();
     }
@@ -78,13 +111,17 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the location
-   * - All roles (OPERATOR, SUPERVISOR, ADMIN) can post issues
+   * - OPERATOR, SUPERVISOR, ADMIN can post issues
+   * - PROCUREMENT_SPECIALIST cannot post issues
    *
    * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can post issues at the location
    */
   const canPostIssues = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot post issues
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have implicit access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -189,13 +226,17 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the source location
-   * - All roles can create transfers (requires supervisor approval)
+   * - OPERATOR, SUPERVISOR, ADMIN can create transfers (requires supervisor approval)
+   * - PROCUREMENT_SPECIALIST cannot create transfers
    *
    * @param fromLocationId - Source location ID (optional, for button visibility shows if user has any location)
    * @returns true if user can create a transfer
    */
   const canCreateTransfer = (fromLocationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot create transfers
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have implicit access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -229,13 +270,17 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the location
-   * - All roles can VIEW reconciliations (operators see totals only)
+   * - OPERATOR, SUPERVISOR, ADMIN can VIEW reconciliations (operators see totals only)
+   * - PROCUREMENT_SPECIALIST cannot view reconciliations
    *
    * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can view reconciliations
    */
   const canViewReconciliations = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot view reconciliations
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -287,13 +332,17 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the location
-   * - All roles can enter POB data
+   * - OPERATOR, SUPERVISOR, ADMIN can enter POB data
+   * - PROCUREMENT_SPECIALIST cannot enter POB data
    *
    * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can enter POB
    */
   const canEnterPOB = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot enter POB
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -314,13 +363,17 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the location
-   * - All roles can create NCRs
+   * - OPERATOR, SUPERVISOR, ADMIN can create NCRs
+   * - PROCUREMENT_SPECIALIST cannot create NCRs
    *
    * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can create NCRs
    */
   const canCreateNCR = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot create NCRs
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -448,12 +501,63 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - User must have access to the location
+   * - PROCUREMENT_SPECIALIST cannot view stock levels
    *
    * @param locationId - Location ID to check (optional, for navigation shows menu if user has any location)
    * @returns true if user can view stock
    */
   const canViewStock = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot view stock
+    if (isProcurementSpecialist.value) return false;
+
+    // Admins and Supervisors have access to all locations
+    if (isAdmin.value || isSupervisor.value) return true;
+
+    // If no specific location requested, check if operator has ANY assigned locations
+    if (!locationId) {
+      return operatorHasAnyLocation();
+    }
+
+    return hasLocationAccess(locationId);
+  };
+
+  /**
+   * Check if user can view Items master data
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - OPERATOR, SUPERVISOR, ADMIN can view Items
+   * - PROCUREMENT_SPECIALIST cannot view Items
+   *
+   * @returns true if user can view Items
+   */
+  const canViewItems = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot view Items master data
+    if (isProcurementSpecialist.value) return false;
+
+    return true;
+  };
+
+  /**
+   * Check if user can view Reports
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - OPERATOR, SUPERVISOR, ADMIN can view Reports
+   * - PROCUREMENT_SPECIALIST cannot view Reports
+   *
+   * @param locationId - Location ID to check (optional)
+   * @returns true if user can view Reports
+   */
+  const canViewReportsPage = (locationId?: string): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot view Reports
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -683,6 +787,7 @@ export function usePermissions() {
   return {
     // Deliveries
     canPostDeliveries,
+    canViewDeliveries,
 
     // Issues
     canPostIssues,
@@ -730,6 +835,8 @@ export function usePermissions() {
 
     // Stock
     canViewStock,
+    canViewItems,
+    canViewReportsPage,
 
     // PRF (Purchase Requisition Form)
     canViewPRFs,
