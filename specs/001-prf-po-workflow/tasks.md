@@ -120,23 +120,23 @@
 
 ### Implementation for User Story 3
 
-- [ ] T049 [P] [US3] Create PO list API endpoint in `server/api/pos/index.get.ts`
-- [ ] T050 [P] [US3] Create PO create API endpoint in `server/api/pos/index.post.ts` with VAT calculations
-- [ ] T051 [P] [US3] Create PO get API endpoint in `server/api/pos/[id].get.ts`
-- [ ] T052 [P] [US3] Create PO update API endpoint in `server/api/pos/[id].patch.ts`
-- [ ] T053 [US3] Create open POs dropdown API in `server/api/pos/open.get.ts`
-- [ ] T054 [US3] Create `app/composables/usePOs.ts` with list, get, create, update functions
-- [ ] T055 [P] [US3] Create PO line items table component in `app/components/orders/POLineItemsTable.vue` with VAT calculations
-- [ ] T056 [US3] Create PO form component in `app/components/orders/POForm.vue` with supplier selection
-- [ ] T057 [US3] Create PO create page in `app/pages/orders/pos/create.vue` with PRF pre-population
-- [ ] T058 [US3] Create PO detail page in `app/pages/orders/pos/[id].vue` with edit capabilities
-- [ ] T059 [US3] Update Orders index page POs tab with list view in `app/pages/orders/index.vue`
-- [ ] T060 [US3] Implement auto-generation of PO numbers (PO-001 format) in create endpoint
-- [ ] T061 [US3] Implement VAT calculation logic (15%) in `server/api/pos/index.post.ts`
-- [ ] T062 [US3] Implement email notification to supplier on PO creation
-- [ ] T063 [US3] Add "Create PO" action button on approved PRF detail page
+- [x] T049 [P] [US3] Create PO list API endpoint in `server/api/pos/index.get.ts`
+- [x] T050 [P] [US3] Create PO create API endpoint in `server/api/pos/index.post.ts` with VAT calculations
+- [x] T051 [P] [US3] Create PO get API endpoint in `server/api/pos/[id].get.ts`
+- [x] T052 [P] [US3] Create PO update API endpoint in `server/api/pos/[id].patch.ts`
+- [x] T053 [US3] Create open POs dropdown API in `server/api/pos/open.get.ts`
+- [x] T054 [US3] Create `app/composables/usePOs.ts` with list, get, create, update functions
+- [x] T055 [P] [US3] Create PO line items table component in `app/components/orders/POLineItemsTable.vue` with VAT calculations
+- [x] T056 [US3] Create PO form component in `app/components/orders/POForm.vue` with supplier selection
+- [x] T057 [US3] Create PO create page in `app/pages/orders/pos/create.vue` with PRF pre-population
+- [x] T058 [US3] Create PO detail page in `app/pages/orders/pos/[id].vue` with edit capabilities
+- [x] T059 [US3] Update Orders index page POs tab with list view in `app/pages/orders/index.vue`
+- [x] T060 [US3] Implement auto-generation of PO numbers (PO-001 format) in create endpoint
+- [x] T061 [US3] Implement VAT calculation logic (15%) in `server/api/pos/index.post.ts`
+- [x] T062 [US3] Implement email notification to supplier on PO creation
+- [x] T063 [US3] Add "Create PO" action button on approved PRF detail page
 
-**Checkpoint**: User Story 3 complete - POs can be created from PRFs with correct VAT calculations
+**Checkpoint**: User Story 3 complete - POs can be created from PRFs with correct VAT calculations ✅
 
 ---
 
@@ -168,13 +168,13 @@
 
 ### Implementation for User Story 5
 
-- [ ] T071 [US5] Create PO close API endpoint in `server/api/pos/[id]/close.patch.ts`
-- [ ] T072 [US5] Add close function to `app/composables/usePOs.ts`
-- [ ] T073 [US5] Add "Close PO" button to PO detail page in `app/pages/orders/pos/[id].vue`
-- [ ] T074 [US5] Update linked PRF status to CLOSED when PO is closed
-- [ ] T075 [US5] Filter closed POs from delivery PO dropdown in `server/api/pos/open.get.ts`
+- [x] T071 [US5] Create PO close API endpoint in `server/api/pos/[id]/close.patch.ts`
+- [x] T072 [US5] Add close function to `app/composables/usePOs.ts`
+- [x] T073 [US5] Add "Close PO" button to PO detail page in `app/pages/orders/pos/[id].vue`
+- [x] T074 [US5] Update linked PRF status to CLOSED when PO is closed
+- [x] T075 [US5] Filter closed POs from delivery PO dropdown in `server/api/pos/open.get.ts`
 
-**Checkpoint**: User Story 5 complete - POs can be closed, completing the order lifecycle
+**Checkpoint**: User Story 5 complete - POs can be closed, completing the order lifecycle ✅
 
 ---
 
