@@ -127,22 +127,21 @@ function initializeFormData() {
     duration_days: po.value.duration_days?.toString() || "",
     terms_conditions: po.value.terms_conditions || "",
     notes: po.value.notes || "",
-    lines:
-      po.value.lines?.map((line) => ({
-        id: line.id,
-        item_id: line.item_id,
-        item_code: line.item_code || "",
-        item_description: line.item_description,
-        unit: line.unit,
-        quantity: line.quantity,
-        unit_price: line.unit_price,
-        discount_percent: line.discount_percent,
-        vat_percent: line.vat_percent,
-        total_before_vat: parseFloat(line.total_before_vat) || 0,
-        vat_amount: parseFloat(line.vat_amount) || 0,
-        total_after_vat: parseFloat(line.total_after_vat) || 0,
-        notes: line.notes || "",
-      })) || [createEmptyLine()],
+    lines: po.value.lines?.map((line) => ({
+      id: line.id,
+      item_id: line.item_id,
+      item_code: line.item_code || "",
+      item_description: line.item_description,
+      unit: line.unit,
+      quantity: line.quantity,
+      unit_price: line.unit_price,
+      discount_percent: line.discount_percent,
+      vat_percent: line.vat_percent,
+      total_before_vat: parseFloat(line.total_before_vat) || 0,
+      vat_amount: parseFloat(line.vat_amount) || 0,
+      total_after_vat: parseFloat(line.total_after_vat) || 0,
+      notes: line.notes || "",
+    })) || [createEmptyLine()],
   };
 }
 

@@ -13,6 +13,29 @@
       </div>
     </div>
 
+    <!-- No Open POs Warning -->
+    <UAlert
+      v-if="!loadingOpenPOs && openPOs.length === 0"
+      icon="i-lucide-alert-circle"
+      color="warning"
+      variant="subtle"
+      title="No Open Purchase Orders"
+      description="There are no open POs available. Deliveries require a linked Purchase Order. Please create a PO first."
+    >
+      <template #actions>
+        <UButton
+          color="warning"
+          variant="soft"
+          size="sm"
+          class="cursor-pointer"
+          to="/orders?tab=pos"
+          icon="i-lucide-plus"
+        >
+          Create PO
+        </UButton>
+      </template>
+    </UAlert>
+
     <!-- Main Form -->
     <div class="space-y-3">
       <!-- Delivery Header Card -->
@@ -50,51 +73,72 @@
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Supplier -->
+          <!-- Purchase Order (Required) -->
+          <div>
+            <label class="form-label mb-2 block">
+              Purchase Order
+              <span class="text-[var(--ui-error)]">*</span>
+            </label>
+            <USelectMenu
+              v-model="formData.po_id"
+              :items="poDropdownItems"
+              label-key="label"
+              value-key="value"
+              placeholder="Select Purchase Order"
+              searchable
+              size="lg"
+              class="w-full"
+              :loading="loadingOpenPOs"
+              :disabled="openPOs.length === 0"
+            >
+              <template #leading>
+                <UIcon name="i-lucide-file-text" class="w-5 h-5" />
+              </template>
+              <template #item="{ item }">
+                <div class="flex flex-col">
+                  <span class="font-medium">{{ item.label }}</span>
+                  <span class="text-xs text-[var(--ui-text-muted)]">
+                    {{ item.supplierName }} - {{ formatCurrency(item.totalAmount) }}
+                  </span>
+                </div>
+              </template>
+            </USelectMenu>
+            <p class="text-xs text-[var(--ui-text-muted)] mt-1">
+              Selecting a PO will auto-populate supplier and items
+            </p>
+          </div>
+
+          <!-- Supplier (Auto-populated from PO, read-only) -->
           <div>
             <label class="form-label mb-2 block">
               Supplier
               <span class="text-[var(--ui-error)]">*</span>
             </label>
-            <USelectMenu
-              v-model="formData.supplier_id"
-              :items="suppliers"
-              label-key="name"
-              value-key="id"
-              placeholder="Select supplier"
-              searchable
-              size="lg"
-              class="w-full"
-            >
-              <template #leading>
-                <UIcon name="i-lucide-building-2" class="w-5 h-5" />
-              </template>
-            </USelectMenu>
-          </div>
-
-          <!-- PO (Optional) - Hidden until PO system is implemented -->
-          <!-- TODO: Replace with PO selector dropdown when PO module is ready -->
-          <div class="hidden">
-            <label class="form-label mb-2 block">Purchase Order (Optional)</label>
-            <UInput
-              v-model="formData.po_id"
-              placeholder="PO number if applicable"
-              size="lg"
-              icon="i-lucide-file-text"
-              class="w-full"
-            />
-          </div>
-
-          <!-- Placeholder for PO field - coming soon -->
-          <div>
-            <label class="form-label mb-2 block text-[var(--ui-text-muted)]">
-              Purchase Order (Optional)
-            </label>
             <div
+              v-if="selectedPO"
+              class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)]"
+            >
+              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
+              <div class="flex-1">
+                <span class="font-medium text-[var(--ui-text)]">
+                  {{ selectedPO.supplier.name }}
+                </span>
+                <span class="text-xs text-[var(--ui-text-muted)] ml-2">
+                  ({{ selectedPO.supplier.code }})
+                </span>
+              </div>
+              <UIcon
+                name="i-lucide-lock"
+                class="w-4 h-4 text-[var(--ui-text-muted)]"
+                title="Auto-populated from PO"
+              />
+            </div>
+            <div
+              v-else
               class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)] text-[var(--ui-text-muted)]"
             >
-              <UIcon name="i-lucide-file-text" class="w-5 h-5" />
-              <span class="text-sm">PO linking coming soon</span>
+              <UIcon name="i-lucide-building-2" class="w-5 h-5" />
+              <span class="text-sm">Select a PO to auto-populate supplier</span>
             </div>
           </div>
 
@@ -160,6 +204,17 @@
           </div>
         </template>
 
+        <!-- Over-Delivery Warning -->
+        <div v-if="hasOverDeliveryLines" class="px-3 sm:px-4 pt-3 sm:pt-4">
+          <UAlert
+            icon="i-lucide-alert-triangle"
+            color="warning"
+            variant="subtle"
+            title="Over-Delivery Detected"
+            :description="`${overDeliveryCount} item(s) have quantity exceeding the PO quantity. Please verify before proceeding.`"
+          />
+        </div>
+
         <!-- Variance Warning -->
         <div v-if="hasVarianceLines" class="px-3 sm:px-4 pt-3 sm:pt-4">
           <UAlert
@@ -177,6 +232,7 @@
             <thead>
               <tr class="bg-[var(--ui-bg-elevated)]">
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">PO Qty</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Quantity</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit Price</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
@@ -190,7 +246,7 @@
             <tbody class="divide-y divide-[var(--ui-border)]">
               <!-- Loading State -->
               <tr v-if="loadingInitialData">
-                <td colspan="7" class="px-4 py-8">
+                <td colspan="8" class="px-4 py-8">
                   <div class="flex flex-col items-center justify-center gap-3">
                     <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
                     <p class="text-sm text-[var(--ui-text-muted)]">Loading items...</p>
@@ -203,7 +259,7 @@
                 v-else
                 :key="line.id"
                 :class="{
-                  'bg-amber-50 dark:bg-amber-950/20': line.has_variance,
+                  'bg-amber-50 dark:bg-amber-950/20': line.has_variance || line.is_over_delivery,
                 }"
                 class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
               >
@@ -220,17 +276,34 @@
                   />
                 </td>
 
+                <!-- PO Quantity -->
+                <td class="px-4 py-3">
+                  <span v-if="line.po_quantity !== undefined" class="text-caption">
+                    {{ formatNumber(line.po_quantity) }}
+                  </span>
+                  <span v-else class="text-caption">-</span>
+                </td>
+
                 <!-- Quantity -->
                 <td class="px-4 py-3">
-                  <UInput
-                    v-model="line.quantity"
-                    type="number"
-                    step="0.0001"
-                    min="0"
-                    placeholder="0.00"
-                    size="sm"
-                    class="w-32"
-                  />
+                  <div class="relative">
+                    <UInput
+                      v-model="line.quantity"
+                      type="number"
+                      step="0.0001"
+                      min="0"
+                      placeholder="0.00"
+                      size="sm"
+                      class="w-32"
+                      :class="{ 'border-amber-500': line.is_over_delivery }"
+                    />
+                    <UIcon
+                      v-if="line.is_over_delivery"
+                      name="i-lucide-alert-triangle"
+                      class="absolute -right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500"
+                      title="Quantity exceeds PO quantity"
+                    />
+                  </div>
                 </td>
 
                 <!-- Unit Price -->
@@ -297,8 +370,11 @@
 
               <!-- Empty State -->
               <tr v-if="!loadingInitialData && lines.length === 0">
-                <td colspan="7" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
-                  No items added yet. Click "Add Item" to start.
+                <td colspan="8" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
+                  <div v-if="selectedPO">
+                    No items added yet. PO items have been added as suggestions.
+                  </div>
+                  <div v-else>Select a Purchase Order to load suggested items.</div>
                 </td>
               </tr>
             </tbody>
@@ -387,7 +463,8 @@
 </template>
 
 <script setup lang="ts">
-import { formatCurrency } from "~/utils/format";
+import { formatCurrency, formatNumber } from "~/utils/format";
+import type { OpenPO } from "~/composables/usePOs";
 
 // Composables
 const router = useRouter();
@@ -397,6 +474,9 @@ const toast = useAppToast();
 const permissions = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess, handleWarning } = useErrorHandler();
+
+// Fetch open POs for dropdown
+const { openPOs, loading: loadingOpenPOs, refresh: refreshOpenPOs } = useOpenPOs();
 
 // State
 const savingDraft = ref(false);
@@ -422,10 +502,38 @@ const periodPrices = ref<Record<string, number>>({}); // Map of itemId -> period
 // Computed permission check
 const hasDeliveryPermission = computed(() => permissions.canPostDeliveries());
 
+// Transform open POs for dropdown
+const poDropdownItems = computed(() => {
+  return openPOs.value.map((po) => ({
+    value: po.id,
+    label: po.po_no,
+    supplierName: po.supplier.name,
+    totalAmount: parseFloat(po.total_amount),
+  }));
+});
+
+// Get selected PO details
+const selectedPO = computed<OpenPO | undefined>(() => {
+  if (!formData.value.po_id) return undefined;
+  return openPOs.value.find((po) => po.id === formData.value.po_id);
+});
+
+// Build a map of item_id -> PO quantity for over-delivery checking
+const poQuantityMap = computed<Record<string, number>>(() => {
+  if (!selectedPO.value) return {};
+  const map: Record<string, number> = {};
+  for (const line of selectedPO.value.lines) {
+    if (line.item_id) {
+      map[line.item_id] = parseFloat(line.quantity);
+    }
+  }
+  return map;
+});
+
 // Form state
 const formData = ref({
   supplier_id: "",
-  po_id: null as string | null,
+  po_id: undefined as string | undefined,
   invoice_no: "",
   delivery_note: "",
   delivery_date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
@@ -442,6 +550,8 @@ const lines = ref<
     price_variance: number;
     has_variance: boolean;
     period_price?: number;
+    po_quantity?: number;
+    is_over_delivery: boolean;
   }>
 >([]);
 
@@ -455,7 +565,24 @@ const addLine = () => {
     line_value: 0,
     price_variance: 0,
     has_variance: false,
+    po_quantity: undefined,
+    is_over_delivery: false,
   });
+};
+
+// Populate delivery lines from selected PO
+const populateLinesFromPO = (po: OpenPO) => {
+  lines.value = po.lines.map((poLine) => ({
+    id: crypto.randomUUID(),
+    item_id: poLine.item_id || "",
+    quantity: poLine.quantity, // Pre-fill with PO quantity
+    unit_price: poLine.unit_price,
+    line_value: parseFloat(poLine.quantity) * parseFloat(poLine.unit_price),
+    price_variance: 0,
+    has_variance: false,
+    po_quantity: parseFloat(poLine.quantity),
+    is_over_delivery: false,
+  }));
 };
 
 // Remove line
@@ -480,6 +607,16 @@ const updateLineCalculations = (line: any) => {
     line.price_variance = 0;
     line.has_variance = false;
   }
+
+  // Check for over-delivery
+  const poQty = poQuantityMap.value[line.item_id];
+  if (poQty !== undefined) {
+    line.po_quantity = poQty;
+    line.is_over_delivery = quantity > poQty;
+  } else {
+    line.po_quantity = undefined;
+    line.is_over_delivery = false;
+  }
 };
 
 // Computed
@@ -495,10 +632,19 @@ const varianceCount = computed(() => {
   return lines.value.filter((line) => line.has_variance).length;
 });
 
+const hasOverDeliveryLines = computed(() => {
+  return lines.value.some((line) => line.is_over_delivery);
+});
+
+const overDeliveryCount = computed(() => {
+  return lines.value.filter((line) => line.is_over_delivery).length;
+});
+
 // Draft validation (relaxed - for saving as draft)
 const isDraftValid = computed(() => {
   return (
-    formData.value.supplier_id &&
+    formData.value.po_id && // PO is now required
+    selectedPO.value?.supplier.id && // Supplier from PO
     formData.value.delivery_date &&
     lines.value.length > 0 &&
     lines.value.some((line) => line.item_id && line.quantity)
@@ -508,7 +654,8 @@ const isDraftValid = computed(() => {
 // Full validation (strict - for posting)
 const isFormValid = computed(() => {
   return (
-    formData.value.supplier_id &&
+    formData.value.po_id && // PO is now required
+    selectedPO.value?.supplier.id && // Supplier from PO
     formData.value.invoice_no &&
     formData.value.delivery_date &&
     lines.value.length > 0 &&
@@ -576,6 +723,13 @@ const saveDraft = async () => {
     return;
   }
 
+  if (!formData.value.po_id || !selectedPO.value) {
+    handleError({
+      data: { message: "Please select a Purchase Order before saving a delivery" },
+    });
+    return;
+  }
+
   if (!locationStore.activeLocation?.id) {
     handleError({
       data: { message: "Please select a location before saving a delivery" },
@@ -598,8 +752,8 @@ const saveDraft = async () => {
           {
             method: "post",
             body: {
-              supplier_id: formData.value.supplier_id,
-              po_id: formData.value.po_id || null,
+              supplier_id: selectedPO.value!.supplier.id, // Use supplier from PO
+              po_id: formData.value.po_id,
               invoice_no: formData.value.invoice_no || null,
               delivery_note: formData.value.delivery_note || null,
               delivery_date: formData.value.delivery_date
@@ -637,6 +791,14 @@ const postDelivery = async () => {
     return;
   }
 
+  if (!formData.value.po_id || !selectedPO.value) {
+    handleError({
+      data: { message: "Please select a Purchase Order before posting a delivery" },
+    });
+    showPostConfirmation.value = false;
+    return;
+  }
+
   if (!locationStore.activeLocation?.id) {
     handleError({
       data: { message: "Please select a location before posting a delivery" },
@@ -661,8 +823,8 @@ const postDelivery = async () => {
           {
             method: "post",
             body: {
-              supplier_id: formData.value.supplier_id,
-              po_id: formData.value.po_id || null,
+              supplier_id: selectedPO.value!.supplier.id, // Use supplier from PO
+              po_id: formData.value.po_id,
               invoice_no: formData.value.invoice_no,
               delivery_note: formData.value.delivery_note || null,
               delivery_date: formData.value.delivery_date
@@ -726,9 +888,24 @@ onMounted(async () => {
     loadingInitialData.value = false;
   }
 
-  // Add initial empty line
-  addLine();
+  // Don't add an initial empty line - wait for PO selection
 });
+
+// Watch for PO selection changes
+watch(
+  () => formData.value.po_id,
+  (newPoId) => {
+    if (newPoId && selectedPO.value) {
+      // Auto-populate lines from selected PO
+      populateLinesFromPO(selectedPO.value);
+      // Update line calculations
+      lines.value.forEach((line) => updateLineCalculations(line));
+    } else {
+      // Clear lines when no PO selected
+      lines.value = [];
+    }
+  }
+);
 
 // Watch for item or price changes to update calculations
 watch(

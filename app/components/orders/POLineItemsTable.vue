@@ -424,10 +424,16 @@ function removeLine(id: string) {
         <tfoot class="bg-[var(--ui-bg-muted)]">
           <!-- Subtotal Before Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td :colspan="showDiscounts ? 5 : 4" class="px-3 py-2 text-right text-[var(--ui-text-muted)]">
+            <td
+              :colspan="showDiscounts ? 5 : 4"
+              class="px-3 py-2 text-right text-[var(--ui-text-muted)]"
+            >
               Subtotal:
             </td>
-            <td colspan="2" class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden md:table-cell">
+            <td
+              colspan="2"
+              class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden md:table-cell"
+            >
               {{ formatCurrency(totals.total_before_discount) }}
             </td>
             <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] md:hidden">
@@ -452,7 +458,10 @@ function removeLine(id: string) {
 
           <!-- After Discount / Before VAT -->
           <tr class="text-sm">
-            <td :colspan="showDiscounts ? 5 : 4" class="px-3 py-2 text-right text-[var(--ui-text-muted)]">
+            <td
+              :colspan="showDiscounts ? 5 : 4"
+              class="px-3 py-2 text-right text-[var(--ui-text-muted)]"
+            >
               Before VAT:
             </td>
             <td colspan="2" class="px-3 py-2 text-right text-[var(--ui-text)] hidden md:table-cell">
@@ -466,7 +475,10 @@ function removeLine(id: string) {
 
           <!-- VAT -->
           <tr class="text-sm">
-            <td :colspan="showDiscounts ? 5 : 4" class="px-3 py-2 text-right text-[var(--ui-text-muted)]">
+            <td
+              :colspan="showDiscounts ? 5 : 4"
+              class="px-3 py-2 text-right text-[var(--ui-text-muted)]"
+            >
               VAT ({{ VAT_RATE }}%):
             </td>
             <td colspan="2" class="px-3 py-2 text-right text-[var(--ui-text)] hidden md:table-cell">

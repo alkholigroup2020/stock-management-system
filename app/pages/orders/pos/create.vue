@@ -233,12 +233,8 @@ async function fetchPRFDetails(prfId: string) {
         discount_percent: "0",
         vat_percent: "15",
         total_before_vat: parseFloat(line.required_qty) * parseFloat(line.estimated_price),
-        vat_amount:
-          parseFloat(line.required_qty) * parseFloat(line.estimated_price) * 0.15,
-        total_after_vat:
-          parseFloat(line.required_qty) *
-          parseFloat(line.estimated_price) *
-          1.15,
+        vat_amount: parseFloat(line.required_qty) * parseFloat(line.estimated_price) * 0.15,
+        total_after_vat: parseFloat(line.required_qty) * parseFloat(line.estimated_price) * 1.15,
         notes: "",
       }));
     }
@@ -367,9 +363,7 @@ onMounted(async () => {
           <h1 class="text-xl sm:text-3xl font-bold text-primary">New Purchase Order</h1>
           <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
             Create a new Purchase Order
-            <span v-if="selectedPRF" class="text-primary">
-              from {{ selectedPRF.prf_no }}
-            </span>
+            <span v-if="selectedPRF" class="text-primary">from {{ selectedPRF.prf_no }}</span>
           </p>
         </div>
       </div>

@@ -180,7 +180,10 @@ function handleLineChange() {
             v-if="selectedSupplier"
             class="flex items-center gap-2 px-3 py-1.5 md:p-3 bg-[var(--ui-bg)] rounded-lg border border-[var(--ui-border)]"
           >
-            <UIcon name="i-lucide-building-2" class="w-4 md:w-6 h-4 md:h-6 text-primary flex-shrink-0" />
+            <UIcon
+              name="i-lucide-building-2"
+              class="w-4 md:w-6 h-4 md:h-6 text-primary flex-shrink-0"
+            />
             <div class="text-left">
               <p class="text-sm font-medium text-[var(--ui-text)]">
                 {{ selectedSupplier.name }}
@@ -200,7 +203,10 @@ function handleLineChange() {
           <label class="form-label mb-2 block">Source PRF</label>
           <USelectMenu
             :model-value="formData.prf_id ?? undefined"
-            :items="[{ id: '', prf_no: 'None (Manual PO)', requester: '', total_value: '', location: '' }, ...prfOptions]"
+            :items="[
+              { id: '', prf_no: 'None (Manual PO)', requester: '', total_value: '', location: '' },
+              ...prfOptions,
+            ]"
             label-key="prf_no"
             value-key="id"
             placeholder="Select source PRF (optional)"
@@ -209,7 +215,12 @@ function handleLineChange() {
             :disabled="disabled || readonly"
             size="lg"
             class="w-full"
-            @update:model-value="(val: string | undefined) => { formData.prf_id = val || null; handlePrfSelect(); }"
+            @update:model-value="
+              (val: string | undefined) => {
+                formData.prf_id = val || null;
+                handlePrfSelect();
+              }
+            "
           >
             <template #leading>
               <UIcon name="i-lucide-file-text" class="w-5 h-5" />

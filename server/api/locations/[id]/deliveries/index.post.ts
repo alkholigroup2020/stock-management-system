@@ -45,7 +45,7 @@ const deliveryLineSchema = z.object({
 // Request body schema
 const bodySchema = z.object({
   supplier_id: z.string().uuid(),
-  po_id: z.string().uuid().nullable().optional(),
+  po_id: z.string().uuid(), // REQUIRED: Deliveries must be linked to a PO (as of User Story 4)
   invoice_no: z.string().min(1).nullable().optional(), // Optional for drafts, required for posting
   delivery_note: z.string().nullable().optional(),
   delivery_date: z.string(), // ISO date string
@@ -160,37 +160,45 @@ export default defineEventHandler(async (event) => {
     const itemIds = data.lines.map((line) => line.item_id);
 
     // Use $transaction to batch all initial validation queries into a single database round-trip
-    const [location, userLocation, currentPeriod, supplier, items] = await prisma.$transaction([
-      // Check if location exists
-      prisma.location.findUnique({
-        where: { id: locationId },
-      }),
-      // Check user access
-      prisma.userLocation.findUnique({
-        where: {
-          user_id_location_id: {
-            user_id: user.id,
-            location_id: locationId,
+    const [location, userLocation, currentPeriod, supplier, items, purchaseOrder] =
+      await prisma.$transaction([
+        // Check if location exists
+        prisma.location.findUnique({
+          where: { id: locationId },
+        }),
+        // Check user access
+        prisma.userLocation.findUnique({
+          where: {
+            user_id_location_id: {
+              user_id: user.id,
+              location_id: locationId,
+            },
           },
-        },
-      }),
-      // Get current open period
-      prisma.period.findFirst({
-        where: { status: "OPEN" },
-        orderBy: { start_date: "desc" },
-      }),
-      // Verify supplier exists
-      prisma.supplier.findUnique({
-        where: { id: data.supplier_id },
-      }),
-      // Verify all items exist
-      prisma.item.findMany({
-        where: {
-          id: { in: itemIds },
-          ...(isPosting ? { is_active: true } : {}),
-        },
-      }),
-    ]);
+        }),
+        // Get current open period
+        prisma.period.findFirst({
+          where: { status: "OPEN" },
+          orderBy: { start_date: "desc" },
+        }),
+        // Verify supplier exists
+        prisma.supplier.findUnique({
+          where: { id: data.supplier_id },
+        }),
+        // Verify all items exist
+        prisma.item.findMany({
+          where: {
+            id: { in: itemIds },
+            ...(isPosting ? { is_active: true } : {}),
+          },
+        }),
+        // Verify PO exists and is OPEN
+        prisma.pO.findUnique({
+          where: { id: data.po_id },
+          include: {
+            supplier: { select: { id: true } },
+          },
+        }),
+      ]);
 
     if (!location) {
       throw createError({
@@ -234,6 +242,42 @@ export default defineEventHandler(async (event) => {
         data: {
           code: "SUPPLIER_NOT_FOUND",
           message: "Supplier not found",
+        },
+      });
+    }
+
+    // Validate PO exists and is in OPEN status
+    if (!purchaseOrder) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Not Found",
+        data: {
+          code: "PO_NOT_FOUND",
+          message: "Purchase Order not found. Deliveries must be linked to a valid PO.",
+        },
+      });
+    }
+
+    if (purchaseOrder.status !== "OPEN") {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "PO_NOT_OPEN",
+          message: `Cannot create delivery for a ${purchaseOrder.status} Purchase Order. Only OPEN POs can receive deliveries.`,
+        },
+      });
+    }
+
+    // Validate that the supplier matches the PO's supplier
+    if (purchaseOrder.supplier.id !== data.supplier_id) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "SUPPLIER_MISMATCH",
+          message:
+            "Supplier does not match the Purchase Order. Delivery supplier must match PO supplier.",
         },
       });
     }
@@ -332,7 +376,7 @@ export default defineEventHandler(async (event) => {
             location_id: locationId,
             supplier_id: data.supplier_id,
             period_id: periodId,
-            po_id: data.po_id || null,
+            po_id: data.po_id, // Required: validated above
             invoice_no: data.invoice_no || null,
             delivery_note: data.delivery_note || null,
             delivery_date: new Date(data.delivery_date),

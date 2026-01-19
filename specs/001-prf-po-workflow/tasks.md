@@ -148,15 +148,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T064 [US4] Update delivery create page to make PO selection mandatory in `app/pages/deliveries/create.vue`
-- [ ] T065 [US4] Add PO dropdown with open POs filter in delivery form
-- [ ] T066 [US4] Implement supplier auto-population when PO selected
-- [ ] T067 [US4] Add PO line items as delivery line suggestions
-- [ ] T068 [US4] Display "No open POs available" message when applicable
-- [ ] T069 [US4] Update delivery create API to validate po_id is required for new deliveries in `server/api/deliveries/index.post.ts`
-- [ ] T070 [US4] Add over-delivery warning when quantity exceeds PO quantity
+- [x] T064 [US4] Update delivery create page to make PO selection mandatory in `app/pages/deliveries/create.vue`
+- [x] T065 [US4] Add PO dropdown with open POs filter in delivery form
+- [x] T066 [US4] Implement supplier auto-population when PO selected
+- [x] T067 [US4] Add PO line items as delivery line suggestions
+- [x] T068 [US4] Display "No open POs available" message when applicable
+- [x] T069 [US4] Update delivery create API to validate po_id is required for new deliveries in `server/api/locations/[id]/deliveries/index.post.ts`
+- [x] T070 [US4] Add over-delivery warning when quantity exceeds PO quantity
 
-**Checkpoint**: User Story 4 complete - Deliveries are linked to POs with validation
+**Checkpoint**: User Story 4 complete - Deliveries are linked to POs with validation ✅
 
 ---
 
