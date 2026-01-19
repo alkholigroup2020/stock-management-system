@@ -472,6 +472,42 @@ export function usePRFActions() {
     }
   }
 
+  /**
+   * Clone a PRF to create a new draft
+   * Typically used to clone rejected PRFs for resubmission
+   */
+  async function clone(
+    id: string,
+    periodId?: string
+  ): Promise<{ data: PRFDetail; message: string; source_prf_no: string } | null> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const response = await $fetch<{
+        data: PRFDetail;
+        message: string;
+        source_prf_no: string;
+      }>(`/api/prfs/${id}/clone`, {
+        method: "POST",
+        body: periodId ? { period_id: periodId } : {},
+      });
+
+      invalidatePRFsCache();
+      return {
+        data: response.data,
+        message: response.message,
+        source_prf_no: response.source_prf_no,
+      };
+    } catch (err) {
+      const errorData = err as { data?: { message?: string } };
+      error.value = errorData.data?.message || "Failed to clone PRF";
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     loading,
     error,
@@ -481,6 +517,7 @@ export function usePRFActions() {
     submit,
     approve,
     reject,
+    clone,
   };
 }
 

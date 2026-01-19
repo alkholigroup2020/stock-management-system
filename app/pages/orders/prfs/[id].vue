@@ -25,7 +25,7 @@ const periodStore = usePeriodStore();
 const { canCreatePRF, canApprovePRF, canCreatePO } = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess, handleWarning } = useErrorHandler();
-const { update, remove, submit } = usePRFActions();
+const { update, remove, submit, clone } = usePRFActions();
 const { user } = useAuth();
 
 // State
@@ -33,8 +33,10 @@ const prfId = computed(() => route.params.id as string);
 const saving = ref(false);
 const submitting = ref(false);
 const deleting = ref(false);
+const cloning = ref(false);
 const showDeleteConfirmation = ref(false);
 const showSubmitConfirmation = ref(false);
+const showCloneConfirmation = ref(false);
 const isEditing = ref(false);
 const loadingInitialData = ref(true);
 const items = ref<Array<{ id: string; code: string; name: string; unit: Unit }>>([]);
@@ -99,6 +101,13 @@ const canCreatePOFromPRF = computed(() => {
     canCreatePO() &&
     (!prf.value?.purchase_orders || prf.value.purchase_orders.length === 0)
   );
+});
+
+const canClone = computed(() => {
+  // Can clone if:
+  // - PRF is rejected (primary use case)
+  // - User can create PRF (has the permission to create new PRFs)
+  return isRejected.value && canCreatePRF();
 });
 
 // Navigate to create PO from this PRF
@@ -296,6 +305,35 @@ async function deletePRF() {
   );
 }
 
+// Clone PRF
+async function clonePRF() {
+  showCloneConfirmation.value = false;
+
+  await guardAction(
+    async () => {
+      cloning.value = true;
+
+      try {
+        const result = await clone(prfId.value);
+
+        if (result) {
+          handleSuccess("PRF Cloned", `New PRF ${result.data.prf_no} has been created as a draft.`);
+          // Navigate to the new PRF
+          router.push(`/orders/prfs/${result.data.id}`);
+        }
+      } catch (error) {
+        handleError(error, { context: "cloning PRF" });
+      } finally {
+        cloning.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot clone PRF",
+      offlineDescription: "You need an internet connection to clone PRFs.",
+    }
+  );
+}
+
 // Fetch items
 async function fetchItems() {
   try {
@@ -472,6 +510,21 @@ onMounted(async () => {
           >
             <span class="hidden sm:inline">Create PO</span>
             <span class="sm:hidden">PO</span>
+          </UButton>
+
+          <!-- Clone PRF Button (for rejected PRFs) -->
+          <UButton
+            v-if="canClone"
+            color="primary"
+            icon="i-lucide-copy"
+            size="md"
+            class="cursor-pointer rounded-full"
+            :loading="cloning"
+            :disabled="!isOnline"
+            @click="showCloneConfirmation = true"
+          >
+            <span class="hidden sm:inline">Clone PRF</span>
+            <span class="sm:hidden">Clone</span>
           </UButton>
         </template>
       </div>
@@ -764,9 +817,23 @@ onMounted(async () => {
       @confirm="submitForApproval"
     />
 
+    <!-- Clone Confirmation Modal -->
+    <UiConfirmModal
+      v-model="showCloneConfirmation"
+      title="Clone PRF"
+      message="This will create a new PRF in Draft status with the same items and details. You can then modify and submit the new PRF for approval."
+      confirm-text="Clone PRF"
+      cancel-text="Cancel"
+      loading-text="Cloning..."
+      :loading="cloning"
+      variant="info"
+      @confirm="clonePRF"
+    />
+
     <!-- Loading Overlays -->
     <LoadingOverlay v-if="saving" title="Saving Changes..." message="Please wait" />
     <LoadingOverlay v-if="submitting" title="Submitting PRF..." message="Please wait" />
     <LoadingOverlay v-if="deleting" title="Deleting PRF..." message="Please wait" />
+    <LoadingOverlay v-if="cloning" title="Cloning PRF..." message="Creating new draft" />
   </div>
 </template>

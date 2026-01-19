@@ -222,12 +222,12 @@
 
 ### Implementation for User Story 8
 
-- [ ] T086 [US8] Create PRF clone API endpoint in `server/api/prfs/[id]/clone.post.ts`
-- [ ] T087 [US8] Add clone function to `app/composables/usePRFs.ts`
-- [ ] T088 [US8] Add "Clone PRF" button on rejected PRF detail page in `app/pages/orders/prfs/[id].vue`
-- [ ] T089 [US8] Verify cloned PRF has new number, DRAFT status, and copies all lines
+- [x] T086 [US8] Create PRF clone API endpoint in `server/api/prfs/[id]/clone.post.ts`
+- [x] T087 [US8] Add clone function to `app/composables/usePRFs.ts`
+- [x] T088 [US8] Add "Clone PRF" button on rejected PRF detail page in `app/pages/orders/prfs/[id].vue`
+- [x] T089 [US8] Verify cloned PRF has new number, DRAFT status, and copies all lines
 
-**Checkpoint**: User Story 8 complete - Rejected PRFs can be cloned
+**Checkpoint**: User Story 8 complete - Rejected PRFs can be cloned ✅
 
 ---
 
