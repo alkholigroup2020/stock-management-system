@@ -24,23 +24,23 @@
 
 **Purpose**: Project initialization, dependencies, and schema changes
 
-- [ ] T001 Install Resend email package via `pnpm add resend`
-- [ ] T002 Add environment variables (RESEND_API_KEY, EMAIL_FROM) to `.env.example`
-- [ ] T003 Update `prisma/schema.prisma` with new enums (PRFType, PRFCategory, PROCUREMENT_SPECIALIST role, CLOSED status)
-- [ ] T004 Update `prisma/schema.prisma` with Supplier model changes (emails, phone, mobile, vat_reg_no, address)
-- [ ] T005 [P] Update `prisma/schema.prisma` with PRF model new fields (prf_type, category, rejection_reason, total_value, etc.)
-- [ ] T006 [P] Create PRFLine model in `prisma/schema.prisma`
-- [ ] T007 [P] Update `prisma/schema.prisma` with PO model new fields (totals, terms, ship_to, created_by)
-- [ ] T008 [P] Create POLine model in `prisma/schema.prisma`
-- [ ] T009 Update `prisma/schema.prisma` with relation updates (User, Location, Item)
-- [ ] T010 Run database migration with `pnpm db:migrate dev --name add_prf_po_workflow`
-- [ ] T011 [P] Update `shared/types/database.ts` with new enums (PRFType, PRFCategory)
-- [ ] T012 [P] Update `shared/types/database.ts` with PRFLine interface
-- [ ] T013 [P] Update `shared/types/database.ts` with POLine interface
-- [ ] T014 [P] Update `shared/types/database.ts` with extended PRF interface
-- [ ] T015 [P] Update `shared/types/database.ts` with extended PO interface
-- [ ] T016 [P] Update `shared/types/database.ts` with extended Supplier interface (emails array)
-- [ ] T017 Update `shared/types/database.ts` with UserRole enum (add PROCUREMENT_SPECIALIST)
+- [x] T001 Install Resend email package via `pnpm add resend`
+- [x] T002 Add environment variables (RESEND_API_KEY, EMAIL_FROM) to `.env.example`
+- [x] T003 Update `prisma/schema.prisma` with new enums (PRFType, PRFCategory, PROCUREMENT_SPECIALIST role, CLOSED status)
+- [x] T004 Update `prisma/schema.prisma` with Supplier model changes (emails, phone, mobile, vat_reg_no, address)
+- [x] T005 [P] Update `prisma/schema.prisma` with PRF model new fields (prf_type, category, rejection_reason, total_value, etc.)
+- [x] T006 [P] Create PRFLine model in `prisma/schema.prisma`
+- [x] T007 [P] Update `prisma/schema.prisma` with PO model new fields (totals, terms, ship_to, created_by)
+- [x] T008 [P] Create POLine model in `prisma/schema.prisma`
+- [x] T009 Update `prisma/schema.prisma` with relation updates (User, Location, Item)
+- [x] T010 Run database migration with `pnpm db:migrate dev --name add_prf_po_workflow`
+- [x] T011 [P] Update `shared/types/database.ts` with new enums (PRFType, PRFCategory)
+- [x] T012 [P] Update `shared/types/database.ts` with PRFLine interface
+- [x] T013 [P] Update `shared/types/database.ts` with POLine interface
+- [x] T014 [P] Update `shared/types/database.ts` with extended PRF interface
+- [x] T015 [P] Update `shared/types/database.ts` with extended PO interface
+- [x] T016 [P] Update `shared/types/database.ts` with extended Supplier interface (emails array)
+- [x] T017 Update `shared/types/database.ts` with UserRole enum (add PROCUREMENT_SPECIALIST)
 
 ---
 

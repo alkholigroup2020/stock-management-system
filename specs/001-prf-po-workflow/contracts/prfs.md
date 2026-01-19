@@ -6,17 +6,17 @@
 
 ## Endpoints Overview
 
-| Method | Path | Description | Roles |
-|--------|------|-------------|-------|
-| GET | `/api/prfs` | List PRFs with filters | All authenticated |
-| POST | `/api/prfs` | Create new PRF | OPERATOR, SUPERVISOR, ADMIN |
-| GET | `/api/prfs/:id` | Get PRF details | All authenticated |
-| PATCH | `/api/prfs/:id` | Update draft PRF | Requester only |
-| DELETE | `/api/prfs/:id` | Delete draft PRF | Requester only |
-| PATCH | `/api/prfs/:id/submit` | Submit for approval | Requester only |
-| PATCH | `/api/prfs/:id/approve` | Approve PRF | SUPERVISOR, ADMIN |
-| PATCH | `/api/prfs/:id/reject` | Reject PRF | SUPERVISOR, ADMIN |
-| POST | `/api/prfs/:id/clone` | Clone rejected PRF | Original requester |
+| Method | Path                    | Description            | Roles                       |
+| ------ | ----------------------- | ---------------------- | --------------------------- |
+| GET    | `/api/prfs`             | List PRFs with filters | All authenticated           |
+| POST   | `/api/prfs`             | Create new PRF         | OPERATOR, SUPERVISOR, ADMIN |
+| GET    | `/api/prfs/:id`         | Get PRF details        | All authenticated           |
+| PATCH  | `/api/prfs/:id`         | Update draft PRF       | Requester only              |
+| DELETE | `/api/prfs/:id`         | Delete draft PRF       | Requester only              |
+| PATCH  | `/api/prfs/:id/submit`  | Submit for approval    | Requester only              |
+| PATCH  | `/api/prfs/:id/approve` | Approve PRF            | SUPERVISOR, ADMIN           |
+| PATCH  | `/api/prfs/:id/reject`  | Reject PRF             | SUPERVISOR, ADMIN           |
+| POST   | `/api/prfs/:id/clone`   | Clone rejected PRF     | Original requester          |
 
 ---
 
@@ -26,17 +26,17 @@ List PRFs with pagination and filters.
 
 ### Query Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 20, max: 100) |
-| status | PRFStatus | No | Filter by status |
-| location_id | UUID | No | Filter by location |
-| period_id | UUID | No | Filter by period |
-| prf_type | PRFType | No | Filter by type |
-| category | PRFCategory | No | Filter by category |
-| requested_by | UUID | No | Filter by requester |
-| search | string | No | Search by PRF number |
+| Parameter    | Type        | Required | Description                            |
+| ------------ | ----------- | -------- | -------------------------------------- |
+| page         | number      | No       | Page number (default: 1)               |
+| limit        | number      | No       | Items per page (default: 20, max: 100) |
+| status       | PRFStatus   | No       | Filter by status                       |
+| location_id  | UUID        | No       | Filter by location                     |
+| period_id    | UUID        | No       | Filter by period                       |
+| prf_type     | PRFType     | No       | Filter by type                         |
+| category     | PRFCategory | No       | Filter by category                     |
+| requested_by | UUID        | No       | Filter by requester                    |
+| search       | string      | No       | Search by PRF number                   |
 
 ### Response 200
 
@@ -60,7 +60,7 @@ List PRFs with pagination and filters.
     limit: number;
     total: number;
     totalPages: number;
-  };
+  }
 }
 ```
 
@@ -305,7 +305,7 @@ Reject a pending PRF.
 
 ```typescript
 {
-  rejection_reason: string;  // Required, non-empty
+  rejection_reason: string; // Required, non-empty
 }
 ```
 

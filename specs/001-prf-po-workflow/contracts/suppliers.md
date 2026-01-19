@@ -85,7 +85,7 @@ Create supplier with new email fields.
 
 ```typescript
 {
-  data: Supplier;  // Full supplier object with new fields
+  data: Supplier; // Full supplier object with new fields
 }
 ```
 
@@ -154,9 +154,7 @@ Server-side email validation using Zod:
 ```typescript
 import { z } from "zod";
 
-const emailArraySchema = z
-  .array(z.string().email("Invalid email format"))
-  .default([]);
+const emailArraySchema = z.array(z.string().email("Invalid email format")).default([]);
 
 // Usage in request validation
 const supplierUpdateSchema = z.object({

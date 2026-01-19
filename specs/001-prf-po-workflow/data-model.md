@@ -12,6 +12,7 @@ This document defines the data model changes required for the PRF/PO workflow fe
 ## 1. Enum Changes
 
 ### UserRole (MODIFY)
+
 Add new role for procurement specialists.
 
 ```prisma
@@ -24,6 +25,7 @@ enum UserRole {
 ```
 
 ### PRFType (NEW)
+
 Classification of purchase requisitions.
 
 ```prisma
@@ -35,6 +37,7 @@ enum PRFType {
 ```
 
 ### PRFCategory (NEW)
+
 Category of items being requested.
 
 ```prisma
@@ -48,6 +51,7 @@ enum PRFCategory {
 ```
 
 ### PRFStatus (MODIFY)
+
 Add CLOSED status for completed PRFs.
 
 ```prisma
@@ -65,6 +69,7 @@ enum PRFStatus {
 ## 2. Entity Changes
 
 ### Supplier (MODIFY)
+
 Add email addresses and contact details.
 
 ```prisma
@@ -100,6 +105,7 @@ model Supplier {
 ---
 
 ### PRF (MODIFY)
+
 Extend with additional fields from the PRF template.
 
 ```prisma
@@ -162,6 +168,7 @@ model PRF {
 ---
 
 ### PRFLine (NEW)
+
 Individual line items on a PRF.
 
 ```prisma
@@ -201,6 +208,7 @@ model PRFLine {
 | notes | String | No | Line-specific notes |
 
 **Validation Rules:**
+
 - `required_qty > 0`
 - `estimated_price >= 0`
 - `line_value = required_qty × estimated_price`
@@ -208,6 +216,7 @@ model PRFLine {
 ---
 
 ### PO (MODIFY)
+
 Extend with detailed pricing and terms fields.
 
 ```prisma
@@ -269,6 +278,7 @@ model PO {
 ---
 
 ### POLine (NEW)
+
 Individual line items on a PO with VAT calculations.
 
 ```prisma
@@ -314,6 +324,7 @@ model POLine {
 | notes | String | No | Line-specific notes |
 
 **Validation Rules:**
+
 - `quantity > 0`
 - `unit_price >= 0`
 - `0 <= discount_percent <= 100`
@@ -325,6 +336,7 @@ model POLine {
 ---
 
 ### Delivery (MODIFY)
+
 Change po_id from optional to required.
 
 ```prisma
@@ -336,6 +348,7 @@ model Delivery {
 ```
 
 **Migration Note:**
+
 - Existing deliveries with `po_id = NULL` must be handled
 - Option: Create a "Legacy" PO or allow NULL for existing records only
 - Recommendation: Allow NULL for existing, require for new (validation in API layer)
@@ -343,6 +356,7 @@ model Delivery {
 ---
 
 ### Location (MODIFY)
+
 Add relation for PO ship-to location.
 
 ```prisma
@@ -356,6 +370,7 @@ model Location {
 ---
 
 ### User (MODIFY)
+
 Add relation for PO creator.
 
 ```prisma
@@ -369,6 +384,7 @@ model User {
 ---
 
 ### Item (MODIFY)
+
 Add relations for PRF and PO lines.
 
 ```prisma
@@ -419,27 +435,29 @@ model Item {
 ## 4. State Transitions
 
 ### PRF Status Flow
+
 ```
 DRAFT ──[submit]──> PENDING ──[approve]──> APPROVED ──[po_closed]──> CLOSED
                         │
                         └──[reject]──> REJECTED
 ```
 
-| Transition | Trigger | Conditions |
-|------------|---------|------------|
-| DRAFT → PENDING | Submit | Has at least 1 line item |
-| PENDING → APPROVED | Approve | User is Supervisor/Admin |
-| PENDING → REJECTED | Reject | User is Supervisor/Admin, reason provided |
-| APPROVED → CLOSED | Auto | When linked PO is closed |
+| Transition         | Trigger | Conditions                                |
+| ------------------ | ------- | ----------------------------------------- |
+| DRAFT → PENDING    | Submit  | Has at least 1 line item                  |
+| PENDING → APPROVED | Approve | User is Supervisor/Admin                  |
+| PENDING → REJECTED | Reject  | User is Supervisor/Admin, reason provided |
+| APPROVED → CLOSED  | Auto    | When linked PO is closed                  |
 
 ### PO Status Flow
+
 ```
 OPEN ──[close]──> CLOSED
 ```
 
-| Transition | Trigger | Conditions |
-|------------|---------|------------|
-| OPEN → CLOSED | Close | User is Procurement Specialist/Admin |
+| Transition    | Trigger | Conditions                           |
+| ------------- | ------- | ------------------------------------ |
+| OPEN → CLOSED | Close   | User is Procurement Specialist/Admin |
 
 ---
 
@@ -562,6 +580,7 @@ export interface Supplier {
 ## 6. Migration Strategy
 
 ### Phase 1: Schema Changes
+
 1. Add new enums (PRFType, PRFCategory)
 2. Modify UserRole enum (add PROCUREMENT_SPECIALIST)
 3. Add PRFLine model
@@ -572,10 +591,12 @@ export interface Supplier {
 8. Add relations to User, Location, Item models
 
 ### Phase 2: Data Migration
+
 1. No data migration needed (new fields have defaults or are nullable)
 2. Existing deliveries with po_id = NULL remain valid (API validates new only)
 
 ### Migration Command
+
 ```bash
 pnpm db:migrate dev --name add_prf_po_workflow
 ```

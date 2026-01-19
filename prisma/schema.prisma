@@ -32,6 +32,7 @@ model User {
   assigned_users      UserLocation[] @relation("AssignedBy")
   user_locations      UserLocation[]
   default_location    Location?      @relation("UserDefaultLocation", fields: [default_location_id], references: [id])
+  created_pos         PO[]           @relation("POCreator")
 
   @@index([role])
   @@index([is_active])
@@ -61,6 +62,7 @@ model Location {
   transfers_to      Transfer[]       @relation("TransferTo")
   user_locations    UserLocation[]
   default_for_users User[]           @relation("UserDefaultLocation")
+  ship_to_pos       PO[]             @relation("POShipTo")
 
   @@index([type])
   @@index([is_active])
@@ -97,6 +99,8 @@ model Item {
   item_prices    ItemPrice[]
   location_stock LocationStock[]
   transfer_lines TransferLine[]
+  prf_lines      PRFLine[]
+  po_lines       POLine[]
 
   @@index([category])
   @@index([is_active])
@@ -109,6 +113,11 @@ model Supplier {
   code            String     @unique @db.VarChar(50)
   name            String     @db.VarChar(200)
   contact         String?
+  emails          String[]   @default([])
+  phone           String?    @db.VarChar(50)
+  mobile          String?    @db.VarChar(50)
+  vat_reg_no      String?    @db.VarChar(50)
+  address         String?
   is_active       Boolean    @default(true)
   created_at      DateTime   @default(now()) @db.Timestamptz(6)
   deliveries      Delivery[]
@@ -198,49 +207,123 @@ model LocationStock {
 }
 
 model PRF {
-  id              String    @id @default(uuid()) @db.Uuid
-  prf_no          String    @unique @db.VarChar(50)
-  period_id       String    @db.Uuid
-  location_id     String    @db.Uuid
-  status          PRFStatus @default(DRAFT)
-  requested_by    String    @db.Uuid
-  approved_by     String?   @db.Uuid
-  request_date    DateTime  @db.Date
-  approval_date   DateTime? @db.Date
-  notes           String?
-  created_at      DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime  @updatedAt @db.Timestamptz(6)
-  approver        User?     @relation("PRFApprover", fields: [approved_by], references: [id])
-  location        Location  @relation(fields: [location_id], references: [id])
-  period          Period    @relation(fields: [period_id], references: [id])
-  requester       User      @relation("PRFRequester", fields: [requested_by], references: [id])
-  purchase_orders PO[]
+  id                     String      @id @default(uuid()) @db.Uuid
+  prf_no                 String      @unique @db.VarChar(50)
+  period_id              String      @db.Uuid
+  location_id            String      @db.Uuid
+  project_name           String?     @db.VarChar(200)
+  prf_type               PRFType     @default(NORMAL)
+  category               PRFCategory @default(MATERIAL)
+  expected_delivery_date DateTime?   @db.Date
+  is_reimbursable        Boolean     @default(false)
+  status                 PRFStatus   @default(DRAFT)
+  requested_by           String      @db.Uuid
+  approved_by            String?     @db.Uuid
+  request_date           DateTime    @db.Date
+  approval_date          DateTime?   @db.Date
+  rejection_reason       String?
+  total_value            Decimal     @default(0) @db.Decimal(15, 2)
+  contact_person_name    String?     @db.VarChar(100)
+  contact_person_phone   String?     @db.VarChar(50)
+  receiver_name          String?     @db.VarChar(100)
+  receiver_phone         String?     @db.VarChar(50)
+  notes                  String?
+  created_at             DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime    @updatedAt @db.Timestamptz(6)
+  lines                  PRFLine[]
+  purchase_orders        PO[]
+  approver               User?       @relation("PRFApprover", fields: [approved_by], references: [id])
+  location               Location    @relation(fields: [location_id], references: [id])
+  period                 Period      @relation(fields: [period_id], references: [id])
+  requester              User        @relation("PRFRequester", fields: [requested_by], references: [id])
 
   @@index([period_id])
   @@index([location_id])
   @@index([status])
   @@index([request_date])
+  @@index([prf_type])
+  @@index([category])
   @@map("prfs")
 }
 
+model PRFLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  prf_id           String   @db.Uuid
+  item_id          String?  @db.Uuid
+  item_description String   @db.VarChar(500)
+  cost_code        String?  @db.VarChar(50)
+  stock_qty        Decimal? @db.Decimal(15, 4)
+  unit             Unit
+  required_qty     Decimal  @db.Decimal(15, 4)
+  estimated_price  Decimal  @db.Decimal(15, 4)
+  line_value       Decimal  @db.Decimal(15, 2)
+  notes            String?
+  prf              PRF      @relation(fields: [prf_id], references: [id], onDelete: Cascade)
+  item             Item?    @relation(fields: [item_id], references: [id])
+
+  @@index([prf_id])
+  @@index([item_id])
+  @@map("prf_lines")
+}
+
 model PO {
-  id           String     @id @default(uuid()) @db.Uuid
-  po_no        String     @unique @db.VarChar(50)
-  prf_id       String?    @db.Uuid
-  supplier_id  String     @db.Uuid
-  status       POStatus   @default(OPEN)
-  total_amount Decimal    @default(0) @db.Decimal(15, 2)
-  notes        String?
-  created_at   DateTime   @default(now()) @db.Timestamptz(6)
-  updated_at   DateTime   @updatedAt @db.Timestamptz(6)
-  deliveries   Delivery[]
-  prf          PRF?       @relation(fields: [prf_id], references: [id])
-  supplier     Supplier   @relation(fields: [supplier_id], references: [id])
+  id                    String     @id @default(uuid()) @db.Uuid
+  po_no                 String     @unique @db.VarChar(50)
+  prf_id                String?    @db.Uuid
+  supplier_id           String     @db.Uuid
+  quotation_ref         String?    @db.VarChar(100)
+  ship_to_location_id   String?    @db.Uuid
+  ship_to_contact       String?    @db.VarChar(100)
+  ship_to_phone         String?    @db.VarChar(50)
+  status                POStatus   @default(OPEN)
+  total_before_discount Decimal    @default(0) @db.Decimal(15, 2)
+  total_discount        Decimal    @default(0) @db.Decimal(15, 2)
+  total_after_discount  Decimal    @default(0) @db.Decimal(15, 2)
+  total_vat             Decimal    @default(0) @db.Decimal(15, 2)
+  total_amount          Decimal    @default(0) @db.Decimal(15, 2)
+  payment_terms         String?    @db.VarChar(200)
+  delivery_terms        String?    @db.VarChar(200)
+  duration_days         Int?
+  terms_conditions      String?
+  notes                 String?
+  created_by            String     @db.Uuid
+  created_at            DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime   @updatedAt @db.Timestamptz(6)
+  lines                 POLine[]
+  deliveries            Delivery[]
+  prf                   PRF?       @relation(fields: [prf_id], references: [id])
+  supplier              Supplier   @relation(fields: [supplier_id], references: [id])
+  ship_to_location      Location?  @relation("POShipTo", fields: [ship_to_location_id], references: [id])
+  creator               User       @relation("POCreator", fields: [created_by], references: [id])
 
   @@index([prf_id])
   @@index([supplier_id])
   @@index([status])
+  @@index([created_by])
   @@map("purchase_orders")
+}
+
+model POLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  po_id            String   @db.Uuid
+  item_id          String?  @db.Uuid
+  item_code        String?  @db.VarChar(50)
+  item_description String   @db.VarChar(500)
+  quantity         Decimal  @db.Decimal(15, 4)
+  unit             Unit
+  unit_price       Decimal  @db.Decimal(15, 4)
+  discount_percent Decimal  @default(0) @db.Decimal(5, 2)
+  total_before_vat Decimal  @db.Decimal(15, 2)
+  vat_percent      Decimal  @default(15) @db.Decimal(5, 2)
+  vat_amount       Decimal  @db.Decimal(15, 2)
+  total_after_vat  Decimal  @db.Decimal(15, 2)
+  notes            String?
+  po               PO       @relation(fields: [po_id], references: [id], onDelete: Cascade)
+  item             Item?    @relation(fields: [item_id], references: [id])
+
+  @@index([po_id])
+  @@index([item_id])
+  @@map("po_lines")
 }
 
 model Delivery {
@@ -250,7 +333,7 @@ model Delivery {
   location_id    String         @db.Uuid
   supplier_id    String         @db.Uuid
   po_id          String?        @db.Uuid
-  invoice_no     String?        @db.VarChar(100) @unique
+  invoice_no     String?        @db.VarChar(100)
   delivery_note  String?
   delivery_date  DateTime       @db.Date
   total_amount   Decimal        @default(0) @db.Decimal(15, 2)
@@ -395,27 +478,27 @@ model TransferLine {
 }
 
 model NCR {
-  id               String        @id @default(uuid()) @db.Uuid
-  ncr_no           String        @unique @db.VarChar(50)
-  location_id      String        @db.Uuid
-  type             NCRType       @default(MANUAL)
-  auto_generated   Boolean       @default(false)
-  delivery_id      String?       @db.Uuid
-  delivery_line_id String?       @db.Uuid
+  id               String              @id @default(uuid()) @db.Uuid
+  ncr_no           String              @unique @db.VarChar(50)
+  location_id      String              @db.Uuid
+  type             NCRType             @default(MANUAL)
+  auto_generated   Boolean             @default(false)
+  delivery_id      String?             @db.Uuid
+  delivery_line_id String?             @db.Uuid
   reason           String
-  quantity         Decimal?      @db.Decimal(15, 4)
-  value            Decimal       @db.Decimal(15, 2)
-  status           NCRStatus     @default(OPEN)
-  created_by       String        @db.Uuid
-  created_at       DateTime             @default(now()) @db.Timestamptz(6)
-  resolved_at      DateTime?            @db.Timestamptz(6)
+  quantity         Decimal?            @db.Decimal(15, 4)
+  value            Decimal             @db.Decimal(15, 2)
+  status           NCRStatus           @default(OPEN)
+  created_by       String              @db.Uuid
+  created_at       DateTime            @default(now()) @db.Timestamptz(6)
+  resolved_at      DateTime?           @db.Timestamptz(6)
   resolution_notes String?
-  resolution_type  String?              @db.VarChar(200)
+  resolution_type  String?             @db.VarChar(200)
   financial_impact NCRFinancialImpact?
-  creator          User                 @relation("NCRCreator", fields: [created_by], references: [id])
-  delivery         Delivery?     @relation(fields: [delivery_id], references: [id])
-  delivery_line    DeliveryLine? @relation(fields: [delivery_line_id], references: [id])
-  location         Location      @relation(fields: [location_id], references: [id])
+  creator          User                @relation("NCRCreator", fields: [created_by], references: [id])
+  delivery         Delivery?           @relation(fields: [delivery_id], references: [id])
+  delivery_line    DeliveryLine?       @relation(fields: [delivery_line_id], references: [id])
+  location         Location            @relation(fields: [location_id], references: [id])
 
   @@index([location_id])
   @@index([type])
@@ -506,6 +589,7 @@ enum UserRole {
   OPERATOR
   SUPERVISOR
   ADMIN
+  PROCUREMENT_SPECIALIST
 }
 
 enum LocationType {
@@ -538,11 +622,26 @@ enum PeriodLocationStatus {
   CLOSED
 }
 
+enum PRFType {
+  URGENT
+  DPA
+  NORMAL
+}
+
+enum PRFCategory {
+  MATERIAL
+  CONSUMABLES
+  SPARE_PARTS
+  ASSET
+  SERVICES
+}
+
 enum PRFStatus {
   DRAFT
   PENDING
   APPROVED
   REJECTED
+  CLOSED
 }
 
 enum POStatus {

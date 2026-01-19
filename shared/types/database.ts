@@ -11,7 +11,7 @@
 // ENUMS
 // ========================================
 
-export type UserRole = "OPERATOR" | "SUPERVISOR" | "ADMIN";
+export type UserRole = "OPERATOR" | "SUPERVISOR" | "ADMIN" | "PROCUREMENT_SPECIALIST";
 
 export type LocationType = "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
 
@@ -21,7 +21,11 @@ export type PeriodStatus = "DRAFT" | "OPEN" | "PENDING_CLOSE" | "APPROVED" | "CL
 
 export type PeriodLocationStatus = "OPEN" | "READY" | "CLOSED";
 
-export type PRFStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED";
+export type PRFType = "URGENT" | "DPA" | "NORMAL";
+
+export type PRFCategory = "MATERIAL" | "CONSUMABLES" | "SPARE_PARTS" | "ASSET" | "SERVICES";
+
+export type PRFStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED" | "CLOSED";
 
 export type POStatus = "OPEN" | "CLOSED";
 
@@ -104,6 +108,11 @@ export interface Supplier {
   code: string;
   name: string;
   contact: string | null;
+  emails: string[];
+  phone: string | null;
+  mobile: string | null;
+  vat_reg_no: string | null;
+  address: string | null;
   is_active: boolean;
   created_at: Date | string;
 }
@@ -165,11 +174,22 @@ export interface PRF {
   prf_no: string;
   period_id: string;
   location_id: string;
+  project_name: string | null;
+  prf_type: PRFType;
+  category: PRFCategory;
+  expected_delivery_date: Date | string | null;
+  is_reimbursable: boolean;
   status: PRFStatus;
   requested_by: string;
   approved_by: string | null;
   request_date: Date | string;
   approval_date: Date | string | null;
+  rejection_reason: string | null;
+  total_value: DecimalValue;
+  contact_person_name: string | null;
+  contact_person_phone: string | null;
+  receiver_name: string | null;
+  receiver_phone: string | null;
   notes: string | null;
   created_at: Date | string;
   updated_at: Date | string;
@@ -180,11 +200,55 @@ export interface PO {
   po_no: string;
   prf_id: string | null;
   supplier_id: string;
+  quotation_ref: string | null;
+  ship_to_location_id: string | null;
+  ship_to_contact: string | null;
+  ship_to_phone: string | null;
   status: POStatus;
+  total_before_discount: DecimalValue;
+  total_discount: DecimalValue;
+  total_after_discount: DecimalValue;
+  total_vat: DecimalValue;
   total_amount: DecimalValue;
+  payment_terms: string | null;
+  delivery_terms: string | null;
+  duration_days: number | null;
+  terms_conditions: string | null;
   notes: string | null;
+  created_by: string;
   created_at: Date | string;
   updated_at: Date | string;
+}
+
+export interface PRFLine {
+  id: string;
+  prf_id: string;
+  item_id: string | null;
+  item_description: string;
+  cost_code: string | null;
+  stock_qty: DecimalValue | null;
+  unit: Unit;
+  required_qty: DecimalValue;
+  estimated_price: DecimalValue;
+  line_value: DecimalValue;
+  notes: string | null;
+}
+
+export interface POLine {
+  id: string;
+  po_id: string;
+  item_id: string | null;
+  item_code: string | null;
+  item_description: string;
+  quantity: DecimalValue;
+  unit: Unit;
+  unit_price: DecimalValue;
+  discount_percent: DecimalValue;
+  total_before_vat: DecimalValue;
+  vat_percent: DecimalValue;
+  vat_amount: DecimalValue;
+  total_after_vat: DecimalValue;
+  notes: string | null;
 }
 
 export interface Delivery {

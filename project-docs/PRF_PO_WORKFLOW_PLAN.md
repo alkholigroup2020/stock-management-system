@@ -1,9 +1,11 @@
 # PRF/PO Workflow Implementation Plan
 
 ## Overview
+
 Implement a complete Purchase Requisition Form (PRF) / Purchase Order (PO) workflow with a new "Orders" page under the Transactions section. Includes email notifications, a new PROCUREMENT_SPECIALIST role, and mandatory delivery-PO linking.
 
 ## Workflow Summary
+
 ```
 User creates PRF → DRAFT
        ↓
@@ -31,6 +33,7 @@ Close PO when complete → PO (CLOSED)
 **File:** `prisma/schema.prisma`
 
 Update UserRole enum:
+
 ```prisma
 enum UserRole {
   OPERATOR
@@ -43,6 +46,7 @@ enum UserRole {
 ### 1.2 Add Supplier Email Fields
 
 Update Supplier model:
+
 ```prisma
 model Supplier {
   id              String     @id @default(uuid()) @db.Uuid
@@ -216,6 +220,7 @@ model PO {
 ### 1.7 Update Delivery Model (Mandatory PO Link)
 
 Change `po_id` from optional to required:
+
 ```prisma
 model Delivery {
   // ... existing fields ...
@@ -225,6 +230,7 @@ model Delivery {
 ```
 
 ### 1.8 Migration Command
+
 ```bash
 pnpm db:migrate dev --name add_prf_po_workflow
 ```
@@ -236,24 +242,27 @@ pnpm db:migrate dev --name add_prf_po_workflow
 ### File: `shared/types/database.ts`
 
 ### 2.1 Update UserRole
+
 ```typescript
 export type UserRole = "OPERATOR" | "SUPERVISOR" | "ADMIN" | "PROCUREMENT_SPECIALIST";
 ```
 
 ### 2.2 Add New Enums
+
 ```typescript
 export type PRFType = "URGENT" | "DPA" | "NORMAL";
 export type PRFCategory = "MATERIAL" | "CONSUMABLES" | "SPARE_PARTS" | "ASSET" | "SERVICES";
 ```
 
 ### 2.3 Update Supplier Interface
+
 ```typescript
 export interface Supplier {
   id: string;
   code: string;
   name: string;
   contact: string | null;
-  emails: string[];           // Multiple emails
+  emails: string[]; // Multiple emails
   phone: string | null;
   mobile: string | null;
   vat_reg_no: string | null;
@@ -264,6 +273,7 @@ export interface Supplier {
 ```
 
 ### 2.4 Add PRFLine Interface
+
 ```typescript
 export interface PRFLine {
   id: string;
@@ -281,6 +291,7 @@ export interface PRFLine {
 ```
 
 ### 2.5 Update PRF Interface
+
 ```typescript
 export interface PRF {
   id: string;
@@ -309,6 +320,7 @@ export interface PRF {
 ```
 
 ### 2.6 Add POLine Interface
+
 ```typescript
 export interface POLine {
   id: string;
@@ -329,6 +341,7 @@ export interface POLine {
 ```
 
 ### 2.7 Update PO Interface
+
 ```typescript
 export interface PO {
   id: string;
@@ -366,11 +379,12 @@ export interface PO {
 
 ```typescript
 // Email service using Resend or Nodemailer
-export async function sendPRFApprovalEmail(prf: PRF, procurementUsers: User[]): Promise<void>
-export async function sendPOToSupplier(po: PO, supplier: Supplier): Promise<void>
+export async function sendPRFApprovalEmail(prf: PRF, procurementUsers: User[]): Promise<void>;
+export async function sendPOToSupplier(po: PO, supplier: Supplier): Promise<void>;
 ```
 
 ### 3.2 Environment Variables
+
 ```env
 SMTP_HOST=
 SMTP_PORT=
@@ -380,6 +394,7 @@ EMAIL_FROM=noreply@amos-sa.com
 ```
 
 ### 3.3 Email Triggers
+
 - **PRF Approval**: When PRF status changes to APPROVED, send to all PROCUREMENT_SPECIALIST users
 - **PO Creation**: When PO is created, send to all supplier email addresses
 
@@ -390,16 +405,18 @@ EMAIL_FROM=noreply@amos-sa.com
 ### File: `app/composables/usePermissions.ts`
 
 ### New Functions:
-| Function | Description | Roles |
-|----------|-------------|-------|
-| `isProcurementSpecialist` | Check if user is procurement | PROCUREMENT_SPECIALIST |
-| `canViewOrders()` | Access Orders page | All authenticated |
-| `canCreatePRF()` | Create PRF | OPERATOR, SUPERVISOR, ADMIN |
-| `canApprovePRF()` | Approve/Reject PRF | SUPERVISOR, ADMIN |
-| `canCreatePO()` | Create PO from PRF | PROCUREMENT_SPECIALIST, ADMIN |
-| `canClosePO()` | Close PO | PROCUREMENT_SPECIALIST, ADMIN |
+
+| Function                  | Description                  | Roles                         |
+| ------------------------- | ---------------------------- | ----------------------------- |
+| `isProcurementSpecialist` | Check if user is procurement | PROCUREMENT_SPECIALIST        |
+| `canViewOrders()`         | Access Orders page           | All authenticated             |
+| `canCreatePRF()`          | Create PRF                   | OPERATOR, SUPERVISOR, ADMIN   |
+| `canApprovePRF()`         | Approve/Reject PRF           | SUPERVISOR, ADMIN             |
+| `canCreatePO()`           | Create PO from PRF           | PROCUREMENT_SPECIALIST, ADMIN |
+| `canClosePO()`            | Close PO                     | PROCUREMENT_SPECIALIST, ADMIN |
 
 ### PROCUREMENT_SPECIALIST Role Access:
+
 - Orders page (full access)
 - View approved PRFs
 - Create/Edit/Close POs
@@ -411,27 +428,30 @@ EMAIL_FROM=noreply@amos-sa.com
 ## Phase 5: API Endpoints
 
 ### PRF Endpoints (`server/api/prfs/`):
-| File | Method | Purpose |
-|------|--------|---------|
-| `index.get.ts` | GET | List PRFs (with filters) |
-| `index.post.ts` | POST | Create PRF with lines |
-| `[id].get.ts` | GET | Get PRF with lines |
-| `[id].patch.ts` | PATCH | Update draft PRF |
-| `[id].delete.ts` | DELETE | Delete draft PRF |
-| `[id]/submit.patch.ts` | PATCH | Submit for approval |
-| `[id]/approve.patch.ts` | PATCH | Approve PRF + trigger email |
-| `[id]/reject.patch.ts` | PATCH | Reject PRF |
+
+| File                    | Method | Purpose                     |
+| ----------------------- | ------ | --------------------------- |
+| `index.get.ts`          | GET    | List PRFs (with filters)    |
+| `index.post.ts`         | POST   | Create PRF with lines       |
+| `[id].get.ts`           | GET    | Get PRF with lines          |
+| `[id].patch.ts`         | PATCH  | Update draft PRF            |
+| `[id].delete.ts`        | DELETE | Delete draft PRF            |
+| `[id]/submit.patch.ts`  | PATCH  | Submit for approval         |
+| `[id]/approve.patch.ts` | PATCH  | Approve PRF + trigger email |
+| `[id]/reject.patch.ts`  | PATCH  | Reject PRF                  |
 
 ### PO Endpoints (`server/api/pos/`):
-| File | Method | Purpose |
-|------|--------|---------|
-| `index.get.ts` | GET | List POs (with filters) |
-| `index.post.ts` | POST | Create PO + trigger email to supplier |
-| `[id].get.ts` | GET | Get PO with lines and deliveries |
-| `[id].patch.ts` | PATCH | Update open PO |
-| `[id]/close.patch.ts` | PATCH | Close PO |
+
+| File                  | Method | Purpose                               |
+| --------------------- | ------ | ------------------------------------- |
+| `index.get.ts`        | GET    | List POs (with filters)               |
+| `index.post.ts`       | POST   | Create PO + trigger email to supplier |
+| `[id].get.ts`         | GET    | Get PO with lines and deliveries      |
+| `[id].patch.ts`       | PATCH  | Update open PO                        |
+| `[id]/close.patch.ts` | PATCH  | Close PO                              |
 
 ### Update Supplier Endpoint:
+
 - `server/api/suppliers/[id].patch.ts` - Support emails array field
 
 ---
@@ -439,6 +459,7 @@ EMAIL_FROM=noreply@amos-sa.com
 ## Phase 6: Frontend Pages
 
 ### Page Structure:
+
 ```
 app/pages/orders/
 ├── index.vue          # Tabs: PRFs | POs | Stock Levels
@@ -471,11 +492,13 @@ app/pages/orders/
 ```
 
 **Tab Items:**
+
 1. **PRFs** - List with status/date/location filters, "New PRF" button
 2. **Purchase Orders** - List with status/supplier filters
 3. **Stock Levels** - Current stock (read-only reference)
 
 ### 6.2 PRF Create Page Fields (from template):
+
 - Location (pre-filled)
 - Project Name
 - PR Type: Urgent / DPA / Normal (radio buttons)
@@ -496,6 +519,7 @@ app/pages/orders/
 - Notes/Comments
 
 ### 6.3 PO Create Page Fields (from template):
+
 - PRF Reference (pre-filled if from PRF)
 - Supplier (required, shows VAT/contact info)
 - Quotation Reference
@@ -523,6 +547,7 @@ app/pages/orders/
 ## Phase 7: Components
 
 ### New Components:
+
 ```
 app/components/orders/
 ├── PRFForm.vue              # PRF form with all fields
@@ -542,6 +567,7 @@ app/components/orders/
 ### 8.1 Update Navigation (`app/layouts/default.vue`)
 
 Add "Orders" to Transactions section:
+
 ```typescript
 if (permissions.canViewOrders()) {
   transactionChildren.push({
@@ -553,12 +579,15 @@ if (permissions.canViewOrders()) {
 ```
 
 ### 8.2 PROCUREMENT_SPECIALIST Menu
+
 For PROCUREMENT_SPECIALIST role, show only:
+
 - Dashboard
 - Orders (full access)
 - Deliveries (view only for PO-linked)
 
 ### 8.3 Page Title Mappings
+
 ```typescript
 orders: "Orders",
 "orders-prfs-create": "Create PRF",
@@ -580,6 +609,7 @@ orders: "Orders",
 - When PO selected, auto-populate supplier and line items
 
 ### 9.2 Validation
+
 - Block delivery creation without PO
 - Warn if delivery quantities exceed PO quantities
 
@@ -590,10 +620,12 @@ orders: "Orders",
 ### Update Supplier Forms
 
 **Files:**
+
 - `app/pages/suppliers/create.vue`
 - `app/pages/suppliers/[id]/edit.vue`
 
 Add fields:
+
 - Email addresses (multiple - array input)
 - Phone
 - Mobile
@@ -641,17 +673,17 @@ Add fields:
 
 ## Key Files Summary
 
-| Category | Files |
-|----------|-------|
-| Schema | `prisma/schema.prisma` |
-| Types | `shared/types/database.ts` |
-| Email | `server/utils/email.ts` |
-| Permissions | `app/composables/usePermissions.ts` |
-| PRF API | `server/api/prfs/*.ts` (8 files) |
-| PO API | `server/api/pos/*.ts` (5 files) |
-| Composables | `app/composables/usePRFs.ts`, `app/composables/usePOs.ts` |
-| Pages | `app/pages/orders/**/*.vue` (5 files) |
-| Components | `app/components/orders/*.vue` (8 files) |
-| Navigation | `app/layouts/default.vue` |
-| Suppliers | `app/pages/suppliers/create.vue`, `app/pages/suppliers/[id]/edit.vue` |
-| Deliveries | `app/pages/deliveries/create.vue` |
+| Category    | Files                                                                 |
+| ----------- | --------------------------------------------------------------------- |
+| Schema      | `prisma/schema.prisma`                                                |
+| Types       | `shared/types/database.ts`                                            |
+| Email       | `server/utils/email.ts`                                               |
+| Permissions | `app/composables/usePermissions.ts`                                   |
+| PRF API     | `server/api/prfs/*.ts` (8 files)                                      |
+| PO API      | `server/api/pos/*.ts` (5 files)                                       |
+| Composables | `app/composables/usePRFs.ts`, `app/composables/usePOs.ts`             |
+| Pages       | `app/pages/orders/**/*.vue` (5 files)                                 |
+| Components  | `app/components/orders/*.vue` (8 files)                               |
+| Navigation  | `app/layouts/default.vue`                                             |
+| Suppliers   | `app/pages/suppliers/create.vue`, `app/pages/suppliers/[id]/edit.vue` |
+| Deliveries  | `app/pages/deliveries/create.vue`                                     |

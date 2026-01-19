@@ -19,6 +19,7 @@ pnpm install
 ```
 
 New dependency to add:
+
 ```bash
 pnpm add resend
 ```
@@ -56,28 +57,33 @@ Application available at: http://localhost:3000
 ## Implementation Order
 
 ### Phase 1: Database & Types (Foundation)
+
 1. Update `prisma/schema.prisma` with new models and enums
 2. Run database migration
 3. Update `shared/types/database.ts` with new TypeScript interfaces
 
 ### Phase 2: Backend API
+
 4. Create `server/utils/email.ts` - Email notification service
 5. Create PRF API endpoints (`server/api/prfs/`)
 6. Create PO API endpoints (`server/api/pos/`)
 7. Update Supplier API endpoints with email support
 
 ### Phase 3: Composables & Permissions
+
 8. Update `app/composables/usePermissions.ts` - Add PROCUREMENT_SPECIALIST role
 9. Create `app/composables/usePRFs.ts` - PRF CRUD operations
 10. Create `app/composables/usePOs.ts` - PO CRUD operations
 
 ### Phase 4: Frontend Components
+
 11. Create status badge components
 12. Create line item table components (PRF and PO)
 13. Create form components (PRF and PO)
 14. Create approval actions component
 
 ### Phase 5: Pages
+
 15. Create Orders index page with tabs
 16. Create PRF create/detail pages
 17. Create PO create/detail pages
@@ -85,6 +91,7 @@ Application available at: http://localhost:3000
 19. Update Delivery create page with mandatory PO selection
 
 ### Phase 6: Navigation & Integration
+
 20. Update navigation for Orders menu item
 21. Update navigation for PROCUREMENT_SPECIALIST role restrictions
 
@@ -93,6 +100,7 @@ Application available at: http://localhost:3000
 ## Key Files Reference
 
 ### Schema Changes
+
 ```
 prisma/schema.prisma
 ├── UserRole enum (add PROCUREMENT_SPECIALIST)
@@ -107,6 +115,7 @@ prisma/schema.prisma
 ```
 
 ### API Routes
+
 ```
 server/api/
 ├── prfs/
@@ -134,6 +143,7 @@ server/api/
 ```
 
 ### Components
+
 ```
 app/components/orders/
 ├── PRFForm.vue
@@ -147,6 +157,7 @@ app/components/orders/
 ```
 
 ### Pages
+
 ```
 app/pages/orders/
 ├── index.vue
@@ -163,6 +174,7 @@ app/pages/orders/
 ## Testing Checklist
 
 ### PRF Workflow
+
 - [ ] Create PRF as Operator
 - [ ] Add/edit/remove line items
 - [ ] Submit PRF for approval
@@ -172,6 +184,7 @@ app/pages/orders/
 - [ ] Clone rejected PRF
 
 ### PO Workflow
+
 - [ ] Create PO from approved PRF as Procurement Specialist
 - [ ] Verify VAT calculations (15%)
 - [ ] Verify email sent to supplier
@@ -180,11 +193,13 @@ app/pages/orders/
 - [ ] Verify linked PRF marked as CLOSED
 
 ### Delivery Integration
+
 - [ ] Create delivery - PO selection is mandatory
 - [ ] Verify only OPEN POs appear in dropdown
 - [ ] Verify supplier auto-populated from PO
 
 ### Role Permissions
+
 - [ ] PROCUREMENT_SPECIALIST sees only: Dashboard, Orders, Deliveries (limited)
 - [ ] PROCUREMENT_SPECIALIST cannot access: Master Data, Issues, Transfers, etc.
 - [ ] OPERATOR can create PRF but not PO
@@ -215,22 +230,26 @@ pnpm test             # Run tests
 ## Troubleshooting
 
 ### Email Not Sending
+
 1. Check `RESEND_API_KEY` in `.env`
 2. Verify `EMAIL_FROM` domain is verified in Resend
 3. Check console for email service logs
 4. Supplier must have at least one email in `emails` array
 
 ### PRF/PO Number Conflicts
+
 - Numbers are auto-generated sequentially
 - If conflicts occur, check for concurrent requests
 - Consider adding database-level sequence in production
 
 ### Permission Denied Errors
+
 1. Verify user role in database
 2. Check `usePermissions.ts` for role checks
 3. Verify API middleware validates role correctly
 
 ### VAT Calculation Mismatch
+
 - All calculations use Decimal with 2-4 decimal places
 - Frontend should match backend calculation logic
 - Use the calculation formulas from `research.md`

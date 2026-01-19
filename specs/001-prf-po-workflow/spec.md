@@ -152,6 +152,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 ### Functional Requirements
 
 **PRF Management**
+
 - **FR-001**: System MUST allow Operators, Supervisors, and Admins to create Purchase Requisition Forms (PRFs)
 - **FR-002**: System MUST auto-generate unique PRF numbers in a sequential format (e.g., PRF-001, PRF-002)
 - **FR-003**: System MUST support PRF types: URGENT, DPA (Direct Purchase Approval), and NORMAL
@@ -164,6 +165,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-010**: System MUST make PRFs read-only after submission (status change from DRAFT)
 
 **PRF Approval**
+
 - **FR-011**: System MUST allow only Supervisors and Admins to approve or reject PENDING PRFs
 - **FR-012**: System MUST record the approver and approval date when a PRF is approved
 - **FR-013**: System MUST send email notifications to all PROCUREMENT_SPECIALIST users when a PRF is approved
@@ -172,6 +174,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-014b**: System MUST allow users to "Clone" a REJECTED PRF, creating a new DRAFT PRF with copied content (new PRF number assigned, original rejection preserved for audit)
 
 **PO Management**
+
 - **FR-015**: System MUST allow Procurement Specialists and Admins to create exactly one PO from each approved PRF (1:1 relationship)
 - **FR-016**: System MUST auto-generate unique PO numbers in a sequential format (e.g., PO-001, PO-002)
 - **FR-017**: System MUST require supplier selection when creating a PO
@@ -184,21 +187,25 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-023**: System MUST allow only Procurement Specialists and Admins to close POs
 
 **Delivery Integration**
+
 - **FR-024**: System MUST require PO selection when creating deliveries (mandatory, not optional)
 - **FR-025**: System MUST filter PO selection dropdown to show only OPEN POs
 - **FR-026**: System MUST auto-populate supplier when a PO is selected for delivery
 - **FR-027**: System MUST display a warning when delivery quantities exceed PO quantities
 
 **Role & Permissions**
+
 - **FR-028**: System MUST support a new PROCUREMENT_SPECIALIST role
 - **FR-029**: PROCUREMENT_SPECIALIST role MUST have access to: Dashboard, Orders (full), Deliveries (view PO-linked only)
 - **FR-030**: PROCUREMENT_SPECIALIST role MUST NOT have access to: Master Data, Issues, Transfers, Reconciliations, Period Close
 
 **Supplier Management**
+
 - **FR-031**: System MUST support multiple email addresses per supplier
 - **FR-032**: System MUST validate email address format before saving
 
 **Email Notifications**
+
 - **FR-033**: System MUST send PRF approval notifications to all PROCUREMENT_SPECIALIST users
 - **FR-034**: System MUST send PO notifications to all email addresses configured for the supplier
 - **FR-035**: System MUST log email failures without blocking the primary transaction

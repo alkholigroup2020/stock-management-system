@@ -6,6 +6,7 @@
 ## Summary
 
 Implement a complete Purchase Requisition Form (PRF) and Purchase Order (PO) workflow with:
+
 - New PROCUREMENT_SPECIALIST role with limited access
 - PRF creation, submission, and approval workflow
 - PO creation from approved PRFs with VAT calculations
@@ -29,16 +30,16 @@ Implement a complete Purchase Requisition Form (PRF) and Purchase Order (PO) wor
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Data Integrity First | ✅ PASS | PRF/PO transactions tied to periods; audit trail via created_by/approved_by |
-| II. Type Safety Non-Negotiable | ✅ PASS | All new types to be defined in shared/types/database.ts; Zod validation on all inputs |
-| III. Location-Centric Architecture | ✅ PASS | PRFs tied to locations; POs inherit context from PRF |
-| IV. Approval Workflow Compliance | ✅ PASS | PRF requires Supervisor approval; workflow states enforced |
-| V. Accessible by Design | ✅ PASS | Will use Nuxt UI components; follow UI_DESIGN_SYSTEM.md |
-| VI. Offline-Aware UI | ✅ PASS | useOnlineStatus() will disable action buttons when offline |
-| VII. Server-Side Security | ✅ PASS | API routes validate roles; PROCUREMENT_SPECIALIST role checked server-side |
-| VIII. Consistent Code Standards | ✅ PASS | Follow Prettier config; pnpm typecheck must pass |
+| Principle                          | Status  | Notes                                                                                 |
+| ---------------------------------- | ------- | ------------------------------------------------------------------------------------- |
+| I. Data Integrity First            | ✅ PASS | PRF/PO transactions tied to periods; audit trail via created_by/approved_by           |
+| II. Type Safety Non-Negotiable     | ✅ PASS | All new types to be defined in shared/types/database.ts; Zod validation on all inputs |
+| III. Location-Centric Architecture | ✅ PASS | PRFs tied to locations; POs inherit context from PRF                                  |
+| IV. Approval Workflow Compliance   | ✅ PASS | PRF requires Supervisor approval; workflow states enforced                            |
+| V. Accessible by Design            | ✅ PASS | Will use Nuxt UI components; follow UI_DESIGN_SYSTEM.md                               |
+| VI. Offline-Aware UI               | ✅ PASS | useOnlineStatus() will disable action buttons when offline                            |
+| VII. Server-Side Security          | ✅ PASS | API routes validate roles; PROCUREMENT_SPECIALIST role checked server-side            |
+| VIII. Consistent Code Standards    | ✅ PASS | Follow Prettier config; pnpm typecheck must pass                                      |
 
 **No violations requiring justification.**
 
@@ -122,8 +123,8 @@ server/
 
 > No constitution violations requiring justification.
 
-| Area | Complexity | Justification |
-|------|------------|---------------|
-| Email Service | Low | Simple SMTP via environment variables; no external dependencies |
-| VAT Calculations | Low | Fixed 15% rate; standard arithmetic |
-| PRF/PO Workflow | Medium | Standard approval workflow matching existing Transfer pattern |
+| Area             | Complexity | Justification                                                   |
+| ---------------- | ---------- | --------------------------------------------------------------- |
+| Email Service    | Low        | Simple SMTP via environment variables; no external dependencies |
+| VAT Calculations | Low        | Fixed 15% rate; standard arithmetic                             |
+| PRF/PO Workflow  | Medium     | Standard approval workflow matching existing Transfer pattern   |

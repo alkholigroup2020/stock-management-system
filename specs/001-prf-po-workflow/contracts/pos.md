@@ -6,14 +6,14 @@
 
 ## Endpoints Overview
 
-| Method | Path | Description | Roles |
-|--------|------|-------------|-------|
-| GET | `/api/pos` | List POs with filters | All authenticated |
-| POST | `/api/pos` | Create PO from PRF | PROCUREMENT_SPECIALIST, ADMIN |
-| GET | `/api/pos/:id` | Get PO details | All authenticated |
-| PATCH | `/api/pos/:id` | Update open PO | PROCUREMENT_SPECIALIST, ADMIN |
-| PATCH | `/api/pos/:id/close` | Close PO | PROCUREMENT_SPECIALIST, ADMIN |
-| POST | `/api/pos/:id/resend-email` | Resend PO email | PROCUREMENT_SPECIALIST, ADMIN |
+| Method | Path                        | Description           | Roles                         |
+| ------ | --------------------------- | --------------------- | ----------------------------- |
+| GET    | `/api/pos`                  | List POs with filters | All authenticated             |
+| POST   | `/api/pos`                  | Create PO from PRF    | PROCUREMENT_SPECIALIST, ADMIN |
+| GET    | `/api/pos/:id`              | Get PO details        | All authenticated             |
+| PATCH  | `/api/pos/:id`              | Update open PO        | PROCUREMENT_SPECIALIST, ADMIN |
+| PATCH  | `/api/pos/:id/close`        | Close PO              | PROCUREMENT_SPECIALIST, ADMIN |
+| POST   | `/api/pos/:id/resend-email` | Resend PO email       | PROCUREMENT_SPECIALIST, ADMIN |
 
 ---
 
@@ -23,17 +23,17 @@ List POs with pagination and filters.
 
 ### Query Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 20, max: 100) |
-| status | POStatus | No | Filter by status (OPEN, CLOSED) |
-| supplier_id | UUID | No | Filter by supplier |
-| prf_id | UUID | No | Filter by source PRF |
-| created_by | UUID | No | Filter by creator |
-| search | string | No | Search by PO number |
-| from_date | string | No | Created after date (ISO) |
-| to_date | string | No | Created before date (ISO) |
+| Parameter   | Type     | Required | Description                            |
+| ----------- | -------- | -------- | -------------------------------------- |
+| page        | number   | No       | Page number (default: 1)               |
+| limit       | number   | No       | Items per page (default: 20, max: 100) |
+| status      | POStatus | No       | Filter by status (OPEN, CLOSED)        |
+| supplier_id | UUID     | No       | Filter by supplier                     |
+| prf_id      | UUID     | No       | Filter by source PRF                   |
+| created_by  | UUID     | No       | Filter by creator                      |
+| search      | string   | No       | Search by PO number                    |
+| from_date   | string   | No       | Created after date (ISO)               |
+| to_date     | string   | No       | Created before date (ISO)              |
 
 ### Response 200
 
@@ -55,7 +55,7 @@ List POs with pagination and filters.
     limit: number;
     total: number;
     totalPages: number;
-  };
+  }
 }
 ```
 
@@ -104,6 +104,7 @@ Create a new PO, typically from an approved PRF.
 ### Calculated Fields (Server-Side)
 
 For each line:
+
 ```
 total_before_vat = quantity × unit_price × (1 - discount_percent / 100)
 vat_amount = total_before_vat × vat_percent / 100
@@ -111,6 +112,7 @@ total_after_vat = total_before_vat + vat_amount
 ```
 
 For PO totals:
+
 ```
 total_before_discount = SUM(quantity × unit_price)
 total_discount = SUM(quantity × unit_price × discount_percent / 100)
@@ -281,7 +283,7 @@ Close a PO. No further edits or deliveries allowed.
 {
   data: PO;
   message: "Purchase Order closed";
-  prf_closed: boolean;  // true if linked PRF was also closed
+  prf_closed: boolean; // true if linked PRF was also closed
 }
 ```
 
@@ -335,11 +337,11 @@ Get list of open POs for dropdown selection (used in Delivery creation).
 
 ### Query Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| supplier_id | UUID | No | Filter by supplier |
-| search | string | No | Search by PO number |
-| limit | number | No | Max results (default: 50) |
+| Parameter   | Type   | Required | Description               |
+| ----------- | ------ | -------- | ------------------------- |
+| supplier_id | UUID   | No       | Filter by supplier        |
+| search      | string | No       | Search by PO number       |
+| limit       | number | No       | Max results (default: 50) |
 
 ### Response 200
 
