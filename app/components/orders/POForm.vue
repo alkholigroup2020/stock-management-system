@@ -189,7 +189,7 @@ function handleLineChange() {
                 {{ selectedSupplier.name }}
               </p>
               <p class="text-xs text-[var(--ui-text-muted)]">
-                {{ selectedSupplier.emails.length }} email(s)
+                {{ selectedSupplier.emails?.length || 0 }} email(s)
               </p>
             </div>
           </div>
@@ -262,7 +262,7 @@ function handleLineChange() {
               <div class="flex flex-col">
                 <span class="font-medium">{{ item.name }}</span>
                 <span class="text-xs text-[var(--ui-text-muted)]">
-                  {{ item.code }} • {{ item.emails.length || 0 }} email(s)
+                  {{ item.code }} • {{ item.emails?.length || 0 }} email(s)
                 </span>
               </div>
             </template>

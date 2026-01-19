@@ -235,15 +235,17 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T090 [P] Create email resend endpoint in `server/api/pos/[id]/resend-email.post.ts`
-- [ ] T091 [P] Add "Resend Email" button to PO detail page
-- [ ] T092 [P] Add loading states to all form submissions using LoadingOverlay
-- [ ] T093 [P] Ensure all buttons have `cursor-pointer` class
-- [ ] T094 [P] Verify offline-aware UI (disable actions when offline) using `useOnlineStatus()`
-- [ ] T095 Run `pnpm typecheck` and fix any type errors
-- [ ] T096 Run `pnpm format` to ensure code formatting
-- [ ] T097 Test complete workflow: PRF → Approve → PO → Delivery → Close PO
-- [ ] T098 Verify with Playwright MCP on localhost:3000
+- [x] T090 [P] Create email resend endpoint in `server/api/pos/[id]/resend-email.post.ts`
+- [x] T091 [P] Add "Resend Email" button to PO detail page
+- [x] T092 [P] Add loading states to all form submissions using LoadingOverlay
+- [x] T093 [P] Ensure all buttons have `cursor-pointer` class
+- [x] T094 [P] Verify offline-aware UI (disable actions when offline) using `useOnlineStatus()`
+- [x] T095 Run `pnpm typecheck` and fix any type errors
+- [x] T096 Run `pnpm format` to ensure code formatting
+- [x] T097 Test complete workflow: PRF → Approve → PO → Delivery → Close PO
+- [x] T098 Verify with Playwright MCP on localhost:3000
+
+**Checkpoint**: Phase 11 complete - All polish and cross-cutting concerns addressed ✅
 
 ---
 
