@@ -9,8 +9,9 @@
  */
 
 import { formatCurrency, formatDate } from "~/utils/format";
-import type { PRFStatus, Unit } from "~~/shared/types/database";
+import type { PRFStatus, POStatus, Unit } from "~~/shared/types/database";
 import type { PRFListItem, PRFFilters } from "~/composables/usePRFs";
+import type { POFilters } from "~/composables/usePOs";
 import type { StockItem } from "~/components/orders/StockLevelsTable.vue";
 
 // SEO
@@ -38,12 +39,27 @@ const prfFilters = ref<PRFFilters>({
   location_id: undefined,
 });
 
+// PO filters
+const poFilters = ref<POFilters>({
+  page: 1,
+  limit: 20,
+  status: undefined,
+});
+
 // Stock tab state
 const stockLoading = ref(false);
 const stocks = ref<StockItem[]>([]);
 
 // Fetch PRFs
 const { prfs, pagination, loading: prfsLoading, refresh: refreshPRFs } = usePRFs(prfFilters);
+
+// Fetch POs
+const {
+  pos,
+  pagination: poPagination,
+  loading: posLoading,
+  refresh: refreshPOs,
+} = usePOs(poFilters);
 
 // Sync tab from URL query
 onMounted(() => {
@@ -151,10 +167,26 @@ function goToPRF(id: string) {
   router.push(`/orders/prfs/${id}`);
 }
 
-// Pagination handlers
-function goToPage(page: number) {
+function goToPO(id: string) {
+  router.push(`/orders/pos/${id}`);
+}
+
+// PRF Pagination handlers
+function goToPRFPage(page: number) {
   prfFilters.value.page = page;
 }
+
+// PO Pagination handlers
+function goToPOPage(page: number) {
+  poFilters.value.page = page;
+}
+
+// PO status filter options
+const poStatusFilterOptions = [
+  { label: "All Statuses", value: undefined },
+  { label: "Open", value: "OPEN" },
+  { label: "Closed", value: "CLOSED" },
+];
 
 // Fetch stock levels for reference
 async function fetchStockLevels() {
@@ -481,7 +513,7 @@ function handleStockItemSelect(item: StockItem) {
               size="sm"
               class="cursor-pointer"
               :disabled="pagination.page === 1"
-              @click="goToPage(pagination.page - 1)"
+              @click="goToPRFPage(pagination.page - 1)"
             />
             <span class="text-sm text-[var(--ui-text)]">
               Page {{ pagination.page }} of {{ pagination.totalPages }}
@@ -493,7 +525,7 @@ function handleStockItemSelect(item: StockItem) {
               size="sm"
               class="cursor-pointer"
               :disabled="pagination.page === pagination.totalPages"
-              @click="goToPage(pagination.page + 1)"
+              @click="goToPRFPage(pagination.page + 1)"
             />
           </div>
         </div>
@@ -501,22 +533,216 @@ function handleStockItemSelect(item: StockItem) {
     </template>
 
     <!-- POs Tab Content -->
-    <UCard v-else-if="activeTab === 'pos'" class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
-      <div class="text-center py-12">
-        <UIcon name="i-lucide-shopping-cart" class="w-16 h-16 mx-auto text-muted mb-4" />
-        <h3 class="text-lg font-medium text-default mb-2">Purchase Orders</h3>
-        <p class="text-muted mb-6">PO list and management will be implemented in User Story 3.</p>
-        <UButton
-          v-if="canCreatePO()"
-          color="primary"
-          icon="i-lucide-plus"
-          class="cursor-pointer"
-          @click="goToNewPO"
+    <template v-else-if="activeTab === 'pos'">
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center gap-3">
+        <USelectMenu
+          v-model="poFilters.status"
+          :items="poStatusFilterOptions"
+          label-key="label"
+          value-key="value"
+          placeholder="Filter by status"
+          class="w-48"
         >
-          Create New PO
+          <template #leading>
+            <UIcon name="i-lucide-filter" class="w-4 h-4" />
+          </template>
+        </USelectMenu>
+
+        <UButton
+          icon="i-lucide-refresh-cw"
+          color="neutral"
+          variant="ghost"
+          class="cursor-pointer"
+          :loading="posLoading"
+          @click="refreshPOs()"
+        >
+          Refresh
         </UButton>
       </div>
-    </UCard>
+
+      <!-- POs List -->
+      <UCard class="card-elevated" :ui="{ body: 'p-0' }">
+        <!-- Loading State -->
+        <div v-if="posLoading" class="flex justify-center py-12">
+          <div class="flex flex-col items-center gap-3">
+            <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
+            <p class="text-sm text-[var(--ui-text-muted)]">Loading POs...</p>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="pos.length === 0" class="text-center py-12 px-4">
+          <UIcon name="i-lucide-shopping-cart" class="w-16 h-16 mx-auto text-muted mb-4" />
+          <h3 class="text-lg font-medium text-default mb-2">No POs Found</h3>
+          <p class="text-muted mb-6">
+            {{
+              poFilters.status
+                ? `No POs with status "${poFilters.status}" found.`
+                : "No purchase orders have been created yet."
+            }}
+          </p>
+          <UButton
+            v-if="canCreatePO()"
+            color="primary"
+            icon="i-lucide-plus"
+            class="cursor-pointer"
+            @click="goToNewPO"
+          >
+            Create New PO
+          </UButton>
+        </div>
+
+        <!-- POs Table -->
+        <div v-else class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-[var(--ui-border)]">
+            <thead>
+              <tr class="bg-[var(--ui-bg-elevated)]">
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                >
+                  PO Number
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider hidden md:table-cell"
+                >
+                  Supplier
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider hidden lg:table-cell"
+                >
+                  Source PRF
+                </th>
+                <th
+                  class="px-4 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                >
+                  Total Amount
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider hidden sm:table-cell"
+                >
+                  Created By
+                </th>
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider hidden md:table-cell"
+                >
+                  Date
+                </th>
+                <th
+                  class="px-4 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-16"
+                >
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--ui-border)]">
+              <tr
+                v-for="po in pos"
+                :key="po.id"
+                class="hover:bg-[var(--ui-bg-elevated)] transition-colors cursor-pointer"
+                @click="goToPO(po.id)"
+              >
+                <!-- PO Number -->
+                <td class="px-4 py-3">
+                  <span class="text-sm font-medium text-primary">{{ po.po_no }}</span>
+                </td>
+
+                <!-- Status -->
+                <td class="px-4 py-3">
+                  <OrdersPOStatusBadge :status="po.status" size="sm" />
+                </td>
+
+                <!-- Supplier -->
+                <td class="px-4 py-3 hidden md:table-cell">
+                  <span class="text-sm text-[var(--ui-text)]">{{ po.supplier?.name }}</span>
+                </td>
+
+                <!-- Source PRF -->
+                <td class="px-4 py-3 hidden lg:table-cell">
+                  <span v-if="po.prf" class="text-sm text-[var(--ui-text)]">
+                    {{ po.prf.prf_no }}
+                  </span>
+                  <span v-else class="text-sm text-[var(--ui-text-muted)]">—</span>
+                </td>
+
+                <!-- Total Amount -->
+                <td class="px-4 py-3 text-right">
+                  <span class="text-sm font-medium text-[var(--ui-text)]">
+                    {{ formatCurrency(parseFloat(po.total_amount)) }}
+                  </span>
+                </td>
+
+                <!-- Created By -->
+                <td class="px-4 py-3 hidden sm:table-cell">
+                  <span class="text-sm text-[var(--ui-text)]">
+                    {{ po.creator?.full_name || "—" }}
+                  </span>
+                </td>
+
+                <!-- Date -->
+                <td class="px-4 py-3 hidden md:table-cell">
+                  <span class="text-sm text-[var(--ui-text-muted)]">
+                    {{ formatDate(po.created_at) }}
+                  </span>
+                </td>
+
+                <!-- Action -->
+                <td class="px-4 py-3 text-center" @click.stop>
+                  <UButton
+                    icon="i-lucide-eye"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    class="cursor-pointer"
+                    @click="goToPO(po.id)"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          v-if="poPagination && poPagination.totalPages > 1"
+          class="flex items-center justify-between px-4 py-3 border-t border-[var(--ui-border)]"
+        >
+          <div class="text-sm text-[var(--ui-text-muted)]">
+            Showing {{ (poPagination.page - 1) * poPagination.limit + 1 }} to
+            {{ Math.min(poPagination.page * poPagination.limit, poPagination.total) }} of
+            {{ poPagination.total }} POs
+          </div>
+          <div class="flex items-center gap-2">
+            <UButton
+              icon="i-lucide-chevron-left"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              class="cursor-pointer"
+              :disabled="poPagination.page === 1"
+              @click="goToPOPage(poPagination.page - 1)"
+            />
+            <span class="text-sm text-[var(--ui-text)]">
+              Page {{ poPagination.page }} of {{ poPagination.totalPages }}
+            </span>
+            <UButton
+              icon="i-lucide-chevron-right"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              class="cursor-pointer"
+              :disabled="poPagination.page === poPagination.totalPages"
+              @click="goToPOPage(poPagination.page + 1)"
+            />
+          </div>
+        </div>
+      </UCard>
+    </template>
 
     <!-- Stock Reference Tab Content -->
     <UCard v-else-if="activeTab === 'stock'" class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">

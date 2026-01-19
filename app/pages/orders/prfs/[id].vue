@@ -22,7 +22,7 @@ const router = useRouter();
 const toast = useAppToast();
 const locationStore = useLocationStore();
 const periodStore = usePeriodStore();
-const { canCreatePRF, canApprovePRF } = usePermissions();
+const { canCreatePRF, canApprovePRF, canCreatePO } = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess, handleWarning } = useErrorHandler();
 const { update, remove, submit } = usePRFActions();
@@ -88,6 +88,23 @@ const canDelete = computed(() => {
   // Only draft PRFs can be deleted by the requester
   return isDraft.value && prf.value?.requested_by === user.value?.id;
 });
+
+const canCreatePOFromPRF = computed(() => {
+  // Can create PO if:
+  // - PRF is approved
+  // - User can create PO (procurement specialist or admin)
+  // - PRF doesn't already have a PO
+  return (
+    isApproved.value &&
+    canCreatePO() &&
+    (!prf.value?.purchase_orders || prf.value.purchase_orders.length === 0)
+  );
+});
+
+// Navigate to create PO from this PRF
+function goToCreatePOFromPRF() {
+  router.push(`/orders/pos/create?prf_id=${prfId.value}`);
+}
 
 // Form validation for editing
 const isFormValid = computed(() => {
@@ -443,6 +460,19 @@ onMounted(async () => {
             @approved="onPRFApproved"
             @rejected="onPRFRejected"
           />
+
+          <!-- Create PO Button (for approved PRFs without PO) -->
+          <UButton
+            v-if="canCreatePOFromPRF"
+            color="primary"
+            icon="i-lucide-shopping-cart"
+            size="md"
+            class="cursor-pointer rounded-full"
+            @click="goToCreatePOFromPRF"
+          >
+            <span class="hidden sm:inline">Create PO</span>
+            <span class="sm:hidden">PO</span>
+          </UButton>
         </template>
       </div>
     </div>
