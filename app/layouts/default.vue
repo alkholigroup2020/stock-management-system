@@ -31,17 +31,7 @@ const mainMenuItems = computed<NavItem[]>(() => {
     },
   ];
 
-  // 2. Orders (PRF/PO Workflow)
-  if (permissions.canAccessOrders()) {
-    items.push({
-      label: "Orders",
-      icon: "i-heroicons-clipboard-document-list",
-      to: "/orders",
-      permission: true,
-    });
-  }
-
-  // 3. Master Data section (expandable)
+  // 2. Master Data section (expandable)
   const masterDataChildren: NavItem[] = [];
   if (permissions.canManageLocations()) {
     masterDataChildren.push({
@@ -83,6 +73,16 @@ const mainMenuItems = computed<NavItem[]>(() => {
 
   // 3. Transactions section (expandable)
   const transactionChildren: NavItem[] = [];
+
+  // Orders (PRF/PO Workflow) - first in Transactions
+  if (permissions.canAccessOrders()) {
+    transactionChildren.push({
+      label: "Orders",
+      to: "/orders",
+      permission: true,
+    });
+  }
+
   if (permissions.canViewDeliveries()) {
     transactionChildren.push({
       label: "Deliveries",
