@@ -131,9 +131,11 @@ const roleOptions = [
   },
 ];
 
-// Check if the FORM role requires location assignment (OPERATOR or PROCUREMENT_SPECIALIST)
-const isOperatorRole = computed(
-  () => formData.role === "OPERATOR" || formData.role === "PROCUREMENT_SPECIALIST"
+// Check if the FORM role requires location assignment
+const isOperatorRole = computed(() => formData.role === "OPERATOR");
+const isProcurementSpecialistRole = computed(() => formData.role === "PROCUREMENT_SPECIALIST");
+const requiresLocationAssignment = computed(
+  () => isOperatorRole.value || isProcurementSpecialistRole.value
 );
 
 // Check if the ORIGINAL role was OPERATOR (for role change warnings)
@@ -733,7 +735,7 @@ useHead({
         </template>
 
         <!-- SUPERVISOR/ADMIN: Show automatic access info -->
-        <div v-if="!isOperatorRole">
+        <div v-if="!requiresLocationAssignment">
           <!-- All Locations Access Info Card -->
           <div class="p-4 rounded-lg bg-success/10 border border-success">
             <div class="flex items-start gap-3">
@@ -799,16 +801,32 @@ useHead({
           </div>
         </div>
 
-        <!-- OPERATOR: Show location management UI -->
+        <!-- OPERATOR/PROCUREMENT_SPECIALIST: Show location management UI -->
         <div v-else>
-          <!-- Operator Info Alert -->
-          <div class="p-3 rounded-lg bg-primary/10 border border-primary mb-4">
+          <!-- Role-specific Info Alert -->
+          <div
+            v-if="isOperatorRole"
+            class="p-3 rounded-lg bg-primary/10 border border-primary mb-4"
+          >
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-info" class="w-4 h-4 text-primary" />
               <p class="text-sm text-[var(--ui-text-muted)]">
                 <strong>Operators</strong>
                 can only access their assigned locations. Add at least one location for this user to
                 post transactions.
+              </p>
+            </div>
+          </div>
+          <div
+            v-else-if="isProcurementSpecialistRole"
+            class="p-3 rounded-lg bg-warning/10 border border-warning mb-4"
+          >
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-shopping-cart" class="w-4 h-4 text-warning" />
+              <p class="text-sm text-[var(--ui-text-muted)]">
+                <strong>Procurement Specialists</strong>
+                have limited system access. Location assignment is optional but recommended for
+                viewing PO-linked deliveries.
               </p>
             </div>
           </div>
@@ -849,12 +867,29 @@ useHead({
           <!-- No Locations Assigned -->
           <div
             v-else
-            class="text-center py-8 px-4 rounded-lg bg-warning/10 border border-warning mb-6"
+            class="text-center py-8 px-4 rounded-lg mb-6"
+            :class="
+              isOperatorRole
+                ? 'bg-warning/10 border border-warning'
+                : 'bg-primary/10 border border-primary'
+            "
           >
-            <UIcon name="i-lucide-alert-triangle" class="w-12 h-12 text-warning mx-auto mb-3" />
-            <p class="font-semibold text-warning mb-1">No Locations Assigned</p>
+            <UIcon
+              :name="isOperatorRole ? 'i-lucide-alert-triangle' : 'i-lucide-info'"
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isOperatorRole ? 'text-warning' : 'text-primary'"
+            />
+            <p class="font-semibold mb-1" :class="isOperatorRole ? 'text-warning' : 'text-primary'">
+              No Locations Assigned
+            </p>
             <p class="text-sm text-[var(--ui-text-muted)]">
-              This operator cannot access any locations. Add at least one location below.
+              <template v-if="isOperatorRole">
+                This operator cannot access any locations. Add at least one location below.
+              </template>
+              <template v-else>
+                No locations assigned yet. You can optionally add locations to allow viewing
+                PO-linked deliveries.
+              </template>
             </p>
           </div>
 

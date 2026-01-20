@@ -46,7 +46,7 @@ const registerSchema = z.object({
     .min(1, "Full name is required")
     .max(100, "Full name must not exceed 100 characters")
     .transform((val) => val.trim()),
-  role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN"]),
+  role: z.enum(["OPERATOR", "SUPERVISOR", "ADMIN", "PROCUREMENT_SPECIALIST"]),
   default_location_id: z.string().uuid("Invalid location ID").optional(),
 });
 

@@ -83,10 +83,9 @@ const roleOptions = [
   },
 ];
 
-// Check if selected role requires location assignment (OPERATOR or PROCUREMENT_SPECIALIST)
-const isOperatorRole = computed(
-  () => formData.role === "OPERATOR" || formData.role === "PROCUREMENT_SPECIALIST"
-);
+// Check if selected role requires location assignment
+const isOperatorRole = computed(() => formData.role === "OPERATOR");
+const isProcurementSpecialistRole = computed(() => formData.role === "PROCUREMENT_SPECIALIST");
 
 // Location options
 const locationOptions = computed(() => [
@@ -369,7 +368,7 @@ useHead({
               label="Default Location"
               name="default_location_id"
               :help="
-                isOperatorRole
+                isOperatorRole || isProcurementSpecialistRole
                   ? 'User will automatically receive access to this location'
                   : 'Optional: User\'s default working location (preference only)'
               "
@@ -403,6 +402,29 @@ useHead({
                     can only access their assigned locations. After creating this user, you will
                     need to assign specific locations on the user's edit page. If you select a
                     Default Location above, it will be automatically assigned with POST access.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROCUREMENT_SPECIALIST: Limited access, can view deliveries -->
+            <div
+              v-else-if="isProcurementSpecialistRole"
+              class="p-4 rounded-lg bg-warning/10 border border-warning"
+            >
+              <div class="flex items-start gap-3">
+                <UIcon
+                  name="i-lucide-shopping-cart"
+                  class="w-5 h-5 text-warning flex-shrink-0 mt-0.5"
+                />
+                <div>
+                  <p class="font-semibold text-warning mb-1">Limited Access Role</p>
+                  <p class="text-sm text-[var(--ui-text-muted)]">
+                    <strong>Procurement Specialists</strong>
+                    have limited access to the system. They can manage Purchase Orders (POs), view
+                    approved PRFs, and view PO-linked deliveries. They cannot access Issues,
+                    Transfers, Reconciliations, or Master Data. Location assignment is optional but
+                    recommended for delivery viewing.
                   </p>
                 </div>
               </div>

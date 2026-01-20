@@ -255,20 +255,28 @@ useHead({
           </div>
         </div>
 
-        <!-- Operator: Specific Location Access -->
+        <!-- Operator/Procurement Specialist: Specific Location Access -->
         <template v-else>
           <!-- No Locations Assigned -->
           <EmptyState
             v-if="user.locations.length === 0"
             icon="i-lucide-map-pin"
             title="No location access"
-            description="This user has not been assigned to any locations yet."
+            :description="
+              user.role === 'PROCUREMENT_SPECIALIST'
+                ? 'No locations assigned yet. Location assignment is optional for viewing PO-linked deliveries.'
+                : 'This user has not been assigned to any locations yet.'
+            "
           />
 
           <!-- Assigned Locations List -->
           <div v-else class="space-y-3">
             <p class="text-caption text-[var(--ui-text-muted)] mb-4">
-              Operators can only access and post transactions at their assigned locations.
+              {{
+                user.role === "PROCUREMENT_SPECIALIST"
+                  ? "Procurement Specialists can view PO-linked deliveries at their assigned locations."
+                  : "Operators can only access and post transactions at their assigned locations."
+              }}
             </p>
             <div
               v-for="loc in user.locations"
@@ -327,6 +335,22 @@ useHead({
               <p class="text-[var(--ui-text)] font-medium">Supervisor Access</p>
               <p class="text-caption text-[var(--ui-text-muted)] mt-1">
                 Can approve transfers and edit reconciliations at all locations
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Procurement Specialist Role -->
+        <div v-else-if="user.role === 'PROCUREMENT_SPECIALIST'" class="space-y-4">
+          <div
+            class="flex items-start gap-3 p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]"
+          >
+            <UIcon name="i-lucide-shopping-cart" class="w-5 h-5 text-info flex-shrink-0 mt-0.5" />
+            <div>
+              <p class="text-[var(--ui-text)] font-medium">Procurement Specialist Access</p>
+              <p class="text-caption text-[var(--ui-text-muted)] mt-1">
+                Can manage Purchase Orders (POs), view approved PRFs, and view PO-linked deliveries.
+                Cannot access Issues, Transfers, Reconciliations, or Master Data.
               </p>
             </div>
           </div>

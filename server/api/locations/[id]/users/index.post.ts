@@ -3,7 +3,7 @@
  * POST /api/locations/[id]/users
  *
  * Assigns a user to a location (Admin only)
- * Only applies to OPERATOR role users
+ * Only applies to OPERATOR and PROCUREMENT_SPECIALIST role users
  */
 
 import type { UserRole } from "@prisma/client";
@@ -130,14 +130,14 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (targetUser.role !== "OPERATOR") {
+    if (targetUser.role !== "OPERATOR" && targetUser.role !== "PROCUREMENT_SPECIALIST") {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",
         data: {
           code: "INVALID_USER_ROLE",
           message:
-            "Location assignments are only applicable to Operators. Supervisors and Admins have automatic access to all locations.",
+            "Location assignments are only applicable to Operators and Procurement Specialists. Supervisors and Admins have automatic access to all locations.",
         },
       });
     }
