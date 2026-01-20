@@ -188,34 +188,55 @@ const poStatusFilterOptions = [
   { label: "Closed", value: "CLOSED" },
 ];
 
+// Stock report response type
+interface StockReportItem {
+  item_id: string;
+  item_code: string;
+  item_name: string;
+  item_unit: Unit;
+  on_hand: number;
+  wac: number;
+  stock_value: number;
+  min_stock: number | null;
+  max_stock: number | null;
+}
+
+interface StockReportLocation {
+  location_id: string;
+  items: StockReportItem[];
+}
+
+interface StockReportResponse {
+  locations: StockReportLocation[];
+}
+
 // Fetch stock levels for reference
 async function fetchStockLevels() {
   if (!activeLocation.value) return;
 
   stockLoading.value = true;
   try {
-    const data: {
-      stocks: Array<{
-        item_id: string;
-        item: { code: string; name: string; unit: Unit };
-        on_hand: string;
-        wac: string;
-        min_stock: string | null;
-        max_stock: string | null;
-      }>;
-    } = await $fetch(`/api/locations/${activeLocation.value.id}/stock`);
+    const data = await $fetch<StockReportResponse>(
+      `/api/reports/stock-now?locationId=${activeLocation.value.id}`
+    );
 
-    stocks.value = (data.stocks || []).map((stock) => ({
-      item_id: stock.item_id,
-      item_code: stock.item.code,
-      item_name: stock.item.name,
-      unit: stock.item.unit,
-      on_hand: parseFloat(stock.on_hand) || 0,
-      wac: parseFloat(stock.wac) || 0,
-      stock_value: (parseFloat(stock.on_hand) || 0) * (parseFloat(stock.wac) || 0),
-      min_stock: stock.min_stock ? parseFloat(stock.min_stock) : null,
-      max_stock: stock.max_stock ? parseFloat(stock.max_stock) : null,
-    }));
+    // Get items from the first (and only) location in the response
+    const locationData = data.locations?.[0];
+    if (locationData && locationData.items) {
+      stocks.value = locationData.items.map((item) => ({
+        item_id: item.item_id,
+        item_code: item.item_code,
+        item_name: item.item_name,
+        unit: item.item_unit,
+        on_hand: item.on_hand,
+        wac: item.wac,
+        stock_value: item.stock_value,
+        min_stock: item.min_stock,
+        max_stock: item.max_stock,
+      }));
+    } else {
+      stocks.value = [];
+    }
   } catch (error) {
     handleError(error, { context: "fetching stock levels" });
     stocks.value = [];
