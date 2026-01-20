@@ -8,7 +8,7 @@
 - Node.js 18+
 - pnpm 8+
 - PostgreSQL 15+ (via Supabase)
-- Resend API key for email notifications
+- Office 365 SMTP credentials for email notifications
 
 ## Setup Steps
 
@@ -18,10 +18,11 @@
 pnpm install
 ```
 
-New dependency to add:
+New dependencies to add:
 
 ```bash
-pnpm add resend
+pnpm add nodemailer
+pnpm add -D @types/nodemailer
 ```
 
 ### 2. Environment Variables
@@ -29,9 +30,12 @@ pnpm add resend
 Add to `.env`:
 
 ```env
-# Email Service (Resend)
-RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxx
-EMAIL_FROM=noreply@amos-sa.com
+# Email Service (Office 365 SMTP)
+SMTP_USER=your-email@your-domain.com
+SMTP_PASSWORD=your-smtp-password
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+EMAIL_FROM=your-email@your-domain.com
 ```
 
 ### 3. Database Migration
@@ -231,10 +235,12 @@ pnpm test             # Run tests
 
 ### Email Not Sending
 
-1. Check `RESEND_API_KEY` in `.env`
-2. Verify `EMAIL_FROM` domain is verified in Resend
-3. Check console for email service logs
-4. Supplier must have at least one email in `emails` array
+1. Check `SMTP_USER` and `SMTP_PASSWORD` in `.env`
+2. Verify `EMAIL_FROM` matches your SMTP_USER or an authorized alias
+3. Ensure SMTP_HOST is `smtp.office365.com` and SMTP_PORT is `587`
+4. Check console for email service logs
+5. If MFA is enabled on O365, create an App Password instead of using your regular password
+6. Supplier must have at least one email in `emails` array
 
 ### PRF/PO Number Conflicts
 

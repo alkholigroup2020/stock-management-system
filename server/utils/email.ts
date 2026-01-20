@@ -1,13 +1,14 @@
 /**
  * Email Service Utility
  *
- * Provides email notification functionality using Resend API.
+ * Provides email notification functionality using Office 365 SMTP via Nodemailer.
  * Includes error handling, logging, and development mode fallback.
  *
- * @see https://resend.com/docs
+ * @see https://nodemailer.com/
  */
 
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
+import type { Transporter } from "nodemailer";
 
 // ========================================
 // TYPES
@@ -27,36 +28,46 @@ export interface EmailResult {
   error?: string;
 }
 
-interface ResendError {
-  message?: string;
-  statusCode?: number;
-}
-
 // ========================================
 // CONFIGURATION
 // ========================================
 
 /**
- * Get Resend client instance
- * Returns null if API key is not configured
+ * Create Office 365 SMTP transporter
+ * Returns null if credentials are not configured
  */
-function getResendClient(): Resend | null {
-  const apiKey = process.env.RESEND_API_KEY;
+function createTransporter(): Transporter | null {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPassword = process.env.SMTP_PASSWORD;
+  const smtpHost = process.env.SMTP_HOST || "smtp.office365.com";
+  const smtpPort = parseInt(process.env.SMTP_PORT || "587", 10);
 
-  if (!apiKey) {
-    console.warn("[Email Service] RESEND_API_KEY not configured - emails will be logged only");
+  if (!smtpUser || !smtpPassword) {
+    console.warn("[Email Service] SMTP_USER or SMTP_PASSWORD not configured - emails will be logged only");
     return null;
   }
 
-  return new Resend(apiKey);
+  return nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: false, // Use STARTTLS
+    auth: {
+      user: smtpUser,
+      pass: smtpPassword,
+    },
+    tls: {
+      ciphers: "SSLv3",
+      rejectUnauthorized: false,
+    },
+  });
 }
 
 /**
  * Get the FROM email address from environment
- * Defaults to a placeholder if not configured
+ * Defaults to SMTP_USER if not configured
  */
 function getFromEmail(): string {
-  return process.env.EMAIL_FROM || "noreply@example.com";
+  return process.env.EMAIL_FROM || process.env.SMTP_USER || "noreply@example.com";
 }
 
 // ========================================
@@ -64,7 +75,7 @@ function getFromEmail(): string {
 // ========================================
 
 /**
- * Send an email using Resend
+ * Send an email using Office 365 SMTP
  *
  * @param options - Email options (to, subject, html, text, replyTo)
  * @returns Promise<EmailResult> with success status and optional messageId/error
@@ -95,8 +106,8 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
   console.log(`[Email Service] Subject: ${subject}`);
 
   // Development mode fallback - log email instead of sending
-  const resend = getResendClient();
-  if (!resend) {
+  const transporter = createTransporter();
+  if (!transporter) {
     console.log("[Email Service] Development mode - email logged but not sent:");
     console.log("[Email Service] ----------------------------------------");
     console.log(`[Email Service] To: ${recipients.join(", ")}`);
@@ -111,29 +122,21 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
   }
 
   try {
-    const result = await resend.emails.send({
-      from: getFromEmail(),
-      to: recipients,
+    const fromEmail = getFromEmail();
+    const result = await transporter.sendMail({
+      from: fromEmail,
+      to: recipients.join(", "),
       subject,
       html,
       text: text || stripHtml(html),
       replyTo,
     });
 
-    if (result.error) {
-      const error = result.error as ResendError;
-      console.error(`[Email Service] Resend API error: ${error.message}`);
-      return {
-        success: false,
-        error: error.message || "Unknown Resend API error",
-      };
-    }
-
-    console.log(`[Email Service] Email sent successfully: ${result.data?.id}`);
+    console.log(`[Email Service] Email sent successfully: ${result.messageId}`);
 
     return {
       success: true,
-      messageId: result.data?.id,
+      messageId: result.messageId,
     };
   } catch (err: unknown) {
     const error = err as Error;

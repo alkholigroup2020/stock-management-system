@@ -13,27 +13,29 @@ This document captures research findings and decisions made during the planning 
 
 ### Decision
 
-Use **Resend** (resend.com) for transactional email delivery.
+Use **Office 365 SMTP** via Nodemailer for transactional email delivery.
 
 ### Rationale
 
-- Simple API with excellent TypeScript support
-- Free tier (100 emails/day) sufficient for MVP
-- Better deliverability than raw SMTP for transactional emails
-- Easy integration with Nuxt/Nitro server routes
+- Leverages existing Office 365 subscription
+- No additional third-party service required
+- Direct integration with corporate email infrastructure
+- Reliable deliverability through trusted Microsoft servers
 
 ### Alternatives Considered
 
-| Option            | Pros                                            | Cons                                   | Verdict     |
-| ----------------- | ----------------------------------------------- | -------------------------------------- | ----------- |
-| Resend            | Simple API, TypeScript SDK, good deliverability | Requires API key                       | ✅ Selected |
-| Nodemailer + SMTP | Standard, flexible                              | Complex setup, deliverability concerns | Rejected    |
-| SendGrid          | Enterprise-grade                                | Overkill for MVP, complex pricing      | Rejected    |
+| Option            | Pros                                            | Cons                                   | Verdict       |
+| ----------------- | ----------------------------------------------- | -------------------------------------- | ------------- |
+| Office 365 SMTP   | Uses existing O365, no extra cost, reliable     | Requires SMTP credentials              | ✅ Selected   |
+| Resend            | Simple API, TypeScript SDK, good deliverability | Requires domain verification, extra service | Previously used, replaced |
+| SendGrid          | Enterprise-grade                                | Overkill for MVP, complex pricing      | Rejected      |
 
 ### Implementation Notes
 
-- Environment variable: `RESEND_API_KEY`
-- Fallback: Log email to console in development
+- Environment variables: `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_HOST`, `SMTP_PORT`, `EMAIL_FROM`
+- SMTP Host: `smtp.office365.com` (default)
+- SMTP Port: `587` (STARTTLS)
+- Fallback: Log email to console in development (when credentials not configured)
 - Retry: No automatic retry; log failures, allow manual resend
 
 ---
@@ -272,19 +274,23 @@ export function use[Resource]() {
 
 ## 10. Dependencies & Integrations
 
-### New npm Package
+### New npm Packages
 
 ```json
 {
-  "resend": "^3.0.0"
+  "nodemailer": "^7.0.0"
 }
 ```
 
 ### New Environment Variables
 
 ```env
-RESEND_API_KEY=re_xxxxxxxxx
-EMAIL_FROM=noreply@amos-sa.com
+# Office 365 SMTP Configuration
+SMTP_USER=your-email@your-domain.com
+SMTP_PASSWORD=your-smtp-password
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+EMAIL_FROM=your-email@your-domain.com
 ```
 
 ### Database Migration

@@ -24,8 +24,8 @@
 
 **Purpose**: Project initialization, dependencies, and schema changes
 
-- [x] T001 Install Resend email package via `pnpm add resend`
-- [x] T002 Add environment variables (RESEND_API_KEY, EMAIL_FROM) to `.env.example`
+- [x] T001 Install Nodemailer email package via `pnpm add nodemailer @types/nodemailer`
+- [x] T002 Add environment variables (SMTP_USER, SMTP_PASSWORD, SMTP_HOST, SMTP_PORT, EMAIL_FROM) to `.env.example`
 - [x] T003 Update `prisma/schema.prisma` with new enums (PRFType, PRFCategory, PROCUREMENT_SPECIALIST role, CLOSED status)
 - [x] T004 Update `prisma/schema.prisma` with Supplier model changes (emails, phone, mobile, vat_reg_no, address)
 - [x] T005 [P] Update `prisma/schema.prisma` with PRF model new fields (prf_type, category, rejection_reason, total_value, etc.)
@@ -50,7 +50,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [x] T018 Create email service utility in `server/utils/email.ts` with Resend integration
+- [x] T018 Create email service utility in `server/utils/email.ts` with Office 365 SMTP integration via Nodemailer
 - [x] T019 [P] Add email service error handling and logging in `server/utils/email.ts`
 - [x] T020 Update `app/composables/usePermissions.ts` with PROCUREMENT_SPECIALIST role checks
 - [x] T021 [P] Add PRF permissions (canCreatePRF, canApprovePRF, canViewPRF) in `app/composables/usePermissions.ts`
