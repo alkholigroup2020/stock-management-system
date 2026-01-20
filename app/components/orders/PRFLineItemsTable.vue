@@ -64,7 +64,11 @@ const unitOptions: { label: string; value: Unit }[] = [
 
 // Computed
 const totalValue = computed(() => {
-  return props.lines.reduce((sum, line) => sum + (line.line_value || 0), 0);
+  return props.lines.reduce((sum, line) => {
+    const qty = parseFloat(line.required_qty) || 0;
+    const price = parseFloat(line.estimated_price) || 0;
+    return sum + qty * price;
+  }, 0);
 });
 
 /**
@@ -89,6 +93,15 @@ function updateLineCalculation(line: PRFLineInput) {
   const price = parseFloat(line.estimated_price) || 0;
   line.line_value = qty * price;
   emit("lineChange", line);
+}
+
+/**
+ * Get line value for display (computed from inputs)
+ */
+function getLineValue(line: PRFLineInput): number {
+  const qty = parseFloat(line.required_qty) || 0;
+  const price = parseFloat(line.estimated_price) || 0;
+  return qty * price;
 }
 
 /**
@@ -130,38 +143,33 @@ function removeLine(id: string) {
         <thead>
           <tr class="bg-[var(--ui-bg-elevated)]">
             <th
-              class="px-3 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider"
+              class="px-3 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider"
             >
               Item
             </th>
             <th
-              class="px-3 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24"
-            >
-              Cost Code
-            </th>
-            <th
-              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-20"
+              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-24"
             >
               Unit
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-28"
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-24"
             >
               Qty
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-32"
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-28"
             >
               Est. Price
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-32"
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-32"
             >
               Line Value
             </th>
             <th
               v-if="!readonly"
-              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-16"
+              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-16"
             >
               Action
             </th>
@@ -170,7 +178,7 @@ function removeLine(id: string) {
         <tbody class="divide-y divide-[var(--ui-border)]">
           <!-- Loading State -->
           <tr v-if="loading">
-            <td :colspan="readonly ? 6 : 7" class="px-4 py-8">
+            <td :colspan="readonly ? 5 : 6" class="px-4 py-8">
               <div class="flex flex-col items-center justify-center gap-3">
                 <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
                 <p class="text-sm text-[var(--ui-text-muted)]">Loading...</p>
@@ -190,16 +198,16 @@ function removeLine(id: string) {
               <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
                 {{ line.item_description }}
               </div>
-              <div v-else class="space-y-2">
+              <div v-else class="flex items-center gap-2">
                 <USelectMenu
                   :model-value="line.item_id ?? undefined"
                   :items="items"
                   label-key="name"
                   value-key="id"
-                  placeholder="Select item (optional)"
+                  placeholder="Select item"
                   searchable
                   clearable
-                  class="min-w-[200px]"
+                  class="w-48 flex-shrink-0"
                   :disabled="disabled"
                   @update:model-value="
                     (val: string | undefined) => {
@@ -220,25 +228,10 @@ function removeLine(id: string) {
                   placeholder="Item description *"
                   size="sm"
                   :disabled="disabled"
-                  class="w-full"
+                  class="flex-1 min-w-[200px]"
                   @blur="updateLineCalculation(line)"
                 />
               </div>
-            </td>
-
-            <!-- Cost Code -->
-            <td class="px-3 py-3">
-              <div v-if="readonly" class="text-sm text-[var(--ui-text-muted)]">
-                {{ line.cost_code || "-" }}
-              </div>
-              <UInput
-                v-else
-                v-model="line.cost_code"
-                placeholder="Code"
-                size="sm"
-                :disabled="disabled"
-                class="w-24"
-              />
             </td>
 
             <!-- Unit -->
@@ -253,7 +246,7 @@ function removeLine(id: string) {
                 label-key="label"
                 value-key="value"
                 :disabled="disabled"
-                class="w-20"
+                class="w-24"
               />
             </td>
 
@@ -264,15 +257,20 @@ function removeLine(id: string) {
               </div>
               <UInput
                 v-else
-                v-model="line.required_qty"
+                :model-value="line.required_qty"
                 type="number"
                 step="0.0001"
                 min="0"
                 placeholder="0"
                 size="sm"
                 :disabled="disabled"
-                class="w-28 text-right"
-                @input="updateLineCalculation(line)"
+                class="w-24 text-right"
+                @update:model-value="
+                  (val: string | number) => {
+                    line.required_qty = String(val);
+                    updateLineCalculation(line);
+                  }
+                "
               />
             </td>
 
@@ -283,22 +281,27 @@ function removeLine(id: string) {
               </div>
               <UInput
                 v-else
-                v-model="line.estimated_price"
+                :model-value="line.estimated_price"
                 type="number"
                 step="0.01"
                 min="0"
                 placeholder="0.00"
                 size="sm"
                 :disabled="disabled"
-                class="w-32 text-right"
-                @input="updateLineCalculation(line)"
+                class="w-28 text-right"
+                @update:model-value="
+                  (val: string | number) => {
+                    line.estimated_price = String(val);
+                    updateLineCalculation(line);
+                  }
+                "
               />
             </td>
 
             <!-- Line Value -->
             <td class="px-3 py-3 text-right">
               <span class="text-sm font-medium text-[var(--ui-text)]">
-                {{ formatCurrency(line.line_value || 0) }}
+                {{ formatCurrency(getLineValue(line)) }}
               </span>
             </td>
 
@@ -321,7 +324,7 @@ function removeLine(id: string) {
           <!-- Empty State -->
           <tr v-if="!loading && lines.length === 0">
             <td
-              :colspan="readonly ? 6 : 7"
+              :colspan="readonly ? 5 : 6"
               class="px-4 py-8 text-center text-[var(--ui-text-muted)]"
             >
               No items added yet.
@@ -340,7 +343,7 @@ function removeLine(id: string) {
         <!-- Summary Footer -->
         <tfoot class="bg-[var(--ui-bg-muted)]">
           <tr>
-            <td :colspan="readonly ? 4 : 5" class="px-3 py-3 text-right">
+            <td :colspan="readonly ? 3 : 4" class="px-3 py-3 text-right">
               <span class="text-sm font-medium text-[var(--ui-text-muted)]">
                 {{ lines.length }} item(s) - Total:
               </span>
