@@ -25,7 +25,7 @@ const router = useRouter();
 const route = useRoute();
 const locationStore = useLocationStore();
 const { canCreatePRF, canCreatePO, canViewPRFs, canViewPOs } = usePermissions();
-const { isProcurementSpecialist, user } = useAuth();
+const { isProcurementSpecialist, user, locations } = useAuth();
 const { handleError } = useErrorHandler();
 
 // State
@@ -101,6 +101,19 @@ watch(
 
 // Computed
 const activeLocation = computed(() => locationStore.activeLocation);
+
+// Check if PROCUREMENT_SPECIALIST has location assignments
+const hasLocationAssignments = computed(() => {
+  // Only relevant for PROCUREMENT_SPECIALIST
+  if (!isProcurementSpecialist.value) return true;
+  // Check if locations array has any items
+  return locations.value && locations.value.length > 0;
+});
+
+// Can create PO (permission + location check for procurement specialists)
+const canCreatePOWithLocation = computed(() => {
+  return canCreatePO() && hasLocationAssignments.value;
+});
 
 // Tab items configuration
 const tabItems = computed(() => {
@@ -305,17 +318,28 @@ function handleStockItemSelect(item: StockItem) {
         </UButton>
 
         <!-- New PO Button -->
-        <UButton
+        <UTooltip
           v-if="canCreatePO() && activeTab === 'pos'"
-          color="primary"
-          icon="i-lucide-plus"
-          size="lg"
-          class="cursor-pointer rounded-full px-3 sm:px-6"
-          @click="goToNewPO"
+          :text="
+            !hasLocationAssignments
+              ? 'You need at least one location assignment to create POs'
+              : ''
+          "
+          :disabled="hasLocationAssignments"
         >
-          <span class="hidden sm:inline">New PO</span>
-          <span class="sm:hidden">New</span>
-        </UButton>
+          <UButton
+            color="primary"
+            icon="i-lucide-plus"
+            size="lg"
+            class="rounded-full px-3 sm:px-6"
+            :class="{ 'cursor-pointer': hasLocationAssignments, 'cursor-not-allowed': !hasLocationAssignments }"
+            :disabled="!hasLocationAssignments"
+            @click="goToNewPO"
+          >
+            <span class="hidden sm:inline">New PO</span>
+            <span class="sm:hidden">New</span>
+          </UButton>
+        </UTooltip>
       </div>
     </div>
 
@@ -603,15 +627,25 @@ function handleStockItemSelect(item: StockItem) {
                 : "No purchase orders have been created yet."
             }}
           </p>
-          <UButton
+          <UTooltip
             v-if="canCreatePO()"
-            color="primary"
-            icon="i-lucide-plus"
-            class="cursor-pointer"
-            @click="goToNewPO"
+            :text="
+              !hasLocationAssignments
+                ? 'You need at least one location assignment to create POs'
+                : ''
+            "
+            :disabled="hasLocationAssignments"
           >
-            Create New PO
-          </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-plus"
+              :class="{ 'cursor-pointer': hasLocationAssignments, 'cursor-not-allowed': !hasLocationAssignments }"
+              :disabled="!hasLocationAssignments"
+              @click="goToNewPO"
+            >
+              Create New PO
+            </UButton>
+          </UTooltip>
         </div>
 
         <!-- POs Table -->

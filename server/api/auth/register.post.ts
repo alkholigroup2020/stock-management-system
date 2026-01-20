@@ -164,9 +164,12 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Auto-create UserLocation for Operators if default location is assigned
+      // Auto-create UserLocation for Operators and Procurement Specialists if default location is assigned
       // Supervisors and Admins have implicit access to all locations
-      if (validatedData.default_location_id && validatedData.role === "OPERATOR") {
+      if (
+        validatedData.default_location_id &&
+        (validatedData.role === "OPERATOR" || validatedData.role === "PROCUREMENT_SPECIALIST")
+      ) {
         await tx.userLocation.create({
           data: {
             user_id: createdUser.id,

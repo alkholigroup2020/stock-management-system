@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // PROCUREMENT_SPECIALIST can only see APPROVED or CLOSED PRFs
+    // PROCUREMENT_SPECIALIST can only see APPROVED or CLOSED PRFs from their assigned locations
     if (user.role === "PROCUREMENT_SPECIALIST") {
       if (prf.status !== "APPROVED" && prf.status !== "CLOSED") {
         throw createError({
@@ -95,6 +95,25 @@ export default defineEventHandler(async (event) => {
           data: {
             code: "ACCESS_DENIED",
             message: "You can only view approved or closed PRFs",
+          },
+        });
+      }
+
+      // Check location access
+      const hasLocationAccess = await prisma.userLocation.findFirst({
+        where: {
+          user_id: user.id,
+          location_id: prf.location_id,
+        },
+      });
+
+      if (!hasLocationAccess) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+          data: {
+            code: "LOCATION_ACCESS_DENIED",
+            message: "You do not have access to this location",
           },
         });
       }

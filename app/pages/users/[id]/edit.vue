@@ -825,8 +825,8 @@ useHead({
               <UIcon name="i-lucide-shopping-cart" class="w-4 h-4 text-warning" />
               <p class="text-sm text-[var(--ui-text-muted)]">
                 <strong>Procurement Specialists</strong>
-                have limited system access. Location assignment is optional but recommended for
-                viewing PO-linked deliveries.
+                have limited system access. Location assignment is required to view PO-linked
+                deliveries and access location data.
               </p>
             </div>
           </div>
@@ -887,8 +887,7 @@ useHead({
                 This operator cannot access any locations. Add at least one location below.
               </template>
               <template v-else>
-                No locations assigned yet. You can optionally add locations to allow viewing
-                PO-linked deliveries.
+                No locations assigned yet. Add at least one location for this user to access data.
               </template>
             </p>
           </div>

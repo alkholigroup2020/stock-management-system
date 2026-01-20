@@ -82,8 +82,20 @@ export default defineEventHandler(async (event) => {
 
     // Role-based filtering
     if (user.role === "PROCUREMENT_SPECIALIST") {
-      // Procurement specialists can only see APPROVED or CLOSED PRFs
-      where.status = { in: ["APPROVED", "CLOSED"] };
+      // Procurement specialists can only see APPROVED or CLOSED PRFs from their assigned locations
+      const userLocations = await prisma.userLocation.findMany({
+        where: { user_id: user.id },
+        select: { location_id: true },
+      });
+      const locationIds = userLocations.map((ul) => ul.location_id);
+
+      // If no locations assigned, return empty results
+      if (locationIds.length === 0) {
+        where.id = "no-results"; // This will return no results
+      } else {
+        where.status = { in: ["APPROVED", "CLOSED"] };
+        where.location_id = { in: locationIds };
+      }
     } else if (user.role === "OPERATOR") {
       // Operators can see their own PRFs + PRFs from their locations
       const userLocations = await prisma.userLocation.findMany({

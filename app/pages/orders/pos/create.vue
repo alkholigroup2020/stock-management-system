@@ -21,6 +21,7 @@ useSeoMeta({
 const router = useRouter();
 const route = useRoute();
 const { canCreatePO } = usePermissions();
+const { isProcurementSpecialist, locations: userLocations } = useAuth();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess } = useErrorHandler();
 const { create } = usePOActions();
@@ -333,6 +334,15 @@ onMounted(async () => {
   if (!canCreatePO()) {
     handleError({
       data: { message: "You do not have permission to create POs" },
+    });
+    router.push("/orders?tab=pos");
+    return;
+  }
+
+  // Check location assignments for PROCUREMENT_SPECIALIST
+  if (isProcurementSpecialist.value && (!userLocations.value || userLocations.value.length === 0)) {
+    handleError({
+      data: { message: "You need at least one location assignment to create POs" },
     });
     router.push("/orders?tab=pos");
     return;

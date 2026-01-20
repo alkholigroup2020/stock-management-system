@@ -68,6 +68,26 @@ export default defineEventHandler(async (event) => {
     // Build where clause
     const where: Prisma.POWhereInput = {};
 
+    // Role-based filtering for PROCUREMENT_SPECIALIST
+    if (user.role === "PROCUREMENT_SPECIALIST") {
+      // Get user's assigned locations
+      const userLocations = await prisma.userLocation.findMany({
+        where: { user_id: user.id },
+        select: { location_id: true },
+      });
+      const locationIds = userLocations.map((ul) => ul.location_id);
+
+      // If no locations assigned, return empty results
+      if (locationIds.length === 0) {
+        where.id = "no-results"; // This will return no results
+      } else {
+        // Filter POs by PRF location (POs are linked to PRFs which have locations)
+        where.prf = {
+          location_id: { in: locationIds },
+        };
+      }
+    }
+
     // Apply optional filters
     if (status) {
       where.status = status;

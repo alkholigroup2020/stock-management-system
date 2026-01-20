@@ -107,6 +107,27 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // PROCUREMENT_SPECIALIST can only see POs from their assigned locations
+    if (user.role === "PROCUREMENT_SPECIALIST" && po.prf) {
+      const hasLocationAccess = await prisma.userLocation.findFirst({
+        where: {
+          user_id: user.id,
+          location_id: po.prf.location.id,
+        },
+      });
+
+      if (!hasLocationAccess) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+          data: {
+            code: "LOCATION_ACCESS_DENIED",
+            message: "You do not have access to this location",
+          },
+        });
+      }
+    }
+
     // Set cache headers (2 seconds)
     setCacheHeaders(event, {
       maxAge: 2,

@@ -264,7 +264,7 @@ useHead({
             title="No location access"
             :description="
               user.role === 'PROCUREMENT_SPECIALIST'
-                ? 'No locations assigned yet. Location assignment is optional for viewing PO-linked deliveries.'
+                ? 'No locations assigned yet. Location assignment is required for this user to access data.'
                 : 'This user has not been assigned to any locations yet.'
             "
           />
@@ -274,7 +274,7 @@ useHead({
             <p class="text-caption text-[var(--ui-text-muted)] mb-4">
               {{
                 user.role === "PROCUREMENT_SPECIALIST"
-                  ? "Procurement Specialists can view PO-linked deliveries at their assigned locations."
+                  ? "Procurement Specialists can only view PO-linked deliveries and access data at their assigned locations."
                   : "Operators can only access and post transactions at their assigned locations."
               }}
             </p>

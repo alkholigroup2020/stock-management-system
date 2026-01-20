@@ -407,7 +407,7 @@ useHead({
               </div>
             </div>
 
-            <!-- PROCUREMENT_SPECIALIST: Limited access, can view deliveries -->
+            <!-- PROCUREMENT_SPECIALIST: Limited access, requires location for data access -->
             <div
               v-else-if="isProcurementSpecialistRole"
               class="p-4 rounded-lg bg-warning/10 border border-warning"
@@ -418,13 +418,14 @@ useHead({
                   class="w-5 h-5 text-warning flex-shrink-0 mt-0.5"
                 />
                 <div>
-                  <p class="font-semibold text-warning mb-1">Limited Access Role</p>
+                  <p class="font-semibold text-warning mb-1">Location Assignment Required</p>
                   <p class="text-sm text-[var(--ui-text-muted)]">
                     <strong>Procurement Specialists</strong>
                     have limited access to the system. They can manage Purchase Orders (POs), view
-                    approved PRFs, and view PO-linked deliveries. They cannot access Issues,
-                    Transfers, Reconciliations, or Master Data. Location assignment is optional but
-                    recommended for delivery viewing.
+                    approved PRFs, and view PO-linked deliveries at their assigned locations. They
+                    cannot access Issues, Transfers, Reconciliations, or Master Data. You can create
+                    this user without a location, but they will need at least one location assigned
+                    to access data.
                   </p>
                 </div>
               </div>
