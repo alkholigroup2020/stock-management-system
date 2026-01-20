@@ -11,6 +11,8 @@
  * - GET /api/locations/[id]/deliveries/* (view deliveries)
  * - GET /api/suppliers/* (view suppliers for PO dropdown)
  * - GET /api/items/* (view items for PO line items)
+ * - GET /api/periods/current (view current period for UI)
+ * - GET /api/reports/deliveries (view deliveries list)
  *
  * PROCUREMENT_SPECIALIST cannot access:
  * - POST/PATCH/DELETE /api/prfs/* (create/edit/delete PRFs)
@@ -21,8 +23,8 @@
  * - /api/pob/* (POB)
  * - /api/ncrs/* (NCR)
  * - /api/stock/* (Stock Now)
- * - /api/reports/* (Reports)
- * - /api/periods/* (Periods)
+ * - /api/reports/* (except /api/reports/deliveries)
+ * - /api/periods/* (except /api/periods/current)
  * - /api/period-locations/* (Period Close)
  * - POST/PATCH/DELETE /api/locations/* (Location management)
  * - POST/PATCH/DELETE /api/suppliers/* (Supplier management)
@@ -48,10 +50,20 @@ const BLOCKED_ROUTES = [
   "/api/pob",
   "/api/ncrs",
   "/api/stock",
-  "/api/reports",
-  "/api/periods",
   "/api/period-locations",
   "/api/users",
+];
+
+// Specific period routes that ARE allowed for PROCUREMENT_SPECIALIST (read-only)
+// These are exceptions to the general /api/periods/* restrictions
+const ALLOWED_PERIOD_ROUTES = [
+  "/api/periods/current", // PROCUREMENT_SPECIALIST needs to see current period for UI
+];
+
+// Specific report routes that ARE allowed for PROCUREMENT_SPECIALIST (read-only)
+// These are exceptions to the general /api/reports/* restrictions
+const ALLOWED_REPORT_ROUTES = [
+  "/api/reports/deliveries", // PROCUREMENT_SPECIALIST needs to view deliveries list
 ];
 
 // Routes with method restrictions for PROCUREMENT_SPECIALIST
@@ -61,6 +73,8 @@ const METHOD_RESTRICTED_ROUTES: Record<string, string[]> = {
   "/api/locations": ["GET"], // Can view locations only
   "/api/suppliers": ["GET"], // Can view suppliers only (for PO dropdown)
   "/api/items": ["GET"], // Can view items only (for PO line items)
+  "/api/periods": ["GET"], // Can view current period only (via ALLOWED_PERIOD_ROUTES check)
+  "/api/reports": ["GET"], // Can view deliveries report only (via ALLOWED_REPORT_ROUTES check)
 };
 
 // Special patterns that need regex matching
@@ -87,11 +101,67 @@ function matchesBlockedPattern(path: string): boolean {
 }
 
 /**
+ * Check if the path is an explicitly allowed period route (read-only)
+ */
+function isAllowedPeriodRoute(path: string, method: string): boolean {
+  // Only GET requests are allowed
+  if (method.toUpperCase() !== "GET") {
+    return false;
+  }
+  // Check if the path exactly matches or starts with an allowed period route
+  return ALLOWED_PERIOD_ROUTES.some((route) => path === route || path.startsWith(route + "?"));
+}
+
+/**
+ * Check if this is a restricted period route (not in allowed list)
+ */
+function isRestrictedPeriodRoute(path: string, method: string): boolean {
+  // If the path starts with /api/periods
+  if (path.startsWith("/api/periods")) {
+    // Block if it's NOT an allowed period route
+    return !isAllowedPeriodRoute(path, method);
+  }
+  return false;
+}
+
+/**
+ * Check if the path is an explicitly allowed report route (read-only)
+ */
+function isAllowedReportRoute(path: string, method: string): boolean {
+  // Only GET requests are allowed
+  if (method.toUpperCase() !== "GET") {
+    return false;
+  }
+  // Check if the path exactly matches or starts with an allowed report route
+  return ALLOWED_REPORT_ROUTES.some((route) => path === route || path.startsWith(route + "?"));
+}
+
+/**
+ * Check if this is a restricted report route (not in allowed list)
+ */
+function isRestrictedReportRoute(path: string, method: string): boolean {
+  // If the path starts with /api/reports
+  if (path.startsWith("/api/reports")) {
+    // Block if it's NOT an allowed report route
+    return !isAllowedReportRoute(path, method);
+  }
+  return false;
+}
+
+/**
  * Check if the method is restricted for the given path
  */
 function isMethodRestricted(path: string, method: string): boolean {
   for (const [routePrefix, allowedMethods] of Object.entries(METHOD_RESTRICTED_ROUTES)) {
     if (path.startsWith(routePrefix)) {
+      // Special handling for /api/periods - need to check allowed routes list
+      if (routePrefix === "/api/periods") {
+        return isRestrictedPeriodRoute(path, method);
+      }
+      // Special handling for /api/reports - need to check allowed routes list
+      if (routePrefix === "/api/reports") {
+        return isRestrictedReportRoute(path, method);
+      }
       return !allowedMethods.includes(method.toUpperCase());
     }
   }

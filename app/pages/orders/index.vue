@@ -321,9 +321,7 @@ function handleStockItemSelect(item: StockItem) {
         <UTooltip
           v-if="canCreatePO() && activeTab === 'pos'"
           :text="
-            !hasLocationAssignments
-              ? 'You need at least one location assignment to create POs'
-              : ''
+            !hasLocationAssignments ? 'You need at least one location assignment to create POs' : ''
           "
           :disabled="hasLocationAssignments"
         >
@@ -332,7 +330,10 @@ function handleStockItemSelect(item: StockItem) {
             icon="i-lucide-plus"
             size="lg"
             class="rounded-full px-3 sm:px-6"
-            :class="{ 'cursor-pointer': hasLocationAssignments, 'cursor-not-allowed': !hasLocationAssignments }"
+            :class="{
+              'cursor-pointer': hasLocationAssignments,
+              'cursor-not-allowed': !hasLocationAssignments,
+            }"
             :disabled="!hasLocationAssignments"
             @click="goToNewPO"
           >
@@ -639,7 +640,10 @@ function handleStockItemSelect(item: StockItem) {
             <UButton
               color="primary"
               icon="i-lucide-plus"
-              :class="{ 'cursor-pointer': hasLocationAssignments, 'cursor-not-allowed': !hasLocationAssignments }"
+              :class="{
+                'cursor-pointer': hasLocationAssignments,
+                'cursor-not-allowed': !hasLocationAssignments,
+              }"
               :disabled="!hasLocationAssignments"
               @click="goToNewPO"
             >
