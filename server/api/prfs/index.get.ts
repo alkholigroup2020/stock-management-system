@@ -43,7 +43,7 @@ const querySchema = z.object({
   location_id: z.string().uuid().optional(),
   period_id: z.string().uuid().optional(),
   prf_type: z.enum(["URGENT", "DPA", "NORMAL"]).optional(),
-  category: z.enum(["MATERIAL", "CONSUMABLES", "SPARE_PARTS", "ASSET", "SERVICES"]).optional(),
+  category: z.enum(["FOOD", "CLEANING", "OTHER"]).optional(),
   requested_by: z.string().uuid().optional(),
   search: z.string().optional(),
 });

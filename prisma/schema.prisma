@@ -213,7 +213,7 @@ model PRF {
   location_id            String      @db.Uuid
   project_name           String?     @db.VarChar(200)
   prf_type               PRFType     @default(NORMAL)
-  category               PRFCategory @default(MATERIAL)
+  category               PRFCategory @default(FOOD)
   expected_delivery_date DateTime?   @db.Date
   is_reimbursable        Boolean     @default(false)
   status                 PRFStatus   @default(DRAFT)
@@ -629,11 +629,9 @@ enum PRFType {
 }
 
 enum PRFCategory {
-  MATERIAL
-  CONSUMABLES
-  SPARE_PARTS
-  ASSET
-  SERVICES
+  FOOD
+  CLEANING
+  OTHER
 }
 
 enum PRFStatus {

@@ -51,9 +51,8 @@ const formData = ref<PRFFormData>({
   period_id: "",
   project_name: "",
   prf_type: "NORMAL" as PRFType,
-  category: "MATERIAL" as PRFCategory,
+  category: "FOOD" as PRFCategory,
   expected_delivery_date: "",
-  is_reimbursable: false,
   contact_person_name: "",
   contact_person_phone: "",
   receiver_name: "",
@@ -155,7 +154,6 @@ function initializeFormData() {
     prf_type: prf.value.prf_type,
     category: prf.value.category,
     expected_delivery_date: prf.value.expected_delivery_date || "",
-    is_reimbursable: prf.value.is_reimbursable,
     contact_person_name: prf.value.contact_person_name || "",
     contact_person_phone: prf.value.contact_person_phone || "",
     receiver_name: prf.value.receiver_name || "",
@@ -219,7 +217,6 @@ async function saveChanges() {
           prf_type: formData.value.prf_type,
           category: formData.value.category,
           expected_delivery_date: formData.value.expected_delivery_date || undefined,
-          is_reimbursable: formData.value.is_reimbursable,
           contact_person_name: formData.value.contact_person_name || undefined,
           contact_person_phone: formData.value.contact_person_phone || undefined,
           receiver_name: formData.value.receiver_name || undefined,
@@ -635,14 +632,6 @@ onMounted(async () => {
             <div v-if="prf.project_name">
               <label class="text-xs text-[var(--ui-text-muted)] uppercase">Project</label>
               <p class="text-sm font-medium text-[var(--ui-text)]">{{ prf.project_name }}</p>
-            </div>
-
-            <!-- Reimbursable -->
-            <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Reimbursable</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">
-                {{ prf.is_reimbursable ? "Yes" : "No" }}
-              </p>
             </div>
 
             <!-- Requester -->

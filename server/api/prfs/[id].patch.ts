@@ -55,7 +55,7 @@ const prfLineSchema = z.object({
 const bodySchema = z.object({
   project_name: z.string().max(200).nullable().optional(),
   prf_type: z.enum(["URGENT", "DPA", "NORMAL"]).optional(),
-  category: z.enum(["MATERIAL", "CONSUMABLES", "SPARE_PARTS", "ASSET", "SERVICES"]).optional(),
+  category: z.enum(["FOOD", "CLEANING", "OTHER"]).optional(),
   expected_delivery_date: z.string().nullable().optional(),
   is_reimbursable: z.boolean().optional(),
   contact_person_name: z.string().max(100).nullable().optional(),

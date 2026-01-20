@@ -251,8 +251,8 @@ function removeLine(id: string) {
             </td>
 
             <!-- Quantity -->
-            <td class="px-3 py-3">
-              <div v-if="readonly" class="text-sm text-right text-[var(--ui-text)]">
+            <td class="px-3 py-3 text-right">
+              <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
                 {{ line.required_qty }}
               </div>
               <UInput
@@ -275,8 +275,8 @@ function removeLine(id: string) {
             </td>
 
             <!-- Estimated Price -->
-            <td class="px-3 py-3">
-              <div v-if="readonly" class="text-sm text-right text-[var(--ui-text)]">
+            <td class="px-3 py-3 text-right">
+              <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
                 {{ formatCurrency(parseFloat(line.estimated_price) || 0) }}
               </div>
               <UInput

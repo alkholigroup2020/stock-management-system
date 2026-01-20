@@ -24,11 +24,11 @@ Use **Office 365 SMTP** via Nodemailer for transactional email delivery.
 
 ### Alternatives Considered
 
-| Option            | Pros                                            | Cons                                   | Verdict       |
-| ----------------- | ----------------------------------------------- | -------------------------------------- | ------------- |
-| Office 365 SMTP   | Uses existing O365, no extra cost, reliable     | Requires SMTP credentials              | ✅ Selected   |
-| Resend            | Simple API, TypeScript SDK, good deliverability | Requires domain verification, extra service | Previously used, replaced |
-| SendGrid          | Enterprise-grade                                | Overkill for MVP, complex pricing      | Rejected      |
+| Option          | Pros                                            | Cons                                        | Verdict                   |
+| --------------- | ----------------------------------------------- | ------------------------------------------- | ------------------------- |
+| Office 365 SMTP | Uses existing O365, no extra cost, reliable     | Requires SMTP credentials                   | ✅ Selected               |
+| Resend          | Simple API, TypeScript SDK, good deliverability | Requires domain verification, extra service | Previously used, replaced |
+| SendGrid        | Enterprise-grade                                | Overkill for MVP, complex pricing           | Rejected                  |
 
 ### Implementation Notes
 

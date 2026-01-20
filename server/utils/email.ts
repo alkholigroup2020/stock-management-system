@@ -43,7 +43,9 @@ function createTransporter(): Transporter | null {
   const smtpPort = parseInt(process.env.SMTP_PORT || "587", 10);
 
   if (!smtpUser || !smtpPassword) {
-    console.warn("[Email Service] SMTP_USER or SMTP_PASSWORD not configured - emails will be logged only");
+    console.warn(
+      "[Email Service] SMTP_USER or SMTP_PASSWORD not configured - emails will be logged only"
+    );
     return null;
   }
 

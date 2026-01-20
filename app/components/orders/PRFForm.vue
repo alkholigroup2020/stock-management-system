@@ -28,7 +28,6 @@ export interface PRFFormData {
   prf_type: PRFType;
   category: PRFCategory;
   expected_delivery_date: string;
-  is_reimbursable: boolean;
   contact_person_name: string;
   contact_person_phone: string;
   receiver_name: string;
@@ -89,11 +88,9 @@ const prfTypeOptions: { label: string; value: PRFType; description: string }[] =
 
 // Category options
 const categoryOptions: { label: string; value: PRFCategory }[] = [
-  { label: "Material", value: "MATERIAL" },
-  { label: "Consumables", value: "CONSUMABLES" },
-  { label: "Spare Parts", value: "SPARE_PARTS" },
-  { label: "Asset", value: "ASSET" },
-  { label: "Services", value: "SERVICES" },
+  { label: "Food", value: "FOOD" },
+  { label: "Cleaning", value: "CLEANING" },
+  { label: "Other", value: "OTHER" },
 ];
 
 // Helper function to get location-specific icon
@@ -258,16 +255,6 @@ const selectedLocation = computed(() => {
             icon="i-lucide-calendar"
             class="w-full"
           />
-        </div>
-
-        <!-- Is Reimbursable -->
-        <div class="flex items-center gap-3 pt-8">
-          <UCheckbox
-            v-model="formData.is_reimbursable"
-            :disabled="disabled || readonly"
-            label="Reimbursable"
-          />
-          <span class="text-xs text-[var(--ui-text-muted)]">(Cost will be charged back)</span>
         </div>
       </div>
 

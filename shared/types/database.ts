@@ -23,7 +23,7 @@ export type PeriodLocationStatus = "OPEN" | "READY" | "CLOSED";
 
 export type PRFType = "URGENT" | "DPA" | "NORMAL";
 
-export type PRFCategory = "MATERIAL" | "CONSUMABLES" | "SPARE_PARTS" | "ASSET" | "SERVICES";
+export type PRFCategory = "FOOD" | "CLEANING" | "OTHER";
 
 export type PRFStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED" | "CLOSED";
 
