@@ -343,6 +343,33 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 ---
 
+## Phase 12: Post-Implementation Bug Fixes
+
+**Purpose**: Bug fixes discovered after initial implementation
+
+### BF001 - PRF Selection Not Working in PO Creation Form (2026-01-21)
+
+**Issue**: When a procurement specialist user logs in to create a PO, they cannot select an approved PRF from the dropdown. The dropdown shows errors and no items appear.
+
+**Root Cause**:
+
+1. **API Missing Data**: The `/api/prfs` endpoint was not returning `purchase_orders` data needed by the frontend to filter PRFs that already have POs.
+2. **Invalid Empty String Value**: The `POForm.vue` component was adding a "None (Manual PO)" option with `id: ''` (empty string) to the dropdown. Nuxt UI's `USelectMenu` component doesn't allow empty string values for items, causing the error: `A <ComboboxItem /> must have a value prop that is not an empty string.`
+
+**Fixes Applied**:
+
+- [x] BF001a Update `server/api/prfs/index.get.ts` to include `purchase_orders` in Prisma include and response mapping
+- [x] BF001b Update `app/components/orders/POForm.vue` to remove "None (Manual PO)" option with empty `id` (the `clearable` prop already provides this functionality)
+
+**Files Changed**:
+
+- `server/api/prfs/index.get.ts` - Added `purchase_orders: { select: { id: true } }` to include and response
+- `app/components/orders/POForm.vue` - Removed empty id item from prfOptions array
+
+**Verification**: Tested as procurement specialist user - PRF dropdown now correctly shows approved PRFs without POs, and selecting a PRF pre-populates the form correctly.
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

@@ -167,6 +167,12 @@ export default defineEventHandler(async (event) => {
               name: true,
             },
           },
+          // Include purchase_orders to allow filtering PRFs that already have POs
+          purchase_orders: {
+            select: {
+              id: true,
+            },
+          },
         },
         orderBy: [{ created_at: "desc" }],
         skip,
@@ -198,6 +204,7 @@ export default defineEventHandler(async (event) => {
           : null,
         requester: prf.requester,
         location: prf.location,
+        purchase_orders: prf.purchase_orders,
         created_at: prf.created_at.toISOString(),
       })),
       pagination: {

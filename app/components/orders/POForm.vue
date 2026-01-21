@@ -203,10 +203,7 @@ function handleLineChange() {
           <label class="form-label mb-2 block">Source PRF</label>
           <USelectMenu
             :model-value="formData.prf_id ?? undefined"
-            :items="[
-              { id: '', prf_no: 'None (Manual PO)', requester: '', total_value: '', location: '' },
-              ...prfOptions,
-            ]"
+            :items="prfOptions"
             label-key="prf_no"
             value-key="id"
             placeholder="Select source PRF (optional)"
@@ -226,13 +223,12 @@ function handleLineChange() {
               <UIcon name="i-lucide-file-text" class="w-5 h-5" />
             </template>
             <template #item="{ item }">
-              <div v-if="item.id" class="flex flex-col">
+              <div class="flex flex-col">
                 <span class="font-medium">{{ item.prf_no }}</span>
                 <span class="text-xs text-[var(--ui-text-muted)]">
                   {{ item.requester }} • {{ item.location }} • {{ item.total_value }}
                 </span>
               </div>
-              <div v-else class="text-[var(--ui-text-muted)]">None (Manual PO)</div>
             </template>
           </USelectMenu>
         </div>

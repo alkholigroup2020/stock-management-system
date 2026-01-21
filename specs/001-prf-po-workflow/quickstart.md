@@ -261,3 +261,12 @@ pnpm test             # Run tests
 - All calculations use Decimal with 2-4 decimal places
 - Frontend should match backend calculation logic
 - Use the calculation formulas from `research.md`
+
+### PRF Dropdown Empty in PO Creation
+
+If the PRF dropdown shows no items or errors when creating a PO:
+
+1. Verify the `/api/prfs` endpoint returns `purchase_orders` array in the response
+2. Check that there are APPROVED PRFs without existing POs
+3. Ensure the user has PROCUREMENT_SPECIALIST role with location assignments
+4. Check browser console for `ComboboxItem` errors - this may indicate empty value keys in dropdown items

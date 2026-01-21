@@ -53,6 +53,7 @@ List PRFs with pagination and filters.
     expected_delivery_date: string | null;
     requester: { id: string; full_name: string };
     location: { id: string; code: string; name: string };
+    purchase_orders: Array<{ id: string }>; // For filtering PRFs that already have POs
     created_at: string;
   }>;
   pagination: {
@@ -63,6 +64,8 @@ List PRFs with pagination and filters.
   }
 }
 ```
+
+**Note**: The `purchase_orders` array is included to allow the frontend to filter out PRFs that already have associated POs when creating a new PO. This is used in the PO creation form's PRF dropdown.
 
 ---
 
