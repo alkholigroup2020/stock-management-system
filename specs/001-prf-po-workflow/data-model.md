@@ -42,11 +42,9 @@ Category of items being requested.
 
 ```prisma
 enum PRFCategory {
-  MATERIAL
-  CONSUMABLES
-  SPARE_PARTS
-  ASSET
-  SERVICES
+  FOOD
+  CLEANING
+  OTHER
 }
 ```
 
@@ -116,9 +114,8 @@ model PRF {
   location_id             String       @db.Uuid
   project_name            String?      @db.VarChar(200)         // NEW
   prf_type                PRFType      @default(NORMAL)         // NEW
-  category                PRFCategory  @default(MATERIAL)       // NEW
+  category                PRFCategory  @default(FOOD)           // NEW
   expected_delivery_date  DateTime?    @db.Date                 // NEW
-  is_reimbursable         Boolean      @default(false)          // NEW
   status                  PRFStatus    @default(DRAFT)
   requested_by            String       @db.Uuid
   approved_by             String?      @db.Uuid
@@ -155,9 +152,8 @@ model PRF {
 |-------|------|-------------|
 | project_name | String? | Associated project name |
 | prf_type | PRFType | URGENT, DPA, or NORMAL |
-| category | PRFCategory | Material type classification |
+| category | PRFCategory | Category classification (FOOD, CLEANING, OTHER) |
 | expected_delivery_date | DateTime? | Requested delivery date |
-| is_reimbursable | Boolean | Whether cost is reimbursable |
 | rejection_reason | String? | Mandatory reason when rejected |
 | total_value | Decimal | Sum of all line values |
 | contact_person_name | String? | Contact for delivery coordination |
@@ -468,7 +464,7 @@ Add to `shared/types/database.ts`:
 ```typescript
 // New Enums
 export type PRFType = "URGENT" | "DPA" | "NORMAL";
-export type PRFCategory = "MATERIAL" | "CONSUMABLES" | "SPARE_PARTS" | "ASSET" | "SERVICES";
+export type PRFCategory = "FOOD" | "CLEANING" | "OTHER";
 
 // Updated UserRole
 export type UserRole = "OPERATOR" | "SUPERVISOR" | "ADMIN" | "PROCUREMENT_SPECIALIST";
@@ -498,7 +494,6 @@ export interface PRF {
   prf_type: PRFType;
   category: PRFCategory;
   expected_delivery_date: Date | string | null;
-  is_reimbursable: boolean;
   status: PRFStatus;
   requested_by: string;
   approved_by: string | null;

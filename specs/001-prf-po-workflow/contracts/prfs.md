@@ -6,17 +6,19 @@
 
 ## Endpoints Overview
 
-| Method | Path                    | Description            | Roles                       |
-| ------ | ----------------------- | ---------------------- | --------------------------- |
-| GET    | `/api/prfs`             | List PRFs with filters | All authenticated           |
-| POST   | `/api/prfs`             | Create new PRF         | OPERATOR, SUPERVISOR, ADMIN |
-| GET    | `/api/prfs/:id`         | Get PRF details        | All authenticated           |
-| PATCH  | `/api/prfs/:id`         | Update draft PRF       | Requester only              |
-| DELETE | `/api/prfs/:id`         | Delete draft PRF       | Requester only              |
-| PATCH  | `/api/prfs/:id/submit`  | Submit for approval    | Requester only              |
-| PATCH  | `/api/prfs/:id/approve` | Approve PRF            | SUPERVISOR, ADMIN           |
-| PATCH  | `/api/prfs/:id/reject`  | Reject PRF             | SUPERVISOR, ADMIN           |
-| POST   | `/api/prfs/:id/clone`   | Clone rejected PRF     | Original requester          |
+| Method | Path                    | Description            | Roles                                        |
+| ------ | ----------------------- | ---------------------- | -------------------------------------------- |
+| GET    | `/api/prfs`             | List PRFs with filters | All authenticated (PROCUREMENT_SPECIALIST: approved only) |
+| POST   | `/api/prfs`             | Create new PRF         | OPERATOR, SUPERVISOR, ADMIN                  |
+| GET    | `/api/prfs/:id`         | Get PRF details        | All authenticated                            |
+| PATCH  | `/api/prfs/:id`         | Update draft PRF       | Requester only                               |
+| DELETE | `/api/prfs/:id`         | Delete draft PRF       | Requester only                               |
+| PATCH  | `/api/prfs/:id/submit`  | Submit for approval    | Requester only                               |
+| PATCH  | `/api/prfs/:id/approve` | Approve PRF            | SUPERVISOR, ADMIN                            |
+| PATCH  | `/api/prfs/:id/reject`  | Reject PRF             | SUPERVISOR, ADMIN                            |
+| POST   | `/api/prfs/:id/clone`   | Clone rejected PRF     | Original requester                           |
+
+**Note**: PROCUREMENT_SPECIALIST can only GET (view) PRFs. They cannot create, update, delete, submit, approve, reject, or clone PRFs. The list is filtered to show only APPROVED PRFs for PROCUREMENT_SPECIALIST users.
 
 ---
 
@@ -81,9 +83,8 @@ Create a new PRF in DRAFT status.
   period_id: string;             // Required
   project_name?: string;
   prf_type?: PRFType;            // Default: NORMAL
-  category?: PRFCategory;        // Default: MATERIAL
+  category?: PRFCategory;        // Default: FOOD
   expected_delivery_date?: string; // ISO date
-  is_reimbursable?: boolean;     // Default: false
   contact_person_name?: string;
   contact_person_phone?: string;
   receiver_name?: string;
@@ -92,7 +93,7 @@ Create a new PRF in DRAFT status.
   lines: Array<{
     item_id?: string;            // Optional - link to Item
     item_description: string;    // Required
-    cost_code?: string;
+    cost_code?: string;          // Optional - not displayed in UI but stored for future use
     unit: Unit;                  // Required
     required_qty: number;        // Required, > 0
     estimated_price: number;     // Required, >= 0
@@ -168,7 +169,6 @@ Update a draft PRF. Only the requester can update.
   prf_type?: PRFType;
   category?: PRFCategory;
   expected_delivery_date?: string;
-  is_reimbursable?: boolean;
   contact_person_name?: string;
   contact_person_phone?: string;
   receiver_name?: string;
@@ -178,7 +178,7 @@ Update a draft PRF. Only the requester can update.
     id?: string;                 // Include for update, omit for new
     item_id?: string;
     item_description: string;
-    cost_code?: string;
+    cost_code?: string;          // Optional - not displayed in UI but stored for future use
     unit: Unit;
     required_qty: number;
     estimated_price: number;

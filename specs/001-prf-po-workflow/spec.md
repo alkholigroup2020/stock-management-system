@@ -156,7 +156,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-001**: System MUST allow Operators, Supervisors, and Admins to create Purchase Requisition Forms (PRFs)
 - **FR-002**: System MUST auto-generate unique PRF numbers in a sequential format (e.g., PRF-001, PRF-002)
 - **FR-003**: System MUST support PRF types: URGENT, DPA (Direct Purchase Approval), and NORMAL
-- **FR-004**: System MUST support PRF categories: MATERIAL, CONSUMABLES, SPARE_PARTS, ASSET, and SERVICES
+- **FR-004**: System MUST support PRF categories: FOOD, CLEANING, and OTHER
 - **FR-005**: System MUST allow PRF line items to reference existing inventory items or use custom item descriptions
 - **FR-006**: System MUST calculate PRF line values as required_qty × estimated_price
 - **FR-007**: System MUST calculate PRF total value as sum of all line values

@@ -370,6 +370,82 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 ---
 
+### BF002 - PRF Line Items Table UI Issues (2026-01-21)
+
+**Issue**: Multiple UI issues in the "Items Required" section on the PRF creation page:
+
+1. Total calculation not updating when entering quantity or price
+2. Table headers in ALL CAPS (not consistent with design system)
+3. Cost Centre column not needed (simplify UI)
+4. Item selection dropdown and description field stacked vertically instead of horizontal
+
+**Root Cause**:
+
+1. **Total Calculation**: The `@input` event on UInput components was firing before v-model updated, causing stale values in calculations
+2. **Headers**: `uppercase` CSS class was applied to all table headers
+3. **Cost Centre**: Field was included but not needed for current business requirements
+4. **Layout**: Item cell used `space-y-2` (vertical stacking) instead of horizontal flex layout
+
+**Fixes Applied**:
+
+- [x] BF002a Fix total calculation by using `@update:model-value` event and computing line values dynamically with `getLineValue()` function
+- [x] BF002b Remove `uppercase` class from table headers (now sentence case: "Item", "Unit", "Qty", "Est. Price", "Line Value", "Action")
+- [x] BF002c Remove Cost Centre column entirely from the table (header, cell, and colspan adjustments)
+- [x] BF002d Change Item cell layout to horizontal flex (`flex items-center gap-2`) with item dropdown (`w-48`) and description input (`flex-1 min-w-[200px]`) on same line
+
+**Files Changed**:
+
+- `app/components/orders/PRFLineItemsTable.vue` - All UI fixes applied
+
+**Verification**: Tested on localhost:3000 - calculations work correctly (10 × 50 = SAR 500.00), headers in sentence case, no Cost Centre column, item dropdown and description on same row.
+
+---
+
+### BF003 - PROCUREMENT_SPECIALIST Cannot Access Current Period (2026-01-21)
+
+**Issue**: When a new user with the PROCUREMENT_SPECIALIST role logs in, they cannot see the current period in the UI header. The error shown is `Error fetching current period: FetchError: [GET] "/api/periods/current": 403 Forbidden`.
+
+**Root Cause**: The `server/middleware/role-access.ts` had `/api/periods` in the `BLOCKED_ROUTES` array, which blocked ALL period endpoints including `/api/periods/current` that the UI needs to display the current period.
+
+**Fixes Applied**:
+
+- [x] BF003a Remove `/api/periods` from `BLOCKED_ROUTES` array
+- [x] BF003b Add `ALLOWED_PERIOD_ROUTES` array with `/api/periods/current`
+- [x] BF003c Add `/api/periods` to `METHOD_RESTRICTED_ROUTES` with only `GET` allowed
+- [x] BF003d Add helper functions `isAllowedPeriodRoute()` and `isRestrictedPeriodRoute()` to handle the special case
+- [x] BF003e Update `isMethodRestricted()` function to use the new period route handling
+
+**Files Changed**:
+
+- `server/middleware/role-access.ts` - Added allowed period routes logic
+
+**Verification**: Tested as PROCUREMENT_SPECIALIST user - period now displays correctly as "January 2025 - Open" in the header.
+
+---
+
+### BF004 - PROCUREMENT_SPECIALIST Cannot Access Deliveries Page (2026-01-21)
+
+**Issue**: When a PROCUREMENT_SPECIALIST user navigates to the Deliveries page, they get an error: `Error fetching deliveries: FetchError: [GET] "/api/reports/deliveries": 403 Forbidden`.
+
+**Root Cause**: The `server/middleware/role-access.ts` had `/api/reports` in the `BLOCKED_ROUTES` array, which blocked all report endpoints including `/api/reports/deliveries` that the deliveries list page uses.
+
+**Fixes Applied**:
+
+- [x] BF004a Remove `/api/reports` from `BLOCKED_ROUTES` array
+- [x] BF004b Add `ALLOWED_REPORT_ROUTES` array with `/api/reports/deliveries`
+- [x] BF004c Add `/api/reports` to `METHOD_RESTRICTED_ROUTES` with only `GET` allowed
+- [x] BF004d Add helper functions `isAllowedReportRoute()` and `isRestrictedReportRoute()`
+- [x] BF004e Update `isMethodRestricted()` function to use the new report route handling
+- [x] BF004f Update documentation comments at top of `role-access.ts` to reflect new permissions
+
+**Files Changed**:
+
+- `server/middleware/role-access.ts` - Added allowed report routes logic
+
+**Verification**: Tested as PROCUREMENT_SPECIALIST user - deliveries page now loads correctly with all delivery records visible.
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies
