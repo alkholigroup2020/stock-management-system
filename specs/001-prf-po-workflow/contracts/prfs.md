@@ -6,17 +6,17 @@
 
 ## Endpoints Overview
 
-| Method | Path                    | Description            | Roles                                        |
-| ------ | ----------------------- | ---------------------- | -------------------------------------------- |
+| Method | Path                    | Description            | Roles                                                     |
+| ------ | ----------------------- | ---------------------- | --------------------------------------------------------- |
 | GET    | `/api/prfs`             | List PRFs with filters | All authenticated (PROCUREMENT_SPECIALIST: approved only) |
-| POST   | `/api/prfs`             | Create new PRF         | OPERATOR, SUPERVISOR, ADMIN                  |
-| GET    | `/api/prfs/:id`         | Get PRF details        | All authenticated                            |
-| PATCH  | `/api/prfs/:id`         | Update draft PRF       | Requester only                               |
-| DELETE | `/api/prfs/:id`         | Delete draft PRF       | Requester only                               |
-| PATCH  | `/api/prfs/:id/submit`  | Submit for approval    | Requester only                               |
-| PATCH  | `/api/prfs/:id/approve` | Approve PRF            | SUPERVISOR, ADMIN                            |
-| PATCH  | `/api/prfs/:id/reject`  | Reject PRF             | SUPERVISOR, ADMIN                            |
-| POST   | `/api/prfs/:id/clone`   | Clone rejected PRF     | Original requester                           |
+| POST   | `/api/prfs`             | Create new PRF         | OPERATOR, SUPERVISOR, ADMIN                               |
+| GET    | `/api/prfs/:id`         | Get PRF details        | All authenticated                                         |
+| PATCH  | `/api/prfs/:id`         | Update draft PRF       | Requester only                                            |
+| DELETE | `/api/prfs/:id`         | Delete draft PRF       | Requester only                                            |
+| PATCH  | `/api/prfs/:id/submit`  | Submit for approval    | Requester only                                            |
+| PATCH  | `/api/prfs/:id/approve` | Approve PRF            | SUPERVISOR, ADMIN                                         |
+| PATCH  | `/api/prfs/:id/reject`  | Reject PRF             | SUPERVISOR, ADMIN                                         |
+| POST   | `/api/prfs/:id/clone`   | Clone rejected PRF     | Original requester                                        |
 
 **Note**: PROCUREMENT_SPECIALIST can only GET (view) PRFs. They cannot create, update, delete, submit, approve, reject, or clone PRFs. The list is filtered to show only APPROVED PRFs for PROCUREMENT_SPECIALIST users.
 

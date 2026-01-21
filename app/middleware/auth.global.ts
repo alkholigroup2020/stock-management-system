@@ -11,7 +11,7 @@
  */
 
 // Routes restricted for PROCUREMENT_SPECIALIST role
-// These users can only access: Dashboard, Orders (PRF/PO), Deliveries (view only)
+// These users can ONLY access: Orders (PRF/PO)
 const PROCUREMENT_SPECIALIST_RESTRICTED_ROUTES = [
   "/items",
   "/issues",
@@ -26,6 +26,7 @@ const PROCUREMENT_SPECIALIST_RESTRICTED_ROUTES = [
   "/locations",
   "/suppliers",
   "/users",
+  "/deliveries", // Added - PROCUREMENT_SPECIALIST cannot view deliveries
 ];
 
 /**
@@ -63,8 +64,13 @@ export default defineNuxtRouteMiddleware((to) => {
 
   // Role-based access control for PROCUREMENT_SPECIALIST
   if (auth.isAuthenticated.value && auth.isProcurementSpecialist.value) {
+    // PROCUREMENT_SPECIALIST cannot access Dashboard - redirect to Orders
+    if (to.path === "/") {
+      return navigateTo("/orders");
+    }
+
     if (isRestrictedForProcurementSpecialist(to.path)) {
-      // Redirect to dashboard with an error message
+      // Redirect to Orders page with an error
       return abortNavigation({
         statusCode: 403,
         statusMessage: "Access denied. Procurement Specialists cannot access this page.",

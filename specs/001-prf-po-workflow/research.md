@@ -203,16 +203,16 @@ Add new role with limited permissions following least-privilege principle.
 
 The following API endpoints must be accessible to PROCUREMENT_SPECIALIST for the UI to function correctly:
 
-| Endpoint                 | Method | Purpose                                    |
-| ------------------------ | ------ | ------------------------------------------ |
-| `/api/periods/current`   | GET    | Display current period in UI header        |
-| `/api/reports/deliveries`| GET    | View deliveries list on Deliveries page    |
-| `/api/prfs/*`            | GET    | View approved PRFs (filtered by API)       |
-| `/api/pos/*`             | GET, POST, PATCH | Full CRUD for Purchase Orders   |
-| `/api/suppliers/*`       | GET    | View suppliers for PO dropdown             |
-| `/api/items/*`           | GET    | View items for PO line items               |
-| `/api/locations/*`       | GET    | View locations for location switcher       |
-| `/api/locations/[id]/deliveries/*` | GET | View deliveries linked to POs  |
+| Endpoint                           | Method           | Purpose                                 |
+| ---------------------------------- | ---------------- | --------------------------------------- |
+| `/api/periods/current`             | GET              | Display current period in UI header     |
+| `/api/reports/deliveries`          | GET              | View deliveries list on Deliveries page |
+| `/api/prfs/*`                      | GET              | View approved PRFs (filtered by API)    |
+| `/api/pos/*`                       | GET, POST, PATCH | Full CRUD for Purchase Orders           |
+| `/api/suppliers/*`                 | GET              | View suppliers for PO dropdown          |
+| `/api/items/*`                     | GET              | View items for PO line items            |
+| `/api/locations/*`                 | GET              | View locations for location switcher    |
+| `/api/locations/[id]/deliveries/*` | GET              | View deliveries linked to POs           |
 
 **Note**: These requirements are enforced in `server/middleware/role-access.ts`.
 

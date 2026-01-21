@@ -21,15 +21,17 @@ interface NavItem {
 }
 
 const mainMenuItems = computed<NavItem[]>(() => {
-  const items: NavItem[] = [
-    // 1. Dashboard
-    {
+  const items: NavItem[] = [];
+
+  // 1. Dashboard - not visible for PROCUREMENT_SPECIALIST
+  if (permissions.canAccessDashboard()) {
+    items.push({
       label: "Dashboard",
       icon: "i-heroicons-home",
       to: "/",
       permission: true,
-    },
-  ];
+    });
+  }
 
   // 2. Master Data section (expandable)
   const masterDataChildren: NavItem[] = [];

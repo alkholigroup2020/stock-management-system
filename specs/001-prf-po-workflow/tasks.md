@@ -446,6 +446,38 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 ---
 
+### BF005 - PROCUREMENT_SPECIALIST Should Only See Orders Tab (2026-01-21)
+
+**Issue**: PROCUREMENT_SPECIALIST users could see Dashboard and Deliveries in the navigation and access those pages. Per updated requirements, they should ONLY have access to the Orders tab.
+
+**Root Cause**: The initial implementation allowed PROCUREMENT_SPECIALIST users to view the Dashboard and Deliveries pages for PO tracking purposes. The requirement was updated to restrict access to only the Orders page.
+
+**Fixes Applied**:
+
+- [x] BF005a Update `app/composables/usePermissions.ts` - Add `canAccessDashboard()` function that returns false for PROCUREMENT_SPECIALIST
+- [x] BF005b Update `app/composables/usePermissions.ts` - Change `canViewDeliveries()` to return false for PROCUREMENT_SPECIALIST
+- [x] BF005c Update `app/layouts/default.vue` - Hide Dashboard menu item for PROCUREMENT_SPECIALIST using `canAccessDashboard()`
+- [x] BF005d Update `app/middleware/auth.global.ts` - Add redirect from "/" to "/orders" for PROCUREMENT_SPECIALIST
+- [x] BF005e Update `app/middleware/auth.global.ts` - Add "/deliveries" to `PROCUREMENT_SPECIALIST_RESTRICTED_ROUTES`
+- [x] BF005f Update `server/middleware/role-access.ts` - Remove `/api/reports/deliveries` from `ALLOWED_REPORT_ROUTES`
+- [x] BF005g Update `server/middleware/role-access.ts` - Add `/api/locations/[id]/deliveries/*` to `BLOCKED_PATTERNS`
+- [x] BF005h Update `server/middleware/role-access.ts` - Remove delivery method restriction check (now fully blocked)
+
+**Files Changed**:
+
+- `app/composables/usePermissions.ts` - Added `canAccessDashboard()`, updated `canViewDeliveries()`
+- `app/layouts/default.vue` - Dashboard menu item visibility check
+- `app/middleware/auth.global.ts` - Dashboard redirect and deliveries route restriction
+- `server/middleware/role-access.ts` - Updated permissions and blocked patterns
+
+**Verification**: Tested as PROCUREMENT_SPECIALIST user:
+- Login redirects to `/orders` instead of Dashboard
+- Navigation shows only "Transactions > Orders"
+- Direct URL to `/` redirects to `/orders`
+- Direct URL to `/deliveries` shows 403 Access Denied error
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

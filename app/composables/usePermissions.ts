@@ -80,7 +80,7 @@ export function usePermissions() {
    * Requirements:
    * - User must be authenticated
    * - OPERATOR, SUPERVISOR, ADMIN can view deliveries
-   * - PROCUREMENT_SPECIALIST can view deliveries (PO-linked only, for tracking)
+   * - PROCUREMENT_SPECIALIST cannot view deliveries
    *
    * @param locationId - Location ID to check (optional)
    * @returns true if user can view deliveries
@@ -88,8 +88,8 @@ export function usePermissions() {
   const canViewDeliveries = (locationId?: string): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    // Procurement Specialists can view deliveries (for PO tracking)
-    if (isProcurementSpecialist.value) return true;
+    // Procurement Specialists cannot view deliveries
+    if (isProcurementSpecialist.value) return false;
 
     // Admins and Supervisors have implicit access to all locations
     if (isAdmin.value || isSupervisor.value) return true;
@@ -782,6 +782,27 @@ export function usePermissions() {
     return true;
   };
 
+  // ==================== DASHBOARD PERMISSIONS ====================
+
+  /**
+   * Check if user can access the Dashboard
+   *
+   * Requirements:
+   * - User must be authenticated
+   * - OPERATOR, SUPERVISOR, ADMIN can access Dashboard
+   * - PROCUREMENT_SPECIALIST cannot access Dashboard
+   *
+   * @returns true if user can access Dashboard
+   */
+  const canAccessDashboard = (): boolean => {
+    if (!isAuthenticated.value || !user.value) return false;
+
+    // Procurement Specialists cannot access Dashboard
+    if (isProcurementSpecialist.value) return false;
+
+    return true;
+  };
+
   // ==================== RETURN ALL PERMISSION FUNCTIONS ====================
 
   return {
@@ -855,5 +876,8 @@ export function usePermissions() {
 
     // Orders Page
     canAccessOrders,
+
+    // Dashboard
+    canAccessDashboard,
   };
 }

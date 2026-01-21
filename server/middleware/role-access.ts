@@ -8,14 +8,13 @@
  * PROCUREMENT_SPECIALIST can only access:
  * - GET /api/prfs/* (view PRFs - approved only filtered by API)
  * - GET/POST/PATCH /api/pos/* (manage POs)
- * - GET /api/locations/[id]/deliveries/* (view deliveries)
  * - GET /api/suppliers/* (view suppliers for PO dropdown)
  * - GET /api/items/* (view items for PO line items)
  * - GET /api/periods/current (view current period for UI)
- * - GET /api/reports/deliveries (view deliveries list)
  *
  * PROCUREMENT_SPECIALIST cannot access:
  * - POST/PATCH/DELETE /api/prfs/* (create/edit/delete PRFs)
+ * - /api/locations/[id]/deliveries/* (Deliveries)
  * - /api/locations/[id]/issues/* (Issues)
  * - /api/transfers/* (Transfers)
  * - /api/reconciliations/* (Reconciliations)
@@ -23,7 +22,7 @@
  * - /api/pob/* (POB)
  * - /api/ncrs/* (NCR)
  * - /api/stock/* (Stock Now)
- * - /api/reports/* (except /api/reports/deliveries)
+ * - /api/reports/* (Reports)
  * - /api/periods/* (except /api/periods/current)
  * - /api/period-locations/* (Period Close)
  * - POST/PATCH/DELETE /api/locations/* (Location management)
@@ -62,9 +61,8 @@ const ALLOWED_PERIOD_ROUTES = [
 
 // Specific report routes that ARE allowed for PROCUREMENT_SPECIALIST (read-only)
 // These are exceptions to the general /api/reports/* restrictions
-const ALLOWED_REPORT_ROUTES = [
-  "/api/reports/deliveries", // PROCUREMENT_SPECIALIST needs to view deliveries list
-];
+// NOTE: No report routes are allowed - PROCUREMENT_SPECIALIST cannot access reports
+const ALLOWED_REPORT_ROUTES: string[] = [];
 
 // Routes with method restrictions for PROCUREMENT_SPECIALIST
 // Key: route prefix, Value: allowed HTTP methods
@@ -81,10 +79,8 @@ const METHOD_RESTRICTED_ROUTES: Record<string, string[]> = {
 const BLOCKED_PATTERNS = [
   /^\/api\/locations\/[^/]+\/issues/i, // /api/locations/[id]/issues/*
   /^\/api\/locations\/[^/]+\/pob/i, // /api/locations/[id]/pob/*
+  /^\/api\/locations\/[^/]+\/deliveries/i, // /api/locations/[id]/deliveries/* - blocked for PROCUREMENT_SPECIALIST
 ];
-
-// Deliveries - PROCUREMENT_SPECIALIST can only GET (view), not POST/PATCH/DELETE
-const DELIVERIES_PATTERN = /^\/api\/locations\/[^/]+\/deliveries/i;
 
 /**
  * Check if the path matches any blocked route prefix
@@ -168,17 +164,6 @@ function isMethodRestricted(path: string, method: string): boolean {
   return false;
 }
 
-/**
- * Check if this is a delivery route with restricted method
- */
-function isDeliveryMethodRestricted(path: string, method: string): boolean {
-  if (DELIVERIES_PATTERN.test(path)) {
-    // PROCUREMENT_SPECIALIST can only GET deliveries
-    return method.toUpperCase() !== "GET";
-  }
-  return false;
-}
-
 export default defineEventHandler(async (event) => {
   const path = event.node.req.url || "";
   const method = event.node.req.method || "GET";
@@ -235,20 +220,6 @@ export default defineEventHandler(async (event) => {
       data: {
         code: "ROLE_ACCESS_DENIED",
         message: `Procurement Specialists cannot ${method} this resource`,
-        path,
-        method,
-      },
-    });
-  }
-
-  // Check delivery method restrictions
-  if (isDeliveryMethodRestricted(path, method)) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-      data: {
-        code: "ROLE_ACCESS_DENIED",
-        message: "Procurement Specialists can only view deliveries",
         path,
         method,
       },
