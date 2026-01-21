@@ -91,7 +91,7 @@ When goods arrive, an Operator creates a delivery record. The system requires se
 
 ### User Story 5 - Close Purchase Order (Priority: P2)
 
-A Procurement Specialist closes a PO when all expected deliveries have been received or when the order is complete. Closed POs can no longer have deliveries linked to them.
+An Admin closes a PO when all expected deliveries have been received or when the order is complete. Closed POs can no longer have deliveries linked to them.
 
 **Why this priority**: Closing POs completes the procurement cycle and prevents further deliveries against completed orders.
 
@@ -99,15 +99,17 @@ A Procurement Specialist closes a PO when all expected deliveries have been rece
 
 **Acceptance Scenarios**:
 
-1. **Given** an OPEN PO with at least one linked delivery, **When** a Procurement Specialist clicks "Close PO", **Then** the PO status changes to CLOSED and it no longer appears in the delivery PO selection dropdown.
+1. **Given** an OPEN PO with at least one linked delivery, **When** an Admin clicks "Close PO", **Then** the PO status changes to CLOSED and it no longer appears in the delivery PO selection dropdown.
 
 2. **Given** a CLOSED PO, **When** an Operator tries to create a delivery linked to it, **Then** the system does not show the closed PO as an option.
+
+3. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they view an OPEN PO, **Then** they do NOT see a "Close PO" button (only Admins can close POs).
 
 ---
 
 ### User Story 6 - Procurement Specialist Access Control (Priority: P2)
 
-A new PROCUREMENT_SPECIALIST role is added with specific permissions limited to procurement-related functions. These users can manage orders and view related deliveries but cannot access master data, issues, transfers, or reconciliations.
+A new PROCUREMENT_SPECIALIST role is added with specific permissions limited to procurement-related functions. These users can only access the Orders page to manage PRFs and POs. They cannot access dashboard, deliveries, master data, issues, transfers, or reconciliations.
 
 **Why this priority**: Role-based access control is foundational for security but depends on the core features being in place.
 
@@ -115,11 +117,11 @@ A new PROCUREMENT_SPECIALIST role is added with specific permissions limited to 
 
 **Acceptance Scenarios**:
 
-1. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they log in, **Then** they see only Dashboard, Orders (full access), and Deliveries (view only for PO-linked) in the navigation menu.
+1. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they log in, **Then** they are redirected to the Orders page and see only "Orders" in the navigation menu (under Transactions).
 
-2. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they try to access Master Data, Issues, Transfers, or Reconciliations pages, **Then** the system denies access.
+2. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they try to access Dashboard, Deliveries, Master Data, Issues, Transfers, or Reconciliations pages, **Then** the system denies access.
 
-3. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they access the Orders page, **Then** they can view all approved PRFs and create/edit/close POs.
+3. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they access the Orders page, **Then** they can view all approved PRFs and create/edit POs (but NOT close POs or create deliveries).
 
 ---
 
@@ -184,7 +186,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-021**: System MUST support PO statuses: OPEN and CLOSED
 - **FR-021a**: System MUST allow OPEN POs to be fully edited (all fields, line items) until closed
 - **FR-022**: ~~System MUST send email notifications to all supplier email addresses when a PO is created~~ (REMOVED - email notifications are not sent on PO creation; supplier email addresses are stored for future use)
-- **FR-023**: System MUST allow only Procurement Specialists to close POs
+- **FR-023**: System MUST allow only Admins to close POs (PROCUREMENT_SPECIALIST cannot close POs)
 
 **Delivery Integration**
 
@@ -196,8 +198,8 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 **Role & Permissions**
 
 - **FR-028**: System MUST support a new PROCUREMENT_SPECIALIST role
-- **FR-029**: PROCUREMENT_SPECIALIST role MUST have access to: Dashboard, Orders (full), Deliveries (view PO-linked only)
-- **FR-030**: PROCUREMENT_SPECIALIST role MUST NOT have access to: Master Data, Issues, Transfers, Reconciliations, Period Close
+- **FR-029**: PROCUREMENT_SPECIALIST role MUST have access to: Orders only (can view PRFs, create/edit POs, but NOT close POs or create deliveries)
+- **FR-030**: PROCUREMENT_SPECIALIST role MUST NOT have access to: Dashboard, Deliveries, Master Data, Issues, Transfers, Reconciliations, Period Close
 
 **Supplier Management**
 

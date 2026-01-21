@@ -451,9 +451,9 @@ DRAFT ──[submit]──> PENDING ──[approve]──> APPROVED ──[po_cl
 OPEN ──[close]──> CLOSED
 ```
 
-| Transition    | Trigger | Conditions                           |
-| ------------- | ------- | ------------------------------------ |
-| OPEN → CLOSED | Close   | User is Procurement Specialist/Admin |
+| Transition    | Trigger | Conditions                                       |
+| ------------- | ------- | ------------------------------------------------ |
+| OPEN → CLOSED | Close   | User is Admin only (Procurement Specialist cannot close) |
 
 ---
 

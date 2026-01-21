@@ -8,7 +8,8 @@
  * - notes?: Additional notes about the closure
  *
  * Permissions:
- * - PROCUREMENT_SPECIALIST, ADMIN can close POs
+ * - ADMIN only can close POs
+ * - PROCUREMENT_SPECIALIST cannot close POs
  */
 
 import prisma from "../../../utils/prisma";
@@ -50,14 +51,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Check role permissions
-  if (user.role !== "PROCUREMENT_SPECIALIST" && user.role !== "ADMIN") {
+  // Check role permissions - only ADMIN can close POs
+  if (user.role !== "ADMIN") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
       data: {
         code: "PERMISSION_DENIED",
-        message: "Only procurement specialists and admins can close POs",
+        message: "Only admins can close POs",
       },
     });
   }

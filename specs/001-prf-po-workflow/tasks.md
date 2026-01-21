@@ -478,6 +478,35 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 ---
 
+### BF006 - PROCUREMENT_SPECIALIST Should Not Create Deliveries or Close POs (2026-01-21)
+
+**Issue**: PROCUREMENT_SPECIALIST users could see "Create Delivery" and "Close PO" buttons on the PO detail page. Per updated requirements, they should NOT have these abilities.
+
+**Root Cause**: The initial implementation allowed PROCUREMENT_SPECIALIST users to:
+1. See the "Create Delivery" button on PO detail page (even though the API was blocked)
+2. Close POs (both UI button and API endpoint)
+
+**Fixes Applied**:
+
+- [x] BF006a Update `app/pages/orders/pos/[id].vue` - Hide "Create Delivery" button for users without `canPostDeliveries()` permission
+- [x] BF006b Update `app/pages/orders/pos/[id].vue` - Use `canClosePO()` permission for "Close PO" button visibility
+- [x] BF006c Update `app/composables/usePermissions.ts` - Change `canClosePO()` to return `true` only for ADMIN
+- [x] BF006d Update `server/api/pos/[id]/close.patch.ts` - Restrict PO close endpoint to ADMIN only
+
+**Files Changed**:
+
+- `app/pages/orders/pos/[id].vue` - Updated button visibility conditions
+- `app/composables/usePermissions.ts` - Updated `canClosePO()` to only allow ADMIN
+- `server/api/pos/[id]/close.patch.ts` - Updated role check to only allow ADMIN
+
+**Verification**: Tested as PROCUREMENT_SPECIALIST user:
+- PO detail page shows only "Edit" button for OPEN POs
+- "Create Delivery" button is NOT visible
+- "Close PO" button is NOT visible
+- Navigation shows only "Transactions > Orders"
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

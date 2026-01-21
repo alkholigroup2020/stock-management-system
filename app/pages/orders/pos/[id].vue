@@ -19,7 +19,7 @@ useSeoMeta({
 // Composables
 const route = useRoute();
 const router = useRouter();
-const { canCreatePO } = usePermissions();
+const { canCreatePO, canPostDeliveries, canClosePO } = usePermissions();
 const { isProcurementSpecialist, isAdmin, user } = useAuth();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess } = useErrorHandler();
@@ -66,9 +66,9 @@ const canEdit = computed(() => {
   return isOpen.value && (isProcurementSpecialist.value || isAdmin.value) && !isEditing.value;
 });
 
-const canClose = computed(() => {
-  // Only open POs can be closed
-  return isOpen.value && (isProcurementSpecialist.value || isAdmin.value);
+const canCloseThisPO = computed(() => {
+  // Only open POs can be closed by users with canClosePO permission
+  return isOpen.value && canClosePO();
 });
 
 // Form validation for editing
@@ -374,9 +374,9 @@ onMounted(async () => {
 
         <!-- View Mode Actions -->
         <template v-else>
-          <!-- Create Delivery -->
+          <!-- Create Delivery - Only show to users who can post deliveries -->
           <UButton
-            v-if="isOpen"
+            v-if="isOpen && canPostDeliveries()"
             color="neutral"
             variant="outline"
             icon="i-lucide-truck"
@@ -403,7 +403,7 @@ onMounted(async () => {
 
           <!-- Close PO -->
           <UButton
-            v-if="canClose"
+            v-if="canCloseThisPO"
             color="warning"
             icon="i-lucide-lock"
             size="md"

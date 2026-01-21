@@ -179,19 +179,19 @@ Add new role with limited permissions following least-privilege principle.
 
 ### Permission Matrix
 
-| Resource        | OPERATOR            | SUPERVISOR        | ADMIN     | PROCUREMENT_SPECIALIST     |
-| --------------- | ------------------- | ----------------- | --------- | -------------------------- |
-| Dashboard       | ✅                  | ✅                | ✅        | ✅                         |
-| Orders (PRFs)   | Create, View own    | View all, Approve | Full      | View approved only         |
-| Orders (POs)    | ❌                  | View              | View only | Full CRUD (exclusive role) |
-| Deliveries      | Full (own location) | Full              | Full      | View PO-linked only        |
-| Issues          | Full (own location) | Full              | Full      | ❌                         |
-| Transfers       | Full (own location) | Full + Approve    | Full      | ❌                         |
-| Master Data     | ❌                  | ❌                | Full      | ❌                         |
-| Reconciliations | View totals         | Full              | Full      | ❌                         |
-| Period Close    | ❌                  | Ready locations   | Full      | ❌                         |
+| Resource        | OPERATOR            | SUPERVISOR        | ADMIN            | PROCUREMENT_SPECIALIST        |
+| --------------- | ------------------- | ----------------- | ---------------- | ----------------------------- |
+| Dashboard       | ✅                  | ✅                | ✅               | ❌                            |
+| Orders (PRFs)   | Create, View own    | View all, Approve | Full             | View approved only            |
+| Orders (POs)    | ❌                  | View              | View, Close only | Create, Edit only (no Close)  |
+| Deliveries      | Full (own location) | Full              | Full             | ❌                            |
+| Issues          | Full (own location) | Full              | Full             | ❌                            |
+| Transfers       | Full (own location) | Full + Approve    | Full             | ❌                            |
+| Master Data     | ❌                  | ❌                | Full             | ❌                            |
+| Reconciliations | View totals         | Full              | Full             | ❌                            |
+| Period Close    | ❌                  | Ready locations   | Full             | ❌                            |
 
-**Note**: PO creation, editing, and closing is restricted to PROCUREMENT_SPECIALIST role only. ADMINs can view POs but cannot create or modify them.
+**Note**: PO creation and editing is restricted to PROCUREMENT_SPECIALIST role only. PO closing is restricted to ADMIN only. PROCUREMENT_SPECIALIST cannot create deliveries or access the Dashboard.
 
 ### Rationale
 
@@ -203,16 +203,20 @@ Add new role with limited permissions following least-privilege principle.
 
 The following API endpoints must be accessible to PROCUREMENT_SPECIALIST for the UI to function correctly:
 
-| Endpoint                           | Method           | Purpose                                 |
-| ---------------------------------- | ---------------- | --------------------------------------- |
-| `/api/periods/current`             | GET              | Display current period in UI header     |
-| `/api/reports/deliveries`          | GET              | View deliveries list on Deliveries page |
-| `/api/prfs/*`                      | GET              | View approved PRFs (filtered by API)    |
-| `/api/pos/*`                       | GET, POST, PATCH | Full CRUD for Purchase Orders           |
-| `/api/suppliers/*`                 | GET              | View suppliers for PO dropdown          |
-| `/api/items/*`                     | GET              | View items for PO line items            |
-| `/api/locations/*`                 | GET              | View locations for location switcher    |
-| `/api/locations/[id]/deliveries/*` | GET              | View deliveries linked to POs           |
+| Endpoint               | Method           | Purpose                               |
+| ---------------------- | ---------------- | ------------------------------------- |
+| `/api/periods/current` | GET              | Display current period in UI header   |
+| `/api/prfs/*`          | GET              | View approved PRFs (filtered by API)  |
+| `/api/pos/*`           | GET, POST, PATCH | Create/Edit POs (no Close)            |
+| `/api/suppliers/*`     | GET              | View suppliers for PO dropdown        |
+| `/api/items/*`         | GET              | View items for PO line items          |
+| `/api/locations/*`     | GET              | View locations for location switcher  |
+
+**Blocked endpoints for PROCUREMENT_SPECIALIST**:
+- `/api/pos/[id]/close` - Only ADMIN can close POs
+- `/api/locations/[id]/deliveries/*` - Cannot create deliveries
+- `/api/reports/deliveries` - Cannot view deliveries report
+- Dashboard and all other non-Orders pages
 
 **Note**: These requirements are enforced in `server/middleware/role-access.ts`.
 

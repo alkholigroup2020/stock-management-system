@@ -6,13 +6,13 @@
 
 ## Endpoints Overview
 
-| Method | Path                 | Description           | Roles                  |
-| ------ | -------------------- | --------------------- | ---------------------- |
-| GET    | `/api/pos`           | List POs with filters | All authenticated      |
-| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST |
-| GET    | `/api/pos/:id`       | Get PO details        | All authenticated      |
-| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST |
-| PATCH  | `/api/pos/:id/close` | Close PO              | PROCUREMENT_SPECIALIST |
+| Method | Path                 | Description           | Roles                            |
+| ------ | -------------------- | --------------------- | -------------------------------- |
+| GET    | `/api/pos`           | List POs with filters | All authenticated                |
+| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST           |
+| GET    | `/api/pos/:id`       | Get PO details        | All authenticated                |
+| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST           |
+| PATCH  | `/api/pos/:id/close` | Close PO              | ADMIN only (not PROCUREMENT_SPECIALIST) |
 
 ---
 
@@ -254,6 +254,8 @@ Update an open PO. Full edit capability until closed.
 
 Close a PO. No further edits or deliveries allowed.
 
+**Note**: Only ADMIN users can close POs. PROCUREMENT_SPECIALIST users cannot close POs.
+
 ### Request Body
 
 ```typescript
@@ -265,7 +267,7 @@ Close a PO. No further edits or deliveries allowed.
 ### Validation Rules
 
 - PO must be in OPEN status
-- User must be PROCUREMENT_SPECIALIST
+- User must be ADMIN (PROCUREMENT_SPECIALIST cannot close POs)
 
 ### Behavior
 
@@ -284,7 +286,7 @@ Close a PO. No further edits or deliveries allowed.
 
 ### Error Responses
 
-- 403: User is not PROCUREMENT_SPECIALIST or PO already CLOSED
+- 403: User is not ADMIN or PO already CLOSED
 - 404: PO not found
 
 ---

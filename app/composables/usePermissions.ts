@@ -741,14 +741,15 @@ export function usePermissions() {
    * Check if user can close a PO
    *
    * Requirements:
-   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   * - User must be ADMIN only
+   * - PROCUREMENT_SPECIALIST cannot close POs
    *
    * @returns true if user can close POs
    */
   const canClosePO = (): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    return isProcurementSpecialist.value || isAdmin.value;
+    return isAdmin.value;
   };
 
   /**

@@ -192,8 +192,9 @@ app/pages/orders/
 - [ ] Create PO from approved PRF as Procurement Specialist (only PROCUREMENT_SPECIALIST role can create POs)
 - [ ] Verify VAT calculations (15%)
 - [ ] Verify no email is sent to supplier on PO creation
-- [ ] Edit open PO (add/remove lines)
-- [ ] Close PO
+- [ ] Edit open PO (add/remove lines) as Procurement Specialist
+- [ ] Verify PROCUREMENT_SPECIALIST cannot see "Close PO" button
+- [ ] Close PO as Admin (only ADMIN can close POs)
 - [ ] Verify linked PRF marked as CLOSED
 
 ### Delivery Integration
@@ -204,12 +205,12 @@ app/pages/orders/
 
 ### Role Permissions
 
-- [ ] PROCUREMENT_SPECIALIST sees only: Dashboard, Orders, Deliveries (limited)
-- [ ] PROCUREMENT_SPECIALIST cannot access: Master Data, Issues, Transfers, etc.
-- [ ] PROCUREMENT_SPECIALIST is the ONLY role that can create/edit/close POs
+- [ ] PROCUREMENT_SPECIALIST sees only: Orders (no Dashboard, no Deliveries)
+- [ ] PROCUREMENT_SPECIALIST cannot access: Dashboard, Deliveries, Master Data, Issues, Transfers, etc.
+- [ ] PROCUREMENT_SPECIALIST can create/edit POs but NOT close them or create deliveries
 - [ ] OPERATOR can create PRF but not PO
 - [ ] SUPERVISOR can approve/reject PRF
-- [ ] ADMIN can view POs but cannot create/edit/close them
+- [ ] ADMIN can view POs and close them (but cannot create/edit POs)
 
 ---
 
