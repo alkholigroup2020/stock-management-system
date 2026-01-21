@@ -23,15 +23,13 @@ const { canCreatePO } = usePermissions();
 const { isProcurementSpecialist, isAdmin, user } = useAuth();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess } = useErrorHandler();
-const { update, close, resendEmail } = usePOActions();
+const { update, close } = usePOActions();
 
 // State
 const poId = computed(() => route.params.id as string);
 const saving = ref(false);
 const closing = ref(false);
-const resendingEmail = ref(false);
 const showCloseConfirmation = ref(false);
-const showResendEmailModal = ref(false);
 const isEditing = ref(false);
 const loadingInitialData = ref(true);
 const items = ref<Array<{ id: string; code: string; name: string; unit: Unit }>>([]);
@@ -71,11 +69,6 @@ const canEdit = computed(() => {
 const canClose = computed(() => {
   // Only open POs can be closed
   return isOpen.value && (isProcurementSpecialist.value || isAdmin.value);
-});
-
-const canResendEmail = computed(() => {
-  // Can resend email if PO is open and supplier has emails
-  return isOpen.value && (po.value?.supplier?.emails?.length || 0) > 0;
 });
 
 // Form validation for editing
@@ -251,33 +244,6 @@ async function closePO() {
   );
 }
 
-// Resend email to supplier
-async function doResendEmail() {
-  showResendEmailModal.value = false;
-
-  await guardAction(
-    async () => {
-      resendingEmail.value = true;
-
-      try {
-        const result = await resendEmail(poId.value);
-
-        if (result) {
-          handleSuccess("Email Sent", `PO email sent to ${result.recipients.length} recipient(s).`);
-        }
-      } catch (error) {
-        handleError(error, { context: "resending email" });
-      } finally {
-        resendingEmail.value = false;
-      }
-    },
-    {
-      offlineMessage: "Cannot send email",
-      offlineDescription: "You need an internet connection to send emails.",
-    }
-  );
-}
-
 // Fetch items
 async function fetchItems() {
   try {
@@ -408,21 +374,6 @@ onMounted(async () => {
 
         <!-- View Mode Actions -->
         <template v-else>
-          <!-- Resend Email -->
-          <UButton
-            v-if="canResendEmail"
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-mail"
-            size="md"
-            class="cursor-pointer rounded-full"
-            :loading="resendingEmail"
-            :disabled="closing || !isOnline"
-            @click="showResendEmailModal = true"
-          >
-            <span class="hidden sm:inline">Resend Email</span>
-          </UButton>
-
           <!-- Create Delivery -->
           <UButton
             v-if="isOpen"
@@ -813,22 +764,8 @@ onMounted(async () => {
       @confirm="closePO"
     />
 
-    <!-- Resend Email Confirmation Modal -->
-    <UiConfirmModal
-      v-model="showResendEmailModal"
-      title="Resend PO Email"
-      :message="`Resend the PO email to ${po?.supplier?.emails?.join(', ') || 'supplier'}?`"
-      confirm-text="Send Email"
-      cancel-text="Cancel"
-      loading-text="Sending..."
-      :loading="resendingEmail"
-      variant="info"
-      @confirm="doResendEmail"
-    />
-
     <!-- Loading Overlays -->
     <LoadingOverlay v-if="saving" title="Saving Changes..." message="Please wait" />
     <LoadingOverlay v-if="closing" title="Closing PO..." message="Please wait" />
-    <LoadingOverlay v-if="resendingEmail" title="Sending Email..." message="Please wait" />
   </div>
 </template>

@@ -55,7 +55,7 @@ A Supervisor reviews pending PRFs and either approves or rejects them. Approved 
 
 ### User Story 3 - Create Purchase Order from Approved PRF (Priority: P1)
 
-A Procurement Specialist receives notification of an approved PRF, logs in, selects a supplier, and creates a formal Purchase Order with pricing, VAT calculations, and terms. The PO is then emailed to the supplier.
+A Procurement Specialist receives notification of an approved PRF, logs in, selects a supplier, and creates a formal Purchase Order with pricing, VAT calculations, and terms.
 
 **Why this priority**: Converting approved PRFs to POs is the core procurement function. This enables actual purchasing to occur.
 
@@ -67,7 +67,7 @@ A Procurement Specialist receives notification of an approved PRF, logs in, sele
 
 2. **Given** a PO being created, **When** the user enters unit prices and quantities, **Then** the system calculates line totals, VAT amounts (15% default), and grand totals automatically.
 
-3. **Given** a completed PO, **When** the user saves the PO, **Then** the system generates a PO number, saves the PO in OPEN status, and sends email notification to all supplier email addresses.
+3. **Given** a completed PO, **When** the user saves the PO, **Then** the system generates a PO number and saves the PO in OPEN status.
 
 ---
 
@@ -135,17 +135,17 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 
 1. **Given** a supplier edit form, **When** an Admin adds multiple email addresses, **Then** the system saves all email addresses and validates each one's format.
 
-2. **Given** a PO being created for a supplier with multiple emails, **When** the PO is saved, **Then** email notifications are sent to all supplier email addresses.
+2. **Given** a supplier with multiple email addresses, **When** the supplier record is saved, **Then** all email addresses are stored for future reference and communication needs.
 
 ---
 
 ### Edge Cases
 
 - What happens when a PRF is submitted but no PROCUREMENT_SPECIALIST users exist? → The PRF is approved but no email notification is sent; system logs a warning.
-- How does the system handle PO creation if the supplier has no email addresses? → The PO is created successfully but no email is sent; a warning is displayed to the user.
+- How does the system handle PO creation if the supplier has no email addresses? → The PO is created successfully; email addresses are optional and stored for future use only.
 - What happens if a user tries to delete a PRF that has been converted to a PO? → The system prevents deletion; PRFs with linked POs are archived, not deleted.
 - How does the system behave when delivery quantities exceed PO quantities? → The system displays a warning but allows the delivery to proceed (over-delivery scenario).
-- What happens if email sending fails? → The PO/PRF action completes but the system logs the email failure; users can manually resend from the detail page.
+- What happens if email sending fails? → The PRF approval action completes but the system logs the email failure (applies to PRF approval notifications to procurement specialists only; POs do not send emails).
 
 ## Requirements _(mandatory)_
 
@@ -175,7 +175,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 
 **PO Management**
 
-- **FR-015**: System MUST allow Procurement Specialists and Admins to create exactly one PO from each approved PRF (1:1 relationship)
+- **FR-015**: System MUST allow only Procurement Specialists to create exactly one PO from each approved PRF (1:1 relationship)
 - **FR-016**: System MUST auto-generate unique PO numbers in a sequential format (e.g., PO-001, PO-002)
 - **FR-017**: System MUST require supplier selection when creating a PO
 - **FR-018**: System MUST pre-populate PO line items from the source PRF when creating from an approved PRF; line items are fully editable (add, remove, modify any field)
@@ -183,8 +183,8 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-020**: System MUST calculate PO grand totals (before discount, discount, after discount, VAT, final total)
 - **FR-021**: System MUST support PO statuses: OPEN and CLOSED
 - **FR-021a**: System MUST allow OPEN POs to be fully edited (all fields, line items) until closed
-- **FR-022**: System MUST send email notifications to all supplier email addresses when a PO is created
-- **FR-023**: System MUST allow only Procurement Specialists and Admins to close POs
+- **FR-022**: ~~System MUST send email notifications to all supplier email addresses when a PO is created~~ (REMOVED - email notifications are not sent on PO creation; supplier email addresses are stored for future use)
+- **FR-023**: System MUST allow only Procurement Specialists to close POs
 
 **Delivery Integration**
 
@@ -207,9 +207,9 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 **Email Notifications**
 
 - **FR-033**: System MUST send PRF approval notifications to all PROCUREMENT_SPECIALIST users
-- **FR-034**: System MUST send PO notifications to all email addresses configured for the supplier
-- **FR-035**: System MUST log email failures without blocking the primary transaction
-- **FR-036**: System MUST allow manual email resend from detail pages
+- **FR-034**: ~~System MUST send PO notifications to all email addresses configured for the supplier~~ (REMOVED - PO email notifications are not sent)
+- **FR-035**: System MUST log email failures without blocking the primary transaction (applies to PRF approval notifications only)
+- **FR-036**: ~~System MUST allow manual email resend from detail pages~~ (REMOVED - no email resend functionality for POs)
 
 ### Key Entities
 
@@ -228,7 +228,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **SC-002**: Supervisors can review and approve/reject a PRF in under 2 minutes
 - **SC-003**: Procurement specialists receive email notification within 1 minute of PRF approval
 - **SC-004**: Users can create a PO from an approved PRF in under 5 minutes for up to 10 line items
-- **SC-005**: Suppliers receive PO email notification within 1 minute of PO creation
+- **SC-005**: ~~Suppliers receive PO email notification within 1 minute of PO creation~~ (REMOVED - PO email notifications are not sent)
 - **SC-006**: 100% of deliveries are linked to a PO (mandatory enforcement)
 - **SC-007**: PROCUREMENT_SPECIALIST users cannot access restricted pages (0% unauthorized access)
 - **SC-008**: VAT and total calculations are 100% accurate on all PO line items and totals

@@ -96,7 +96,7 @@ model Supplier {
 **New Fields:**
 | Field | Type | Description |
 |-------|------|-------------|
-| emails | String[] | Array of email addresses for PO notifications |
+| emails | String[] | Array of email addresses for supplier contact (stored for reference, not used for automatic notifications) |
 | phone | String? | Office phone number |
 | mobile | String? | Mobile phone number |
 | vat_reg_no | String? | VAT registration number (Saudi Arabia) |

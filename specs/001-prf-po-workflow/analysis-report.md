@@ -10,11 +10,13 @@
 
 The PRF/PO Workflow specification is **well-defined and implementation-ready**. Analysis across all artifacts identified:
 
-- **36 Functional Requirements** mapped to **98 Tasks**
+- **33 Functional Requirements** mapped to **98 Tasks** (3 requirements removed: PO email features)
 - **8 Constitution Principles** - all compliant
 - **5 Clarifications** successfully integrated
 - **2 Minor Issues** requiring attention
-- **Coverage**: 100% requirement-to-task traceability
+- **Coverage**: 100% requirement-to-task traceability (for active requirements)
+
+**Note**: PO email notification features (FR-022, FR-034, FR-036) have been removed. PO creation does not send emails to suppliers. Only PROCUREMENT_SPECIALIST role can create/edit/close POs (not ADMIN).
 
 ---
 
@@ -72,8 +74,8 @@ The PRF/PO Workflow specification is **well-defined and implementation-ready**. 
 | FR-020      | PO grand totals                          | T050, T061 | ✅ Covered   |
 | FR-021      | PO statuses (OPEN, CLOSED)               | T003       | ✅ Covered   |
 | FR-021a     | OPEN POs fully editable                  | T052       | ✅ Covered   |
-| FR-022      | Email to supplier on PO create           | T062       | ✅ Covered   |
-| FR-023      | Only PROC_SPEC/Admin close POs           | T071       | ✅ Covered   |
+| FR-022      | ~~Email to supplier on PO create~~       | ~~T062~~   | ❌ REMOVED   |
+| FR-023      | Only PROC_SPEC close POs                 | T071       | ✅ Covered   |
 | FR-024      | Mandatory PO selection for delivery      | T064, T069 | ✅ Covered   |
 | FR-025      | Filter to OPEN POs only                  | T065, T075 | ✅ Covered   |
 | FR-026      | Auto-populate supplier from PO           | T066       | ✅ Covered   |
@@ -84,11 +86,11 @@ The PRF/PO Workflow specification is **well-defined and implementation-ready**. 
 | FR-031      | Multiple supplier emails                 | T004, T016 | ✅ Covered   |
 | FR-032      | Email format validation                  | T082       | ✅ Covered   |
 | FR-033      | PRF approval email                       | T047       | ✅ Covered   |
-| FR-034      | PO email to supplier                     | T062       | ✅ Covered   |
-| FR-035      | Log email failures                       | T019       | ✅ Covered   |
-| FR-036      | Manual email resend                      | T090-T091  | ✅ Covered   |
+| FR-034      | ~~PO email to supplier~~                 | ~~T062~~   | ❌ REMOVED   |
+| FR-035      | Log email failures (PRF approval only)   | T019       | ✅ Covered   |
+| FR-036      | ~~Manual email resend~~                  | ~~T090-T091~~ | ❌ REMOVED |
 
-**Coverage: 36/36 requirements (100%)**
+**Coverage: 33/36 requirements (3 removed: FR-022, FR-034, FR-036 - PO email features)**
 
 ---
 
@@ -127,22 +129,22 @@ All 98 tasks map to requirements or support infrastructure. No orphan tasks foun
 
 ## 5. Metrics
 
-| Metric                  | Value                     |
-| ----------------------- | ------------------------- |
-| Total Requirements      | 36                        |
-| Total Tasks             | 98                        |
-| Requirements Coverage   | 100%                      |
-| Constitution Principles | 8/8 compliant             |
-| Clarifications Resolved | 5/5                       |
-| User Stories            | 7 (+ 1 implied for Clone) |
-| API Endpoints Defined   | 16                        |
-| New Components          | 8                         |
-| New Pages               | 6                         |
-| Severity: Critical      | 0                         |
-| Severity: High          | 0                         |
-| Severity: Medium        | 0                         |
-| Severity: Low           | 2                         |
-| Severity: Info          | 3                         |
+| Metric                  | Value                                  |
+| ----------------------- | -------------------------------------- |
+| Total Requirements      | 33 (3 removed: PO email features)      |
+| Total Tasks             | 98                                     |
+| Requirements Coverage   | 100% (active requirements)             |
+| Constitution Principles | 8/8 compliant                          |
+| Clarifications Resolved | 5/5                                    |
+| User Stories            | 7 (+ 1 implied for Clone)              |
+| API Endpoints Defined   | 15 (resend-email endpoint removed)     |
+| New Components          | 8                                      |
+| New Pages               | 6                                      |
+| Severity: Critical      | 0                                      |
+| Severity: High          | 0                                      |
+| Severity: Medium        | 0                                      |
+| Severity: Low           | 2                                      |
+| Severity: Info          | 3                                      |
 
 ---
 
@@ -162,8 +164,8 @@ All 98 tasks map to requirements or support infrastructure. No orphan tasks foun
 ### Post-Implementation
 
 6. Use Playwright MCP to verify complete workflow (T098)
-7. Verify email delivery in development using console logs
-8. Test PROCUREMENT_SPECIALIST role restrictions thoroughly
+7. Verify PRF approval email delivery in development using console logs (PO emails are not sent)
+8. Test PROCUREMENT_SPECIALIST role restrictions thoroughly (only role that can create/edit/close POs)
 
 ---
 

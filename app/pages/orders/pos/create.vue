@@ -303,11 +303,7 @@ async function createPO() {
         });
 
         if (result) {
-          const emailInfo = result.email_sent
-            ? ` Email sent to ${result.email_recipients || 0} recipient(s).`
-            : " (No email sent - supplier has no email configured)";
-
-          handleSuccess("PO Created", `PO ${result.data.po_no} has been created.${emailInfo}`);
+          handleSuccess("PO Created", `PO ${result.data.po_no} has been created.`);
           router.push(`/orders/pos/${result.data.id}`);
         }
       } catch (error) {
@@ -431,7 +427,7 @@ onMounted(async () => {
     <LoadingOverlay
       v-if="saving"
       title="Creating PO..."
-      message="Please wait while we create your PO and notify the supplier"
+      message="Please wait while we create your PO"
     />
   </div>
 </template>

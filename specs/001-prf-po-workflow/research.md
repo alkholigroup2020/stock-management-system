@@ -36,7 +36,13 @@ Use **Office 365 SMTP** via Nodemailer for transactional email delivery.
 - SMTP Host: `smtp.office365.com` (default)
 - SMTP Port: `587` (STARTTLS)
 - Fallback: Log email to console in development (when credentials not configured)
-- Retry: No automatic retry; log failures, allow manual resend
+- Retry: No automatic retry; log failures for investigation
+
+### Email Usage Scope
+
+- **PRF Approval**: Email notifications ARE sent to PROCUREMENT_SPECIALIST users when a PRF is approved
+- **PO Creation**: Email notifications are NOT sent to suppliers; supplier email addresses are stored for reference only
+- **Resend**: No manual resend functionality for POs
 
 ---
 
@@ -173,17 +179,19 @@ Add new role with limited permissions following least-privilege principle.
 
 ### Permission Matrix
 
-| Resource        | OPERATOR            | SUPERVISOR        | ADMIN | PROCUREMENT_SPECIALIST |
-| --------------- | ------------------- | ----------------- | ----- | ---------------------- |
-| Dashboard       | ✅                  | ✅                | ✅    | ✅                     |
-| Orders (PRFs)   | Create, View own    | View all, Approve | Full  | View approved only     |
-| Orders (POs)    | ❌                  | View              | Full  | Full CRUD              |
-| Deliveries      | Full (own location) | Full              | Full  | View PO-linked only    |
-| Issues          | Full (own location) | Full              | Full  | ❌                     |
-| Transfers       | Full (own location) | Full + Approve    | Full  | ❌                     |
-| Master Data     | ❌                  | ❌                | Full  | ❌                     |
-| Reconciliations | View totals         | Full              | Full  | ❌                     |
-| Period Close    | ❌                  | Ready locations   | Full  | ❌                     |
+| Resource        | OPERATOR            | SUPERVISOR        | ADMIN     | PROCUREMENT_SPECIALIST     |
+| --------------- | ------------------- | ----------------- | --------- | -------------------------- |
+| Dashboard       | ✅                  | ✅                | ✅        | ✅                         |
+| Orders (PRFs)   | Create, View own    | View all, Approve | Full      | View approved only         |
+| Orders (POs)    | ❌                  | View              | View only | Full CRUD (exclusive role) |
+| Deliveries      | Full (own location) | Full              | Full      | View PO-linked only        |
+| Issues          | Full (own location) | Full              | Full      | ❌                         |
+| Transfers       | Full (own location) | Full + Approve    | Full      | ❌                         |
+| Master Data     | ❌                  | ❌                | Full      | ❌                         |
+| Reconciliations | View totals         | Full              | Full      | ❌                         |
+| Period Close    | ❌                  | Ready locations   | Full      | ❌                         |
+
+**Note**: PO creation, editing, and closing is restricted to PROCUREMENT_SPECIALIST role only. ADMINs can view POs but cannot create or modify them.
 
 ### Rationale
 

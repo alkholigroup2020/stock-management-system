@@ -711,7 +711,7 @@ export function usePermissions() {
    * Check if user can create a PO
    *
    * Requirements:
-   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   * - User must be PROCUREMENT_SPECIALIST only
    * - POs are created from approved PRFs
    *
    * @returns true if user can create POs
@@ -719,7 +719,7 @@ export function usePermissions() {
   const canCreatePO = (): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    return isProcurementSpecialist.value || isAdmin.value;
+    return isProcurementSpecialist.value;
   };
 
   /**

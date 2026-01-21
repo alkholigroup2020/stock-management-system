@@ -116,7 +116,7 @@
 
 **Goal**: Procurement Specialists can create POs from approved PRFs with VAT calculations
 
-**Independent Test**: Create a PO from an approved PRF, verify VAT calculations, receive email notification
+**Independent Test**: Create a PO from an approved PRF, verify VAT calculations
 
 ### Implementation for User Story 3
 
@@ -133,7 +133,7 @@
 - [x] T059 [US3] Update Orders index page POs tab with list view in `app/pages/orders/index.vue`
 - [x] T060 [US3] Implement auto-generation of PO numbers (PO-001 format) in create endpoint
 - [x] T061 [US3] Implement VAT calculation logic (15%) in `server/api/pos/index.post.ts`
-- [x] T062 [US3] Implement email notification to supplier on PO creation
+- [x] T062 [US3] ~~Implement email notification to supplier on PO creation~~ (REMOVED - PO creation does not send emails)
 - [x] T063 [US3] Add "Create PO" action button on approved PRF detail page
 
 **Checkpoint**: User Story 3 complete - POs can be created from PRFs with correct VAT calculations ✅
@@ -235,8 +235,8 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [x] T090 [P] Create email resend endpoint in `server/api/pos/[id]/resend-email.post.ts`
-- [x] T091 [P] Add "Resend Email" button to PO detail page
+- [x] T090 [P] ~~Create email resend endpoint in `server/api/pos/[id]/resend-email.post.ts`~~ (REMOVED - no email resend feature for POs)
+- [x] T091 [P] ~~Add "Resend Email" button to PO detail page~~ (REMOVED - no email resend feature for POs)
 - [x] T092 [P] Add loading states to all form submissions using LoadingOverlay
 - [x] T093 [P] Ensure all buttons have `cursor-pointer` class
 - [x] T094 [P] Verify offline-aware UI (disable actions when offline) using `useOnlineStatus()`

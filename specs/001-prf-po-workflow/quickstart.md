@@ -189,9 +189,9 @@ app/pages/orders/
 
 ### PO Workflow
 
-- [ ] Create PO from approved PRF as Procurement Specialist
+- [ ] Create PO from approved PRF as Procurement Specialist (only PROCUREMENT_SPECIALIST role can create POs)
 - [ ] Verify VAT calculations (15%)
-- [ ] Verify email sent to supplier
+- [ ] Verify no email is sent to supplier on PO creation
 - [ ] Edit open PO (add/remove lines)
 - [ ] Close PO
 - [ ] Verify linked PRF marked as CLOSED
@@ -206,8 +206,10 @@ app/pages/orders/
 
 - [ ] PROCUREMENT_SPECIALIST sees only: Dashboard, Orders, Deliveries (limited)
 - [ ] PROCUREMENT_SPECIALIST cannot access: Master Data, Issues, Transfers, etc.
+- [ ] PROCUREMENT_SPECIALIST is the ONLY role that can create/edit/close POs
 - [ ] OPERATOR can create PRF but not PO
 - [ ] SUPERVISOR can approve/reject PRF
+- [ ] ADMIN can view POs but cannot create/edit/close them
 
 ---
 

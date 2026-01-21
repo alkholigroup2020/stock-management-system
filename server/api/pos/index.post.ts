@@ -18,11 +18,10 @@
  * - lines: Array of line items (at least 1 required)
  *
  * Permissions:
- * - PROCUREMENT_SPECIALIST, ADMIN can create POs
+ * - Only PROCUREMENT_SPECIALIST can create POs
  */
 
 import prisma from "../../utils/prisma";
-import { sendPOToSupplier } from "../../utils/email";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 
@@ -124,14 +123,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Check role permissions
-  if (user.role !== "PROCUREMENT_SPECIALIST" && user.role !== "ADMIN") {
+  // Check role permissions - only PROCUREMENT_SPECIALIST can create POs
+  if (user.role !== "PROCUREMENT_SPECIALIST") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
       data: {
         code: "PERMISSION_DENIED",
-        message: "Only procurement specialists and admins can create POs",
+        message: "Only procurement specialists can create POs",
       },
     });
   }
@@ -404,29 +403,8 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Send email notification to supplier
-    let emailSent = false;
-    let emailRecipients = 0;
-    let emailError: string | undefined;
-
-    if (supplier.emails.length > 0) {
-      const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
-      const poUrl = `${siteUrl}/orders/pos/${result.po.id}`;
-
-      const emailResult = await sendPOToSupplier({
-        supplierEmails: supplier.emails,
-        poNumber: poNo,
-        supplierName: supplier.name,
-        totalAmount: `SAR ${totals.total_amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        deliveryTerms: data.delivery_terms || null,
-        paymentTerms: data.payment_terms || null,
-        poUrl,
-      });
-
-      emailSent = emailResult.success;
-      emailRecipients = emailSent ? supplier.emails.length : 0;
-      emailError = emailResult.error;
-    }
+    // Note: Email notification to supplier is disabled on PO creation.
+    // Supplier email addresses are stored for future use (manual sending via resend-email endpoint).
 
     return {
       data: {
@@ -475,9 +453,6 @@ export default defineEventHandler(async (event) => {
         ship_to_location: po?.ship_to_location,
       },
       message: "Purchase Order created",
-      email_sent: emailSent,
-      email_recipients: emailRecipients,
-      email_error: emailError,
     };
   } catch (error) {
     // Handle Zod validation errors

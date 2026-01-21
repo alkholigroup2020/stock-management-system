@@ -6,14 +6,13 @@
 
 ## Endpoints Overview
 
-| Method | Path                        | Description           | Roles                         |
-| ------ | --------------------------- | --------------------- | ----------------------------- |
-| GET    | `/api/pos`                  | List POs with filters | All authenticated             |
-| POST   | `/api/pos`                  | Create PO from PRF    | PROCUREMENT_SPECIALIST, ADMIN |
-| GET    | `/api/pos/:id`              | Get PO details        | All authenticated             |
-| PATCH  | `/api/pos/:id`              | Update open PO        | PROCUREMENT_SPECIALIST, ADMIN |
-| PATCH  | `/api/pos/:id/close`        | Close PO              | PROCUREMENT_SPECIALIST, ADMIN |
-| POST   | `/api/pos/:id/resend-email` | Resend PO email       | PROCUREMENT_SPECIALIST, ADMIN |
+| Method | Path                 | Description           | Roles                  |
+| ------ | -------------------- | --------------------- | ---------------------- |
+| GET    | `/api/pos`           | List POs with filters | All authenticated      |
+| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST |
+| GET    | `/api/pos/:id`       | Get PO details        | All authenticated      |
+| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST |
+| PATCH  | `/api/pos/:id/close` | Close PO              | PROCUREMENT_SPECIALIST |
 
 ---
 
@@ -126,8 +125,7 @@ total_amount = total_after_discount + total_vat
 1. Create PO in OPEN status
 2. Generate unique po_no
 3. Calculate all line totals and PO totals
-4. Send email notification to supplier (all emails in supplier.emails array)
-5. If prf_id provided and email fails, PO is still created
+4. Supplier email addresses are stored for reference but no email is sent on PO creation
 
 ### Response 201
 
@@ -139,16 +137,13 @@ total_amount = total_after_discount + total_vat
     prf?: PRF;
   };
   message: "Purchase Order created";
-  email_sent: boolean;
-  email_recipients?: number;
-  email_error?: string;          // Only if email failed
 }
 ```
 
 ### Error Responses
 
 - 400: Validation error
-- 403: User is not PROCUREMENT_SPECIALIST/ADMIN
+- 403: User is not PROCUREMENT_SPECIALIST
 - 404: Supplier, PRF, or ship-to location not found
 - 409: PRF already has a PO (1:1 constraint)
 
@@ -250,7 +245,7 @@ Update an open PO. Full edit capability until closed.
 ### Error Responses
 
 - 400: Validation error
-- 403: User is not PROCUREMENT_SPECIALIST/ADMIN or PO is CLOSED
+- 403: User is not PROCUREMENT_SPECIALIST or PO is CLOSED
 - 404: PO not found
 
 ---
@@ -270,7 +265,7 @@ Close a PO. No further edits or deliveries allowed.
 ### Validation Rules
 
 - PO must be in OPEN status
-- User must be PROCUREMENT_SPECIALIST or ADMIN
+- User must be PROCUREMENT_SPECIALIST
 
 ### Behavior
 
@@ -289,43 +284,8 @@ Close a PO. No further edits or deliveries allowed.
 
 ### Error Responses
 
-- 403: User is not PROCUREMENT_SPECIALIST/ADMIN or PO already CLOSED
+- 403: User is not PROCUREMENT_SPECIALIST or PO already CLOSED
 - 404: PO not found
-
----
-
-## POST /api/pos/:id/resend-email
-
-Resend PO notification email to supplier.
-
-### Request Body
-
-```typescript
-{
-  additional_emails?: string[];  // Optional additional recipients
-}
-```
-
-### Behavior
-
-1. Send PO email to all supplier emails + any additional emails
-2. Include PO details and line items in email
-
-### Response 200
-
-```typescript
-{
-  message: "Email sent successfully";
-  recipients: string[];
-}
-```
-
-### Error Responses
-
-- 400: Supplier has no emails and no additional_emails provided
-- 403: User is not PROCUREMENT_SPECIALIST/ADMIN
-- 404: PO not found
-- 500: Email sending failed
 
 ---
 
