@@ -471,6 +471,7 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 - `server/middleware/role-access.ts` - Updated permissions and blocked patterns
 
 **Verification**: Tested as PROCUREMENT_SPECIALIST user:
+
 - Login redirects to `/orders` instead of Dashboard
 - Navigation shows only "Transactions > Orders"
 - Direct URL to `/` redirects to `/orders`
@@ -483,6 +484,7 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 **Issue**: PROCUREMENT_SPECIALIST users could see "Create Delivery" and "Close PO" buttons on the PO detail page. Per updated requirements, they should NOT have these abilities.
 
 **Root Cause**: The initial implementation allowed PROCUREMENT_SPECIALIST users to:
+
 1. See the "Create Delivery" button on PO detail page (even though the API was blocked)
 2. Close POs (both UI button and API endpoint)
 
@@ -500,10 +502,148 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 - `server/api/pos/[id]/close.patch.ts` - Updated role check to only allow ADMIN
 
 **Verification**: Tested as PROCUREMENT_SPECIALIST user:
+
 - PO detail page shows only "Edit" button for OPEN POs
 - "Create Delivery" button is NOT visible
 - "Close PO" button is NOT visible
 - Navigation shows only "Transactions > Orders"
+
+---
+
+## Phase 13: Delivery Tracking & Over-Delivery Workflow (2026-01-22)
+
+**Purpose**: Implement PO line delivery tracking, over-delivery approval workflow, and automatic PO closure
+
+### DT001 - PO Line Delivery Tracking
+
+**Feature**: Track cumulative delivered quantities on each PO line and display remaining quantities.
+
+**Implementation**:
+
+- [x] DT001a Update `prisma/schema.prisma` - Add `delivered_qty` field to POLine model
+- [x] DT001b Update `prisma/schema.prisma` - Add `po_line_id` field to DeliveryLine model
+- [x] DT001c Update `prisma/schema.prisma` - Add relation from DeliveryLine to POLine
+- [x] DT001d Update `shared/types/database.ts` - Add new fields to POLine and DeliveryLine interfaces
+- [x] DT001e Update `app/composables/usePOs.ts` - Add `delivered_qty` and `remaining_qty` to interfaces
+- [x] DT001f Update `server/api/pos/[id].get.ts` - Return `delivered_qty` and computed `remaining_qty`
+- [x] DT001g Update `server/api/pos/open.get.ts` - Return delivery tracking info for dropdown
+- [x] DT001h Update `app/components/orders/POLineItemsTable.vue` - Add "Delivered" and "Remaining" columns
+- [x] DT001i Update `app/pages/orders/pos/[id].vue` - Enable delivery tracking display
+
+**Files Changed**:
+
+- `prisma/schema.prisma` - New fields and relations
+- `shared/types/database.ts` - Updated interfaces
+- `app/composables/usePOs.ts` - Updated types
+- `server/api/pos/[id].get.ts` - Return delivery tracking data
+- `server/api/pos/open.get.ts` - Include delivery tracking in dropdown
+- `app/components/orders/POLineItemsTable.vue` - New columns
+- `app/pages/orders/pos/[id].vue` - Enable tracking display
+
+---
+
+### DT002 - Delivery Form Pre-fill with Remaining Quantities
+
+**Feature**: Pre-fill delivery lines with remaining PO quantities instead of full quantities.
+
+**Implementation**:
+
+- [x] DT002a Update `app/pages/deliveries/create.vue` - Add `poLineTrackingMap` computed for tracking info
+- [x] DT002b Update `app/pages/deliveries/create.vue` - Change `poQuantityMap` to use `remaining_qty`
+- [x] DT002c Update `app/pages/deliveries/create.vue` - Pre-fill lines with remaining qty in `populateLinesFromPO()`
+- [x] DT002d Update `app/pages/deliveries/create.vue` - Add "Remaining" column to line items table
+- [x] DT002e Update `app/pages/deliveries/create.vue` - Show delivered qty info alongside remaining
+
+**Files Changed**:
+
+- `app/pages/deliveries/create.vue` - All pre-fill and display logic
+
+---
+
+### DT003 - Over-Delivery Approval Workflow
+
+**Feature**: Require Supervisor/Admin approval when delivery quantity exceeds PO remaining quantity.
+
+**Implementation**:
+
+- [x] DT003a Update `prisma/schema.prisma` - Add `over_delivery_approved` field to DeliveryLine
+- [x] DT003b Update `server/api/locations/[id]/deliveries/index.post.ts` - Detect over-delivery and block Operators
+- [x] DT003c Update `server/api/deliveries/[id].patch.ts` - Validate over-delivery approval on post
+- [x] DT003d Update `server/api/deliveries/[id].get.ts` - Return over-delivery status in response
+- [x] DT003e Update `app/pages/deliveries/create.vue` - Add approval status tracking to lines
+- [x] DT003f Update `app/pages/deliveries/create.vue` - Show approval alert for Supervisors/Admins
+- [x] DT003g Update `app/pages/deliveries/[id]/index.vue` - Add over-delivery alert banner
+- [x] DT003h Update `app/pages/deliveries/[id]/index.vue` - Add Approve/Reject buttons for Supervisors
+- [x] DT003i Update `app/pages/deliveries/[id]/index.vue` - Disable Operator actions when pending approval
+- [x] DT003j Update `app/pages/deliveries/[id]/index.vue` - Add rejection modal with reason field
+
+**Files Changed**:
+
+- `prisma/schema.prisma` - New field
+- `server/api/locations/[id]/deliveries/index.post.ts` - Over-delivery validation
+- `server/api/deliveries/[id].patch.ts` - Approval validation and processing
+- `server/api/deliveries/[id].get.ts` - Over-delivery status in response
+- `app/pages/deliveries/create.vue` - UI for over-delivery in create form
+- `app/pages/deliveries/[id]/index.vue` - Approval workflow UI
+
+---
+
+### DT004 - Over-Delivery Email Notifications
+
+**Feature**: Send email notifications for over-delivery approval workflow.
+
+**Implementation**:
+
+- [x] DT004a Update `server/utils/email.ts` - Add `sendOverDeliveryApprovalNotification()` function
+- [x] DT004b Update `server/utils/email.ts` - Add `sendOverDeliveryApprovedNotification()` function
+- [x] DT004c Update `server/utils/email.ts` - Add `sendOverDeliveryRejectedNotification()` function
+- [x] DT004d Update `server/api/locations/[id]/deliveries/index.post.ts` - Send approval request email
+- [x] DT004e Update `server/api/deliveries/[id].patch.ts` - Send approved/rejected emails
+
+**Files Changed**:
+
+- `server/utils/email.ts` - Three new email templates
+- `server/api/locations/[id]/deliveries/index.post.ts` - Approval request email trigger
+- `server/api/deliveries/[id].patch.ts` - Approved/rejected email triggers
+
+---
+
+### DT005 - Automatic PO Closure
+
+**Feature**: Automatically close PO when all line items have been fully delivered.
+
+**Implementation**:
+
+- [x] DT005a Update `server/api/locations/[id]/deliveries/index.post.ts` - Add auto-close check after delivery post
+- [x] DT005b Update `server/api/deliveries/[id].patch.ts` - Add auto-close check after delivery post
+- [x] DT005c Update both APIs - Close linked PRF when PO auto-closes
+- [x] DT005d Update both APIs - Return `po_auto_closed` flag in response
+- [x] DT005e Update `app/pages/deliveries/create.vue` - Show auto-close notification in success message
+
+**Files Changed**:
+
+- `server/api/locations/[id]/deliveries/index.post.ts` - Auto-close logic
+- `server/api/deliveries/[id].patch.ts` - Auto-close logic
+- `app/pages/deliveries/create.vue` - UI notification
+
+---
+
+### DT006 - Update PO Line delivered_qty on Delivery Post
+
+**Feature**: Increment PO line delivered_qty when delivery is posted.
+
+**Implementation**:
+
+- [x] DT006a Update `server/api/locations/[id]/deliveries/index.post.ts` - Increment delivered_qty in transaction
+- [x] DT006b Update `server/api/deliveries/[id].patch.ts` - Increment delivered_qty in transaction
+- [x] DT006c Both APIs - Match delivery lines to PO lines by po_line_id or item_id fallback
+
+**Files Changed**:
+
+- `server/api/locations/[id]/deliveries/index.post.ts` - delivered_qty increment
+- `server/api/deliveries/[id].patch.ts` - delivered_qty increment
+
+**Checkpoint**: Phase 13 complete - Full delivery tracking with over-delivery approval and auto-PO closure ✅
 
 ---
 

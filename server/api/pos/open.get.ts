@@ -85,6 +85,7 @@ export default defineEventHandler(async (event) => {
             id: true,
             item_description: true,
             quantity: true,
+            delivered_qty: true,
             unit: true,
             unit_price: true,
             item_id: true,
@@ -111,15 +112,22 @@ export default defineEventHandler(async (event) => {
         po_no: po.po_no,
         supplier: po.supplier,
         total_amount: po.total_amount.toString(),
-        lines: po.lines.map((line) => ({
-          id: line.id,
-          item_id: line.item_id,
-          item_description: line.item_description,
-          quantity: line.quantity.toString(),
-          unit: line.unit,
-          unit_price: line.unit_price.toString(),
-          item: line.item,
-        })),
+        lines: po.lines.map((line) => {
+          const quantity = parseFloat(line.quantity.toString());
+          const deliveredQty = parseFloat(line.delivered_qty.toString());
+          const remainingQty = Math.max(0, quantity - deliveredQty);
+          return {
+            id: line.id,
+            item_id: line.item_id,
+            item_description: line.item_description,
+            quantity: line.quantity.toString(),
+            delivered_qty: line.delivered_qty.toString(),
+            remaining_qty: remainingQty.toString(), // Computed field for convenience
+            unit: line.unit,
+            unit_price: line.unit_price.toString(),
+            item: line.item,
+          };
+        }),
       })),
     };
   } catch (error) {

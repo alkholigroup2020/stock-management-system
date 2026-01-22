@@ -684,6 +684,8 @@ onMounted(async () => {
                 item_description: line.item_description,
                 unit: line.unit,
                 quantity: line.quantity,
+                delivered_qty: line.delivered_qty || '0',
+                remaining_qty: line.remaining_qty || line.quantity,
                 unit_price: line.unit_price,
                 discount_percent: line.discount_percent,
                 vat_percent: line.vat_percent,
@@ -696,6 +698,7 @@ onMounted(async () => {
             :items="items"
             :readonly="true"
             :loading="false"
+            :show-delivery-tracking="true"
           />
         </UCard>
 

@@ -241,6 +241,7 @@ export interface POLine {
   item_code: string | null;
   item_description: string;
   quantity: DecimalValue;
+  delivered_qty: DecimalValue; // Track cumulative delivered quantity
   unit: Unit;
   unit_price: DecimalValue;
   discount_percent: DecimalValue;
@@ -274,12 +275,14 @@ export interface DeliveryLine {
   id: string;
   delivery_id: string;
   item_id: string;
+  po_line_id: string | null; // Link to the PO line this delivery fulfills
   quantity: DecimalValue;
   unit_price: DecimalValue;
   period_price: DecimalValue;
   price_variance: DecimalValue;
   line_value: DecimalValue;
   ncr_id: string | null;
+  over_delivery_approved: boolean; // True if Supervisor/Admin approved over-delivery
 }
 
 export interface Issue {

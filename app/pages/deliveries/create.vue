@@ -208,11 +208,41 @@
         <div v-if="hasOverDeliveryLines" class="px-3 sm:px-4 pt-3 sm:pt-4">
           <UAlert
             icon="i-lucide-alert-triangle"
-            color="warning"
+            :color="hasUnapprovedOverDelivery ? 'error' : 'warning'"
             variant="subtle"
-            title="Over-Delivery Detected"
-            :description="`${overDeliveryCount} item(s) have quantity exceeding the PO quantity. Please verify before proceeding.`"
-          />
+            :title="
+              hasUnapprovedOverDelivery
+                ? 'Over-Delivery Requires Approval'
+                : 'Over-Delivery Approved'
+            "
+          >
+            <template #description>
+              <div class="space-y-2">
+                <p>
+                  {{ overDeliveryCount }} item(s) have quantity exceeding the remaining PO quantity.
+                </p>
+                <p v-if="hasUnapprovedOverDelivery && canApproveOverDelivery" class="text-sm">
+                  As a {{ user?.role }}, you can approve these over-deliveries.
+                </p>
+                <p v-else-if="hasUnapprovedOverDelivery" class="text-sm">
+                  <strong>Supervisor or Admin approval is required</strong>
+                  to proceed with over-deliveries.
+                </p>
+              </div>
+            </template>
+            <template v-if="hasUnapprovedOverDelivery && canApproveOverDelivery" #actions>
+              <UButton
+                color="warning"
+                variant="soft"
+                size="sm"
+                class="cursor-pointer"
+                icon="i-lucide-check"
+                @click="approveAllOverDeliveries"
+              >
+                Approve Over-Deliveries
+              </UButton>
+            </template>
+          </UAlert>
         </div>
 
         <!-- Variance Warning -->
@@ -233,6 +263,7 @@
               <tr class="bg-[var(--ui-bg-elevated)]">
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">PO Qty</th>
+                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Remaining</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Quantity</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit Price</th>
                 <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
@@ -246,7 +277,7 @@
             <tbody class="divide-y divide-[var(--ui-border)]">
               <!-- Loading State -->
               <tr v-if="loadingInitialData">
-                <td colspan="8" class="px-4 py-8">
+                <td colspan="9" class="px-4 py-8">
                   <div class="flex flex-col items-center justify-center gap-3">
                     <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
                     <p class="text-sm text-[var(--ui-text-muted)]">Loading items...</p>
@@ -276,10 +307,32 @@
                   />
                 </td>
 
-                <!-- PO Quantity -->
+                <!-- PO Quantity (Original) -->
                 <td class="px-4 py-3">
                   <span v-if="line.po_quantity !== undefined" class="text-caption">
                     {{ formatNumber(line.po_quantity) }}
+                  </span>
+                  <span v-else class="text-caption">-</span>
+                </td>
+
+                <!-- Remaining Quantity -->
+                <td class="px-4 py-3">
+                  <span
+                    v-if="line.remaining_qty !== undefined"
+                    :class="[
+                      'text-caption font-medium',
+                      line.remaining_qty <= 0
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-[var(--ui-text)]',
+                    ]"
+                  >
+                    {{ formatNumber(line.remaining_qty) }}
+                    <span
+                      v-if="line.delivered_qty && line.delivered_qty > 0"
+                      class="text-xs text-[var(--ui-text-muted)]"
+                    >
+                      ({{ formatNumber(line.delivered_qty) }} received)
+                    </span>
                   </span>
                   <span v-else class="text-caption">-</span>
                 </td>
@@ -370,7 +423,7 @@
 
               <!-- Empty State -->
               <tr v-if="!loadingInitialData && lines.length === 0">
-                <td colspan="8" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
+                <td colspan="9" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
                   <div v-if="selectedPO">
                     No items added yet. PO items have been added as suggestions.
                   </div>
@@ -518,13 +571,39 @@ const selectedPO = computed<OpenPO | undefined>(() => {
   return openPOs.value.find((po) => po.id === formData.value.po_id);
 });
 
-// Build a map of item_id -> PO quantity for over-delivery checking
+// Build a map of item_id -> { po_line_id, quantity, delivered_qty, remaining_qty } for delivery tracking
+const poLineTrackingMap = computed<
+  Record<
+    string,
+    { po_line_id: string; quantity: number; delivered_qty: number; remaining_qty: number }
+  >
+>(() => {
+  if (!selectedPO.value) return {};
+  const map: Record<
+    string,
+    { po_line_id: string; quantity: number; delivered_qty: number; remaining_qty: number }
+  > = {};
+  for (const line of selectedPO.value.lines) {
+    if (line.item_id) {
+      map[line.item_id] = {
+        po_line_id: line.id,
+        quantity: parseFloat(line.quantity),
+        delivered_qty: parseFloat(line.delivered_qty || "0"),
+        remaining_qty: parseFloat(line.remaining_qty || line.quantity),
+      };
+    }
+  }
+  return map;
+});
+
+// Backwards compatibility: simple map for quick lookup
 const poQuantityMap = computed<Record<string, number>>(() => {
   if (!selectedPO.value) return {};
   const map: Record<string, number> = {};
   for (const line of selectedPO.value.lines) {
     if (line.item_id) {
-      map[line.item_id] = parseFloat(line.quantity);
+      // Use remaining_qty for over-delivery checking
+      map[line.item_id] = parseFloat(line.remaining_qty || line.quantity);
     }
   }
   return map;
@@ -539,19 +618,23 @@ const formData = ref({
   delivery_date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
 });
 
-// Delivery lines state
+// Delivery lines state - with PO line tracking
 const lines = ref<
   Array<{
     id: string;
     item_id: string;
+    po_line_id?: string; // Link to the PO line
     quantity: string;
     unit_price: string;
     line_value: number;
     price_variance: number;
     has_variance: boolean;
     period_price?: number;
-    po_quantity?: number;
+    po_quantity?: number; // Original PO quantity
+    delivered_qty?: number; // Already delivered
+    remaining_qty?: number; // What's left to deliver
     is_over_delivery: boolean;
+    over_delivery_approved: boolean; // Set to true if user confirms over-delivery
   }>
 >([]);
 
@@ -560,29 +643,42 @@ const addLine = () => {
   lines.value.push({
     id: crypto.randomUUID(),
     item_id: "",
+    po_line_id: undefined,
     quantity: "",
     unit_price: "",
     line_value: 0,
     price_variance: 0,
     has_variance: false,
     po_quantity: undefined,
+    delivered_qty: undefined,
+    remaining_qty: undefined,
     is_over_delivery: false,
+    over_delivery_approved: false,
   });
 };
 
-// Populate delivery lines from selected PO
+// Populate delivery lines from selected PO - use remaining quantity
 const populateLinesFromPO = (po: OpenPO) => {
-  lines.value = po.lines.map((poLine) => ({
-    id: crypto.randomUUID(),
-    item_id: poLine.item_id || "",
-    quantity: poLine.quantity, // Pre-fill with PO quantity
-    unit_price: poLine.unit_price,
-    line_value: parseFloat(poLine.quantity) * parseFloat(poLine.unit_price),
-    price_variance: 0,
-    has_variance: false,
-    po_quantity: parseFloat(poLine.quantity),
-    is_over_delivery: false,
-  }));
+  lines.value = po.lines.map((poLine) => {
+    const quantity = parseFloat(poLine.quantity);
+    const deliveredQty = parseFloat(poLine.delivered_qty || "0");
+    const remainingQty = parseFloat(poLine.remaining_qty || poLine.quantity);
+    return {
+      id: crypto.randomUUID(),
+      item_id: poLine.item_id || "",
+      po_line_id: poLine.id, // Track the PO line ID
+      quantity: remainingQty > 0 ? remainingQty.toString() : "0", // Pre-fill with REMAINING qty
+      unit_price: poLine.unit_price,
+      line_value: remainingQty * parseFloat(poLine.unit_price),
+      price_variance: 0,
+      has_variance: false,
+      po_quantity: quantity, // Original PO quantity
+      delivered_qty: deliveredQty, // Already delivered
+      remaining_qty: remainingQty, // What's left
+      is_over_delivery: false,
+      over_delivery_approved: false,
+    };
+  });
 };
 
 // Remove line
@@ -608,13 +704,20 @@ const updateLineCalculations = (line: any) => {
     line.has_variance = false;
   }
 
-  // Check for over-delivery
-  const poQty = poQuantityMap.value[line.item_id];
-  if (poQty !== undefined) {
-    line.po_quantity = poQty;
-    line.is_over_delivery = quantity > poQty;
+  // Check for over-delivery based on remaining quantity
+  const poLineInfo = poLineTrackingMap.value[line.item_id];
+  if (poLineInfo) {
+    line.po_line_id = poLineInfo.po_line_id;
+    line.po_quantity = poLineInfo.quantity;
+    line.delivered_qty = poLineInfo.delivered_qty;
+    line.remaining_qty = poLineInfo.remaining_qty;
+    // Over-delivery is when quantity exceeds what's remaining
+    line.is_over_delivery = quantity > poLineInfo.remaining_qty;
   } else {
+    line.po_line_id = undefined;
     line.po_quantity = undefined;
+    line.delivered_qty = undefined;
+    line.remaining_qty = undefined;
     line.is_over_delivery = false;
   }
 };
@@ -640,6 +743,28 @@ const overDeliveryCount = computed(() => {
   return lines.value.filter((line) => line.is_over_delivery).length;
 });
 
+// Check if there are unapproved over-deliveries
+const hasUnapprovedOverDelivery = computed(() => {
+  return lines.value.some((line) => line.is_over_delivery && !line.over_delivery_approved);
+});
+
+// Get current user from auth
+const { user } = useAuth();
+
+// Check if user can approve over-deliveries (Supervisor/Admin)
+const canApproveOverDelivery = computed(() => {
+  return user.value?.role === "SUPERVISOR" || user.value?.role === "ADMIN";
+});
+
+// Approve all over-deliveries
+const approveAllOverDeliveries = () => {
+  lines.value.forEach((line) => {
+    if (line.is_over_delivery) {
+      line.over_delivery_approved = true;
+    }
+  });
+};
+
 // Draft validation (relaxed - for saving as draft)
 const isDraftValid = computed(() => {
   return (
@@ -653,14 +778,24 @@ const isDraftValid = computed(() => {
 
 // Full validation (strict - for posting)
 const isFormValid = computed(() => {
-  return (
+  // Basic validation
+  const basicValid =
     formData.value.po_id && // PO is now required
     selectedPO.value?.supplier.id && // Supplier from PO
     formData.value.invoice_no &&
     formData.value.delivery_date &&
     lines.value.length > 0 &&
-    lines.value.every((line) => line.item_id && line.quantity && line.unit_price)
-  );
+    lines.value.every((line) => line.item_id && line.quantity && line.unit_price);
+
+  if (!basicValid) return false;
+
+  // Check over-delivery approval requirements
+  if (hasUnapprovedOverDelivery.value && !canApproveOverDelivery.value) {
+    // Non-Supervisor/Admin cannot submit with unapproved over-deliveries
+    return false;
+  }
+
+  return true;
 });
 
 // Fetch suppliers
@@ -705,14 +840,16 @@ const fetchPeriodPrices = async () => {
   }
 };
 
-// Prepare lines data for API
+// Prepare lines data for API - include PO line tracking and over-delivery approval
 const prepareLinesData = () => {
   return lines.value
     .filter((line) => line.item_id && line.quantity)
     .map((line) => ({
       item_id: line.item_id,
+      po_line_id: line.po_line_id || undefined,
       quantity: parseFloat(line.quantity) || 0,
       unit_price: parseFloat(line.unit_price) || 0,
+      over_delivery_approved: line.over_delivery_approved || false,
     }));
 };
 
@@ -836,13 +973,25 @@ const postDelivery = async () => {
           }
         );
 
-        // Check if NCRs were created
+        // Check if NCRs were created and if PO was auto-closed
         const ncrCount = result.ncrs?.length || 0;
+        const poAutoClosed = result.po_auto_closed || false;
+
+        // Build notification messages
+        const notificationParts: string[] = [];
+        if (ncrCount > 0) {
+          notificationParts.push(`${ncrCount} NCR(s) automatically generated for review`);
+        }
+        if (poAutoClosed) {
+          notificationParts.push("PO has been automatically closed (all items fully delivered)");
+        }
 
         if (ncrCount > 0) {
           handleWarning("Delivery Posted with Price Variances", {
-            description: `${ncrCount} NCR(s) automatically generated for review. The delivery has been recorded successfully.`,
+            description: notificationParts.join(". ") + ".",
           });
+        } else if (poAutoClosed) {
+          handleSuccess("Delivery Posted - PO Completed", notificationParts.join(". ") + ".");
         } else {
           handleSuccess(
             "Delivery Posted Successfully",

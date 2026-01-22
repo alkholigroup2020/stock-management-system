@@ -23,6 +23,10 @@ import prisma from "../../utils/prisma";
 import { z } from "zod";
 import { calculateWAC } from "../../utils/wac";
 import { checkPriceVariance } from "../../utils/priceVariance";
+import {
+  sendOverDeliveryApprovedNotification,
+  sendOverDeliveryRejectedNotification,
+} from "../../utils/email";
 import type { UserRole } from "@prisma/client";
 
 // User session type
@@ -38,8 +42,10 @@ interface AuthUser {
 const deliveryLineSchema = z.object({
   id: z.string().uuid().optional(), // Existing line ID (for updates)
   item_id: z.string().uuid(),
+  po_line_id: z.string().uuid().nullable().optional(), // Link to the specific PO line (can be null)
   quantity: z.number().positive(),
   unit_price: z.number().nonnegative(),
+  over_delivery_approved: z.boolean().optional().default(false), // Requires Supervisor/Admin approval
 });
 
 // Request body schema
@@ -51,6 +57,10 @@ const bodySchema = z.object({
   delivery_date: z.string().optional(),
   lines: z.array(deliveryLineSchema).min(1).optional(),
   status: z.enum(["DRAFT", "POSTED"]).optional(),
+  // Email notification triggers
+  notify_approval: z.boolean().optional(), // Send approval notification to creator
+  notify_rejection: z.boolean().optional(), // Send rejection notification to creator
+  rejection_reason: z.string().optional(), // Reason for rejection (required if notify_rejection)
 });
 
 export default defineEventHandler(async (event) => {
@@ -224,13 +234,16 @@ export default defineEventHandler(async (event) => {
     }
 
     // Get items for validation - use fetched items or fetch from existing delivery lines
+    // IMPORTANT: Include po_line_id and over_delivery_approved to preserve approval status
     const linesToProcess =
       data.lines ||
       delivery.delivery_lines.map((l) => ({
         id: l.id,
         item_id: l.item_id,
+        po_line_id: l.po_line_id,
         quantity: parseFloat(l.quantity.toString()),
         unit_price: parseFloat(l.unit_price.toString()),
+        over_delivery_approved: l.over_delivery_approved,
       }));
 
     const itemIds = linesToProcess.map((line) => line.item_id);
@@ -257,6 +270,130 @@ export default defineEventHandler(async (event) => {
             : "One or more items not found",
         },
       });
+    }
+
+    // Get PO and its lines for over-delivery validation (if PO exists)
+    const poId = data.po_id ?? delivery.po_id;
+    let poLineMap = new Map<
+      string,
+      { item_id: string | null; quantity: number; delivered_qty: number; remaining_qty: number }
+    >();
+
+    if (poId && isPosting) {
+      const purchaseOrder = await prisma.pO.findUnique({
+        where: { id: poId },
+        include: {
+          lines: {
+            select: {
+              id: true,
+              item_id: true,
+              quantity: true,
+              delivered_qty: true,
+            },
+          },
+        },
+      });
+
+      if (purchaseOrder && purchaseOrder.status !== "OPEN") {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Bad Request",
+          data: {
+            code: "PO_NOT_OPEN",
+            message: `Cannot post delivery for a ${purchaseOrder.status} Purchase Order.`,
+          },
+        });
+      }
+
+      if (purchaseOrder?.lines) {
+        for (const poLine of purchaseOrder.lines) {
+          const qty = parseFloat(poLine.quantity.toString());
+          const deliveredQty = parseFloat(poLine.delivered_qty.toString());
+          poLineMap.set(poLine.id, {
+            item_id: poLine.item_id,
+            quantity: qty,
+            delivered_qty: deliveredQty,
+            remaining_qty: Math.max(0, qty - deliveredQty),
+          });
+        }
+      }
+    }
+
+    // Validate over-delivery when posting
+    interface OverDeliveryLineInfo {
+      item_id: string;
+      po_line_id: string | undefined;
+      requested_qty: number;
+      remaining_qty: number;
+      approved: boolean;
+    }
+    const overDeliveryLines: OverDeliveryLineInfo[] = [];
+
+    if (isPosting && poId) {
+      for (const lineData of linesToProcess) {
+        // Find matching PO line by po_line_id or by item_id
+        const lineWithPoId = lineData as typeof lineData & { po_line_id?: string; over_delivery_approved?: boolean };
+        let poLineId = lineWithPoId.po_line_id;
+        let poLineInfo:
+          | { item_id: string | null; quantity: number; delivered_qty: number; remaining_qty: number }
+          | undefined;
+
+        if (poLineId && poLineMap.has(poLineId)) {
+          poLineInfo = poLineMap.get(poLineId);
+        } else {
+          // Fallback: find PO line by item_id
+          for (const [id, info] of poLineMap.entries()) {
+            if (info.item_id === lineData.item_id) {
+              poLineId = id;
+              poLineInfo = info;
+              break;
+            }
+          }
+        }
+
+        if (poLineInfo && lineData.quantity > poLineInfo.remaining_qty) {
+          // Check if this line was already marked as approved in the delivery
+          const existingLine = delivery.delivery_lines.find((l) => l.item_id === lineData.item_id);
+          const isApproved = existingLine?.over_delivery_approved || lineWithPoId.over_delivery_approved || false;
+
+          overDeliveryLines.push({
+            item_id: lineData.item_id,
+            po_line_id: poLineId,
+            requested_qty: lineData.quantity,
+            remaining_qty: poLineInfo.remaining_qty,
+            approved: isApproved,
+          });
+        }
+      }
+
+      // If there are unapproved over-deliveries, block non-Supervisor/Admin
+      const unapprovedOverDeliveries = overDeliveryLines.filter((line) => !line.approved);
+      if (unapprovedOverDeliveries.length > 0) {
+        if (user.role !== "SUPERVISOR" && user.role !== "ADMIN") {
+          const itemNames = unapprovedOverDeliveries.map((line) => {
+            const item = finalItems.find((i) => i.id === line.item_id);
+            return item ? item.name : line.item_id;
+          });
+          throw createError({
+            statusCode: 400,
+            statusMessage: "Bad Request",
+            data: {
+              code: "OVER_DELIVERY_NOT_APPROVED",
+              message: `Over-delivery detected for: ${itemNames.join(", ")}. Supervisor or Admin approval is required.`,
+              details: unapprovedOverDeliveries.map((line) => ({
+                item_id: line.item_id,
+                requested_qty: line.requested_qty,
+                remaining_qty: line.remaining_qty,
+                excess: line.requested_qty - line.remaining_qty,
+              })),
+            },
+          });
+        }
+        // Supervisor/Admin implicitly approves by posting
+        for (const line of overDeliveryLines) {
+          line.approved = true;
+        }
+      }
     }
 
     // Get period prices and stock levels (only for posting)
@@ -294,22 +431,28 @@ export default defineEventHandler(async (event) => {
     // Increase timeout to 30 seconds to handle multiple line items and stock updates
     const result = await prisma.$transaction(
       async (tx) => {
-        // Delete existing lines if new lines provided OR if we're posting
-        // When posting without explicit lines, we use existing lines as fallback (line 200),
-        // but we still need to delete them first to avoid duplication
-        if (data.lines || isPosting) {
-          await tx.deliveryLine.deleteMany({
-            where: { delivery_id: deliveryId },
-          });
-        }
-
-        let totalAmount = 0;
-        let hasVariance = false;
+        let totalAmount = parseFloat(delivery.total_amount.toString());
+        let hasVariance = delivery.has_variance;
         const createdLines: unknown[] = [];
         const createdNCRs: unknown[] = [];
 
-        // Process each delivery line
-        for (const lineData of linesToProcess) {
+        // Only process lines if explicitly provided or posting
+        // This prevents duplicating lines when only updating header fields (e.g., rejection note)
+        const shouldProcessLines = data.lines || isPosting;
+
+        if (shouldProcessLines) {
+          // Delete existing lines first to avoid duplication
+          await tx.deliveryLine.deleteMany({
+            where: { delivery_id: deliveryId },
+          });
+
+          // Reset totals for recalculation
+          totalAmount = 0;
+          hasVariance = false;
+        }
+
+        // Process each delivery line (only if we should)
+        for (const lineData of shouldProcessLines ? linesToProcess : []) {
           const item = finalItems.find((i) => i.id === lineData.item_id)!;
           const periodPrice = periodPriceMap.get(lineData.item_id);
           const currentStock = stockMap.get(lineData.item_id) || { quantity: 0, wac: 0 };
@@ -350,18 +493,53 @@ export default defineEventHandler(async (event) => {
             }
           }
 
+          // Find matching PO line info for this delivery line
+          const lineWithPoId = lineData as typeof lineData & { po_line_id?: string };
+          let matchedPoLineId = lineWithPoId.po_line_id;
+          if (!matchedPoLineId) {
+            // Fallback: find PO line by item_id
+            for (const [id, info] of poLineMap.entries()) {
+              if (info.item_id === lineData.item_id) {
+                matchedPoLineId = id;
+                break;
+              }
+            }
+          }
+
+          // Check if this line has approved over-delivery
+          // When posting, use the calculated overDeliveryLines array
+          // When updating draft, also accept the value from the request body
+          const overDeliveryInfo = overDeliveryLines.find(
+            (ol) => ol.item_id === lineData.item_id && ol.po_line_id === matchedPoLineId
+          );
+          const lineWithApproval = lineData as typeof lineData & { over_delivery_approved?: boolean };
+          const isOverDeliveryApproved =
+            overDeliveryInfo?.approved ?? lineWithApproval.over_delivery_approved ?? false;
+
           // Create delivery line (either new or recreated)
           const deliveryLine = await tx.deliveryLine.create({
             data: {
               delivery_id: deliveryId,
               item_id: lineData.item_id,
+              po_line_id: matchedPoLineId || null,
               quantity: lineData.quantity,
               unit_price: lineData.unit_price,
               period_price: periodPrice || lineData.unit_price,
               price_variance: priceVariance,
               line_value: lineValue,
+              over_delivery_approved: isOverDeliveryApproved,
             },
           });
+
+          // Update PO line delivered_qty (only when posting and we have a matched PO line)
+          if (isPosting && matchedPoLineId) {
+            await tx.pOLine.update({
+              where: { id: matchedPoLineId },
+              data: {
+                delivered_qty: { increment: lineData.quantity },
+              },
+            });
+          }
 
           // Update or create location stock (only when posting)
           if (isPosting) {
@@ -463,8 +641,11 @@ export default defineEventHandler(async (event) => {
             period_id: isPosting && currentPeriod ? currentPeriod.id : undefined,
             status: data.status,
             posted_at: isPosting ? new Date() : undefined,
-            total_amount: totalAmount,
-            has_variance: hasVariance,
+            // Only update totals if we processed lines
+            ...(shouldProcessLines && {
+              total_amount: totalAmount,
+              has_variance: hasVariance,
+            }),
           },
           include: {
             location: {
@@ -504,12 +685,185 @@ export default defineEventHandler(async (event) => {
       }
     );
 
+    // Check if PO should be automatically closed (all items fully delivered)
+    let poAutoClosed = false;
+    if (isPosting && poId) {
+      // Re-query the PO lines to get updated delivered_qty values
+      const poLines = await prisma.pOLine.findMany({
+        where: { po_id: poId },
+        select: {
+          id: true,
+          quantity: true,
+          delivered_qty: true,
+        },
+      });
+
+      // Check if all lines are fully delivered (delivered_qty >= quantity)
+      const allFullyDelivered = poLines.every((line) => {
+        const qty = parseFloat(line.quantity.toString());
+        const deliveredQty = parseFloat(line.delivered_qty.toString());
+        return deliveredQty >= qty;
+      });
+
+      if (allFullyDelivered && poLines.length > 0) {
+        // Automatically close the PO
+        const closedPO = await prisma.pO.update({
+          where: { id: poId },
+          data: { status: "CLOSED" },
+          include: { prf: { select: { id: true, status: true } } },
+        });
+
+        poAutoClosed = true;
+
+        // Also close the linked PRF if it exists and is still approved
+        if (closedPO.prf && closedPO.prf.status === "APPROVED") {
+          await prisma.pRF.update({
+            where: { id: closedPO.prf.id },
+            data: { status: "CLOSED" },
+          });
+        }
+      }
+    }
+
+    // Send email notifications (non-blocking - don't fail the request if email fails)
+    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    if (data.notify_approval || data.notify_rejection) {
+      // Get creator's email and over-delivery items info
+      const creatorWithEmail = await prisma.user.findUnique({
+        where: { id: delivery.created_by },
+        select: { email: true, full_name: true },
+      });
+
+      // Fetch PO lines for over-delivery calculation if we have a PO
+      // (poLineMap might be empty if not posting)
+      let notificationPoLineMap = poLineMap;
+      if (poId && notificationPoLineMap.size === 0) {
+        const purchaseOrderForNotification = await prisma.pO.findUnique({
+          where: { id: poId },
+          include: {
+            lines: {
+              select: {
+                id: true,
+                item_id: true,
+                quantity: true,
+                delivered_qty: true,
+              },
+            },
+          },
+        });
+
+        if (purchaseOrderForNotification?.lines) {
+          notificationPoLineMap = new Map();
+          for (const poLine of purchaseOrderForNotification.lines) {
+            const qty = parseFloat(poLine.quantity.toString());
+            const deliveredQty = parseFloat(poLine.delivered_qty.toString());
+            notificationPoLineMap.set(poLine.id, {
+              item_id: poLine.item_id,
+              quantity: qty,
+              delivered_qty: deliveredQty,
+              remaining_qty: Math.max(0, qty - deliveredQty),
+            });
+          }
+        }
+      }
+
+      // Get over-delivery items from the updated delivery lines
+      const overDeliveryItems = result.lines
+        .filter((line) => {
+          const lineAny = line as { item: { id: string; name: string }; quantity: number };
+          // Check if this item was an over-delivery by comparing to PO line
+          const matchingLineData = linesToProcess.find((l) => l.item_id === lineAny.item.id);
+          const poLineIdToCheck = matchingLineData?.po_line_id as string | undefined;
+
+          // Try to find by po_line_id first, then by item_id
+          let poLineInfo;
+          if (poLineIdToCheck) {
+            poLineInfo = notificationPoLineMap.get(poLineIdToCheck);
+          }
+          if (!poLineInfo) {
+            for (const [, info] of notificationPoLineMap.entries()) {
+              if (info.item_id === lineAny.item.id) {
+                poLineInfo = info;
+                break;
+              }
+            }
+          }
+
+          return poLineInfo && lineAny.quantity > poLineInfo.remaining_qty;
+        })
+        .map((line) => {
+          const lineAny = line as { item: { id: string; name: string }; quantity: number };
+          const matchingLineData = linesToProcess.find((l) => l.item_id === lineAny.item.id);
+          const poLineIdToCheck = matchingLineData?.po_line_id as string | undefined;
+
+          let poLineInfo;
+          if (poLineIdToCheck) {
+            poLineInfo = notificationPoLineMap.get(poLineIdToCheck);
+          }
+          if (!poLineInfo) {
+            for (const [, info] of notificationPoLineMap.entries()) {
+              if (info.item_id === lineAny.item.id) {
+                poLineInfo = info;
+                break;
+              }
+            }
+          }
+
+          return {
+            itemName: lineAny.item.name,
+            requestedQty: lineAny.quantity,
+            remainingQty: poLineInfo?.remaining_qty ?? 0,
+          };
+        });
+
+      if (creatorWithEmail?.email && overDeliveryItems.length > 0) {
+        if (data.notify_approval) {
+          // Send approval notification
+          sendOverDeliveryApprovedNotification({
+            recipientEmail: creatorWithEmail.email,
+            deliveryNumber: result.delivery.delivery_no,
+            approverName: user.username,
+            locationName: result.delivery.location.name,
+            approvedItems: overDeliveryItems,
+            deliveryUrl: `${siteUrl}/deliveries/${deliveryId}`,
+          }).catch((err) => {
+            console.error("[Delivery PATCH] Failed to send approval notification:", err);
+          });
+        }
+
+        if (data.notify_rejection && data.rejection_reason) {
+          // Send rejection notification
+          sendOverDeliveryRejectedNotification({
+            recipientEmail: creatorWithEmail.email,
+            deliveryNumber: result.delivery.delivery_no,
+            rejectorName: user.username,
+            locationName: result.delivery.location.name,
+            rejectionReason: data.rejection_reason,
+            rejectedItems: overDeliveryItems,
+            deliveryUrl: `${siteUrl}/deliveries/${deliveryId}/edit`,
+          }).catch((err) => {
+            console.error("[Delivery PATCH] Failed to send rejection notification:", err);
+          });
+        }
+      }
+    }
+
     // Build response message based on status
     let message: string;
     if (isPosting) {
+      const parts: string[] = [];
+      if (result.ncrs.length > 0) {
+        parts.push(
+          `${result.ncrs.length} price variance(s) detected and NCR(s) created automatically`
+        );
+      }
+      if (poAutoClosed) {
+        parts.push("PO has been automatically closed (all items fully delivered)");
+      }
       message =
-        result.ncrs.length > 0
-          ? `Delivery posted. ${result.ncrs.length} price variance(s) detected and NCR(s) created automatically.`
+        parts.length > 0
+          ? `Delivery posted. ${parts.join(". ")}.`
           : "Delivery posted successfully.";
     } else {
       message = "Delivery draft updated successfully.";
@@ -518,6 +872,7 @@ export default defineEventHandler(async (event) => {
     return {
       id: result.delivery.id,
       message,
+      po_auto_closed: poAutoClosed,
       delivery: {
         id: result.delivery.id,
         delivery_no: result.delivery.delivery_no,

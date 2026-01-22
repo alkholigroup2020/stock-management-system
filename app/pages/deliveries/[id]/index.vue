@@ -63,6 +63,7 @@
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
               aria-label="Delete draft"
+              :disabled="isOperatorWithOverDelivery"
               @click="showDeleteConfirmation = true"
             >
               <span class="hidden sm:inline">Delete</span>
@@ -74,6 +75,7 @@
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
               aria-label="Edit draft"
+              :disabled="isOperatorEditDisabled"
               @click="editDraft"
             >
               <span class="hidden sm:inline">Edit</span>
@@ -84,6 +86,7 @@
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
               aria-label="Post delivery"
+              :disabled="isOperatorWithPendingApproval"
               @click="showPostConfirmation = true"
             >
               <span class="hidden sm:inline">Post</span>
@@ -105,6 +108,93 @@
           </UButton>
         </div>
       </div>
+
+      <!-- Over-Delivery Alert (for drafts) -->
+      <UAlert
+        v-if="isDraft && hasOverDeliveryLines"
+        icon="i-lucide-alert-triangle"
+        color="warning"
+        variant="subtle"
+        :title="
+          hasUnapprovedOverDelivery ? 'Over-Delivery Requires Approval' : 'Over-Delivery Approved'
+        "
+      >
+        <template #description>
+          <div class="space-y-3">
+            <p>
+              {{ overDeliveryLinesCount }} item(s) have quantities exceeding the remaining PO
+              quantity.
+            </p>
+
+            <!-- List of over-delivery items -->
+            <div class="bg-[var(--ui-bg)] rounded-md p-3 space-y-1">
+              <div
+                v-for="line in delivery?.lines.filter((l) => l.is_over_delivery)"
+                :key="line.id"
+                class="flex justify-between text-sm"
+              >
+                <span>{{ line.item.name }}</span>
+                <span class="text-[var(--ui-text-muted)]">
+                  {{ line.quantity.toFixed(2) }} / {{ line.po_line_remaining_qty?.toFixed(2) ?? 0 }}
+                  remaining
+                  <UBadge
+                    v-if="line.over_delivery_approved"
+                    color="success"
+                    variant="subtle"
+                    size="xs"
+                    class="ml-2"
+                  >
+                    Approved
+                  </UBadge>
+                  <UBadge v-else color="warning" variant="subtle" size="xs" class="ml-2">
+                    Pending
+                  </UBadge>
+                </span>
+              </div>
+            </div>
+
+            <div v-if="hasUnapprovedOverDelivery">
+              <p v-if="canApproveOverDelivery" class="text-sm">
+                As a {{ userRole }}, you can approve and post this delivery.
+              </p>
+              <p v-else class="text-sm">
+                <strong>Supervisor or Admin approval is required</strong>
+                to post this delivery.
+              </p>
+
+              <!-- Approve/Reject buttons for Supervisors/Admins -->
+              <div v-if="canApproveOverDelivery" class="mt-3 flex gap-2">
+                <UButton
+                  color="success"
+                  variant="solid"
+                  icon="i-lucide-check-circle"
+                  size="sm"
+                  class="cursor-pointer"
+                  :loading="approvingOverDelivery"
+                  @click="showApproveOverDeliveryConfirmation = true"
+                >
+                  Approve
+                </UButton>
+                <UButton
+                  color="error"
+                  variant="soft"
+                  icon="i-lucide-x-circle"
+                  size="sm"
+                  class="cursor-pointer"
+                  :loading="rejectingOverDelivery"
+                  @click="showRejectOverDeliveryModal = true"
+                >
+                  Reject
+                </UButton>
+              </div>
+            </div>
+            <p v-else class="text-sm text-emerald-600 dark:text-emerald-400">
+              <UIcon name="i-lucide-check-circle" class="h-4 w-4 inline mr-1" />
+              All over-delivery items have been approved. You can now post this delivery.
+            </p>
+          </div>
+        </template>
+      </UAlert>
 
       <!-- Price Variance Alert -->
       <UAlert
@@ -440,6 +530,72 @@
         :loading="deleting"
         @confirm="deleteDraft"
       />
+
+      <!-- Approve Over-Delivery Confirmation Modal -->
+      <UiConfirmModal
+        v-model="showApproveOverDeliveryConfirmation"
+        title="Approve Over-Delivery"
+        message="Are you sure you want to approve all over-delivery items? This will allow the delivery to be posted even though some quantities exceed the PO remaining amounts."
+        confirm-text="Approve"
+        cancel-text="Cancel"
+        variant="warning"
+        :loading="approvingOverDelivery"
+        @confirm="approveOverDelivery"
+      />
+
+      <!-- Reject Over-Delivery Modal -->
+      <UModal v-model:open="showRejectOverDeliveryModal">
+        <template #content>
+          <div class="p-6 space-y-4">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"
+              >
+                <UIcon name="i-lucide-x-circle" class="w-5 h-5 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-[var(--ui-text)]">Reject Over-Delivery</h3>
+                <p class="text-sm text-[var(--ui-text-muted)]">
+                  Please provide a reason for rejection
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <UTextarea
+                v-model="rejectionReason"
+                placeholder="Enter the reason for rejecting this over-delivery..."
+                :rows="3"
+                class="w-full"
+              />
+            </div>
+
+            <p class="text-sm text-[var(--ui-text-muted)]">
+              The operator will be notified and can edit the delivery to correct the quantities.
+            </p>
+
+            <div class="flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                class="cursor-pointer"
+                @click="showRejectOverDeliveryModal = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                class="cursor-pointer"
+                :loading="rejectingOverDelivery"
+                :disabled="!rejectionReason.trim()"
+                @click="rejectOverDelivery"
+              >
+                Reject
+              </UButton>
+            </div>
+          </div>
+        </template>
+      </UModal>
     </template>
 
     <!-- Not Found State -->
@@ -475,6 +631,7 @@ const toast = useAppToast();
 // Types
 interface DeliveryLine {
   id: string;
+  po_line_id: string | null;
   item: {
     id: string;
     code: string;
@@ -489,6 +646,9 @@ interface DeliveryLine {
   price_variance: number;
   line_value: number;
   has_variance: boolean;
+  is_over_delivery: boolean;
+  po_line_remaining_qty: number | null;
+  over_delivery_approved: boolean;
   variance_percentage: string | null;
 }
 
@@ -519,6 +679,8 @@ interface Delivery {
   delivery_note: string | null;
   total_amount: number;
   has_variance: boolean;
+  has_over_delivery: boolean;
+  has_unapproved_over_delivery: boolean;
   status: DeliveryStatus;
   created_at: string;
   updated_at: string;
@@ -572,8 +734,16 @@ const error = ref<string | null>(null);
 const delivery = ref<Delivery | null>(null);
 const showPostConfirmation = ref(false);
 const showDeleteConfirmation = ref(false);
+const showApproveOverDeliveryConfirmation = ref(false);
+const showRejectOverDeliveryModal = ref(false);
+const rejectionReason = ref("");
 const posting = ref(false);
 const deleting = ref(false);
+const approvingOverDelivery = ref(false);
+const rejectingOverDelivery = ref(false);
+
+// Get user for role-based permissions
+const { user } = useAuth();
 
 // Computed
 const deliveryId = computed(() => route.params.id as string);
@@ -582,6 +752,35 @@ const varianceLinesCount = computed(() => delivery.value?.summary.variance_lines
 const totalVarianceAmount = computed(() => delivery.value?.summary.total_variance_amount ?? 0);
 const isDraft = computed(() => delivery.value?.status === "DRAFT");
 const isPosted = computed(() => delivery.value?.status === "POSTED");
+const hasOverDeliveryLines = computed(() => delivery.value?.has_over_delivery ?? false);
+const hasUnapprovedOverDelivery = computed(
+  () => delivery.value?.has_unapproved_over_delivery ?? false
+);
+const overDeliveryLinesCount = computed(
+  () => delivery.value?.lines.filter((l) => l.is_over_delivery).length ?? 0
+);
+const canApproveOverDelivery = computed(
+  () => user.value?.role === "SUPERVISOR" || user.value?.role === "ADMIN"
+);
+const userRole = computed(() => user.value?.role ?? "");
+const isOperator = computed(() => user.value?.role === "OPERATOR");
+// Check if delivery has been rejected (note starts with "[REJECTED")
+const isRejected = computed(() => {
+  const note = delivery.value?.delivery_note || "";
+  return note.startsWith("[REJECTED");
+});
+// Operator can't delete when there are ANY over-delivery lines (approved or not)
+const isOperatorWithOverDelivery = computed(
+  () => isOperator.value && hasOverDeliveryLines.value
+);
+// Operator can't edit when there's over-delivery, UNLESS it was rejected (so they can fix quantities)
+const isOperatorEditDisabled = computed(
+  () => isOperator.value && hasOverDeliveryLines.value && !isRejected.value
+);
+// Operator can't post when there's unapproved over-delivery
+const isOperatorWithPendingApproval = computed(
+  () => isOperator.value && hasUnapprovedOverDelivery.value
+);
 
 type BadgeColor = "error" | "info" | "success" | "primary" | "secondary" | "warning" | "neutral";
 
@@ -663,6 +862,83 @@ async function deleteDraft() {
   } finally {
     deleting.value = false;
     showDeleteConfirmation.value = false;
+  }
+}
+
+// Approve over-delivery items (Supervisor/Admin only)
+async function approveOverDelivery() {
+  if (!deliveryId.value || !delivery.value) return;
+
+  approvingOverDelivery.value = true;
+
+  try {
+    // Get all lines with over_delivery_approved set to true for over-delivery lines
+    const updatedLines = delivery.value.lines.map((line) => ({
+      id: line.id,
+      item_id: line.item.id,
+      po_line_id: line.po_line_id,
+      quantity: line.quantity,
+      unit_price: line.unit_price,
+      over_delivery_approved: line.is_over_delivery ? true : line.over_delivery_approved,
+    }));
+
+    await $fetch(`/api/deliveries/${deliveryId.value}`, {
+      method: "PATCH",
+      body: {
+        lines: updatedLines,
+        notify_approval: true, // Trigger email notification to creator
+      },
+    });
+
+    toast.success("Over-delivery items approved. The operator has been notified.");
+    // Refresh the delivery details
+    await fetchDelivery();
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    toast.error(fetchError?.data?.message || "Failed to approve over-delivery items");
+    console.error("Error approving over-delivery:", err);
+  } finally {
+    approvingOverDelivery.value = false;
+    showApproveOverDeliveryConfirmation.value = false;
+  }
+}
+
+// Reject over-delivery items (Supervisor/Admin only)
+async function rejectOverDelivery() {
+  if (!deliveryId.value || !delivery.value) return;
+  if (!rejectionReason.value.trim()) {
+    toast.error("Please provide a rejection reason");
+    return;
+  }
+
+  rejectingOverDelivery.value = true;
+
+  try {
+    // Prepend rejection reason to delivery note
+    const existingNote = delivery.value.delivery_note || "";
+    const rejectionNote = `[REJECTED by ${user.value?.full_name || userRole.value}]: ${rejectionReason.value.trim()}`;
+    const newNote = existingNote ? `${rejectionNote}\n\n${existingNote}` : rejectionNote;
+
+    await $fetch(`/api/deliveries/${deliveryId.value}`, {
+      method: "PATCH",
+      body: {
+        delivery_note: newNote,
+        notify_rejection: true, // Trigger email notification to creator
+        rejection_reason: rejectionReason.value.trim(), // Include reason for email
+      },
+    });
+
+    toast.success("Over-delivery items rejected. The operator has been notified.");
+    rejectionReason.value = "";
+    // Refresh the delivery details
+    await fetchDelivery();
+  } catch (err: unknown) {
+    const fetchError = err as { data?: { message?: string } };
+    toast.error(fetchError?.data?.message || "Failed to reject over-delivery items");
+    console.error("Error rejecting over-delivery:", err);
+  } finally {
+    rejectingOverDelivery.value = false;
+    showRejectOverDeliveryModal.value = false;
   }
 }
 

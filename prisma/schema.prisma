@@ -304,22 +304,24 @@ model PO {
 }
 
 model POLine {
-  id               String   @id @default(uuid()) @db.Uuid
-  po_id            String   @db.Uuid
-  item_id          String?  @db.Uuid
-  item_code        String?  @db.VarChar(50)
-  item_description String   @db.VarChar(500)
-  quantity         Decimal  @db.Decimal(15, 4)
+  id               String         @id @default(uuid()) @db.Uuid
+  po_id            String         @db.Uuid
+  item_id          String?        @db.Uuid
+  item_code        String?        @db.VarChar(50)
+  item_description String         @db.VarChar(500)
+  quantity         Decimal        @db.Decimal(15, 4)
+  delivered_qty    Decimal        @default(0) @db.Decimal(15, 4) // Track cumulative delivered quantity
   unit             Unit
-  unit_price       Decimal  @db.Decimal(15, 4)
-  discount_percent Decimal  @default(0) @db.Decimal(5, 2)
-  total_before_vat Decimal  @db.Decimal(15, 2)
-  vat_percent      Decimal  @default(15) @db.Decimal(5, 2)
-  vat_amount       Decimal  @db.Decimal(15, 2)
-  total_after_vat  Decimal  @db.Decimal(15, 2)
+  unit_price       Decimal        @db.Decimal(15, 4)
+  discount_percent Decimal        @default(0) @db.Decimal(5, 2)
+  total_before_vat Decimal        @db.Decimal(15, 2)
+  vat_percent      Decimal        @default(15) @db.Decimal(5, 2)
+  vat_amount       Decimal        @db.Decimal(15, 2)
+  total_after_vat  Decimal        @db.Decimal(15, 2)
   notes            String?
-  po               PO       @relation(fields: [po_id], references: [id], onDelete: Cascade)
-  item             Item?    @relation(fields: [item_id], references: [id])
+  po               PO             @relation(fields: [po_id], references: [id], onDelete: Cascade)
+  item             Item?          @relation(fields: [item_id], references: [id])
+  delivery_lines   DeliveryLine[] // Track which deliveries fulfilled this PO line
 
   @@index([po_id])
   @@index([item_id])
@@ -368,21 +370,25 @@ model Delivery {
 }
 
 model DeliveryLine {
-  id             String   @id @default(uuid()) @db.Uuid
-  delivery_id    String   @db.Uuid
-  item_id        String   @db.Uuid
-  quantity       Decimal  @db.Decimal(15, 4)
-  unit_price     Decimal  @db.Decimal(15, 4)
-  period_price   Decimal  @db.Decimal(15, 4)
-  price_variance Decimal  @default(0) @db.Decimal(15, 4)
-  line_value     Decimal  @db.Decimal(15, 2)
-  ncr_id         String?  @db.Uuid
-  delivery       Delivery @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
-  item           Item     @relation(fields: [item_id], references: [id])
-  ncrs           NCR[]
+  id                    String   @id @default(uuid()) @db.Uuid
+  delivery_id           String   @db.Uuid
+  item_id               String   @db.Uuid
+  po_line_id            String?  @db.Uuid // Link to the PO line this delivery fulfills
+  quantity              Decimal  @db.Decimal(15, 4)
+  unit_price            Decimal  @db.Decimal(15, 4)
+  period_price          Decimal  @db.Decimal(15, 4)
+  price_variance        Decimal  @default(0) @db.Decimal(15, 4)
+  line_value            Decimal  @db.Decimal(15, 2)
+  ncr_id                String?  @db.Uuid
+  over_delivery_approved Boolean @default(false) // True if Supervisor/Admin approved over-delivery
+  delivery              Delivery @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
+  item                  Item     @relation(fields: [item_id], references: [id])
+  po_line               POLine?  @relation(fields: [po_line_id], references: [id])
+  ncrs                  NCR[]
 
   @@index([delivery_id])
   @@index([item_id])
+  @@index([po_line_id])
   @@index([ncr_id])
   @@map("delivery_lines")
 }

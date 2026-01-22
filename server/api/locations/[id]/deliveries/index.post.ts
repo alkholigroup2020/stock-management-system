@@ -24,6 +24,7 @@ import prisma from "../../../../utils/prisma";
 import { z } from "zod";
 import { calculateWAC } from "../../../../utils/wac";
 import { checkPriceVariance } from "../../../../utils/priceVariance";
+import { sendOverDeliveryApprovalNotification } from "../../../../utils/email";
 import type { UserRole } from "@prisma/client";
 
 // User session type
@@ -38,8 +39,10 @@ interface AuthUser {
 // Delivery line schema
 const deliveryLineSchema = z.object({
   item_id: z.string().uuid(),
+  po_line_id: z.string().uuid().optional(), // Link to the specific PO line
   quantity: z.number().positive(),
   unit_price: z.number().nonnegative(),
+  over_delivery_approved: z.boolean().optional().default(false), // Requires Supervisor/Admin approval
 });
 
 // Request body schema
@@ -191,11 +194,19 @@ export default defineEventHandler(async (event) => {
             ...(isPosting ? { is_active: true } : {}),
           },
         }),
-        // Verify PO exists and is OPEN
+        // Verify PO exists and is OPEN, include lines for quantity tracking
         prisma.pO.findUnique({
           where: { id: data.po_id },
           include: {
             supplier: { select: { id: true } },
+            lines: {
+              select: {
+                id: true,
+                item_id: true,
+                quantity: true,
+                delivered_qty: true,
+              },
+            },
           },
         }),
       ]);
@@ -293,6 +304,97 @@ export default defineEventHandler(async (event) => {
             : "One or more items not found",
         },
       });
+    }
+
+    // Build a map of PO lines for quantity tracking
+    // Map: po_line_id -> { item_id, quantity, delivered_qty, remaining_qty }
+    const poLineMap = new Map<
+      string,
+      { item_id: string | null; quantity: number; delivered_qty: number; remaining_qty: number }
+    >();
+    if (purchaseOrder.lines) {
+      for (const poLine of purchaseOrder.lines) {
+        const qty = parseFloat(poLine.quantity.toString());
+        const deliveredQty = parseFloat(poLine.delivered_qty.toString());
+        poLineMap.set(poLine.id, {
+          item_id: poLine.item_id,
+          quantity: qty,
+          delivered_qty: deliveredQty,
+          remaining_qty: Math.max(0, qty - deliveredQty),
+        });
+      }
+    }
+
+    // Validate over-delivery: check if any line exceeds remaining PO quantity
+    const overDeliveryLines: Array<{
+      item_id: string;
+      po_line_id: string | undefined;
+      requested_qty: number;
+      remaining_qty: number;
+      approved: boolean;
+    }> = [];
+
+    for (const lineData of data.lines) {
+      // Find matching PO line by po_line_id or by item_id
+      let poLineId = lineData.po_line_id;
+      let poLineInfo:
+        | { item_id: string | null; quantity: number; delivered_qty: number; remaining_qty: number }
+        | undefined;
+
+      if (poLineId && poLineMap.has(poLineId)) {
+        poLineInfo = poLineMap.get(poLineId);
+      } else {
+        // Fallback: find PO line by item_id (for backwards compatibility)
+        for (const [id, info] of poLineMap.entries()) {
+          if (info.item_id === lineData.item_id) {
+            poLineId = id;
+            poLineInfo = info;
+            break;
+          }
+        }
+      }
+
+      if (poLineInfo && lineData.quantity > poLineInfo.remaining_qty) {
+        overDeliveryLines.push({
+          item_id: lineData.item_id,
+          po_line_id: poLineId,
+          requested_qty: lineData.quantity,
+          remaining_qty: poLineInfo.remaining_qty,
+          approved: lineData.over_delivery_approved ?? false,
+        });
+      }
+    }
+
+    // If there are over-delivery lines without approval, block for non-Supervisor/Admin
+    // NOTE: This validation only applies when POSTING, not when saving as draft
+    // Operators can save drafts with over-delivery and Supervisors will be notified
+    const unapprovedOverDeliveries = overDeliveryLines.filter((line) => !line.approved);
+    if (isPosting && unapprovedOverDeliveries.length > 0) {
+      // Only Supervisor and Admin can approve over-deliveries when posting
+      if (user.role !== "SUPERVISOR" && user.role !== "ADMIN") {
+        const itemNames = unapprovedOverDeliveries.map((line) => {
+          const item = items.find((i) => i.id === line.item_id);
+          return item ? item.name : line.item_id;
+        });
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Bad Request",
+          data: {
+            code: "OVER_DELIVERY_NOT_APPROVED",
+            message: `Over-delivery detected for: ${itemNames.join(", ")}. Supervisor or Admin approval is required to exceed PO quantities.`,
+            details: unapprovedOverDeliveries.map((line) => ({
+              item_id: line.item_id,
+              requested_qty: line.requested_qty,
+              remaining_qty: line.remaining_qty,
+              excess: line.requested_qty - line.remaining_qty,
+            })),
+          },
+        });
+      }
+      // Supervisor/Admin can proceed, but flag it as approved
+      for (const line of overDeliveryLines) {
+        line.approved = true;
+      }
     }
 
     // Build maps for period prices and stock levels
@@ -399,6 +501,24 @@ export default defineEventHandler(async (event) => {
           const periodPrice = periodPriceMap.get(lineData.item_id);
           const currentStock = stockMap.get(lineData.item_id) || { quantity: 0, wac: 0 };
 
+          // Find the matching PO line for tracking
+          let matchedPoLineId = lineData.po_line_id;
+          if (!matchedPoLineId) {
+            // Fallback: find PO line by item_id
+            for (const [id, info] of poLineMap.entries()) {
+              if (info.item_id === lineData.item_id) {
+                matchedPoLineId = id;
+                break;
+              }
+            }
+          }
+
+          // Check if this line has approved over-delivery
+          const overDeliveryInfo = overDeliveryLines.find(
+            (ol) => ol.item_id === lineData.item_id && ol.po_line_id === matchedPoLineId
+          );
+          const isOverDeliveryApproved = overDeliveryInfo?.approved ?? false;
+
           // Calculate line value
           const lineValue = lineData.quantity * lineData.unit_price;
           totalAmount += lineValue;
@@ -435,18 +555,30 @@ export default defineEventHandler(async (event) => {
             }
           }
 
-          // Create delivery line
+          // Create delivery line with PO line link and over-delivery approval
           const deliveryLine = await tx.deliveryLine.create({
             data: {
               delivery_id: delivery.id,
               item_id: lineData.item_id,
+              po_line_id: matchedPoLineId || null,
               quantity: lineData.quantity,
               unit_price: lineData.unit_price,
               period_price: periodPrice || lineData.unit_price,
               price_variance: priceVariance,
               line_value: lineValue,
+              over_delivery_approved: isOverDeliveryApproved,
             },
           });
+
+          // Update PO line delivered_qty (only when posting and we have a matched PO line)
+          if (isPosting && matchedPoLineId) {
+            await tx.pOLine.update({
+              where: { id: matchedPoLineId },
+              data: {
+                delivered_qty: { increment: lineData.quantity },
+              },
+            });
+          }
 
           // Update or create location stock (only when posting)
           if (isPosting) {
@@ -521,6 +653,7 @@ export default defineEventHandler(async (event) => {
 
           createdLines.push({
             id: deliveryLine.id,
+            po_line_id: matchedPoLineId || null,
             item: {
               id: item.id,
               code: item.code,
@@ -534,6 +667,7 @@ export default defineEventHandler(async (event) => {
             line_value: lineValue,
             wac_before: currentStock.wac,
             wac_after: wacResult.newWAC,
+            over_delivery_approved: isOverDeliveryApproved,
           });
         }
 
@@ -582,20 +716,151 @@ export default defineEventHandler(async (event) => {
       }
     );
 
+    // Check if PO should be automatically closed (all items fully delivered)
+    let poAutoClosed = false;
+    if (isPosting && data.po_id) {
+      // Re-query the PO lines to get updated delivered_qty values
+      const poLines = await prisma.pOLine.findMany({
+        where: { po_id: data.po_id },
+        select: {
+          id: true,
+          quantity: true,
+          delivered_qty: true,
+        },
+      });
+
+      // Check if all lines are fully delivered (delivered_qty >= quantity)
+      const allFullyDelivered = poLines.every((line) => {
+        const qty = parseFloat(line.quantity.toString());
+        const deliveredQty = parseFloat(line.delivered_qty.toString());
+        return deliveredQty >= qty;
+      });
+
+      if (allFullyDelivered && poLines.length > 0) {
+        // Automatically close the PO
+        const closedPO = await prisma.pO.update({
+          where: { id: data.po_id },
+          data: { status: "CLOSED" },
+          include: { prf: { select: { id: true, status: true } } },
+        });
+
+        poAutoClosed = true;
+
+        // Also close the linked PRF if it exists and is still approved
+        if (closedPO.prf && closedPO.prf.status === "APPROVED") {
+          await prisma.pRF.update({
+            where: { id: closedPO.prf.id },
+            data: { status: "CLOSED" },
+          });
+        }
+      }
+    }
+
     // Build response message based on status
     let message: string;
+    let emailSent = false;
+
     if (isPosting) {
+      const parts: string[] = [];
+      if (result.ncrs.length > 0) {
+        parts.push(
+          `${result.ncrs.length} price variance(s) detected and NCR(s) created automatically`
+        );
+      }
+      if (poAutoClosed) {
+        parts.push("PO has been automatically closed (all items fully delivered)");
+      }
       message =
-        result.ncrs.length > 0
-          ? `Delivery posted. ${result.ncrs.length} price variance(s) detected and NCR(s) created automatically.`
+        parts.length > 0
+          ? `Delivery posted. ${parts.join(". ")}.`
           : "Delivery posted successfully.";
     } else {
       message = "Delivery draft saved successfully.";
+
+      // Send email notification to Supervisors if Operator saves draft with over-delivery
+      if (
+        user.role === "OPERATOR" &&
+        overDeliveryLines.length > 0 &&
+        overDeliveryLines.some((line) => !line.approved)
+      ) {
+        try {
+          // Find all Supervisors and Admins assigned to this location
+          const supervisorsAndAdmins = await prisma.user.findMany({
+            where: {
+              is_active: true,
+              role: { in: ["SUPERVISOR", "ADMIN"] },
+              OR: [
+                // Supervisors/Admins explicitly assigned to this location
+                {
+                  user_locations: {
+                    some: { location_id: locationId },
+                  },
+                },
+                // Admins and Supervisors have implicit access to all locations
+                { role: "ADMIN" },
+                { role: "SUPERVISOR" },
+              ],
+            },
+            select: {
+              email: true,
+              full_name: true,
+            },
+          });
+
+          const recipientEmails = supervisorsAndAdmins
+            .map((u) => u.email)
+            .filter((email): email is string => !!email);
+
+          if (recipientEmails.length > 0) {
+            // Build over-delivery items for email
+            const overDeliveryItemsForEmail = overDeliveryLines
+              .filter((line) => !line.approved)
+              .map((line) => {
+                const item = items.find((i) => i.id === line.item_id);
+                return {
+                  itemName: item?.name || line.item_id,
+                  requestedQty: line.requested_qty,
+                  remainingQty: line.remaining_qty,
+                  excessQty: line.requested_qty - line.remaining_qty,
+                };
+              });
+
+            // Build delivery URL
+            const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+            const deliveryUrl = `${siteUrl}/deliveries/${result.delivery.id}`;
+
+            // Send notification email
+            const emailResult = await sendOverDeliveryApprovalNotification({
+              recipientEmails,
+              deliveryNumber: result.delivery.delivery_no,
+              creatorName: user.username,
+              locationName: location.name,
+              overDeliveryItems: overDeliveryItemsForEmail,
+              deliveryUrl,
+            });
+
+            if (emailResult.success) {
+              emailSent = true;
+              console.log(
+                `[Delivery API] Over-delivery notification sent to ${recipientEmails.length} supervisor(s)`
+              );
+            }
+          }
+        } catch (emailError) {
+          // Don't fail the delivery creation if email fails
+          console.error("[Delivery API] Failed to send over-delivery notification:", emailError);
+        }
+
+        message = emailSent
+          ? "Delivery draft saved. Supervisors have been notified for over-delivery approval."
+          : "Delivery draft saved. Over-delivery items require supervisor approval.";
+      }
     }
 
     return {
       id: result.delivery.id,
       message,
+      po_auto_closed: poAutoClosed, // Flag to indicate if PO was automatically closed
       delivery: {
         id: result.delivery.id,
         delivery_no: result.delivery.delivery_no,

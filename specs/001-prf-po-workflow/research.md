@@ -43,6 +43,9 @@ Use **Office 365 SMTP** via Nodemailer for transactional email delivery.
 - **PRF Approval**: Email notifications ARE sent to PROCUREMENT_SPECIALIST users when a PRF is approved
 - **PO Creation**: Email notifications are NOT sent to suppliers; supplier email addresses are stored for reference only
 - **Resend**: No manual resend functionality for POs
+- **Over-Delivery Approval Request**: Email sent to Supervisors/Admins when Operator saves draft with over-delivery
+- **Over-Delivery Approved**: Email sent to delivery creator when Supervisor/Admin approves over-delivery
+- **Over-Delivery Rejected**: Email sent to delivery creator when Supervisor/Admin rejects (includes reason)
 
 ---
 
@@ -179,17 +182,17 @@ Add new role with limited permissions following least-privilege principle.
 
 ### Permission Matrix
 
-| Resource        | OPERATOR            | SUPERVISOR        | ADMIN            | PROCUREMENT_SPECIALIST        |
-| --------------- | ------------------- | ----------------- | ---------------- | ----------------------------- |
-| Dashboard       | ✅                  | ✅                | ✅               | ❌                            |
-| Orders (PRFs)   | Create, View own    | View all, Approve | Full             | View approved only            |
-| Orders (POs)    | ❌                  | View              | View, Close only | Create, Edit only (no Close)  |
-| Deliveries      | Full (own location) | Full              | Full             | ❌                            |
-| Issues          | Full (own location) | Full              | Full             | ❌                            |
-| Transfers       | Full (own location) | Full + Approve    | Full             | ❌                            |
-| Master Data     | ❌                  | ❌                | Full             | ❌                            |
-| Reconciliations | View totals         | Full              | Full             | ❌                            |
-| Period Close    | ❌                  | Ready locations   | Full             | ❌                            |
+| Resource        | OPERATOR            | SUPERVISOR        | ADMIN            | PROCUREMENT_SPECIALIST       |
+| --------------- | ------------------- | ----------------- | ---------------- | ---------------------------- |
+| Dashboard       | ✅                  | ✅                | ✅               | ❌                           |
+| Orders (PRFs)   | Create, View own    | View all, Approve | Full             | View approved only           |
+| Orders (POs)    | ❌                  | View              | View, Close only | Create, Edit only (no Close) |
+| Deliveries      | Full (own location) | Full              | Full             | ❌                           |
+| Issues          | Full (own location) | Full              | Full             | ❌                           |
+| Transfers       | Full (own location) | Full + Approve    | Full             | ❌                           |
+| Master Data     | ❌                  | ❌                | Full             | ❌                           |
+| Reconciliations | View totals         | Full              | Full             | ❌                           |
+| Period Close    | ❌                  | Ready locations   | Full             | ❌                           |
 
 **Note**: PO creation and editing is restricted to PROCUREMENT_SPECIALIST role only. PO closing is restricted to ADMIN only. PROCUREMENT_SPECIALIST cannot create deliveries or access the Dashboard.
 
@@ -203,16 +206,17 @@ Add new role with limited permissions following least-privilege principle.
 
 The following API endpoints must be accessible to PROCUREMENT_SPECIALIST for the UI to function correctly:
 
-| Endpoint               | Method           | Purpose                               |
-| ---------------------- | ---------------- | ------------------------------------- |
-| `/api/periods/current` | GET              | Display current period in UI header   |
-| `/api/prfs/*`          | GET              | View approved PRFs (filtered by API)  |
-| `/api/pos/*`           | GET, POST, PATCH | Create/Edit POs (no Close)            |
-| `/api/suppliers/*`     | GET              | View suppliers for PO dropdown        |
-| `/api/items/*`         | GET              | View items for PO line items          |
-| `/api/locations/*`     | GET              | View locations for location switcher  |
+| Endpoint               | Method           | Purpose                              |
+| ---------------------- | ---------------- | ------------------------------------ |
+| `/api/periods/current` | GET              | Display current period in UI header  |
+| `/api/prfs/*`          | GET              | View approved PRFs (filtered by API) |
+| `/api/pos/*`           | GET, POST, PATCH | Create/Edit POs (no Close)           |
+| `/api/suppliers/*`     | GET              | View suppliers for PO dropdown       |
+| `/api/items/*`         | GET              | View items for PO line items         |
+| `/api/locations/*`     | GET              | View locations for location switcher |
 
 **Blocked endpoints for PROCUREMENT_SPECIALIST**:
+
 - `/api/pos/[id]/close` - Only ADMIN can close POs
 - `/api/locations/[id]/deliveries/*` - Cannot create deliveries
 - `/api/reports/deliveries` - Cannot view deliveries report
@@ -226,7 +230,7 @@ The following API endpoints must be accessible to PROCUREMENT_SPECIALIST for the
 
 ### Decision
 
-Make PO selection **mandatory** for all new deliveries.
+Make PO selection **mandatory** for all new deliveries with delivery tracking.
 
 ### Migration Strategy
 
@@ -244,8 +248,159 @@ Make PO selection **mandatory** for all new deliveries.
 ### Edge Cases
 
 - No open POs: Display message, disable delivery creation
-- Over-delivery: Warn but allow (common in practice)
-- Partial delivery: PO stays OPEN until manually closed
+- Over-delivery: Requires Supervisor/Admin approval (see Section 7b)
+- Partial delivery: PO stays OPEN until all lines fully delivered or manually closed
+
+---
+
+## 7b. Delivery Tracking (PO Line Fulfillment)
+
+### Decision
+
+Track cumulative delivered quantities on each PO line and auto-close POs when fully delivered.
+
+### Implementation
+
+**Database Schema:**
+```prisma
+// POLine - tracks what's been delivered
+delivered_qty    Decimal  @default(0)  // Cumulative delivered quantity
+
+// DeliveryLine - links to specific PO line
+po_line_id       String?  @db.Uuid     // Link to PO line
+over_delivery_approved Boolean @default(false)  // Approval status
+```
+
+**Delivery Tracking Logic:**
+```typescript
+// When delivery is posted:
+1. For each delivery line, find the matching PO line (by po_line_id or item_id fallback)
+2. Increment POLine.delivered_qty by the delivery line quantity
+3. Check if all PO lines have delivered_qty >= quantity
+4. If yes, auto-close the PO and linked PRF
+```
+
+**API Response Fields:**
+```typescript
+// PO lines include:
+{
+  quantity: string,
+  delivered_qty: string,        // From database
+  remaining_qty: string,        // Computed: quantity - delivered_qty
+}
+
+// Delivery API response includes:
+{
+  po_auto_closed: boolean,      // True if PO was auto-closed
+}
+```
+
+### Rationale
+
+- Enables real-time visibility into PO fulfillment status
+- Pre-fills delivery forms with remaining quantities (not full PO quantities)
+- Reduces manual tracking and data entry errors
+- Automatically closes completed POs, reducing administrative burden
+
+---
+
+## 7c. Over-Delivery Approval Workflow
+
+### Decision
+
+Require Supervisor/Admin approval when delivery quantity exceeds PO line's remaining quantity.
+
+### Implementation
+
+**Detection:**
+```typescript
+// Over-delivery detected when:
+delivery_line.quantity > po_line.remaining_qty
+// Where: remaining_qty = quantity - delivered_qty
+```
+
+**Workflow States:**
+```
+Operator saves draft with over-delivery
+    │
+    ├──[is_over_delivery = true, over_delivery_approved = false]
+    │
+    ▼
+Email sent to Supervisors/Admins
+    │
+    ├──[Supervisor clicks "Approve"]──> over_delivery_approved = true
+    │                                   Email sent to creator
+    │                                   Operator can now post
+    │
+    └──[Supervisor clicks "Reject"]──> Rejection reason added to notes
+                                       Email sent to creator
+                                       Operator can edit delivery
+```
+
+**Role-Based Behavior:**
+| Role | Can Save Draft | Can Post Over-Delivery | Requires Approval |
+|------|---------------|----------------------|-------------------|
+| OPERATOR | Yes | No (blocked) | Yes |
+| SUPERVISOR | Yes | Yes (implicit) | No |
+| ADMIN | Yes | Yes (implicit) | No |
+
+**Email Notifications:**
+1. `sendOverDeliveryApprovalNotification` - To Supervisors when draft saved
+2. `sendOverDeliveryApprovedNotification` - To creator when approved
+3. `sendOverDeliveryRejectedNotification` - To creator when rejected
+
+### Rationale
+
+- Provides oversight for purchase order variances
+- Prevents unauthorized receipt of goods
+- Maintains audit trail for over-delivery decisions
+- Allows Supervisors/Admins to quickly approve legitimate over-deliveries
+
+---
+
+## 7d. Automatic PO Closure
+
+### Decision
+
+Automatically close POs when all line items have been fully delivered.
+
+### Implementation
+
+**Trigger Condition:**
+```typescript
+// After posting a delivery:
+const poLines = await prisma.pOLine.findMany({ where: { po_id } });
+
+const allFullyDelivered = poLines.every(line =>
+  parseFloat(line.delivered_qty) >= parseFloat(line.quantity)
+);
+
+if (allFullyDelivered) {
+  // Auto-close PO
+  await prisma.pO.update({ where: { id: poId }, data: { status: "CLOSED" } });
+
+  // Also close linked PRF if exists and is APPROVED
+  if (po.prf && po.prf.status === "APPROVED") {
+    await prisma.pRF.update({ where: { id: po.prf.id }, data: { status: "CLOSED" } });
+  }
+}
+```
+
+**Response:**
+```typescript
+return {
+  message: "Delivery posted. PO has been automatically closed.",
+  po_auto_closed: true,
+  // ...
+};
+```
+
+### Rationale
+
+- Reduces administrative burden of manual PO closure
+- Ensures POs are closed promptly when complete
+- Maintains data integrity (closed POs don't appear in dropdowns)
+- Linked PRF closure maintains workflow consistency
 
 ---
 

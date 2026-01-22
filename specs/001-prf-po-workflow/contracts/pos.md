@@ -6,12 +6,12 @@
 
 ## Endpoints Overview
 
-| Method | Path                 | Description           | Roles                            |
-| ------ | -------------------- | --------------------- | -------------------------------- |
-| GET    | `/api/pos`           | List POs with filters | All authenticated                |
-| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST           |
-| GET    | `/api/pos/:id`       | Get PO details        | All authenticated                |
-| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST           |
+| Method | Path                 | Description           | Roles                                   |
+| ------ | -------------------- | --------------------- | --------------------------------------- |
+| GET    | `/api/pos`           | List POs with filters | All authenticated                       |
+| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST                  |
+| GET    | `/api/pos/:id`       | Get PO details        | All authenticated                       |
+| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST                  |
 | PATCH  | `/api/pos/:id/close` | Close PO              | ADMIN only (not PROCUREMENT_SPECIALIST) |
 
 ---
@@ -151,7 +151,7 @@ total_amount = total_after_discount + total_vat
 
 ## GET /api/pos/:id
 
-Get PO details with lines, supplier, and linked deliveries.
+Get PO details with lines (including delivery tracking), supplier, and linked deliveries.
 
 ### Response 200
 
@@ -160,6 +160,8 @@ Get PO details with lines, supplier, and linked deliveries.
   data: PO & {
     lines: Array<POLine & {
       item?: { id: string; code: string; name: string };
+      delivered_qty: string;    // Cumulative delivered quantity
+      remaining_qty: string;    // Computed: quantity - delivered_qty
     }>;
     supplier: {
       id: string;
@@ -188,6 +190,15 @@ Get PO details with lines, supplier, and linked deliveries.
   };
 }
 ```
+
+### Delivery Tracking Fields
+
+Each line includes delivery fulfillment status:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| delivered_qty | string | Cumulative quantity delivered against this line |
+| remaining_qty | string | Computed: `quantity - delivered_qty` (minimum 0) |
 
 ### Error Responses
 
@@ -295,7 +306,7 @@ Close a PO. No further edits or deliveries allowed.
 
 ### GET /api/pos/open
 
-Get list of open POs for dropdown selection (used in Delivery creation).
+Get list of open POs for dropdown selection (used in Delivery creation). Includes delivery tracking information for each line.
 
 ### Query Parameters
 
@@ -316,16 +327,62 @@ Get list of open POs for dropdown selection (used in Delivery creation).
     total_amount: string;
     lines: Array<{
       id: string;
+      item_id: string | null;
       item_description: string;
       quantity: string;
+      delivered_qty: string;    // NEW: Cumulative delivered quantity
+      remaining_qty: string;    // NEW: Computed remaining quantity
       unit: Unit;
       unit_price: string;
+      item?: { id: string; code: string; name: string };
     }>;
   }>;
 }
 ```
 
+### Delivery Tracking in Lines
+
+Each PO line includes tracking fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| delivered_qty | string | Total quantity already delivered against this line |
+| remaining_qty | string | Quantity still to be delivered (`quantity - delivered_qty`) |
+
 ### Notes
 
 - Only returns POs with status = OPEN
 - Used by delivery creation page for mandatory PO selection
+- **Delivery form pre-fills with `remaining_qty` instead of full `quantity`**
+- Over-delivery (quantity > remaining_qty) requires Supervisor/Admin approval
+
+---
+
+## Auto-Close PO Behavior
+
+When a delivery is posted, the system automatically checks if all PO lines are fully delivered.
+
+### Trigger Condition
+
+```
+FOR ALL lines in PO:
+  delivered_qty >= quantity
+```
+
+### Behavior
+
+1. If all lines are fully delivered, PO status changes to `CLOSED`
+2. Linked PRF (if exists and status is `APPROVED`) is also closed
+3. Delivery API returns `po_auto_closed: true` flag
+4. Success message includes: "PO has been automatically closed (all items fully delivered)"
+
+### Response Flag (in Delivery POST/PATCH)
+
+```typescript
+{
+  id: string;
+  message: string;
+  po_auto_closed: boolean;  // true if PO was automatically closed
+  delivery: { ... };
+}
+```

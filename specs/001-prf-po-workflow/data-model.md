@@ -275,26 +275,28 @@ model PO {
 
 ### POLine (NEW)
 
-Individual line items on a PO with VAT calculations.
+Individual line items on a PO with VAT calculations and delivery tracking.
 
 ```prisma
 model POLine {
-  id                 String   @id @default(uuid()) @db.Uuid
-  po_id              String   @db.Uuid
-  item_id            String?  @db.Uuid
-  item_code          String?  @db.VarChar(50)
-  item_description   String   @db.VarChar(500)
-  quantity           Decimal  @db.Decimal(15, 4)
+  id                 String         @id @default(uuid()) @db.Uuid
+  po_id              String         @db.Uuid
+  item_id            String?        @db.Uuid
+  item_code          String?        @db.VarChar(50)
+  item_description   String         @db.VarChar(500)
+  quantity           Decimal        @db.Decimal(15, 4)
+  delivered_qty      Decimal        @default(0) @db.Decimal(15, 4)  // NEW: Cumulative delivered quantity
   unit               Unit
-  unit_price         Decimal  @db.Decimal(15, 4)
-  discount_percent   Decimal  @default(0) @db.Decimal(5, 2)
-  total_before_vat   Decimal  @db.Decimal(15, 2)
-  vat_percent        Decimal  @default(15) @db.Decimal(5, 2)  // Saudi VAT 15%
-  vat_amount         Decimal  @db.Decimal(15, 2)
-  total_after_vat    Decimal  @db.Decimal(15, 2)
+  unit_price         Decimal        @db.Decimal(15, 4)
+  discount_percent   Decimal        @default(0) @db.Decimal(5, 2)
+  total_before_vat   Decimal        @db.Decimal(15, 2)
+  vat_percent        Decimal        @default(15) @db.Decimal(5, 2)  // Saudi VAT 15%
+  vat_amount         Decimal        @db.Decimal(15, 2)
+  total_after_vat    Decimal        @db.Decimal(15, 2)
   notes              String?
-  po                 PO       @relation(fields: [po_id], references: [id], onDelete: Cascade)
-  item               Item?    @relation(fields: [item_id], references: [id])
+  po                 PO             @relation(fields: [po_id], references: [id], onDelete: Cascade)
+  item               Item?          @relation(fields: [item_id], references: [id])
+  delivery_lines     DeliveryLine[] // NEW: Track which deliveries fulfilled this PO line
 
   @@index([po_id])
   @@index([item_id])
@@ -310,6 +312,7 @@ model POLine {
 | item_code | String | No | Item code (denormalized) |
 | item_description | String | Yes | Item description |
 | quantity | Decimal | Yes | Order quantity |
+| **delivered_qty** | **Decimal** | **No** | **Cumulative delivered quantity (updated on each delivery post)** |
 | unit | Unit | Yes | Unit of measure |
 | unit_price | Decimal | Yes | Unit price |
 | discount_percent | Decimal | No | Line discount (0-100%) |
@@ -318,6 +321,11 @@ model POLine {
 | vat_amount | Decimal | Yes | Calculated VAT amount |
 | total_after_vat | Decimal | Yes | Line total including VAT |
 | notes | String | No | Line-specific notes |
+
+**Computed Field (API-level):**
+| Field | Type | Description |
+|-------|------|-------------|
+| remaining_qty | Decimal | `quantity - delivered_qty` (computed by API, not stored) |
 
 **Validation Rules:**
 
@@ -328,6 +336,13 @@ model POLine {
 - `total_before_vat = quantity × unit_price × (1 - discount_percent / 100)`
 - `vat_amount = total_before_vat × vat_percent / 100`
 - `total_after_vat = total_before_vat + vat_amount`
+- `delivered_qty >= 0` (cannot be negative)
+
+**Delivery Tracking Behavior:**
+
+- When a delivery is **posted**, each delivery line increments the corresponding `delivered_qty`
+- The `remaining_qty` is computed as `quantity - delivered_qty`
+- Over-delivery (when `delivered_qty > quantity`) is allowed but requires Supervisor/Admin approval
 
 ---
 
@@ -348,6 +363,52 @@ model Delivery {
 - Existing deliveries with `po_id = NULL` must be handled
 - Option: Create a "Legacy" PO or allow NULL for existing records only
 - Recommendation: Allow NULL for existing, require for new (validation in API layer)
+
+---
+
+### DeliveryLine (MODIFY)
+
+Add PO line tracking and over-delivery approval fields.
+
+```prisma
+model DeliveryLine {
+  id                      String   @id @default(uuid()) @db.Uuid
+  delivery_id             String   @db.Uuid
+  item_id                 String   @db.Uuid
+  po_line_id              String?  @db.Uuid          // NEW: Link to the PO line this delivery fulfills
+  quantity                Decimal  @db.Decimal(15, 4)
+  unit_price              Decimal  @db.Decimal(15, 4)
+  period_price            Decimal  @db.Decimal(15, 4)
+  price_variance          Decimal  @default(0) @db.Decimal(15, 4)
+  line_value              Decimal  @db.Decimal(15, 2)
+  ncr_id                  String?  @db.Uuid
+  over_delivery_approved  Boolean  @default(false)   // NEW: True if Supervisor/Admin approved over-delivery
+  delivery                Delivery @relation(fields: [delivery_id], references: [id], onDelete: Cascade)
+  item                    Item     @relation(fields: [item_id], references: [id])
+  po_line                 POLine?  @relation(fields: [po_line_id], references: [id])  // NEW relation
+  ncrs                    NCR[]
+
+  @@index([delivery_id])
+  @@index([item_id])
+  @@index([po_line_id])  // NEW index
+  @@index([ncr_id])
+  @@map("delivery_lines")
+}
+```
+
+**New Fields:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| po_line_id | UUID | No | Link to the specific PO line this delivery fulfills |
+| over_delivery_approved | Boolean | No | True if a Supervisor/Admin approved exceeding PO quantity |
+
+**Over-Delivery Workflow:**
+
+1. When delivery quantity exceeds PO line's remaining quantity, it's flagged as over-delivery
+2. Operators can save drafts with over-delivery, but cannot post without approval
+3. Supervisors/Admins can approve over-delivery lines (sets `over_delivery_approved = true`)
+4. Once approved, the delivery can be posted
+5. Supervisors/Admins can also reject with a reason (appended to delivery notes)
 
 ---
 
@@ -449,11 +510,21 @@ DRAFT ──[submit]──> PENDING ──[approve]──> APPROVED ──[po_cl
 
 ```
 OPEN ──[close]──> CLOSED
+OPEN ──[auto]───> CLOSED (when all items fully delivered)
 ```
 
-| Transition    | Trigger | Conditions                                       |
-| ------------- | ------- | ------------------------------------------------ |
-| OPEN → CLOSED | Close   | User is Admin only (Procurement Specialist cannot close) |
+| Transition    | Trigger       | Conditions                                                   |
+| ------------- | ------------- | ------------------------------------------------------------ |
+| OPEN → CLOSED | Manual Close  | User is Admin only (Procurement Specialist cannot close)     |
+| OPEN → CLOSED | Auto-Close    | All PO lines have `delivered_qty >= quantity` after delivery |
+
+**Auto-Close Behavior:**
+
+When a delivery is posted, the system checks if all PO lines are fully delivered:
+- If `delivered_qty >= quantity` for ALL lines, the PO is automatically closed
+- The linked PRF (if any) is also automatically closed
+- The API returns `po_auto_closed: true` flag in the response
+- A success message indicates the PO was auto-closed
 
 ---
 
@@ -518,6 +589,7 @@ export interface POLine {
   item_code: string | null;
   item_description: string;
   quantity: DecimalValue;
+  delivered_qty: DecimalValue;  // NEW: Cumulative delivered quantity
   unit: Unit;
   unit_price: DecimalValue;
   discount_percent: DecimalValue;
@@ -526,6 +598,21 @@ export interface POLine {
   vat_amount: DecimalValue;
   total_after_vat: DecimalValue;
   notes: string | null;
+}
+
+// DeliveryLine Interface (extended)
+export interface DeliveryLine {
+  id: string;
+  delivery_id: string;
+  item_id: string;
+  po_line_id: string | null;          // NEW: Link to PO line
+  quantity: DecimalValue;
+  unit_price: DecimalValue;
+  period_price: DecimalValue;
+  price_variance: DecimalValue;
+  line_value: DecimalValue;
+  ncr_id: string | null;
+  over_delivery_approved: boolean;    // NEW: Over-delivery approval status
 }
 
 // PO Interface (extended)

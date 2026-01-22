@@ -319,6 +319,305 @@ export async function sendPOToSupplier(params: {
 // ========================================
 
 /**
+ * Send over-delivery approval notification to Supervisors
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendOverDeliveryApprovalNotification(params: {
+  recipientEmails: string[];
+  deliveryNumber: string;
+  creatorName: string;
+  locationName: string;
+  overDeliveryItems: Array<{
+    itemName: string;
+    requestedQty: number;
+    remainingQty: number;
+    excessQty: number;
+  }>;
+  deliveryUrl: string;
+}): Promise<EmailResult> {
+  const { recipientEmails, deliveryNumber, creatorName, locationName, overDeliveryItems, deliveryUrl } =
+    params;
+
+  if (recipientEmails.length === 0) {
+    console.warn("[Email Service] No recipient emails provided for over-delivery approval notification");
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `Over-Delivery Approval Required: ${deliveryNumber} at ${locationName}`;
+
+  const itemsHtml = overDeliveryItems
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${item.itemName}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.remainingQty.toFixed(2)}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.requestedQty.toFixed(2)}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right; color: #dc2626; font-weight: bold;">+${item.excessQty.toFixed(2)}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #f59e0b;">Over-Delivery Approval Required</h2>
+      <p>A delivery draft has been created that requires supervisor approval due to over-delivery.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Delivery Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${deliveryNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Created By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${creatorName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Location:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${locationName}</td>
+        </tr>
+      </table>
+
+      <h3 style="color: #374151; margin-top: 20px;">Over-Delivery Items</h3>
+      <table style="width: 100%; border-collapse: collapse; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <thead>
+          <tr style="background-color: #f9fafb;">
+            <th style="padding: 10px 8px; text-align: left; border-bottom: 2px solid #e5e7eb;">Item</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">PO Remaining</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Requested</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Excess</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <p style="margin-top: 20px;">
+        <a href="${deliveryUrl}" style="display: inline-block; padding: 12px 24px; background-color: #f59e0b; color: white; text-decoration: none; border-radius: 6px;">
+          Review & Approve Delivery
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmails,
+    subject,
+    html,
+  });
+}
+
+/**
+ * Send over-delivery approved notification to the delivery creator
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendOverDeliveryApprovedNotification(params: {
+  recipientEmail: string;
+  deliveryNumber: string;
+  approverName: string;
+  locationName: string;
+  approvedItems: Array<{
+    itemName: string;
+    requestedQty: number;
+    remainingQty: number;
+  }>;
+  deliveryUrl: string;
+}): Promise<EmailResult> {
+  const { recipientEmail, deliveryNumber, approverName, locationName, approvedItems, deliveryUrl } =
+    params;
+
+  if (!recipientEmail) {
+    console.warn("[Email Service] No recipient email provided for over-delivery approved notification");
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `Over-Delivery Approved: ${deliveryNumber} at ${locationName}`;
+
+  const itemsHtml = approvedItems
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${item.itemName}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.remainingQty.toFixed(2)}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.requestedQty.toFixed(2)}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #10b981;">Over-Delivery Approved</h2>
+      <p>Your delivery draft has been approved and is ready to be posted.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Delivery Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${deliveryNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Approved By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${approverName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Location:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${locationName}</td>
+        </tr>
+      </table>
+
+      <h3 style="color: #374151; margin-top: 20px;">Approved Over-Delivery Items</h3>
+      <table style="width: 100%; border-collapse: collapse; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <thead>
+          <tr style="background-color: #f9fafb;">
+            <th style="padding: 10px 8px; text-align: left; border-bottom: 2px solid #e5e7eb;">Item</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">PO Remaining</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Approved Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <p style="margin-top: 20px;">
+        <a href="${deliveryUrl}" style="display: inline-block; padding: 12px 24px; background-color: #10b981; color: white; text-decoration: none; border-radius: 6px;">
+          View & Post Delivery
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject,
+    html,
+  });
+}
+
+/**
+ * Send over-delivery rejected notification to the delivery creator
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendOverDeliveryRejectedNotification(params: {
+  recipientEmail: string;
+  deliveryNumber: string;
+  rejectorName: string;
+  locationName: string;
+  rejectionReason: string;
+  rejectedItems: Array<{
+    itemName: string;
+    requestedQty: number;
+    remainingQty: number;
+  }>;
+  deliveryUrl: string;
+}): Promise<EmailResult> {
+  const {
+    recipientEmail,
+    deliveryNumber,
+    rejectorName,
+    locationName,
+    rejectionReason,
+    rejectedItems,
+    deliveryUrl,
+  } = params;
+
+  if (!recipientEmail) {
+    console.warn("[Email Service] No recipient email provided for over-delivery rejected notification");
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `Over-Delivery Rejected: ${deliveryNumber} at ${locationName}`;
+
+  const itemsHtml = rejectedItems
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${item.itemName}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${item.remainingQty.toFixed(2)}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right; color: #dc2626;">${item.requestedQty.toFixed(2)}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #dc2626;">Over-Delivery Rejected</h2>
+      <p>Your delivery draft has been rejected due to over-delivery issues. Please review and correct the quantities.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Delivery Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${deliveryNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Rejected By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${rejectorName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Location:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${locationName}</td>
+        </tr>
+      </table>
+
+      <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 16px; margin: 20px 0;">
+        <h4 style="color: #dc2626; margin: 0 0 8px 0;">Rejection Reason:</h4>
+        <p style="color: #7f1d1d; margin: 0;">${rejectionReason}</p>
+      </div>
+
+      <h3 style="color: #374151; margin-top: 20px;">Items Requiring Correction</h3>
+      <table style="width: 100%; border-collapse: collapse; margin: 10px 0; border: 1px solid #e5e7eb;">
+        <thead>
+          <tr style="background-color: #f9fafb;">
+            <th style="padding: 10px 8px; text-align: left; border-bottom: 2px solid #e5e7eb;">Item</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">PO Remaining</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Requested</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <p style="margin-top: 20px;">
+        <a href="${deliveryUrl}" style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">
+          Edit Delivery
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject,
+    html,
+  });
+}
+
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
+/**
  * Strip HTML tags from a string
  * Used to generate plain text version of emails
  */

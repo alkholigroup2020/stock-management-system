@@ -37,6 +37,8 @@ export interface POLineItem {
   item_code: string | null;
   item_description: string;
   quantity: string;
+  delivered_qty: string; // Cumulative delivered quantity
+  remaining_qty: string; // quantity - delivered_qty (computed by API)
   unit: Unit;
   unit_price: string;
   discount_percent: string;
@@ -185,7 +187,7 @@ export interface POUpdateInput {
   lines?: POLineInput[];
 }
 
-// Open PO for dropdown
+// Open PO for dropdown - includes delivery tracking info
 export interface OpenPO {
   id: string;
   po_no: string;
@@ -200,6 +202,8 @@ export interface OpenPO {
     item_id: string | null;
     item_description: string;
     quantity: string;
+    delivered_qty: string; // Cumulative delivered quantity
+    remaining_qty: string; // quantity - delivered_qty
     unit: Unit;
     unit_price: string;
     item?: {

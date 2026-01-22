@@ -20,6 +20,8 @@ export interface POLineInput {
   item_description: string;
   unit: Unit;
   quantity: string;
+  delivered_qty?: string; // Cumulative delivered quantity (readonly display)
+  remaining_qty?: string; // Remaining quantity (readonly display)
   unit_price: string;
   discount_percent: string;
   vat_percent: string;
@@ -44,6 +46,7 @@ interface Props {
   readonly?: boolean;
   loading?: boolean;
   showDiscounts?: boolean;
+  showDeliveryTracking?: boolean; // Show delivered/remaining columns in readonly mode
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -51,6 +54,7 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false,
   loading: false,
   showDiscounts: true,
+  showDeliveryTracking: false,
 });
 
 // Emits
@@ -194,6 +198,19 @@ function removeLine(id: string) {
             >
               Qty
             </th>
+            <!-- Delivery Tracking Columns (readonly mode only) -->
+            <th
+              v-if="showDeliveryTracking && readonly"
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24"
+            >
+              Delivered
+            </th>
+            <th
+              v-if="showDeliveryTracking && readonly"
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24"
+            >
+              Remaining
+            </th>
             <th
               class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-28"
             >
@@ -323,6 +340,41 @@ function removeLine(id: string) {
                 class="w-24 text-right"
                 @input="updateLineCalculation(line)"
               />
+            </td>
+
+            <!-- Delivered Quantity (readonly mode only) -->
+            <td v-if="showDeliveryTracking && readonly" class="px-3 py-3 text-right">
+              <span
+                class="text-sm"
+                :class="[
+                  parseFloat(line.delivered_qty || '0') > 0
+                    ? 'text-primary font-medium'
+                    : 'text-[var(--ui-text-muted)]',
+                ]"
+              >
+                {{ line.delivered_qty || "0" }}
+              </span>
+            </td>
+
+            <!-- Remaining Quantity (readonly mode only) -->
+            <td v-if="showDeliveryTracking && readonly" class="px-3 py-3 text-right">
+              <span
+                class="text-sm font-medium"
+                :class="[
+                  parseFloat(line.remaining_qty || '0') <= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : parseFloat(line.remaining_qty || '0') < parseFloat(line.quantity)
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-[var(--ui-text)]',
+                ]"
+              >
+                {{ line.remaining_qty || line.quantity }}
+                <UIcon
+                  v-if="parseFloat(line.remaining_qty || line.quantity) <= 0"
+                  name="i-lucide-check-circle"
+                  class="w-4 h-4 inline ml-1"
+                />
+              </span>
             </td>
 
             <!-- Unit Price -->

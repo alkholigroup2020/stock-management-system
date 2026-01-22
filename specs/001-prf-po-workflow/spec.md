@@ -73,29 +73,33 @@ A Procurement Specialist receives notification of an approved PRF, logs in, sele
 
 ### User Story 4 - Link Delivery to Purchase Order (Priority: P2)
 
-When goods arrive, an Operator creates a delivery record. The system requires selecting an existing PO to link the delivery, ensuring all deliveries are tracked against orders.
+When goods arrive, an Operator creates a delivery record. The system requires selecting an existing PO to link the delivery, ensuring all deliveries are tracked against orders. The system tracks how much of each PO line has been delivered and pre-fills remaining quantities.
 
 **Why this priority**: Mandatory PO-delivery linking ensures complete traceability but depends on POs existing first.
 
-**Independent Test**: Can be tested by creating a delivery, selecting a PO, and verifying the system auto-populates supplier and expected items. Delivers value by maintaining procurement traceability.
+**Independent Test**: Can be tested by creating a delivery, selecting a PO, and verifying the system auto-populates supplier and expected items with remaining quantities. Delivers value by maintaining procurement traceability.
 
 **Acceptance Scenarios**:
 
 1. **Given** an Operator creating a new delivery, **When** they reach the PO selection field, **Then** the system requires a PO to be selected (field is mandatory, not optional).
 
-2. **Given** a PO selected during delivery creation, **When** the user confirms selection, **Then** the system auto-populates the supplier and offers PO line items as delivery line suggestions.
+2. **Given** a PO selected during delivery creation, **When** the user confirms selection, **Then** the system auto-populates the supplier and pre-fills delivery lines with the **remaining quantities** (not full PO quantities).
 
 3. **Given** a delivery being created, **When** no open POs exist, **Then** the system displays a message indicating no open POs are available and the user cannot proceed until a PO exists.
+
+4. **Given** a PO with partial deliveries already posted, **When** creating a new delivery for that PO, **Then** the system shows "Delivered" and "Remaining" columns to indicate fulfillment status.
+
+5. **Given** a PO line that has been fully delivered (delivered_qty >= quantity), **When** viewing the PO detail page, **Then** that line shows a green checkmark indicating it's complete.
 
 ---
 
 ### User Story 5 - Close Purchase Order (Priority: P2)
 
-An Admin closes a PO when all expected deliveries have been received or when the order is complete. Closed POs can no longer have deliveries linked to them.
+An Admin can manually close a PO when needed, or the system automatically closes a PO when all items have been fully delivered. Closed POs can no longer have deliveries linked to them.
 
 **Why this priority**: Closing POs completes the procurement cycle and prevents further deliveries against completed orders.
 
-**Independent Test**: Can be tested by selecting an open PO with linked deliveries and closing it. Delivers value by providing order lifecycle management.
+**Independent Test**: Can be tested by selecting an open PO with linked deliveries and closing it, or by posting a delivery that completes all PO lines. Delivers value by providing order lifecycle management.
 
 **Acceptance Scenarios**:
 
@@ -104,6 +108,36 @@ An Admin closes a PO when all expected deliveries have been received or when the
 2. **Given** a CLOSED PO, **When** an Operator tries to create a delivery linked to it, **Then** the system does not show the closed PO as an option.
 
 3. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they view an OPEN PO, **Then** they do NOT see a "Close PO" button (only Admins can close POs).
+
+4. **Given** an OPEN PO where all line items have `delivered_qty >= quantity`, **When** a delivery is posted that completes the final line, **Then** the PO is automatically closed and the linked PRF is also closed.
+
+5. **Given** a delivery that fully satisfies all PO lines, **When** the delivery is posted, **Then** the success message indicates "PO has been automatically closed (all items fully delivered)".
+
+---
+
+### User Story 5b - Over-Delivery Approval Workflow (Priority: P2)
+
+When a delivery quantity exceeds the remaining PO quantity (over-delivery), the system requires Supervisor or Admin approval before the delivery can be posted. This ensures proper oversight of purchase order variances.
+
+**Why this priority**: Over-delivery control is a critical business rule that prevents unauthorized receipt of goods beyond ordered quantities.
+
+**Independent Test**: Can be tested by creating a delivery with quantities exceeding PO remaining, saving as draft, and having a Supervisor approve or reject the over-delivery.
+
+**Acceptance Scenarios**:
+
+1. **Given** a delivery line with quantity exceeding the PO line's remaining quantity, **When** an Operator saves the delivery as draft, **Then** the system displays an "Over-Delivery Requires Approval" warning and notifies Supervisors via email.
+
+2. **Given** a draft delivery with unapproved over-delivery items, **When** an Operator attempts to post the delivery, **Then** the system blocks the action and displays "Supervisor or Admin approval is required."
+
+3. **Given** a draft delivery with over-delivery items, **When** a Supervisor views the delivery detail page, **Then** they see "Approve" and "Reject" buttons for the over-delivery items.
+
+4. **Given** a Supervisor approving over-delivery items, **When** they click "Approve", **Then** the system marks the items as approved and sends an email notification to the delivery creator.
+
+5. **Given** a Supervisor rejecting over-delivery items, **When** they enter a rejection reason and click "Reject", **Then** the rejection reason is recorded in the delivery notes and an email notification is sent to the creator.
+
+6. **Given** an Operator viewing a draft delivery with pending over-delivery approval, **When** they access the delivery detail page, **Then** the Edit, Delete, and Post buttons are disabled until approval.
+
+7. **Given** a Supervisor or Admin creating a delivery with over-delivery, **When** they save or post the delivery, **Then** the over-delivery is implicitly approved (no separate approval workflow needed).
 
 ---
 
@@ -146,8 +180,15 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - What happens when a PRF is submitted but no PROCUREMENT_SPECIALIST users exist? → The PRF is approved but no email notification is sent; system logs a warning.
 - How does the system handle PO creation if the supplier has no email addresses? → The PO is created successfully; email addresses are optional and stored for future use only.
 - What happens if a user tries to delete a PRF that has been converted to a PO? → The system prevents deletion; PRFs with linked POs are archived, not deleted.
-- How does the system behave when delivery quantities exceed PO quantities? → The system displays a warning but allows the delivery to proceed (over-delivery scenario).
+- How does the system behave when delivery quantities exceed PO remaining quantities? → **Over-delivery requires Supervisor/Admin approval**:
+  - Operators can save drafts with over-delivery but cannot post without approval
+  - Supervisors/Admins can approve or reject over-delivery items
+  - Once approved, the delivery can be posted
+  - Supervisors/Admins can directly post over-delivery (implicit approval)
 - What happens if email sending fails? → The PRF approval action completes but the system logs the email failure (applies to PRF approval notifications to procurement specialists only; POs do not send emails).
+- What happens when all PO items are fully delivered? → The system automatically closes the PO and its linked PRF. The delivery API returns `po_auto_closed: true`.
+- What happens if a delivery is created against a fully-delivered PO line? → This is treated as over-delivery and requires approval, since remaining_qty is 0.
+- What happens when Supervisor rejects over-delivery? → The rejection reason is prepended to the delivery notes, creator is notified via email, and the operator can edit the delivery to correct quantities.
 
 ## Requirements _(mandatory)_
 
@@ -193,7 +234,31 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-024**: System MUST require PO selection when creating deliveries (mandatory, not optional)
 - **FR-025**: System MUST filter PO selection dropdown to show only OPEN POs
 - **FR-026**: System MUST auto-populate supplier when a PO is selected for delivery
-- **FR-027**: System MUST display a warning when delivery quantities exceed PO quantities
+- **FR-027**: System MUST display a warning when delivery quantities exceed PO remaining quantities
+
+**Delivery Tracking (PO Line Fulfillment)**
+
+- **FR-037**: System MUST track cumulative delivered quantity (`delivered_qty`) on each PO line
+- **FR-038**: System MUST compute and display remaining quantity (`remaining_qty = quantity - delivered_qty`) on PO lines
+- **FR-039**: System MUST pre-fill delivery lines with remaining quantities (not full PO quantities) when selecting a PO
+- **FR-040**: System MUST display "Delivered" and "Remaining" columns on PO detail page
+
+**Over-Delivery Approval Workflow**
+
+- **FR-041**: System MUST detect over-delivery when delivery quantity exceeds PO line's remaining quantity
+- **FR-042**: Operators MUST NOT post deliveries with unapproved over-delivery items
+- **FR-043**: Supervisors and Admins MUST be able to approve or reject over-delivery items
+- **FR-044**: System MUST send email notification to Supervisors when Operator saves draft with over-delivery
+- **FR-045**: System MUST send email notification to delivery creator when over-delivery is approved
+- **FR-046**: System MUST send email notification to delivery creator when over-delivery is rejected (with reason)
+- **FR-047**: Operators MUST NOT edit, delete, or post drafts with pending over-delivery approval
+- **FR-048**: Supervisors/Admins creating deliveries with over-delivery MUST have implicit approval (no separate workflow)
+
+**Automatic PO Closure**
+
+- **FR-049**: System MUST automatically close PO when all lines have `delivered_qty >= quantity`
+- **FR-050**: System MUST automatically close linked PRF when PO is auto-closed
+- **FR-051**: System MUST return `po_auto_closed: true` flag in delivery API response when auto-close occurs
 
 **Role & Permissions**
 
@@ -236,6 +301,11 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **SC-008**: VAT and total calculations are 100% accurate on all PO line items and totals
 - **SC-009**: PRF and PO numbers are unique with no duplicates in the system
 - **SC-010**: Email failures do not block transaction completion (0% transaction failures due to email issues)
+- **SC-011**: PO line delivery tracking is 100% accurate (delivered_qty matches sum of posted delivery quantities)
+- **SC-012**: Over-delivery detection is 100% accurate (flags when quantity > remaining_qty)
+- **SC-013**: Operators cannot post deliveries with unapproved over-delivery (100% enforcement)
+- **SC-014**: POs auto-close within the same transaction when all lines are fully delivered
+- **SC-015**: Over-delivery approval/rejection emails are sent within 1 minute of action
 
 ## Assumptions
 

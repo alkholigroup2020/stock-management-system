@@ -89,6 +89,14 @@ export default defineEventHandler(async (event) => {
             po_no: true,
             status: true,
             total_amount: true,
+            lines: {
+              select: {
+                id: true,
+                item_id: true,
+                quantity: true,
+                delivered_qty: true,
+              },
+            },
           },
         },
         delivery_lines: {
@@ -187,6 +195,101 @@ export default defineEventHandler(async (event) => {
     // Format the response - convert Decimal types to numbers for JSON serialization
     const totalAmount = parseFloat(delivery.total_amount.toString());
 
+    // Build PO line map for over-delivery calculation
+    // Map: po_line_id -> { remaining_qty (before this delivery), item_id }
+    // For draft deliveries, we calculate remaining by: quantity - delivered_qty
+    // For posted deliveries, we need to add back this delivery's qty since it's already counted
+    const poLineMap = new Map<
+      string,
+      { item_id: string | null; quantity: number; delivered_qty: number; remaining_qty: number }
+    >();
+
+    if (delivery.po?.lines) {
+      for (const poLine of delivery.po.lines) {
+        const poQty = parseFloat(poLine.quantity.toString());
+        const deliveredQty = parseFloat(poLine.delivered_qty.toString());
+
+        // For POSTED deliveries, the delivered_qty already includes this delivery
+        // For DRAFT deliveries, delivered_qty doesn't include this delivery yet
+        // Calculate remaining as if this delivery hadn't happened yet
+        let effectiveDeliveredQty = deliveredQty;
+        if (delivery.status === "POSTED") {
+          // Subtract this delivery's quantity from delivered_qty to get the "before" state
+          const thisDeliveryLine = delivery.delivery_lines.find(
+            (dl) => dl.po_line_id === poLine.id
+          );
+          if (thisDeliveryLine) {
+            effectiveDeliveredQty -= parseFloat(thisDeliveryLine.quantity.toString());
+          }
+        }
+
+        poLineMap.set(poLine.id, {
+          item_id: poLine.item_id,
+          quantity: poQty,
+          delivered_qty: effectiveDeliveredQty,
+          remaining_qty: Math.max(0, poQty - effectiveDeliveredQty),
+        });
+      }
+    }
+
+    // Process delivery lines with over-delivery detection
+    const processedLines = [...delivery.delivery_lines]
+      .sort((a, b) => (a.item?.name || "").localeCompare(b.item?.name || ""))
+      .map((line) => {
+        const quantity = parseFloat(line.quantity.toString());
+        const unitPrice = parseFloat(line.unit_price.toString());
+        const periodPrice = line.period_price ? parseFloat(line.period_price.toString()) : null;
+        const priceVariance = parseFloat(line.price_variance.toString());
+        const lineValue = parseFloat(line.line_value.toString());
+
+        // Calculate over-delivery status by comparing to PO line
+        let isOverDelivery = false;
+        let poLineRemainingQty: number | null = null;
+
+        if (line.po_line_id && poLineMap.has(line.po_line_id)) {
+          const poLineInfo = poLineMap.get(line.po_line_id)!;
+          poLineRemainingQty = poLineInfo.remaining_qty;
+          isOverDelivery = quantity > poLineRemainingQty;
+        } else if (delivery.po?.lines) {
+          // Fallback: find PO line by item_id
+          for (const poLine of delivery.po.lines) {
+            if (poLine.item_id === line.item_id) {
+              const poLineInfo = poLineMap.get(poLine.id);
+              if (poLineInfo) {
+                poLineRemainingQty = poLineInfo.remaining_qty;
+                isOverDelivery = quantity > poLineRemainingQty;
+              }
+              break;
+            }
+          }
+        }
+
+        return {
+          id: line.id,
+          po_line_id: line.po_line_id,
+          item: line.item,
+          quantity,
+          unit_price: unitPrice,
+          period_price: periodPrice,
+          price_variance: priceVariance,
+          line_value: lineValue,
+          has_variance: priceVariance !== 0,
+          is_over_delivery: isOverDelivery,
+          po_line_remaining_qty: poLineRemainingQty,
+          over_delivery_approved: line.over_delivery_approved,
+          variance_percentage:
+            periodPrice && periodPrice > 0
+              ? ((priceVariance / periodPrice) * 100).toFixed(2)
+              : null,
+        };
+      });
+
+    // Check if there are any over-delivery lines that need approval
+    const hasOverDeliveryLines = processedLines.some((line) => line.is_over_delivery);
+    const hasUnapprovedOverDelivery = processedLines.some(
+      (line) => line.is_over_delivery && !line.over_delivery_approved
+    );
+
     return {
       delivery: {
         id: delivery.id,
@@ -196,6 +299,8 @@ export default defineEventHandler(async (event) => {
         delivery_note: delivery.delivery_note,
         total_amount: totalAmount,
         has_variance: delivery.has_variance,
+        has_over_delivery: hasOverDeliveryLines,
+        has_unapproved_over_delivery: hasUnapprovedOverDelivery,
         status: delivery.status,
         created_at: delivery.created_at,
         updated_at: delivery.updated_at,
@@ -205,36 +310,14 @@ export default defineEventHandler(async (event) => {
         period: delivery.period,
         po: delivery.po
           ? {
-              ...delivery.po,
+              id: delivery.po.id,
+              po_no: delivery.po.po_no,
+              status: delivery.po.status,
               total_amount: parseFloat(delivery.po.total_amount.toString()),
             }
           : null,
         creator: delivery.creator,
-        // Sort delivery lines by item name in JavaScript (faster than nested SQL ordering)
-        lines: [...delivery.delivery_lines]
-          .sort((a, b) => (a.item?.name || "").localeCompare(b.item?.name || ""))
-          .map((line) => {
-            const quantity = parseFloat(line.quantity.toString());
-            const unitPrice = parseFloat(line.unit_price.toString());
-            const periodPrice = line.period_price ? parseFloat(line.period_price.toString()) : null;
-            const priceVariance = parseFloat(line.price_variance.toString());
-            const lineValue = parseFloat(line.line_value.toString());
-
-            return {
-              id: line.id,
-              item: line.item,
-              quantity,
-              unit_price: unitPrice,
-              period_price: periodPrice,
-              price_variance: priceVariance,
-              line_value: lineValue,
-              has_variance: priceVariance !== 0,
-              variance_percentage:
-                periodPrice && periodPrice > 0
-                  ? ((priceVariance / periodPrice) * 100).toFixed(2)
-                  : null,
-            };
-          }),
+        lines: processedLines,
         ncrs: delivery.ncrs.map((ncr) => ({
           ...ncr,
           quantity: ncr.quantity ? parseFloat(ncr.quantity.toString()) : null,

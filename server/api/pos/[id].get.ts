@@ -158,23 +158,30 @@ export default defineEventHandler(async (event) => {
         created_by: po.created_by,
         created_at: po.created_at.toISOString(),
         updated_at: po.updated_at.toISOString(),
-        lines: po.lines.map((line) => ({
-          id: line.id,
-          po_id: line.po_id,
-          item_id: line.item_id,
-          item_code: line.item_code,
-          item_description: line.item_description,
-          quantity: line.quantity.toString(),
-          unit: line.unit,
-          unit_price: line.unit_price.toString(),
-          discount_percent: line.discount_percent.toString(),
-          total_before_vat: line.total_before_vat.toString(),
-          vat_percent: line.vat_percent.toString(),
-          vat_amount: line.vat_amount.toString(),
-          total_after_vat: line.total_after_vat.toString(),
-          notes: line.notes,
-          item: line.item,
-        })),
+        lines: po.lines.map((line) => {
+          const quantity = parseFloat(line.quantity.toString());
+          const deliveredQty = parseFloat(line.delivered_qty.toString());
+          const remainingQty = Math.max(0, quantity - deliveredQty);
+          return {
+            id: line.id,
+            po_id: line.po_id,
+            item_id: line.item_id,
+            item_code: line.item_code,
+            item_description: line.item_description,
+            quantity: line.quantity.toString(),
+            delivered_qty: line.delivered_qty.toString(),
+            remaining_qty: remainingQty.toString(), // Computed field for convenience
+            unit: line.unit,
+            unit_price: line.unit_price.toString(),
+            discount_percent: line.discount_percent.toString(),
+            total_before_vat: line.total_before_vat.toString(),
+            vat_percent: line.vat_percent.toString(),
+            vat_amount: line.vat_amount.toString(),
+            total_after_vat: line.total_after_vat.toString(),
+            notes: line.notes,
+            item: line.item,
+          };
+        }),
         supplier: po.supplier,
         prf: po.prf,
         ship_to_location: po.ship_to_location,
