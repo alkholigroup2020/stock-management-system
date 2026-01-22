@@ -262,6 +262,7 @@ Track cumulative delivered quantities on each PO line and auto-close POs when fu
 ### Implementation
 
 **Database Schema:**
+
 ```prisma
 // POLine - tracks what's been delivered
 delivered_qty    Decimal  @default(0)  // Cumulative delivered quantity
@@ -272,6 +273,7 @@ over_delivery_approved Boolean @default(false)  // Approval status
 ```
 
 **Delivery Tracking Logic:**
+
 ```typescript
 // When delivery is posted:
 1. For each delivery line, find the matching PO line (by po_line_id or item_id fallback)
@@ -281,6 +283,7 @@ over_delivery_approved Boolean @default(false)  // Approval status
 ```
 
 **API Response Fields:**
+
 ```typescript
 // PO lines include:
 {
@@ -313,13 +316,15 @@ Require Supervisor/Admin approval when delivery quantity exceeds PO line's remai
 ### Implementation
 
 **Detection:**
+
 ```typescript
 // Over-delivery detected when:
-delivery_line.quantity > po_line.remaining_qty
+delivery_line.quantity > po_line.remaining_qty;
 // Where: remaining_qty = quantity - delivered_qty
 ```
 
 **Workflow States:**
+
 ```
 Operator saves draft with over-delivery
     │
@@ -345,6 +350,7 @@ Email sent to Supervisors/Admins
 | ADMIN | Yes | Yes (implicit) | No |
 
 **Email Notifications:**
+
 1. `sendOverDeliveryApprovalNotification` - To Supervisors when draft saved
 2. `sendOverDeliveryApprovedNotification` - To creator when approved
 3. `sendOverDeliveryRejectedNotification` - To creator when rejected
@@ -367,12 +373,13 @@ Automatically close POs when all line items have been fully delivered.
 ### Implementation
 
 **Trigger Condition:**
+
 ```typescript
 // After posting a delivery:
 const poLines = await prisma.pOLine.findMany({ where: { po_id } });
 
-const allFullyDelivered = poLines.every(line =>
-  parseFloat(line.delivered_qty) >= parseFloat(line.quantity)
+const allFullyDelivered = poLines.every(
+  (line) => parseFloat(line.delivered_qty) >= parseFloat(line.quantity)
 );
 
 if (allFullyDelivered) {
@@ -387,6 +394,7 @@ if (allFullyDelivered) {
 ```
 
 **Response:**
+
 ```typescript
 return {
   message: "Delivery posted. PO has been automatically closed.",

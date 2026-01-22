@@ -133,11 +133,13 @@ When a delivery quantity exceeds the remaining PO quantity (over-delivery), the 
 
 4. **Given** a Supervisor approving over-delivery items, **When** they click "Approve", **Then** the system marks the items as approved and sends an email notification to the delivery creator.
 
-5. **Given** a Supervisor rejecting over-delivery items, **When** they enter a rejection reason and click "Reject", **Then** the rejection reason is recorded in the delivery notes and an email notification is sent to the creator.
+5. **Given** a Supervisor rejecting over-delivery items, **When** they enter a rejection reason and click "Reject", **Then** the rejection reason is recorded in the delivery notes with error styling, the delivery is permanently locked (all actions disabled), and an email notification is sent to the creator.
 
 6. **Given** an Operator viewing a draft delivery with pending over-delivery approval, **When** they access the delivery detail page, **Then** the Edit, Delete, and Post buttons are disabled until approval.
 
 7. **Given** a Supervisor or Admin creating a delivery with over-delivery, **When** they save or post the delivery, **Then** the over-delivery is implicitly approved (no separate approval workflow needed).
+
+8. **Given** a delivery that has been rejected due to over-delivery, **When** any user views the delivery detail page, **Then** all actions (Delete, Edit, Post) are permanently disabled, an "Over-Delivery Rejected" alert is displayed indicating the delivery is locked, and the user must create a new delivery with correct quantities.
 
 ---
 
@@ -188,7 +190,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - What happens if email sending fails? → The PRF approval action completes but the system logs the email failure (applies to PRF approval notifications to procurement specialists only; POs do not send emails).
 - What happens when all PO items are fully delivered? → The system automatically closes the PO and its linked PRF. The delivery API returns `po_auto_closed: true`.
 - What happens if a delivery is created against a fully-delivered PO line? → This is treated as over-delivery and requires approval, since remaining_qty is 0.
-- What happens when Supervisor rejects over-delivery? → The rejection reason is prepended to the delivery notes, creator is notified via email, and the operator can edit the delivery to correct quantities.
+- What happens when Supervisor rejects over-delivery? → The rejection reason is prepended to the delivery notes with error styling, the delivery is **permanently locked** (all actions disabled including Edit, Delete, Post), creator is notified via email, and **the operator must create a new delivery** with correct quantities instead of editing the rejected one.
 
 ## Requirements _(mandatory)_
 
@@ -252,6 +254,8 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-045**: System MUST send email notification to delivery creator when over-delivery is approved
 - **FR-046**: System MUST send email notification to delivery creator when over-delivery is rejected (with reason)
 - **FR-047**: Operators MUST NOT edit, delete, or post drafts with pending over-delivery approval
+- **FR-047a**: Rejected deliveries MUST be permanently locked (all actions disabled) and require a new delivery to be created
+- **FR-047b**: Rejection notes MUST be displayed with error styling to clearly indicate rejection status
 - **FR-048**: Supervisors/Admins creating deliveries with over-delivery MUST have implicit approval (no separate workflow)
 
 **Automatic PO Closure**

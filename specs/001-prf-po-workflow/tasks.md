@@ -647,6 +647,47 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 ---
 
+### DT007 - Over-Delivery Rejection Locking (2026-01-22)
+
+**Feature**: Permanently lock deliveries when over-delivery is rejected.
+
+**Issue**: When an admin/supervisor rejected an over-delivery, only a note was added to the delivery but all other actions (Post, Edit, Delete) remained available, allowing the delivery to still be posted.
+
+**Solution**: Add `over_delivery_rejected` field to permanently lock rejected deliveries.
+
+**Implementation**:
+
+- [x] DT007a Update `prisma/schema.prisma` - Add `over_delivery_rejected` Boolean field to Delivery model
+- [x] DT007b Update `shared/types/database.ts` - Add `over_delivery_rejected` to Delivery interface
+- [x] DT007c Update `server/api/deliveries/[id].get.ts` - Return `over_delivery_rejected` status in response
+- [x] DT007d Update `server/api/deliveries/[id].patch.ts` - Block ALL PATCH requests for rejected deliveries
+- [x] DT007e Update `server/api/deliveries/[id].patch.ts` - Set `over_delivery_rejected: true` when rejecting
+- [x] DT007f Update `app/pages/deliveries/[id]/index.vue` - Disable ALL action buttons when rejected (Delete, Edit, Post)
+- [x] DT007g Update `app/pages/deliveries/[id]/index.vue` - Add "Over-Delivery Rejected" alert with lock icon
+- [x] DT007h Update `app/pages/deliveries/[id]/index.vue` - Format delivery notes with rejection notes on separate lines
+- [x] DT007i Update `app/pages/deliveries/[id]/index.vue` - Style rejection notes with error color variant
+
+**Files Changed**:
+
+- `prisma/schema.prisma` - New `over_delivery_rejected` field
+- `shared/types/database.ts` - Updated Delivery interface
+- `server/api/deliveries/[id].get.ts` - Return rejection status
+- `server/api/deliveries/[id].patch.ts` - Block actions for rejected deliveries
+- `app/pages/deliveries/[id]/index.vue` - UI for locked delivery state
+
+**Verification**: Tested rejection workflow:
+
+1. Created delivery with over-delivery quantity
+2. Rejected as admin with reason
+3. Verified all buttons (Delete, Edit, Post) are disabled
+4. Verified "Over-Delivery Rejected" alert shows with lock message
+5. Verified rejection notes display in error color on separate lines
+6. Verified backend blocks all PATCH requests for rejected deliveries
+
+**Checkpoint**: DT007 complete - Rejected deliveries are permanently locked ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

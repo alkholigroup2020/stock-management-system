@@ -329,22 +329,23 @@ model POLine {
 }
 
 model Delivery {
-  id             String         @id @default(uuid()) @db.Uuid
-  delivery_no    String         @unique @db.VarChar(50)
-  period_id      String         @db.Uuid
-  location_id    String         @db.Uuid
-  supplier_id    String         @db.Uuid
-  po_id          String?        @db.Uuid
-  invoice_no     String?        @db.VarChar(100)
-  delivery_note  String?
-  delivery_date  DateTime       @db.Date
-  total_amount   Decimal        @default(0) @db.Decimal(15, 2)
-  has_variance   Boolean        @default(false)
-  status         DeliveryStatus @default(DRAFT)
-  created_by     String         @db.Uuid
-  posted_at      DateTime?      @db.Timestamptz(6)
-  created_at     DateTime       @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime       @updatedAt @db.Timestamptz(6)
+  id                      String         @id @default(uuid()) @db.Uuid
+  delivery_no             String         @unique @db.VarChar(50)
+  period_id               String         @db.Uuid
+  location_id             String         @db.Uuid
+  supplier_id             String         @db.Uuid
+  po_id                   String?        @db.Uuid
+  invoice_no              String?        @db.VarChar(100)
+  delivery_note           String?
+  delivery_date           DateTime       @db.Date
+  total_amount            Decimal        @default(0) @db.Decimal(15, 2)
+  has_variance            Boolean        @default(false)
+  over_delivery_rejected  Boolean        @default(false) // True if over-delivery was rejected by Supervisor/Admin
+  status                  DeliveryStatus @default(DRAFT)
+  created_by              String         @db.Uuid
+  posted_at               DateTime?      @db.Timestamptz(6)
+  created_at              DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime       @updatedAt @db.Timestamptz(6)
   creator        User           @relation("DeliveryCreator", fields: [created_by], references: [id])
   location       Location       @relation(fields: [location_id], references: [id])
   period         Period         @relation(fields: [period_id], references: [id])

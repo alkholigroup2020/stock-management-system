@@ -158,6 +158,20 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Block ALL actions if over-delivery was rejected
+    // Rejected deliveries are locked - a new delivery must be created instead
+    if (delivery.over_delivery_rejected) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+        data: {
+          code: "OVER_DELIVERY_REJECTED",
+          message:
+            "This delivery was rejected due to over-delivery and is now locked. Please create a new delivery with the correct quantities.",
+        },
+      });
+    }
+
     // Check if user is the creator (or ADMIN/SUPERVISOR)
     if (delivery.created_by !== user.id && user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
       throw createError({
@@ -332,10 +346,18 @@ export default defineEventHandler(async (event) => {
     if (isPosting && poId) {
       for (const lineData of linesToProcess) {
         // Find matching PO line by po_line_id or by item_id
-        const lineWithPoId = lineData as typeof lineData & { po_line_id?: string; over_delivery_approved?: boolean };
+        const lineWithPoId = lineData as typeof lineData & {
+          po_line_id?: string;
+          over_delivery_approved?: boolean;
+        };
         let poLineId = lineWithPoId.po_line_id;
         let poLineInfo:
-          | { item_id: string | null; quantity: number; delivered_qty: number; remaining_qty: number }
+          | {
+              item_id: string | null;
+              quantity: number;
+              delivered_qty: number;
+              remaining_qty: number;
+            }
           | undefined;
 
         if (poLineId && poLineMap.has(poLineId)) {
@@ -354,7 +376,8 @@ export default defineEventHandler(async (event) => {
         if (poLineInfo && lineData.quantity > poLineInfo.remaining_qty) {
           // Check if this line was already marked as approved in the delivery
           const existingLine = delivery.delivery_lines.find((l) => l.item_id === lineData.item_id);
-          const isApproved = existingLine?.over_delivery_approved || lineWithPoId.over_delivery_approved || false;
+          const isApproved =
+            existingLine?.over_delivery_approved || lineWithPoId.over_delivery_approved || false;
 
           overDeliveryLines.push({
             item_id: lineData.item_id,
@@ -512,7 +535,9 @@ export default defineEventHandler(async (event) => {
           const overDeliveryInfo = overDeliveryLines.find(
             (ol) => ol.item_id === lineData.item_id && ol.po_line_id === matchedPoLineId
           );
-          const lineWithApproval = lineData as typeof lineData & { over_delivery_approved?: boolean };
+          const lineWithApproval = lineData as typeof lineData & {
+            over_delivery_approved?: boolean;
+          };
           const isOverDeliveryApproved =
             overDeliveryInfo?.approved ?? lineWithApproval.over_delivery_approved ?? false;
 
@@ -630,6 +655,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // Update delivery record
+        // Set over_delivery_rejected when rejecting - once rejected, delivery is locked
         const updatedDelivery = await tx.delivery.update({
           where: { id: deliveryId },
           data: {
@@ -641,6 +667,8 @@ export default defineEventHandler(async (event) => {
             period_id: isPosting && currentPeriod ? currentPeriod.id : undefined,
             status: data.status,
             posted_at: isPosting ? new Date() : undefined,
+            // Set rejection flag when rejecting over-delivery (delivery becomes permanently locked)
+            over_delivery_rejected: data.notify_rejection ? true : undefined,
             // Only update totals if we processed lines
             ...(shouldProcessLines && {
               total_amount: totalAmount,

@@ -195,9 +195,9 @@ Get PO details with lines (including delivery tracking), supplier, and linked de
 
 Each line includes delivery fulfillment status:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| delivered_qty | string | Cumulative quantity delivered against this line |
+| Field         | Type   | Description                                      |
+| ------------- | ------ | ------------------------------------------------ |
+| delivered_qty | string | Cumulative quantity delivered against this line  |
 | remaining_qty | string | Computed: `quantity - delivered_qty` (minimum 0) |
 
 ### Error Responses
@@ -330,8 +330,8 @@ Get list of open POs for dropdown selection (used in Delivery creation). Include
       item_id: string | null;
       item_description: string;
       quantity: string;
-      delivered_qty: string;    // NEW: Cumulative delivered quantity
-      remaining_qty: string;    // NEW: Computed remaining quantity
+      delivered_qty: string; // NEW: Cumulative delivered quantity
+      remaining_qty: string; // NEW: Computed remaining quantity
       unit: Unit;
       unit_price: string;
       item?: { id: string; code: string; name: string };
@@ -344,9 +344,9 @@ Get list of open POs for dropdown selection (used in Delivery creation). Include
 
 Each PO line includes tracking fields:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| delivered_qty | string | Total quantity already delivered against this line |
+| Field         | Type   | Description                                                 |
+| ------------- | ------ | ----------------------------------------------------------- |
+| delivered_qty | string | Total quantity already delivered against this line          |
 | remaining_qty | string | Quantity still to be delivered (`quantity - delivered_qty`) |
 
 ### Notes

@@ -33,7 +33,11 @@
 
 - Specification is complete and ready for `/speckit.clarify` or `/speckit.plan`
 - All 7 user stories cover the complete PRF/PO workflow from creation through closure
-- 36 functional requirements defined across 6 categories
+- 38 functional requirements defined across 6 categories (includes FR-047a/b for over-delivery rejection locking)
 - 10 measurable success criteria established
 - 5 edge cases identified with clear handling approaches
 - Assumptions documented for integration with existing systems
+
+### Update History
+
+- **2026-01-22**: Added over-delivery rejection locking requirements (FR-047a, FR-047b) and acceptance scenario 8 to User Story 5b

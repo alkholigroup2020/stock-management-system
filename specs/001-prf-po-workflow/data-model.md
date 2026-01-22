@@ -348,15 +348,30 @@ model POLine {
 
 ### Delivery (MODIFY)
 
-Change po_id from optional to required.
+Change po_id from optional to required and add over-delivery rejection tracking.
 
 ```prisma
 model Delivery {
   // ... existing fields ...
-  po_id          String         @db.Uuid  // CHANGED: String? → String (REQUIRED)
+  po_id                   String         @db.Uuid  // CHANGED: String? → String (REQUIRED)
+  over_delivery_rejected  Boolean        @default(false)  // NEW: True if over-delivery was rejected by Supervisor/Admin
   // ... rest unchanged ...
 }
 ```
+
+**New Fields:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| over_delivery_rejected | Boolean | No | True if a Supervisor/Admin rejected the over-delivery. When true, the delivery is permanently locked (all actions disabled). |
+
+**Over-Delivery Rejection Workflow:**
+
+1. When a Supervisor/Admin rejects over-delivery, `over_delivery_rejected` is set to `true`
+2. The rejection reason is prepended to the delivery notes with `[REJECTED by {username}]: {reason}` format
+3. The delivery becomes **permanently locked** - all API PATCH requests are blocked
+4. The frontend disables all action buttons (Delete, Edit, Post)
+5. An "Over-Delivery Rejected" alert is displayed indicating the delivery is locked
+6. User must create a new delivery with correct quantities
 
 **Migration Note:**
 
@@ -513,14 +528,15 @@ OPEN ──[close]──> CLOSED
 OPEN ──[auto]───> CLOSED (when all items fully delivered)
 ```
 
-| Transition    | Trigger       | Conditions                                                   |
-| ------------- | ------------- | ------------------------------------------------------------ |
-| OPEN → CLOSED | Manual Close  | User is Admin only (Procurement Specialist cannot close)     |
-| OPEN → CLOSED | Auto-Close    | All PO lines have `delivered_qty >= quantity` after delivery |
+| Transition    | Trigger      | Conditions                                                   |
+| ------------- | ------------ | ------------------------------------------------------------ |
+| OPEN → CLOSED | Manual Close | User is Admin only (Procurement Specialist cannot close)     |
+| OPEN → CLOSED | Auto-Close   | All PO lines have `delivered_qty >= quantity` after delivery |
 
 **Auto-Close Behavior:**
 
 When a delivery is posted, the system checks if all PO lines are fully delivered:
+
 - If `delivered_qty >= quantity` for ALL lines, the PO is automatically closed
 - The linked PRF (if any) is also automatically closed
 - The API returns `po_auto_closed: true` flag in the response
@@ -589,7 +605,7 @@ export interface POLine {
   item_code: string | null;
   item_description: string;
   quantity: DecimalValue;
-  delivered_qty: DecimalValue;  // NEW: Cumulative delivered quantity
+  delivered_qty: DecimalValue; // NEW: Cumulative delivered quantity
   unit: Unit;
   unit_price: DecimalValue;
   discount_percent: DecimalValue;
@@ -600,19 +616,40 @@ export interface POLine {
   notes: string | null;
 }
 
+// Delivery Interface (extended)
+export interface Delivery {
+  id: string;
+  delivery_no: string;
+  period_id: string;
+  location_id: string;
+  supplier_id: string;
+  po_id: string | null;
+  invoice_no: string | null;
+  delivery_note: string | null;
+  delivery_date: Date | string;
+  total_amount: DecimalValue;
+  has_variance: boolean;
+  over_delivery_rejected: boolean; // NEW: True if over-delivery was rejected by Supervisor/Admin
+  status: DeliveryStatus;
+  created_by: string;
+  posted_at: Date | string | null;
+  created_at: Date | string;
+  updated_at: Date | string;
+}
+
 // DeliveryLine Interface (extended)
 export interface DeliveryLine {
   id: string;
   delivery_id: string;
   item_id: string;
-  po_line_id: string | null;          // NEW: Link to PO line
+  po_line_id: string | null; // NEW: Link to PO line
   quantity: DecimalValue;
   unit_price: DecimalValue;
   period_price: DecimalValue;
   price_variance: DecimalValue;
   line_value: DecimalValue;
   ncr_id: string | null;
-  over_delivery_approved: boolean;    // NEW: Over-delivery approval status
+  over_delivery_approved: boolean; // NEW: Over-delivery approval status
 }
 
 // PO Interface (extended)

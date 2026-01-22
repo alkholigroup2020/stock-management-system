@@ -63,7 +63,7 @@
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
               aria-label="Delete draft"
-              :disabled="isOperatorWithOverDelivery"
+              :disabled="isDeletingBlocked"
               @click="showDeleteConfirmation = true"
             >
               <span class="hidden sm:inline">Delete</span>
@@ -75,7 +75,7 @@
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
               aria-label="Edit draft"
-              :disabled="isOperatorEditDisabled"
+              :disabled="isEditingBlocked"
               @click="editDraft"
             >
               <span class="hidden sm:inline">Edit</span>
@@ -86,7 +86,7 @@
               size="lg"
               class="cursor-pointer rounded-full px-3 sm:px-6"
               aria-label="Post delivery"
-              :disabled="isOperatorWithPendingApproval"
+              :disabled="isPostingBlocked"
               @click="showPostConfirmation = true"
             >
               <span class="hidden sm:inline">Post</span>
@@ -109,9 +109,34 @@
         </div>
       </div>
 
-      <!-- Over-Delivery Alert (for drafts) -->
+      <!-- Over-Delivery Rejected Alert -->
       <UAlert
-        v-if="isDraft && hasOverDeliveryLines"
+        v-if="isDraft && isRejected"
+        icon="i-lucide-x-circle"
+        color="error"
+        variant="subtle"
+        title="Over-Delivery Rejected"
+      >
+        <template #description>
+          <div class="space-y-3">
+            <p>
+              This delivery was rejected due to over-delivery quantities exceeding the PO limits.
+            </p>
+            <p class="text-sm">
+              <strong>This delivery is now locked.</strong>
+              Please create a new delivery with the correct quantities.
+            </p>
+            <p class="text-sm text-[var(--ui-text-muted)]">
+              <UIcon name="i-lucide-lock" class="h-4 w-4 inline mr-1" />
+              All actions are disabled for rejected deliveries.
+            </p>
+          </div>
+        </template>
+      </UAlert>
+
+      <!-- Over-Delivery Alert (for drafts - not rejected) -->
+      <UAlert
+        v-else-if="isDraft && hasOverDeliveryLines"
         icon="i-lucide-alert-triangle"
         color="warning"
         variant="subtle"
@@ -315,7 +340,18 @@
         <!-- Delivery Note -->
         <div v-if="delivery.delivery_note" class="mt-6 pt-6 border-t border-[var(--ui-border)]">
           <h3 class="text-label uppercase mb-2">Delivery Note</h3>
-          <p class="text-[var(--ui-text)]">{{ delivery.delivery_note }}</p>
+          <div class="space-y-2">
+            <template v-for="(note, index) in formattedDeliveryNotes" :key="index">
+              <p
+                v-if="note.isRejection"
+                class="text-[var(--ui-error)] bg-[var(--ui-error)]/10 px-3 py-2 rounded-md text-sm"
+              >
+                <UIcon name="i-lucide-x-circle" class="h-4 w-4 inline mr-1" />
+                {{ note.text }}
+              </p>
+              <p v-else class="text-[var(--ui-text)]">{{ note.text }}</p>
+            </template>
+          </div>
         </div>
       </UCard>
 
@@ -681,6 +717,7 @@ interface Delivery {
   has_variance: boolean;
   has_over_delivery: boolean;
   has_unapproved_over_delivery: boolean;
+  over_delivery_rejected: boolean;
   status: DeliveryStatus;
   created_at: string;
   updated_at: string;
@@ -764,23 +801,46 @@ const canApproveOverDelivery = computed(
 );
 const userRole = computed(() => user.value?.role ?? "");
 const isOperator = computed(() => user.value?.role === "OPERATOR");
-// Check if delivery has been rejected (note starts with "[REJECTED")
-const isRejected = computed(() => {
-  const note = delivery.value?.delivery_note || "";
-  return note.startsWith("[REJECTED");
-});
+// Check if delivery has been rejected for over-delivery
+const isRejected = computed(() => delivery.value?.over_delivery_rejected ?? false);
+
+// When rejected: disable ALL actions for EVERYONE - a new delivery must be created instead
+const isRejectedDelivery = computed(() => isRejected.value);
+
 // Operator can't delete when there are ANY over-delivery lines (approved or not)
-const isOperatorWithOverDelivery = computed(
-  () => isOperator.value && hasOverDeliveryLines.value
-);
-// Operator can't edit when there's over-delivery, UNLESS it was rejected (so they can fix quantities)
+const isOperatorWithOverDelivery = computed(() => isOperator.value && hasOverDeliveryLines.value);
+// Operator can't edit when there's unapproved over-delivery
 const isOperatorEditDisabled = computed(
-  () => isOperator.value && hasOverDeliveryLines.value && !isRejected.value
+  () => isOperator.value && hasOverDeliveryLines.value && hasUnapprovedOverDelivery.value
 );
 // Operator can't post when there's unapproved over-delivery
 const isOperatorWithPendingApproval = computed(
   () => isOperator.value && hasUnapprovedOverDelivery.value
 );
+// When rejected, ALL actions are blocked - delivery is locked
+const isEditingBlocked = computed(() => isRejectedDelivery.value || isOperatorEditDisabled.value);
+const isPostingBlocked = computed(
+  () => isRejectedDelivery.value || isOperatorWithPendingApproval.value
+);
+const isDeletingBlocked = computed(
+  () => isRejectedDelivery.value || isOperatorWithOverDelivery.value
+);
+
+// Format delivery notes - separate rejection notes for styling
+const formattedDeliveryNotes = computed(() => {
+  const note = delivery.value?.delivery_note || "";
+  if (!note) return [];
+
+  // Split by [REJECTED pattern to separate rejection notes
+  const parts = note.split(/(?=\[REJECTED)/);
+  return parts
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0)
+    .map((part) => ({
+      text: part,
+      isRejection: part.startsWith("[REJECTED"),
+    }));
+});
 
 type BadgeColor = "error" | "info" | "success" | "primary" | "secondary" | "warning" | "neutral";
 

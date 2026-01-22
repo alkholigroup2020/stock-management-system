@@ -337,11 +337,19 @@ export async function sendOverDeliveryApprovalNotification(params: {
   }>;
   deliveryUrl: string;
 }): Promise<EmailResult> {
-  const { recipientEmails, deliveryNumber, creatorName, locationName, overDeliveryItems, deliveryUrl } =
-    params;
+  const {
+    recipientEmails,
+    deliveryNumber,
+    creatorName,
+    locationName,
+    overDeliveryItems,
+    deliveryUrl,
+  } = params;
 
   if (recipientEmails.length === 0) {
-    console.warn("[Email Service] No recipient emails provided for over-delivery approval notification");
+    console.warn(
+      "[Email Service] No recipient emails provided for over-delivery approval notification"
+    );
     return { success: true, messageId: "no-recipients" };
   }
 
@@ -436,7 +444,9 @@ export async function sendOverDeliveryApprovedNotification(params: {
     params;
 
   if (!recipientEmail) {
-    console.warn("[Email Service] No recipient email provided for over-delivery approved notification");
+    console.warn(
+      "[Email Service] No recipient email provided for over-delivery approved notification"
+    );
     return { success: true, messageId: "no-recipients" };
   }
 
@@ -537,7 +547,9 @@ export async function sendOverDeliveryRejectedNotification(params: {
   } = params;
 
   if (!recipientEmail) {
-    console.warn("[Email Service] No recipient email provided for over-delivery rejected notification");
+    console.warn(
+      "[Email Service] No recipient email provided for over-delivery rejected notification"
+    );
     return { success: true, messageId: "no-recipients" };
   }
 
