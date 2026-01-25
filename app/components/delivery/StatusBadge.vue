@@ -35,7 +35,7 @@ const statusColor = computed<BadgeColor>(() => {
   const colorMap: Record<DisplayStatus, BadgeColor> = {
     DRAFT: "neutral",
     PENDING_APPROVAL: "warning",
-    APPROVED: "success",
+    APPROVED: "warning",
     REJECTED: "error",
     POSTED: "success",
   };

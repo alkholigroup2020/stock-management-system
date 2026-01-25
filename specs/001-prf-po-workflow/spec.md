@@ -141,11 +141,11 @@ When a delivery quantity exceeds the remaining PO quantity (over-delivery), the 
 
 8. **Given** a delivery that has been rejected due to over-delivery, **When** any user views the delivery detail page, **Then** all actions (Delete, Edit, Post) are permanently disabled, an "Over-Delivery Rejected" alert is displayed indicating the delivery is locked, and the user must create a new delivery with correct quantities.
 
-9. **Given** a delivery list page, **When** viewing deliveries with over-delivery approval workflow states, **Then** the status badge displays the appropriate state: "Draft" (gray) for normal drafts, "Pending Approval" (amber) for drafts awaiting approval, "Approved" (green) for approved drafts ready to post, "Rejected" (red) for rejected drafts, and "Posted" (green) for posted deliveries.
+9. **Given** a delivery list page, **When** viewing deliveries with over-delivery approval workflow states, **Then** the status badge displays the appropriate state: "Draft" (gray) for normal drafts, "Pending Approval" (amber) for drafts awaiting approval, "Approved" (amber) for approved drafts ready to post, "Rejected" (red) for rejected drafts, and "Posted" (green) for posted deliveries.
 
 10. **Given** a delivery detail page for a delivery with pending over-delivery approval, **When** viewing the page, **Then** the status badge displays "Pending Approval" (amber) and shows which items are pending or approved.
 
-11. **Given** a delivery where all over-delivery items have been approved but not yet posted, **When** viewing the delivery list or detail page, **Then** the status badge displays "Approved" (green) indicating the delivery is ready to be posted.
+11. **Given** a delivery where all over-delivery items have been approved but not yet posted, **When** viewing the delivery list or detail page, **Then** the status badge displays "Approved" (amber) indicating the delivery is ready to be posted but not yet finalized.
 
 ---
 
@@ -224,6 +224,15 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-014a**: System MUST require Supervisors to enter a mandatory free-text rejection reason when rejecting a PRF
 - **FR-014b**: System MUST allow users to "Clone" a REJECTED PRF, creating a new DRAFT PRF with copied content (new PRF number assigned, original rejection preserved for audit)
 
+**PRF Display Statuses**
+
+- **FR-014c**: System MUST display PRF status badges that reflect the approval workflow state
+- **FR-014d**: System MUST show "Draft" (gray/neutral) for PRFs in DRAFT status
+- **FR-014e**: System MUST show "Pending Approval" (amber/warning) for PRFs in PENDING status awaiting supervisor approval
+- **FR-014f**: System MUST show "Approved" (green/success) for PRFs in APPROVED status
+- **FR-014g**: System MUST show "Rejected" (red/error) for PRFs in REJECTED status
+- **FR-014h**: System MUST show "Closed" (blue/info) for PRFs in CLOSED status
+
 **PO Management**
 
 - **FR-015**: System MUST allow only Procurement Specialists to create exactly one PO from each approved PRF (1:1 relationship)
@@ -269,7 +278,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-052**: System MUST display delivery status badges that reflect the over-delivery approval workflow state
 - **FR-053**: System MUST show "Draft" (gray/neutral) for normal draft deliveries without over-delivery
 - **FR-054**: System MUST show "Pending Approval" (amber/warning) for draft deliveries awaiting over-delivery approval
-- **FR-055**: System MUST show "Approved" (green/success) for draft deliveries where all over-delivery items have been approved but not yet posted
+- **FR-055**: System MUST show "Approved" (amber/warning) for draft deliveries where all over-delivery items have been approved but not yet posted
 - **FR-056**: System MUST show "Rejected" (red/error) for deliveries where over-delivery was rejected
 - **FR-057**: System MUST show "Posted" (green/success) for posted deliveries
 - **FR-058**: System MUST compute effective delivery status from database fields: `status`, `pending_approval`, `over_delivery_rejected`, and line-level `over_delivery_approved`

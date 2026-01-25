@@ -24,9 +24,9 @@ const props = withDefaults(defineProps<PRFStatusBadgeProps>(), {
 
 // Computed
 const statusColor = computed(() => {
-  const colorMap: Record<PRFStatus, "neutral" | "primary" | "success" | "error" | "info"> = {
+  const colorMap: Record<PRFStatus, "neutral" | "warning" | "success" | "error" | "info"> = {
     DRAFT: "neutral",
-    PENDING: "primary",
+    PENDING: "warning",
     APPROVED: "success",
     REJECTED: "error",
     CLOSED: "info",

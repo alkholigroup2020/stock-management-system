@@ -708,13 +708,15 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 - [x] DT008c Create `app/components/delivery/StatusBadge.vue` - Reusable component for delivery status display
 - [x] DT008d Update `app/pages/deliveries/index.vue` - Use DeliveryStatusBadge component in list view
 - [x] DT008e Update `app/pages/deliveries/[id]/index.vue` - Use DeliveryStatusBadge component in detail view
-- [x] DT008f Update status colors - Change "Approved" from blue (info) to green (success)
+- [x] DT008f Update status colors - Change "Approved" from blue (info) to warning (amber)
+- [x] DT008g Update PRF status colors - Change "Pending Approval" from primary (blue) to warning (amber)
 
 **Files Changed**:
 
-- `server/api/reports/deliveries.get.ts` - Fixed remainingQty calculation for effective status
+- `server/api/reports/deliveries.get.ts` - Simplified effective status logic: trusts `pending_approval` flag instead of recomputing over-delivery from PO quantities
 - `server/api/deliveries/[id].patch.ts` - Fixed pending_approval flag preservation
-- `app/components/delivery/StatusBadge.vue` - New reusable status badge component
+- `app/components/delivery/StatusBadge.vue` - Reusable status badge component with amber for "Approved"
+- `app/components/orders/PRFStatusBadge.vue` - Updated "Pending Approval" from primary (blue) to warning (amber)
 - `app/pages/deliveries/index.vue` - Uses DeliveryStatusBadge component
 - `app/pages/deliveries/[id]/index.vue` - Uses DeliveryStatusBadge component
 
@@ -724,7 +726,7 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 |----------------|----------------|-------|------|
 | `status=DRAFT`, `pending_approval=false`, `rejected=false` | Draft | neutral (gray) | i-lucide-file-edit |
 | `status=DRAFT`, `pending_approval=true`, `rejected=false` | Pending Approval | warning (amber) | i-lucide-clock |
-| `status=DRAFT`, all over-delivery approved, not rejected | Approved | success (green) | i-lucide-check |
+| `status=DRAFT`, all over-delivery approved, not rejected | Approved | warning (amber) | i-lucide-check |
 | `status=DRAFT`, `rejected=true` | Rejected | error (red) | i-lucide-x-circle |
 | `status=POSTED` | Posted | success (green) | i-lucide-check-circle |
 
@@ -732,10 +734,32 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 1. Created PRF → PO → Delivery with over-delivery (15 KG on 10 KG PO line)
 2. Verified "Pending Approval" status appears in list and detail views
 3. Approved over-delivery as admin
-4. Verified "Approved" status appears (green) after approval
+4. Verified "Approved" status appears (amber) after approval
 5. Rejected over-delivery in separate test to verify "Rejected" status
 
 **Checkpoint**: DT008 complete - Delivery status badges correctly reflect approval workflow state ✅
+
+---
+
+### DT009: PRF Status Badge Color Update
+
+**Context**: PRF "Pending Approval" status badge was using primary (blue) color, which didn't convey the "action required" urgency. Changed to warning (amber) to be consistent with delivery "Pending Approval" badge.
+
+**PRF Status Badge Mapping**:
+
+| PRF Status | Display Label | Color | Icon |
+|------------|---------------|-------|------|
+| DRAFT | Draft | neutral (gray) | i-lucide-file-edit |
+| PENDING | Pending Approval | warning (amber) | i-lucide-clock |
+| APPROVED | Approved | success (green) | i-lucide-check-circle |
+| REJECTED | Rejected | error (red) | i-lucide-x-circle |
+| CLOSED | Closed | info (blue) | i-lucide-lock |
+
+**Files Changed**:
+
+- `app/components/orders/PRFStatusBadge.vue` - Changed PENDING status from primary to warning color
+
+**Checkpoint**: DT009 complete - PRF status badges use consistent color scheme ✅
 
 ---
 
