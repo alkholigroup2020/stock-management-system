@@ -357,45 +357,24 @@ export default defineEventHandler(async (event) => {
       }));
 
       // Compute over-delivery approval status
-      // Check if there are over-delivery lines and if all are approved
-      let hasOverDeliveryLines = false;
-      let allOverDeliveryApproved = true;
-
-      for (const line of delivery.delivery_lines) {
-        if (!line.po_line) continue;
-        const poQty = parseFloat(line.po_line.quantity.toString());
-        const deliveredQty = parseFloat(line.po_line.delivered_qty.toString());
-        const lineQty = parseFloat(line.quantity.toString());
-        // For POSTED deliveries: add back this line's qty since it's already in delivered_qty
-        // For DRAFT deliveries: delivered_qty doesn't include this line yet
-        const remainingQty =
-          delivery.status === "POSTED"
-            ? Math.max(0, poQty - deliveredQty + lineQty)
-            : Math.max(0, poQty - deliveredQty);
-        const isOverDelivery = lineQty > remainingQty;
-
-        if (isOverDelivery) {
-          hasOverDeliveryLines = true;
-          if (!line.over_delivery_approved) {
-            allOverDeliveryApproved = false;
-          }
-        }
-      }
+      // If pending_approval is true, we trust that there was over-delivery (verified at send time)
+      // We only need to check if any line has been approved to determine status
+      const anyLineApproved = delivery.delivery_lines.some((line) => line.over_delivery_approved);
 
       // Determine the effective status flags:
-      // - pending_approval: true only if sent for approval AND has unapproved over-delivery lines
-      // - over_delivery_approved: true if was sent for approval AND all over-delivery lines are now approved
+      // - pending_approval: true if sent for approval AND no lines have been approved yet
+      // - over_delivery_approved: true if sent for approval AND at least one line has been approved
       const effectivePendingApproval =
         delivery.pending_approval &&
         !delivery.over_delivery_rejected &&
-        hasOverDeliveryLines &&
-        !allOverDeliveryApproved;
+        delivery.status === "DRAFT" &&
+        !anyLineApproved;
 
       const effectiveOverDeliveryApproved =
         delivery.pending_approval &&
         !delivery.over_delivery_rejected &&
-        hasOverDeliveryLines &&
-        allOverDeliveryApproved;
+        delivery.status === "DRAFT" &&
+        anyLineApproved;
 
       deliveryReports.push({
         id: delivery.id,
