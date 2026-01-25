@@ -264,6 +264,7 @@ export interface Delivery {
   delivery_date: Date | string;
   total_amount: DecimalValue;
   has_variance: boolean;
+  pending_approval: boolean; // True if operator sent delivery for over-delivery approval
   over_delivery_rejected: boolean; // True if over-delivery was rejected by Supervisor/Admin
   status: DeliveryStatus;
   created_by: string;

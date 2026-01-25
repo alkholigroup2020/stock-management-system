@@ -301,6 +301,7 @@ export default defineEventHandler(async (event) => {
         has_variance: delivery.has_variance,
         has_over_delivery: hasOverDeliveryLines,
         has_unapproved_over_delivery: hasUnapprovedOverDelivery,
+        pending_approval: delivery.pending_approval,
         over_delivery_rejected: delivery.over_delivery_rejected,
         status: delivery.status,
         created_at: delivery.created_at,

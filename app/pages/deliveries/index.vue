@@ -284,20 +284,12 @@
 
               <!-- Status -->
               <td class="px-4 py-4">
-                <UBadge
-                  :color="delivery.status === 'DRAFT' ? 'neutral' : 'success'"
-                  variant="subtle"
-                  size="md"
-                  class="inline-flex items-center gap-1"
-                >
-                  <UIcon
-                    :name="
-                      delivery.status === 'DRAFT' ? 'i-lucide-file-edit' : 'i-lucide-check-circle'
-                    "
-                    class="h-3 w-3"
-                  />
-                  {{ delivery.status === "DRAFT" ? "Draft" : "Posted" }}
-                </UBadge>
+                <DeliveryStatusBadge
+                  :status="delivery.status"
+                  :pending-approval="delivery.pending_approval"
+                  :approved="delivery.over_delivery_approved"
+                  :rejected="delivery.over_delivery_rejected"
+                />
               </td>
 
               <!-- Date -->
@@ -422,6 +414,9 @@ interface Delivery {
   total_amount: number;
   has_variance: boolean;
   status: DeliveryStatus;
+  pending_approval: boolean;
+  over_delivery_approved: boolean;
+  over_delivery_rejected: boolean;
   supplier: {
     id: string;
     name: string;
@@ -452,12 +447,14 @@ const deliveries = ref<Delivery[]>([]);
 const suppliers = ref<Supplier[]>([]);
 
 // Filters
+type StatusFilter = "all" | "my_drafts" | "pending_approval" | "approved" | "rejected" | "posted";
+
 const filters = reactive({
   supplierId: "all",
   hasVariance: null as boolean | null,
   startDate: "",
   endDate: "",
-  status: "all" as "all" | "my_drafts" | "posted",
+  status: "all" as StatusFilter,
 });
 
 // Pagination
@@ -540,6 +537,24 @@ const statusDropdownItems = computed(() => [
       onSelect: () => selectStatus("my_drafts"),
     },
     {
+      label: "Pending Approval",
+      icon: "i-lucide-clock",
+      active: filters.status === "pending_approval",
+      onSelect: () => selectStatus("pending_approval"),
+    },
+    {
+      label: "Approved",
+      icon: "i-lucide-check",
+      active: filters.status === "approved",
+      onSelect: () => selectStatus("approved"),
+    },
+    {
+      label: "Rejected",
+      icon: "i-lucide-x-circle",
+      active: filters.status === "rejected",
+      onSelect: () => selectStatus("rejected"),
+    },
+    {
       label: "Posted",
       icon: "i-lucide-check-circle",
       active: filters.status === "posted",
@@ -549,15 +564,27 @@ const statusDropdownItems = computed(() => [
 ]);
 
 const currentStatusLabel = computed(() => {
-  if (filters.status === "my_drafts") return "My Drafts";
-  if (filters.status === "posted") return "Posted";
-  return "All";
+  const labelMap: Record<StatusFilter, string> = {
+    all: "All",
+    my_drafts: "My Drafts",
+    pending_approval: "Pending",
+    approved: "Approved",
+    rejected: "Rejected",
+    posted: "Posted",
+  };
+  return labelMap[filters.status];
 });
 
 const currentStatusIcon = computed(() => {
-  if (filters.status === "my_drafts") return "i-lucide-file-edit";
-  if (filters.status === "posted") return "i-lucide-check-circle";
-  return "i-lucide-list";
+  const iconMap: Record<StatusFilter, string> = {
+    all: "i-lucide-list",
+    my_drafts: "i-lucide-file-edit",
+    pending_approval: "i-lucide-clock",
+    approved: "i-lucide-check",
+    rejected: "i-lucide-x-circle",
+    posted: "i-lucide-check-circle",
+  };
+  return iconMap[filters.status];
 });
 
 // Active filters
@@ -593,10 +620,18 @@ const activeFilters = computed(() => {
   }
 
   if (filters.status !== "all") {
+    const statusValueMap: Record<StatusFilter, string> = {
+      all: "All",
+      my_drafts: "My Drafts",
+      pending_approval: "Pending Approval",
+      approved: "Approved",
+      rejected: "Rejected",
+      posted: "Posted",
+    };
     activeFiltersList.push({
       key: "status",
       label: "Status",
-      value: filters.status === "my_drafts" ? "My Drafts" : "Posted",
+      value: statusValueMap[filters.status],
     });
   }
 
@@ -610,7 +645,7 @@ function selectVariance(value: boolean | null) {
 }
 
 // Select status handler
-function selectStatus(value: "all" | "my_drafts" | "posted") {
+function selectStatus(value: StatusFilter) {
   filters.status = value;
   applyFilters();
 }
@@ -646,6 +681,15 @@ async function fetchDeliveries() {
     if (filters.status === "my_drafts") {
       params.append("status", "DRAFT");
       params.append("myDrafts", "true");
+    } else if (filters.status === "pending_approval") {
+      params.append("status", "DRAFT");
+      params.append("pendingApproval", "true");
+    } else if (filters.status === "approved") {
+      params.append("status", "DRAFT");
+      params.append("approved", "true");
+    } else if (filters.status === "rejected") {
+      params.append("status", "DRAFT");
+      params.append("rejected", "true");
     } else if (filters.status === "posted") {
       params.append("status", "POSTED");
     }
@@ -659,6 +703,9 @@ async function fetchDeliveries() {
         total_amount: number;
         has_variance: boolean;
         status: DeliveryStatus;
+        pending_approval: boolean;
+        over_delivery_approved: boolean;
+        over_delivery_rejected: boolean;
         supplier_code: string;
         supplier_name: string;
         creator_id: string;
@@ -680,6 +727,9 @@ async function fetchDeliveries() {
       total_amount: d.total_amount,
       has_variance: d.has_variance,
       status: d.status || "POSTED", // Default to POSTED for backwards compatibility
+      pending_approval: d.pending_approval ?? false,
+      over_delivery_approved: d.over_delivery_approved ?? false,
+      over_delivery_rejected: d.over_delivery_rejected ?? false,
       supplier: {
         id: "", // Not available in report response
         name: d.supplier_name,

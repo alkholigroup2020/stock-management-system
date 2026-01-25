@@ -688,6 +688,57 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 ---
 
+### DT008 - Delivery Display Status Badges (2026-01-25)
+
+**Feature**: Display meaningful status badges on deliveries list and detail pages based on over-delivery approval workflow state.
+
+**Issue**: Deliveries with over-delivery approval workflow showed incorrect statuses:
+1. All non-posted deliveries showed "Draft" regardless of approval state
+2. "Pending Approval" status was not being computed correctly in the reports API
+3. "Approved" status was not being preserved after approval (flag was being reset)
+
+**Root Causes**:
+1. **remainingQty calculation bug**: In `server/api/reports/deliveries.get.ts`, the `remainingQty` formula was adding back `lineQty` for DRAFT deliveries, causing `isOverDelivery` to be false when it should be true
+2. **pending_approval flag reset**: In `server/api/deliveries/[id].patch.ts`, the `pending_approval` flag was being reset to `false` when approval notification was sent, instead of only when posting
+
+**Implementation**:
+
+- [x] DT008a Fix `server/api/reports/deliveries.get.ts` - Conditional `remainingQty` calculation based on delivery status (DRAFT vs POSTED)
+- [x] DT008b Fix `server/api/deliveries/[id].patch.ts` - Only reset `pending_approval` when posting, not when approving
+- [x] DT008c Create `app/components/delivery/StatusBadge.vue` - Reusable component for delivery status display
+- [x] DT008d Update `app/pages/deliveries/index.vue` - Use DeliveryStatusBadge component in list view
+- [x] DT008e Update `app/pages/deliveries/[id]/index.vue` - Use DeliveryStatusBadge component in detail view
+- [x] DT008f Update status colors - Change "Approved" from blue (info) to green (success)
+
+**Files Changed**:
+
+- `server/api/reports/deliveries.get.ts` - Fixed remainingQty calculation for effective status
+- `server/api/deliveries/[id].patch.ts` - Fixed pending_approval flag preservation
+- `app/components/delivery/StatusBadge.vue` - New reusable status badge component
+- `app/pages/deliveries/index.vue` - Uses DeliveryStatusBadge component
+- `app/pages/deliveries/[id]/index.vue` - Uses DeliveryStatusBadge component
+
+**Display Status Mapping**:
+
+| Database State | Display Status | Color | Icon |
+|----------------|----------------|-------|------|
+| `status=DRAFT`, `pending_approval=false`, `rejected=false` | Draft | neutral (gray) | i-lucide-file-edit |
+| `status=DRAFT`, `pending_approval=true`, `rejected=false` | Pending Approval | warning (amber) | i-lucide-clock |
+| `status=DRAFT`, all over-delivery approved, not rejected | Approved | success (green) | i-lucide-check |
+| `status=DRAFT`, `rejected=true` | Rejected | error (red) | i-lucide-x-circle |
+| `status=POSTED` | Posted | success (green) | i-lucide-check-circle |
+
+**Verification**: Tested complete workflow:
+1. Created PRF → PO → Delivery with over-delivery (15 KG on 10 KG PO line)
+2. Verified "Pending Approval" status appears in list and detail views
+3. Approved over-delivery as admin
+4. Verified "Approved" status appears (green) after approval
+5. Rejected over-delivery in separate test to verify "Rejected" status
+
+**Checkpoint**: DT008 complete - Delivery status badges correctly reflect approval workflow state ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

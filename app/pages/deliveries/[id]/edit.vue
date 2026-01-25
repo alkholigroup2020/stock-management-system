@@ -340,7 +340,7 @@
             variant="soft"
             size="lg"
             class="cursor-pointer rounded-full px-6"
-            :disabled="saving || posting"
+            :disabled="saving || posting || sendingForApproval"
             @click="cancel"
           >
             Cancel
@@ -352,10 +352,23 @@
             size="lg"
             class="cursor-pointer rounded-full px-6"
             :loading="saving"
-            :disabled="!isDraftValid || saving || posting || !isOnline"
+            :disabled="!isDraftValid || saving || posting || sendingForApproval || !isOnline"
             @click="saveChanges"
           >
             Save Changes
+          </UButton>
+          <!-- Send For Approval Button - Only for Operators with unapproved over-deliveries -->
+          <UButton
+            v-if="showSendForApprovalButton"
+            color="warning"
+            icon="i-lucide-send"
+            size="lg"
+            class="cursor-pointer rounded-full px-6"
+            :loading="sendingForApproval"
+            :disabled="!isDraftValid || saving || posting || sendingForApproval || !isOnline"
+            @click="sendForApproval"
+          >
+            Send For Approval
           </UButton>
           <UButton
             color="primary"
@@ -363,7 +376,7 @@
             size="lg"
             class="cursor-pointer rounded-full px-6"
             :loading="posting"
-            :disabled="!isFormValid || saving || posting || !isOnline"
+            :disabled="!isFormValid || saving || posting || sendingForApproval || !isOnline"
             @click="showPostConfirmation = true"
           >
             Post Delivery
@@ -412,6 +425,13 @@
       title="Posting Delivery..."
       message="Please wait while we process your delivery"
     />
+
+    <!-- Loading Overlay for Send For Approval -->
+    <LoadingOverlay
+      v-if="sendingForApproval"
+      title="Sending for Approval..."
+      message="Please wait while we save and notify supervisors"
+    />
   </div>
 </template>
 
@@ -426,6 +446,7 @@ const periodStore = usePeriodStore();
 const permissions = usePermissions();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess, handleWarning } = useErrorHandler();
+const { user } = useAuth();
 
 // State
 const loadingDelivery = ref(true);
@@ -434,7 +455,13 @@ const deliveryLoaded = ref(false);
 const deliveryNo = ref("");
 const saving = ref(false);
 const posting = ref(false);
+const sendingForApproval = ref(false);
 const showPostConfirmation = ref(false);
+
+// Over-delivery state (loaded from API)
+const hasOverDelivery = ref(false);
+const hasUnapprovedOverDelivery = ref(false);
+const pendingApproval = ref(false);
 
 // Delivery ID from route
 const deliveryId = computed(() => route.params.id as string);
@@ -542,13 +569,27 @@ const isDraftValid = computed(() => {
 
 // Full validation (strict - for posting)
 const isFormValid = computed(() => {
-  return (
+  const basicValid =
     formData.value.supplier_id &&
     formData.value.invoice_no &&
     formData.value.delivery_date &&
     lines.value.length > 0 &&
-    lines.value.every((line) => line.item_id && line.quantity && line.unit_price)
-  );
+    lines.value.every((line) => line.item_id && line.quantity && line.unit_price);
+
+  if (!basicValid) return false;
+
+  // Operators cannot post with unapproved over-delivery
+  const isOperator = user.value?.role === "OPERATOR";
+  if (isOperator && hasUnapprovedOverDelivery.value) {
+    return false;
+  }
+
+  return true;
+});
+
+// Show "Send For Approval" button only for Operators with unapproved over-deliveries
+const showSendForApprovalButton = computed(() => {
+  return user.value?.role === "OPERATOR" && hasUnapprovedOverDelivery.value;
 });
 
 // Fetch delivery data
@@ -571,6 +612,9 @@ const fetchDeliveryData = async () => {
         invoice_no: string | null;
         delivery_note: string | null;
         status: string;
+        has_over_delivery: boolean;
+        has_unapproved_over_delivery: boolean;
+        pending_approval: boolean;
         supplier: { id: string; name: string; code: string };
         po: { id: string } | null;
         lines: Array<{
@@ -591,6 +635,11 @@ const fetchDeliveryData = async () => {
       loadingDelivery.value = false;
       return;
     }
+
+    // Populate over-delivery state
+    hasOverDelivery.value = delivery.has_over_delivery ?? false;
+    hasUnapprovedOverDelivery.value = delivery.has_unapproved_over_delivery ?? false;
+    pendingApproval.value = delivery.pending_approval ?? false;
 
     // Populate form data
     deliveryNo.value = delivery.delivery_no;
@@ -727,6 +776,59 @@ const saveChanges = async () => {
     {
       offlineMessage: "Cannot save changes",
       offlineDescription: "You need an internet connection to save changes.",
+    }
+  );
+};
+
+// Send for approval (save draft and notify supervisors)
+const sendForApproval = async () => {
+  if (!isDraftValid.value) {
+    handleError("REQUIRED_FIELD");
+    return;
+  }
+
+  if (!hasDeliveryPermission.value) {
+    handleError("PERMISSION_DENIED");
+    return;
+  }
+
+  await guardAction(
+    async () => {
+      sendingForApproval.value = true;
+
+      try {
+        await $fetch(`/api/deliveries/${deliveryId.value}`, {
+          method: "PATCH",
+          body: {
+            supplier_id: formData.value.supplier_id,
+            po_id: formData.value.po_id || null,
+            invoice_no: formData.value.invoice_no || null,
+            delivery_note: formData.value.delivery_note || null,
+            delivery_date: formData.value.delivery_date
+              ? new Date(formData.value.delivery_date).toISOString()
+              : new Date().toISOString(),
+            lines: prepareLinesData(),
+            send_for_approval: true,
+          },
+        });
+
+        handleSuccess(
+          "Sent for Approval",
+          "Delivery draft saved. Supervisors have been notified for over-delivery approval."
+        );
+
+        // Navigate back to detail page
+        router.push(`/deliveries/${deliveryId.value}`);
+      } catch (error: unknown) {
+        console.error("Send for approval error:", error);
+        handleError(error, { context: "sending for approval" });
+      } finally {
+        sendingForApproval.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot send for approval",
+      offlineDescription: "You need an internet connection to send for approval.",
     }
   );
 };

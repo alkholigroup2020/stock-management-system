@@ -49,6 +49,9 @@ const querySchema = z.object({
   hasVariance: z.enum(["true", "false"]).optional(),
   status: z.enum(["DRAFT", "POSTED"]).optional(),
   myDrafts: z.enum(["true", "false"]).optional(),
+  pendingApproval: z.enum(["true", "false"]).optional(),
+  approved: z.enum(["true", "false"]).optional(),
+  rejected: z.enum(["true", "false"]).optional(),
 });
 
 // Delivery line type
@@ -78,6 +81,9 @@ interface DeliveryReport {
   has_variance: boolean;
   total_variance: number;
   status: string;
+  pending_approval: boolean;
+  over_delivery_approved: boolean;
+  over_delivery_rejected: boolean;
   creator_id: string;
   creator_name: string;
   created_at: Date;
@@ -125,8 +131,19 @@ export default defineEventHandler(async (event) => {
   try {
     // Parse and validate query parameters
     const query = await getQuery(event);
-    const { periodId, locationId, supplierId, startDate, endDate, hasVariance, status, myDrafts } =
-      querySchema.parse(query);
+    const {
+      periodId,
+      locationId,
+      supplierId,
+      startDate,
+      endDate,
+      hasVariance,
+      status,
+      myDrafts,
+      pendingApproval,
+      approved,
+      rejected,
+    } = querySchema.parse(query);
 
     // OPTIMIZATION: If specific location provided, verify access to just that location
     // instead of fetching ALL accessible locations
@@ -218,6 +235,27 @@ export default defineEventHandler(async (event) => {
       where.status = status;
     }
 
+    // Filter for pending approval deliveries (has pending_approval but not all lines approved yet)
+    if (pendingApproval === "true") {
+      where.pending_approval = true;
+      where.over_delivery_rejected = false;
+      where.status = "DRAFT";
+    }
+
+    // Filter for approved deliveries (has pending_approval and all lines approved)
+    // Note: We need to filter after computing effective status since it requires line-level check
+    if (approved === "true") {
+      where.pending_approval = true;
+      where.over_delivery_rejected = false;
+      where.status = "DRAFT";
+    }
+
+    // Filter for rejected deliveries
+    if (rejected === "true") {
+      where.over_delivery_rejected = true;
+      where.status = "DRAFT";
+    }
+
     // Filter for user's drafts only
     if (myDrafts === "true") {
       where.created_by = user.id;
@@ -274,6 +312,12 @@ export default defineEventHandler(async (event) => {
                 unit: true,
               },
             },
+            po_line: {
+              select: {
+                quantity: true,
+                delivered_qty: true,
+              },
+            },
           },
         },
         ncrs: {
@@ -312,6 +356,47 @@ export default defineEventHandler(async (event) => {
         line_value: parseFloat(line.line_value.toString()),
       }));
 
+      // Compute over-delivery approval status
+      // Check if there are over-delivery lines and if all are approved
+      let hasOverDeliveryLines = false;
+      let allOverDeliveryApproved = true;
+
+      for (const line of delivery.delivery_lines) {
+        if (!line.po_line) continue;
+        const poQty = parseFloat(line.po_line.quantity.toString());
+        const deliveredQty = parseFloat(line.po_line.delivered_qty.toString());
+        const lineQty = parseFloat(line.quantity.toString());
+        // For POSTED deliveries: add back this line's qty since it's already in delivered_qty
+        // For DRAFT deliveries: delivered_qty doesn't include this line yet
+        const remainingQty =
+          delivery.status === "POSTED"
+            ? Math.max(0, poQty - deliveredQty + lineQty)
+            : Math.max(0, poQty - deliveredQty);
+        const isOverDelivery = lineQty > remainingQty;
+
+        if (isOverDelivery) {
+          hasOverDeliveryLines = true;
+          if (!line.over_delivery_approved) {
+            allOverDeliveryApproved = false;
+          }
+        }
+      }
+
+      // Determine the effective status flags:
+      // - pending_approval: true only if sent for approval AND has unapproved over-delivery lines
+      // - over_delivery_approved: true if was sent for approval AND all over-delivery lines are now approved
+      const effectivePendingApproval =
+        delivery.pending_approval &&
+        !delivery.over_delivery_rejected &&
+        hasOverDeliveryLines &&
+        !allOverDeliveryApproved;
+
+      const effectiveOverDeliveryApproved =
+        delivery.pending_approval &&
+        !delivery.over_delivery_rejected &&
+        hasOverDeliveryLines &&
+        allOverDeliveryApproved;
+
       deliveryReports.push({
         id: delivery.id,
         delivery_no: delivery.delivery_no,
@@ -326,6 +411,9 @@ export default defineEventHandler(async (event) => {
         has_variance: delivery.has_variance,
         total_variance: Math.round(totalVariance * 100) / 100,
         status: delivery.status,
+        pending_approval: effectivePendingApproval,
+        over_delivery_approved: effectiveOverDeliveryApproved,
+        over_delivery_rejected: delivery.over_delivery_rejected,
         creator_id: delivery.created_by,
         creator_name: delivery.creator.full_name || delivery.creator.username,
         created_at: delivery.created_at,
@@ -377,6 +465,17 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Apply post-fetch filtering for approval status filters
+    // These require line-level computation that can't be done at database level
+    let filteredReports = deliveryReports;
+    if (pendingApproval === "true") {
+      // Only show deliveries that are still pending (not all lines approved)
+      filteredReports = deliveryReports.filter((d) => d.pending_approval === true);
+    } else if (approved === "true") {
+      // Only show deliveries where all over-delivery lines are approved
+      filteredReports = deliveryReports.filter((d) => d.over_delivery_approved === true);
+    }
+
     // Convert maps to arrays and round values
     const locationSummaries = Array.from(locationMap.values()).map((loc) => ({
       ...loc,
@@ -390,17 +489,17 @@ export default defineEventHandler(async (event) => {
       total_variance: Math.round(sup.total_variance * 100) / 100,
     }));
 
-    // Calculate grand totals
+    // Calculate grand totals (using filtered reports)
     const grandTotals = {
-      total_deliveries: deliveryReports.length,
+      total_deliveries: filteredReports.length,
       total_value:
-        Math.round(deliveryReports.reduce((sum, d) => sum + d.total_amount, 0) * 100) / 100,
-      deliveries_with_variance: deliveryReports.filter((d) => d.has_variance).length,
+        Math.round(filteredReports.reduce((sum, d) => sum + d.total_amount, 0) * 100) / 100,
+      deliveries_with_variance: filteredReports.filter((d) => d.has_variance).length,
       total_variance:
-        Math.round(deliveryReports.reduce((sum, d) => sum + Math.abs(d.total_variance), 0) * 100) /
+        Math.round(filteredReports.reduce((sum, d) => sum + Math.abs(d.total_variance), 0) * 100) /
         100,
-      total_ncrs: deliveryReports.reduce((sum, d) => sum + d.ncr_count, 0),
-      total_line_items: deliveryReports.reduce((sum, d) => sum + d.lines.length, 0),
+      total_ncrs: filteredReports.reduce((sum, d) => sum + d.ncr_count, 0),
+      total_line_items: filteredReports.reduce((sum, d) => sum + d.lines.length, 0),
     };
 
     // Get period info from deliveries (already included) or fetch if no deliveries
@@ -453,9 +552,12 @@ export default defineEventHandler(async (event) => {
         has_variance_only: hasVariance === "true",
         status: status || null,
         my_drafts_only: myDrafts === "true",
+        pending_approval_only: pendingApproval === "true",
+        approved_only: approved === "true",
+        rejected_only: rejected === "true",
       },
       period: periodInfo,
-      deliveries: deliveryReports,
+      deliveries: filteredReports,
       by_location: locationSummaries.sort((a, b) => a.location_code.localeCompare(b.location_code)),
       by_supplier: supplierSummaries.sort((a, b) => b.total_value - a.total_value),
       grand_totals: grandTotals,

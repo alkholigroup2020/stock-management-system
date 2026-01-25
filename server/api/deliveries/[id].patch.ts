@@ -24,6 +24,7 @@ import { z } from "zod";
 import { calculateWAC } from "../../utils/wac";
 import { checkPriceVariance } from "../../utils/priceVariance";
 import {
+  sendOverDeliveryApprovalNotification,
   sendOverDeliveryApprovedNotification,
   sendOverDeliveryRejectedNotification,
 } from "../../utils/email";
@@ -58,6 +59,7 @@ const bodySchema = z.object({
   lines: z.array(deliveryLineSchema).min(1).optional(),
   status: z.enum(["DRAFT", "POSTED"]).optional(),
   // Email notification triggers
+  send_for_approval: z.boolean().optional(), // Operator sends draft for over-delivery approval
   notify_approval: z.boolean().optional(), // Send approval notification to creator
   notify_rejection: z.boolean().optional(), // Send rejection notification to creator
   rejection_reason: z.string().optional(), // Reason for rejection (required if notify_rejection)
@@ -667,6 +669,13 @@ export default defineEventHandler(async (event) => {
             period_id: isPosting && currentPeriod ? currentPeriod.id : undefined,
             status: data.status,
             posted_at: isPosting ? new Date() : undefined,
+            // Set pending_approval when operator sends for approval
+            // Reset only when posting (not when approving - keep true for "Approved" status)
+            pending_approval: isPosting
+              ? false
+              : data.send_for_approval
+                ? true
+                : undefined,
             // Set rejection flag when rejecting over-delivery (delivery becomes permanently locked)
             over_delivery_rejected: data.notify_rejection ? true : undefined,
             // Only update totals if we processed lines
@@ -877,6 +886,84 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Send notification to supervisors when operator sends for approval
+    let emailSent = false;
+    if (
+      data.send_for_approval &&
+      user.role === "OPERATOR" &&
+      result.lines.some((line) => {
+        const lineAny = line as { over_delivery_approved?: boolean };
+        return !lineAny.over_delivery_approved;
+      })
+    ) {
+      try {
+        // Find all Supervisors and Admins assigned to this location
+        const supervisorsAndAdmins = await prisma.user.findMany({
+          where: {
+            is_active: true,
+            role: { in: ["SUPERVISOR", "ADMIN"] },
+            OR: [
+              {
+                user_locations: {
+                  some: { location_id: delivery.location_id },
+                },
+              },
+              { role: "ADMIN" },
+              { role: "SUPERVISOR" },
+            ],
+          },
+          select: {
+            email: true,
+            full_name: true,
+          },
+        });
+
+        const recipientEmails = supervisorsAndAdmins
+          .map((u) => u.email)
+          .filter((email): email is string => !!email);
+
+        if (recipientEmails.length > 0) {
+          // Build over-delivery items for email
+          const overDeliveryItemsForEmail = result.lines
+            .filter((line) => {
+              const lineAny = line as { over_delivery_approved?: boolean };
+              return !lineAny.over_delivery_approved;
+            })
+            .map((line) => {
+              const lineAny = line as {
+                item: { name: string };
+                quantity: number;
+              };
+              return {
+                itemName: lineAny.item.name,
+                requestedQty: lineAny.quantity,
+                remainingQty: 0, // Not easily available here
+                excessQty: 0,
+              };
+            });
+
+          // Send notification email
+          const emailResult = await sendOverDeliveryApprovalNotification({
+            recipientEmails,
+            deliveryNumber: result.delivery.delivery_no,
+            creatorName: user.username,
+            locationName: result.delivery.location.name,
+            overDeliveryItems: overDeliveryItemsForEmail,
+            deliveryUrl: `${siteUrl}/deliveries/${deliveryId}`,
+          });
+
+          if (emailResult.success) {
+            emailSent = true;
+            console.log(
+              `[Delivery PATCH] Over-delivery notification sent to ${recipientEmails.length} supervisor(s)`
+            );
+          }
+        }
+      } catch (emailError) {
+        console.error("[Delivery PATCH] Failed to send over-delivery notification:", emailError);
+      }
+    }
+
     // Build response message based on status
     let message: string;
     if (isPosting) {
@@ -894,7 +981,13 @@ export default defineEventHandler(async (event) => {
           ? `Delivery posted. ${parts.join(". ")}.`
           : "Delivery posted successfully.";
     } else {
-      message = "Delivery draft updated successfully.";
+      if (data.send_for_approval && emailSent) {
+        message = "Delivery draft updated. Supervisors have been notified for over-delivery approval.";
+      } else if (data.send_for_approval) {
+        message = "Delivery draft updated. Over-delivery items require supervisor approval.";
+      } else {
+        message = "Delivery draft updated successfully.";
+      }
     }
 
     return {

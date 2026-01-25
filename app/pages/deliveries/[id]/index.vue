@@ -19,18 +19,12 @@
               <h1 class="text-xl sm:text-3xl font-bold text-primary">
                 {{ delivery.delivery_no }}
               </h1>
-              <UBadge
-                :color="isDraft ? 'neutral' : 'success'"
-                variant="subtle"
-                size="md"
-                class="inline-flex items-center gap-1"
-              >
-                <UIcon
-                  :name="isDraft ? 'i-lucide-file-edit' : 'i-lucide-check-circle'"
-                  class="h-3 w-3"
-                />
-                {{ isDraft ? "Draft" : "Posted" }}
-              </UBadge>
+              <DeliveryStatusBadge
+                :status="delivery.status"
+                :pending-approval="isPendingApproval && hasUnapprovedOverDelivery"
+                :approved="isPendingApproval && !hasUnapprovedOverDelivery && !isRejected"
+                :rejected="isRejected"
+              />
             </div>
             <p v-if="isPosted" class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
               Posted by {{ delivery.creator.full_name }} on {{ formatDateTime(delivery.posted_at) }}
@@ -717,6 +711,7 @@ interface Delivery {
   has_variance: boolean;
   has_over_delivery: boolean;
   has_unapproved_over_delivery: boolean;
+  pending_approval: boolean;
   over_delivery_rejected: boolean;
   status: DeliveryStatus;
   created_at: string;
@@ -803,27 +798,29 @@ const userRole = computed(() => user.value?.role ?? "");
 const isOperator = computed(() => user.value?.role === "OPERATOR");
 // Check if delivery has been rejected for over-delivery
 const isRejected = computed(() => delivery.value?.over_delivery_rejected ?? false);
+// Check if delivery has been sent for approval (operator locked until supervisor reviews)
+const isPendingApproval = computed(() => delivery.value?.pending_approval ?? false);
 
 // When rejected: disable ALL actions for EVERYONE - a new delivery must be created instead
 const isRejectedDelivery = computed(() => isRejected.value);
 
-// Operator can't delete when there are ANY over-delivery lines (approved or not)
-const isOperatorWithOverDelivery = computed(() => isOperator.value && hasOverDeliveryLines.value);
-// Operator can't edit when there's unapproved over-delivery
-const isOperatorEditDisabled = computed(
-  () => isOperator.value && hasOverDeliveryLines.value && hasUnapprovedOverDelivery.value
+// Operator can't edit/delete when delivery is sent for approval (pending_approval: true)
+const isOperatorLockedForApproval = computed(
+  () => isOperator.value && isPendingApproval.value
 );
 // Operator can't post when there's unapproved over-delivery
 const isOperatorWithPendingApproval = computed(
   () => isOperator.value && hasUnapprovedOverDelivery.value
 );
-// When rejected, ALL actions are blocked - delivery is locked
-const isEditingBlocked = computed(() => isRejectedDelivery.value || isOperatorEditDisabled.value);
+// When rejected OR sent for approval, editing/deleting is blocked for operators
+const isEditingBlocked = computed(
+  () => isRejectedDelivery.value || isOperatorLockedForApproval.value
+);
 const isPostingBlocked = computed(
   () => isRejectedDelivery.value || isOperatorWithPendingApproval.value
 );
 const isDeletingBlocked = computed(
-  () => isRejectedDelivery.value || isOperatorWithOverDelivery.value
+  () => isRejectedDelivery.value || isOperatorLockedForApproval.value
 );
 
 // Format delivery notes - separate rejection notes for styling

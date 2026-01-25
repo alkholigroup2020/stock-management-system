@@ -54,6 +54,7 @@ const bodySchema = z.object({
   delivery_date: z.string(), // ISO date string
   lines: z.array(deliveryLineSchema).min(1),
   status: z.enum(["DRAFT", "POSTED"]).optional().default("DRAFT"), // Draft or Post directly
+  send_for_approval: z.boolean().optional().default(false), // Only send approval notification when true
 });
 
 /**
@@ -487,6 +488,7 @@ export default defineEventHandler(async (event) => {
             posted_at: isPosting ? new Date() : null,
             total_amount: 0, // Will be calculated from lines
             has_variance: false, // Will be updated if variance detected
+            pending_approval: data.send_for_approval || false, // Lock for operator if sent for approval
           },
         });
 
@@ -777,8 +779,9 @@ export default defineEventHandler(async (event) => {
     } else {
       message = "Delivery draft saved successfully.";
 
-      // Send email notification to Supervisors if Operator saves draft with over-delivery
+      // Send email notification to Supervisors only when explicitly requested via send_for_approval flag
       if (
+        data.send_for_approval &&
         user.role === "OPERATOR" &&
         overDeliveryLines.length > 0 &&
         overDeliveryLines.some((line) => !line.approved)

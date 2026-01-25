@@ -455,7 +455,7 @@
           variant="soft"
           size="lg"
           class="cursor-pointer rounded-full px-6"
-          :disabled="savingDraft || posting"
+          :disabled="savingDraft || posting || sendingForApproval"
           @click="cancel"
         >
           Cancel
@@ -467,10 +467,23 @@
           size="lg"
           class="cursor-pointer rounded-full px-6"
           :loading="savingDraft"
-          :disabled="!isDraftValid || savingDraft || posting || !isOnline"
+          :disabled="!isDraftValid || savingDraft || posting || sendingForApproval || !isOnline"
           @click="saveDraft"
         >
           Save Draft
+        </UButton>
+        <!-- Send For Approval Button - Only for Operators with unapproved over-deliveries -->
+        <UButton
+          v-if="showSendForApprovalButton"
+          color="warning"
+          icon="i-lucide-send"
+          size="lg"
+          class="cursor-pointer rounded-full px-6"
+          :loading="sendingForApproval"
+          :disabled="!isDraftValid || savingDraft || posting || sendingForApproval || !isOnline"
+          @click="sendForApproval"
+        >
+          Send For Approval
         </UButton>
         <UButton
           color="primary"
@@ -478,7 +491,7 @@
           size="lg"
           class="cursor-pointer rounded-full px-6"
           :loading="posting"
-          :disabled="!isFormValid || savingDraft || posting || !isOnline"
+          :disabled="!isFormValid || savingDraft || posting || sendingForApproval || !isOnline"
           @click="showPostConfirmation = true"
         >
           Post Delivery
@@ -512,6 +525,13 @@
       title="Posting Delivery..."
       message="Please wait while we process your delivery"
     />
+
+    <!-- Loading Overlay for Send For Approval -->
+    <LoadingOverlay
+      v-if="sendingForApproval"
+      title="Sending for Approval..."
+      message="Please wait while we save and notify supervisors"
+    />
   </div>
 </template>
 
@@ -534,6 +554,7 @@ const { openPOs, loading: loadingOpenPOs, refresh: refreshOpenPOs } = useOpenPOs
 // State
 const savingDraft = ref(false);
 const posting = ref(false);
+const sendingForApproval = ref(false);
 const showPostConfirmation = ref(false);
 const loadingInitialData = ref(true);
 
@@ -756,6 +777,11 @@ const canApproveOverDelivery = computed(() => {
   return user.value?.role === "SUPERVISOR" || user.value?.role === "ADMIN";
 });
 
+// Show "Send For Approval" button only for Operators with unapproved over-deliveries
+const showSendForApprovalButton = computed(() => {
+  return user.value?.role === "OPERATOR" && hasUnapprovedOverDelivery.value;
+});
+
 // Approve all over-deliveries
 const approveAllOverDeliveries = () => {
   lines.value.forEach((line) => {
@@ -916,6 +942,77 @@ const saveDraft = async () => {
     {
       offlineMessage: "Cannot save draft",
       offlineDescription: "You need an internet connection to save delivery drafts.",
+    }
+  );
+};
+
+// Send for approval (save draft and notify supervisors)
+const sendForApproval = async () => {
+  if (!isDraftValid.value) {
+    handleError("REQUIRED_FIELD");
+    return;
+  }
+
+  if (!formData.value.po_id || !selectedPO.value) {
+    handleError({
+      data: { message: "Please select a Purchase Order before saving a delivery" },
+    });
+    return;
+  }
+
+  if (!locationStore.activeLocation?.id) {
+    handleError({
+      data: { message: "Please select a location before saving a delivery" },
+    });
+    return;
+  }
+
+  if (!hasDeliveryPermission.value) {
+    handleError("PERMISSION_DENIED");
+    return;
+  }
+
+  await guardAction(
+    async () => {
+      sendingForApproval.value = true;
+
+      try {
+        const result: any = await $fetch(
+          `/api/locations/${locationStore.activeLocation!.id}/deliveries`,
+          {
+            method: "post",
+            body: {
+              supplier_id: selectedPO.value!.supplier.id,
+              po_id: formData.value.po_id,
+              invoice_no: formData.value.invoice_no || null,
+              delivery_note: formData.value.delivery_note || null,
+              delivery_date: formData.value.delivery_date
+                ? new Date(formData.value.delivery_date).toISOString()
+                : new Date().toISOString(),
+              lines: prepareLinesData(),
+              status: "DRAFT",
+              send_for_approval: true,
+            },
+          }
+        );
+
+        handleSuccess(
+          "Sent for Approval",
+          "Delivery draft saved. Supervisors have been notified for over-delivery approval."
+        );
+
+        // Redirect to delivery detail page
+        router.push(`/deliveries/${result.id}`);
+      } catch (error: any) {
+        console.error("Send for approval error:", error);
+        handleError(error, { context: "sending for approval" });
+      } finally {
+        sendingForApproval.value = false;
+      }
+    },
+    {
+      offlineMessage: "Cannot send for approval",
+      offlineDescription: "You need an internet connection to send for approval.",
     }
   );
 };

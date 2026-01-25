@@ -340,6 +340,7 @@ model Delivery {
   delivery_date           DateTime       @db.Date
   total_amount            Decimal        @default(0) @db.Decimal(15, 2)
   has_variance            Boolean        @default(false)
+  pending_approval        Boolean        @default(false) // True if operator sent delivery for over-delivery approval
   over_delivery_rejected  Boolean        @default(false) // True if over-delivery was rejected by Supervisor/Admin
   status                  DeliveryStatus @default(DRAFT)
   created_by              String         @db.Uuid
