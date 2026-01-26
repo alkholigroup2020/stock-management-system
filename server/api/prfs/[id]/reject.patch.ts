@@ -16,6 +16,7 @@
 import prisma from "../../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import { sendPRFRejectionNotification } from "../../../utils/email";
 
 // User session type
 interface AuthUser {
@@ -120,7 +121,7 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         requester: {
-          select: { id: true, username: true, full_name: true },
+          select: { id: true, username: true, full_name: true, email: true },
         },
         approver: {
           select: { id: true, username: true, full_name: true },
@@ -130,6 +131,35 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+
+    // Send email notification to the requester
+    let emailSent = false;
+
+    try {
+      if (prf.requester.email) {
+        // Build PRF URL
+        const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+        const prfUrl = `${baseUrl}/orders/prfs/${prf.id}`;
+
+        const emailResult = await sendPRFRejectionNotification({
+          recipientEmail: prf.requester.email,
+          prfNumber: prf.prf_no,
+          rejectorName: user.username,
+          locationName: prf.location.name,
+          rejectionReason: validatedBody.rejection_reason,
+          prfUrl,
+        });
+
+        emailSent = emailResult.success;
+
+        if (!emailResult.success) {
+          console.error(`[PRF Reject] Email notification failed: ${emailResult.error}`);
+        }
+      }
+    } catch (emailError) {
+      console.error("[PRF Reject] Failed to send email notification:", emailError);
+      // Don't fail the rejection if email fails
+    }
 
     return {
       data: {
@@ -147,6 +177,7 @@ export default defineEventHandler(async (event) => {
         location: prf.location,
       },
       message: "PRF rejected",
+      email_sent: emailSent,
     };
   } catch (error) {
     // Handle Zod validation errors

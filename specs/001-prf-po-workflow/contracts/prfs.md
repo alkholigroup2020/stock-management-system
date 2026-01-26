@@ -230,7 +230,7 @@ Delete a draft PRF. Only the requester can delete.
 
 ## PATCH /api/prfs/:id/submit
 
-Submit PRF for approval. Changes status from DRAFT to PENDING.
+Submit PRF for approval. Changes status from DRAFT to PENDING. Triggers email notification to Supervisors and Admins.
 
 ### Request Body
 
@@ -242,12 +242,19 @@ None (empty body or `{}`)
 - PRF must have at least 1 line item
 - User must be the requester
 
+### Behavior
+
+1. Update PRF status to PENDING
+2. Send email notification to all SUPERVISOR and ADMIN users
+
 ### Response 200
 
 ```typescript
 {
   data: PRF;
   message: "PRF submitted for approval";
+  email_sent: boolean;           // false if no supervisors/admins or email failed
+  email_recipients?: number;     // Number of recipients if sent
 }
 ```
 
@@ -302,7 +309,7 @@ Approve a pending PRF. Triggers email notification.
 
 ## PATCH /api/prfs/:id/reject
 
-Reject a pending PRF.
+Reject a pending PRF. Triggers email notification to the original requester.
 
 ### Request Body
 
@@ -318,12 +325,20 @@ Reject a pending PRF.
 - User must be SUPERVISOR or ADMIN
 - `rejection_reason` is required and non-empty
 
+### Behavior
+
+1. Update PRF status to REJECTED
+2. Set approved_by (rejector) and approval_date
+3. Store rejection_reason
+4. Send email notification to the PRF requester with rejection reason
+
 ### Response 200
 
 ```typescript
 {
   data: PRF;
   message: "PRF rejected";
+  email_sent: boolean; // false if requester has no email or email failed
 }
 ```
 

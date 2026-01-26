@@ -27,6 +27,7 @@ import {
   sendOverDeliveryApprovalNotification,
   sendOverDeliveryApprovedNotification,
   sendOverDeliveryRejectedNotification,
+  sendPOClosedNotification,
 } from "../../utils/email";
 import type { UserRole } from "@prisma/client";
 
@@ -706,9 +707,24 @@ export default defineEventHandler(async (event) => {
           },
         });
 
+        // If we didn't process lines (e.g., during rejection), fetch existing lines
+        // This is needed for notifications that need to check over-delivery items
+        let linesToReturn = createdLines;
+        if (!shouldProcessLines || createdLines.length === 0) {
+          const existingLines = await tx.deliveryLine.findMany({
+            where: { delivery_id: deliveryId },
+            include: {
+              item: {
+                select: { id: true, code: true, name: true },
+              },
+            },
+          });
+          linesToReturn = existingLines;
+        }
+
         return {
           delivery: updatedDelivery,
-          lines: createdLines,
+          lines: linesToReturn,
           ncrs: createdNCRs,
         };
       },
@@ -721,39 +737,95 @@ export default defineEventHandler(async (event) => {
     // Check if PO should be automatically closed (all items fully delivered)
     let poAutoClosed = false;
     if (isPosting && poId) {
-      // Re-query the PO lines to get updated delivered_qty values
-      const poLines = await prisma.pOLine.findMany({
-        where: { po_id: poId },
-        select: {
-          id: true,
-          quantity: true,
-          delivered_qty: true,
-        },
+      // First check if PO is still OPEN (don't auto-close if already closed)
+      const poStatus = await prisma.pO.findUnique({
+        where: { id: poId },
+        select: { status: true },
       });
 
-      // Check if all lines are fully delivered (delivered_qty >= quantity)
-      const allFullyDelivered = poLines.every((line) => {
-        const qty = parseFloat(line.quantity.toString());
-        const deliveredQty = parseFloat(line.delivered_qty.toString());
-        return deliveredQty >= qty;
-      });
-
-      if (allFullyDelivered && poLines.length > 0) {
-        // Automatically close the PO
-        const closedPO = await prisma.pO.update({
-          where: { id: poId },
-          data: { status: "CLOSED" },
-          include: { prf: { select: { id: true, status: true } } },
+      if (poStatus?.status === "OPEN") {
+        // Re-query the PO lines to get updated delivered_qty values
+        const poLines = await prisma.pOLine.findMany({
+          where: { po_id: poId },
+          select: {
+            id: true,
+            quantity: true,
+            delivered_qty: true,
+          },
         });
 
-        poAutoClosed = true;
+        // Check if all lines are fully delivered (delivered_qty >= quantity)
+        const allFullyDelivered = poLines.every((line) => {
+          const qty = parseFloat(line.quantity.toString());
+          const deliveredQty = parseFloat(line.delivered_qty.toString());
+          return deliveredQty >= qty;
+        });
 
-        // Also close the linked PRF if it exists and is still approved
-        if (closedPO.prf && closedPO.prf.status === "APPROVED") {
-          await prisma.pRF.update({
-            where: { id: closedPO.prf.id },
+        if (allFullyDelivered && poLines.length > 0) {
+          // Automatically close the PO with full details for email notification
+          const closedPO = await prisma.pO.update({
+            where: { id: poId },
             data: { status: "CLOSED" },
+            include: {
+              prf: {
+                select: {
+                  id: true,
+                  status: true,
+                  prf_no: true,
+                  requester: {
+                    select: { id: true, username: true, full_name: true, email: true },
+                  },
+                },
+              },
+              supplier: {
+                select: { id: true, name: true },
+              },
+            },
           });
+
+          poAutoClosed = true;
+
+          // Also close the linked PRF if it exists and is still approved
+          if (closedPO.prf && closedPO.prf.status === "APPROVED") {
+            await prisma.pRF.update({
+              where: { id: closedPO.prf.id },
+              data: { status: "CLOSED" },
+            });
+          }
+
+          // Send email notification to the original PRF requester
+          if (closedPO.prf && closedPO.prf.requester?.email) {
+            const poWithDetails = await prisma.pO.findUnique({
+              where: { id: poId },
+              select: { po_no: true, total_amount: true },
+            });
+
+            if (poWithDetails) {
+              const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+              const poUrl = `${baseUrl}/orders/pos/${poId}`;
+
+              try {
+                const emailResult = await sendPOClosedNotification({
+                  recipientEmail: closedPO.prf.requester.email,
+                  poNumber: poWithDetails.po_no,
+                  prfNumber: closedPO.prf.prf_no,
+                  closedByName: "System (Auto-Close)",
+                  supplierName: closedPO.supplier.name,
+                  totalAmount: `SAR ${Number(poWithDetails.total_amount).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                  poUrl,
+                });
+
+                if (!emailResult.success) {
+                  console.error(
+                    `[Delivery PATCH] PO auto-close email failed: ${emailResult.error}`
+                  );
+                }
+              } catch (err) {
+                console.error("[Delivery PATCH] Failed to send PO auto-close notification:", err);
+                // Don't fail the delivery post if email fails
+              }
+            }
+          }
         }
       }
     }
@@ -804,10 +876,14 @@ export default defineEventHandler(async (event) => {
       // Get over-delivery items from the updated delivery lines
       const overDeliveryItems = result.lines
         .filter((line) => {
-          const lineAny = line as { item: { id: string; name: string }; quantity: number };
+          const lineAny = line as {
+            item: { id: string; name: string };
+            quantity: number;
+            po_line_id?: string | null;
+          };
           // Check if this item was an over-delivery by comparing to PO line
-          const matchingLineData = linesToProcess.find((l) => l.item_id === lineAny.item.id);
-          const poLineIdToCheck = matchingLineData?.po_line_id as string | undefined;
+          // Use po_line_id from the delivery line itself (from database)
+          const poLineIdToCheck = lineAny.po_line_id;
 
           // Try to find by po_line_id first, then by item_id
           let poLineInfo;
@@ -826,9 +902,12 @@ export default defineEventHandler(async (event) => {
           return poLineInfo && lineAny.quantity > poLineInfo.remaining_qty;
         })
         .map((line) => {
-          const lineAny = line as { item: { id: string; name: string }; quantity: number };
-          const matchingLineData = linesToProcess.find((l) => l.item_id === lineAny.item.id);
-          const poLineIdToCheck = matchingLineData?.po_line_id as string | undefined;
+          const lineAny = line as {
+            item: { id: string; name: string };
+            quantity: number;
+            po_line_id?: string | null;
+          };
+          const poLineIdToCheck = lineAny.po_line_id;
 
           let poLineInfo;
           if (poLineIdToCheck) {
@@ -950,9 +1029,6 @@ export default defineEventHandler(async (event) => {
 
           if (emailResult.success) {
             emailSent = true;
-            console.log(
-              `[Delivery PATCH] Over-delivery notification sent to ${recipientEmails.length} supervisor(s)`
-            );
           }
         }
       } catch (emailError) {

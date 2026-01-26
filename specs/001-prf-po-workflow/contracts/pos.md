@@ -6,12 +6,12 @@
 
 ## Endpoints Overview
 
-| Method | Path                 | Description           | Roles                                   |
-| ------ | -------------------- | --------------------- | --------------------------------------- |
-| GET    | `/api/pos`           | List POs with filters | All authenticated                       |
-| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST                  |
-| GET    | `/api/pos/:id`       | Get PO details        | All authenticated                       |
-| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST                  |
+| Method | Path                 | Description           | Roles                                          |
+| ------ | -------------------- | --------------------- | ---------------------------------------------- |
+| GET    | `/api/pos`           | List POs with filters | All authenticated                              |
+| POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST                         |
+| GET    | `/api/pos/:id`       | Get PO details        | All authenticated                              |
+| PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST                         |
 | PATCH  | `/api/pos/:id/close` | Close PO              | ADMIN, SUPERVISOR (not PROCUREMENT_SPECIALIST) |
 
 ---
@@ -263,7 +263,7 @@ Update an open PO. Full edit capability until closed.
 
 ## PATCH /api/pos/:id/close
 
-Close a PO. No further edits or deliveries allowed.
+Close a PO. No further edits or deliveries allowed. Triggers email notification to the original PRF requester.
 
 **Note**: Only ADMIN and SUPERVISOR users can close POs. PROCUREMENT_SPECIALIST users cannot close POs.
 
@@ -284,6 +284,7 @@ Close a PO. No further edits or deliveries allowed.
 
 1. Update PO status to CLOSED
 2. Update linked PRF status to CLOSED (if exists)
+3. Send email notification to the original PRF requester (if PO has a linked PRF)
 
 ### Response 200
 
@@ -292,6 +293,7 @@ Close a PO. No further edits or deliveries allowed.
   data: PO;
   message: "Purchase Order closed";
   prf_closed: boolean; // true if linked PRF was also closed
+  email_sent: boolean; // false if no PRF requester or email failed
 }
 ```
 

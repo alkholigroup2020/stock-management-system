@@ -24,7 +24,10 @@ import prisma from "../../../../utils/prisma";
 import { z } from "zod";
 import { calculateWAC } from "../../../../utils/wac";
 import { checkPriceVariance } from "../../../../utils/priceVariance";
-import { sendOverDeliveryApprovalNotification } from "../../../../utils/email";
+import {
+  sendOverDeliveryApprovalNotification,
+  sendPOClosedNotification,
+} from "../../../../utils/email";
 import type { UserRole } from "@prisma/client";
 
 // User session type
@@ -720,6 +723,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if PO should be automatically closed (all items fully delivered)
     let poAutoClosed = false;
+    let poAutoCloseEmailSent = false;
     if (isPosting && data.po_id) {
       // Re-query the PO lines to get updated delivered_qty values
       const poLines = await prisma.pOLine.findMany({
@@ -739,11 +743,25 @@ export default defineEventHandler(async (event) => {
       });
 
       if (allFullyDelivered && poLines.length > 0) {
-        // Automatically close the PO
+        // Automatically close the PO with full details for email notification
         const closedPO = await prisma.pO.update({
           where: { id: data.po_id },
           data: { status: "CLOSED" },
-          include: { prf: { select: { id: true, status: true } } },
+          include: {
+            prf: {
+              select: {
+                id: true,
+                status: true,
+                prf_no: true,
+                requester: {
+                  select: { id: true, username: true, full_name: true, email: true },
+                },
+              },
+            },
+            supplier: {
+              select: { id: true, name: true },
+            },
+          },
         });
 
         poAutoClosed = true;
@@ -754,6 +772,42 @@ export default defineEventHandler(async (event) => {
             where: { id: closedPO.prf.id },
             data: { status: "CLOSED" },
           });
+        }
+
+        // Send email notification to the original PRF requester
+        if (closedPO.prf && closedPO.prf.requester?.email) {
+          const poWithDetails = await prisma.pO.findUnique({
+            where: { id: data.po_id },
+            select: { po_no: true, total_amount: true },
+          });
+
+          if (poWithDetails) {
+            const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+            const poUrl = `${baseUrl}/orders/pos/${data.po_id}`;
+
+            try {
+              const emailResult = await sendPOClosedNotification({
+                recipientEmail: closedPO.prf.requester.email,
+                poNumber: poWithDetails.po_no,
+                prfNumber: closedPO.prf.prf_no,
+                closedByName: "System (Auto-Close)",
+                supplierName: closedPO.supplier.name,
+                totalAmount: `SAR ${Number(poWithDetails.total_amount).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                poUrl,
+              });
+
+              if (emailResult.success) {
+                poAutoCloseEmailSent = true;
+              } else {
+                console.error(
+                  `[Delivery POST] PO auto-close email notification failed: ${emailResult.error}`
+                );
+              }
+            } catch (err) {
+              console.error("[Delivery POST] Failed to send PO auto-close notification:", err);
+              // Don't fail the delivery creation if email fails
+            }
+          }
         }
       }
     }
@@ -844,9 +898,6 @@ export default defineEventHandler(async (event) => {
 
             if (emailResult.success) {
               emailSent = true;
-              console.log(
-                `[Delivery API] Over-delivery notification sent to ${recipientEmails.length} supervisor(s)`
-              );
             }
           }
         } catch (emailError) {

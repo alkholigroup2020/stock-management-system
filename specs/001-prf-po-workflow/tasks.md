@@ -814,16 +814,16 @@ Total (After VAT) = Line Value + VAT Amount
 **Previous Permissions:**
 
 | Operation | OPERATOR | SUPERVISOR | ADMIN | PROCUREMENT_SPECIALIST |
-|-----------|----------|------------|-------|------------------------|
-| Edit PO   | No       | No         | Yes   | Yes |
-| Close PO  | No       | No         | Yes   | No |
+| --------- | -------- | ---------- | ----- | ---------------------- |
+| Edit PO   | No       | No         | Yes   | Yes                    |
+| Close PO  | No       | No         | Yes   | No                     |
 
 **New Permissions:**
 
 | Operation | OPERATOR | SUPERVISOR | ADMIN | PROCUREMENT_SPECIALIST |
-|-----------|----------|------------|-------|------------------------|
-| Edit PO   | No       | No         | No    | Yes |
-| Close PO  | No       | Yes        | Yes   | No |
+| --------- | -------- | ---------- | ----- | ---------------------- |
+| Edit PO   | No       | No         | No    | Yes                    |
+| Close PO  | No       | Yes        | Yes   | No                     |
 
 **Implementation**:
 
@@ -841,6 +841,61 @@ Total (After VAT) = Line Value + VAT Amount
 **Verification**: Run `pnpm typecheck` - passed with no errors
 
 **Checkpoint**: DT011 complete - PO edit/close permissions updated ✅
+
+---
+
+### DT012: Additional Email Notifications (2026-01-26)
+
+**Feature**: Add email notifications for PRF submission, PRF rejection, and PO closure to complete the notification coverage for all major workflow state transitions.
+
+**Email Notifications Added**:
+
+1. **PRF Submission Notification**
+   - Trigger: When an Operator submits a PRF for approval
+   - Recipients: All SUPERVISOR and ADMIN users
+   - Purpose: Alert approvers about pending PRF requiring review
+
+2. **PRF Rejection Notification**
+   - Trigger: When a Supervisor/Admin rejects a PRF
+   - Recipients: The original PRF requester (Operator)
+   - Purpose: Inform requester their PRF was rejected with reason
+
+3. **PO Closed Notification**
+   - Trigger: When a Supervisor/Admin manually closes a PO
+   - Recipients: The original PRF requester
+   - Purpose: Inform requester that their purchase request is fulfilled
+
+**Implementation**:
+
+- [x] DT012a Add `sendPRFSubmissionNotification()` function to `server/utils/email.ts`
+- [x] DT012b Update `server/api/prfs/[id]/submit.patch.ts` to send email when PRF is submitted
+- [x] DT012c Add `sendPRFRejectionNotification()` function to `server/utils/email.ts`
+- [x] DT012d Update `server/api/prfs/[id]/reject.patch.ts` to send email when PRF is rejected
+- [x] DT012e Add `sendPOClosedNotification()` function to `server/utils/email.ts`
+- [x] DT012f Update `server/api/pos/[id]/close.patch.ts` to send email when PO is closed
+
+**Files Changed**:
+
+- `server/utils/email.ts` - Added three new email notification functions
+- `server/api/prfs/[id]/submit.patch.ts` - Added email notification trigger for PRF submission
+- `server/api/prfs/[id]/reject.patch.ts` - Added email notification trigger for PRF rejection
+- `server/api/pos/[id]/close.patch.ts` - Added email notification trigger for PO closure
+
+**Email Notification Summary** (Updated):
+
+| Trigger Event          | Recipients                 | Color Theme   | Status    |
+| ---------------------- | -------------------------- | ------------- | --------- |
+| PRF Submitted          | All SUPERVISOR & ADMIN     | Amber/Warning | ✅ Active |
+| PRF Rejected           | PRF requester (Operator)   | Red/Error     | ✅ Active |
+| PRF Approved           | All PROCUREMENT_SPECIALIST | Green/Success | ✅ Active |
+| PO Closed              | Original PRF requester     | Blue/Info     | ✅ Active |
+| Over-Delivery Created  | All SUPERVISOR & ADMIN     | Amber/Warning | ✅ Active |
+| Over-Delivery Approved | Delivery creator           | Green/Success | ✅ Active |
+| Over-Delivery Rejected | Delivery creator           | Red/Error     | ✅ Active |
+
+**Verification**: All emails are non-blocking (failures don't prevent operations), include `email_sent` status in API responses, and follow existing email template patterns.
+
+**Checkpoint**: DT012 complete - Email notification coverage is now complete for all PRF/PO workflow state transitions ✅
 
 ---
 

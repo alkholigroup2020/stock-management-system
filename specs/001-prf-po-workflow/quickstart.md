@@ -182,9 +182,11 @@ app/pages/orders/
 - [ ] Create PRF as Operator
 - [ ] Add/edit/remove line items
 - [ ] Submit PRF for approval
+- [ ] Verify email sent to all SUPERVISOR and ADMIN users (PRF submission notification)
 - [ ] Approve PRF as Supervisor
-- [ ] Verify email sent to PROCUREMENT_SPECIALIST users
+- [ ] Verify email sent to PROCUREMENT_SPECIALIST users (PRF approval notification)
 - [ ] Reject PRF with reason as Supervisor
+- [ ] Verify email sent to original requester with rejection reason (PRF rejection notification)
 - [ ] Clone rejected PRF
 
 ### PO Workflow
@@ -196,6 +198,7 @@ app/pages/orders/
 - [ ] Verify PROCUREMENT_SPECIALIST cannot see "Close PO" button
 - [ ] Close PO as Admin or Supervisor (ADMIN and SUPERVISOR can close POs)
 - [ ] Verify linked PRF marked as CLOSED
+- [ ] Verify email sent to original PRF requester (PO closed notification)
 
 ### Delivery Integration
 
@@ -241,9 +244,11 @@ pnpm test             # Run tests
 1. Check `SMTP_USER` and `SMTP_PASSWORD` in `.env`
 2. Verify `EMAIL_FROM` matches your SMTP_USER or an authorized alias
 3. Ensure SMTP_HOST is `smtp.office365.com` and SMTP_PORT is `587`
-4. Check console for email service logs
+4. Check console for email service logs (emails are logged in development mode)
 5. If MFA is enabled on O365, create an App Password instead of using your regular password
-6. Supplier must have at least one email in `emails` array
+6. Verify users have valid email addresses in the database
+7. Check API response `email_sent` flag to confirm notification status
+8. Ensure at least one user exists with the recipient role (e.g., PROCUREMENT_SPECIALIST, SUPERVISOR, or ADMIN)
 
 ### PRF/PO Number Conflicts
 

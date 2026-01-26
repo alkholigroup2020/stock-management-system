@@ -40,9 +40,20 @@ Use **Office 365 SMTP** via Nodemailer for transactional email delivery.
 
 ### Email Usage Scope
 
-- **PRF Approval**: Email notifications ARE sent to PROCUREMENT_SPECIALIST users when a PRF is approved
+**PRF Workflow Notifications:**
+
+- **PRF Submission**: Email sent to all SUPERVISOR and ADMIN users when an Operator submits a PRF for approval
+- **PRF Approval**: Email sent to all PROCUREMENT_SPECIALIST users when a PRF is approved
+- **PRF Rejection**: Email sent to the original requester when a Supervisor/Admin rejects a PRF (includes rejection reason)
+
+**PO Workflow Notifications:**
+
 - **PO Creation**: Email notifications are NOT sent to suppliers; supplier email addresses are stored for reference only
+- **PO Closed**: Email sent to the original PRF requester when a Supervisor/Admin closes a PO (includes PO details)
 - **Resend**: No manual resend functionality for POs
+
+**Over-Delivery Workflow Notifications:**
+
 - **Over-Delivery Approval Request**: Email sent to Supervisors/Admins when Operator saves draft with over-delivery
 - **Over-Delivery Approved**: Email sent to delivery creator when Supervisor/Admin approves over-delivery
 - **Over-Delivery Rejected**: Email sent to delivery creator when Supervisor/Admin rejects (includes reason)
@@ -392,11 +403,15 @@ Email sent to Supervisors/Admins
 | SUPERVISOR | Yes | Yes (implicit) | No |
 | ADMIN | Yes | Yes (implicit) | No |
 
-**Email Notifications:**
+**Email Notifications (Complete List):**
 
-1. `sendOverDeliveryApprovalNotification` - To Supervisors when draft saved
-2. `sendOverDeliveryApprovedNotification` - To creator when approved
-3. `sendOverDeliveryRejectedNotification` - To creator when rejected
+1. `sendPRFSubmissionNotification` - To Supervisors/Admins when PRF submitted
+2. `sendPRFApprovalNotification` - To Procurement Specialists when PRF approved
+3. `sendPRFRejectionNotification` - To requester when PRF rejected
+4. `sendPOClosedNotification` - To original PRF requester when PO closed
+5. `sendOverDeliveryApprovalNotification` - To Supervisors/Admins when draft with over-delivery saved
+6. `sendOverDeliveryApprovedNotification` - To delivery creator when over-delivery approved
+7. `sendOverDeliveryRejectedNotification` - To delivery creator when over-delivery rejected
 
 ### Rationale
 

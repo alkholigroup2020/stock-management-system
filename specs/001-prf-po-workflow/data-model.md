@@ -213,12 +213,12 @@ model PRFLine {
 
 PRF VAT is calculated at the UI level for display purposes only. Since PRFs are internal requisitions, VAT amounts are not stored in the database. The following fields are computed client-side:
 
-| Computed Field    | Type    | Formula                                |
-| ----------------- | ------- | -------------------------------------- |
-| vat_percent       | Decimal | Fixed at 15% (Saudi Arabia)            |
-| total_before_vat  | Decimal | `required_qty × estimated_price`       |
-| vat_amount        | Decimal | `total_before_vat × vat_percent / 100` |
-| total_after_vat   | Decimal | `total_before_vat + vat_amount`        |
+| Computed Field   | Type    | Formula                                |
+| ---------------- | ------- | -------------------------------------- |
+| vat_percent      | Decimal | Fixed at 15% (Saudi Arabia)            |
+| total_before_vat | Decimal | `required_qty × estimated_price`       |
+| vat_amount       | Decimal | `total_before_vat × vat_percent / 100` |
+| total_after_vat  | Decimal | `total_before_vat + vat_amount`        |
 
 This differs from PO lines where VAT is stored because POs are formal orders sent to suppliers.
 
@@ -541,10 +541,10 @@ OPEN ──[close]──> CLOSED
 OPEN ──[auto]───> CLOSED (when all items fully delivered)
 ```
 
-| Transition    | Trigger      | Conditions                                                   |
-| ------------- | ------------ | ------------------------------------------------------------ |
+| Transition    | Trigger      | Conditions                                                        |
+| ------------- | ------------ | ----------------------------------------------------------------- |
 | OPEN → CLOSED | Manual Close | User is Admin or Supervisor (Procurement Specialist cannot close) |
-| OPEN → CLOSED | Auto-Close   | All PO lines have `delivered_qty >= quantity` after delivery |
+| OPEN → CLOSED | Auto-Close   | All PO lines have `delivered_qty >= quantity` after delivery      |
 
 **Auto-Close Behavior:**
 

@@ -15,6 +15,7 @@
 import prisma from "../../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import { sendPRFSubmissionNotification } from "../../../utils/email";
 
 // User session type
 interface AuthUser {
@@ -121,6 +122,59 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    // Send email notification to Supervisors and Admins in the same location
+    let emailSent = false;
+    let emailRecipients = 0;
+
+    try {
+      // Get all active Supervisors and Admins who have access to this location
+      const locationApprovers = await prisma.user.findMany({
+        where: {
+          role: { in: ["SUPERVISOR", "ADMIN"] },
+          is_active: true,
+          OR: [
+            // Admins and Supervisors have access to all locations by default
+            { role: "ADMIN" },
+            { role: "SUPERVISOR" },
+          ],
+        },
+        select: { email: true, role: true },
+      });
+
+      const recipientEmails = locationApprovers.map((u) => u.email);
+
+      if (recipientEmails.length > 0) {
+        // Build PRF URL
+        const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+        const prfUrl = `${baseUrl}/orders/prfs/${prf.id}`;
+
+        // Format PRF type and category for display
+        const prfTypeDisplay = prf.prf_type.replace("_", " ");
+        const categoryDisplay = prf.category || "N/A";
+
+        const emailResult = await sendPRFSubmissionNotification({
+          recipientEmails,
+          prfNumber: prf.prf_no,
+          requesterName: prf.requester.full_name || prf.requester.username,
+          locationName: prf.location.name,
+          prfType: prfTypeDisplay,
+          category: categoryDisplay,
+          totalValue: `SAR ${Number(prf.total_value).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          prfUrl,
+        });
+
+        emailSent = emailResult.success;
+        emailRecipients = recipientEmails.length;
+
+        if (!emailResult.success) {
+          console.error(`[PRF Submit] Email notification failed: ${emailResult.error}`);
+        }
+      }
+    } catch (emailError) {
+      console.error("[PRF Submit] Failed to send email notification:", emailError);
+      // Don't fail the submission if email fails
+    }
+
     return {
       data: {
         id: prf.id,
@@ -134,6 +188,8 @@ export default defineEventHandler(async (event) => {
         location: prf.location,
       },
       message: "PRF submitted for approval",
+      email_sent: emailSent,
+      email_recipients: emailRecipients > 0 ? emailRecipients : undefined,
     };
   } catch (error) {
     // Handle Zod validation errors

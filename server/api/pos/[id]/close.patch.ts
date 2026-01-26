@@ -15,6 +15,7 @@
 import prisma from "../../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import { sendPOClosedNotification } from "../../../utils/email";
 
 // User session type
 interface AuthUser {
@@ -76,7 +77,14 @@ export default defineEventHandler(async (event) => {
       where: { id: params.id },
       include: {
         prf: {
-          select: { id: true, prf_no: true, status: true },
+          select: {
+            id: true,
+            prf_no: true,
+            status: true,
+            requester: {
+              select: { id: true, username: true, full_name: true, email: true },
+            },
+          },
         },
         supplier: {
           select: { id: true, code: true, name: true, emails: true, phone: true, vat_reg_no: true },
@@ -156,6 +164,9 @@ export default defineEventHandler(async (event) => {
               location: {
                 select: { id: true, code: true, name: true },
               },
+              requester: {
+                select: { id: true, username: true, full_name: true, email: true },
+              },
             },
           },
           lines: {
@@ -195,6 +206,36 @@ export default defineEventHandler(async (event) => {
 
       return { po: updatedPO, prfClosed };
     });
+
+    // Send email notification to the original PRF requester
+    let emailSent = false;
+
+    try {
+      if (result.po.prf && result.po.prf.requester?.email) {
+        // Build PO URL
+        const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+        const poUrl = `${baseUrl}/orders/pos/${result.po.id}`;
+
+        const emailResult = await sendPOClosedNotification({
+          recipientEmail: result.po.prf.requester.email,
+          poNumber: result.po.po_no,
+          prfNumber: result.po.prf.prf_no,
+          closedByName: user.username,
+          supplierName: result.po.supplier.name,
+          totalAmount: `SAR ${Number(result.po.total_amount).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          poUrl,
+        });
+
+        emailSent = emailResult.success;
+
+        if (!emailResult.success) {
+          console.error(`[PO Close] Email notification failed: ${emailResult.error}`);
+        }
+      }
+    } catch (emailError) {
+      console.error("[PO Close] Failed to send email notification:", emailError);
+      // Don't fail the PO closure if email fails
+    }
 
     return {
       data: {
@@ -251,6 +292,7 @@ export default defineEventHandler(async (event) => {
       },
       message: "PO closed successfully",
       prf_closed: result.prfClosed,
+      email_sent: emailSent,
     };
   } catch (error) {
     // Handle Zod validation errors

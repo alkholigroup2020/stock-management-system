@@ -222,6 +222,308 @@ export async function sendPRFApprovalNotification(params: {
 }
 
 /**
+ * Send PRF submission notification to Supervisors and Admins
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendPRFSubmissionNotification(params: {
+  recipientEmails: string[];
+  prfNumber: string;
+  requesterName: string;
+  locationName: string;
+  prfType: string;
+  category: string;
+  totalValue: string;
+  prfUrl: string;
+}): Promise<EmailResult> {
+  const {
+    recipientEmails,
+    prfNumber,
+    requesterName,
+    locationName,
+    prfType,
+    category,
+    totalValue,
+    prfUrl,
+  } = params;
+
+  if (recipientEmails.length === 0) {
+    console.warn("[Email Service] No recipient emails provided for PRF submission notification");
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `PRF ${prfNumber} Submitted - Approval Required`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #f59e0b;">PRF Approval Required</h2>
+      <p>A Purchase Requisition Form has been submitted and requires your approval.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>PRF Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${prfNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Submitted By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${requesterName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Location:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${locationName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Type:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${prfType}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Category:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${category}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Total Value:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${totalValue}</td>
+        </tr>
+      </table>
+
+      <p>
+        <a href="${prfUrl}" style="display: inline-block; padding: 12px 24px; background-color: #f59e0b; color: white; text-decoration: none; border-radius: 6px;">
+          Review & Approve PRF
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmails,
+    subject,
+    html,
+  });
+}
+
+/**
+ * Send PRF approval notification to the requester (creator)
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendPRFApprovedToRequesterNotification(params: {
+  recipientEmail: string;
+  prfNumber: string;
+  approverName: string;
+  locationName: string;
+  totalValue: string;
+  prfUrl: string;
+}): Promise<EmailResult> {
+  const { recipientEmail, prfNumber, approverName, locationName, totalValue, prfUrl } = params;
+
+  if (!recipientEmail) {
+    console.warn(
+      "[Email Service] No recipient email provided for PRF approved requester notification"
+    );
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `PRF ${prfNumber} Approved`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #10b981;">PRF Approved</h2>
+      <p>Your Purchase Requisition Form has been approved and is now being processed by the Procurement team.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>PRF Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${prfNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Approved By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${approverName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Location:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${locationName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Total Value:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${totalValue}</td>
+        </tr>
+      </table>
+
+      <div style="background-color: #d1fae5; border: 1px solid #6ee7b7; border-radius: 6px; padding: 16px; margin: 20px 0;">
+        <p style="color: #065f46; margin: 0;">
+          ✅ A Purchase Order will be created by the Procurement team. You will be notified once the order is fulfilled.
+        </p>
+      </div>
+
+      <p>
+        <a href="${prfUrl}" style="display: inline-block; padding: 12px 24px; background-color: #10b981; color: white; text-decoration: none; border-radius: 6px;">
+          View PRF
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject,
+    html,
+  });
+}
+
+/**
+ * Send PRF rejection notification to the requester
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendPRFRejectionNotification(params: {
+  recipientEmail: string;
+  prfNumber: string;
+  rejectorName: string;
+  locationName: string;
+  rejectionReason: string;
+  prfUrl: string;
+}): Promise<EmailResult> {
+  const { recipientEmail, prfNumber, rejectorName, locationName, rejectionReason, prfUrl } = params;
+
+  if (!recipientEmail) {
+    console.warn("[Email Service] No recipient email provided for PRF rejection notification");
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `PRF ${prfNumber} Rejected`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #dc2626;">PRF Rejected</h2>
+      <p>Your Purchase Requisition Form has been rejected. Please review the rejection reason below.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>PRF Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${prfNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Rejected By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${rejectorName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Location:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${locationName}</td>
+        </tr>
+      </table>
+
+      <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 16px; margin: 20px 0;">
+        <h4 style="color: #dc2626; margin: 0 0 8px 0;">Rejection Reason:</h4>
+        <p style="color: #7f1d1d; margin: 0;">${rejectionReason}</p>
+      </div>
+
+      <p>You can clone this PRF to create a new request with the necessary changes.</p>
+
+      <p>
+        <a href="${prfUrl}" style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">
+          View PRF
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject,
+    html,
+  });
+}
+
+/**
+ * Send PO closed notification to the original PRF requester
+ *
+ * @param params - Notification parameters
+ * @returns Promise<EmailResult>
+ */
+export async function sendPOClosedNotification(params: {
+  recipientEmail: string;
+  poNumber: string;
+  prfNumber: string;
+  closedByName: string;
+  supplierName: string;
+  totalAmount: string;
+  poUrl: string;
+}): Promise<EmailResult> {
+  const { recipientEmail, poNumber, prfNumber, closedByName, supplierName, totalAmount, poUrl } =
+    params;
+
+  if (!recipientEmail) {
+    console.warn("[Email Service] No recipient email provided for PO closed notification");
+    return { success: true, messageId: "no-recipients" };
+  }
+
+  const subject = `PO ${poNumber} Closed - Your Request is Fulfilled`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #3b82f6;">Purchase Order Closed</h2>
+      <p>The Purchase Order for your requisition has been closed and your request is now fulfilled.</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>PO Number:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${poNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Original PRF:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${prfNumber}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Supplier:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${supplierName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Total Amount:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${totalAmount}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Closed By:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${closedByName}</td>
+        </tr>
+      </table>
+
+      <p>All deliveries for this purchase order have been completed.</p>
+
+      <p>
+        <a href="${poUrl}" style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">
+          View Purchase Order
+        </a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        This is an automated notification from the Stock Management System.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: recipientEmail,
+    subject,
+    html,
+  });
+}
+
+/**
  * Send PO notification to supplier
  *
  * @param params - Notification parameters

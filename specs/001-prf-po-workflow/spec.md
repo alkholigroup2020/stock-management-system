@@ -307,8 +307,11 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 **Email Notifications**
 
 - **FR-033**: System MUST send PRF approval notifications to all PROCUREMENT_SPECIALIST users
+- **FR-033a**: System MUST send PRF submission notifications to all SUPERVISOR and ADMIN users when an Operator submits a PRF for approval
+- **FR-033b**: System MUST send PRF rejection notifications to the original requester when a Supervisor/Admin rejects a PRF (includes rejection reason)
 - **FR-034**: ~~System MUST send PO notifications to all email addresses configured for the supplier~~ (REMOVED - PO email notifications are not sent)
-- **FR-035**: System MUST log email failures without blocking the primary transaction (applies to PRF approval notifications only)
+- **FR-034a**: System MUST send PO closed notifications to the original PRF requester when a Supervisor/Admin closes a PO (includes PO details and supplier information)
+- **FR-035**: System MUST log email failures without blocking the primary transaction (applies to all email notifications)
 - **FR-036**: ~~System MUST allow manual email resend from detail pages~~ (REMOVED - no email resend functionality for POs)
 
 ### Key Entities

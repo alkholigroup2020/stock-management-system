@@ -15,7 +15,10 @@
 import prisma from "../../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
-import { sendPRFApprovalNotification } from "../../../utils/email";
+import {
+  sendPRFApprovalNotification,
+  sendPRFApprovedToRequesterNotification,
+} from "../../../utils/email";
 
 // User session type
 interface AuthUser {
@@ -116,7 +119,7 @@ export default defineEventHandler(async (event) => {
       },
       include: {
         requester: {
-          select: { id: true, username: true, full_name: true },
+          select: { id: true, username: true, full_name: true, email: true },
         },
         approver: {
           select: { id: true, username: true, full_name: true },
@@ -127,12 +130,17 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Send email notification to all PROCUREMENT_SPECIALIST users
-    let emailSent = false;
-    let emailRecipients = 0;
+    // Send email notifications (non-blocking - don't fail approval if email fails)
+    let emailSentToSpecialists = false;
+    let specialistRecipients = 0;
+    let emailSentToRequester = false;
+
+    const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const prfUrl = `${baseUrl}/orders/prfs/${prf.id}`;
+    const totalValueFormatted = `SAR ${Number(prf.total_value).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     try {
-      // Get all active procurement specialists
+      // 1. Send email notification to all PROCUREMENT_SPECIALIST users
       const procurementSpecialists = await prisma.user.findMany({
         where: {
           role: "PROCUREMENT_SPECIALIST",
@@ -144,28 +152,47 @@ export default defineEventHandler(async (event) => {
       const recipientEmails = procurementSpecialists.map((u) => u.email);
 
       if (recipientEmails.length > 0) {
-        // Build PRF URL
-        const baseUrl = process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000";
-        const prfUrl = `${baseUrl}/orders/prfs/${prf.id}`;
-
         const emailResult = await sendPRFApprovalNotification({
           recipientEmails,
           prfNumber: prf.prf_no,
           requesterName: prf.requester.full_name || prf.requester.username,
           locationName: prf.location.name,
-          totalValue: `SAR ${Number(prf.total_value).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          totalValue: totalValueFormatted,
           prfUrl,
         });
 
-        emailSent = emailResult.success;
-        emailRecipients = recipientEmails.length;
+        emailSentToSpecialists = emailResult.success;
+        specialistRecipients = recipientEmails.length;
 
         if (!emailResult.success) {
-          console.error(`[PRF Approve] Email notification failed: ${emailResult.error}`);
+          console.error(`[PRF Approve] Email to specialists failed: ${emailResult.error}`);
         }
       }
     } catch (emailError) {
-      console.error("[PRF Approve] Failed to send email notification:", emailError);
+      console.error("[PRF Approve] Failed to send email to procurement specialists:", emailError);
+      // Don't fail the approval if email fails
+    }
+
+    try {
+      // 2. Send email notification to the PRF requester (creator)
+      if (prf.requester.email) {
+        const emailResult = await sendPRFApprovedToRequesterNotification({
+          recipientEmail: prf.requester.email,
+          prfNumber: prf.prf_no,
+          approverName: user.username,
+          locationName: prf.location.name,
+          totalValue: totalValueFormatted,
+          prfUrl,
+        });
+
+        emailSentToRequester = emailResult.success;
+
+        if (!emailResult.success) {
+          console.error(`[PRF Approve] Email to requester failed: ${emailResult.error}`);
+        }
+      }
+    } catch (emailError) {
+      console.error("[PRF Approve] Failed to send email to requester:", emailError);
       // Don't fail the approval if email fails
     }
 
@@ -185,8 +212,9 @@ export default defineEventHandler(async (event) => {
         location: prf.location,
       },
       message: "PRF approved",
-      email_sent: emailSent,
-      email_recipients: emailRecipients > 0 ? emailRecipients : undefined,
+      email_sent_to_specialists: emailSentToSpecialists,
+      email_sent_to_requester: emailSentToRequester,
+      specialist_recipients: specialistRecipients > 0 ? specialistRecipients : undefined,
     };
   } catch (error) {
     // Handle Zod validation errors
