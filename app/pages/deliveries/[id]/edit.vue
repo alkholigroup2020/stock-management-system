@@ -365,7 +365,7 @@
             size="lg"
             class="cursor-pointer rounded-full px-6"
             :loading="sendingForApproval"
-            :disabled="!isDraftValid || saving || posting || sendingForApproval || !isOnline"
+            :disabled="!isSendForApprovalValid || saving || posting || sendingForApproval || !isOnline"
             @click="sendForApproval"
           >
             Send For Approval
@@ -590,6 +590,17 @@ const isFormValid = computed(() => {
 // Show "Send For Approval" button only for Operators with unapproved over-deliveries
 const showSendForApprovalButton = computed(() => {
   return user.value?.role === "OPERATOR" && hasUnapprovedOverDelivery.value;
+});
+
+// Validation for sending for approval - requires invoice number
+const isSendForApprovalValid = computed(() => {
+  return (
+    formData.value.supplier_id &&
+    formData.value.invoice_no && // Invoice number is REQUIRED for approval
+    formData.value.delivery_date &&
+    lines.value.length > 0 &&
+    lines.value.some((line) => line.item_id && line.quantity)
+  );
 });
 
 // Fetch delivery data

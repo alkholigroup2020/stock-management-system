@@ -899,6 +899,43 @@ Total (After VAT) = Line Value + VAT Amount
 
 ---
 
+### DT013: Invoice Number Required for Over-Delivery Approval (2026-01-26)
+
+**Bug**: Operators could submit an over-delivery for approval without filling in the invoice number.
+
+**Root Cause**: The "Send For Approval" button was using the `isDraftValid` computed property for its disabled state, which does not require an invoice number. The stricter `isFormValid` validation requires invoice number but is only used for "Post Delivery".
+
+**Solution**: Added a new `isSendForApprovalValid` computed property that requires invoice number, and updated the "Send For Approval" button to use this validation. Also added server-side validation to reject `send_for_approval` requests without an invoice number.
+
+**Implementation**:
+
+- [x] DT013a Update `app/pages/deliveries/create.vue` - Add `isSendForApprovalValid` computed property that requires invoice_no
+- [x] DT013b Update `app/pages/deliveries/create.vue` - Change "Send For Approval" button to use `isSendForApprovalValid` for disabled state
+- [x] DT013c Update `server/api/locations/[id]/deliveries/index.post.ts` - Add server-side validation for invoice_no when send_for_approval is true
+- [x] DT013d Update `app/pages/deliveries/[id]/edit.vue` - Add `isSendForApprovalValid` computed property that requires invoice_no
+- [x] DT013e Update `app/pages/deliveries/[id]/edit.vue` - Change "Send For Approval" button to use `isSendForApprovalValid` for disabled state
+- [x] DT013f Update `server/api/deliveries/[id].patch.ts` - Add server-side validation for invoice_no when send_for_approval is true
+
+**Files Changed**:
+
+- `app/pages/deliveries/create.vue` - Added validation and updated button disabled condition
+- `app/pages/deliveries/[id]/edit.vue` - Added validation and updated button disabled condition
+- `server/api/locations/[id]/deliveries/index.post.ts` - Added server-side validation
+- `server/api/deliveries/[id].patch.ts` - Added server-side validation
+
+**Verification**: Tested as OPERATOR (mwilliams) with PO-040:
+
+1. **Create page**: Selected PO-040, increased quantity to 15 (over remaining 12) to trigger over-delivery
+2. Verified "Send For Approval" button is disabled when invoice number is empty
+3. Filled in invoice number → button becomes enabled
+4. **Edit page**: Saved draft without invoice, then edited
+5. Verified "Send For Approval" button is disabled on edit page without invoice
+6. Filled in invoice number → button becomes enabled
+
+**Checkpoint**: DT013 complete - Invoice number now required for over-delivery approval requests on both create and edit pages ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

@@ -217,6 +217,18 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Additional validation for send_for_approval - invoice number is required
+    if (data.send_for_approval && !finalInvoiceNo) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "VALIDATION_ERROR",
+          message: "Invoice number is required when sending for approval",
+        },
+      });
+    }
+
     if (finalInvoiceNo) {
       const existingInvoice = await prisma.delivery.findFirst({
         where: {
