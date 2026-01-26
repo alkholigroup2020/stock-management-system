@@ -12,7 +12,7 @@
 | POST   | `/api/pos`           | Create PO from PRF    | PROCUREMENT_SPECIALIST                  |
 | GET    | `/api/pos/:id`       | Get PO details        | All authenticated                       |
 | PATCH  | `/api/pos/:id`       | Update open PO        | PROCUREMENT_SPECIALIST                  |
-| PATCH  | `/api/pos/:id/close` | Close PO              | ADMIN only (not PROCUREMENT_SPECIALIST) |
+| PATCH  | `/api/pos/:id/close` | Close PO              | ADMIN, SUPERVISOR (not PROCUREMENT_SPECIALIST) |
 
 ---
 
@@ -265,7 +265,7 @@ Update an open PO. Full edit capability until closed.
 
 Close a PO. No further edits or deliveries allowed.
 
-**Note**: Only ADMIN users can close POs. PROCUREMENT_SPECIALIST users cannot close POs.
+**Note**: Only ADMIN and SUPERVISOR users can close POs. PROCUREMENT_SPECIALIST users cannot close POs.
 
 ### Request Body
 
@@ -278,7 +278,7 @@ Close a PO. No further edits or deliveries allowed.
 ### Validation Rules
 
 - PO must be in OPEN status
-- User must be ADMIN (PROCUREMENT_SPECIALIST cannot close POs)
+- User must be ADMIN or SUPERVISOR (PROCUREMENT_SPECIALIST cannot close POs)
 
 ### Behavior
 
@@ -297,7 +297,7 @@ Close a PO. No further edits or deliveries allowed.
 
 ### Error Responses
 
-- 403: User is not ADMIN or PO already CLOSED
+- 403: User is not ADMIN/SUPERVISOR or PO already CLOSED
 - 404: PO not found
 
 ---

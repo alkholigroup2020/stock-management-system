@@ -7,13 +7,13 @@
 
 Implement a complete Purchase Requisition Form (PRF) and Purchase Order (PO) workflow with:
 
-- New PROCUREMENT_SPECIALIST role with limited access (can only access Orders page; can create/edit POs but NOT close them or create deliveries)
+- New PROCUREMENT_SPECIALIST role with limited access (can only access Orders page; can create/edit POs but NOT close them or create deliveries); ADMIN and SUPERVISOR cannot edit POs but can close them
 - PRF creation, submission, and approval workflow
 - PO creation from approved PRFs with VAT calculations
 - Email notifications for PRF approval (to procurement specialists)
 - Mandatory PO-Delivery linking (only ADMIN/SUPERVISOR/OPERATOR can create deliveries)
 - PRF clone functionality for rejected PRFs
-- PO close functionality restricted to ADMIN only
+- PO close functionality restricted to ADMIN and SUPERVISOR only
 
 **Note**: PO creation does not send email notifications to suppliers. Supplier email addresses are stored for reference only.
 

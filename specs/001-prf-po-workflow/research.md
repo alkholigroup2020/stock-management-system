@@ -229,7 +229,7 @@ Add new role with limited permissions following least-privilege principle.
 | --------------- | ------------------- | ----------------- | ---------------- | ---------------------------- |
 | Dashboard       | ✅                  | ✅                | ✅               | ❌                           |
 | Orders (PRFs)   | Create, View own    | View all, Approve | Full             | View approved only           |
-| Orders (POs)    | ❌                  | View              | View, Close only | Create, Edit only (no Close) |
+| Orders (POs)    | ❌                  | View, Close       | View, Close only | Create, Edit only (no Close) |
 | Deliveries      | Full (own location) | Full              | Full             | ❌                           |
 | Issues          | Full (own location) | Full              | Full             | ❌                           |
 | Transfers       | Full (own location) | Full + Approve    | Full             | ❌                           |
@@ -237,7 +237,7 @@ Add new role with limited permissions following least-privilege principle.
 | Reconciliations | View totals         | Full              | Full             | ❌                           |
 | Period Close    | ❌                  | Ready locations   | Full             | ❌                           |
 
-**Note**: PO creation and editing is restricted to PROCUREMENT_SPECIALIST role only. PO closing is restricted to ADMIN only. PROCUREMENT_SPECIALIST cannot create deliveries or access the Dashboard.
+**Note**: PO creation and editing is restricted to PROCUREMENT_SPECIALIST role only. PO closing is restricted to ADMIN and SUPERVISOR. PROCUREMENT_SPECIALIST cannot create deliveries or access the Dashboard.
 
 ### Rationale
 
@@ -260,7 +260,7 @@ The following API endpoints must be accessible to PROCUREMENT_SPECIALIST for the
 
 **Blocked endpoints for PROCUREMENT_SPECIALIST**:
 
-- `/api/pos/[id]/close` - Only ADMIN can close POs
+- `/api/pos/[id]/close` - Only ADMIN and SUPERVISOR can close POs
 - `/api/locations/[id]/deliveries/*` - Cannot create deliveries
 - `/api/reports/deliveries` - Cannot view deliveries report
 - Dashboard and all other non-Orders pages

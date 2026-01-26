@@ -101,14 +101,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Check role permissions
-  if (user.role !== "PROCUREMENT_SPECIALIST" && user.role !== "ADMIN") {
+  // Check role permissions - only PROCUREMENT_SPECIALIST can edit POs
+  // ADMIN and SUPERVISOR cannot edit POs after creation
+  if (user.role !== "PROCUREMENT_SPECIALIST") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
       data: {
         code: "PERMISSION_DENIED",
-        message: "Only procurement specialists and admins can update POs",
+        message: "Only procurement specialists can update POs",
       },
     });
   }

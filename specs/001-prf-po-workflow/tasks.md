@@ -807,6 +807,43 @@ Total (After VAT) = Line Value + VAT Amount
 
 ---
 
+### DT011: PO Edit/Close Permission Restrictions (2026-01-26)
+
+**Feature**: Restrict ADMIN and SUPERVISOR roles from editing POs after creation. Both roles retain the ability to manually close POs.
+
+**Previous Permissions:**
+
+| Operation | OPERATOR | SUPERVISOR | ADMIN | PROCUREMENT_SPECIALIST |
+|-----------|----------|------------|-------|------------------------|
+| Edit PO   | No       | No         | Yes   | Yes |
+| Close PO  | No       | No         | Yes   | No |
+
+**New Permissions:**
+
+| Operation | OPERATOR | SUPERVISOR | ADMIN | PROCUREMENT_SPECIALIST |
+|-----------|----------|------------|-------|------------------------|
+| Edit PO   | No       | No         | No    | Yes |
+| Close PO  | No       | Yes        | Yes   | No |
+
+**Implementation**:
+
+- [x] DT011a Update `app/composables/usePermissions.ts` - Change `canEditPO()` to only allow PROCUREMENT_SPECIALIST
+- [x] DT011b Update `app/composables/usePermissions.ts` - Change `canClosePO()` to allow ADMIN and SUPERVISOR
+- [x] DT011c Update `server/api/pos/[id].patch.ts` - Restrict PO edit to PROCUREMENT_SPECIALIST only
+- [x] DT011d Update `server/api/pos/[id]/close.patch.ts` - Allow SUPERVISOR to close POs alongside ADMIN
+
+**Files Changed**:
+
+- `app/composables/usePermissions.ts` - Updated `canEditPO()` and `canClosePO()` functions
+- `server/api/pos/[id].patch.ts` - Restricted edit permission to PROCUREMENT_SPECIALIST only
+- `server/api/pos/[id]/close.patch.ts` - Added SUPERVISOR to allowed roles for closing POs
+
+**Verification**: Run `pnpm typecheck` - passed with no errors
+
+**Checkpoint**: DT011 complete - PO edit/close permissions updated ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

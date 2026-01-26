@@ -13,7 +13,7 @@
 - Q: How should rejected PRF revision be handled? → A: User can "Clone" a rejected PRF to create a new DRAFT PRF with copied content
 - Q: Can PO line items be modified from the source PRF? → A: PO line items are fully editable (can add, remove, modify any field)
 - Q: Is a rejection reason required when rejecting a PRF? → A: Mandatory free-text reason (Supervisor must enter explanation before rejecting)
-- Q: Can OPEN POs be edited after creation? → A: OPEN POs can be edited anytime (full edit capability until closed)
+- Q: Can OPEN POs be edited after creation? → A: OPEN POs can be edited by PROCUREMENT_SPECIALIST only (ADMIN and SUPERVISOR cannot edit POs after creation, but can close them)
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -97,7 +97,7 @@ When goods arrive, an Operator creates a delivery record. The system requires se
 
 ### User Story 5 - Close Purchase Order (Priority: P2)
 
-An Admin can manually close a PO when needed, or the system automatically closes a PO when all items have been fully delivered. Closed POs can no longer have deliveries linked to them.
+An Admin or Supervisor can manually close a PO when needed, or the system automatically closes a PO when all items have been fully delivered. Closed POs can no longer have deliveries linked to them.
 
 **Why this priority**: Closing POs completes the procurement cycle and prevents further deliveries against completed orders.
 
@@ -105,11 +105,11 @@ An Admin can manually close a PO when needed, or the system automatically closes
 
 **Acceptance Scenarios**:
 
-1. **Given** an OPEN PO with at least one linked delivery, **When** an Admin clicks "Close PO", **Then** the PO status changes to CLOSED and it no longer appears in the delivery PO selection dropdown.
+1. **Given** an OPEN PO with at least one linked delivery, **When** an Admin or Supervisor clicks "Close PO", **Then** the PO status changes to CLOSED and it no longer appears in the delivery PO selection dropdown.
 
 2. **Given** a CLOSED PO, **When** an Operator tries to create a delivery linked to it, **Then** the system does not show the closed PO as an option.
 
-3. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they view an OPEN PO, **Then** they do NOT see a "Close PO" button (only Admins can close POs).
+3. **Given** a user with PROCUREMENT_SPECIALIST role, **When** they view an OPEN PO, **Then** they do NOT see a "Close PO" button (only Admins and Supervisors can close POs).
 
 4. **Given** an OPEN PO where all line items have `delivered_qty >= quantity`, **When** a delivery is posted that completes the final line, **Then** the PO is automatically closed and the linked PRF is also closed.
 
@@ -246,9 +246,9 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-019**: System MUST calculate PO line totals including discount and VAT (15% default for Saudi Arabia)
 - **FR-020**: System MUST calculate PO grand totals (before discount, discount, after discount, VAT, final total)
 - **FR-021**: System MUST support PO statuses: OPEN and CLOSED
-- **FR-021a**: System MUST allow OPEN POs to be fully edited (all fields, line items) until closed
+- **FR-021a**: System MUST allow OPEN POs to be fully edited (all fields, line items) by PROCUREMENT_SPECIALIST only; ADMIN and SUPERVISOR cannot edit POs after creation
 - **FR-022**: ~~System MUST send email notifications to all supplier email addresses when a PO is created~~ (REMOVED - email notifications are not sent on PO creation; supplier email addresses are stored for future use)
-- **FR-023**: System MUST allow only Admins to close POs (PROCUREMENT_SPECIALIST cannot close POs)
+- **FR-023**: System MUST allow only Admins and Supervisors to close POs (PROCUREMENT_SPECIALIST cannot close POs)
 
 **Delivery Integration**
 

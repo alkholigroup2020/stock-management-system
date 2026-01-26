@@ -51,14 +51,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Check role permissions - only ADMIN can close POs
-  if (user.role !== "ADMIN") {
+  // Check role permissions - ADMIN and SUPERVISOR can close POs
+  if (user.role !== "ADMIN" && user.role !== "SUPERVISOR") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
       data: {
         code: "PERMISSION_DENIED",
-        message: "Only admins can close POs",
+        message: "Only admins and supervisors can close POs",
       },
     });
   }

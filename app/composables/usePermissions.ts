@@ -726,7 +726,8 @@ export function usePermissions() {
    * Check if user can edit a PO (only OPEN status)
    *
    * Requirements:
-   * - User must be PROCUREMENT_SPECIALIST or ADMIN
+   * - User must be PROCUREMENT_SPECIALIST only
+   * - ADMIN and SUPERVISOR cannot edit POs after creation
    * - PO must be in OPEN status (checked by caller)
    *
    * @returns true if user can edit POs
@@ -734,14 +735,16 @@ export function usePermissions() {
   const canEditPO = (): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    return isProcurementSpecialist.value || isAdmin.value;
+    // Only PROCUREMENT_SPECIALIST can edit POs
+    // ADMIN and SUPERVISOR cannot edit POs after creation
+    return isProcurementSpecialist.value;
   };
 
   /**
    * Check if user can close a PO
    *
    * Requirements:
-   * - User must be ADMIN only
+   * - User must be ADMIN or SUPERVISOR
    * - PROCUREMENT_SPECIALIST cannot close POs
    *
    * @returns true if user can close POs
@@ -749,7 +752,8 @@ export function usePermissions() {
   const canClosePO = (): boolean => {
     if (!isAuthenticated.value || !user.value) return false;
 
-    return isAdmin.value;
+    // Both ADMIN and SUPERVISOR can close POs
+    return isAdmin.value || isSupervisor.value;
   };
 
   /**

@@ -543,7 +543,7 @@ OPEN ──[auto]───> CLOSED (when all items fully delivered)
 
 | Transition    | Trigger      | Conditions                                                   |
 | ------------- | ------------ | ------------------------------------------------------------ |
-| OPEN → CLOSED | Manual Close | User is Admin only (Procurement Specialist cannot close)     |
+| OPEN → CLOSED | Manual Close | User is Admin or Supervisor (Procurement Specialist cannot close) |
 | OPEN → CLOSED | Auto-Close   | All PO lines have `delivered_qty >= quantity` after delivery |
 
 **Auto-Close Behavior:**

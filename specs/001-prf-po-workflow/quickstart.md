@@ -194,7 +194,7 @@ app/pages/orders/
 - [ ] Verify no email is sent to supplier on PO creation
 - [ ] Edit open PO (add/remove lines) as Procurement Specialist
 - [ ] Verify PROCUREMENT_SPECIALIST cannot see "Close PO" button
-- [ ] Close PO as Admin (only ADMIN can close POs)
+- [ ] Close PO as Admin or Supervisor (ADMIN and SUPERVISOR can close POs)
 - [ ] Verify linked PRF marked as CLOSED
 
 ### Delivery Integration
@@ -210,7 +210,7 @@ app/pages/orders/
 - [ ] PROCUREMENT_SPECIALIST can create/edit POs but NOT close them or create deliveries
 - [ ] OPERATOR can create PRF but not PO
 - [ ] SUPERVISOR can approve/reject PRF
-- [ ] ADMIN can view POs and close them (but cannot create/edit POs)
+- [ ] ADMIN and SUPERVISOR can view POs and close them (but cannot create/edit POs)
 
 ---
 

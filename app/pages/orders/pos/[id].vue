@@ -19,7 +19,7 @@ useSeoMeta({
 // Composables
 const route = useRoute();
 const router = useRouter();
-const { canCreatePO, canPostDeliveries, canClosePO } = usePermissions();
+const { canCreatePO, canPostDeliveries, canClosePO, canEditPO } = usePermissions();
 const { isProcurementSpecialist, isAdmin, user } = useAuth();
 const { isOnline, guardAction } = useOfflineGuard();
 const { handleError, handleSuccess } = useErrorHandler();
@@ -62,8 +62,8 @@ const isOpen = computed(() => po.value?.status === "OPEN");
 const isClosed = computed(() => po.value?.status === "CLOSED");
 
 const canEdit = computed(() => {
-  // Only open POs can be edited by procurement specialists or admins
-  return isOpen.value && (isProcurementSpecialist.value || isAdmin.value) && !isEditing.value;
+  // Only open POs can be edited by users with canEditPO permission (PROCUREMENT_SPECIALIST only)
+  return isOpen.value && canEditPO() && !isEditing.value;
 });
 
 const canCloseThisPO = computed(() => {

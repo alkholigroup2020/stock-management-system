@@ -16,7 +16,7 @@ The PRF/PO Workflow specification is **well-defined and implementation-ready**. 
 - **2 Minor Issues** requiring attention
 - **Coverage**: 100% requirement-to-task traceability (for active requirements)
 
-**Note**: PO email notification features (FR-022, FR-034, FR-036) have been removed. PO creation does not send emails to suppliers. Only PROCUREMENT_SPECIALIST role can create/edit/close POs (not ADMIN).
+**Note**: PO email notification features (FR-022, FR-034, FR-036) have been removed. PO creation does not send emails to suppliers. Only PROCUREMENT_SPECIALIST role can create/edit POs. Only ADMIN and SUPERVISOR can close POs.
 
 ---
 
@@ -165,7 +165,7 @@ All 98 tasks map to requirements or support infrastructure. No orphan tasks foun
 
 6. Use Playwright MCP to verify complete workflow (T098)
 7. Verify PRF approval email delivery in development using console logs (PO emails are not sent)
-8. Test PROCUREMENT_SPECIALIST role restrictions thoroughly (only role that can create/edit/close POs)
+8. Test PROCUREMENT_SPECIALIST role restrictions thoroughly (only role that can create/edit POs; only ADMIN/SUPERVISOR can close POs)
 
 ---
 
