@@ -8,6 +8,9 @@
 
 import type { PRFType, PRFCategory, Unit } from "~~/shared/types/database";
 
+// VAT rate for Saudi Arabia
+const VAT_RATE = 15;
+
 // Types
 export interface PRFLineInput {
   id: string;
@@ -18,6 +21,10 @@ export interface PRFLineInput {
   required_qty: string;
   estimated_price: string;
   line_value: number;
+  vat_percent: string;
+  total_before_vat: number;
+  vat_amount: number;
+  total_after_vat: number;
   notes: string;
 }
 
@@ -115,6 +122,10 @@ function addLine() {
     required_qty: "",
     estimated_price: "",
     line_value: 0,
+    vat_percent: String(VAT_RATE),
+    total_before_vat: 0,
+    vat_amount: 0,
+    total_after_vat: 0,
     notes: "",
   });
 }

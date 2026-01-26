@@ -671,11 +671,7 @@ export default defineEventHandler(async (event) => {
             posted_at: isPosting ? new Date() : undefined,
             // Set pending_approval when operator sends for approval
             // Reset only when posting (not when approving - keep true for "Approved" status)
-            pending_approval: isPosting
-              ? false
-              : data.send_for_approval
-                ? true
-                : undefined,
+            pending_approval: isPosting ? false : data.send_for_approval ? true : undefined,
             // Set rejection flag when rejecting over-delivery (delivery becomes permanently locked)
             over_delivery_rejected: data.notify_rejection ? true : undefined,
             // Only update totals if we processed lines
@@ -982,7 +978,8 @@ export default defineEventHandler(async (event) => {
           : "Delivery posted successfully.";
     } else {
       if (data.send_for_approval && emailSent) {
-        message = "Delivery draft updated. Supervisors have been notified for over-delivery approval.";
+        message =
+          "Delivery draft updated. Supervisors have been notified for over-delivery approval.";
       } else if (data.send_for_approval) {
         message = "Delivery draft updated. Over-delivery items require supervisor approval.";
       } else {

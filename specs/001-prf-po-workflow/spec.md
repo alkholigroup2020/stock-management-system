@@ -33,6 +33,8 @@ An Operator needs to request materials or supplies for their location. They crea
 
 3. **Given** a PRF in DRAFT status, **When** the requester adds multiple line items, **Then** the system calculates the total value as the sum of all line values (required_qty × estimated_price).
 
+4. **Given** a PRF form with line items, **When** the user enters quantities and estimated prices, **Then** the system displays VAT calculations for each line showing "Before VAT", "VAT (15%)", and "Total" columns, and displays a footer summary showing total before VAT, total VAT amount, and grand total.
+
 ---
 
 ### User Story 2 - Approve or Reject Purchase Requisition (Priority: P1)
@@ -210,6 +212,8 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-004**: System MUST support PRF categories: FOOD, CLEANING, and OTHER
 - **FR-005**: System MUST allow PRF line items to reference existing inventory items or use custom item descriptions
 - **FR-006**: System MUST calculate PRF line values as required_qty × estimated_price
+- **FR-006a**: System MUST display PRF line-level VAT calculations (Before VAT, VAT 15%, Total After VAT) in the UI
+- **FR-006b**: System MUST display PRF footer summary showing total before VAT, total VAT amount (15%), and grand total
 - **FR-007**: System MUST calculate PRF total value as sum of all line values
 - **FR-008**: System MUST support PRF statuses: DRAFT, PENDING, APPROVED, REJECTED, CLOSED
 - **FR-009**: System MUST allow only the requester to edit or delete DRAFT PRFs
@@ -340,6 +344,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 
 - The existing period management system will be used to associate PRFs with accounting periods
 - VAT rate is fixed at 15% for Saudi Arabia (configurable in the future if needed)
+- PRF VAT calculations are computed client-side for display purposes only; VAT fields are not stored in the database since PRFs are internal requisitions (only PO VAT is stored for formal orders)
 - Email service will be configured using environment variables (SMTP settings)
 - Users with PROCUREMENT_SPECIALIST role will be created through the existing user management system
 - The existing authentication and session management will be used for all new pages

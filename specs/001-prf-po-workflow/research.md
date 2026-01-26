@@ -120,6 +120,49 @@ const totalAmount = totalAfterDiscount + totalVat;
 
 ---
 
+## 3a. PRF VAT Display (UI-Level Calculation)
+
+### Decision
+
+Display VAT calculations on PRF forms for user reference, but do not store VAT fields in the database.
+
+### Rationale
+
+- PRFs are internal requisitions, not formal orders sent to suppliers
+- Users benefit from seeing the estimated total including VAT when planning purchases
+- Storing VAT on PRFs would be redundant since the actual VAT is calculated and stored on the PO
+- Keeping the calculation client-side reduces database complexity
+
+### Implementation
+
+```typescript
+// PRF line VAT calculation (UI only)
+const VAT_RATE = 15;
+
+// Per line item (computed):
+const total_before_vat = required_qty * estimated_price;
+const vat_amount = (total_before_vat * VAT_RATE) / 100;
+const total_after_vat = total_before_vat + vat_amount;
+
+// PRF totals (computed):
+const totals = lines.reduce(
+  (acc, line) => ({
+    total_before_vat: acc.total_before_vat + line.total_before_vat,
+    total_vat: acc.total_vat + line.vat_amount,
+    total_amount: acc.total_amount + line.total_after_vat,
+  }),
+  { total_before_vat: 0, total_vat: 0, total_amount: 0 }
+);
+```
+
+### UI Display
+
+- Table columns: Before VAT, VAT (15%), Total
+- Footer summary: Total Before VAT, VAT (15%), Grand Total
+- Responsive design: VAT columns hidden on smaller screens (md:table-cell, lg:table-cell)
+
+---
+
 ## 4. PRF Status Workflow
 
 ### Decision

@@ -693,11 +693,13 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 **Feature**: Display meaningful status badges on deliveries list and detail pages based on over-delivery approval workflow state.
 
 **Issue**: Deliveries with over-delivery approval workflow showed incorrect statuses:
+
 1. All non-posted deliveries showed "Draft" regardless of approval state
 2. "Pending Approval" status was not being computed correctly in the reports API
 3. "Approved" status was not being preserved after approval (flag was being reset)
 
 **Root Causes**:
+
 1. **remainingQty calculation bug**: In `server/api/reports/deliveries.get.ts`, the `remainingQty` formula was adding back `lineQty` for DRAFT deliveries, causing `isOverDelivery` to be false when it should be true
 2. **pending_approval flag reset**: In `server/api/deliveries/[id].patch.ts`, the `pending_approval` flag was being reset to `false` when approval notification was sent, instead of only when posting
 
@@ -722,15 +724,16 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 **Display Status Mapping**:
 
-| Database State | Display Status | Color | Icon |
-|----------------|----------------|-------|------|
-| `status=DRAFT`, `pending_approval=false`, `rejected=false` | Draft | neutral (gray) | i-lucide-file-edit |
-| `status=DRAFT`, `pending_approval=true`, `rejected=false` | Pending Approval | warning (amber) | i-lucide-clock |
-| `status=DRAFT`, all over-delivery approved, not rejected | Approved | warning (amber) | i-lucide-check |
-| `status=DRAFT`, `rejected=true` | Rejected | error (red) | i-lucide-x-circle |
-| `status=POSTED` | Posted | success (green) | i-lucide-check-circle |
+| Database State                                             | Display Status   | Color           | Icon                  |
+| ---------------------------------------------------------- | ---------------- | --------------- | --------------------- |
+| `status=DRAFT`, `pending_approval=false`, `rejected=false` | Draft            | neutral (gray)  | i-lucide-file-edit    |
+| `status=DRAFT`, `pending_approval=true`, `rejected=false`  | Pending Approval | warning (amber) | i-lucide-clock        |
+| `status=DRAFT`, all over-delivery approved, not rejected   | Approved         | warning (amber) | i-lucide-check        |
+| `status=DRAFT`, `rejected=true`                            | Rejected         | error (red)     | i-lucide-x-circle     |
+| `status=POSTED`                                            | Posted           | success (green) | i-lucide-check-circle |
 
 **Verification**: Tested complete workflow:
+
 1. Created PRF → PO → Delivery with over-delivery (15 KG on 10 KG PO line)
 2. Verified "Pending Approval" status appears in list and detail views
 3. Approved over-delivery as admin
@@ -747,19 +750,60 @@ Task: "Create stock levels reference table in app/components/orders/StockLevelsT
 
 **PRF Status Badge Mapping**:
 
-| PRF Status | Display Label | Color | Icon |
-|------------|---------------|-------|------|
-| DRAFT | Draft | neutral (gray) | i-lucide-file-edit |
-| PENDING | Pending Approval | warning (amber) | i-lucide-clock |
-| APPROVED | Approved | success (green) | i-lucide-check-circle |
-| REJECTED | Rejected | error (red) | i-lucide-x-circle |
-| CLOSED | Closed | info (blue) | i-lucide-lock |
+| PRF Status | Display Label    | Color           | Icon                  |
+| ---------- | ---------------- | --------------- | --------------------- |
+| DRAFT      | Draft            | neutral (gray)  | i-lucide-file-edit    |
+| PENDING    | Pending Approval | warning (amber) | i-lucide-clock        |
+| APPROVED   | Approved         | success (green) | i-lucide-check-circle |
+| REJECTED   | Rejected         | error (red)     | i-lucide-x-circle     |
+| CLOSED     | Closed           | info (blue)     | i-lucide-lock         |
 
 **Files Changed**:
 
 - `app/components/orders/PRFStatusBadge.vue` - Changed PENDING status from primary to warning color
 
 **Checkpoint**: DT009 complete - PRF status badges use consistent color scheme ✅
+
+---
+
+### DT010: PRF Tax Calculation (2026-01-26)
+
+**Feature**: Add VAT calculation to PRF line items table, consistent with PO line items.
+
+**Implementation**:
+
+- [x] DT010a Update `app/components/orders/PRFLineItemsTable.vue` - Add VAT_RATE constant (15%)
+- [x] DT010b Update `app/components/orders/PRFLineItemsTable.vue` - Extend PRFLineInput interface with VAT fields (vat_percent, total_before_vat, vat_amount, total_after_vat)
+- [x] DT010c Update `app/components/orders/PRFLineItemsTable.vue` - Add computed totals with VAT breakdown
+- [x] DT010d Update `app/components/orders/PRFLineItemsTable.vue` - Add "Before VAT", "VAT (15%)", and "Total" columns to table
+- [x] DT010e Update `app/components/orders/PRFLineItemsTable.vue` - Update footer to show VAT breakdown (Before VAT, VAT 15%, Grand Total)
+- [x] DT010f Update `app/components/orders/PRFForm.vue` - Add VAT_RATE constant and update PRFLineInput interface
+- [x] DT010g Update `app/components/orders/PRFForm.vue` - Update addLine() to include VAT default values
+- [x] DT010h Update `app/pages/orders/prfs/create.vue` - Update createEmptyLine() with VAT fields
+- [x] DT010i Update `app/pages/orders/prfs/[id].vue` - Update createEmptyLine() and line mappings with VAT fields
+
+**Files Changed**:
+
+- `app/components/orders/PRFLineItemsTable.vue` - VAT calculation and display
+- `app/components/orders/PRFForm.vue` - Interface and default values
+- `app/pages/orders/prfs/create.vue` - Empty line helper with VAT fields
+- `app/pages/orders/prfs/[id].vue` - Line mapping with VAT calculations
+
+**Calculation Formula**:
+
+```
+Line Value (Before VAT) = Quantity × Estimated Price
+VAT Amount = Line Value × 15%
+Total (After VAT) = Line Value + VAT Amount
+```
+
+**Verification**: Tested on localhost:3000 - PRF form now shows:
+
+- Table columns: Item, Unit, Qty, Est. Price, Before VAT, VAT (15%), Total, Action
+- Footer summary: Before VAT, VAT (15%), Grand Total
+- Example: 10 × SAR 100 = SAR 1,000.00 Before VAT + SAR 150.00 VAT = SAR 1,150.00 Total
+
+**Checkpoint**: DT010 complete - PRF form includes tax calculation ✅
 
 ---
 

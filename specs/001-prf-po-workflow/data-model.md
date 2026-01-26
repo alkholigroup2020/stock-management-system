@@ -209,6 +209,19 @@ model PRFLine {
 - `estimated_price >= 0`
 - `line_value = required_qty × estimated_price`
 
+**UI-Level VAT Calculation (Not Stored):**
+
+PRF VAT is calculated at the UI level for display purposes only. Since PRFs are internal requisitions, VAT amounts are not stored in the database. The following fields are computed client-side:
+
+| Computed Field    | Type    | Formula                                |
+| ----------------- | ------- | -------------------------------------- |
+| vat_percent       | Decimal | Fixed at 15% (Saudi Arabia)            |
+| total_before_vat  | Decimal | `required_qty × estimated_price`       |
+| vat_amount        | Decimal | `total_before_vat × vat_percent / 100` |
+| total_after_vat   | Decimal | `total_before_vat + vat_amount`        |
+
+This differs from PO lines where VAT is stored because POs are formal orders sent to suppliers.
+
 ---
 
 ### PO (MODIFY)

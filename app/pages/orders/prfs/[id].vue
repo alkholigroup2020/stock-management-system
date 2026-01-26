@@ -128,6 +128,9 @@ const isFormValid = computed(() => {
   return validLines.length > 0;
 });
 
+// VAT rate for Saudi Arabia
+const VAT_RATE = 15;
+
 // Create empty line helper
 function createEmptyLine(): PRFLineInput {
   return {
@@ -139,6 +142,10 @@ function createEmptyLine(): PRFLineInput {
     required_qty: "",
     estimated_price: "",
     line_value: 0,
+    vat_percent: String(VAT_RATE),
+    total_before_vat: 0,
+    vat_amount: 0,
+    total_after_vat: 0,
     notes: "",
   };
 }
@@ -168,6 +175,10 @@ function initializeFormData() {
       required_qty: line.required_qty,
       estimated_price: line.estimated_price,
       line_value: parseFloat(line.line_value) || 0,
+      vat_percent: String(VAT_RATE),
+      total_before_vat: parseFloat(line.line_value) || 0,
+      vat_amount: ((parseFloat(line.line_value) || 0) * VAT_RATE) / 100,
+      total_after_vat: (parseFloat(line.line_value) || 0) * (1 + VAT_RATE / 100),
       notes: line.notes || "",
     })) || [createEmptyLine()],
   };
@@ -731,6 +742,10 @@ onMounted(async () => {
                 required_qty: line.required_qty,
                 estimated_price: line.estimated_price,
                 line_value: parseFloat(line.line_value) || 0,
+                vat_percent: String(VAT_RATE),
+                total_before_vat: parseFloat(line.line_value) || 0,
+                vat_amount: ((parseFloat(line.line_value) || 0) * VAT_RATE) / 100,
+                total_after_vat: (parseFloat(line.line_value) || 0) * (1 + VAT_RATE / 100),
                 notes: line.notes || '',
               }))
             "

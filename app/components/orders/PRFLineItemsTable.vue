@@ -3,11 +3,14 @@
  * PRFLineItemsTable Component
  *
  * Displays and manages editable line items for a PRF (Purchase Requisition Form).
- * Supports adding, editing, and removing line items with automatic calculations.
+ * Supports adding, editing, and removing line items with automatic VAT calculations.
  */
 
 import { formatCurrency } from "~/utils/format";
 import type { Unit } from "~~/shared/types/database";
+
+// VAT rate for Saudi Arabia
+const VAT_RATE = 15;
 
 // Types
 export interface PRFLineInput {
@@ -19,6 +22,10 @@ export interface PRFLineInput {
   required_qty: string;
   estimated_price: string;
   line_value: number;
+  vat_percent: string;
+  total_before_vat: number;
+  vat_amount: number;
+  total_after_vat: number;
   notes: string;
 }
 
@@ -62,13 +69,36 @@ const unitOptions: { label: string; value: Unit }[] = [
   { label: "PACK", value: "PACK" },
 ];
 
-// Computed
-const totalValue = computed(() => {
-  return props.lines.reduce((sum, line) => {
-    const qty = parseFloat(line.required_qty) || 0;
-    const price = parseFloat(line.estimated_price) || 0;
-    return sum + qty * price;
-  }, 0);
+// Computed totals
+const totals = computed(() => {
+  const result = props.lines.reduce(
+    (acc, line) => {
+      const qty = parseFloat(line.required_qty) || 0;
+      const price = parseFloat(line.estimated_price) || 0;
+      const vatPercent = parseFloat(line.vat_percent) || VAT_RATE;
+
+      const lineValue = qty * price;
+      const vatAmount = (lineValue * vatPercent) / 100;
+      const totalAfterVat = lineValue + vatAmount;
+
+      return {
+        total_before_vat: acc.total_before_vat + lineValue,
+        total_vat: acc.total_vat + vatAmount,
+        total_amount: acc.total_amount + totalAfterVat,
+      };
+    },
+    {
+      total_before_vat: 0,
+      total_vat: 0,
+      total_amount: 0,
+    }
+  );
+
+  return {
+    total_before_vat: Math.round(result.total_before_vat * 100) / 100,
+    total_vat: Math.round(result.total_vat * 100) / 100,
+    total_amount: Math.round(result.total_amount * 100) / 100,
+  };
 });
 
 /**
@@ -86,22 +116,46 @@ function handleItemSelect(line: PRFLineInput) {
 }
 
 /**
- * Update line value calculation
+ * Update line value calculation with VAT
  */
 function updateLineCalculation(line: PRFLineInput) {
   const qty = parseFloat(line.required_qty) || 0;
   const price = parseFloat(line.estimated_price) || 0;
-  line.line_value = qty * price;
+  const vatPercent = parseFloat(line.vat_percent) || VAT_RATE;
+
+  const lineValue = qty * price;
+  const vatAmount = (lineValue * vatPercent) / 100;
+  const totalAfterVat = lineValue + vatAmount;
+
+  line.line_value = lineValue;
+  line.total_before_vat = Math.round(lineValue * 100) / 100;
+  line.vat_amount = Math.round(vatAmount * 100) / 100;
+  line.total_after_vat = Math.round(totalAfterVat * 100) / 100;
+
   emit("lineChange", line);
 }
 
 /**
- * Get line value for display (computed from inputs)
+ * Get line values for display (computed from inputs)
  */
-function getLineValue(line: PRFLineInput): number {
+function getLineValues(line: PRFLineInput): {
+  lineValue: number;
+  vatAmount: number;
+  totalAfterVat: number;
+} {
   const qty = parseFloat(line.required_qty) || 0;
   const price = parseFloat(line.estimated_price) || 0;
-  return qty * price;
+  const vatPercent = parseFloat(line.vat_percent) || VAT_RATE;
+
+  const lineValue = qty * price;
+  const vatAmount = (lineValue * vatPercent) / 100;
+  const totalAfterVat = lineValue + vatAmount;
+
+  return {
+    lineValue: Math.round(lineValue * 100) / 100,
+    vatAmount: Math.round(vatAmount * 100) / 100,
+    totalAfterVat: Math.round(totalAfterVat * 100) / 100,
+  };
 }
 
 /**
@@ -163,9 +217,19 @@ function removeLine(id: string) {
               Est. Price
             </th>
             <th
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-28 hidden md:table-cell"
+            >
+              Before VAT
+            </th>
+            <th
+              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-24 hidden lg:table-cell"
+            >
+              VAT ({{ VAT_RATE }}%)
+            </th>
+            <th
               class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-32"
             >
-              Line Value
+              Total
             </th>
             <th
               v-if="!readonly"
@@ -178,7 +242,7 @@ function removeLine(id: string) {
         <tbody class="divide-y divide-[var(--ui-border)]">
           <!-- Loading State -->
           <tr v-if="loading">
-            <td :colspan="readonly ? 5 : 6" class="px-4 py-8">
+            <td :colspan="readonly ? 7 : 8" class="px-4 py-8">
               <div class="flex flex-col items-center justify-center gap-3">
                 <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
                 <p class="text-sm text-[var(--ui-text-muted)]">Loading...</p>
@@ -298,10 +362,24 @@ function removeLine(id: string) {
               />
             </td>
 
-            <!-- Line Value -->
+            <!-- Before VAT -->
+            <td class="px-3 py-3 text-right hidden md:table-cell">
+              <span class="text-sm text-[var(--ui-text)]">
+                {{ formatCurrency(getLineValues(line).lineValue) }}
+              </span>
+            </td>
+
+            <!-- VAT Amount -->
+            <td class="px-3 py-3 text-right hidden lg:table-cell">
+              <span class="text-sm text-[var(--ui-text-muted)]">
+                {{ formatCurrency(getLineValues(line).vatAmount) }}
+              </span>
+            </td>
+
+            <!-- Total After VAT -->
             <td class="px-3 py-3 text-right">
               <span class="text-sm font-medium text-[var(--ui-text)]">
-                {{ formatCurrency(getLineValue(line)) }}
+                {{ formatCurrency(getLineValues(line).totalAfterVat) }}
               </span>
             </td>
 
@@ -324,7 +402,7 @@ function removeLine(id: string) {
           <!-- Empty State -->
           <tr v-if="!loading && lines.length === 0">
             <td
-              :colspan="readonly ? 5 : 6"
+              :colspan="readonly ? 7 : 8"
               class="px-4 py-8 text-center text-[var(--ui-text-muted)]"
             >
               No items added yet.
@@ -341,19 +419,51 @@ function removeLine(id: string) {
         </tbody>
 
         <!-- Summary Footer -->
-        <tfoot class="bg-[var(--ui-bg-muted)]">
-          <tr>
-            <td :colspan="readonly ? 3 : 4" class="px-3 py-3 text-right">
-              <span class="text-sm font-medium text-[var(--ui-text-muted)]">
+        <tfoot class="bg-[var(--ui-bg-elevated)]">
+          <!-- Before VAT -->
+          <tr class="text-sm">
+            <td colspan="4" class="px-3 py-2"></td>
+            <td class="px-3 py-2 hidden md:table-cell"></td>
+            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
+              Before VAT:
+            </td>
+            <td class="px-3 py-2 text-right text-[var(--ui-text)]">
+              {{ formatCurrency(totals.total_before_vat) }}
+            </td>
+            <td v-if="!readonly" class="px-3 py-2"></td>
+          </tr>
+
+          <!-- VAT -->
+          <tr class="text-sm">
+            <td colspan="4" class="px-3 py-2"></td>
+            <td class="px-3 py-2 hidden md:table-cell"></td>
+            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
+              VAT ({{ VAT_RATE }}%):
+            </td>
+            <td class="px-3 py-2 text-right text-[var(--ui-text)]">
+              {{ formatCurrency(totals.total_vat) }}
+            </td>
+            <td v-if="!readonly" class="px-3 py-2"></td>
+          </tr>
+
+          <!-- Grand Total -->
+          <tr class="border-t border-[var(--ui-border)]">
+            <td colspan="4" class="px-3 py-3"></td>
+            <td class="px-3 py-3 hidden md:table-cell"></td>
+            <td class="px-3 py-3 text-right hidden lg:table-cell">
+              <span class="text-base font-semibold text-[var(--ui-text)]">
                 {{ lines.length }} item(s) - Total:
               </span>
             </td>
             <td class="px-3 py-3 text-right">
-              <span class="text-lg font-bold text-primary">
-                {{ formatCurrency(totalValue) }}
+              <span class="lg:hidden text-sm font-medium text-[var(--ui-text-muted)] mr-2">
+                {{ lines.length }} item(s) - Total:
+              </span>
+              <span class="text-xl font-bold text-primary">
+                {{ formatCurrency(totals.total_amount) }}
               </span>
             </td>
-            <td v-if="!readonly"></td>
+            <td v-if="!readonly" class="px-3 py-3"></td>
           </tr>
         </tfoot>
       </table>

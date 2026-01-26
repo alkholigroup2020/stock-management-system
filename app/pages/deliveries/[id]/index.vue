@@ -805,9 +805,7 @@ const isPendingApproval = computed(() => delivery.value?.pending_approval ?? fal
 const isRejectedDelivery = computed(() => isRejected.value);
 
 // Operator can't edit/delete when delivery is sent for approval (pending_approval: true)
-const isOperatorLockedForApproval = computed(
-  () => isOperator.value && isPendingApproval.value
-);
+const isOperatorLockedForApproval = computed(() => isOperator.value && isPendingApproval.value);
 // Operator can't post when there's unapproved over-delivery
 const isOperatorWithPendingApproval = computed(
   () => isOperator.value && hasUnapprovedOverDelivery.value
