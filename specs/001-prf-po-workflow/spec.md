@@ -109,12 +109,12 @@ All create and detail pages use a consistent header structure:
 
 Form sections use color-coded icon badges for visual hierarchy:
 
-| Section Type      | Badge Color                        | Icon Example        |
-| ----------------- | ---------------------------------- | ------------------- |
-| Basic Information | `bg-sky-500/10 text-sky-600`       | `i-lucide-file-text`|
-| Contact Info      | `bg-emerald-500/10 text-emerald-600`| `i-lucide-user`    |
-| Line Items        | `bg-amber-500/10 text-amber-600`   | `i-lucide-list`     |
-| Delivery Details  | `bg-purple-500/10 text-purple-600` | `i-lucide-truck`    |
+| Section Type      | Badge Color                          | Icon Example         |
+| ----------------- | ------------------------------------ | -------------------- |
+| Basic Information | `bg-sky-500/10 text-sky-600`         | `i-lucide-file-text` |
+| Contact Info      | `bg-emerald-500/10 text-emerald-600` | `i-lucide-user`      |
+| Line Items        | `bg-amber-500/10 text-amber-600`     | `i-lucide-list`      |
+| Delivery Details  | `bg-purple-500/10 text-purple-600`   | `i-lucide-truck`     |
 
 Section header structure:
 

@@ -192,12 +192,12 @@ All page headers use CSS variables for theme-aware colors:
 
 Form sections use color-coded icon badges:
 
-| Section              | Color Class                | Icon                |
-| -------------------- | -------------------------- | ------------------- |
-| Basic Information    | `bg-sky-500/10`            | `i-lucide-file-text`|
-| Contact Information  | `bg-emerald-500/10`        | `i-lucide-user`     |
-| Line Items           | `bg-amber-500/10`          | `i-lucide-list`     |
-| Delivery Details     | `bg-purple-500/10`         | `i-lucide-truck`    |
+| Section             | Color Class         | Icon                 |
+| ------------------- | ------------------- | -------------------- |
+| Basic Information   | `bg-sky-500/10`     | `i-lucide-file-text` |
+| Contact Information | `bg-emerald-500/10` | `i-lucide-user`      |
+| Line Items          | `bg-amber-500/10`   | `i-lucide-list`      |
+| Delivery Details    | `bg-purple-500/10`  | `i-lucide-truck`     |
 
 ### Sticky Footer
 

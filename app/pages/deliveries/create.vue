@@ -661,6 +661,7 @@ import type { OpenPO } from "~/composables/usePOs";
 
 // Composables
 const router = useRouter();
+const route = useRoute();
 const locationStore = useLocationStore();
 const periodStore = usePeriodStore();
 const toast = useAppToast();
@@ -1264,6 +1265,18 @@ onMounted(async () => {
     await Promise.all([fetchSuppliers(), fetchItems(), fetchPeriodPrices()]);
   } finally {
     loadingInitialData.value = false;
+  }
+
+  // Check for po_id query parameter and pre-select the PO
+  const poIdFromQuery = route.query.po_id as string | undefined;
+  if (poIdFromQuery) {
+    // Wait for next tick to ensure openPOs are loaded
+    await nextTick();
+    // Verify the PO exists in the open POs list
+    const poExists = openPOs.value.some((po) => po.id === poIdFromQuery);
+    if (poExists) {
+      formData.value.po_id = poIdFromQuery;
+    }
   }
 
   // Don't add an initial empty line - wait for PO selection

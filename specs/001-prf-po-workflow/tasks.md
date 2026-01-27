@@ -1080,6 +1080,83 @@ Total (After VAT) = Line Value + VAT Amount
 
 ---
 
+## Phase 15: Bug Fixes - Routing Issues (2026-01-27)
+
+**Purpose**: Fix incorrect route paths causing 404 errors
+
+### BF007 - Create Delivery Button 404 Error (2026-01-27)
+
+**Issue**: When clicking the "Create Delivery" button on the PO details page, the navigation resulted in a "404 Page Not Found" error.
+
+**Root Cause**: The `goToCreateDelivery()` function in `app/pages/orders/pos/[id].vue` was navigating to the incorrect path `/transactions/deliveries/create` instead of the correct Nuxt 4 route `/deliveries/create`. Additionally, the "Linked Deliveries" section was using the incorrect path `/transactions/deliveries/${delivery.id}` for viewing individual deliveries.
+
+**Fixes Applied**:
+
+- [x] BF007a Update `goToCreateDelivery()` function to navigate to `/deliveries/create?po_id=${poId.value}` (line 304)
+- [x] BF007b Update linked delivery view button route from `/transactions/deliveries/${delivery.id}` to `/deliveries/${delivery.id}` (line 929)
+
+**Files Changed**:
+
+- `app/pages/orders/pos/[id].vue` - Fixed both routing issues
+
+**Verification**: Tested with Playwright on localhost:3000:
+
+1. Logged in as admin user
+2. Navigated to Orders → Purchase Orders tab
+3. Clicked on PO "PO-ALULA-27-Jan-2026-01"
+4. Clicked "Create Delivery" button
+5. Verified correct navigation to `/deliveries/create?po_id=130b0f71-e5a7-4ae8-80fe-726eae0d62f9`
+6. Verified delivery form loaded correctly with PO pre-selected
+7. Verified supplier auto-populated and line items pre-filled from PO
+
+**Checkpoint**: BF007 complete - Create Delivery button now navigates correctly ✅
+
+---
+
+### UX001 - Auto-Select PO on Delivery Create Page (2026-01-27)
+
+**Feature**: When users navigate to the delivery create page from a PO detail page (via the "Create Delivery" button), automatically pre-select the PO and populate the form.
+
+**Business Value**: Improves user experience by eliminating the need to manually re-select the PO that the user just came from, reducing clicks and potential errors.
+
+**Implementation**:
+
+- [x] UX001a Add `useRoute()` composable to access query parameters (line 664)
+- [x] UX001b Update `onMounted()` to check for `po_id` query parameter
+- [x] UX001c Verify PO exists in the open POs list before auto-selecting
+- [x] UX001d Set `formData.value.po_id` to trigger existing form population logic
+
+**Files Changed**:
+
+- `app/pages/deliveries/create.vue` - Added auto-selection logic in onMounted hook
+
+**How It Works**:
+
+1. User clicks "Create Delivery" button on PO detail page (e.g., `/orders/pos/[id]`)
+2. Navigation occurs to `/deliveries/create?po_id=130b0f71-e5a7-4ae8-80fe-726eae0d62f9`
+3. Page loads and checks for `po_id` query parameter in `onMounted()`
+4. If `po_id` exists and matches an open PO, it's automatically selected
+5. The existing `watch()` on `formData.value.po_id` triggers and populates:
+   - Supplier information
+   - Line items with remaining quantities
+   - Price variance calculations
+   - Over-delivery detection
+
+**Verification**: Tested with Playwright on localhost:3000:
+
+1. Navigated to PO "PO-ALULA-27-Jan-2026-01" detail page
+2. Clicked "Create Delivery" button
+3. Verified page loaded with `?po_id=130b0f71-e5a7-4ae8-80fe-726eae0d62f9` in URL
+4. Verified PO dropdown shows "PO-ALULA-27-Jan-2026-01" (pre-selected)
+5. Verified supplier auto-populated: "Delivered (1)"
+6. Verified line items pre-filled: "Basmati Rice" - qty 12, price SAR 15.00
+7. Verified total calculated: SAR 180.00
+8. Verified "Save Draft" button enabled (form ready to use)
+
+**Checkpoint**: UX001 complete - PO auto-selection provides seamless workflow ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

@@ -480,10 +480,7 @@ function removeLine(id: string) {
         <tfoot class="bg-[var(--ui-bg-elevated)] border-t-2 border-[var(--ui-border)]">
           <!-- Subtotal Before Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td
-              :colspan="showDeliveryTracking && readonly ? 6 : 4"
-              class="px-4 py-2.5"
-            ></td>
+            <td :colspan="showDeliveryTracking && readonly ? 6 : 4" class="px-4 py-2.5"></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
             <td
@@ -499,13 +496,12 @@ function removeLine(id: string) {
 
           <!-- Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td
-              :colspan="showDeliveryTracking && readonly ? 6 : 4"
-              class="px-4 py-2.5"
-            ></td>
+            <td :colspan="showDeliveryTracking && readonly ? 6 : 4" class="px-4 py-2.5"></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
-            <td class="px-4 py-2.5 text-right font-semibold text-error hidden lg:table-cell whitespace-nowrap">
+            <td
+              class="px-4 py-2.5 text-right font-semibold text-error hidden lg:table-cell whitespace-nowrap"
+            >
               Discount:
             </td>
             <td class="px-4 py-2.5 text-right font-medium text-error">
@@ -516,10 +512,7 @@ function removeLine(id: string) {
 
           <!-- After Discount / Before VAT -->
           <tr class="text-sm">
-            <td
-              :colspan="showDeliveryTracking && readonly ? 6 : 4"
-              class="px-4 py-2.5"
-            ></td>
+            <td :colspan="showDeliveryTracking && readonly ? 6 : 4" class="px-4 py-2.5"></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
             <td
@@ -535,10 +528,7 @@ function removeLine(id: string) {
 
           <!-- VAT -->
           <tr class="text-sm">
-            <td
-              :colspan="showDeliveryTracking && readonly ? 6 : 4"
-              class="px-4 py-2.5"
-            ></td>
+            <td :colspan="showDeliveryTracking && readonly ? 6 : 4" class="px-4 py-2.5"></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
             <td
@@ -554,10 +544,7 @@ function removeLine(id: string) {
 
           <!-- Grand Total -->
           <tr class="border-t-2 border-[var(--ui-border)] bg-[var(--ui-bg-muted)]">
-            <td
-              :colspan="showDeliveryTracking && readonly ? 6 : 4"
-              class="px-4 py-4"
-            ></td>
+            <td :colspan="showDeliveryTracking && readonly ? 6 : 4" class="px-4 py-4"></td>
             <td v-if="showDiscounts" class="px-4 py-4 hidden lg:table-cell"></td>
             <td class="px-4 py-4 hidden md:table-cell"></td>
             <td class="px-4 py-4 text-right hidden lg:table-cell whitespace-nowrap">
@@ -566,7 +553,9 @@ function removeLine(id: string) {
               </span>
             </td>
             <td class="px-4 py-4 text-right">
-              <span class="lg:hidden text-sm font-semibold text-[var(--ui-text-muted)] mr-2 whitespace-nowrap">
+              <span
+                class="lg:hidden text-sm font-semibold text-[var(--ui-text-muted)] mr-2 whitespace-nowrap"
+              >
                 {{ lines.length }} item(s) - Total:
               </span>
               <span class="text-xl font-bold text-primary">

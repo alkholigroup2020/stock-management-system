@@ -301,7 +301,7 @@ function goBack() {
 
 // Go to create delivery
 function goToCreateDelivery() {
-  router.push(`/transactions/deliveries/create?po_id=${poId.value}`);
+  router.push(`/deliveries/create?po_id=${poId.value}`);
 }
 
 // Watch for PO load
@@ -926,7 +926,7 @@ onMounted(async () => {
                   variant="ghost"
                   size="sm"
                   class="cursor-pointer"
-                  :to="`/transactions/deliveries/${delivery.id}`"
+                  :to="`/deliveries/${delivery.id}`"
                 />
               </div>
             </div>
