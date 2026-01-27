@@ -480,11 +480,14 @@ function removeLine(id: string) {
         <tfoot class="bg-[var(--ui-bg-elevated)] border-t-2 border-[var(--ui-border)]">
           <!-- Subtotal Before Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td colspan="4" class="px-4 py-2.5"></td>
+            <td
+              :colspan="showDeliveryTracking && readonly ? 6 : 4"
+              class="px-4 py-2.5"
+            ></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
             <td
-              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell whitespace-nowrap"
             >
               Subtotal:
             </td>
@@ -496,10 +499,13 @@ function removeLine(id: string) {
 
           <!-- Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td colspan="4" class="px-4 py-2.5"></td>
+            <td
+              :colspan="showDeliveryTracking && readonly ? 6 : 4"
+              class="px-4 py-2.5"
+            ></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
-            <td class="px-4 py-2.5 text-right font-semibold text-error hidden lg:table-cell">
+            <td class="px-4 py-2.5 text-right font-semibold text-error hidden lg:table-cell whitespace-nowrap">
               Discount:
             </td>
             <td class="px-4 py-2.5 text-right font-medium text-error">
@@ -510,11 +516,14 @@ function removeLine(id: string) {
 
           <!-- After Discount / Before VAT -->
           <tr class="text-sm">
-            <td colspan="4" class="px-4 py-2.5"></td>
+            <td
+              :colspan="showDeliveryTracking && readonly ? 6 : 4"
+              class="px-4 py-2.5"
+            ></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
             <td
-              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell whitespace-nowrap"
             >
               Before VAT:
             </td>
@@ -526,11 +535,14 @@ function removeLine(id: string) {
 
           <!-- VAT -->
           <tr class="text-sm">
-            <td colspan="4" class="px-4 py-2.5"></td>
+            <td
+              :colspan="showDeliveryTracking && readonly ? 6 : 4"
+              class="px-4 py-2.5"
+            ></td>
             <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
             <td class="px-4 py-2.5 hidden md:table-cell"></td>
             <td
-              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell whitespace-nowrap"
             >
               VAT ({{ VAT_RATE }}%):
             </td>
@@ -542,16 +554,19 @@ function removeLine(id: string) {
 
           <!-- Grand Total -->
           <tr class="border-t-2 border-[var(--ui-border)] bg-[var(--ui-bg-muted)]">
-            <td colspan="4" class="px-4 py-4"></td>
+            <td
+              :colspan="showDeliveryTracking && readonly ? 6 : 4"
+              class="px-4 py-4"
+            ></td>
             <td v-if="showDiscounts" class="px-4 py-4 hidden lg:table-cell"></td>
             <td class="px-4 py-4 hidden md:table-cell"></td>
-            <td class="px-4 py-4 text-right hidden lg:table-cell">
+            <td class="px-4 py-4 text-right hidden lg:table-cell whitespace-nowrap">
               <span class="text-base font-bold text-[var(--ui-text)]">
                 {{ lines.length }} item(s) - Total:
               </span>
             </td>
             <td class="px-4 py-4 text-right">
-              <span class="lg:hidden text-sm font-semibold text-[var(--ui-text-muted)] mr-2">
+              <span class="lg:hidden text-sm font-semibold text-[var(--ui-text-muted)] mr-2 whitespace-nowrap">
                 {{ lines.length }} item(s) - Total:
               </span>
               <span class="text-xl font-bold text-primary">

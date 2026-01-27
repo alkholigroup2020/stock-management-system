@@ -744,7 +744,7 @@ const navigateToLocation = (locationId: string) => {
             <!-- Totals Row -->
             <tfoot>
               <tr class="bg-[var(--ui-bg-muted)]">
-                <td class="py-3 px-4 font-semibold text-[var(--ui-text)]" colspan="2">
+                <td class="py-3 px-4 font-semibold text-[var(--ui-text)] whitespace-nowrap" colspan="2">
                   Total ({{ consolidatedData.location_breakdown.length }} locations)
                 </td>
                 <td class="py-3 px-4 text-right font-bold text-[var(--ui-text)]">

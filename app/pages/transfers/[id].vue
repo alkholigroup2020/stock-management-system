@@ -446,7 +446,7 @@ onMounted(async () => {
             <!-- Summary Row -->
             <tfoot class="border-t-2 border-[var(--ui-border)] bg-[var(--ui-bg-muted)]">
               <tr>
-                <td colspan="3" class="px-4 py-3 text-body font-semibold">Total</td>
+                <td colspan="3" class="px-4 py-3 text-body font-semibold whitespace-nowrap">Total</td>
                 <td class="whitespace-nowrap px-4 py-3 text-right text-body font-semibold">
                   {{
                     transfer.lines.reduce((sum, line) => sum + Number(line.quantity), 0).toFixed(4)

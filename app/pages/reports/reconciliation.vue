@@ -648,7 +648,7 @@ onMounted(async () => {
             </tbody>
             <tfoot class="bg-[var(--ui-bg-elevated)] font-semibold">
               <tr>
-                <td class="px-4 py-3">TOTAL</td>
+                <td class="px-4 py-3 whitespace-nowrap">TOTAL</td>
                 <td class="px-4 py-3 text-right font-mono">
                   {{ reportData ? formatCurrency(reportData.grand_totals.opening_stock) : "" }}
                 </td>

@@ -452,7 +452,7 @@ function removeLine(id: string) {
               <td colspan="4" class="px-4 py-3"></td>
               <td class="px-4 py-3 hidden md:table-cell"></td>
               <td
-                class="px-4 py-3 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+                class="px-4 py-3 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell whitespace-nowrap"
               >
                 Subtotal:
               </td>
@@ -469,7 +469,7 @@ function removeLine(id: string) {
               <td colspan="4" class="px-4 py-3"></td>
               <td class="px-4 py-3 hidden md:table-cell"></td>
               <td
-                class="px-4 py-3 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+                class="px-4 py-3 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell whitespace-nowrap"
               >
                 VAT ({{ VAT_RATE }}%):
               </td>
@@ -485,7 +485,7 @@ function removeLine(id: string) {
             <tr class="border-t-2 border-[var(--ui-border)]">
               <td colspan="4" class="px-4 py-4"></td>
               <td class="px-4 py-4 hidden md:table-cell"></td>
-              <td class="px-4 py-4 text-right hidden lg:table-cell">
+              <td class="px-4 py-4 text-right hidden lg:table-cell whitespace-nowrap">
                 <div class="flex flex-col items-end gap-1">
                   <span
                     class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-bold"
@@ -500,7 +500,7 @@ function removeLine(id: string) {
               <td class="px-4 py-4 text-right">
                 <div class="flex flex-col items-end gap-1">
                   <span
-                    class="lg:hidden text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-bold"
+                    class="lg:hidden text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-bold whitespace-nowrap"
                   >
                     Grand Total ({{ lines.length }} item{{ lines.length !== 1 ? "s" : "" }})
                   </span>

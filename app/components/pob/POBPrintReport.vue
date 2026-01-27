@@ -97,7 +97,7 @@ const signatureBlocks = [
       </tbody>
       <tfoot>
         <tr class="border-t-2 border-black font-bold">
-          <td class="py-2">TOTAL</td>
+          <td class="py-2 whitespace-nowrap">TOTAL</td>
           <td class="py-2 text-center">{{ summary.total_crew_count.toLocaleString() }}</td>
           <td class="py-2 text-center">{{ summary.total_extra_count.toLocaleString() }}</td>
           <td class="py-2 text-center">{{ summary.total_mandays.toLocaleString() }}</td>
