@@ -3,7 +3,7 @@
  * PO Create Page
  *
  * Page for creating a new Purchase Order (PO).
- * Supports creating PO from approved PRF or as a standalone PO.
+ * A PO must be created from an approved PRF (1:1 relationship per spec).
  * Can be navigated with query params: ?prf_id=xxx for pre-population from PRF.
  */
 
@@ -93,8 +93,17 @@ const selectedPRF = ref<{
   }>;
 } | null>(null);
 
+// Check if there are approved PRFs available to create a PO from
+const hasAvailablePRFs = computed(() => approvedPRFs.value.length > 0);
+
+// Check if PRF is pre-selected via query param
+const hasPRFFromQuery = computed(() => !!route.query.prf_id);
+
 // Form validation
 const isFormValid = computed(() => {
+  // Must have PRF selected (mandatory per spec - PO requires approved PRF)
+  if (!formData.value.prf_id) return false;
+
   // Must have supplier
   if (!formData.value.supplier_id) return false;
 
@@ -427,6 +436,34 @@ onMounted(async () => {
       </div>
     </div>
 
+    <!-- No Approved PRFs Available Alert -->
+    <template v-else-if="!hasAvailablePRFs && !hasPRFFromQuery">
+      <UCard class="card-elevated">
+        <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
+          <div
+            class="flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4"
+          >
+            <UIcon name="i-lucide-file-x" class="w-8 h-8 text-amber-600 dark:text-amber-400" />
+          </div>
+          <h3 class="text-lg font-semibold text-[var(--ui-text)] mb-2">
+            No Approved PRFs Available
+          </h3>
+          <p class="text-sm text-[var(--ui-text-muted)] max-w-md mb-6">
+            You must have an approved Purchase Requisition Form (PRF) to create a Purchase Order.
+            Please create and get a PRF approved first.
+          </p>
+          <UButton
+            color="primary"
+            icon="i-lucide-arrow-left"
+            class="cursor-pointer"
+            @click="cancel"
+          >
+            Back to Orders
+          </UButton>
+        </div>
+      </UCard>
+    </template>
+
     <!-- Main Form -->
     <template v-else>
       <OrdersPOForm
@@ -437,7 +474,7 @@ onMounted(async () => {
         :prf-options="approvedPRFs"
         :disabled="saving"
         :loading="loadingInitialData"
-        :show-prf-select="!route.query.prf_id"
+        :show-prf-select="!hasPRFFromQuery"
         @prf-selected="handlePrfSelected"
       />
 

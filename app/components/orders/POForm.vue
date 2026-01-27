@@ -187,18 +187,20 @@ function handleLineChange() {
 
         <!-- Source PRF and Supplier Selection -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <!-- Source PRF (optional) -->
-          <div v-if="showPrfSelect && prfOptions.length > 0">
-            <label class="form-label mb-2 block">Source PRF</label>
+          <!-- Source PRF (required) -->
+          <div v-if="showPrfSelect">
+            <label class="form-label mb-2 block">
+              Source PRF
+              <span class="text-[var(--ui-error)]">*</span>
+            </label>
             <USelectMenu
               :model-value="formData.prf_id ?? undefined"
               :items="prfOptions"
               label-key="prf_no"
               value-key="id"
-              placeholder="Select source PRF (optional)"
+              placeholder="Select source PRF"
               searchable
-              clearable
-              :disabled="disabled || readonly"
+              :disabled="disabled || readonly || prfOptions.length === 0"
               size="lg"
               class="w-full"
               @update:model-value="
@@ -219,11 +221,17 @@ function handleLineChange() {
                   </span>
                 </div>
               </template>
+              <template #empty>
+                <div class="p-3 text-center text-[var(--ui-text-muted)]">
+                  <UIcon name="i-lucide-file-x" class="w-5 h-5 mx-auto mb-1" />
+                  <p class="text-sm">No approved PRFs available</p>
+                </div>
+              </template>
             </USelectMenu>
           </div>
 
           <!-- Supplier -->
-          <div :class="{ 'md:col-span-2': !showPrfSelect || prfOptions.length === 0 }">
+          <div :class="{ 'md:col-span-2': !showPrfSelect }">
             <label class="form-label mb-2 block">
               Supplier
               <span class="text-[var(--ui-error)]">*</span>
