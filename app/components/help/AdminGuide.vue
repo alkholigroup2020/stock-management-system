@@ -87,20 +87,27 @@ watch(
             <li>
               <strong>Operator:</strong>
               Front-line staff who handle day-to-day operations. They can post deliveries, record
-              issues, and enter POB counts at their assigned locations only. They cannot approve
-              transfers or access administrative functions.
+              issues, enter POB counts, and create PRFs at their assigned locations only. They
+              cannot approve transfers or access administrative functions.
             </li>
             <li>
               <strong>Supervisor:</strong>
               Oversight role with approval authority. Supervisors can approve or reject transfer
-              requests, manage reconciliations, create manual NCRs, and access all locations. They
-              cannot manage system settings or close periods.
+              requests, approve PRFs and over-deliveries, close POs, manage reconciliations, create
+              manual NCRs, and access all locations. They cannot manage system settings or close
+              periods.
             </li>
             <li>
               <strong>Admin:</strong>
               Full system control. Admins can do everything Supervisors can, plus manage users,
               locations, items, suppliers, set period prices, and execute period close. Use this
               role sparingly.
+            </li>
+            <li>
+              <strong>Procurement Specialist:</strong>
+              Specialized role for purchase order management. Can view approved PRFs from all
+              locations and create/edit Purchase Orders. Cannot close POs, create deliveries, or
+              access other system functions. This role is focused solely on procurement activities.
             </li>
           </ul>
         </div>

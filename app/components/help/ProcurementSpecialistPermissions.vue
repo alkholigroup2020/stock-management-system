@@ -1,12 +1,14 @@
 <script setup lang="ts">
-// Supervisor Permissions - Responsibilities and permissions for Supervisor role
+// Procurement Specialist Permissions - Responsibilities and permissions for Procurement Specialist role
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Header -->
     <div class="pb-4 border-b border-[var(--ui-border)]">
-      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Supervisor Role</h2>
+      <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">
+        Procurement Specialist Role
+      </h2>
       <p class="text-sm text-[var(--ui-text-muted)] mt-1">
         Your responsibilities and system permissions
       </p>
@@ -15,29 +17,29 @@
     <!-- Your Responsibilities Section -->
     <section class="p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
       <h3 class="font-semibold text-[var(--ui-text-highlighted)] mb-3 flex items-center gap-2">
-        <UIcon name="i-heroicons-clipboard-document-check" class="text-[var(--ui-primary)]" />
+        <UIcon name="i-heroicons-shopping-cart" class="text-[var(--ui-primary)]" />
         Your Responsibilities
       </h3>
       <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>Approve or reject transfer requests between locations</span>
+          <span>View approved Purchase Requisition Forms (PRFs) from all locations</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>Manage period-end reconciliations for each location</span>
+          <span>Create Purchase Orders (POs) from approved PRFs</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>Create manual NCRs for quality issues</span>
+          <span>Edit Purchase Orders while in OPEN status</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>View consolidated reports across all locations</span>
+          <span>Select suppliers and manage line item details</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>All Operator tasks (deliveries, issues, POB, etc.)</span>
+          <span>Track PO fulfillment status</span>
         </li>
       </ul>
     </section>
@@ -66,73 +68,13 @@
           </thead>
           <tbody class="divide-y divide-[var(--ui-border)]">
             <tr>
-              <td class="p-3 text-[var(--ui-text)]">Dashboard (view)</td>
+              <td class="p-3 text-[var(--ui-text)]">Orders page (view)</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
               </td>
             </tr>
             <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">POB (enter/edit)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">Items (view)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Items (create/edit)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">Deliveries (post)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Issues (post)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">NCR (create/update)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Stock Now (view)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">Reconciliations (view)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Reconciliations (edit)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">Transfer (create request)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Transfer (approve)</td>
+              <td class="p-3 text-[var(--ui-text)]">PRF (view approved)</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
               </td>
@@ -140,11 +82,11 @@
             <tr>
               <td class="p-3 text-[var(--ui-text)]">PRF (create/submit)</td>
               <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
               </td>
             </tr>
             <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">PRF (approve/reject)</td>
+              <td class="p-3 text-[var(--ui-text)]">PO (create/edit)</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
               </td>
@@ -152,35 +94,47 @@
             <tr>
               <td class="p-3 text-[var(--ui-text)]">PO (close)</td>
               <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
               </td>
             </tr>
             <tr class="bg-[var(--ui-bg-elevated)]/50">
-              <td class="p-3 text-[var(--ui-text)]">Over-delivery (approve)</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">Set Period Prices</td>
+              <td class="p-3 text-[var(--ui-text)]">Dashboard (view)</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
               </td>
             </tr>
             <tr>
-              <td class="p-3 text-[var(--ui-text)]">Period Close</td>
+              <td class="p-3 text-[var(--ui-text)]">Deliveries (post)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
+              </td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Issues (post)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
+              </td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Stock Now (view)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
+              </td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Transfers</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
+              </td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Reconciliations</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
               </td>
             </tr>
             <tr class="bg-[var(--ui-bg-elevated)]/50">
               <td class="p-3 text-[var(--ui-text)]">User & Role management</td>
-              <td class="p-3 text-center">
-                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
-              </td>
-            </tr>
-            <tr>
-              <td class="p-3 text-[var(--ui-text)]">Location management</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
               </td>
@@ -210,8 +164,9 @@
           class="shrink-0 mt-0.5 text-[var(--ui-info)]"
         />
         <span>
-          Supervisors have access to all locations. You can view and manage data across the entire
-          system.
+          Procurement Specialists have a focused role limited to the Orders page. You can view
+          approved PRFs from all locations and create Purchase Orders, but cannot access other
+          system functions like deliveries, stock management, or administrative features.
         </span>
       </p>
     </section>

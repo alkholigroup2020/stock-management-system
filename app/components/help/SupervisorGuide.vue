@@ -54,6 +54,384 @@ watch(
       </p>
     </div>
 
+    <!-- PRF Approval Section -->
+    <section
+      id="supervisor-section-prf-approval"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('prf-approval')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-document-check" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">PRF Approval</span>
+        </span>
+        <UIcon
+          :name="isExpanded('prf-approval') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('prf-approval')" class="p-4 space-y-4">
+        <!-- Section Introduction -->
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          Purchase Requisition Forms (PRFs) submitted by Operators require Supervisor approval
+          before they can be converted to Purchase Orders. This ensures proper budget control and
+          verification of procurement needs. As a Supervisor, you review PRF details and either
+          approve or reject with a reason.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Status Workflow</h4>
+          <div class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)] flex-wrap mb-2">
+            <UBadge color="neutral" variant="subtle">DRAFT</UBadge>
+            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
+            <UBadge color="warning" variant="subtle">PENDING</UBadge>
+            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
+            <UBadge color="success" variant="subtle">APPROVED</UBadge>
+            <span>or</span>
+            <UBadge color="error" variant="subtle">REJECTED</UBadge>
+          </div>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            You review PRFs with PENDING status. Your decision moves them to APPROVED or REJECTED.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Viewing Pending PRFs</h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Orders</strong>
+              in the left menu
+            </li>
+            <li>Navigate to the PRFs tab</li>
+            <li>Filter by status PENDING to see PRFs awaiting approval</li>
+            <li>Click on a PRF to view details</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Reviewing PRF Details</h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            When reviewing a PRF, check the following:
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-user" class="text-[var(--ui-text-dimmed)]" />
+              <span>
+                <strong>Requester:</strong>
+                Who submitted the request
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-map-pin" class="text-[var(--ui-text-dimmed)]" />
+              <span>
+                <strong>Location:</strong>
+                Which location needs the items
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-tag" class="text-[var(--ui-text-dimmed)]" />
+              <span>
+                <strong>Type:</strong>
+                URGENT, DPA, or NORMAL
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-queue-list" class="text-[var(--ui-text-dimmed)]" />
+              <span>
+                <strong>Line Items:</strong>
+                Items requested with quantities and estimated prices
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-currency-dollar" class="text-[var(--ui-text-dimmed)]" />
+              <span>
+                <strong>Total Value:</strong>
+                Estimated cost including VAT (15%)
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Approving a PRF</h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>Open the PRF detail view</li>
+            <li>Review all items and justification</li>
+            <li>
+              Click
+              <strong>Approve</strong>
+            </li>
+            <li>PRF status changes to APPROVED</li>
+            <li>Email notification sent to Procurement Specialists</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Rejecting a PRF</h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>Open the PRF detail view</li>
+            <li>
+              Click
+              <strong>Reject</strong>
+            </li>
+            <li>
+              Enter a
+              <strong>rejection reason</strong>
+              (required)
+            </li>
+            <li>PRF status changes to REJECTED</li>
+            <li>Requester is notified and can clone the PRF to resubmit</li>
+          </ol>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              When you approve a PRF, an email notification is automatically sent to Procurement
+              Specialists alerting them that a new PRF is ready for PO creation.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Over-Delivery Approval Section -->
+    <section
+      id="supervisor-section-over-delivery"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('over-delivery')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-scale" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Over-Delivery Approval</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('over-delivery') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('over-delivery')" class="p-4 space-y-4">
+        <!-- Section Introduction -->
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          Over-delivery occurs when an Operator records a delivery quantity that exceeds the
+          remaining quantity on the linked Purchase Order. The system flags these deliveries for
+          Supervisor approval to ensure proper oversight of quantities received beyond what was
+          ordered.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            What Triggers Over-Delivery Approval
+          </h4>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-exclamation-triangle" class="text-[var(--ui-warning)]" />
+              <span>Delivery quantity > PO remaining quantity for any line item</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-clock" class="text-[var(--ui-warning)]" />
+              <span>Delivery status automatically set to PENDING_APPROVAL</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-lock-closed" class="text-[var(--ui-text-muted)]" />
+              <span>Delivery cannot be posted until approved</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Reviewing Pending Over-Deliveries
+          </h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Deliveries</strong>
+              in the left menu
+            </li>
+            <li>Filter by status PENDING_APPROVAL</li>
+            <li>Click on a delivery to view details</li>
+            <li>Over-delivery items are highlighted with the excess quantity shown</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Approving Over-Delivery
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Approve when the over-delivery is legitimate (e.g., supplier sent extra, rounding
+            differences, or intentional order increase):
+          </p>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>Review the over-delivery items and quantities</li>
+            <li>Verify the reason is acceptable</li>
+            <li>
+              Click
+              <strong>Approve</strong>
+            </li>
+            <li>Delivery is posted and stock is updated</li>
+            <li>Email notification sent to the delivery creator</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Rejecting Over-Delivery
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Reject when the over-delivery is not acceptable:
+          </p>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Reject</strong>
+            </li>
+            <li>
+              Enter a
+              <strong>rejection reason</strong>
+              (required)
+            </li>
+            <li>Delivery is permanently locked and cannot be posted</li>
+            <li>Operator must create a new delivery with corrected quantities</li>
+            <li>Email notification sent to the delivery creator</li>
+          </ol>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-error)]/30">
+          <p class="text-sm text-[var(--ui-error)] flex items-start gap-2">
+            <UIcon name="i-heroicons-exclamation-circle" class="shrink-0 mt-0.5" />
+            <span>
+              <strong>Important:</strong>
+              Rejecting an over-delivery is permanent. The delivery cannot be recovered or edited.
+              The Operator will need to create a new delivery with the correct quantities.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PO Management Section -->
+    <section
+      id="supervisor-section-po-management"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('po-management')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-clipboard-document-list" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">PO Management</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('po-management') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('po-management')" class="p-4 space-y-4">
+        <!-- Section Introduction -->
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          Purchase Orders (POs) are created by Procurement Specialists from approved PRFs. As a
+          Supervisor, you can view POs, track their fulfillment status, and close POs when needed.
+          This section covers PO oversight and closure responsibilities.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Viewing POs</h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Orders</strong>
+              in the left menu
+            </li>
+            <li>Navigate to the POs tab</li>
+            <li>View all POs with their status (OPEN or CLOSED)</li>
+            <li>Click on a PO to view details including line items and delivery history</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Understanding Fulfillment Status
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Each PO line item shows fulfillment progress:
+          </p>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Ordered:</strong>
+              Original quantity on the PO
+            </li>
+            <li>
+              <strong>Delivered:</strong>
+              Total quantity received across all deliveries
+            </li>
+            <li>
+              <strong>Remaining:</strong>
+              Ordered minus Delivered (what's still expected)
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Auto-Closure</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            POs are automatically closed when all line items are fully delivered (Remaining = 0
+            for all lines). No manual action is required for fully fulfilled POs.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Manual PO Closure</h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Sometimes you need to close a PO before all items are delivered (e.g., cancelled items,
+            supplier issues, or order changes). Only Supervisors and Admins can manually close POs.
+          </p>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>Open the PO detail view</li>
+            <li>
+              Click
+              <strong>Close PO</strong>
+            </li>
+            <li>A warning modal shows any unfulfilled line items</li>
+            <li>
+              Enter a
+              <strong>closure reason</strong>
+              (required when items are unfulfilled)
+            </li>
+            <li>Confirm closure</li>
+            <li>PO status changes to CLOSED and cannot be reopened</li>
+          </ol>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30">
+          <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
+            <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
+            <span>
+              <strong>Warning:</strong>
+              Closing a PO is permanent. Once closed, the PO cannot be reopened or have additional
+              deliveries recorded against it. Any remaining unfulfilled items will not be tracked.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- Transfer Management Section -->
     <section
       id="supervisor-section-transfers"

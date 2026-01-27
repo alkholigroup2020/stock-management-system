@@ -138,6 +138,30 @@
               </td>
             </tr>
             <tr>
+              <td class="p-3 text-[var(--ui-text)]">PRF (create/submit)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
+              </td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">PRF (approve/reject)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
+              </td>
+            </tr>
+            <tr>
+              <td class="p-3 text-[var(--ui-text)]">Orders page (view)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
+              </td>
+            </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">PO (create/edit)</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />
+              </td>
+            </tr>
+            <tr>
               <td class="p-3 text-[var(--ui-text)]">Set Period Prices</td>
               <td class="p-3 text-center">
                 <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)] text-lg" />

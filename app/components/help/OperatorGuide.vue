@@ -121,9 +121,15 @@ watch(
               button
             </li>
             <li>
-              Select the
+              <strong>Select a Purchase Order (PO)</strong>
+              - this is required. The PO determines the supplier and expected items.
+            </li>
+            <li>
+              The
               <strong>Supplier</strong>
-              from the dropdown
+              and
+              <strong>Line Items</strong>
+              are auto-populated from the selected PO
             </li>
             <li>
               Enter the
@@ -135,13 +141,77 @@ watch(
               <strong>Delivery Date</strong>
               (when goods were received)
             </li>
-            <li>Add line items: select item, enter quantity received, enter unit price</li>
+            <li>
+              Enter quantities received - the
+              <strong>Remaining</strong>
+              quantities from the PO are pre-filled
+            </li>
             <li>
               Review totals and click
               <strong>Post Delivery</strong>
               to finalize
             </li>
           </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Selecting a Purchase Order
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            Every delivery must be linked to a Purchase Order. When you select a PO:
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)] mt-2">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Supplier is automatically set from the PO</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Line items are pre-populated with PO items</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Remaining quantities show how much is still expected</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>System tracks fulfillment against the PO</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Over-Delivery Detection</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            If you enter a quantity that exceeds the remaining quantity on the PO, the system
+            detects this as an over-delivery:
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)] mt-2">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-exclamation-triangle" class="text-[var(--ui-warning)]" />
+              <span>Over-delivery items are flagged in the delivery</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-clock" class="text-[var(--ui-warning)]" />
+              <span>Delivery status changes to PENDING_APPROVAL</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-user-circle" class="text-[var(--ui-info)]" />
+              <span>A Supervisor must approve or reject the over-delivery</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30 mb-4">
+          <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
+            <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
+            <span>
+              <strong>Over-Delivery Rejection:</strong>
+              If a Supervisor rejects the over-delivery, the delivery is permanently locked and
+              cannot be posted. You will need to create a new delivery with corrected quantities.
+            </span>
+          </p>
         </div>
 
         <div>
@@ -400,6 +470,194 @@ watch(
             <span>
               The import preview shows exactly what will happen. Take time to review it carefully
               before clicking Import Items. Once imported, changes are permanent.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRF Section -->
+    <section
+      id="operator-section-prf"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('prf')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-document-text" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            PRF (Purchase Requisitions)
+          </span>
+        </span>
+        <UIcon
+          :name="isExpanded('prf') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('prf')" class="p-4 space-y-4">
+        <!-- Section Introduction -->
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          A Purchase Requisition Form (PRF) is the formal request to purchase materials, supplies,
+          or services. PRFs must be approved by a Supervisor before a Purchase Order can be created.
+          This ensures proper oversight and budget control over all procurement activities.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Types</h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>URGENT:</strong>
+              High-priority requests requiring immediate attention. Use for critical shortages or
+              time-sensitive needs.
+            </li>
+            <li>
+              <strong>DPA (Direct Purchase Authorization):</strong>
+              Pre-approved purchases, often with designated suppliers. May have streamlined approval.
+            </li>
+            <li>
+              <strong>NORMAL:</strong>
+              Standard requests following the regular approval workflow.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Categories</h4>
+          <div class="flex flex-wrap gap-2 mb-2">
+            <UBadge color="neutral" variant="subtle">MATERIAL</UBadge>
+            <UBadge color="neutral" variant="subtle">CONSUMABLES</UBadge>
+            <UBadge color="neutral" variant="subtle">SPARE_PARTS</UBadge>
+            <UBadge color="neutral" variant="subtle">ASSET</UBadge>
+            <UBadge color="neutral" variant="subtle">SERVICES</UBadge>
+          </div>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            Select the category that best matches your request. This helps with reporting and budget
+            tracking.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Creating a New PRF</h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Orders</strong>
+              in the left menu
+            </li>
+            <li>
+              Click the
+              <strong>New PRF</strong>
+              button
+            </li>
+            <li>
+              Select
+              <strong>Type</strong>
+              (URGENT, DPA, or NORMAL)
+            </li>
+            <li>
+              Select
+              <strong>Category</strong>
+            </li>
+            <li>Add line items - either select an item from the system or enter a custom description</li>
+            <li>Enter quantity and estimated unit price for each item</li>
+            <li>Add notes or justification for the request</li>
+            <li>
+              Click
+              <strong>Save as Draft</strong>
+              to save for later, or
+              <strong>Submit</strong>
+              for approval
+            </li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Line Item Types</h4>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Item Reference:</strong>
+              Select an existing item from the item master. The item code and name are linked, making
+              it easier to track deliveries against stock.
+            </li>
+            <li>
+              <strong>Custom Description:</strong>
+              For one-off purchases or services not in the item master. Enter a free-text description
+              of what you need.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">VAT Display</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            The PRF displays VAT at 15% for your reference. The subtotal, VAT amount, and grand
+            total are shown so you can see the estimated cost including tax.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Status Flow</h4>
+          <div class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)] flex-wrap mb-2">
+            <UBadge color="neutral" variant="subtle">DRAFT</UBadge>
+            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
+            <UBadge color="warning" variant="subtle">PENDING</UBadge>
+            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
+            <UBadge color="success" variant="subtle">APPROVED</UBadge>
+            <span>or</span>
+            <UBadge color="error" variant="subtle">REJECTED</UBadge>
+          </div>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>DRAFT:</strong>
+              Saved but not submitted. You can edit or delete it.
+            </li>
+            <li>
+              <strong>PENDING:</strong>
+              Submitted and waiting for Supervisor approval.
+            </li>
+            <li>
+              <strong>APPROVED:</strong>
+              Approved by Supervisor. Ready for PO creation by Procurement.
+            </li>
+            <li>
+              <strong>REJECTED:</strong>
+              Rejected by Supervisor. Check the rejection reason.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Numbering</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            PRF numbers are generated automatically in the format:
+            <code class="px-1 py-0.5 rounded bg-[var(--ui-bg)] text-[var(--ui-text)]">
+              PRF-{Location}-{DD}-{Mon}-{YYYY}-{NN}
+            </code>
+          </p>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-1">
+            Example: PRF-Kitchen-15-Jan-2026-01
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Cloning Rejected PRFs</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            If your PRF is rejected, you can clone it to create a new PRF with the same details.
+            Review the rejection reason, make necessary changes, and resubmit for approval.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              Once a PRF is submitted (PENDING status), you cannot edit it. If changes are needed,
+              contact your Supervisor or wait for approval/rejection.
             </span>
           </p>
         </div>
@@ -1111,11 +1369,19 @@ watch(
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+          <span>Check for pending over-delivery approvals</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
           <span>Post any issues for stock used today</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
           <span>Check for low stock items that need reordering</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+          <span>Create PRFs for needed materials</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />

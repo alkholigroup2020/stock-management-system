@@ -12,7 +12,7 @@ const emit = defineEmits<{
 }>();
 
 // Auth for role-based content
-const { isAdmin, isSupervisor, isOperator } = useAuth();
+const { isAdmin, isSupervisor, isOperator, isProcurementSpecialist } = useAuth();
 
 // Sidebar collapsed state - collapsed on mobile by default, visible on desktop
 const sidebarCollapsed = ref(true);
@@ -138,9 +138,75 @@ const searchableContent = computed(() => {
     });
   }
 
+  // Procurement Specialist content - visible only to Procurement Specialists
+  if (isProcurementSpecialist.value) {
+    content.push(
+      {
+        id: "proc-permissions",
+        section: "Procurement Specialist Permissions",
+        sectionId: "procurement-specialist-permissions",
+        targetSection: "",
+        title: "Role & Permissions",
+        content:
+          "Procurement Specialist role responsibilities and system permissions. View approved PRFs, create and edit Purchase Orders. Limited access to Orders page only - cannot access deliveries, stock, or other system functions.",
+        icon: "i-heroicons-shield-check",
+      },
+      {
+        id: "proc-orders-overview",
+        section: "Procurement Guide",
+        sectionId: "procurement-specialist-guide",
+        targetSection: "orders-overview",
+        title: "Orders Overview",
+        content:
+          "Orders page contains PRF and PO tabs. PRF statuses: DRAFT, PENDING, APPROVED, REJECTED. PO statuses: OPEN, CLOSED. Procurement Specialists see only approved PRFs ready for PO creation.",
+        icon: "i-heroicons-shopping-cart",
+      },
+      {
+        id: "proc-viewing-prfs",
+        section: "Procurement Guide",
+        sectionId: "procurement-specialist-guide",
+        targetSection: "viewing-prfs",
+        title: "Viewing Approved PRFs",
+        content:
+          "View approved Purchase Requisition Forms from all locations. Filter by location, type (URGENT, DPA, NORMAL), or category (MATERIAL, CONSUMABLES, SPARE_PARTS, ASSET, SERVICES). PRF number format: PRF-{Location}-{DD}-{Mon}-{YYYY}-{NN}.",
+        icon: "i-heroicons-shopping-cart",
+      },
+      {
+        id: "proc-creating-pos",
+        section: "Procurement Guide",
+        sectionId: "procurement-specialist-guide",
+        targetSection: "creating-pos",
+        title: "Creating Purchase Orders",
+        content:
+          "Create PO from approved PRF. Select supplier, review line items, adjust quantities and prices, save. VAT calculated at 15%. Line items can be item references or custom descriptions. PO number format: PO-{DD}-{Mon}-{YYYY}-{NNN}.",
+        icon: "i-heroicons-shopping-cart",
+      },
+      {
+        id: "proc-editing-pos",
+        section: "Procurement Guide",
+        sectionId: "procurement-specialist-guide",
+        targetSection: "editing-pos",
+        title: "Editing Purchase Orders",
+        content:
+          "Edit POs while in OPEN status. Can modify supplier, quantities, prices, add or remove lines. Cannot edit after PO is closed or has deliveries recorded. Cannot close POs - only Supervisors and Admins can close.",
+        icon: "i-heroicons-shopping-cart",
+      }
+    );
+  }
+
   // Operator Guide content - visible to all roles
   if (isOperator.value || isSupervisor.value || isAdmin.value) {
     content.push(
+      {
+        id: "op-prf",
+        section: "Operator Guide",
+        sectionId: "operator-guide",
+        targetSection: "prf",
+        title: "PRF (Purchase Requisitions)",
+        content:
+          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: MATERIAL, CONSUMABLES, SPARE_PARTS, ASSET, SERVICES. Add line items with item reference or custom description. VAT calculated at 15%. Save as DRAFT or submit for PENDING approval. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone rejected PRFs to create new submissions.",
+        icon: "i-heroicons-clipboard-document-list",
+      },
       {
         id: "op-deliveries",
         section: "Operator Guide",
@@ -148,7 +214,7 @@ const searchableContent = computed(() => {
         targetSection: "deliveries",
         title: "Deliveries",
         content:
-          "Create new delivery by clicking Deliveries menu, then New Delivery. Select supplier, enter a unique invoice number and delivery date. Add line items with item, quantity, and unit price. Post delivery to finalize. Price variance warning if price differs from period price. Save as draft to edit later, post to finalize and update stock.",
+          "Create new delivery by clicking Deliveries menu, then New Delivery. Must select a Purchase Order (PO) to link the delivery. Supplier and line items auto-populate from PO. Enter quantities received - remaining quantities from PO pre-filled. Over-delivery detection triggers PENDING_APPROVAL status for supervisor review. Price variance warning if price differs from period price. Save as draft to edit later, post to finalize and update stock.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -227,6 +293,36 @@ const searchableContent = computed(() => {
   // Supervisor Guide content - visible to Supervisors and Admins
   if (isSupervisor.value || isAdmin.value) {
     content.push(
+      {
+        id: "sup-prf-approval",
+        section: "Supervisor Guide",
+        sectionId: "supervisor-guide",
+        targetSection: "prf-approval",
+        title: "PRF Approval",
+        content:
+          "Review and approve Purchase Requisition Forms from Operators. View pending PRFs in Orders page. Approve to allow PO creation - triggers email notification to procurement specialists. Reject with mandatory reason - requester can clone and resubmit. PRF status workflow: DRAFT, PENDING, APPROVED or REJECTED.",
+        icon: "i-heroicons-clipboard-document-check",
+      },
+      {
+        id: "sup-over-delivery",
+        section: "Supervisor Guide",
+        sectionId: "supervisor-guide",
+        targetSection: "over-delivery",
+        title: "Over-Delivery Approval",
+        content:
+          "Approve or reject deliveries that exceed PO quantities. Over-delivery triggers PENDING_APPROVAL status. Review over-delivery items and quantities. Approve to post delivery and update stock. Reject with mandatory reason - delivery is permanently locked, operator must create new delivery.",
+        icon: "i-heroicons-clipboard-document-check",
+      },
+      {
+        id: "sup-po-management",
+        section: "Supervisor Guide",
+        sectionId: "supervisor-guide",
+        targetSection: "po-management",
+        title: "PO Management",
+        content:
+          "View Purchase Orders in Orders page. Track PO fulfillment status - delivered vs remaining quantities. Manual PO closure available for Supervisors and Admins. Auto-closure when all lines fully delivered. Closing with unfulfilled items requires mandatory reason. Warning modal shows unfulfilled line items.",
+        icon: "i-heroicons-clipboard-document-check",
+      },
       {
         id: "sup-transfers",
         section: "Supervisor Guide",
@@ -451,6 +547,19 @@ const navSections = computed(() => {
         icon: "i-heroicons-clipboard-document-list",
       }
     );
+  } else if (isProcurementSpecialist.value) {
+    sections.push(
+      {
+        id: "procurement-specialist-permissions",
+        label: "Role & Permissions",
+        icon: "i-heroicons-shield-check",
+      },
+      {
+        id: "procurement-specialist-guide",
+        label: "Procurement Guide",
+        icon: "i-heroicons-shopping-cart",
+      }
+    );
   } else if (isOperator.value) {
     sections.push({
       id: "operator-guide",
@@ -469,6 +578,7 @@ const activeSection = ref("getting-started");
 const roleLabel = computed(() => {
   if (isAdmin.value) return "Admin";
   if (isSupervisor.value) return "Supervisor";
+  if (isProcurementSpecialist.value) return "Procurement Specialist";
   return "Operator";
 });
 
@@ -482,9 +592,15 @@ const contentComponents: Record<string, Component> = {
     () => import("~/components/help/SupervisorPermissions.vue")
   ),
   "admin-permissions": defineAsyncComponent(() => import("~/components/help/AdminPermissions.vue")),
+  "procurement-specialist-permissions": defineAsyncComponent(
+    () => import("~/components/help/ProcurementSpecialistPermissions.vue")
+  ),
   "operator-guide": defineAsyncComponent(() => import("~/components/help/OperatorGuide.vue")),
   "supervisor-guide": defineAsyncComponent(() => import("~/components/help/SupervisorGuide.vue")),
   "admin-guide": defineAsyncComponent(() => import("~/components/help/AdminGuide.vue")),
+  "procurement-specialist-guide": defineAsyncComponent(
+    () => import("~/components/help/ProcurementSpecialistGuide.vue")
+  ),
 };
 
 // Get current component
