@@ -63,21 +63,8 @@
       color="warning"
       variant="subtle"
       title="No Open Purchase Orders"
-      description="There are no open POs available. Deliveries require a linked Purchase Order. Please create a PO first."
-    >
-      <template #actions>
-        <UButton
-          color="warning"
-          variant="soft"
-          size="sm"
-          class="cursor-pointer"
-          to="/orders?tab=pos"
-          icon="i-lucide-plus"
-        >
-          Create PO
-        </UButton>
-      </template>
-    </UAlert>
+      description="There are no open POs available. Deliveries require a linked Purchase Order. Please contact a Procurement Specialist to create a PO."
+    />
 
     <!-- Main Form -->
     <div class="space-y-3">
