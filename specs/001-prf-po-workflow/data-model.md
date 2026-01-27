@@ -14,6 +14,7 @@ PRF, PO, and Delivery document numbers follow an enhanced format that includes l
 **Format**: `{Prefix}-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}`
 
 Where:
+
 - `Prefix`: PRF, PO, or DLV
 - `LocationName`: Location name converted to uppercase, spaces replaced with hyphens (e.g., KITCHEN, CENTRAL-STORE)
 - `DD`: Two-digit day (01-31)
@@ -22,12 +23,14 @@ Where:
 - `NN`: Two-digit sequential number per location+date combination (01-99)
 
 **Examples**:
+
 - `PRF-KITCHEN-27-Jan-2026-01` (first PRF for Kitchen on Jan 27, 2026)
 - `PRF-KITCHEN-27-Jan-2026-02` (second PRF for Kitchen on same day)
 - `PO-KITCHEN-27-Jan-2026-01` (PO created from Kitchen PRF)
 - `DLV-STORE-27-Jan-2026-03` (third delivery for Store on Jan 27, 2026)
 
 **Implementation Notes**:
+
 - PO numbers use the PRF's location name (since POs are created from PRFs)
 - Sequential numbers restart daily for each location
 - Existing documents retain their old format (no migration required)

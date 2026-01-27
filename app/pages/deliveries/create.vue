@@ -1,14 +1,57 @@
 <template>
   <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
-    <!-- Page Header -->
-    <div class="flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-truck" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
-        <div>
-          <h1 class="text-xl sm:text-3xl font-bold text-primary">New Delivery</h1>
-          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
-            Record a new delivery from supplier
-          </p>
+    <!-- Enhanced Page Header -->
+    <div
+      class="relative overflow-hidden rounded-lg sm:rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 shadow-sm"
+    >
+      <!-- Subtle Decorative Pattern -->
+      <div
+        class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            var(--ui-text-muted) 1px,
+            transparent 0
+          );
+          background-size: 24px 24px;
+        "
+      />
+
+      <div class="relative flex items-center justify-between gap-3 sm:gap-6">
+        <div class="flex items-center gap-3 sm:gap-5">
+          <!-- Icon with Primary Color Accent -->
+          <div
+            class="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30 shadow-sm"
+          >
+            <UIcon name="i-lucide-package-check" class="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+          </div>
+
+          <!-- Title Section -->
+          <div>
+            <h1 class="text-xl sm:text-3xl lg:text-4xl font-bold text-primary tracking-tight">
+              New Delivery
+            </h1>
+            <p
+              class="hidden sm:block text-sm sm:text-base text-[var(--ui-text-muted)] mt-1 font-medium"
+            >
+              Record a new delivery from supplier
+            </p>
+          </div>
+        </div>
+
+        <!-- Location/Period Indicator -->
+        <div
+          v-if="locationStore.activeLocation"
+          class="hidden lg:flex items-center gap-3 px-4 py-3 bg-[var(--ui-bg-muted)] rounded-xl border border-[var(--ui-border)]"
+        >
+          <div class="text-right">
+            <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+              Location
+            </p>
+            <p class="text-sm font-bold text-[var(--ui-text)]">
+              {{ locationStore.activeLocation.name }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -38,159 +81,153 @@
 
     <!-- Main Form -->
     <div class="space-y-3">
-      <!-- Delivery Header Card -->
-      <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Information</h2>
-
-            <!-- Location Indicator -->
+      <!-- Unified Form Card with Internal Sections -->
+      <UCard class="card-elevated overflow-hidden" :ui="{ body: 'p-0' }">
+        <!-- Delivery Information Section -->
+        <div class="p-4 sm:p-6 bg-gradient-to-br from-[var(--ui-bg)] to-[var(--ui-bg-elevated)]">
+          <div class="flex items-center gap-3 mb-6">
             <div
-              v-if="locationStore.activeLocation"
-              class="flex items-center gap-2 px-3 py-1.5 md:p-3 bg-[var(--ui-bg)] rounded-lg border border-[var(--ui-border)]"
+              class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20"
             >
-              <UIcon
-                :name="getLocationIcon(locationStore.activeLocation.type)"
-                class="w-4 md:w-6 h-4 md:h-6 text-primary flex-shrink-0"
-              />
-              <div class="text-left">
-                <p class="text-sm font-medium text-[var(--ui-text)]">
-                  {{ locationStore.activeLocation.name }}
-                </p>
-                <p class="text-xs text-[var(--ui-text-muted)]">
-                  Delivery will be linked to this location
-                </p>
-              </div>
+              <UIcon name="i-lucide-file-text" class="w-5 h-5 text-primary" />
             </div>
-            <div
-              v-else
-              class="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800"
-            >
-              <UIcon name="i-lucide-alert-triangle" class="w-4 h-4 text-amber-500" />
-              <p class="text-sm text-amber-700 dark:text-amber-400">No location selected</p>
+            <div>
+              <h2 class="text-lg font-bold text-[var(--ui-text)]">Delivery Information</h2>
+              <p class="text-xs text-[var(--ui-text-muted)]">Basic details about this delivery</p>
             </div>
           </div>
-        </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Purchase Order (Required) -->
-          <div>
-            <label class="form-label mb-2 block">
-              Purchase Order
-              <span class="text-[var(--ui-error)]">*</span>
-            </label>
-            <USelectMenu
-              v-model="formData.po_id"
-              :items="poDropdownItems"
-              label-key="label"
-              value-key="value"
-              placeholder="Select Purchase Order"
-              searchable
-              size="lg"
-              class="w-full"
-              :loading="loadingOpenPOs"
-              :disabled="openPOs.length === 0"
-            >
-              <template #leading>
-                <UIcon name="i-lucide-file-text" class="w-5 h-5" />
-              </template>
-              <template #item="{ item }">
-                <div class="flex flex-col">
-                  <span class="font-medium">{{ item.label }}</span>
-                  <span class="text-xs text-[var(--ui-text-muted)]">
-                    {{ item.supplierName }} - {{ formatCurrency(item.totalAmount) }}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Purchase Order (Required) -->
+            <div>
+              <label class="form-label mb-2 block">
+                Purchase Order
+                <span class="text-[var(--ui-error)]">*</span>
+              </label>
+              <USelectMenu
+                v-model="formData.po_id"
+                :items="poDropdownItems"
+                label-key="label"
+                value-key="value"
+                placeholder="Select Purchase Order"
+                searchable
+                size="lg"
+                class="w-full"
+                :loading="loadingOpenPOs"
+                :disabled="openPOs.length === 0"
+              >
+                <template #leading>
+                  <UIcon name="i-lucide-file-text" class="w-5 h-5" />
+                </template>
+                <template #item="{ item }">
+                  <div class="flex flex-col">
+                    <span class="font-medium">{{ item.label }}</span>
+                    <span class="text-xs text-[var(--ui-text-muted)]">
+                      {{ item.supplierName }} - {{ formatCurrency(item.totalAmount) }}
+                    </span>
+                  </div>
+                </template>
+              </USelectMenu>
+              <p class="text-xs text-[var(--ui-text-muted)] mt-1">
+                Selecting a PO will auto-populate supplier and items
+              </p>
+            </div>
+
+            <!-- Supplier (Auto-populated from PO, read-only) -->
+            <div>
+              <label class="form-label mb-2 block">
+                Supplier
+                <span class="text-[var(--ui-error)]">*</span>
+              </label>
+              <div
+                v-if="selectedPO"
+                class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)]"
+              >
+                <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
+                <div class="flex-1">
+                  <span class="font-medium text-[var(--ui-text)]">
+                    {{ selectedPO.supplier.name }}
+                  </span>
+                  <span class="text-xs text-[var(--ui-text-muted)] ml-2">
+                    ({{ selectedPO.supplier.code }})
                   </span>
                 </div>
-              </template>
-            </USelectMenu>
-            <p class="text-xs text-[var(--ui-text-muted)] mt-1">
-              Selecting a PO will auto-populate supplier and items
-            </p>
-          </div>
-
-          <!-- Supplier (Auto-populated from PO, read-only) -->
-          <div>
-            <label class="form-label mb-2 block">
-              Supplier
-              <span class="text-[var(--ui-error)]">*</span>
-            </label>
-            <div
-              v-if="selectedPO"
-              class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)]"
-            >
-              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
-              <div class="flex-1">
-                <span class="font-medium text-[var(--ui-text)]">
-                  {{ selectedPO.supplier.name }}
-                </span>
-                <span class="text-xs text-[var(--ui-text-muted)] ml-2">
-                  ({{ selectedPO.supplier.code }})
-                </span>
+                <UIcon
+                  name="i-lucide-lock"
+                  class="w-4 h-4 text-[var(--ui-text-muted)]"
+                  title="Auto-populated from PO"
+                />
               </div>
-              <UIcon
-                name="i-lucide-lock"
-                class="w-4 h-4 text-[var(--ui-text-muted)]"
-                title="Auto-populated from PO"
+              <div
+                v-else
+                class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)] text-[var(--ui-text-muted)]"
+              >
+                <UIcon name="i-lucide-building-2" class="w-5 h-5" />
+                <span class="text-sm">Select a PO to auto-populate supplier</span>
+              </div>
+            </div>
+
+            <!-- Invoice Number -->
+            <div>
+              <label class="form-label mb-2 block">
+                Invoice Number
+                <span class="text-[var(--ui-error)]">*</span>
+              </label>
+              <UInput
+                v-model="formData.invoice_no"
+                placeholder="Enter invoice number"
+                size="lg"
+                icon="i-lucide-file-check"
+                class="w-full"
               />
             </div>
-            <div
-              v-else
-              class="flex items-center gap-2 px-3 py-2.5 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)] text-[var(--ui-text-muted)]"
-            >
-              <UIcon name="i-lucide-building-2" class="w-5 h-5" />
-              <span class="text-sm">Select a PO to auto-populate supplier</span>
+
+            <!-- Delivery Date -->
+            <div>
+              <label class="form-label mb-2 block">
+                Delivery Date
+                <span class="text-[var(--ui-error)]">*</span>
+              </label>
+              <UInput
+                v-model="formData.delivery_date"
+                type="date"
+                size="lg"
+                icon="i-lucide-calendar"
+                class="w-full"
+              />
+            </div>
+
+            <!-- Delivery Note (Full Width) -->
+            <div class="md:col-span-2">
+              <label class="form-label mb-2 block">Delivery Note</label>
+              <UTextarea
+                v-model="formData.delivery_note"
+                placeholder="Add any notes about this delivery"
+                :rows="3"
+                size="lg"
+                class="w-full"
+              />
             </div>
           </div>
-
-          <!-- Invoice Number -->
-          <div>
-            <label class="form-label mb-2 block">
-              Invoice Number
-              <span class="text-[var(--ui-error)]">*</span>
-            </label>
-            <UInput
-              v-model="formData.invoice_no"
-              placeholder="Enter invoice number"
-              size="lg"
-              icon="i-lucide-file-check"
-              class="w-full"
-            />
-          </div>
-
-          <!-- Delivery Date -->
-          <div>
-            <label class="form-label mb-2 block">
-              Delivery Date
-              <span class="text-[var(--ui-error)]">*</span>
-            </label>
-            <UInput
-              v-model="formData.delivery_date"
-              type="date"
-              size="lg"
-              icon="i-lucide-calendar"
-              class="w-full"
-            />
-          </div>
-
-          <!-- Delivery Note (Full Width) -->
-          <div class="md:col-span-2">
-            <label class="form-label mb-2 block">Delivery Note</label>
-            <UTextarea
-              v-model="formData.delivery_note"
-              placeholder="Add any notes about this delivery"
-              :rows="3"
-              size="lg"
-              class="w-full"
-            />
-          </div>
         </div>
-      </UCard>
 
-      <!-- Delivery Lines Card -->
-      <UCard class="card-elevated" :ui="{ body: 'p-0' }">
-        <template #header>
-          <div class="flex items-center justify-between p-3 sm:p-4">
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">Delivery Items</h2>
+        <!-- Divider -->
+        <div class="h-px bg-gradient-to-r from-transparent via-[var(--ui-border)] to-transparent" />
+
+        <!-- Delivery Items Section -->
+        <div class="p-4 sm:p-6 bg-[var(--ui-bg)]">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20"
+              >
+                <UIcon name="i-lucide-package" class="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-[var(--ui-text)]">Delivery Items</h2>
+                <p class="text-xs text-[var(--ui-text-muted)]">Items being delivered</p>
+              </div>
+            </div>
             <UButton
               icon="i-lucide-plus"
               color="primary"
@@ -202,302 +239,383 @@
               <span class="hidden sm:inline">Add Item</span>
             </UButton>
           </div>
-        </template>
 
-        <!-- Over-Delivery Warning -->
-        <div v-if="hasOverDeliveryLines" class="px-3 sm:px-4 pt-3 sm:pt-4">
-          <UAlert
-            icon="i-lucide-alert-triangle"
-            :color="hasUnapprovedOverDelivery ? 'error' : 'warning'"
-            variant="subtle"
-            :title="
-              hasUnapprovedOverDelivery
-                ? 'Over-Delivery Requires Approval'
-                : 'Over-Delivery Approved'
-            "
-          >
-            <template #description>
-              <div class="space-y-2">
-                <p>
-                  {{ overDeliveryCount }} item(s) have quantity exceeding the remaining PO quantity.
-                </p>
-                <p v-if="hasUnapprovedOverDelivery && canApproveOverDelivery" class="text-sm">
-                  As a {{ user?.role }}, you can approve these over-deliveries.
-                </p>
-                <p v-else-if="hasUnapprovedOverDelivery" class="text-sm">
-                  <strong>Supervisor or Admin approval is required</strong>
-                  to proceed with over-deliveries.
-                </p>
-              </div>
-            </template>
-            <template v-if="hasUnapprovedOverDelivery && canApproveOverDelivery" #actions>
-              <UButton
-                color="warning"
-                variant="soft"
-                size="sm"
-                class="cursor-pointer"
-                icon="i-lucide-check"
-                @click="approveAllOverDeliveries"
-              >
-                Approve Over-Deliveries
-              </UButton>
-            </template>
-          </UAlert>
-        </div>
+          <!-- Over-Delivery Warning -->
+          <div v-if="hasOverDeliveryLines" class="mb-4">
+            <UAlert
+              icon="i-lucide-alert-triangle"
+              :color="hasUnapprovedOverDelivery ? 'error' : 'warning'"
+              variant="subtle"
+              :title="
+                hasUnapprovedOverDelivery
+                  ? 'Over-Delivery Requires Approval'
+                  : 'Over-Delivery Approved'
+              "
+            >
+              <template #description>
+                <div class="space-y-2">
+                  <p>
+                    {{ overDeliveryCount }} item(s) have quantity exceeding the remaining PO
+                    quantity.
+                  </p>
+                  <p v-if="hasUnapprovedOverDelivery && canApproveOverDelivery" class="text-sm">
+                    As a {{ user?.role }}, you can approve these over-deliveries.
+                  </p>
+                  <p v-else-if="hasUnapprovedOverDelivery" class="text-sm">
+                    <strong>Supervisor or Admin approval is required</strong>
+                    to proceed with over-deliveries.
+                  </p>
+                </div>
+              </template>
+              <template v-if="hasUnapprovedOverDelivery && canApproveOverDelivery" #actions>
+                <UButton
+                  color="warning"
+                  variant="soft"
+                  size="sm"
+                  class="cursor-pointer"
+                  icon="i-lucide-check"
+                  @click="approveAllOverDeliveries"
+                >
+                  Approve Over-Deliveries
+                </UButton>
+              </template>
+            </UAlert>
+          </div>
 
-        <!-- Variance Warning -->
-        <div v-if="hasVarianceLines" class="px-3 sm:px-4 pt-3 sm:pt-4">
-          <UAlert
-            icon="i-lucide-alert-triangle"
-            color="warning"
-            variant="subtle"
-            title="Price Variance Detected"
-            :description="`${varianceCount} item(s) have price variance. NCRs will be automatically created.`"
-          />
-        </div>
+          <!-- Variance Warning -->
+          <div v-if="hasVarianceLines" class="mb-4">
+            <UAlert
+              icon="i-lucide-alert-triangle"
+              color="warning"
+              variant="subtle"
+              title="Price Variance Detected"
+              :description="`${varianceCount} item(s) have price variance. NCRs will be automatically created.`"
+            />
+          </div>
 
-        <!-- Lines Table -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-[var(--ui-border)]">
-            <thead>
-              <tr class="bg-[var(--ui-bg-elevated)]">
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Item</th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">PO Qty</th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Remaining</th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Quantity</th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Unit Price</th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">
-                  Period Price
-                </th>
-                <th class="px-4 py-3 text-left text-label uppercase tracking-wider">Variance</th>
-                <th class="px-4 py-3 text-right text-label uppercase tracking-wider">Line Value</th>
-                <th class="px-4 py-3 text-center text-label uppercase tracking-wider">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[var(--ui-border)]">
-              <!-- Loading State -->
-              <tr v-if="loadingInitialData">
-                <td colspan="9" class="px-4 py-8">
-                  <div class="flex flex-col items-center justify-center gap-3">
-                    <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
-                    <p class="text-sm text-[var(--ui-text-muted)]">Loading items...</p>
-                  </div>
-                </td>
-              </tr>
-
-              <tr
-                v-for="line in lines"
-                v-else
-                :key="line.id"
-                :class="{
-                  'bg-amber-50 dark:bg-amber-950/20': line.has_variance || line.is_over_delivery,
-                }"
-                class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
-              >
-                <!-- Item Selection -->
-                <td class="px-4 py-3">
-                  <USelectMenu
-                    v-model="line.item_id"
-                    :items="items"
-                    label-key="name"
-                    value-key="id"
-                    placeholder="Select item"
-                    searchable
-                    class="min-w-[200px] w-full"
-                  />
-                </td>
-
-                <!-- PO Quantity (Original) -->
-                <td class="px-4 py-3">
-                  <span v-if="line.po_quantity !== undefined" class="text-caption">
-                    {{ formatNumber(line.po_quantity) }}
-                  </span>
-                  <span v-else class="text-caption">-</span>
-                </td>
-
-                <!-- Remaining Quantity -->
-                <td class="px-4 py-3">
-                  <span
-                    v-if="line.remaining_qty !== undefined"
-                    :class="[
-                      'text-caption font-medium',
-                      line.remaining_qty <= 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-[var(--ui-text)]',
-                    ]"
+          <!-- Lines Table -->
+          <div class="overflow-x-auto -mx-4 sm:-mx-6">
+            <table class="min-w-full divide-y divide-[var(--ui-border)]">
+              <thead>
+                <tr class="bg-[var(--ui-bg-elevated)]">
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
                   >
-                    {{ formatNumber(line.remaining_qty) }}
+                    Item
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    PO Qty
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Remaining
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Quantity
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Unit Price
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Period Price
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Variance
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-right text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Line Value
+                  </th>
+                  <th
+                    class="px-4 sm:px-6 py-3 text-center text-xs font-bold text-[var(--ui-text-muted)] uppercase tracking-wider"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--ui-border)]">
+                <!-- Loading State -->
+                <tr v-if="loadingInitialData">
+                  <td colspan="9" class="px-4 py-8">
+                    <div class="flex flex-col items-center justify-center gap-3">
+                      <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
+                      <p class="text-sm text-[var(--ui-text-muted)]">Loading items...</p>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr
+                  v-for="line in lines"
+                  v-else
+                  :key="line.id"
+                  :class="{
+                    'bg-amber-50 dark:bg-amber-950/20': line.has_variance || line.is_over_delivery,
+                  }"
+                  class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
+                >
+                  <!-- Item Selection -->
+                  <td class="px-4 sm:px-6 py-4">
+                    <USelectMenu
+                      v-model="line.item_id"
+                      :items="items"
+                      label-key="name"
+                      value-key="id"
+                      placeholder="Select item"
+                      searchable
+                      size="lg"
+                      class="min-w-[200px] w-full"
+                    />
+                  </td>
+
+                  <!-- PO Quantity (Original) -->
+                  <td class="px-4 sm:px-6 py-4">
                     <span
-                      v-if="line.delivered_qty && line.delivered_qty > 0"
-                      class="text-xs text-[var(--ui-text-muted)]"
+                      v-if="line.po_quantity !== undefined"
+                      class="text-sm text-[var(--ui-text)]"
                     >
-                      ({{ formatNumber(line.delivered_qty) }} received)
+                      {{ formatNumber(line.po_quantity) }}
                     </span>
-                  </span>
-                  <span v-else class="text-caption">-</span>
-                </td>
+                    <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+                  </td>
 
-                <!-- Quantity -->
-                <td class="px-4 py-3">
-                  <div class="relative">
-                    <UInput
-                      v-model="line.quantity"
-                      type="number"
-                      step="0.0001"
-                      min="0"
-                      placeholder="0.00"
-                      size="sm"
-                      class="w-32"
-                      :class="{ 'border-amber-500': line.is_over_delivery }"
-                    />
-                    <UIcon
-                      v-if="line.is_over_delivery"
-                      name="i-lucide-alert-triangle"
-                      class="absolute -right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500"
-                      title="Quantity exceeds PO quantity"
-                    />
-                  </div>
-                </td>
-
-                <!-- Unit Price -->
-                <td class="px-4 py-3">
-                  <UInput
-                    v-model="line.unit_price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    size="sm"
-                    class="w-32"
-                  />
-                </td>
-
-                <!-- Period Price -->
-                <td class="px-4 py-3">
-                  <span v-if="line.period_price !== undefined" class="text-caption">
-                    {{ formatCurrency(line.period_price) }}
-                  </span>
-                  <span v-else class="text-caption">-</span>
-                </td>
-
-                <!-- Variance -->
-                <td class="px-4 py-3">
-                  <div v-if="line.has_variance" class="flex items-center space-x-2">
-                    <UIcon name="i-lucide-alert-triangle" class="text-amber-500 w-4 h-4" />
+                  <!-- Remaining Quantity -->
+                  <td class="px-4 sm:px-6 py-4">
                     <span
+                      v-if="line.remaining_qty !== undefined"
                       :class="[
                         'text-sm font-medium',
-                        line.price_variance > 0
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-emerald-600 dark:text-emerald-400',
+                        line.remaining_qty <= 0
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-[var(--ui-text)]',
                       ]"
                     >
-                      {{ formatCurrency(line.price_variance) }}
+                      {{ formatNumber(line.remaining_qty) }}
+                      <span
+                        v-if="line.delivered_qty && line.delivered_qty > 0"
+                        class="text-xs text-[var(--ui-text-muted)] block"
+                      >
+                        ({{ formatNumber(line.delivered_qty) }} received)
+                      </span>
                     </span>
-                  </div>
-                  <span v-else class="text-caption">-</span>
-                </td>
+                    <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+                  </td>
 
-                <!-- Line Value -->
-                <td class="px-4 py-3 text-right">
-                  <span class="text-[var(--ui-text)] font-medium">
-                    {{ formatCurrency(line.line_value) }}
-                  </span>
-                </td>
+                  <!-- Quantity -->
+                  <td class="px-4 sm:px-6 py-4">
+                    <div class="relative">
+                      <UInput
+                        v-model="line.quantity"
+                        type="number"
+                        step="0.0001"
+                        min="0"
+                        placeholder="0.00"
+                        size="lg"
+                        class="w-32"
+                        :class="{ 'border-amber-500': line.is_over_delivery }"
+                      />
+                      <UIcon
+                        v-if="line.is_over_delivery"
+                        name="i-lucide-alert-triangle"
+                        class="absolute -right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500"
+                        title="Quantity exceeds PO quantity"
+                      />
+                    </div>
+                  </td>
 
-                <!-- Action -->
-                <td class="px-4 py-3 text-center">
-                  <UButton
-                    icon="i-lucide-trash-2"
-                    color="error"
-                    variant="ghost"
-                    size="sm"
-                    class="cursor-pointer"
-                    :disabled="lines.length === 1"
-                    aria-label="Remove line item"
-                    title="Remove this item"
-                    @click="removeLine(line.id)"
-                  />
-                </td>
-              </tr>
+                  <!-- Unit Price -->
+                  <td class="px-4 sm:px-6 py-4">
+                    <UInput
+                      v-model="line.unit_price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      size="lg"
+                      class="w-32"
+                    />
+                  </td>
 
-              <!-- Empty State -->
-              <tr v-if="!loadingInitialData && lines.length === 0">
-                <td colspan="9" class="px-4 py-8 text-center text-[var(--ui-text-muted)]">
-                  <div v-if="selectedPO">
-                    No items added yet. PO items have been added as suggestions.
-                  </div>
-                  <div v-else>Select a Purchase Order to load suggested items.</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  <!-- Period Price -->
+                  <td class="px-4 sm:px-6 py-4">
+                    <span
+                      v-if="line.period_price !== undefined"
+                      class="text-sm text-[var(--ui-text)]"
+                    >
+                      {{ formatCurrency(line.period_price) }}
+                    </span>
+                    <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+                  </td>
 
-        <!-- Summary -->
-        <div class="px-4 py-6 border-t border-[var(--ui-border)]">
-          <div class="flex justify-between items-center">
-            <div class="text-caption">{{ lines.length }} item(s)</div>
-            <div class="text-right">
-              <div class="text-caption">Total Amount</div>
-              <div class="text-2xl font-bold text-primary">
-                {{ formatCurrency(totalAmount) }}
+                  <!-- Variance -->
+                  <td class="px-4 sm:px-6 py-4">
+                    <div v-if="line.has_variance" class="flex items-center space-x-2">
+                      <UIcon name="i-lucide-alert-triangle" class="text-amber-500 w-4 h-4" />
+                      <span
+                        :class="[
+                          'text-sm font-medium',
+                          line.price_variance > 0
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-emerald-600 dark:text-emerald-400',
+                        ]"
+                      >
+                        {{ formatCurrency(line.price_variance) }}
+                      </span>
+                    </div>
+                    <span v-else class="text-sm text-[var(--ui-text-muted)]">-</span>
+                  </td>
+
+                  <!-- Line Value -->
+                  <td class="px-4 sm:px-6 py-4 text-right">
+                    <span class="text-sm text-[var(--ui-text)] font-semibold">
+                      {{ formatCurrency(line.line_value) }}
+                    </span>
+                  </td>
+
+                  <!-- Action -->
+                  <td class="px-4 sm:px-6 py-4 text-center">
+                    <UButton
+                      icon="i-lucide-trash-2"
+                      color="error"
+                      variant="ghost"
+                      size="sm"
+                      class="cursor-pointer"
+                      :disabled="lines.length === 1"
+                      aria-label="Remove line item"
+                      title="Remove this item"
+                      @click="removeLine(line.id)"
+                    />
+                  </td>
+                </tr>
+
+                <!-- Empty State -->
+                <tr v-if="!loadingInitialData && lines.length === 0">
+                  <td
+                    colspan="9"
+                    class="px-4 sm:px-6 py-12 text-center text-[var(--ui-text-muted)]"
+                  >
+                    <div class="flex flex-col items-center gap-3">
+                      <UIcon name="i-lucide-inbox" class="w-12 h-12 text-[var(--ui-text-muted)]" />
+                      <div v-if="selectedPO" class="text-sm font-medium">
+                        No items added yet. PO items have been added as suggestions.
+                      </div>
+                      <div v-else class="text-sm font-medium">
+                        Select a Purchase Order to load suggested items.
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Summary Footer -->
+          <div
+            class="mt-6 pt-6 border-t border-[var(--ui-border)] bg-gradient-to-br from-[var(--ui-bg-muted)]/50 to-transparent p-4 rounded-lg"
+          >
+            <div class="flex justify-between items-center">
+              <div class="text-sm text-[var(--ui-text-muted)] font-medium">
+                {{ lines.length }} item(s)
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider mb-1">
+                  Total Amount
+                </div>
+                <div class="text-2xl font-bold text-primary">
+                  {{ formatCurrency(totalAmount) }}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </UCard>
 
-      <!-- Form Actions -->
-      <div class="flex flex-wrap items-center justify-end gap-3">
-        <UButton
-          color="error"
-          variant="soft"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :disabled="savingDraft || posting || sendingForApproval"
-          @click="cancel"
-        >
-          Cancel
-        </UButton>
-        <UButton
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-save"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :loading="savingDraft"
-          :disabled="!isDraftValid || savingDraft || posting || sendingForApproval || !isOnline"
-          @click="saveDraft"
-        >
-          Save Draft
-        </UButton>
-        <!-- Send For Approval Button - Only for Operators with unapproved over-deliveries -->
-        <UButton
-          v-if="showSendForApprovalButton"
-          color="warning"
-          icon="i-lucide-send"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :loading="sendingForApproval"
-          :disabled="
-            !isSendForApprovalValid || savingDraft || posting || sendingForApproval || !isOnline
-          "
-          @click="sendForApproval"
-        >
-          Send For Approval
-        </UButton>
-        <UButton
-          color="primary"
-          icon="i-lucide-check"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :loading="posting"
-          :disabled="!isFormValid || savingDraft || posting || sendingForApproval || !isOnline"
-          @click="showPostConfirmation = true"
-        >
-          Post Delivery
-        </UButton>
+      <!-- Sticky Footer with Form Actions -->
+      <div
+        class="sticky bottom-0 z-10 bg-[var(--ui-bg-elevated)]/95 dark:bg-[var(--ui-bg-elevated)]/98 backdrop-blur-md border-t border-[var(--ui-border)] rounded-t-lg shadow-2xl -mx-4 px-4 py-4 sm:mx-0 sm:px-6 sm:rounded-xl"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <!-- Form Status Indicator -->
+          <div class="hidden sm:flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
+            <UIcon
+              :name="isFormValid ? 'i-lucide-check-circle-2' : 'i-lucide-alert-circle'"
+              :class="['w-5 h-5', isFormValid ? 'text-emerald-500' : 'text-amber-500']"
+            />
+            <span class="font-medium">
+              {{
+                isFormValid
+                  ? "Form ready to post"
+                  : hasUnapprovedOverDelivery && !canApproveOverDelivery
+                    ? "Over-delivery approval required"
+                    : "Please complete all required fields"
+              }}
+            </span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 ml-auto">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 hover:bg-[var(--ui-bg-elevated)] transition-all"
+              :disabled="savingDraft || posting || sendingForApproval"
+              @click="cancel"
+            >
+              <UIcon name="i-lucide-x" class="w-4 h-4 sm:mr-2" />
+              <span class="hidden sm:inline">Cancel</span>
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="outline"
+              icon="i-lucide-save"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 hover:bg-[var(--ui-bg-elevated)] transition-all"
+              :loading="savingDraft"
+              :disabled="!isDraftValid || savingDraft || posting || sendingForApproval || !isOnline"
+              @click="saveDraft"
+            >
+              Save Draft
+            </UButton>
+            <!-- Send For Approval Button - Only for Operators with unapproved over-deliveries -->
+            <UButton
+              v-if="showSendForApprovalButton"
+              color="warning"
+              icon="i-lucide-send"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+              :loading="sendingForApproval"
+              :disabled="
+                !isSendForApprovalValid || savingDraft || posting || sendingForApproval || !isOnline
+              "
+              @click="sendForApproval"
+            >
+              Send For Approval
+            </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-check"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+              :loading="posting"
+              :disabled="!isFormValid || savingDraft || posting || sendingForApproval || !isOnline"
+              @click="showPostConfirmation = true"
+            >
+              Post Delivery
+            </UButton>
+          </div>
+        </div>
       </div>
     </div>
 

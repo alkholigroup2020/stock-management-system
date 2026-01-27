@@ -972,6 +972,114 @@ Total (After VAT) = Line Value + VAT Amount
 
 ---
 
+## Phase 14: UI Redesign (2026-01-27)
+
+**Purpose**: Polished, theme-aware UI for PRF, PO, and Delivery create/detail pages
+
+### UI001 - PRF Create Page Redesign
+
+**Feature**: Redesigned PRF create page with theme-aware header and unified form structure.
+
+**Implementation**:
+
+- [x] UI001a Update `app/pages/orders/prfs/create.vue` - Theme-aware page header with decorative pattern
+- [x] UI001b Update `app/pages/orders/prfs/create.vue` - Primary color icon badge with shadow
+- [x] UI001c Update `app/pages/orders/prfs/create.vue` - Location/Period indicator with muted background
+- [x] UI001d Update `app/pages/orders/prfs/create.vue` - Sticky footer with validation status indicator
+
+**Files Changed**:
+
+- `app/pages/orders/prfs/create.vue`
+
+---
+
+### UI002 - PRF Form Component Redesign
+
+**Feature**: Unified card structure with color-coded section headers.
+
+**Implementation**:
+
+- [x] UI002a Update `app/components/orders/PRFForm.vue` - Single card container for all sections
+- [x] UI002b Update `app/components/orders/PRFForm.vue` - Blue icon badge for Basic Information section
+- [x] UI002c Update `app/components/orders/PRFForm.vue` - Green icon badge for Contact Information section
+- [x] UI002d Update `app/components/orders/PRFForm.vue` - Amber icon badge for Line Items section
+- [x] UI002e Update `app/components/orders/PRFForm.vue` - Gradient dividers between sections
+
+**Files Changed**:
+
+- `app/components/orders/PRFForm.vue`
+
+---
+
+### UI003 - PRF Line Items Table Redesign
+
+**Feature**: Professional table styling with larger inputs and better totals display.
+
+**Implementation**:
+
+- [x] UI003a Update `app/components/orders/PRFLineItemsTable.vue` - Larger input fields (size="md")
+- [x] UI003b Update `app/components/orders/PRFLineItemsTable.vue` - Professional header styling (uppercase, tracking-wider)
+- [x] UI003c Update `app/components/orders/PRFLineItemsTable.vue` - Improved footer totals with VAT breakdown
+- [x] UI003d Update `app/components/orders/PRFLineItemsTable.vue` - Responsive design improvements
+
+**Files Changed**:
+
+- `app/components/orders/PRFLineItemsTable.vue`
+
+---
+
+### UI004 - PO Create Page Redesign
+
+**Feature**: Same theme-aware design patterns applied to PO create page.
+
+**Implementation**:
+
+- [x] UI004a Update `app/pages/orders/pos/create.vue` - Theme-aware page header with decorative pattern
+- [x] UI004b Update `app/pages/orders/pos/create.vue` - Sticky footer with validation status
+- [x] UI004c Update `app/components/orders/POForm.vue` - Color-coded section headers
+- [x] UI004d Update `app/components/orders/POLineItemsTable.vue` - Professional table styling
+
+**Files Changed**:
+
+- `app/pages/orders/pos/create.vue`
+- `app/components/orders/POForm.vue`
+- `app/components/orders/POLineItemsTable.vue`
+
+---
+
+### UI005 - Delivery Create Page Redesign
+
+**Feature**: Consistent design with PRF/PO pages.
+
+**Implementation**:
+
+- [x] UI005a Update `app/pages/deliveries/create.vue` - Theme-aware page header
+- [x] UI005b Update `app/pages/deliveries/create.vue` - Color-coded form sections
+- [x] UI005c Update `app/pages/deliveries/create.vue` - Sticky footer with validation status
+
+**Files Changed**:
+
+- `app/pages/deliveries/create.vue`
+
+---
+
+### UI006 - PO Detail Page Redesign
+
+**Feature**: Professional detail page with consistent styling.
+
+**Implementation**:
+
+- [x] UI006a Update `app/pages/orders/pos/[id].vue` - Theme-aware page header
+- [x] UI006b Update `app/pages/orders/pos/[id].vue` - Improved section structure
+
+**Files Changed**:
+
+- `app/pages/orders/pos/[id].vue`
+
+**Checkpoint**: Phase 14 complete - All create/detail pages have consistent, polished UI ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

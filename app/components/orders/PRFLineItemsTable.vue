@@ -176,297 +176,344 @@ function removeLine(id: string) {
 <template>
   <div class="space-y-4">
     <!-- Header with Add Button -->
-    <div v-if="!readonly" class="flex items-center justify-between">
-      <h3 class="text-base font-semibold text-[var(--ui-text)]">Line Items</h3>
+    <div v-if="!readonly" class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-[var(--ui-text-muted)]">
+          {{ lines.length }} item{{ lines.length !== 1 ? "s" : "" }}
+        </span>
+      </div>
       <UButton
         icon="i-lucide-plus"
         color="primary"
         variant="soft"
-        size="sm"
-        class="cursor-pointer rounded-full"
+        size="md"
+        class="cursor-pointer rounded-full shadow-sm hover:shadow-md transition-all"
         :disabled="disabled"
         @click="addLine"
       >
         <span class="hidden sm:inline">Add Item</span>
+        <span class="sm:hidden">Add</span>
       </UButton>
     </div>
 
     <!-- Lines Table -->
-    <div class="overflow-x-auto border border-[var(--ui-border)] rounded-lg">
-      <table class="min-w-full divide-y divide-[var(--ui-border)]">
-        <thead>
-          <tr class="bg-[var(--ui-bg-elevated)]">
-            <th
-              class="px-3 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider"
-            >
-              Item
-            </th>
-            <th
-              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-24"
-            >
-              Unit
-            </th>
-            <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-24"
-            >
-              Qty
-            </th>
-            <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-28"
-            >
-              Est. Price
-            </th>
-            <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-28 hidden md:table-cell"
-            >
-              Before VAT
-            </th>
-            <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-24 hidden lg:table-cell"
-            >
-              VAT ({{ VAT_RATE }}%)
-            </th>
-            <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-32"
-            >
-              Total
-            </th>
-            <th
-              v-if="!readonly"
-              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] tracking-wider w-16"
-            >
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--ui-border)]">
-          <!-- Loading State -->
-          <tr v-if="loading">
-            <td :colspan="readonly ? 7 : 8" class="px-4 py-8">
-              <div class="flex flex-col items-center justify-center gap-3">
-                <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
-                <p class="text-sm text-[var(--ui-text-muted)]">Loading...</p>
-              </div>
-            </td>
-          </tr>
+    <div
+      class="overflow-hidden border border-[var(--ui-border)] rounded-xl shadow-sm bg-[var(--ui-bg)]"
+    >
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[var(--ui-border)]">
+          <thead>
+            <tr class="bg-gradient-to-r from-[var(--ui-bg-elevated)] to-[var(--ui-bg-elevated)]">
+              <th
+                class="px-4 py-3.5 text-left text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider"
+              >
+                Item Description
+              </th>
+              <th
+                class="px-4 py-3.5 text-center text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-24"
+              >
+                Unit
+              </th>
+              <th
+                class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-28"
+              >
+                Qty
+              </th>
+              <th
+                class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-32"
+              >
+                Est. Price
+              </th>
+              <th
+                class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-32 hidden md:table-cell"
+              >
+                Before VAT
+              </th>
+              <th
+                class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-28 hidden lg:table-cell"
+              >
+                VAT
+              </th>
+              <th
+                class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-36"
+              >
+                Total
+              </th>
+              <th
+                v-if="!readonly"
+                class="px-4 py-3.5 text-center text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-20"
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--ui-border)] bg-[var(--ui-bg)]">
+            <!-- Loading State -->
+            <tr v-if="loading">
+              <td :colspan="readonly ? 7 : 8" class="px-4 py-12">
+                <div class="flex flex-col items-center justify-center gap-3">
+                  <UIcon name="i-lucide-loader-2" class="w-10 h-10 text-primary animate-spin" />
+                  <p class="text-sm text-[var(--ui-text-muted)] font-medium">Loading items...</p>
+                </div>
+              </td>
+            </tr>
 
-          <!-- Line Items -->
-          <tr
-            v-for="line in lines"
-            v-else
-            :key="line.id"
-            class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
-          >
-            <!-- Item Selection / Description -->
-            <td class="px-3 py-3">
-              <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
-                {{ line.item_description }}
-              </div>
-              <div v-else class="flex items-center gap-2">
+            <!-- Line Items -->
+            <tr
+              v-for="(line, index) in lines"
+              v-else
+              :key="line.id"
+              class="group hover:bg-[var(--ui-bg-elevated)] transition-colors duration-150"
+              :class="{ 'bg-[var(--ui-bg-muted)]/30': index % 2 === 0 }"
+            >
+              <!-- Item Selection / Description -->
+              <td class="px-4 py-4">
+                <div v-if="readonly" class="text-sm font-medium text-[var(--ui-text)]">
+                  {{ line.item_description }}
+                </div>
+                <div v-else class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <USelectMenu
+                    :model-value="line.item_id ?? undefined"
+                    :items="items"
+                    label-key="name"
+                    value-key="id"
+                    placeholder="Select from catalog"
+                    searchable
+                    clearable
+                    size="md"
+                    class="w-full sm:w-52 flex-shrink-0"
+                    :disabled="disabled"
+                    @update:model-value="
+                      (val: string | undefined) => {
+                        line.item_id = val ?? null;
+                        handleItemSelect(line);
+                      }
+                    "
+                  >
+                    <template #item="{ item }">
+                      <div class="flex flex-col py-1">
+                        <span class="font-medium text-sm">{{ item.name }}</span>
+                        <span class="text-xs text-[var(--ui-text-muted)]">
+                          Code: {{ item.code }}
+                        </span>
+                      </div>
+                    </template>
+                  </USelectMenu>
+                  <UInput
+                    v-model="line.item_description"
+                    placeholder="Item description (required)"
+                    size="md"
+                    :disabled="disabled"
+                    class="flex-1 min-w-[200px]"
+                    @blur="updateLineCalculation(line)"
+                  />
+                </div>
+              </td>
+
+              <!-- Unit -->
+              <td class="px-4 py-4 text-center">
+                <div v-if="readonly" class="text-sm font-medium text-[var(--ui-text)]">
+                  {{ line.unit }}
+                </div>
                 <USelectMenu
-                  :model-value="line.item_id ?? undefined"
-                  :items="items"
-                  label-key="name"
-                  value-key="id"
-                  placeholder="Select item"
-                  searchable
-                  clearable
-                  class="w-48 flex-shrink-0"
+                  v-else
+                  v-model="line.unit"
+                  :items="unitOptions"
+                  label-key="label"
+                  value-key="value"
+                  size="md"
                   :disabled="disabled"
+                  class="w-full"
+                />
+              </td>
+
+              <!-- Quantity -->
+              <td class="px-4 py-4 text-right">
+                <div v-if="readonly" class="text-sm font-medium text-[var(--ui-text)]">
+                  {{ line.required_qty }}
+                </div>
+                <UInput
+                  v-else
+                  :model-value="line.required_qty"
+                  type="number"
+                  step="0.0001"
+                  min="0"
+                  placeholder="0"
+                  size="md"
+                  :disabled="disabled"
+                  class="w-full text-right font-mono"
                   @update:model-value="
-                    (val: string | undefined) => {
-                      line.item_id = val ?? null;
-                      handleItemSelect(line);
+                    (val: string | number) => {
+                      line.required_qty = String(val);
+                      updateLineCalculation(line);
                     }
                   "
-                >
-                  <template #item="{ item }">
-                    <div class="flex flex-col">
-                      <span class="font-medium">{{ item.name }}</span>
-                      <span class="text-xs text-[var(--ui-text-muted)]">{{ item.code }}</span>
-                    </div>
-                  </template>
-                </USelectMenu>
-                <UInput
-                  v-model="line.item_description"
-                  placeholder="Item description *"
-                  size="sm"
-                  :disabled="disabled"
-                  class="flex-1 min-w-[200px]"
-                  @blur="updateLineCalculation(line)"
                 />
-              </div>
-            </td>
+              </td>
 
-            <!-- Unit -->
-            <td class="px-3 py-3 text-center">
-              <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
-                {{ line.unit }}
-              </div>
-              <USelectMenu
-                v-else
-                v-model="line.unit"
-                :items="unitOptions"
-                label-key="label"
-                value-key="value"
-                :disabled="disabled"
-                class="w-24"
-              />
-            </td>
+              <!-- Estimated Price -->
+              <td class="px-4 py-4 text-right">
+                <div v-if="readonly" class="text-sm font-medium text-[var(--ui-text)]">
+                  {{ formatCurrency(parseFloat(line.estimated_price) || 0) }}
+                </div>
+                <UInput
+                  v-else
+                  :model-value="line.estimated_price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  size="md"
+                  :disabled="disabled"
+                  class="w-full text-right font-mono"
+                  @update:model-value="
+                    (val: string | number) => {
+                      line.estimated_price = String(val);
+                      updateLineCalculation(line);
+                    }
+                  "
+                />
+              </td>
 
-            <!-- Quantity -->
-            <td class="px-3 py-3 text-right">
-              <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
-                {{ line.required_qty }}
-              </div>
-              <UInput
-                v-else
-                :model-value="line.required_qty"
-                type="number"
-                step="0.0001"
-                min="0"
-                placeholder="0"
-                size="sm"
-                :disabled="disabled"
-                class="w-24 text-right"
-                @update:model-value="
-                  (val: string | number) => {
-                    line.required_qty = String(val);
-                    updateLineCalculation(line);
-                  }
-                "
-              />
-            </td>
+              <!-- Before VAT -->
+              <td class="px-4 py-4 text-right hidden md:table-cell">
+                <span class="text-sm font-semibold text-[var(--ui-text)] font-mono">
+                  {{ formatCurrency(getLineValues(line).lineValue) }}
+                </span>
+              </td>
 
-            <!-- Estimated Price -->
-            <td class="px-3 py-3 text-right">
-              <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
-                {{ formatCurrency(parseFloat(line.estimated_price) || 0) }}
-              </div>
-              <UInput
-                v-else
-                :model-value="line.estimated_price"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                size="sm"
-                :disabled="disabled"
-                class="w-28 text-right"
-                @update:model-value="
-                  (val: string | number) => {
-                    line.estimated_price = String(val);
-                    updateLineCalculation(line);
-                  }
-                "
-              />
-            </td>
+              <!-- VAT Amount -->
+              <td class="px-4 py-4 text-right hidden lg:table-cell">
+                <span class="text-sm text-[var(--ui-text-muted)] font-mono">
+                  {{ formatCurrency(getLineValues(line).vatAmount) }}
+                </span>
+              </td>
 
-            <!-- Before VAT -->
-            <td class="px-3 py-3 text-right hidden md:table-cell">
-              <span class="text-sm text-[var(--ui-text)]">
-                {{ formatCurrency(getLineValues(line).lineValue) }}
-              </span>
-            </td>
+              <!-- Total After VAT -->
+              <td class="px-4 py-4 text-right">
+                <span class="text-base font-bold text-primary font-mono">
+                  {{ formatCurrency(getLineValues(line).totalAfterVat) }}
+                </span>
+              </td>
 
-            <!-- VAT Amount -->
-            <td class="px-3 py-3 text-right hidden lg:table-cell">
-              <span class="text-sm text-[var(--ui-text-muted)]">
-                {{ formatCurrency(getLineValues(line).vatAmount) }}
-              </span>
-            </td>
+              <!-- Action -->
+              <td v-if="!readonly" class="px-4 py-4 text-center">
+                <UButton
+                  icon="i-lucide-trash-2"
+                  color="error"
+                  variant="ghost"
+                  size="md"
+                  class="cursor-pointer opacity-60 group-hover:opacity-100 transition-opacity"
+                  :disabled="disabled || lines.length === 1"
+                  aria-label="Remove line item"
+                  title="Remove this item"
+                  @click="removeLine(line.id)"
+                />
+              </td>
+            </tr>
 
-            <!-- Total After VAT -->
-            <td class="px-3 py-3 text-right">
-              <span class="text-sm font-medium text-[var(--ui-text)]">
-                {{ formatCurrency(getLineValues(line).totalAfterVat) }}
-              </span>
-            </td>
-
-            <!-- Action -->
-            <td v-if="!readonly" class="px-3 py-3 text-center">
-              <UButton
-                icon="i-lucide-trash-2"
-                color="error"
-                variant="ghost"
-                size="sm"
-                class="cursor-pointer"
-                :disabled="disabled || lines.length === 1"
-                aria-label="Remove line item"
-                title="Remove this item"
-                @click="removeLine(line.id)"
-              />
-            </td>
-          </tr>
-
-          <!-- Empty State -->
-          <tr v-if="!loading && lines.length === 0">
-            <td
-              :colspan="readonly ? 7 : 8"
-              class="px-4 py-8 text-center text-[var(--ui-text-muted)]"
-            >
-              No items added yet.
-              <button
-                v-if="!readonly"
-                type="button"
-                class="text-primary hover:underline cursor-pointer"
-                @click="addLine"
+            <!-- Empty State -->
+            <tr v-if="!loading && lines.length === 0">
+              <td
+                :colspan="readonly ? 7 : 8"
+                class="px-4 py-16 text-center bg-[var(--ui-bg-muted)]/20"
               >
-                Add an item
-              </button>
-            </td>
-          </tr>
-        </tbody>
+                <div class="flex flex-col items-center gap-3">
+                  <div
+                    class="flex items-center justify-center w-16 h-16 rounded-full bg-[var(--ui-bg-elevated)] border-2 border-dashed border-[var(--ui-border)]"
+                  >
+                    <UIcon
+                      name="i-lucide-package-open"
+                      class="w-8 h-8 text-[var(--ui-text-muted)]"
+                    />
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-[var(--ui-text-muted)]">
+                      No items added yet
+                    </p>
+                    <button
+                      v-if="!readonly"
+                      type="button"
+                      class="text-sm text-primary hover:underline cursor-pointer font-semibold mt-1"
+                      @click="addLine"
+                    >
+                      Add your first item
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
 
-        <!-- Summary Footer -->
-        <tfoot class="bg-[var(--ui-bg-elevated)]">
-          <!-- Before VAT -->
-          <tr class="text-sm">
-            <td colspan="4" class="px-3 py-2"></td>
-            <td class="px-3 py-2 hidden md:table-cell"></td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
-              Before VAT:
-            </td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text)]">
-              {{ formatCurrency(totals.total_before_vat) }}
-            </td>
-            <td v-if="!readonly" class="px-3 py-2"></td>
-          </tr>
+          <!-- Summary Footer -->
+          <tfoot class="bg-gradient-to-br from-[var(--ui-bg-elevated)] to-[var(--ui-bg-muted)]/30">
+            <!-- Before VAT -->
+            <tr class="border-t-2 border-[var(--ui-border)]">
+              <td colspan="4" class="px-4 py-3"></td>
+              <td class="px-4 py-3 hidden md:table-cell"></td>
+              <td
+                class="px-4 py-3 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+              >
+                Subtotal:
+              </td>
+              <td class="px-4 py-3 text-right">
+                <span class="text-sm font-bold text-[var(--ui-text)] font-mono">
+                  {{ formatCurrency(totals.total_before_vat) }}
+                </span>
+              </td>
+              <td v-if="!readonly" class="px-4 py-3"></td>
+            </tr>
 
-          <!-- VAT -->
-          <tr class="text-sm">
-            <td colspan="4" class="px-3 py-2"></td>
-            <td class="px-3 py-2 hidden md:table-cell"></td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
-              VAT ({{ VAT_RATE }}%):
-            </td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text)]">
-              {{ formatCurrency(totals.total_vat) }}
-            </td>
-            <td v-if="!readonly" class="px-3 py-2"></td>
-          </tr>
+            <!-- VAT -->
+            <tr>
+              <td colspan="4" class="px-4 py-3"></td>
+              <td class="px-4 py-3 hidden md:table-cell"></td>
+              <td
+                class="px-4 py-3 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+              >
+                VAT ({{ VAT_RATE }}%):
+              </td>
+              <td class="px-4 py-3 text-right">
+                <span class="text-sm font-bold text-[var(--ui-text)] font-mono">
+                  {{ formatCurrency(totals.total_vat) }}
+                </span>
+              </td>
+              <td v-if="!readonly" class="px-4 py-3"></td>
+            </tr>
 
-          <!-- Grand Total -->
-          <tr class="border-t border-[var(--ui-border)]">
-            <td colspan="4" class="px-3 py-3"></td>
-            <td class="px-3 py-3 hidden md:table-cell"></td>
-            <td class="px-3 py-3 text-right hidden lg:table-cell">
-              <span class="text-base font-semibold text-[var(--ui-text)]">
-                {{ lines.length }} item(s) - Total:
-              </span>
-            </td>
-            <td class="px-3 py-3 text-right">
-              <span class="lg:hidden text-sm font-medium text-[var(--ui-text-muted)] mr-2">
-                {{ lines.length }} item(s) - Total:
-              </span>
-              <span class="text-xl font-bold text-primary">
-                {{ formatCurrency(totals.total_amount) }}
-              </span>
-            </td>
-            <td v-if="!readonly" class="px-3 py-3"></td>
-          </tr>
-        </tfoot>
-      </table>
+            <!-- Grand Total -->
+            <tr class="border-t-2 border-[var(--ui-border)]">
+              <td colspan="4" class="px-4 py-4"></td>
+              <td class="px-4 py-4 hidden md:table-cell"></td>
+              <td class="px-4 py-4 text-right hidden lg:table-cell">
+                <div class="flex flex-col items-end gap-1">
+                  <span
+                    class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-bold"
+                  >
+                    Grand Total
+                  </span>
+                  <span class="text-sm text-[var(--ui-text-muted)]">
+                    {{ lines.length }} item{{ lines.length !== 1 ? "s" : "" }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-right">
+                <div class="flex flex-col items-end gap-1">
+                  <span
+                    class="lg:hidden text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-bold"
+                  >
+                    Grand Total ({{ lines.length }} item{{ lines.length !== 1 ? "s" : "" }})
+                  </span>
+                  <span class="text-2xl font-black text-primary font-mono tracking-tight">
+                    {{ formatCurrency(totals.total_amount) }}
+                  </span>
+                </div>
+              </td>
+              <td v-if="!readonly" class="px-4 py-4"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 </template>

@@ -102,8 +102,20 @@ async function generatePRFNumber(locationId: string): Promise<string> {
 
   // 2. Format date as DD-Mon-YYYY
   const today = new Date();
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const formattedDate = `${today.getDate().toString().padStart(2, "0")}-${months[today.getMonth()]}-${today.getFullYear()}`;
 
   // 3. Build prefix and find highest number for this location+date
@@ -127,12 +139,12 @@ async function generatePRFNumber(locationId: string): Promise<string> {
 
 ### Alternatives Considered
 
-| Option                                      | Pros                              | Cons                             | Verdict                          |
-| ------------------------------------------- | --------------------------------- | -------------------------------- | -------------------------------- |
-| Simple sequence (PRF-001, PO-001)           | Simple, matches existing patterns | No location/date context         | Superseded                       |
-| Enhanced location-date format               | Better traceability, organization | Slightly longer document numbers | ✅ Selected (Updated 2026-01-27) |
-| UUID only                                   | No conflicts                      | Not human-readable               | Rejected                         |
-| Location code only (e.g., KIT-PRF-001)      | Some location context             | No date context, breaks patterns | Rejected                         |
+| Option                                 | Pros                              | Cons                             | Verdict                          |
+| -------------------------------------- | --------------------------------- | -------------------------------- | -------------------------------- |
+| Simple sequence (PRF-001, PO-001)      | Simple, matches existing patterns | No location/date context         | Superseded                       |
+| Enhanced location-date format          | Better traceability, organization | Slightly longer document numbers | ✅ Selected (Updated 2026-01-27) |
+| UUID only                              | No conflicts                      | Not human-readable               | Rejected                         |
+| Location code only (e.g., KIT-PRF-001) | Some location context             | No date context, breaks patterns | Rejected                         |
 
 ### Migration Strategy
 

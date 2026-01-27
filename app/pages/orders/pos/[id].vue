@@ -323,98 +323,149 @@ onMounted(async () => {
 
 <template>
   <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
-    <!-- Page Header -->
-    <div class="flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2 sm:gap-4">
-        <UButton
-          icon="i-lucide-arrow-left"
-          color="neutral"
-          variant="ghost"
-          class="cursor-pointer"
-          @click="goBack"
-        />
-        <UIcon name="i-lucide-shopping-cart" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
-        <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-xl sm:text-3xl font-bold text-primary">
-              {{ po?.po_no || "Loading..." }}
-            </h1>
-            <OrdersPOStatusBadge v-if="po?.status" :status="po.status" size="lg" />
+    <!-- Enhanced Page Header -->
+    <div
+      class="relative overflow-hidden rounded-lg sm:rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 shadow-sm"
+    >
+      <!-- Subtle Decorative Pattern -->
+      <div
+        class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            var(--ui-text-muted) 1px,
+            transparent 0
+          );
+          background-size: 24px 24px;
+        "
+      />
+
+      <div class="relative flex items-center justify-between gap-3 sm:gap-6">
+        <div class="flex items-center gap-3 sm:gap-5">
+          <!-- Back Button -->
+          <UButton
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
+            size="lg"
+            class="cursor-pointer"
+            @click="goBack"
+          />
+
+          <!-- Icon with Primary Color Accent -->
+          <div
+            class="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30 shadow-sm"
+          >
+            <UIcon name="i-lucide-shopping-cart" class="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
           </div>
-          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">Purchase Order</p>
+
+          <!-- Title Section -->
+          <div>
+            <div class="flex items-center gap-3 flex-wrap">
+              <h1 class="text-xl sm:text-3xl lg:text-4xl font-bold text-primary tracking-tight">
+                {{ po?.po_no || "Loading..." }}
+              </h1>
+              <OrdersPOStatusBadge v-if="po?.status" :status="po.status" size="lg" />
+            </div>
+            <p
+              class="hidden sm:block text-sm sm:text-base text-[var(--ui-text-muted)] mt-1 font-medium"
+            >
+              Purchase Order
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div v-if="!loadingPO && po" class="flex items-center gap-2 flex-wrap">
+          <!-- Edit Mode Actions -->
+          <template v-if="isEditing">
+            <UButton
+              color="error"
+              variant="soft"
+              size="md"
+              class="cursor-pointer rounded-full px-4 sm:px-6"
+              :disabled="saving"
+              @click="cancelEditing"
+            >
+              <UIcon name="i-lucide-x" class="w-4 h-4 sm:mr-2" />
+              <span class="hidden sm:inline">Cancel</span>
+            </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-save"
+              size="md"
+              class="cursor-pointer rounded-full px-4 sm:px-6"
+              :loading="saving"
+              :disabled="!isFormValid || saving || !isOnline"
+              @click="saveChanges"
+            >
+              <span class="hidden sm:inline">Save Changes</span>
+              <span class="sm:hidden">Save</span>
+            </UButton>
+          </template>
+
+          <!-- View Mode Actions -->
+          <template v-else>
+            <!-- Create Delivery - Only show to users who can post deliveries -->
+            <UButton
+              v-if="isOpen && canPostDeliveries()"
+              color="neutral"
+              variant="outline"
+              icon="i-lucide-truck"
+              size="md"
+              class="cursor-pointer rounded-full px-3 sm:px-5"
+              @click="goToCreateDelivery"
+            >
+              <span class="hidden sm:inline">Create Delivery</span>
+            </UButton>
+
+            <!-- Edit -->
+            <UButton
+              v-if="canEdit"
+              color="neutral"
+              variant="outline"
+              icon="i-lucide-pencil"
+              size="md"
+              class="cursor-pointer rounded-full px-3 sm:px-5"
+              :disabled="closing"
+              @click="startEditing"
+            >
+              <span class="hidden sm:inline">Edit</span>
+            </UButton>
+
+            <!-- Close PO -->
+            <UButton
+              v-if="canCloseThisPO"
+              color="warning"
+              icon="i-lucide-lock"
+              size="md"
+              class="cursor-pointer rounded-full px-3 sm:px-5"
+              :loading="closing"
+              :disabled="!isOnline"
+              @click="showCloseConfirmation = true"
+            >
+              <span class="hidden sm:inline">Close PO</span>
+            </UButton>
+          </template>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div v-if="!loadingPO && po" class="flex items-center gap-2 flex-wrap">
-        <!-- Edit Mode Actions -->
-        <template v-if="isEditing">
-          <UButton
-            color="error"
-            variant="soft"
-            size="md"
-            class="cursor-pointer rounded-full"
-            :disabled="saving"
-            @click="cancelEditing"
+      <!-- Source PRF Link (if exists) -->
+      <div
+        v-if="po?.prf && !loadingPO"
+        class="relative mt-4 pt-4 border-t border-[var(--ui-border)]"
+      >
+        <div class="flex items-center gap-2 text-sm">
+          <UIcon name="i-lucide-git-branch" class="w-4 h-4 text-[var(--ui-text-muted)]" />
+          <span class="text-[var(--ui-text-muted)]">Created from PRF:</span>
+          <NuxtLink
+            :to="`/orders/prfs/${po.prf.id}`"
+            class="font-semibold text-primary hover:underline inline-flex items-center gap-1"
           >
-            Cancel
-          </UButton>
-          <UButton
-            color="primary"
-            icon="i-lucide-save"
-            size="md"
-            class="cursor-pointer rounded-full"
-            :loading="saving"
-            :disabled="!isFormValid || saving || !isOnline"
-            @click="saveChanges"
-          >
-            Save Changes
-          </UButton>
-        </template>
-
-        <!-- View Mode Actions -->
-        <template v-else>
-          <!-- Create Delivery - Only show to users who can post deliveries -->
-          <UButton
-            v-if="isOpen && canPostDeliveries()"
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-truck"
-            size="md"
-            class="cursor-pointer rounded-full"
-            @click="goToCreateDelivery"
-          >
-            <span class="hidden sm:inline">Create Delivery</span>
-          </UButton>
-
-          <!-- Edit -->
-          <UButton
-            v-if="canEdit"
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-pencil"
-            size="md"
-            class="cursor-pointer rounded-full"
-            :disabled="closing"
-            @click="startEditing"
-          >
-            <span class="hidden sm:inline">Edit</span>
-          </UButton>
-
-          <!-- Close PO -->
-          <UButton
-            v-if="canCloseThisPO"
-            color="warning"
-            icon="i-lucide-lock"
-            size="md"
-            class="cursor-pointer rounded-full"
-            :loading="closing"
-            :disabled="!isOnline"
-            @click="showCloseConfirmation = true"
-          >
-            <span class="hidden sm:inline">Close PO</span>
-          </UButton>
-        </template>
+            {{ po.prf.prf_no }}
+            <UIcon name="i-lucide-external-link" class="w-3 h-3" />
+          </NuxtLink>
+        </div>
       </div>
     </div>
 
@@ -455,71 +506,96 @@ onMounted(async () => {
       <!-- View Mode -->
       <template v-else>
         <!-- PO Header Info -->
-        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
           <template #header>
-            <h2 class="text-lg font-semibold text-[var(--ui-text)]">Purchase Order Details</h2>
+            <div class="flex items-center gap-3">
+              <!-- Icon Badge -->
+              <div
+                class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30"
+              >
+                <UIcon name="i-lucide-file-text" class="w-5 h-5 text-primary" />
+              </div>
+              <h2 class="text-lg font-semibold text-[var(--ui-text)]">Purchase Order Details</h2>
+            </div>
           </template>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <!-- PO Number -->
             <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">PO Number</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.po_no }}</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                PO Number
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">{{ po.po_no }}</p>
             </div>
 
             <!-- Supplier -->
             <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Supplier</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.supplier?.name }}</p>
-              <p v-if="po.supplier?.code" class="text-xs text-[var(--ui-text-muted)]">
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Supplier
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.supplier?.name }}
+              </p>
+              <p v-if="po.supplier?.code" class="text-xs text-[var(--ui-text-muted)] mt-0.5">
                 {{ po.supplier.code }}
               </p>
             </div>
 
-            <!-- Linked PRF -->
-            <div v-if="po.prf">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Source PRF</label>
-              <NuxtLink
-                :to="`/orders/prfs/${po.prf.id}`"
-                class="text-sm font-medium text-primary hover:underline"
-              >
-                {{ po.prf.prf_no }}
-              </NuxtLink>
+            <!-- Status -->
+            <div>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Status
+              </p>
+              <div class="mt-1">
+                <OrdersPOStatusBadge :status="po.status" size="md" />
+              </div>
+            </div>
+
+            <!-- Created Date -->
+            <div>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Created
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ formatDate(po.created_at) }}
+              </p>
             </div>
 
             <!-- Quotation Reference -->
             <div v-if="po.quotation_ref">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Quotation Ref</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.quotation_ref }}</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Quotation Ref
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">{{ po.quotation_ref }}</p>
             </div>
 
             <!-- Ship-To Location -->
             <div v-if="po.ship_to_location">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Ship To</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Ship To
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
                 {{ po.ship_to_location.name }}
               </p>
             </div>
 
             <!-- Contract Duration -->
             <div v-if="po.duration_days">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Duration</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.duration_days }} days</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Duration
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.duration_days }} days
+              </p>
             </div>
 
             <!-- Created By -->
             <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Created By</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">
-                {{ po.creator?.full_name || po.creator?.username }}
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Created By
               </p>
-            </div>
-
-            <!-- Created Date -->
-            <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Created Date</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">
-                {{ formatDate(po.created_at) }}
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.creator?.full_name || po.creator?.username }}
               </p>
             </div>
           </div>
@@ -536,12 +612,24 @@ onMounted(async () => {
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div v-if="po.ship_to_contact">
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Contact Name</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.ship_to_contact }}</p>
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Contact Name
+                </p>
+                <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                  {{ po.ship_to_contact }}
+                </p>
               </div>
               <div v-if="po.ship_to_phone">
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Contact Phone</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.ship_to_phone }}</p>
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Contact Phone
+                </p>
+                <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                  {{ po.ship_to_phone }}
+                </p>
               </div>
             </div>
           </div>
@@ -558,17 +646,31 @@ onMounted(async () => {
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div v-if="po.payment_terms">
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Payment Terms</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.payment_terms }}</p>
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Payment Terms
+                </p>
+                <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                  {{ po.payment_terms }}
+                </p>
               </div>
               <div v-if="po.delivery_terms">
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Delivery Terms</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.delivery_terms }}</p>
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Delivery Terms
+                </p>
+                <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                  {{ po.delivery_terms }}
+                </p>
               </div>
             </div>
             <div v-if="po.terms_conditions" class="mt-4">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Additional Terms</label>
-              <p class="text-sm text-[var(--ui-text)] mt-1 whitespace-pre-wrap">
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Additional Terms
+              </p>
+              <p class="text-sm text-[var(--ui-text)] mt-1 whitespace-pre-wrap leading-relaxed">
                 {{ po.terms_conditions }}
               </p>
             </div>
@@ -576,40 +678,69 @@ onMounted(async () => {
 
           <!-- Notes -->
           <div v-if="po.notes" class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-            <label class="text-xs text-[var(--ui-text-muted)] uppercase">Notes</label>
-            <p class="text-sm text-[var(--ui-text)] mt-1 whitespace-pre-wrap">{{ po.notes }}</p>
+            <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+              Notes
+            </p>
+            <p class="text-sm text-[var(--ui-text)] mt-1 whitespace-pre-wrap leading-relaxed">
+              {{ po.notes }}
+            </p>
           </div>
 
           <!-- Totals Summary -->
           <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
+            <h3
+              class="text-sm font-semibold text-[var(--ui-text-muted)] mb-4 uppercase tracking-wider"
+            >
+              Order Totals
+            </h3>
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Subtotal</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Subtotal
+                </p>
+                <p class="text-sm font-bold text-[var(--ui-text)] mt-1">
                   {{ formatCurrency(parseFloat(po.total_before_discount)) }}
                 </p>
               </div>
               <div v-if="parseFloat(po.total_discount) > 0">
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Discount</label>
-                <p class="text-sm font-medium text-error">
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Discount
+                </p>
+                <p class="text-sm font-bold text-error mt-1">
                   -{{ formatCurrency(parseFloat(po.total_discount)) }}
                 </p>
               </div>
               <div>
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Before VAT</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Before VAT
+                </p>
+                <p class="text-sm font-bold text-[var(--ui-text)] mt-1">
                   {{ formatCurrency(parseFloat(po.total_after_discount)) }}
                 </p>
               </div>
               <div>
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">VAT (15%)</label>
-                <p class="text-sm font-medium text-[var(--ui-text)]">
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  VAT (15%)
+                </p>
+                <p class="text-sm font-bold text-[var(--ui-text)] mt-1">
                   {{ formatCurrency(parseFloat(po.total_vat)) }}
                 </p>
               </div>
-              <div>
-                <label class="text-xs text-[var(--ui-text-muted)] uppercase">Total</label>
-                <p class="text-xl font-bold text-primary">
+              <div class="col-span-2 md:col-span-1">
+                <p
+                  class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold"
+                >
+                  Total Amount
+                </p>
+                <p class="text-xl font-bold text-primary mt-1">
                   {{ formatCurrency(parseFloat(po.total_amount)) }}
                 </p>
               </div>
@@ -618,48 +749,76 @@ onMounted(async () => {
         </UCard>
 
         <!-- Supplier Information -->
-        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
           <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
+            <div class="flex items-center gap-3">
+              <!-- Icon Badge -->
+              <div
+                class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 dark:border-emerald-500/30"
+              >
+                <UIcon
+                  name="i-lucide-building-2"
+                  class="w-5 h-5 text-emerald-600 dark:text-emerald-400"
+                />
+              </div>
               <h2 class="text-lg font-semibold text-[var(--ui-text)]">Supplier Information</h2>
             </div>
           </template>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Name</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.supplier?.name }}</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Name
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.supplier?.name }}
+              </p>
             </div>
             <div>
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Code</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.supplier?.code }}</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Code
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.supplier?.code }}
+              </p>
             </div>
             <div v-if="po.supplier?.phone">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Phone</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.supplier.phone }}</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Phone
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.supplier.phone }}
+              </p>
             </div>
             <div v-if="po.supplier?.vat_reg_no">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">VAT Registration</label>
-              <p class="text-sm font-medium text-[var(--ui-text)]">{{ po.supplier.vat_reg_no }}</p>
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                VAT Registration
+              </p>
+              <p class="text-sm font-semibold text-[var(--ui-text)] mt-1">
+                {{ po.supplier.vat_reg_no }}
+              </p>
             </div>
             <div v-if="po.supplier?.emails && po.supplier.emails.length > 0" class="md:col-span-2">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Email(s)</label>
-              <div class="flex flex-wrap gap-2 mt-1">
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Email(s)
+              </p>
+              <div class="flex flex-wrap gap-2 mt-2">
                 <UBadge
                   v-for="email in po.supplier.emails"
                   :key="email"
                   color="neutral"
                   variant="subtle"
-                  size="sm"
+                  size="md"
                 >
                   {{ email }}
                 </UBadge>
               </div>
             </div>
             <div v-if="po.supplier?.address" class="md:col-span-2">
-              <label class="text-xs text-[var(--ui-text-muted)] uppercase">Address</label>
-              <p class="text-sm text-[var(--ui-text)] mt-1 whitespace-pre-wrap">
+              <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+                Address
+              </p>
+              <p class="text-sm text-[var(--ui-text)] mt-1 whitespace-pre-wrap leading-relaxed">
                 {{ po.supplier.address }}
               </p>
             </div>
@@ -667,10 +826,15 @@ onMounted(async () => {
         </UCard>
 
         <!-- Line Items (Read-only) -->
-        <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <UCard class="card-elevated" :ui="{ body: 'p-4 sm:p-6' }">
           <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-list" class="w-5 h-5 text-primary" />
+            <div class="flex items-center gap-3">
+              <!-- Icon Badge -->
+              <div
+                class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30"
+              >
+                <UIcon name="i-lucide-shopping-bag" class="w-5 h-5 text-primary" />
+              </div>
               <h2 class="text-lg font-semibold text-[var(--ui-text)]">Order Items</h2>
             </div>
           </template>
@@ -706,26 +870,43 @@ onMounted(async () => {
         <UCard
           v-if="po.deliveries && po.deliveries.length > 0"
           class="card-elevated"
-          :ui="{ body: 'p-3 sm:p-4' }"
+          :ui="{ body: 'p-4 sm:p-6' }"
         >
           <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-truck" class="w-5 h-5 text-primary" />
-              <h2 class="text-lg font-semibold text-[var(--ui-text)]">Linked Deliveries</h2>
+            <div class="flex items-center gap-3">
+              <!-- Icon Badge -->
+              <div
+                class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30"
+              >
+                <UIcon name="i-lucide-truck" class="w-5 h-5 text-primary" />
+              </div>
+              <div class="flex-1">
+                <h2 class="text-lg font-semibold text-[var(--ui-text)]">Linked Deliveries</h2>
+                <p class="text-sm text-[var(--ui-text-muted)]">
+                  {{ po.deliveries.length }}
+                  {{ po.deliveries.length === 1 ? "delivery" : "deliveries" }} linked to this PO
+                </p>
+              </div>
             </div>
           </template>
 
-          <div class="space-y-2">
+          <div class="space-y-3">
             <div
               v-for="delivery in po.deliveries"
               :key="delivery.id"
-              class="flex items-center justify-between p-3 bg-[var(--ui-bg)] rounded-lg border border-[var(--ui-border)]"
+              class="flex items-center justify-between p-4 bg-[var(--ui-bg-muted)] rounded-lg border border-[var(--ui-border)] hover:bg-[var(--ui-bg-elevated)] transition-colors"
             >
               <div class="flex items-center gap-3">
-                <UIcon name="i-lucide-package" class="w-5 h-5 text-primary" />
+                <div
+                  class="flex items-center justify-center w-10 h-10 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]"
+                >
+                  <UIcon name="i-lucide-package" class="w-5 h-5 text-primary" />
+                </div>
                 <div>
-                  <span class="font-medium text-[var(--ui-text)]">{{ delivery.delivery_no }}</span>
-                  <p class="text-xs text-[var(--ui-text-muted)]">
+                  <span class="font-semibold text-[var(--ui-text)]">
+                    {{ delivery.delivery_no }}
+                  </span>
+                  <p class="text-xs text-[var(--ui-text-muted)] mt-0.5">
                     {{ formatDate(delivery.delivery_date) }} •
                     {{ formatCurrency(parseFloat(delivery.total_amount)) }}
                   </p>
@@ -735,12 +916,12 @@ onMounted(async () => {
                 <UBadge
                   :color="delivery.status === 'POSTED' ? 'success' : 'warning'"
                   variant="subtle"
-                  size="sm"
+                  size="md"
                 >
                   {{ delivery.status }}
                 </UBadge>
                 <UButton
-                  icon="i-lucide-external-link"
+                  icon="i-lucide-arrow-right"
                   color="neutral"
                   variant="ghost"
                   size="sm"

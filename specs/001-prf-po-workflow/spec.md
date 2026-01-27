@@ -8,23 +8,157 @@
 
 ## Changelog
 
+### 2026-01-27: UI Redesign for Create/Detail Pages
+
+**Enhancement**: Redesigned PRF, PO, and Delivery create/detail pages with polished, theme-aware UI components.
+
+**Design Changes**:
+
+1. **Theme-Aware Page Headers**
+   - Replaced fixed navy gradients with `bg-[var(--ui-bg-elevated)]`
+   - Primary color accents for icons and titles (adapts to light/dark mode)
+   - Subtle decorative dot pattern background (`radial-gradient` at 2-3% opacity)
+   - Location/Period indicator with theme-aware colors
+
+2. **Unified Form Card Structure**
+   - Single card containing all form sections
+   - Color-coded section headers with icon badges:
+     - Blue (`bg-sky-500/10`) - Basic Information section
+     - Green (`bg-emerald-500/10`) - Contact Information section
+     - Amber (`bg-amber-500/10`) - Line Items section
+   - Gradient dividers between sections
+
+3. **Professional Line Items Table**
+   - Larger input fields (`size="md"`)
+   - Professional table header styling with uppercase labels
+   - Better footer totals with VAT breakdown display
+   - Responsive design for smaller screens
+
+4. **Sticky Footer with Validation Status**
+   - Form validation indicator (ready/incomplete)
+   - Action buttons with proper loading states
+   - Backdrop blur effect for visual hierarchy
+
+**Files Changed**:
+
+- `app/pages/orders/prfs/create.vue` - PRF create page
+- `app/components/orders/PRFForm.vue` - PRF form component
+- `app/components/orders/PRFLineItemsTable.vue` - Line items table
+- `app/pages/orders/pos/create.vue` - PO create page
+- `app/components/orders/POForm.vue` - PO form component
+- `app/components/orders/POLineItemsTable.vue` - PO line items
+- `app/pages/deliveries/create.vue` - Delivery create page
+- `app/pages/orders/pos/[id].vue` - PO detail page
+
+**Rationale**:
+
+- Theme-aware colors adapt to light/dark mode automatically
+- Color-coded sections improve visual hierarchy and scannability
+- Consistent design patterns across PRF, PO, and Delivery pages
+- Professional appearance suitable for business application
+
+---
+
 ### 2026-01-27: Enhanced Document Numbering
 
 **Enhancement**: Updated PRF, PO, and Delivery numbering scheme to include location name and date for better traceability.
 
 **New Format**: `{Prefix}-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}`
+
 - Example: `PRF-KITCHEN-27-Jan-2026-01`, `PO-STORE-27-Jan-2026-02`, `DLV-ALULA-27-Jan-2026-03`
 - Location names converted to uppercase
 - Sequential numbers (01-99) restart daily per location
 - Date format: DD = two-digit day, Mon = three-letter month, YYYY = four-digit year
 
 **Rationale**:
+
 - Better traceability: Location and date visible at a glance
 - Easier sorting: Documents naturally group by location and date
 - Reduced conflicts: Daily restart per location reduces collision probability
 - No migration needed: Existing documents keep old format
 
 **Impact**: FR-002 (PRF numbering) and FR-016 (PO numbering) updated to reflect new format.
+
+## UI Design Patterns
+
+### Page Header Pattern
+
+All create and detail pages use a consistent header structure:
+
+```vue
+<div class="relative overflow-hidden rounded-lg sm:rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 shadow-sm">
+  <!-- Decorative dot pattern (2-3% opacity) -->
+  <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, var(--ui-text-muted) 1px, transparent 0); background-size: 24px 24px;" />
+
+  <div class="relative flex items-center justify-between gap-3 sm:gap-6">
+    <!-- Icon with primary accent -->
+    <div class="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30 shadow-sm">
+      <UIcon name="i-lucide-{icon}" class="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+    </div>
+
+    <!-- Title -->
+    <div>
+      <h1 class="text-xl sm:text-3xl lg:text-4xl font-bold text-primary tracking-tight">Page Title</h1>
+      <p class="hidden sm:block text-sm sm:text-base text-[var(--ui-text-muted)] mt-1 font-medium">Subtitle</p>
+    </div>
+  </div>
+</div>
+```
+
+### Form Section Headers
+
+Form sections use color-coded icon badges for visual hierarchy:
+
+| Section Type      | Badge Color                        | Icon Example        |
+| ----------------- | ---------------------------------- | ------------------- |
+| Basic Information | `bg-sky-500/10 text-sky-600`       | `i-lucide-file-text`|
+| Contact Info      | `bg-emerald-500/10 text-emerald-600`| `i-lucide-user`    |
+| Line Items        | `bg-amber-500/10 text-amber-600`   | `i-lucide-list`     |
+| Delivery Details  | `bg-purple-500/10 text-purple-600` | `i-lucide-truck`    |
+
+Section header structure:
+
+```vue
+<div class="flex items-center gap-3 mb-4">
+  <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-{color}-500/10">
+    <UIcon name="i-lucide-{icon}" class="w-4 h-4 text-{color}-600" />
+  </div>
+  <h3 class="text-base font-semibold text-[var(--ui-text)]">Section Title</h3>
+</div>
+```
+
+### Sticky Footer Pattern
+
+Create/edit pages use a sticky footer with validation status:
+
+```vue
+<div class="sticky bottom-0 z-10 bg-[var(--ui-bg-elevated)]/95 dark:bg-[var(--ui-bg-elevated)]/98 backdrop-blur-md border-t border-[var(--ui-border)] rounded-t-lg shadow-2xl -mx-4 px-4 py-4 sm:mx-0 sm:px-6 sm:rounded-xl">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <!-- Validation indicator -->
+    <div class="hidden sm:flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
+      <UIcon :name="isFormValid ? 'i-lucide-check-circle-2' : 'i-lucide-alert-circle'" :class="isFormValid ? 'text-emerald-500' : 'text-amber-500'" />
+      <span>{{ isFormValid ? 'Form ready to save' : 'Please complete all required fields' }}</span>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex items-center gap-3 ml-auto">
+      <UButton color="neutral" variant="outline">Cancel</UButton>
+      <UButton color="primary" :loading="saving" :disabled="!isFormValid">Save</UButton>
+    </div>
+  </div>
+</div>
+```
+
+### Line Items Table
+
+Tables use professional styling with consistent column widths and footer totals:
+
+- Input fields: `size="md"` for better touch targets
+- Table headers: `text-xs font-semibold uppercase tracking-wider`
+- Footer totals: Separate rows for Before VAT, VAT (15%), and Grand Total
+- Responsive: Stack on mobile, horizontal on desktop
+
+---
 
 ## Clarifications
 

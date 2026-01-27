@@ -148,132 +148,136 @@ const selectedLocation = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- PRF Header Card -->
-    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">PRF Information</h2>
-
-          <!-- Location Indicator -->
+  <div class="space-y-3">
+    <!-- Unified Form Card with Internal Sections -->
+    <UCard class="card-elevated overflow-hidden" :ui="{ body: 'p-0' }">
+      <!-- PRF Information Section -->
+      <div class="p-4 sm:p-6 bg-gradient-to-br from-[var(--ui-bg)] to-[var(--ui-bg-elevated)]">
+        <div class="flex items-center gap-3 mb-6">
           <div
-            v-if="selectedLocation"
-            class="flex items-center gap-2 px-3 py-1.5 md:p-3 bg-[var(--ui-bg)] rounded-lg border border-[var(--ui-border)]"
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20"
           >
-            <UIcon
-              :name="getLocationIcon(selectedLocation.locationType)"
-              class="w-4 md:w-6 h-4 md:h-6 text-primary flex-shrink-0"
-            />
-            <div class="text-left">
-              <p class="text-sm font-medium text-[var(--ui-text)]">
-                {{ selectedLocation.name }}
-              </p>
-              <p class="text-xs text-[var(--ui-text-muted)]">Period: {{ currentPeriodName }}</p>
-            </div>
+            <UIcon name="i-lucide-file-text" class="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-[var(--ui-text)]">PRF Information</h2>
+            <p class="text-xs text-[var(--ui-text-muted)]">Basic details about this requisition</p>
           </div>
         </div>
-      </template>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Location (if multiple) -->
-        <div v-if="locations.length > 1">
-          <label class="form-label mb-2 block">
-            Location
-            <span class="text-[var(--ui-error)]">*</span>
-          </label>
-          <USelectMenu
-            v-model="formData.location_id"
-            :items="locations"
-            label-key="name"
-            value-key="id"
-            placeholder="Select location"
-            :disabled="disabled || readonly"
-            size="lg"
-            class="w-full"
-          >
-            <template #leading>
-              <UIcon
-                v-if="selectedLocation"
-                :name="getLocationIcon(selectedLocation.locationType)"
-                class="w-5 h-5"
-              />
-            </template>
-          </USelectMenu>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Location (if multiple) -->
+          <div v-if="locations.length > 1">
+            <label class="form-label mb-2 block">
+              Location
+              <span class="text-[var(--ui-error)]">*</span>
+            </label>
+            <USelectMenu
+              v-model="formData.location_id"
+              :items="locations"
+              label-key="name"
+              value-key="id"
+              placeholder="Select location"
+              :disabled="disabled || readonly"
+              size="lg"
+              class="w-full"
+            >
+              <template #leading>
+                <UIcon
+                  v-if="selectedLocation"
+                  :name="getLocationIcon(selectedLocation.locationType)"
+                  class="w-5 h-5"
+                />
+              </template>
+            </USelectMenu>
+          </div>
 
-        <!-- PRF Type -->
-        <div>
-          <label class="form-label mb-2 block">
-            PRF Type
-            <span class="text-[var(--ui-error)]">*</span>
-          </label>
-          <USelectMenu
-            v-model="formData.prf_type"
-            :items="prfTypeOptions"
-            label-key="label"
-            value-key="value"
-            :disabled="disabled || readonly"
-            size="lg"
-            class="w-full"
-          >
-            <template #item="{ item }">
-              <div class="flex flex-col">
-                <span class="font-medium">{{ item.label }}</span>
-                <span class="text-xs text-[var(--ui-text-muted)]">{{ item.description }}</span>
-              </div>
-            </template>
-          </USelectMenu>
-        </div>
+          <!-- PRF Type -->
+          <div>
+            <label class="form-label mb-2 block">
+              PRF Type
+              <span class="text-[var(--ui-error)]">*</span>
+            </label>
+            <USelectMenu
+              v-model="formData.prf_type"
+              :items="prfTypeOptions"
+              label-key="label"
+              value-key="value"
+              :disabled="disabled || readonly"
+              size="lg"
+              class="w-full"
+            >
+              <template #item="{ item }">
+                <div class="flex flex-col">
+                  <span class="font-medium">{{ item.label }}</span>
+                  <span class="text-xs text-[var(--ui-text-muted)]">{{ item.description }}</span>
+                </div>
+              </template>
+            </USelectMenu>
+          </div>
 
-        <!-- Category -->
-        <div>
-          <label class="form-label mb-2 block">
-            Category
-            <span class="text-[var(--ui-error)]">*</span>
-          </label>
-          <USelectMenu
-            v-model="formData.category"
-            :items="categoryOptions"
-            label-key="label"
-            value-key="value"
-            :disabled="disabled || readonly"
-            size="lg"
-            class="w-full"
-          />
-        </div>
+          <!-- Category -->
+          <div>
+            <label class="form-label mb-2 block">
+              Category
+              <span class="text-[var(--ui-error)]">*</span>
+            </label>
+            <USelectMenu
+              v-model="formData.category"
+              :items="categoryOptions"
+              label-key="label"
+              value-key="value"
+              :disabled="disabled || readonly"
+              size="lg"
+              class="w-full"
+            />
+          </div>
 
-        <!-- Project Name -->
-        <div>
-          <label class="form-label mb-2 block">Project Name</label>
-          <UInput
-            v-model="formData.project_name"
-            placeholder="Optional project name"
-            :disabled="disabled || readonly"
-            size="lg"
-            icon="i-lucide-folder"
-            class="w-full"
-          />
-        </div>
+          <!-- Project Name -->
+          <div>
+            <label class="form-label mb-2 block">Project Name</label>
+            <UInput
+              v-model="formData.project_name"
+              placeholder="Optional project name"
+              :disabled="disabled || readonly"
+              size="lg"
+              icon="i-lucide-folder"
+              class="w-full"
+            />
+          </div>
 
-        <!-- Expected Delivery Date -->
-        <div>
-          <label class="form-label mb-2 block">Expected Delivery Date</label>
-          <UInput
-            v-model="formData.expected_delivery_date"
-            type="date"
-            :disabled="disabled || readonly"
-            size="lg"
-            icon="i-lucide-calendar"
-            class="w-full"
-          />
+          <!-- Expected Delivery Date -->
+          <div>
+            <label class="form-label mb-2 block">Expected Delivery Date</label>
+            <UInput
+              v-model="formData.expected_delivery_date"
+              type="date"
+              :disabled="disabled || readonly"
+              size="lg"
+              icon="i-lucide-calendar"
+              class="w-full"
+            />
+          </div>
         </div>
       </div>
 
+      <!-- Divider -->
+      <div class="h-px bg-gradient-to-r from-transparent via-[var(--ui-border)] to-transparent" />
+
       <!-- Contact Information Section -->
-      <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-        <h3 class="text-sm font-semibold text-[var(--ui-text-muted)] mb-4 uppercase tracking-wider">
-          Contact Information
-        </h3>
+      <div class="p-4 sm:p-6 bg-[var(--ui-bg)]">
+        <div class="flex items-center gap-3 mb-6">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/20"
+          >
+            <UIcon name="i-lucide-users" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-[var(--ui-text)]">Contact Information</h3>
+            <p class="text-xs text-[var(--ui-text-muted)]">Who to contact for this requisition</p>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Contact Person -->
           <div>
@@ -329,14 +333,31 @@ const selectedLocation = computed(() => {
         </div>
       </div>
 
+      <!-- Divider -->
+      <div class="h-px bg-gradient-to-r from-transparent via-[var(--ui-border)] to-transparent" />
+
       <!-- Notes Section -->
-      <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-        <label class="form-label mb-2 block">Notes</label>
+      <div class="p-4 sm:p-6 bg-[var(--ui-bg-elevated)]">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500/10 dark:bg-amber-400/20"
+          >
+            <UIcon
+              name="i-lucide-message-square"
+              class="w-5 h-5 text-amber-600 dark:text-amber-400"
+            />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-[var(--ui-text)]">Additional Notes</h3>
+            <p class="text-xs text-[var(--ui-text-muted)]">Special instructions or requirements</p>
+          </div>
+        </div>
+
         <UTextarea
           v-model="formData.notes"
-          placeholder="Additional notes or special instructions"
+          placeholder="Add any special instructions, requirements, or notes for this requisition..."
           :disabled="disabled || readonly"
-          :rows="3"
+          :rows="4"
           size="lg"
           class="w-full"
         />
@@ -344,24 +365,37 @@ const selectedLocation = computed(() => {
     </UCard>
 
     <!-- Line Items Card -->
-    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-      <template #header>
-        <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-list" class="w-5 h-5 text-primary" />
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Items Required</h2>
+    <UCard class="card-elevated overflow-hidden" :ui="{ body: 'p-0' }">
+      <!-- Header -->
+      <div
+        class="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-b border-[var(--ui-border)]"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20 dark:bg-primary/30"
+          >
+            <UIcon name="i-lucide-shopping-cart" class="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-[var(--ui-text)]">Items Required</h2>
+            <p class="text-xs text-[var(--ui-text-muted)]">Add all items you need to requisition</p>
+          </div>
         </div>
-      </template>
+      </div>
 
-      <OrdersPRFLineItemsTable
-        :lines="formData.lines"
-        :items="items"
-        :disabled="disabled"
-        :readonly="readonly"
-        :loading="loading"
-        @add-line="addLine"
-        @remove-line="removeLine"
-        @line-change="handleLineChange"
-      />
+      <!-- Line Items Table -->
+      <div class="p-4 sm:p-6">
+        <OrdersPRFLineItemsTable
+          :lines="formData.lines"
+          :items="items"
+          :disabled="disabled"
+          :readonly="readonly"
+          :loading="loading"
+          @add-line="addLine"
+          @remove-line="removeLine"
+          @line-change="handleLineChange"
+        />
+      </div>
     </UCard>
   </div>
 </template>

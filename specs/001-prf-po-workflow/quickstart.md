@@ -157,8 +157,55 @@ app/components/orders/
 ├── PRFStatusBadge.vue
 ├── POStatusBadge.vue
 ├── PRFApprovalActions.vue
+├── POCloseModal.vue
 └── StockLevelsTable.vue
 ```
+
+---
+
+## UI Design Patterns
+
+### Theme-Aware Headers
+
+All page headers use CSS variables for theme-aware colors:
+
+```vue
+<div class="bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
+  <!-- Icon with primary color -->
+  <div class="bg-primary/10 border border-primary/20">
+    <UIcon class="text-primary" />
+  </div>
+  <!-- Title in primary color -->
+  <h1 class="text-primary">Page Title</h1>
+</div>
+```
+
+**Key CSS Variables**:
+
+- `var(--ui-bg-elevated)` - Card background (adapts to light/dark)
+- `var(--ui-bg-muted)` - Subtle background
+- `var(--ui-border)` - Border color
+- `var(--ui-text)` - Primary text
+- `var(--ui-text-muted)` - Secondary text
+
+### Color-Coded Sections
+
+Form sections use color-coded icon badges:
+
+| Section              | Color Class                | Icon                |
+| -------------------- | -------------------------- | ------------------- |
+| Basic Information    | `bg-sky-500/10`            | `i-lucide-file-text`|
+| Contact Information  | `bg-emerald-500/10`        | `i-lucide-user`     |
+| Line Items           | `bg-amber-500/10`          | `i-lucide-list`     |
+| Delivery Details     | `bg-purple-500/10`         | `i-lucide-truck`    |
+
+### Sticky Footer
+
+Create/edit pages use a sticky footer with validation status:
+
+- Background: `bg-[var(--ui-bg-elevated)]/95` with `backdrop-blur-md`
+- Shows validation indicator (check/warning icon)
+- Action buttons aligned to the right
 
 ### Pages
 

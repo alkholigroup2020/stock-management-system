@@ -361,25 +361,69 @@ onMounted(async () => {
 
 <template>
   <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
-    <!-- Page Header -->
-    <div class="flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-shopping-cart" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
-        <div>
-          <h1 class="text-xl sm:text-3xl font-bold text-primary">New Purchase Order</h1>
-          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
-            Create a new Purchase Order
-            <span v-if="selectedPRF" class="text-primary">from {{ selectedPRF.prf_no }}</span>
-          </p>
+    <!-- Enhanced Page Header -->
+    <div
+      class="relative overflow-hidden rounded-lg sm:rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 shadow-sm"
+    >
+      <!-- Subtle Decorative Pattern -->
+      <div
+        class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            var(--ui-text-muted) 1px,
+            transparent 0
+          );
+          background-size: 24px 24px;
+        "
+      />
+
+      <div class="relative flex items-center justify-between gap-3 sm:gap-6">
+        <div class="flex items-center gap-3 sm:gap-5">
+          <!-- Icon with Primary Color Accent -->
+          <div
+            class="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30 shadow-sm"
+          >
+            <UIcon name="i-lucide-shopping-cart" class="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+          </div>
+
+          <!-- Title Section -->
+          <div>
+            <h1 class="text-xl sm:text-3xl lg:text-4xl font-bold text-primary tracking-tight">
+              New Purchase Order
+            </h1>
+            <p
+              class="hidden sm:block text-sm sm:text-base text-[var(--ui-text-muted)] mt-1 font-medium"
+            >
+              Create a new Purchase Order
+              <span v-if="selectedPRF" class="text-primary">from {{ selectedPRF.prf_no }}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Supplier Indicator (shown when supplier is selected) -->
+        <div
+          v-if="formData.supplier_id && suppliers.find((s) => s.id === formData.supplier_id)"
+          class="hidden lg:flex items-center gap-3 px-4 py-3 bg-[var(--ui-bg-muted)] rounded-xl border border-[var(--ui-border)]"
+        >
+          <UIcon name="i-lucide-building-2" class="w-6 h-6 text-primary flex-shrink-0" />
+          <div class="text-right">
+            <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+              Supplier
+            </p>
+            <p class="text-sm font-bold text-[var(--ui-text)]">
+              {{ suppliers.find((s) => s.id === formData.supplier_id)?.name }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loadingInitialData" class="flex justify-center py-12">
-      <div class="flex flex-col items-center gap-3">
+    <div v-if="loadingInitialData" class="flex justify-center py-16">
+      <div class="flex flex-col items-center gap-4">
         <UIcon name="i-lucide-loader-2" class="w-12 h-12 text-primary animate-spin" />
-        <p class="text-sm text-[var(--ui-text-muted)]">Loading form data...</p>
+        <p class="text-sm text-[var(--ui-text-muted)] font-medium">Loading form data...</p>
       </div>
     </div>
 
@@ -397,29 +441,48 @@ onMounted(async () => {
         @prf-selected="handlePrfSelected"
       />
 
-      <!-- Form Actions -->
-      <div class="flex flex-wrap items-center justify-end gap-3">
-        <UButton
-          color="error"
-          variant="soft"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :disabled="saving"
-          @click="cancel"
-        >
-          Cancel
-        </UButton>
-        <UButton
-          color="primary"
-          icon="i-lucide-check"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :loading="saving"
-          :disabled="!isFormValid || saving || !isOnline"
-          @click="createPO"
-        >
-          Create PO
-        </UButton>
+      <!-- Sticky Footer with Form Actions -->
+      <div
+        class="sticky bottom-0 z-10 bg-[var(--ui-bg-elevated)]/95 dark:bg-[var(--ui-bg-elevated)]/98 backdrop-blur-md border-t border-[var(--ui-border)] rounded-t-lg shadow-2xl -mx-4 px-4 py-4 sm:mx-0 sm:px-6 sm:rounded-xl"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <!-- Form Status Indicator -->
+          <div class="hidden sm:flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
+            <UIcon
+              :name="isFormValid ? 'i-lucide-check-circle-2' : 'i-lucide-alert-circle'"
+              :class="['w-5 h-5', isFormValid ? 'text-emerald-500' : 'text-amber-500']"
+            />
+            <span class="font-medium">
+              {{ isFormValid ? "Form ready to submit" : "Please complete all required fields" }}
+            </span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 ml-auto">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 hover:bg-[var(--ui-bg-elevated)] transition-all"
+              :disabled="saving"
+              @click="cancel"
+            >
+              <UIcon name="i-lucide-x" class="w-4 h-4 sm:mr-2" />
+              <span class="hidden sm:inline">Cancel</span>
+            </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-check"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+              :loading="saving"
+              :disabled="!isFormValid || saving || !isOnline"
+              @click="createPO"
+            >
+              Create PO
+            </UButton>
+          </div>
+        </div>
       </div>
     </template>
 

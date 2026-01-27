@@ -163,14 +163,16 @@ function removeLine(id: string) {
 <template>
   <div class="space-y-4">
     <!-- Header with Add Button -->
-    <div v-if="!readonly" class="flex items-center justify-between">
-      <h3 class="text-base font-semibold text-[var(--ui-text)]">Line Items</h3>
+    <div v-if="!readonly" class="flex items-center justify-between mb-2">
+      <p class="text-sm font-medium text-[var(--ui-text-muted)]">
+        Add and manage line items for this purchase order
+      </p>
       <UButton
         icon="i-lucide-plus"
         color="primary"
         variant="soft"
-        size="sm"
-        class="cursor-pointer rounded-full"
+        size="md"
+        class="cursor-pointer rounded-full px-4"
         :disabled="disabled"
         @click="addLine"
       >
@@ -179,67 +181,67 @@ function removeLine(id: string) {
     </div>
 
     <!-- Lines Table -->
-    <div class="overflow-x-auto border border-[var(--ui-border)] rounded-lg">
+    <div class="overflow-x-auto border border-[var(--ui-border)] rounded-lg shadow-sm">
       <table class="min-w-full divide-y divide-[var(--ui-border)]">
-        <thead>
-          <tr class="bg-[var(--ui-bg-elevated)]">
+        <thead class="bg-[var(--ui-bg-elevated)]">
+          <tr>
             <th
-              class="px-3 py-3 text-left text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider"
+              class="px-4 py-3.5 text-left text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider"
             >
               Item
             </th>
             <th
-              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-20"
+              class="px-4 py-3.5 text-center text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-20"
             >
               Unit
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-24"
             >
               Qty
             </th>
             <!-- Delivery Tracking Columns (readonly mode only) -->
             <th
               v-if="showDeliveryTracking && readonly"
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-24"
             >
               Delivered
             </th>
             <th
               v-if="showDeliveryTracking && readonly"
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-24"
             >
               Remaining
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-28"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-28"
             >
               Unit Price
             </th>
             <th
               v-if="showDiscounts"
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-20 hidden lg:table-cell"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-20 hidden lg:table-cell"
             >
               Disc %
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-28 hidden md:table-cell"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-28 hidden md:table-cell"
             >
               Before VAT
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-24 hidden lg:table-cell"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-24 hidden lg:table-cell"
             >
               VAT ({{ VAT_RATE }}%)
             </th>
             <th
-              class="px-3 py-3 text-right text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-32"
+              class="px-4 py-3.5 text-right text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-32"
             >
               Total
             </th>
             <th
               v-if="!readonly"
-              class="px-3 py-3 text-center text-xs font-semibold text-[var(--ui-text-muted)] uppercase tracking-wider w-16"
+              class="px-4 py-3.5 text-center text-xs font-bold text-[var(--ui-text)] uppercase tracking-wider w-16"
             >
               Action
             </th>
@@ -264,7 +266,7 @@ function removeLine(id: string) {
             class="hover:bg-[var(--ui-bg-elevated)] transition-colors"
           >
             <!-- Item Selection / Description -->
-            <td class="px-3 py-3">
+            <td class="px-4 py-3">
               <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
                 <span v-if="line.item_code" class="font-mono text-xs text-[var(--ui-text-muted)]">
                   {{ line.item_code }}
@@ -280,6 +282,7 @@ function removeLine(id: string) {
                   placeholder="Select item (optional)"
                   searchable
                   clearable
+                  size="md"
                   class="w-48 flex-shrink-0"
                   :disabled="disabled"
                   @update:model-value="
@@ -299,7 +302,7 @@ function removeLine(id: string) {
                 <UInput
                   v-model="line.item_description"
                   placeholder="Item description *"
-                  size="sm"
+                  size="md"
                   :disabled="disabled"
                   class="flex-1 min-w-[200px]"
                   @blur="updateLineCalculation(line)"
@@ -308,7 +311,7 @@ function removeLine(id: string) {
             </td>
 
             <!-- Unit -->
-            <td class="px-3 py-3 text-center">
+            <td class="px-4 py-3 text-center">
               <div v-if="readonly" class="text-sm text-[var(--ui-text)]">
                 {{ line.unit }}
               </div>
@@ -318,13 +321,14 @@ function removeLine(id: string) {
                 :items="unitOptions"
                 label-key="label"
                 value-key="value"
+                size="md"
                 :disabled="disabled"
                 class="w-20"
               />
             </td>
 
             <!-- Quantity -->
-            <td class="px-3 py-3">
+            <td class="px-4 py-3">
               <div v-if="readonly" class="text-sm text-right text-[var(--ui-text)]">
                 {{ line.quantity }}
               </div>
@@ -335,7 +339,7 @@ function removeLine(id: string) {
                 step="0.0001"
                 min="0"
                 placeholder="0"
-                size="sm"
+                size="md"
                 :disabled="disabled"
                 class="w-24 text-right"
                 @input="updateLineCalculation(line)"
@@ -343,7 +347,7 @@ function removeLine(id: string) {
             </td>
 
             <!-- Delivered Quantity (readonly mode only) -->
-            <td v-if="showDeliveryTracking && readonly" class="px-3 py-3 text-right">
+            <td v-if="showDeliveryTracking && readonly" class="px-4 py-3 text-right">
               <span
                 class="text-sm"
                 :class="[
@@ -357,7 +361,7 @@ function removeLine(id: string) {
             </td>
 
             <!-- Remaining Quantity (readonly mode only) -->
-            <td v-if="showDeliveryTracking && readonly" class="px-3 py-3 text-right">
+            <td v-if="showDeliveryTracking && readonly" class="px-4 py-3 text-right">
               <span
                 class="text-sm font-medium"
                 :class="[
@@ -378,7 +382,7 @@ function removeLine(id: string) {
             </td>
 
             <!-- Unit Price -->
-            <td class="px-3 py-3">
+            <td class="px-4 py-3">
               <div v-if="readonly" class="text-sm text-right text-[var(--ui-text)]">
                 {{ formatCurrency(parseFloat(line.unit_price) || 0) }}
               </div>
@@ -389,7 +393,7 @@ function removeLine(id: string) {
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                size="sm"
+                size="md"
                 :disabled="disabled"
                 class="w-28 text-right"
                 @input="updateLineCalculation(line)"
@@ -397,7 +401,7 @@ function removeLine(id: string) {
             </td>
 
             <!-- Discount Percent -->
-            <td v-if="showDiscounts" class="px-3 py-3 hidden lg:table-cell">
+            <td v-if="showDiscounts" class="px-4 py-3 hidden lg:table-cell">
               <div v-if="readonly" class="text-sm text-right text-[var(--ui-text-muted)]">
                 {{ line.discount_percent || 0 }}%
               </div>
@@ -409,7 +413,7 @@ function removeLine(id: string) {
                 min="0"
                 max="100"
                 placeholder="0"
-                size="sm"
+                size="md"
                 :disabled="disabled"
                 class="w-20 text-right"
                 @input="updateLineCalculation(line)"
@@ -417,33 +421,33 @@ function removeLine(id: string) {
             </td>
 
             <!-- Before VAT -->
-            <td class="px-3 py-3 text-right hidden md:table-cell">
+            <td class="px-4 py-3 text-right hidden md:table-cell">
               <span class="text-sm text-[var(--ui-text)]">
                 {{ formatCurrency(line.total_before_vat || 0) }}
               </span>
             </td>
 
             <!-- VAT Amount -->
-            <td class="px-3 py-3 text-right hidden lg:table-cell">
+            <td class="px-4 py-3 text-right hidden lg:table-cell">
               <span class="text-sm text-[var(--ui-text-muted)]">
                 {{ formatCurrency(line.vat_amount || 0) }}
               </span>
             </td>
 
             <!-- Total After VAT -->
-            <td class="px-3 py-3 text-right">
+            <td class="px-4 py-3 text-right">
               <span class="text-sm font-medium text-[var(--ui-text)]">
                 {{ formatCurrency(line.total_after_vat || 0) }}
               </span>
             </td>
 
             <!-- Action -->
-            <td v-if="!readonly" class="px-3 py-3 text-center">
+            <td v-if="!readonly" class="px-4 py-3 text-center">
               <UButton
                 icon="i-lucide-trash-2"
                 color="error"
                 variant="ghost"
-                size="sm"
+                size="md"
                 class="cursor-pointer"
                 :disabled="disabled || lines.length === 1"
                 aria-label="Remove line item"
@@ -473,80 +477,88 @@ function removeLine(id: string) {
         </tbody>
 
         <!-- Summary Footer -->
-        <tfoot class="bg-[var(--ui-bg-elevated)]">
+        <tfoot class="bg-[var(--ui-bg-elevated)] border-t-2 border-[var(--ui-border)]">
           <!-- Subtotal Before Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td colspan="4" class="px-3 py-2"></td>
-            <td v-if="showDiscounts" class="px-3 py-2 hidden lg:table-cell"></td>
-            <td class="px-3 py-2 hidden md:table-cell"></td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
+            <td colspan="4" class="px-4 py-2.5"></td>
+            <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
+            <td class="px-4 py-2.5 hidden md:table-cell"></td>
+            <td
+              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+            >
               Subtotal:
             </td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)]">
+            <td class="px-4 py-2.5 text-right font-medium text-[var(--ui-text)]">
               {{ formatCurrency(totals.total_before_discount) }}
             </td>
-            <td v-if="!readonly" class="px-3 py-2"></td>
+            <td v-if="!readonly" class="px-4 py-2.5"></td>
           </tr>
 
           <!-- Discount -->
           <tr v-if="totals.total_discount > 0" class="text-sm">
-            <td colspan="4" class="px-3 py-2"></td>
-            <td v-if="showDiscounts" class="px-3 py-2 hidden lg:table-cell"></td>
-            <td class="px-3 py-2 hidden md:table-cell"></td>
-            <td class="px-3 py-2 text-right text-error hidden lg:table-cell">Discount:</td>
-            <td class="px-3 py-2 text-right text-error">
+            <td colspan="4" class="px-4 py-2.5"></td>
+            <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
+            <td class="px-4 py-2.5 hidden md:table-cell"></td>
+            <td class="px-4 py-2.5 text-right font-semibold text-error hidden lg:table-cell">
+              Discount:
+            </td>
+            <td class="px-4 py-2.5 text-right font-medium text-error">
               -{{ formatCurrency(totals.total_discount) }}
             </td>
-            <td v-if="!readonly" class="px-3 py-2"></td>
+            <td v-if="!readonly" class="px-4 py-2.5"></td>
           </tr>
 
           <!-- After Discount / Before VAT -->
           <tr class="text-sm">
-            <td colspan="4" class="px-3 py-2"></td>
-            <td v-if="showDiscounts" class="px-3 py-2 hidden lg:table-cell"></td>
-            <td class="px-3 py-2 hidden md:table-cell"></td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
+            <td colspan="4" class="px-4 py-2.5"></td>
+            <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
+            <td class="px-4 py-2.5 hidden md:table-cell"></td>
+            <td
+              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+            >
               Before VAT:
             </td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text)]">
+            <td class="px-4 py-2.5 text-right font-medium text-[var(--ui-text)]">
               {{ formatCurrency(totals.total_after_discount) }}
             </td>
-            <td v-if="!readonly" class="px-3 py-2"></td>
+            <td v-if="!readonly" class="px-4 py-2.5"></td>
           </tr>
 
           <!-- VAT -->
           <tr class="text-sm">
-            <td colspan="4" class="px-3 py-2"></td>
-            <td v-if="showDiscounts" class="px-3 py-2 hidden lg:table-cell"></td>
-            <td class="px-3 py-2 hidden md:table-cell"></td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text-muted)] hidden lg:table-cell">
+            <td colspan="4" class="px-4 py-2.5"></td>
+            <td v-if="showDiscounts" class="px-4 py-2.5 hidden lg:table-cell"></td>
+            <td class="px-4 py-2.5 hidden md:table-cell"></td>
+            <td
+              class="px-4 py-2.5 text-right font-semibold text-[var(--ui-text-muted)] hidden lg:table-cell"
+            >
               VAT ({{ VAT_RATE }}%):
             </td>
-            <td class="px-3 py-2 text-right text-[var(--ui-text)]">
+            <td class="px-4 py-2.5 text-right font-medium text-[var(--ui-text)]">
               {{ formatCurrency(totals.total_vat) }}
             </td>
-            <td v-if="!readonly" class="px-3 py-2"></td>
+            <td v-if="!readonly" class="px-4 py-2.5"></td>
           </tr>
 
           <!-- Grand Total -->
-          <tr class="border-t border-[var(--ui-border)]">
-            <td colspan="4" class="px-3 py-3"></td>
-            <td v-if="showDiscounts" class="px-3 py-3 hidden lg:table-cell"></td>
-            <td class="px-3 py-3 hidden md:table-cell"></td>
-            <td class="px-3 py-3 text-right hidden lg:table-cell">
-              <span class="text-base font-semibold text-[var(--ui-text)]">
+          <tr class="border-t-2 border-[var(--ui-border)] bg-[var(--ui-bg-muted)]">
+            <td colspan="4" class="px-4 py-4"></td>
+            <td v-if="showDiscounts" class="px-4 py-4 hidden lg:table-cell"></td>
+            <td class="px-4 py-4 hidden md:table-cell"></td>
+            <td class="px-4 py-4 text-right hidden lg:table-cell">
+              <span class="text-base font-bold text-[var(--ui-text)]">
                 {{ lines.length }} item(s) - Total:
               </span>
             </td>
-            <td class="px-3 py-3 text-right">
-              <span class="lg:hidden text-sm font-medium text-[var(--ui-text-muted)] mr-2">
+            <td class="px-4 py-4 text-right">
+              <span class="lg:hidden text-sm font-semibold text-[var(--ui-text-muted)] mr-2">
                 {{ lines.length }} item(s) - Total:
               </span>
               <span class="text-xl font-bold text-primary">
                 {{ formatCurrency(totals.total_amount) }}
               </span>
             </td>
-            <td v-if="!readonly" class="px-3 py-3"></td>
+            <td v-if="!readonly" class="px-4 py-4"></td>
           </tr>
         </tfoot>
       </table>

@@ -39,7 +39,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 | II. Type Safety Non-Negotiable     | ✅ PASS | All new types to be defined in shared/types/database.ts; Zod validation on all inputs |
 | III. Location-Centric Architecture | ✅ PASS | PRFs tied to locations; POs inherit context from PRF                                  |
 | IV. Approval Workflow Compliance   | ✅ PASS | PRF requires Supervisor approval; workflow states enforced                            |
-| V. Accessible by Design            | ✅ PASS | Will use Nuxt UI components; follow UI_DESIGN_SYSTEM.md                               |
+| V. Accessible by Design            | ✅ PASS | Uses Nuxt UI components; follows UI_DESIGN_SYSTEM.md; theme-aware color patterns     |
 | VI. Offline-Aware UI               | ✅ PASS | useOnlineStatus() will disable action buttons when offline                            |
 | VII. Server-Side Security          | ✅ PASS | API routes validate roles; PROCUREMENT_SPECIALIST role checked server-side            |
 | VIII. Consistent Code Standards    | ✅ PASS | Follow Prettier config; pnpm typecheck must pass                                      |
@@ -131,3 +131,4 @@ server/
 | Email Service    | Low        | Simple SMTP via environment variables; no external dependencies |
 | VAT Calculations | Low        | Fixed 15% rate; standard arithmetic                             |
 | PRF/PO Workflow  | Medium     | Standard approval workflow matching existing Transfer pattern   |
+| UI Design        | Low        | Theme-aware patterns using CSS variables; consistent across pages |

@@ -3,6 +3,7 @@
 **Base Path**: `/api/pos`
 
 **Document Numbering Format**: PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
+
 - Example: `PO-KITCHEN-27-Jan-2026-01`, `PO-STORE-27-Jan-2026-02`
 - Uses the PRF's location name (POs inherit location context from their source PRF)
 - Location names are converted to uppercase
@@ -306,8 +307,8 @@ Close a PO. No further edits or deliveries allowed. Triggers email notification 
 {
   data: PO;
   message: "Purchase Order closed";
-  prf_closed: boolean;  // true if linked PRF was also closed
-  email_sent: boolean;  // false if no PRF requester or email failed
+  prf_closed: boolean; // true if linked PRF was also closed
+  email_sent: boolean; // false if no PRF requester or email failed
   fulfillment_summary: {
     total_lines: number;
     fulfilled_lines: number;
@@ -320,7 +321,7 @@ Close a PO. No further edits or deliveries allowed. Triggers email notification 
       remaining_qty: string;
       is_fulfilled: boolean;
     }>;
-  };
+  }
 }
 ```
 

@@ -41,7 +41,10 @@
           />
 
           <!-- Unfulfilled items table -->
-          <div v-if="hasUnfulfilledItems && unfulfilledItems.length > 0" class="flex flex-col gap-2">
+          <div
+            v-if="hasUnfulfilledItems && unfulfilledItems.length > 0"
+            class="flex flex-col gap-2"
+          >
             <span class="block text-sm font-medium text-[var(--ui-text)]">Unfulfilled Items</span>
             <div class="max-h-48 overflow-y-auto border border-[var(--ui-border)] rounded-lg">
               <table class="w-full text-sm">
@@ -92,7 +95,11 @@
             v-if="hasUnfulfilledItems"
             label="Closure Reason"
             required
-            :error="!closureReason.trim() ? 'A closure reason is required when closing a PO with unfulfilled quantities.' : undefined"
+            :error="
+              !closureReason.trim()
+                ? 'A closure reason is required when closing a PO with unfulfilled quantities.'
+                : undefined
+            "
           >
             <UTextarea
               v-model="closureReason"

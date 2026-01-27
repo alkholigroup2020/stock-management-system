@@ -168,166 +168,168 @@ function handleLineChange() {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- PO Header Card -->
-    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Purchase Order Details</h2>
-
-          <!-- Supplier Indicator -->
+  <div class="space-y-3">
+    <!-- Unified Form Card with Internal Sections -->
+    <UCard class="card-elevated overflow-hidden" :ui="{ body: 'p-0' }">
+      <!-- PO Information Section -->
+      <div class="p-4 sm:p-6 bg-gradient-to-br from-[var(--ui-bg)] to-[var(--ui-bg-elevated)]">
+        <div class="flex items-center gap-3 mb-6">
           <div
-            v-if="selectedSupplier"
-            class="flex items-center gap-2 px-3 py-1.5 md:p-3 bg-[var(--ui-bg)] rounded-lg border border-[var(--ui-border)]"
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20"
           >
-            <UIcon
-              name="i-lucide-building-2"
-              class="w-4 md:w-6 h-4 md:h-6 text-primary flex-shrink-0"
-            />
-            <div class="text-left">
-              <p class="text-sm font-medium text-[var(--ui-text)]">
-                {{ selectedSupplier.name }}
-              </p>
-              <p class="text-xs text-[var(--ui-text-muted)]">
-                {{ selectedSupplier.emails?.length || 0 }} email(s)
-              </p>
-            </div>
+            <UIcon name="i-lucide-shopping-cart" class="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-[var(--ui-text)]">PO Information</h2>
+            <p class="text-xs text-[var(--ui-text-muted)]">Basic purchase order details</p>
           </div>
         </div>
-      </template>
 
-      <!-- Source PRF and Supplier Selection -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <!-- Source PRF (optional) -->
-        <div v-if="showPrfSelect && prfOptions.length > 0">
-          <label class="form-label mb-2 block">Source PRF</label>
-          <USelectMenu
-            :model-value="formData.prf_id ?? undefined"
-            :items="prfOptions"
-            label-key="prf_no"
-            value-key="id"
-            placeholder="Select source PRF (optional)"
-            searchable
-            clearable
-            :disabled="disabled || readonly"
-            size="lg"
-            class="w-full"
-            @update:model-value="
-              (val: string | undefined) => {
-                formData.prf_id = val || null;
-                handlePrfSelect();
-              }
-            "
-          >
-            <template #leading>
-              <UIcon name="i-lucide-file-text" class="w-5 h-5" />
-            </template>
-            <template #item="{ item }">
-              <div class="flex flex-col">
-                <span class="font-medium">{{ item.prf_no }}</span>
-                <span class="text-xs text-[var(--ui-text-muted)]">
-                  {{ item.requester }} • {{ item.location }} • {{ item.total_value }}
-                </span>
-              </div>
-            </template>
-          </USelectMenu>
+        <!-- Source PRF and Supplier Selection -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <!-- Source PRF (optional) -->
+          <div v-if="showPrfSelect && prfOptions.length > 0">
+            <label class="form-label mb-2 block">Source PRF</label>
+            <USelectMenu
+              :model-value="formData.prf_id ?? undefined"
+              :items="prfOptions"
+              label-key="prf_no"
+              value-key="id"
+              placeholder="Select source PRF (optional)"
+              searchable
+              clearable
+              :disabled="disabled || readonly"
+              size="lg"
+              class="w-full"
+              @update:model-value="
+                (val: string | undefined) => {
+                  formData.prf_id = val || null;
+                  handlePrfSelect();
+                }
+              "
+            >
+              <template #leading>
+                <UIcon name="i-lucide-file-text" class="w-5 h-5" />
+              </template>
+              <template #item="{ item }">
+                <div class="flex flex-col">
+                  <span class="font-medium">{{ item.prf_no }}</span>
+                  <span class="text-xs text-[var(--ui-text-muted)]">
+                    {{ item.requester }} • {{ item.location }} • {{ item.total_value }}
+                  </span>
+                </div>
+              </template>
+            </USelectMenu>
+          </div>
+
+          <!-- Supplier -->
+          <div :class="{ 'md:col-span-2': !showPrfSelect || prfOptions.length === 0 }">
+            <label class="form-label mb-2 block">
+              Supplier
+              <span class="text-[var(--ui-error)]">*</span>
+            </label>
+            <USelectMenu
+              v-model="formData.supplier_id"
+              :items="suppliers"
+              label-key="name"
+              value-key="id"
+              placeholder="Select supplier"
+              searchable
+              :disabled="disabled || readonly"
+              size="lg"
+              class="w-full"
+              @update:model-value="handleSupplierSelect"
+            >
+              <template #leading>
+                <UIcon name="i-lucide-building-2" class="w-5 h-5" />
+              </template>
+              <template #item="{ item }">
+                <div class="flex flex-col">
+                  <span class="font-medium">{{ item.name }}</span>
+                  <span class="text-xs text-[var(--ui-text-muted)]">
+                    {{ item.code }} • {{ item.emails?.length || 0 }} email(s)
+                  </span>
+                </div>
+              </template>
+            </USelectMenu>
+          </div>
         </div>
 
-        <!-- Supplier -->
-        <div :class="{ 'md:col-span-2': !showPrfSelect || prfOptions.length === 0 }">
-          <label class="form-label mb-2 block">
-            Supplier
-            <span class="text-[var(--ui-error)]">*</span>
-          </label>
-          <USelectMenu
-            v-model="formData.supplier_id"
-            :items="suppliers"
-            label-key="name"
-            value-key="id"
-            placeholder="Select supplier"
-            searchable
-            :disabled="disabled || readonly"
-            size="lg"
-            class="w-full"
-            @update:model-value="handleSupplierSelect"
-          >
-            <template #leading>
-              <UIcon name="i-lucide-building-2" class="w-5 h-5" />
-            </template>
-            <template #item="{ item }">
-              <div class="flex flex-col">
-                <span class="font-medium">{{ item.name }}</span>
-                <span class="text-xs text-[var(--ui-text-muted)]">
-                  {{ item.code }} • {{ item.emails?.length || 0 }} email(s)
-                </span>
-              </div>
-            </template>
-          </USelectMenu>
+        <!-- PO Details Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Quotation Reference -->
+          <div>
+            <label class="form-label mb-2 block">Quotation Reference</label>
+            <UInput
+              v-model="formData.quotation_ref"
+              placeholder="Supplier quotation number"
+              :disabled="disabled || readonly"
+              size="lg"
+              icon="i-lucide-file-badge"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Ship-To Location -->
+          <div>
+            <label class="form-label mb-2 block">Ship To Location</label>
+            <USelectMenu
+              v-model="formData.ship_to_location_id"
+              :items="locations"
+              label-key="name"
+              value-key="id"
+              placeholder="Select delivery location"
+              searchable
+              clearable
+              :disabled="disabled || readonly"
+              size="lg"
+              class="w-full"
+            >
+              <template #leading>
+                <UIcon
+                  v-if="selectedShipToLocation"
+                  :name="getLocationIcon(selectedShipToLocation.locationType)"
+                  class="w-5 h-5"
+                />
+                <UIcon v-else name="i-lucide-map-pin" class="w-5 h-5" />
+              </template>
+            </USelectMenu>
+          </div>
+
+          <!-- Contract Duration -->
+          <div>
+            <label class="form-label mb-2 block">Contract Duration (Days)</label>
+            <UInput
+              v-model="formData.duration_days"
+              type="number"
+              min="1"
+              placeholder="e.g., 30"
+              :disabled="disabled || readonly"
+              size="lg"
+              icon="i-lucide-calendar-days"
+              class="w-full"
+            />
+          </div>
         </div>
       </div>
 
-      <!-- PO Details Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Quotation Reference -->
-        <div>
-          <label class="form-label mb-2 block">Quotation Reference</label>
-          <UInput
-            v-model="formData.quotation_ref"
-            placeholder="Supplier quotation number"
-            :disabled="disabled || readonly"
-            size="lg"
-            icon="i-lucide-file-badge"
-            class="w-full"
-          />
-        </div>
+      <!-- Divider -->
+      <div class="h-px bg-gradient-to-r from-transparent via-[var(--ui-border)] to-transparent" />
 
-        <!-- Ship-To Location -->
-        <div>
-          <label class="form-label mb-2 block">Ship To Location</label>
-          <USelectMenu
-            v-model="formData.ship_to_location_id"
-            :items="locations"
-            label-key="name"
-            value-key="id"
-            placeholder="Select delivery location"
-            searchable
-            clearable
-            :disabled="disabled || readonly"
-            size="lg"
-            class="w-full"
+      <!-- Shipping Contact Section -->
+      <div class="p-4 sm:p-6 bg-[var(--ui-bg)]">
+        <div class="flex items-center gap-3 mb-6">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/20"
           >
-            <template #leading>
-              <UIcon
-                v-if="selectedShipToLocation"
-                :name="getLocationIcon(selectedShipToLocation.locationType)"
-                class="w-5 h-5"
-              />
-              <UIcon v-else name="i-lucide-map-pin" class="w-5 h-5" />
-            </template>
-          </USelectMenu>
+            <UIcon name="i-lucide-truck" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-[var(--ui-text)]">Shipping Contact</h3>
+            <p class="text-xs text-[var(--ui-text-muted)]">Contact details at delivery location</p>
+          </div>
         </div>
 
-        <!-- Contract Duration -->
-        <div>
-          <label class="form-label mb-2 block">Contract Duration (Days)</label>
-          <UInput
-            v-model="formData.duration_days"
-            type="number"
-            min="1"
-            placeholder="e.g., 30"
-            :disabled="disabled || readonly"
-            size="lg"
-            icon="i-lucide-calendar-days"
-            class="w-full"
-          />
-        </div>
-      </div>
-
-      <!-- Ship-To Contact Information -->
-      <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-        <h3 class="text-sm font-semibold text-[var(--ui-text-muted)] mb-4 uppercase tracking-wider">
-          Shipping Contact
-        </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Ship-To Contact Name -->
           <div>
@@ -357,11 +359,23 @@ function handleLineChange() {
         </div>
       </div>
 
-      <!-- Terms Section -->
-      <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-        <h3 class="text-sm font-semibold text-[var(--ui-text-muted)] mb-4 uppercase tracking-wider">
-          Terms & Conditions
-        </h3>
+      <!-- Divider -->
+      <div class="h-px bg-gradient-to-r from-transparent via-[var(--ui-border)] to-transparent" />
+
+      <!-- Terms & Conditions Section -->
+      <div class="p-4 sm:p-6 bg-[var(--ui-bg-elevated)]">
+        <div class="flex items-center gap-3 mb-6">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500/10 dark:bg-amber-400/20"
+          >
+            <UIcon name="i-lucide-file-check" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-[var(--ui-text)]">Terms & Conditions</h3>
+            <p class="text-xs text-[var(--ui-text-muted)]">Payment and delivery terms</p>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Payment Terms -->
           <div>
@@ -397,21 +411,38 @@ function handleLineChange() {
             v-model="formData.terms_conditions"
             placeholder="Any special terms or conditions"
             :disabled="disabled || readonly"
-            :rows="2"
+            :rows="3"
             size="lg"
             class="w-full"
           />
         </div>
       </div>
 
+      <!-- Divider -->
+      <div class="h-px bg-gradient-to-r from-transparent via-[var(--ui-border)] to-transparent" />
+
       <!-- Notes Section -->
-      <div class="mt-6 pt-6 border-t border-[var(--ui-border)]">
-        <label class="form-label mb-2 block">Notes</label>
+      <div class="p-4 sm:p-6 bg-[var(--ui-bg)]">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500/10 dark:bg-amber-400/20"
+          >
+            <UIcon
+              name="i-lucide-message-square"
+              class="w-5 h-5 text-amber-600 dark:text-amber-400"
+            />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-[var(--ui-text)]">Additional Notes</h3>
+            <p class="text-xs text-[var(--ui-text-muted)]">Special instructions or requirements</p>
+          </div>
+        </div>
+
         <UTextarea
           v-model="formData.notes"
-          placeholder="Additional notes or special instructions"
+          placeholder="Add any special instructions, requirements, or notes for this order..."
           :disabled="disabled || readonly"
-          :rows="3"
+          :rows="4"
           size="lg"
           class="w-full"
         />
@@ -419,24 +450,37 @@ function handleLineChange() {
     </UCard>
 
     <!-- Line Items Card -->
-    <UCard class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
-      <template #header>
-        <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-list" class="w-5 h-5 text-primary" />
-          <h2 class="text-lg font-semibold text-[var(--ui-text)]">Order Items</h2>
+    <UCard class="card-elevated overflow-hidden" :ui="{ body: 'p-0' }">
+      <!-- Header -->
+      <div
+        class="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-b border-[var(--ui-border)]"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20 dark:bg-primary/30"
+          >
+            <UIcon name="i-lucide-list" class="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-[var(--ui-text)]">Order Items</h2>
+            <p class="text-xs text-[var(--ui-text-muted)]">Add all items for this purchase order</p>
+          </div>
         </div>
-      </template>
+      </div>
 
-      <OrdersPOLineItemsTable
-        :lines="formData.lines"
-        :items="items"
-        :disabled="disabled"
-        :readonly="readonly"
-        :loading="loading"
-        @add-line="addLine"
-        @remove-line="removeLine"
-        @line-change="handleLineChange"
-      />
+      <!-- Line Items Table -->
+      <div class="p-4 sm:p-6">
+        <OrdersPOLineItemsTable
+          :lines="formData.lines"
+          :items="items"
+          :disabled="disabled"
+          :readonly="readonly"
+          :loading="loading"
+          @add-line="addLine"
+          @remove-line="removeLine"
+          @line-change="handleLineChange"
+        />
+      </div>
     </UCard>
   </div>
 </template>

@@ -228,24 +228,72 @@ onMounted(async () => {
 
 <template>
   <div class="px-0 py-0 md:px-4 md:py-1 space-y-3">
-    <!-- Page Header -->
-    <div class="flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2 sm:gap-4">
-        <UIcon name="i-lucide-file-plus" class="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
-        <div>
-          <h1 class="text-xl sm:text-3xl font-bold text-primary">New PRF</h1>
-          <p class="hidden sm:block text-sm text-[var(--ui-text-muted)] mt-1">
-            Create a new Purchase Requisition Form
-          </p>
+    <!-- Enhanced Page Header -->
+    <div
+      class="relative overflow-hidden rounded-lg sm:rounded-xl bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)] p-4 sm:p-6 shadow-sm"
+    >
+      <!-- Subtle Decorative Pattern -->
+      <div
+        class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            var(--ui-text-muted) 1px,
+            transparent 0
+          );
+          background-size: 24px 24px;
+        "
+      />
+
+      <div class="relative flex items-center justify-between gap-3 sm:gap-6">
+        <div class="flex items-center gap-3 sm:gap-5">
+          <!-- Icon with Primary Color Accent -->
+          <div
+            class="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-primary/10 dark:bg-primary/15 border border-primary/20 dark:border-primary/30 shadow-sm"
+          >
+            <UIcon name="i-lucide-file-plus" class="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+          </div>
+
+          <!-- Title Section -->
+          <div>
+            <h1 class="text-xl sm:text-3xl lg:text-4xl font-bold text-primary tracking-tight">
+              New PRF
+            </h1>
+            <p
+              class="hidden sm:block text-sm sm:text-base text-[var(--ui-text-muted)] mt-1 font-medium"
+            >
+              Create a new Purchase Requisition Form
+            </p>
+          </div>
+        </div>
+
+        <!-- Location/Period Indicator -->
+        <div
+          v-if="activeLocation && currentPeriod"
+          class="hidden lg:flex items-center gap-3 px-4 py-3 bg-[var(--ui-bg-muted)] rounded-xl border border-[var(--ui-border)]"
+        >
+          <div class="text-right">
+            <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+              Location
+            </p>
+            <p class="text-sm font-bold text-[var(--ui-text)]">{{ activeLocation.name }}</p>
+          </div>
+          <div class="w-px h-8 bg-[var(--ui-border)]" />
+          <div class="text-right">
+            <p class="text-xs text-[var(--ui-text-muted)] uppercase tracking-wider font-semibold">
+              Period
+            </p>
+            <p class="text-sm font-bold text-[var(--ui-text)]">{{ currentPeriodName }}</p>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loadingInitialData" class="flex justify-center py-12">
-      <div class="flex flex-col items-center gap-3">
+    <div v-if="loadingInitialData" class="flex justify-center py-16">
+      <div class="flex flex-col items-center gap-4">
         <UIcon name="i-lucide-loader-2" class="w-12 h-12 text-primary animate-spin" />
-        <p class="text-sm text-[var(--ui-text-muted)]">Loading form data...</p>
+        <p class="text-sm text-[var(--ui-text-muted)] font-medium">Loading form data...</p>
       </div>
     </div>
 
@@ -261,29 +309,48 @@ onMounted(async () => {
         :loading="loadingInitialData"
       />
 
-      <!-- Form Actions -->
-      <div class="flex flex-wrap items-center justify-end gap-3">
-        <UButton
-          color="error"
-          variant="soft"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :disabled="saving"
-          @click="cancel"
-        >
-          Cancel
-        </UButton>
-        <UButton
-          color="primary"
-          icon="i-lucide-save"
-          size="lg"
-          class="cursor-pointer rounded-full px-6"
-          :loading="saving"
-          :disabled="!isFormValid || saving || !isOnline"
-          @click="saveDraft"
-        >
-          Save as Draft
-        </UButton>
+      <!-- Sticky Footer with Form Actions -->
+      <div
+        class="sticky bottom-0 z-10 bg-[var(--ui-bg-elevated)]/95 dark:bg-[var(--ui-bg-elevated)]/98 backdrop-blur-md border-t border-[var(--ui-border)] rounded-t-lg shadow-2xl -mx-4 px-4 py-4 sm:mx-0 sm:px-6 sm:rounded-xl"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <!-- Form Status Indicator -->
+          <div class="hidden sm:flex items-center gap-2 text-sm text-[var(--ui-text-muted)]">
+            <UIcon
+              :name="isFormValid ? 'i-lucide-check-circle-2' : 'i-lucide-alert-circle'"
+              :class="['w-5 h-5', isFormValid ? 'text-emerald-500' : 'text-amber-500']"
+            />
+            <span class="font-medium">
+              {{ isFormValid ? "Form ready to save" : "Please complete all required fields" }}
+            </span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 ml-auto">
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 hover:bg-[var(--ui-bg-elevated)] transition-all"
+              :disabled="saving"
+              @click="cancel"
+            >
+              <UIcon name="i-lucide-x" class="w-4 h-4 sm:mr-2" />
+              <span class="hidden sm:inline">Cancel</span>
+            </UButton>
+            <UButton
+              color="primary"
+              icon="i-lucide-save"
+              size="lg"
+              class="cursor-pointer rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+              :loading="saving"
+              :disabled="!isFormValid || saving || !isOnline"
+              @click="saveDraft"
+            >
+              Save as Draft
+            </UButton>
+          </div>
+        </div>
       </div>
     </template>
 
