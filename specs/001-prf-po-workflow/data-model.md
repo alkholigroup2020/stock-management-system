@@ -7,6 +7,32 @@
 
 This document defines the data model changes required for the PRF/PO workflow feature. Changes are additive to the existing schema unless marked as MODIFY.
 
+### Document Numbering Enhancement
+
+PRF, PO, and Delivery document numbers follow an enhanced format that includes location context and date:
+
+**Format**: `{Prefix}-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}`
+
+Where:
+- `Prefix`: PRF, PO, or DLV
+- `LocationName`: Location name converted to uppercase, spaces replaced with hyphens (e.g., KITCHEN, CENTRAL-STORE)
+- `DD`: Two-digit day (01-31)
+- `Mon`: Three-letter month abbreviation (Jan, Feb, Mar, etc.)
+- `YYYY`: Four-digit year
+- `NN`: Two-digit sequential number per location+date combination (01-99)
+
+**Examples**:
+- `PRF-KITCHEN-27-Jan-2026-01` (first PRF for Kitchen on Jan 27, 2026)
+- `PRF-KITCHEN-27-Jan-2026-02` (second PRF for Kitchen on same day)
+- `PO-KITCHEN-27-Jan-2026-01` (PO created from Kitchen PRF)
+- `DLV-STORE-27-Jan-2026-03` (third delivery for Store on Jan 27, 2026)
+
+**Implementation Notes**:
+- PO numbers use the PRF's location name (since POs are created from PRFs)
+- Sequential numbers restart daily for each location
+- Existing documents retain their old format (no migration required)
+- Location name sanitization removes special characters except hyphens
+
 ---
 
 ## 1. Enum Changes
@@ -109,7 +135,7 @@ Extend with additional fields from the PRF template.
 ```prisma
 model PRF {
   id                      String       @id @default(uuid()) @db.Uuid
-  prf_no                  String       @unique @db.VarChar(50)
+  prf_no                  String       @unique @db.VarChar(50)  // Format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
   period_id               String       @db.Uuid
   location_id             String       @db.Uuid
   project_name            String?      @db.VarChar(200)         // NEW
@@ -231,7 +257,7 @@ Extend with detailed pricing and terms fields.
 ```prisma
 model PO {
   id                    String     @id @default(uuid()) @db.Uuid
-  po_no                 String     @unique @db.VarChar(50)
+  po_no                 String     @unique @db.VarChar(50)  // Format: PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN} (uses PRF's location)
   prf_id                String?    @db.Uuid
   supplier_id           String     @db.Uuid
   quotation_ref         String?    @db.VarChar(100)  // NEW

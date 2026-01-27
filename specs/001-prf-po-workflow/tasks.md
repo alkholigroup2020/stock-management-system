@@ -86,7 +86,7 @@
 - [x] T038 [US1] Create PRF detail page in `app/pages/orders/prfs/[id].vue` with edit/submit capabilities
 - [x] T039 [US1] Update Orders index page PRFs tab with list view in `app/pages/orders/index.vue`
 - [x] T040 [US1] Add Zod validation schemas for PRF create/update in `server/api/prfs/index.post.ts`
-- [x] T041 [US1] Implement auto-generation of PRF numbers (PRF-001 format) in create endpoint
+- [x] T041 [US1] Implement auto-generation of PRF numbers (Format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}, e.g., PRF-KITCHEN-27-Jan-2026-01) in create endpoint
 
 **Checkpoint**: User Story 1 complete - PRFs can be created, edited, and submitted for approval ✅
 
@@ -131,7 +131,7 @@
 - [x] T057 [US3] Create PO create page in `app/pages/orders/pos/create.vue` with PRF pre-population
 - [x] T058 [US3] Create PO detail page in `app/pages/orders/pos/[id].vue` with edit capabilities
 - [x] T059 [US3] Update Orders index page POs tab with list view in `app/pages/orders/index.vue`
-- [x] T060 [US3] Implement auto-generation of PO numbers (PO-001 format) in create endpoint
+- [x] T060 [US3] Implement auto-generation of PO numbers (Format: PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}, e.g., PO-KITCHEN-27-Jan-2026-01, uses PRF's location) in create endpoint
 - [x] T061 [US3] Implement VAT calculation logic (15%) in `server/api/pos/index.post.ts`
 - [x] T062 [US3] ~~Implement email notification to supplier on PO creation~~ (REMOVED - PO creation does not send emails)
 - [x] T063 [US3] Add "Create PO" action button on approved PRF detail page

@@ -2,6 +2,12 @@
 
 **Base Path**: `/api/prfs`
 
+**Document Numbering Format**: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
+- Example: `PRF-KITCHEN-27-Jan-2026-01`, `PRF-STORE-27-Jan-2026-02`
+- Location names are converted to uppercase
+- Sequential numbers (NN) restart daily per location (01-99)
+- Date format: DD = two-digit day, Mon = three-letter month, YYYY = four-digit year
+
 ---
 
 ## Endpoints Overview

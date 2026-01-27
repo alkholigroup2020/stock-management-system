@@ -29,6 +29,10 @@ import {
   sendPOClosedNotification,
 } from "../../../../utils/email";
 import type { UserRole } from "@prisma/client";
+import {
+  getLocationNameForDocument,
+  formatDateForDocumentNumber,
+} from "../../../../utils/documentNumbering";
 
 // User session type
 interface AuthUser {
@@ -62,39 +66,39 @@ const bodySchema = z.object({
 
 /**
  * Generate next delivery number
- * Format: DEL-YYYY-NNN (e.g., DEL-2025-001)
+ * Format: DLV-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
+ * Example: DLV-KITCHEN-27-Jan-2026-01
  */
-async function generateDeliveryNumber(year?: number): Promise<string> {
-  const currentYear = year || new Date().getFullYear();
-  const prefix = `DEL-${currentYear}-`;
+async function generateDeliveryNumber(locationId: string): Promise<string> {
+  // Fetch and sanitize location name (uppercase)
+  const sanitizedName = await getLocationNameForDocument(locationId);
 
-  // Find the highest delivery number for this year
+  // Format date as DD-Mon-YYYY
+  const formattedDate = formatDateForDocumentNumber();
+
+  // Build prefix: DLV-LocationName-Date-
+  const prefix = `DLV-${sanitizedName}-${formattedDate}-`;
+
+  // Find highest number for this location+date combination
   const lastDelivery = await prisma.delivery.findFirst({
     where: {
-      delivery_no: {
-        startsWith: prefix,
-      },
+      delivery_no: { startsWith: prefix },
+      location_id: locationId,
     },
-    orderBy: {
-      delivery_no: "desc",
-    },
-    select: {
-      delivery_no: true,
-    },
+    orderBy: { delivery_no: "desc" },
+    select: { delivery_no: true },
   });
 
   if (!lastDelivery) {
-    // First delivery of the year
-    return `${prefix}001`;
+    return `${prefix}01`;
   }
 
-  // Extract number from last delivery and increment
+  // Extract number and increment
   const parts = lastDelivery.delivery_no.split("-");
-  const lastNumber = parseInt(parts[2] || "0", 10);
+  const lastNumber = parseInt(parts[parts.length - 1] || "0", 10);
   const nextNumber = lastNumber + 1;
 
-  // Pad with zeros to 3 digits
-  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
+  return `${prefix}${nextNumber.toString().padStart(2, "0")}`;
 }
 
 export default defineEventHandler(async (event) => {
@@ -466,7 +470,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Generate delivery number
-    const deliveryNo = await generateDeliveryNumber();
+    const deliveryNo = await generateDeliveryNumber(locationId);
 
     // Ensure periodIdForDelivery is defined before creating delivery
     if (!periodIdForDelivery) {

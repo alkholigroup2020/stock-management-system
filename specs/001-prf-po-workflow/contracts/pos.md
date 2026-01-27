@@ -2,6 +2,14 @@
 
 **Base Path**: `/api/pos`
 
+**Document Numbering Format**: PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
+- Example: `PO-KITCHEN-27-Jan-2026-01`, `PO-STORE-27-Jan-2026-02`
+- Uses the PRF's location name (POs inherit location context from their source PRF)
+- Location names are converted to uppercase
+- Sequential numbers (NN) restart daily per location (01-99)
+- Date format: DD = two-digit day, Mon = three-letter month, YYYY = four-digit year
+- **Note**: All POs must be created from an approved PRF (prf_id is required)
+
 ---
 
 ## Endpoints Overview

@@ -26,6 +26,10 @@
 import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import {
+  getLocationNameForDocument,
+  formatDateForDocumentNumber,
+} from "../../utils/documentNumbering";
 
 // User session type
 interface AuthUser {
@@ -66,26 +70,39 @@ const bodySchema = z.object({
 
 /**
  * Generate next PRF number
- * Format: PRF-NNN (e.g., PRF-001)
+ * Format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
+ * Example: PRF-KITCHEN-27-Jan-2026-01
  */
-async function generatePRFNumber(): Promise<string> {
-  const prefix = "PRF-";
+async function generatePRFNumber(locationId: string): Promise<string> {
+  // Fetch and sanitize location name (uppercase)
+  const sanitizedName = await getLocationNameForDocument(locationId);
 
-  // Find the highest PRF number
+  // Format date as DD-Mon-YYYY
+  const formattedDate = formatDateForDocumentNumber();
+
+  // Build prefix: PRF-LocationName-Date-
+  const prefix = `PRF-${sanitizedName}-${formattedDate}-`;
+
+  // Find highest number for this location+date combination
   const lastPRF = await prisma.pRF.findFirst({
+    where: {
+      prf_no: { startsWith: prefix },
+      location_id: locationId,
+    },
     orderBy: { prf_no: "desc" },
     select: { prf_no: true },
   });
 
   if (!lastPRF) {
-    return `${prefix}001`;
+    return `${prefix}01`;
   }
 
   // Extract number and increment
-  const lastNumber = parseInt(lastPRF.prf_no.split("-")[1] || "0", 10);
+  const parts = lastPRF.prf_no.split("-");
+  const lastNumber = parseInt(parts[parts.length - 1] || "0", 10);
   const nextNumber = lastNumber + 1;
 
-  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
+  return `${prefix}${nextNumber.toString().padStart(2, "0")}`;
 }
 
 export default defineEventHandler(async (event) => {
@@ -215,7 +232,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Generate PRF number
-    const prfNo = await generatePRFNumber();
+    const prfNo = await generatePRFNumber(data.location_id);
 
     // Create PRF with lines in a transaction
     const result = await prisma.$transaction(async (tx) => {

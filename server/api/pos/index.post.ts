@@ -24,6 +24,10 @@
 import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import {
+  getLocationNameForDocument,
+  formatDateForDocumentNumber,
+} from "../../utils/documentNumbering";
 
 // User session type
 interface AuthUser {
@@ -65,26 +69,56 @@ const bodySchema = z.object({
 
 /**
  * Generate next PO number
- * Format: PO-NNN (e.g., PO-001)
+ * Format: PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}
+ * Example: PO-KITCHEN-27-Jan-2026-01
+ * Uses the PRF's location name
  */
-async function generatePONumber(): Promise<string> {
-  const prefix = "PO-";
+async function generatePONumber(prfId: string): Promise<string> {
+  // Fetch PRF to get location
+  const prf = await prisma.pRF.findUnique({
+    where: { id: prfId },
+    select: {
+      location_id: true,
+      location: { select: { name: true } },
+    },
+  });
 
-  // Find the highest PO number
+  if (!prf) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "PRF not found",
+    });
+  }
+
+  // Fetch and sanitize location name (uppercase)
+  const sanitizedName = await getLocationNameForDocument(prf.location_id);
+
+  // Format date as DD-Mon-YYYY
+  const formattedDate = formatDateForDocumentNumber();
+
+  // Build prefix: PO-LocationName-Date-
+  const prefix = `PO-${sanitizedName}-${formattedDate}-`;
+
+  // Find highest number for this location+date combination
   const lastPO = await prisma.pO.findFirst({
+    where: {
+      po_no: { startsWith: prefix },
+      prf_id: prfId,
+    },
     orderBy: { po_no: "desc" },
     select: { po_no: true },
   });
 
   if (!lastPO) {
-    return `${prefix}001`;
+    return `${prefix}01`;
   }
 
   // Extract number and increment
-  const lastNumber = parseInt(lastPO.po_no.split("-")[1] || "0", 10);
+  const parts = lastPO.po_no.split("-");
+  const lastNumber = parseInt(parts[parts.length - 1] || "0", 10);
   const nextNumber = lastNumber + 1;
 
-  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
+  return `${prefix}${nextNumber.toString().padStart(2, "0")}`;
 }
 
 /**
@@ -266,8 +300,20 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // PRF ID is required for new naming scheme
+    if (!data.prf_id) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "PRF_REQUIRED",
+          message: "PRF ID is required to create a PO",
+        },
+      });
+    }
+
     // Generate PO number
-    const poNo = await generatePONumber();
+    const poNo = await generatePONumber(data.prf_id);
 
     // Calculate line amounts and PO totals
     const linesWithAmounts = data.lines.map((line) => {

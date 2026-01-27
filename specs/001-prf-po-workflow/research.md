@@ -62,34 +62,83 @@ Use **Office 365 SMTP** via Nodemailer for transactional email delivery.
 
 ## 2. Sequential Number Generation
 
-### Decision
+### Decision (Updated 2026-01-27)
 
-Use **database sequence with prefix** pattern for PRF/PO numbers.
+Use **enhanced location-date-based sequential numbering** for PRF/PO/Delivery documents.
+
+**Format**: `{Prefix}-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}`
 
 ### Rationale
 
-- Follows existing pattern in codebase (delivery_no, issue_no, transfer_no)
-- PostgreSQL handles concurrency correctly
-- Human-readable format: `PRF-001`, `PO-001`
+- **Location Context**: Document numbers now include location name for better traceability
+- **Date Context**: Documents naturally group by date for easier reporting
+- **Sequential per Location+Date**: Each location has independent numbering per day (01-99)
+- **Better Organization**: At a glance, see which location and when document was created
+- **Reduced Conflicts**: Daily restart per location reduces collision probability
+
+### Examples
+
+- `PRF-KITCHEN-27-Jan-2026-01` (first PRF for Kitchen on Jan 27, 2026)
+- `PRF-KITCHEN-27-Jan-2026-02` (second PRF for Kitchen on same day)
+- `PO-KITCHEN-27-Jan-2026-01` (PO created from Kitchen PRF)
+- `DLV-STORE-27-Jan-2026-03` (third delivery for Store on Jan 27, 2026)
 
 ### Implementation Pattern
 
 ```typescript
-// Generate next PRF number
-const lastPrf = await prisma.pRF.findFirst({
-  orderBy: { prf_no: "desc" },
-});
-const nextNum = lastPrf ? parseInt(lastPrf.prf_no.split("-")[1]) + 1 : 1;
-const prf_no = `PRF-${String(nextNum).padStart(3, "0")}`;
+// Generate next PRF number (Enhanced Format)
+async function generatePRFNumber(locationId: string): Promise<string> {
+  // 1. Fetch and sanitize location name (uppercase, replace spaces with hyphens)
+  const location = await prisma.location.findUnique({
+    where: { id: locationId },
+    select: { name: true },
+  });
+  const sanitizedName = location.name
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^A-Z0-9-]/g, "")
+    .substring(0, 20);
+
+  // 2. Format date as DD-Mon-YYYY
+  const today = new Date();
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const formattedDate = `${today.getDate().toString().padStart(2, "0")}-${months[today.getMonth()]}-${today.getFullYear()}`;
+
+  // 3. Build prefix and find highest number for this location+date
+  const prefix = `PRF-${sanitizedName}-${formattedDate}-`;
+  const lastPRF = await prisma.pRF.findFirst({
+    where: {
+      prf_no: { startsWith: prefix },
+      location_id: locationId,
+    },
+    orderBy: { prf_no: "desc" },
+    select: { prf_no: true },
+  });
+
+  // 4. Extract number and increment
+  if (!lastPRF) return `${prefix}01`;
+  const parts = lastPRF.prf_no.split("-");
+  const lastNumber = parseInt(parts[parts.length - 1] || "0", 10);
+  return `${prefix}${(lastNumber + 1).toString().padStart(2, "0")}`;
+}
 ```
 
 ### Alternatives Considered
 
-| Option                                | Pros                              | Cons                             | Verdict     |
-| ------------------------------------- | --------------------------------- | -------------------------------- | ----------- |
-| Database sequence + prefix            | Simple, matches existing patterns | Requires careful ordering        | ✅ Selected |
-| UUID only                             | No conflicts                      | Not human-readable               | Rejected    |
-| Location-prefixed (e.g., KIT-PRF-001) | Location context                  | Complex, breaks current patterns | Rejected    |
+| Option                                      | Pros                              | Cons                             | Verdict                          |
+| ------------------------------------------- | --------------------------------- | -------------------------------- | -------------------------------- |
+| Simple sequence (PRF-001, PO-001)           | Simple, matches existing patterns | No location/date context         | Superseded                       |
+| Enhanced location-date format               | Better traceability, organization | Slightly longer document numbers | ✅ Selected (Updated 2026-01-27) |
+| UUID only                                   | No conflicts                      | Not human-readable               | Rejected                         |
+| Location code only (e.g., KIT-PRF-001)      | Some location context             | No date context, breaks patterns | Rejected                         |
+
+### Migration Strategy
+
+- **Existing Records**: Keep old format (no migration required)
+- **New Records**: Use enhanced format from implementation date forward
+- **Database**: No schema changes needed (VarChar(50) accommodates both formats)
 
 ---
 

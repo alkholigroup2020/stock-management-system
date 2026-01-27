@@ -2,8 +2,29 @@
 
 **Feature Branch**: `001-prf-po-workflow`
 **Created**: 2026-01-19
+**Last Updated**: 2026-01-27
 **Status**: Draft
 **Input**: User description: "Implement complete Purchase Requisition Form (PRF) / Purchase Order (PO) workflow with approval chain, email notifications, a new PROCUREMENT_SPECIALIST role, and mandatory delivery-PO linking"
+
+## Changelog
+
+### 2026-01-27: Enhanced Document Numbering
+
+**Enhancement**: Updated PRF, PO, and Delivery numbering scheme to include location name and date for better traceability.
+
+**New Format**: `{Prefix}-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}`
+- Example: `PRF-KITCHEN-27-Jan-2026-01`, `PO-STORE-27-Jan-2026-02`, `DLV-ALULA-27-Jan-2026-03`
+- Location names converted to uppercase
+- Sequential numbers (01-99) restart daily per location
+- Date format: DD = two-digit day, Mon = three-letter month, YYYY = four-digit year
+
+**Rationale**:
+- Better traceability: Location and date visible at a glance
+- Easier sorting: Documents naturally group by location and date
+- Reduced conflicts: Daily restart per location reduces collision probability
+- No migration needed: Existing documents keep old format
+
+**Impact**: FR-002 (PRF numbering) and FR-016 (PO numbering) updated to reflect new format.
 
 ## Clarifications
 
@@ -216,7 +237,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 **PRF Management**
 
 - **FR-001**: System MUST allow Operators, Supervisors, and Admins to create Purchase Requisition Forms (PRFs)
-- **FR-002**: System MUST auto-generate unique PRF numbers in a sequential format (e.g., PRF-001, PRF-002)
+- **FR-002**: System MUST auto-generate unique PRF numbers in the format PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN} (e.g., PRF-KITCHEN-27-Jan-2026-01, PRF-STORE-27-Jan-2026-01)
 - **FR-003**: System MUST support PRF types: URGENT, DPA (Direct Purchase Approval), and NORMAL
 - **FR-004**: System MUST support PRF categories: FOOD, CLEANING, and OTHER
 - **FR-005**: System MUST allow PRF line items to reference existing inventory items or use custom item descriptions
@@ -249,7 +270,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 **PO Management**
 
 - **FR-015**: System MUST allow only Procurement Specialists to create exactly one PO from each approved PRF (1:1 relationship)
-- **FR-016**: System MUST auto-generate unique PO numbers in a sequential format (e.g., PO-001, PO-002)
+- **FR-016**: System MUST auto-generate unique PO numbers in the format PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN} (e.g., PO-KITCHEN-27-Jan-2026-01, PO-STORE-27-Jan-2026-01), using the PRF's location name
 - **FR-017**: System MUST require supplier selection when creating a PO
 - **FR-018**: System MUST pre-populate PO line items from the source PRF when creating from an approved PRF; line items are fully editable (add, remove, modify any field)
 - **FR-019**: System MUST calculate PO line totals including discount and VAT (15% default for Saudi Arabia)
@@ -365,3 +386,5 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - Users with PROCUREMENT_SPECIALIST role will be created through the existing user management system
 - The existing authentication and session management will be used for all new pages
 - The existing navigation sidebar structure will accommodate the new "Orders" menu item
+- Document numbering format includes location name and date: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN} and PO-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}, where location names are converted to uppercase and sequential numbers restart daily per location
+- Delivery numbers follow the same enhanced format: DLV-{LocationName}-{DD}-{Mon}-{YYYY}-{NN} (note: DLV not DEL prefix)

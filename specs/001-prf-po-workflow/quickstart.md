@@ -252,9 +252,11 @@ pnpm test             # Run tests
 
 ### PRF/PO Number Conflicts
 
-- Numbers are auto-generated sequentially
-- If conflicts occur, check for concurrent requests
-- Consider adding database-level sequence in production
+- Numbers follow the format: `{Prefix}-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}`
+- Sequential numbers restart daily per location, reducing collision probability
+- Examples: `PRF-KITCHEN-27-Jan-2026-01`, `PO-STORE-27-Jan-2026-02`
+- If conflicts occur, check for concurrent requests with same location+date
+- Existing documents retain old format (e.g., `PRF-001`, `PO-001`)
 
 ### Permission Denied Errors
 
