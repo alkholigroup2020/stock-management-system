@@ -463,21 +463,100 @@ export async function sendPOClosedNotification(params: {
   supplierName: string;
   totalAmount: string;
   poUrl: string;
+  // Optional fulfillment details for early closure
+  fulfillmentPercent?: number;
+  closureReason?: string;
+  lineItems?: Array<{
+    item_description: string;
+    unit: string;
+    ordered_qty: string;
+    delivered_qty: string;
+    remaining_qty: string;
+    is_fulfilled: boolean;
+  }>;
 }): Promise<EmailResult> {
-  const { recipientEmail, poNumber, prfNumber, closedByName, supplierName, totalAmount, poUrl } =
-    params;
+  const {
+    recipientEmail,
+    poNumber,
+    prfNumber,
+    closedByName,
+    supplierName,
+    totalAmount,
+    poUrl,
+    fulfillmentPercent = 100,
+    closureReason,
+    lineItems,
+  } = params;
 
   if (!recipientEmail) {
     console.warn("[Email Service] No recipient email provided for PO closed notification");
     return { success: true, messageId: "no-recipients" };
   }
 
-  const subject = `PO ${poNumber} Closed - Your Request is Fulfilled`;
+  const isFullyFulfilled = fulfillmentPercent === 100;
+  const subject = isFullyFulfilled
+    ? `PO ${poNumber} Closed - Your Request is Fulfilled`
+    : `PO ${poNumber} Closed Early - ${fulfillmentPercent}% Fulfilled`;
+
+  // Build the header message
+  const headerMessage = isFullyFulfilled
+    ? "The Purchase Order for your requisition has been closed and your request is now fulfilled."
+    : `The Purchase Order for your requisition has been closed with <strong>${fulfillmentPercent}%</strong> of items delivered.`;
+
+  // Build early closure reason section if applicable
+  const closureReasonSection = closureReason
+    ? `
+      <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 20px 0;">
+        <strong style="color: #92400e;">Closure Reason:</strong>
+        <p style="margin: 8px 0 0 0; color: #78350f;">${closureReason}</p>
+      </div>
+    `
+    : "";
+
+  // Build line items table with fulfillment status
+  const lineItemsSection =
+    lineItems && lineItems.length > 0
+      ? `
+      <h3 style="color: #374151; margin-top: 24px; margin-bottom: 12px;">Delivery Status by Item</h3>
+      <table style="width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px;">
+        <thead>
+          <tr style="background-color: #f3f4f6;">
+            <th style="padding: 10px 8px; text-align: left; border-bottom: 2px solid #e5e7eb;">Item</th>
+            <th style="padding: 10px 8px; text-align: center; border-bottom: 2px solid #e5e7eb;">Unit</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Ordered</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Delivered</th>
+            <th style="padding: 10px 8px; text-align: right; border-bottom: 2px solid #e5e7eb;">Remaining</th>
+            <th style="padding: 10px 8px; text-align: center; border-bottom: 2px solid #e5e7eb;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lineItems
+            .map(
+              (line) => `
+            <tr>
+              <td style="padding: 10px 8px; border-bottom: 1px solid #e5e7eb;">${line.item_description}</td>
+              <td style="padding: 10px 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">${line.unit}</td>
+              <td style="padding: 10px 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">${line.ordered_qty}</td>
+              <td style="padding: 10px 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">${line.delivered_qty}</td>
+              <td style="padding: 10px 8px; text-align: right; border-bottom: 1px solid #e5e7eb; ${Number(line.remaining_qty) > 0 ? "color: #dc2626; font-weight: 600;" : ""}">${line.remaining_qty}</td>
+              <td style="padding: 10px 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">
+                ${line.is_fulfilled ? '<span style="color: #16a34a;">✓ Complete</span>' : '<span style="color: #dc2626;">✗ Incomplete</span>'}
+              </td>
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    `
+      : "";
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #3b82f6;">Purchase Order Closed</h2>
-      <p>The Purchase Order for your requisition has been closed and your request is now fulfilled.</p>
+      <h2 style="color: ${isFullyFulfilled ? "#3b82f6" : "#f59e0b"};">Purchase Order Closed</h2>
+      <p>${headerMessage}</p>
+
+      ${closureReasonSection}
 
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr>
@@ -497,12 +576,16 @@ export async function sendPOClosedNotification(params: {
           <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${totalAmount}</td>
         </tr>
         <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Fulfillment:</strong></td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; ${isFullyFulfilled ? "color: #16a34a;" : "color: #f59e0b;"} font-weight: 600;">${fulfillmentPercent}%</td>
+        </tr>
+        <tr>
           <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Closed By:</strong></td>
           <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${closedByName}</td>
         </tr>
       </table>
 
-      <p>All deliveries for this purchase order have been completed.</p>
+      ${lineItemsSection}
 
       <p>
         <a href="${poUrl}" style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">

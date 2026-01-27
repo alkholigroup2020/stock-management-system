@@ -263,7 +263,7 @@ Update an open PO. Full edit capability until closed.
 
 ## PATCH /api/pos/:id/close
 
-Close a PO. No further edits or deliveries allowed. Triggers email notification to the original PRF requester.
+Close a PO. No further edits or deliveries allowed. Triggers email notification to the original PRF requester with fulfillment status.
 
 **Note**: Only ADMIN and SUPERVISOR users can close POs. PROCUREMENT_SPECIALIST users cannot close POs.
 
@@ -271,7 +271,8 @@ Close a PO. No further edits or deliveries allowed. Triggers email notification 
 
 ```typescript
 {
-  notes?: string;  // Optional closing notes
+  closure_reason?: string;  // Required if PO has unfulfilled items
+  notes?: string;           // Optional additional closing notes
 }
 ```
 
@@ -279,12 +280,17 @@ Close a PO. No further edits or deliveries allowed. Triggers email notification 
 
 - PO must be in OPEN status
 - User must be ADMIN or SUPERVISOR (PROCUREMENT_SPECIALIST cannot close POs)
+- `closure_reason` is **required** if any PO line has `delivered_qty < quantity` (unfulfilled items)
+- `closure_reason` is optional if PO is 100% fulfilled
 
 ### Behavior
 
-1. Update PO status to CLOSED
-2. Update linked PRF status to CLOSED (if exists)
-3. Send email notification to the original PRF requester (if PO has a linked PRF)
+1. Calculate fulfillment status for each PO line
+2. If unfulfilled items exist and no `closure_reason` provided, return 400 error
+3. If `closure_reason` provided, prepend to notes with format: `[EARLY CLOSURE - X% fulfilled] Closed by {username} on {date} at {time}\nReason: {closure_reason}`
+4. Update PO status to CLOSED
+5. Update linked PRF status to CLOSED (if exists)
+6. Send email notification to the original PRF requester with fulfillment details (if PO has a linked PRF)
 
 ### Response 200
 
@@ -292,13 +298,38 @@ Close a PO. No further edits or deliveries allowed. Triggers email notification 
 {
   data: PO;
   message: "Purchase Order closed";
-  prf_closed: boolean; // true if linked PRF was also closed
-  email_sent: boolean; // false if no PRF requester or email failed
+  prf_closed: boolean;  // true if linked PRF was also closed
+  email_sent: boolean;  // false if no PRF requester or email failed
+  fulfillment_summary: {
+    total_lines: number;
+    fulfilled_lines: number;
+    fulfillment_percent: number;
+    lines: Array<{
+      item_description: string;
+      unit: string;
+      ordered_qty: string;
+      delivered_qty: string;
+      remaining_qty: string;
+      is_fulfilled: boolean;
+    }>;
+  };
 }
 ```
 
 ### Error Responses
 
+- 400: `closure_reason` required when closing PO with unfulfilled quantities
+  ```typescript
+  {
+    statusCode: 400,
+    data: {
+      code: "CLOSURE_REASON_REQUIRED",
+      message: "A closure reason is required when closing a PO with unfulfilled quantities.",
+      unfulfilled_items: Array<{ item_description, unit, ordered_qty, delivered_qty, remaining_qty }>,
+      fulfillment_percent: number
+    }
+  }
+  ```
 - 403: User is not ADMIN/SUPERVISOR or PO already CLOSED
 - 404: PO not found
 

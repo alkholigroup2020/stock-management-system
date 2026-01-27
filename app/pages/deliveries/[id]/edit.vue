@@ -365,7 +365,9 @@
             size="lg"
             class="cursor-pointer rounded-full px-6"
             :loading="sendingForApproval"
-            :disabled="!isSendForApprovalValid || saving || posting || sendingForApproval || !isOnline"
+            :disabled="
+              !isSendForApprovalValid || saving || posting || sendingForApproval || !isOnline
+            "
             @click="sendForApproval"
           >
             Send For Approval

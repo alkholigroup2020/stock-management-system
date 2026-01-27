@@ -936,6 +936,42 @@ Total (After VAT) = Line Value + VAT Amount
 
 ---
 
+### DT014: Manual PO Closure with Shortage Warning & Mandatory Reason (2026-01-27)
+
+**Feature**: When manually closing a PO that has unfulfilled quantities (shortage or no deliveries), require a closure reason and show a warning with the unfulfilled items.
+
+**Business Rules**:
+
+- POs that are 100% fulfilled are automatically closed (no manual action needed)
+- When manually closing a PO with unfulfilled quantities:
+  - Show warning listing all unfulfilled items with ordered/delivered/remaining quantities
+  - Require a mandatory closure reason
+  - Store the reason in notes with timestamp and username
+  - Include fulfillment status in closure notification email
+
+**Implementation**:
+
+- [x] DT014a Update `server/api/pos/[id]/close.patch.ts` - Calculate fulfillment status for each line
+- [x] DT014b Update `server/api/pos/[id]/close.patch.ts` - Require `closure_reason` if any line has remaining qty > 0
+- [x] DT014c Update `server/api/pos/[id]/close.patch.ts` - Store closure reason in notes with timestamp
+- [x] DT014d Update `server/api/pos/[id]/close.patch.ts` - Return fulfillment summary in response
+- [x] DT014e Update `server/utils/email.ts` - Add line items with fulfillment status to `sendPOClosedNotification`
+- [x] DT014f Update `app/composables/usePOs.ts` - Add `closure_reason` parameter to close function
+- [x] DT014g Create `app/components/orders/POCloseModal.vue` - Custom modal with warning and reason input
+- [x] DT014h Update `app/pages/orders/pos/[id].vue` - Use new POCloseModal component
+
+**Files Changed**:
+
+- `server/api/pos/[id]/close.patch.ts` - Validation and storage logic
+- `server/utils/email.ts` - Enhanced email with fulfillment details
+- `app/composables/usePOs.ts` - Updated close function signature
+- `app/components/orders/POCloseModal.vue` - New component
+- `app/pages/orders/pos/[id].vue` - Use new modal
+
+**Checkpoint**: DT014 complete - Manual PO closure requires reason when items are unfulfilled ✅
+
+---
+
 ## Notes
 
 - [P] tasks = different files, no dependencies

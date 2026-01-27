@@ -496,32 +496,55 @@ export function usePOActions() {
 
   /**
    * Close a PO
+   * @param id - PO ID
+   * @param options - Optional closure options
+   * @param options.closure_reason - Required if PO has unfulfilled quantities
+   * @param options.notes - Additional notes
    */
   async function close(
     id: string,
-    notes?: string
-  ): Promise<{ data: PODetail; prf_closed: boolean } | null> {
+    options?: { closure_reason?: string; notes?: string }
+  ): Promise<{
+    data: PODetail;
+    prf_closed: boolean;
+    message: string;
+    fulfillment_summary?: {
+      total_ordered: number;
+      total_delivered: number;
+      fulfillment_percent: number;
+      has_unfulfilled_items: boolean;
+    };
+  } | null> {
     loading.value = true;
     error.value = null;
 
     try {
-      const response = await $fetch<{ data: PODetail; message: string; prf_closed: boolean }>(
-        `/api/pos/${id}/close`,
-        {
-          method: "PATCH",
-          body: notes ? { notes } : {},
-        }
-      );
+      const response = await $fetch<{
+        data: PODetail;
+        message: string;
+        prf_closed: boolean;
+        fulfillment_summary?: {
+          total_ordered: number;
+          total_delivered: number;
+          fulfillment_percent: number;
+          has_unfulfilled_items: boolean;
+        };
+      }>(`/api/pos/${id}/close`, {
+        method: "PATCH",
+        body: options || {},
+      });
 
       invalidatePOCache(id);
       return {
         data: response.data,
         prf_closed: response.prf_closed,
+        message: response.message,
+        fulfillment_summary: response.fulfillment_summary,
       };
     } catch (err) {
       const errorData = err as { data?: { message?: string } };
       error.value = errorData.data?.message || "Failed to close PO";
-      return null;
+      throw err; // Re-throw to let the caller handle specific errors
     } finally {
       loading.value = false;
     }

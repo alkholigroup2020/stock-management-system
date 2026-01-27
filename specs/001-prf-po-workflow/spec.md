@@ -97,7 +97,7 @@ When goods arrive, an Operator creates a delivery record. The system requires se
 
 ### User Story 5 - Close Purchase Order (Priority: P2)
 
-An Admin or Supervisor can manually close a PO when needed, or the system automatically closes a PO when all items have been fully delivered. Closed POs can no longer have deliveries linked to them.
+An Admin or Supervisor can manually close a PO when needed, or the system automatically closes a PO when all items have been fully delivered. Closed POs can no longer have deliveries linked to them. When manually closing a PO with unfulfilled quantities, a closure reason is required.
 
 **Why this priority**: Closing POs completes the procurement cycle and prevents further deliveries against completed orders.
 
@@ -114,6 +114,14 @@ An Admin or Supervisor can manually close a PO when needed, or the system automa
 4. **Given** an OPEN PO where all line items have `delivered_qty >= quantity`, **When** a delivery is posted that completes the final line, **Then** the PO is automatically closed and the linked PRF is also closed.
 
 5. **Given** a delivery that fully satisfies all PO lines, **When** the delivery is posted, **Then** the success message indicates "PO has been automatically closed (all items fully delivered)".
+
+6. **Given** an OPEN PO with unfulfilled quantities (any line where `delivered_qty < quantity`), **When** an Admin or Supervisor clicks "Close PO", **Then** the system displays a warning modal showing unfulfilled items with ordered/delivered/remaining quantities and requires a mandatory closure reason.
+
+7. **Given** a PO closure modal with unfulfilled items, **When** the user attempts to close without providing a closure reason, **Then** the "Close PO" button is disabled and an error message is displayed requiring a reason.
+
+8. **Given** a PO closed with unfulfilled items and a closure reason, **When** the PO is closed, **Then** the closure reason is stored in the PO notes with timestamp and username, and the closure notification email includes the fulfillment status and reason.
+
+9. **Given** an OPEN PO that is 100% fulfilled (all items fully delivered), **When** an Admin or Supervisor clicks "Close PO", **Then** the closure modal does not require a reason (optional notes can be added).
 
 ---
 
@@ -197,6 +205,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
   - Supervisors/Admins can directly post over-delivery (implicit approval)
 - What happens if email sending fails? → The PRF approval action completes but the system logs the email failure (applies to PRF approval notifications to procurement specialists only; POs do not send emails).
 - What happens when all PO items are fully delivered? → The system automatically closes the PO and its linked PRF. The delivery API returns `po_auto_closed: true`.
+- What happens when manually closing a PO with unfulfilled items? → The system requires a mandatory closure reason. A warning modal displays all unfulfilled items with ordered/delivered/remaining quantities. The reason is stored in notes with timestamp, and the closure notification email includes fulfillment status.
 - What happens if a delivery is created against a fully-delivered PO line? → This is treated as over-delivery and requires approval, since remaining_qty is 0.
 - What happens when Supervisor rejects over-delivery? → The rejection reason is prepended to the delivery notes with error styling, the delivery is **permanently locked** (all actions disabled including Edit, Delete, Post), creator is notified via email, and **the operator must create a new delivery** with correct quantities instead of editing the rejected one.
 
@@ -249,6 +258,10 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-021a**: System MUST allow OPEN POs to be fully edited (all fields, line items) by PROCUREMENT_SPECIALIST only; ADMIN and SUPERVISOR cannot edit POs after creation
 - **FR-022**: ~~System MUST send email notifications to all supplier email addresses when a PO is created~~ (REMOVED - email notifications are not sent on PO creation; supplier email addresses are stored for future use)
 - **FR-023**: System MUST allow only Admins and Supervisors to close POs (PROCUREMENT_SPECIALIST cannot close POs)
+- **FR-023a**: System MUST require a mandatory closure reason when manually closing a PO with unfulfilled quantities (any line where delivered_qty < quantity)
+- **FR-023b**: System MUST display a warning modal showing unfulfilled items with ordered/delivered/remaining quantities when closing a PO with unfulfilled items
+- **FR-023c**: System MUST store the closure reason in PO notes with timestamp and username when closing with unfulfilled items
+- **FR-023d**: System MUST NOT require a closure reason when closing a fully fulfilled PO (100% delivered)
 
 **Delivery Integration**
 
@@ -310,7 +323,7 @@ Administrators can add and manage multiple email addresses for each supplier. Th
 - **FR-033a**: System MUST send PRF submission notifications to all SUPERVISOR and ADMIN users when an Operator submits a PRF for approval
 - **FR-033b**: System MUST send PRF rejection notifications to the original requester when a Supervisor/Admin rejects a PRF (includes rejection reason)
 - **FR-034**: ~~System MUST send PO notifications to all email addresses configured for the supplier~~ (REMOVED - PO email notifications are not sent)
-- **FR-034a**: System MUST send PO closed notifications to the original PRF requester when a Supervisor/Admin closes a PO (includes PO details and supplier information)
+- **FR-034a**: System MUST send PO closed notifications to the original PRF requester when a Supervisor/Admin closes a PO (includes PO details, supplier information, fulfillment status per line item, and closure reason if provided)
 - **FR-035**: System MUST log email failures without blocking the primary transaction (applies to all email notifications)
 - **FR-036**: ~~System MUST allow manual email resend from detail pages~~ (REMOVED - no email resend functionality for POs)
 

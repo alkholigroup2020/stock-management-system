@@ -4,12 +4,18 @@
  * Close a PO, preventing further edits and deliveries.
  * Also closes the linked PRF if one exists.
  *
- * Request Body (optional):
+ * Request Body:
+ * - closure_reason: Required if PO has unfulfilled quantities (mandatory for shortage/no deliveries)
  * - notes?: Additional notes about the closure
  *
  * Permissions:
- * - ADMIN only can close POs
+ * - ADMIN and SUPERVISOR can close POs
  * - PROCUREMENT_SPECIALIST cannot close POs
+ *
+ * Business Rules:
+ * - If any PO line has remaining_qty > 0, closure_reason is required
+ * - The closure reason is stored in notes with timestamp and username
+ * - Email notification includes fulfillment status for each line item
  */
 
 import prisma from "../../../utils/prisma";
@@ -31,12 +37,23 @@ const paramsSchema = z.object({
   id: z.string().uuid("Invalid PO ID"),
 });
 
-// Request body schema (optional)
+// Request body schema
 const bodySchema = z
   .object({
+    closure_reason: z.string().max(1000).optional(),
     notes: z.string().max(1000).optional(),
   })
   .optional();
+
+// Line fulfillment info for response and email
+interface LineFulfillment {
+  item_description: string;
+  unit: string;
+  ordered_qty: string;
+  delivered_qty: string;
+  remaining_qty: string;
+  is_fulfilled: boolean;
+}
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user as AuthUser | undefined;
@@ -128,14 +145,65 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Calculate fulfillment status for each line
+    const lineFulfillment: LineFulfillment[] = existingPO.lines.map((line) => {
+      const orderedQty = Number(line.quantity);
+      const deliveredQty = Number(line.delivered_qty || 0);
+      const remainingQty = Math.max(0, orderedQty - deliveredQty);
+
+      return {
+        item_description: line.item_description,
+        unit: line.unit,
+        ordered_qty: orderedQty.toString(),
+        delivered_qty: deliveredQty.toString(),
+        remaining_qty: remainingQty.toString(),
+        is_fulfilled: remainingQty === 0,
+      };
+    });
+
+    // Check if PO is fully fulfilled
+    const hasUnfulfilledItems = lineFulfillment.some((line) => !line.is_fulfilled);
+    const totalOrdered = lineFulfillment.reduce((sum, l) => sum + Number(l.ordered_qty), 0);
+    const totalDelivered = lineFulfillment.reduce((sum, l) => sum + Number(l.delivered_qty), 0);
+    const fulfillmentPercent =
+      totalOrdered > 0 ? Math.round((totalDelivered / totalOrdered) * 100) : 0;
+
+    // Require closure_reason if there are unfulfilled items
+    if (hasUnfulfilledItems && !data?.closure_reason?.trim()) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        data: {
+          code: "CLOSURE_REASON_REQUIRED",
+          message:
+            "A closure reason is required when closing a PO with unfulfilled quantities. Please provide a reason for early closure.",
+          unfulfilled_items: lineFulfillment.filter((l) => !l.is_fulfilled),
+          fulfillment_percent: fulfillmentPercent,
+        },
+      });
+    }
+
     // Update PO and linked PRF in a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Prepare updated notes
-      const updatedNotes = data?.notes
-        ? existingPO.notes
-          ? `${existingPO.notes}\n\nClosure note: ${data.notes}`
-          : `Closure note: ${data.notes}`
-        : existingPO.notes;
+      // Prepare updated notes with closure reason and timestamp
+      const timestamp = new Date().toISOString();
+      const closedByInfo = `Closed by ${user.username} on ${new Date(timestamp).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} at ${new Date(timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
+
+      let closureNote = "";
+
+      // Add closure reason if provided (required for unfulfilled POs)
+      if (data?.closure_reason?.trim()) {
+        closureNote = `[EARLY CLOSURE - ${fulfillmentPercent}% fulfilled]\n${closedByInfo}\nReason: ${data.closure_reason.trim()}`;
+      } else {
+        closureNote = `[CLOSED - 100% fulfilled]\n${closedByInfo}`;
+      }
+
+      // Add additional notes if provided
+      if (data?.notes?.trim()) {
+        closureNote += `\nAdditional notes: ${data.notes.trim()}`;
+      }
+
+      const updatedNotes = existingPO.notes ? `${existingPO.notes}\n\n${closureNote}` : closureNote;
 
       // Close the PO
       const updatedPO = await tx.pO.update({
@@ -224,6 +292,10 @@ export default defineEventHandler(async (event) => {
           supplierName: result.po.supplier.name,
           totalAmount: `SAR ${Number(result.po.total_amount).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
           poUrl,
+          // Include fulfillment details
+          fulfillmentPercent,
+          closureReason: data?.closure_reason?.trim() || undefined,
+          lineItems: lineFulfillment,
         });
 
         emailSent = emailResult.success;
@@ -290,9 +362,18 @@ export default defineEventHandler(async (event) => {
           total_amount: delivery.total_amount.toString(),
         })),
       },
-      message: "PO closed successfully",
+      message: hasUnfulfilledItems
+        ? `PO closed with ${fulfillmentPercent}% fulfillment`
+        : "PO closed successfully (fully delivered)",
       prf_closed: result.prfClosed,
       email_sent: emailSent,
+      fulfillment_summary: {
+        total_ordered: totalOrdered,
+        total_delivered: totalDelivered,
+        fulfillment_percent: fulfillmentPercent,
+        has_unfulfilled_items: hasUnfulfilledItems,
+        line_items: lineFulfillment,
+      },
     };
   } catch (error) {
     // Handle Zod validation errors

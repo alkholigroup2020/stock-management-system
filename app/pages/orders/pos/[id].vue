@@ -213,7 +213,7 @@ async function saveChanges() {
 }
 
 // Close PO
-async function closePO() {
+async function closePO(options: { closure_reason?: string; notes?: string }) {
   showCloseConfirmation.value = false;
 
   await guardAction(
@@ -221,10 +221,10 @@ async function closePO() {
       closing.value = true;
 
       try {
-        const result = await close(poId.value);
+        const result = await close(poId.value, options);
 
         if (result) {
-          let message = `PO ${po.value?.po_no} has been closed.`;
+          let message = result.message;
           if (result.prf_closed) {
             message += " The linked PRF has also been closed.";
           }
@@ -754,16 +754,11 @@ onMounted(async () => {
       </template>
     </template>
 
-    <!-- Close PO Confirmation Modal -->
-    <UiConfirmModal
+    <!-- Close PO Modal with Fulfillment Check -->
+    <OrdersPOCloseModal
       v-model="showCloseConfirmation"
-      title="Close Purchase Order"
-      message="Are you sure you want to close this PO? Once closed, it cannot be edited and no more deliveries can be linked to it."
-      confirm-text="Close PO"
-      cancel-text="Cancel"
-      loading-text="Closing..."
+      :po="po"
       :loading="closing"
-      variant="warning"
       @confirm="closePO"
     />
 
