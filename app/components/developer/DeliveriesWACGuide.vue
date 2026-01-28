@@ -42,28 +42,29 @@ const codeExamples = {
 // File: prisma/schema.prisma
 
 model Delivery {
-  id             String         @id @default(uuid()) @db.Uuid
-  delivery_no    String         @unique @db.VarChar(50)
-  period_id      String         @db.Uuid
-  location_id    String         @db.Uuid
-  supplier_id    String         @db.Uuid
-  po_id          String?        @db.Uuid
-  invoice_no     String?        @db.VarChar(100)
-  delivery_note  String?
-  delivery_date  DateTime       @db.Date
-  total_amount   Decimal        @default(0) @db.Decimal(15, 2)
-  has_variance   Boolean        @default(false)
-  status         DeliveryStatus @default(DRAFT)
-  created_by     String         @db.Uuid
-  posted_at      DateTime?      @db.Timestamptz(6)
-  created_at     DateTime       @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime       @updatedAt @db.Timestamptz(6)
+  id                     String         @id @default(uuid()) @db.Uuid
+  delivery_no            String         @unique @db.VarChar(50)
+  period_id              String         @db.Uuid
+  location_id            String         @db.Uuid
+  supplier_id            String         @db.Uuid
+  po_id                  String         @db.Uuid      // NOW REQUIRED (was optional)
+  invoice_no             String?        @db.VarChar(100)
+  delivery_note          String?
+  delivery_date          DateTime       @db.Date
+  total_amount           Decimal        @default(0) @db.Decimal(15, 2)
+  has_variance           Boolean        @default(false)
+  over_delivery_rejected Boolean        @default(false) // NEW: Permanent lock
+  status                 DeliveryStatus @default(DRAFT)
+  created_by             String         @db.Uuid
+  posted_at              DateTime?      @db.Timestamptz(6)
+  created_at             DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime       @updatedAt @db.Timestamptz(6)
 
   // Relations
   creator        User           @relation(...)
   location       Location       @relation(...)
   period         Period         @relation(...)
-  po             PO?            @relation(...)
+  po             PO             @relation(...)  // NOW REQUIRED
   supplier       Supplier       @relation(...)
   delivery_lines DeliveryLine[]
   ncrs           NCR[]
@@ -84,19 +85,22 @@ enum DeliveryStatus {
 // File: prisma/schema.prisma
 
 model DeliveryLine {
-  id             String   @id @default(uuid()) @db.Uuid
-  delivery_id    String   @db.Uuid
-  item_id        String   @db.Uuid
-  quantity       Decimal  @db.Decimal(15, 4)
-  unit_price     Decimal  @db.Decimal(15, 4)   // Actual invoice price
-  period_price   Decimal  @db.Decimal(15, 4)   // Expected price (from ItemPrice)
-  price_variance Decimal  @default(0) @db.Decimal(15, 4)
-  line_value     Decimal  @db.Decimal(15, 2)   // quantity × unit_price
-  ncr_id         String?  @db.Uuid
+  id                     String   @id @default(uuid()) @db.Uuid
+  delivery_id            String   @db.Uuid
+  item_id                String   @db.Uuid
+  po_line_id             String?  @db.Uuid           // NEW: Link to PO line
+  quantity               Decimal  @db.Decimal(15, 4)
+  unit_price             Decimal  @db.Decimal(15, 4) // Actual invoice price
+  period_price           Decimal  @db.Decimal(15, 4) // Expected price (from ItemPrice)
+  price_variance         Decimal  @default(0) @db.Decimal(15, 4)
+  line_value             Decimal  @db.Decimal(15, 2) // quantity × unit_price
+  ncr_id                 String?  @db.Uuid
+  over_delivery_approved Boolean? @default(null)     // NEW: null=pending, true/false
 
   // Relations
   delivery       Delivery @relation(...)
   item           Item     @relation(...)
+  po_line        POLine?  @relation(...)             // NEW: PO line relation
   ncrs           NCR[]
 
   @@index([delivery_id])
@@ -766,6 +770,73 @@ INTERNAL_ERROR        // Unexpected server error
 // • Atomic within transaction
 // • Location-specific (per LocationStock)
 // • Never allows negative stock (validated elsewhere)`,
+
+  mandatoryPoLinking: `// Mandatory PO Linking for Deliveries
+//
+// With the PRF/PO workflow, deliveries are now REQUIRED to be linked
+// to a Purchase Order for complete procurement traceability.
+//
+// Key Changes:
+// ─────────────
+// • PO selection is mandatory (not optional)
+// • Dropdown shows only OPEN POs
+// • Supplier is auto-populated from selected PO
+// • Lines pre-fill with remaining_qty (not full quantity)
+// • Over-delivery requires approval workflow
+//
+// PO Line Tracking Fields:
+// ────────────────────────
+// POLine.quantity       - Original ordered quantity
+// POLine.delivered_qty  - Cumulative quantity received
+// remaining_qty         - Computed: quantity - delivered_qty
+//
+// Delivery Form Flow:
+// ───────────────────
+// 1. User selects an OPEN PO from dropdown
+// 2. Supplier field auto-populates (read-only)
+// 3. Lines show remaining_qty with edit capability
+// 4. Over-delivery (qty > remaining) triggers approval workflow
+// 5. On post: POLine.delivered_qty incremented
+// 6. Auto-close: PO closes when all lines fulfilled
+//
+// See PRF/PO Workflow guide for complete documentation.`,
+
+  overDeliveryWorkflow: `// Over-Delivery Approval Workflow
+//
+// Detection:
+// ──────────
+// Over-delivery = delivery.quantity > POLine.remaining_qty
+//
+// New Fields (Delivery Model):
+// ────────────────────────────
+// over_delivery_rejected  Boolean  @default(false)
+// pending_approval        Boolean  @default(false) // Computed
+//
+// New Fields (DeliveryLine Model):
+// ────────────────────────────────
+// po_line_id              String?  @db.Uuid         // Link to PO line
+// over_delivery_approved  Boolean? @default(null)   // null=pending
+//
+// Workflow States:
+// ────────────────
+// 1. DRAFT (normal)           - No over-delivery
+// 2. DRAFT (pending approval) - Over-delivery, awaiting approval
+// 3. DRAFT (approved)         - Over-delivery approved, can post
+// 4. REJECTED (locked)        - Over-delivery rejected, ALL actions disabled
+// 5. POSTED                    - Finalized, stock updated
+//
+// Implicit Approval:
+// ──────────────────
+// When Supervisor/Admin creates delivery with over-delivery,
+// it's implicitly approved (no separate workflow).
+//
+// Rejection:
+// ──────────
+// When rejected:
+// • over_delivery_rejected = true
+// • Delivery is PERMANENTLY LOCKED
+// • Edit, Delete, Post all disabled
+// • User must create new delivery`,
 };
 </script>
 
@@ -897,8 +968,8 @@ INTERNAL_ERROR        // Unexpected server error
         </div>
 
         <div class="space-y-3">
-          <h4 class="font-medium text-[var(--ui-text-highlighted)]">DRAFT vs POSTED</h4>
-          <div class="grid gap-3 sm:grid-cols-2">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Delivery States</h4>
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="mb-2 flex items-center gap-2">
                 <UBadge color="neutral" variant="soft">DRAFT</UBadge>
@@ -907,9 +978,29 @@ INTERNAL_ERROR        // Unexpected server error
                 <li>• No stock impact</li>
                 <li>• Can be edited or deleted</li>
                 <li>• invoice_no optional</li>
-                <li>• invoice_no must be unique when provided</li>
                 <li>• Period not required to be OPEN</li>
-                <li>• Only visible to creator</li>
+              </ul>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="warning" variant="soft">Pending Approval</UBadge>
+              </div>
+              <ul class="space-y-1 text-xs text-[var(--ui-text-muted)]">
+                <li>• Over-delivery detected</li>
+                <li>• Awaiting Supervisor approval</li>
+                <li>• Post button disabled</li>
+                <li>• Can still edit quantities</li>
+              </ul>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="error" variant="soft">Rejected</UBadge>
+              </div>
+              <ul class="space-y-1 text-xs text-[var(--ui-text-muted)]">
+                <li>• Over-delivery rejected</li>
+                <li>• ALL actions disabled</li>
+                <li>• Cannot edit, delete, or post</li>
+                <li>• Must create new delivery</li>
               </ul>
             </div>
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
@@ -919,10 +1010,10 @@ INTERNAL_ERROR        // Unexpected server error
               <ul class="space-y-1 text-xs text-[var(--ui-text-muted)]">
                 <li>• Stock updated (on_hand ↑)</li>
                 <li>• WAC recalculated</li>
-                <li>• invoice_no required</li>
-                <li>• invoice_no must be unique</li>
+                <li>• invoice_no required & unique</li>
                 <li>• Period must be OPEN</li>
                 <li>• Price variance NCRs created</li>
+                <li>• PO tracking updated</li>
               </ul>
             </div>
           </div>
@@ -1191,6 +1282,183 @@ INTERNAL_ERROR        // Unexpected server error
               <strong>Transaction Timeout:</strong>
               Set to 30 seconds for large deliveries with many line items. If timeout occurs, the
               entire delivery rolls back.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mandatory PO Linking Section -->
+    <section
+      id="dev-section-mandatory-po-linking"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('mandatory-po-linking')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-link" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Mandatory PO Linking</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('mandatory-po-linking')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('mandatory-po-linking')" class="space-y-4 p-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          With the PRF/PO workflow, deliveries are now
+          <strong>required</strong>
+          to be linked to a Purchase Order for complete procurement traceability.
+        </p>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">PO Linking Details</h4>
+          <DeveloperCodeBlock :code="codeExamples.mandatoryPoLinking" language="plaintext" />
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Key Integration Points</h4>
+          <div class="space-y-2">
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Mandatory PO Selection</strong>
+                - Dropdown shows only OPEN POs
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Supplier Auto-Population</strong>
+                - Inherited from selected PO
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Pre-fill with Remaining</strong>
+                - Shows remaining_qty, not full quantity
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Auto-Close Cascade</strong>
+                - PO and PRF close when fully delivered
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
+            <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Full Documentation:</strong>
+              See the
+              <NuxtLink
+                to="/dev-guide/prf-po-workflow/delivery-po-integration"
+                class="underline hover:no-underline"
+              >
+                PRF/PO Workflow
+              </NuxtLink>
+              guide for complete Delivery-PO integration details.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Over-Delivery Workflow Section -->
+    <section
+      id="dev-section-over-delivery-section"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('over-delivery-section')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-shield-check" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Over-Delivery Approval
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('over-delivery-section')
+              ? 'i-heroicons-chevron-up'
+              : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('over-delivery-section')" class="space-y-4 p-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          When a delivery quantity exceeds the PO's remaining quantity, supervisor/admin approval is
+          required before posting.
+        </p>
+
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Workflow Details</h4>
+          <DeveloperCodeBlock :code="codeExamples.overDeliveryWorkflow" language="plaintext" />
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">New Model Fields</h4>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="flex items-center gap-2">
+                <UBadge color="primary" variant="soft" size="xs">Delivery</UBadge>
+              </div>
+              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+                <code class="code-inline">over_delivery_rejected</code>
+                - Boolean flag for permanent lock
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="flex items-center gap-2">
+                <UBadge color="primary" variant="soft" size="xs">DeliveryLine</UBadge>
+              </div>
+              <p class="mt-1 text-xs text-[var(--ui-text-muted)]">
+                <code class="code-inline">po_line_id</code>
+                ,
+                <code class="code-inline">over_delivery_approved</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-error)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-error)]">
+            <UIcon name="i-heroicons-exclamation-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Rejection is Permanent:</strong>
+              When over-delivery is rejected, the delivery is permanently locked. All actions (Edit,
+              Delete, Post) are disabled. User must create a new delivery.
+            </span>
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
+            <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>Full Documentation:</strong>
+              See the
+              <NuxtLink
+                to="/dev-guide/prf-po-workflow/over-delivery-workflow"
+                class="underline hover:no-underline"
+              >
+                PRF/PO Workflow
+              </NuxtLink>
+              guide for complete approval workflow details.
             </span>
           </p>
         </div>

@@ -1888,4 +1888,132 @@ export const devGuideSearchContent: SearchResult[] = [
       "Standardized error codes for consistent handling. Categories: Stock, Location, Period, Price, Validation, Permission, Approval, Network, Database, Business Logic. Each code maps to user-friendly message with suggestion. SCREAMING_SNAKE_CASE format. Documented in ERROR_MESSAGES object.",
     icon: "i-heroicons-exclamation-circle",
   },
+
+  // ============================================
+  // PRF/PO Workflow
+  // ============================================
+  {
+    id: "prf-po-overview",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "prf-po-overview",
+    title: "PRF/PO Overview & Data Model",
+    content:
+      "PRF to PO to Delivery workflow for structured procurement. PRF model with status workflow DRAFT, PENDING, APPROVED, REJECTED, CLOSED. PO model with OPEN, CLOSED status. POLine tracks delivered_qty and remaining_qty. 1:1 relationship between PRF and PO. Document numbering format PRF-LOCATION-DD-Mon-YYYY-NN.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "prf-status-workflow",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "prf-status-workflow",
+    title: "PRF Status Workflow",
+    content:
+      "PRF status workflow: DRAFT initial state, PENDING after submit, APPROVED or REJECTED by Supervisor/Admin, CLOSED when PO closes. Status badge colors Gray, Amber, Green, Red, Blue. Rejection requires mandatory reason. REJECTED PRFs use Clone to create new DRAFT.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "prf-api-endpoints",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "prf-api-endpoints",
+    title: "PRF API Endpoints",
+    content:
+      "PRF API endpoints: GET list, POST create, PATCH update, DELETE draft, PATCH submit, PATCH approve, PATCH reject, POST clone. Role permissions: OPERATOR create and submit, SUPERVISOR approve and reject, PROCUREMENT_SPECIALIST view approved only. Clone creates new DRAFT from rejected PRF.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "po-status-workflow",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "po-status-workflow",
+    title: "PO Status Workflow",
+    content:
+      "PO status workflow: OPEN active for deliveries, CLOSED completed or manually closed. Delivery tracking with quantity, delivered_qty, remaining_qty. Auto-close when all lines fully delivered. Manual close requires closure reason for unfulfilled items.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "po-api-endpoints",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "po-api-endpoints",
+    title: "PO API Endpoints",
+    content:
+      "PO API endpoints: GET list, POST create from PRF, PATCH update, PATCH close, GET open dropdown. VAT calculations at 15% for Saudi Arabia. PROCUREMENT_SPECIALIST can create and edit POs but cannot close them. Only ADMIN and SUPERVISOR can close POs.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "over-delivery-workflow",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "over-delivery-workflow",
+    title: "Over-Delivery Approval Workflow",
+    content:
+      "Over-delivery detected when delivery quantity exceeds PO remaining quantity. Requires Supervisor/Admin approval before posting. Draft pending approval state. Approval allows posting, rejection permanently locks delivery. Implicit approval when Supervisor/Admin creates delivery.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "delivery-po-integration",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "delivery-po-integration",
+    title: "Delivery-PO Integration",
+    content:
+      "Delivery-PO integration: PO selection is mandatory not optional. Supplier auto-populated from PO. Pre-fill with remaining quantities. POLine delivered_qty incremented on post. Auto-close cascade when PO fully delivered closes PO and linked PRF.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "procurement-specialist-role",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "procurement-specialist-role",
+    title: "PROCUREMENT_SPECIALIST Role",
+    content:
+      "PROCUREMENT_SPECIALIST role for procurement operations. Navigation restricted to Orders page only. Can view APPROVED PRFs only. Can create and edit POs but cannot close them. Cannot access Dashboard, Deliveries, Master Data, Issues, Transfers, Reconciliations, Period Management.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "email-notifications",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "email-notifications",
+    title: "Email Notifications",
+    content:
+      "Email notifications for PRF/PO workflow. PRF submitted sends to Supervisors/Admins. PRF approved sends to Procurement Specialists. PRF rejected sends to requester. Over-delivery sends to Supervisors. PO closed sends to PRF requester. Async non-blocking email service.",
+    icon: "i-heroicons-document-check",
+  },
+  {
+    id: "prf-po-business-rules",
+    section: "PRF/PO Workflow",
+    sectionId: "prf-po-workflow",
+    targetSection: "prf-po-business-rules",
+    title: "PRF/PO Business Rules Summary",
+    content:
+      "Business rules: 1:1 PRF-PO relationship. Mandatory rejection reason. REJECTED PRFs use Clone. Only Admin/Supervisor close POs. Mandatory PO for deliveries. Over-delivery approval required. Error codes: PRF_NOT_DRAFT, PRF_NOT_PENDING, REJECTION_REASON_REQUIRED, PO_NOT_OPEN, OVER_DELIVERY_PENDING.",
+    icon: "i-heroicons-document-check",
+  },
+
+  // ============================================
+  // Deliveries & WAC (Additional Sections)
+  // ============================================
+  {
+    id: "dw-mandatory-po-linking",
+    section: "Deliveries & WAC",
+    sectionId: "deliveries-wac",
+    targetSection: "mandatory-po-linking",
+    title: "Mandatory PO Linking",
+    content:
+      "PO selection is now required for deliveries. Dropdown shows only OPEN POs. Supplier auto-populated from selected PO. Lines pre-fill with remaining quantities. Reference to PRF/PO Workflow guide for full details.",
+    icon: "i-heroicons-truck",
+  },
+  {
+    id: "dw-over-delivery-section",
+    section: "Deliveries & WAC",
+    sectionId: "deliveries-wac",
+    targetSection: "over-delivery-section",
+    title: "Over-Delivery Approval",
+    content:
+      "Over-delivery detected when delivery quantity exceeds PO remaining quantity. Requires Supervisor/Admin approval before posting. over_delivery_approved and over_delivery_rejected fields on DeliveryLine and Delivery. Rejected deliveries are permanently locked.",
+    icon: "i-heroicons-truck",
+  },
 ];

@@ -124,6 +124,12 @@ const navSections: DocSection[] = [
     componentName: "DeveloperTransfersGuide",
   },
   {
+    id: "prf-po-workflow",
+    label: "PRF/PO Workflow",
+    icon: "i-heroicons-document-check",
+    componentName: "DeveloperPRFPOWorkflowGuide",
+  },
+  {
     id: "items-management",
     label: "Items Management",
     icon: "i-heroicons-cube",
