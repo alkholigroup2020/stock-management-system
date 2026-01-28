@@ -63,6 +63,13 @@ const mainMenuItems = computed<NavItem[]>(() => {
       permission: true,
     });
   }
+  if (permissions.canManageNotificationSettings()) {
+    masterDataChildren.push({
+      label: "Notifications",
+      to: "/settings/notifications",
+      permission: true,
+    });
+  }
 
   if (masterDataChildren.length > 0) {
     items.push({
@@ -182,25 +189,6 @@ const mainMenuItems = computed<NavItem[]>(() => {
       label: "Period Close",
       icon: "i-heroicons-lock-closed",
       to: "/period-close",
-      permission: true,
-    });
-  }
-
-  // 11. Settings section (expandable)
-  const settingsChildren: NavItem[] = [];
-  if (permissions.canManageNotificationSettings()) {
-    settingsChildren.push({
-      label: "Notifications",
-      to: "/settings/notifications",
-      permission: true,
-    });
-  }
-
-  if (settingsChildren.length > 0) {
-    items.push({
-      label: "Settings",
-      icon: "i-heroicons-cog-8-tooth",
-      children: settingsChildren,
       permission: true,
     });
   }
