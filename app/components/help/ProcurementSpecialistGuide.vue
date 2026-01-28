@@ -203,7 +203,7 @@ watch(
               <UIcon name="i-heroicons-folder" class="text-[var(--ui-text-dimmed)]" />
               <span>
                 <strong>Category:</strong>
-                MATERIAL, CONSUMABLES, SPARE_PARTS, ASSET, or SERVICES
+                FOOD, CLEANING, or OTHER
               </span>
             </li>
             <li class="flex items-center gap-2">
@@ -239,7 +239,7 @@ watch(
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span>Filter by category for category-specific purchasing</span>
+              <span>Filter by category (FOOD, CLEANING, OTHER) for category-specific purchasing</span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />

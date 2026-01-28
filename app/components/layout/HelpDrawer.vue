@@ -67,7 +67,7 @@ const searchableContent = computed(() => {
       targetSection: "", // No subsection for Getting Started
       title: "Welcome & Features",
       content:
-        "Stock Management System streamlines inventory management across multiple locations, replacing Excel-based workflows. Features include multi-location stock tracking for Kitchen, Store, Central, Warehouse. Delivery management with automatic Weighted Average Cost (WAC) calculation. Stock issues tracking by cost centre. Inter-location transfers with approval workflows. Price variance detection with automatic NCRs. POB and Mandays calculation for cost-per-person reporting. Period-end reconciliation with coordinated month-end close.",
+        "Stock Management System streamlines inventory management across multiple locations, replacing Excel-based workflows. Features include multi-location stock tracking for Kitchen, Store, Central, Warehouse. Purchase Requisitions (PRF) with approval workflow before ordering. Purchase Orders (PO) created from approved PRFs with supplier and VAT management. Delivery management linked to POs with over-delivery detection and automatic WAC recalculation. Stock issues tracking by cost centre. Inter-location transfers with approval workflows. Price variance detection with automatic NCRs. POB and Mandays calculation for cost-per-person reporting. Period-end reconciliation with coordinated month-end close.",
       icon: "i-heroicons-home",
     },
     {
@@ -138,19 +138,24 @@ const searchableContent = computed(() => {
     });
   }
 
-  // Procurement Specialist content - visible only to Procurement Specialists
+  // Procurement Specialist content - visible to Procurement Specialists and Admins
   if (isProcurementSpecialist.value) {
+    // Procurement Specialists see their own permissions section
+    content.push({
+      id: "proc-permissions",
+      section: "Procurement Specialist Permissions",
+      sectionId: "procurement-specialist-permissions",
+      targetSection: "",
+      title: "Role & Permissions",
+      content:
+        "Procurement Specialist role responsibilities and system permissions. View approved PRFs, create and edit Purchase Orders. Limited access to Orders page only - cannot access deliveries, stock, or other system functions.",
+      icon: "i-heroicons-shield-check",
+    });
+  }
+
+  // Procurement Guide content - visible to Procurement Specialists and Admins
+  if (isProcurementSpecialist.value || isAdmin.value) {
     content.push(
-      {
-        id: "proc-permissions",
-        section: "Procurement Specialist Permissions",
-        sectionId: "procurement-specialist-permissions",
-        targetSection: "",
-        title: "Role & Permissions",
-        content:
-          "Procurement Specialist role responsibilities and system permissions. View approved PRFs, create and edit Purchase Orders. Limited access to Orders page only - cannot access deliveries, stock, or other system functions.",
-        icon: "i-heroicons-shield-check",
-      },
       {
         id: "proc-orders-overview",
         section: "Procurement Guide",
@@ -168,7 +173,7 @@ const searchableContent = computed(() => {
         targetSection: "viewing-prfs",
         title: "Viewing Approved PRFs",
         content:
-          "View approved Purchase Requisition Forms from all locations. Filter by location, type (URGENT, DPA, NORMAL), or category (MATERIAL, CONSUMABLES, SPARE_PARTS, ASSET, SERVICES). PRF number format: PRF-{Location}-{DD}-{Mon}-{YYYY}-{NN}.",
+          "View approved Purchase Requisition Forms from all locations. Filter by location, type (URGENT, DPA, NORMAL), or category (FOOD, CLEANING, OTHER). PRF number format: PRF-{Location}-{DD}-{Mon}-{YYYY}-{NN}.",
         icon: "i-heroicons-shopping-cart",
       },
       {
@@ -204,7 +209,7 @@ const searchableContent = computed(() => {
         targetSection: "prf",
         title: "PRF (Purchase Requisitions)",
         content:
-          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: MATERIAL, CONSUMABLES, SPARE_PARTS, ASSET, SERVICES. Add line items with item reference or custom description. VAT calculated at 15%. Save as DRAFT or submit for PENDING approval. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone rejected PRFs to create new submissions.",
+          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: FOOD, CLEANING, OTHER. Add line items with item reference or custom description. VAT calculated at 15%. Save as DRAFT or submit for PENDING approval. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone rejected PRFs to create new submissions.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -513,9 +518,10 @@ const navSections = computed(() => {
   }
 
   // Add role-specific guides
-  // Admin sees all guides (Admin, Supervisor, Operator)
+  // Admin sees all guides (Admin, Supervisor, Operator, Procurement Specialist)
   // Supervisor sees Supervisor and Operator guides
   // Operator sees only Operator guide
+  // Procurement Specialist sees only Procurement Specialist guide
   if (isAdmin.value) {
     sections.push(
       {
@@ -532,6 +538,11 @@ const navSections = computed(() => {
         id: "operator-guide",
         label: "Operator Guide",
         icon: "i-heroicons-clipboard-document-list",
+      },
+      {
+        id: "procurement-specialist-guide",
+        label: "Procurement Guide",
+        icon: "i-heroicons-shopping-cart",
       }
     );
   } else if (isSupervisor.value) {
@@ -656,7 +667,7 @@ const highlightMatch = (text: string, query: string): string => {
   <USlideover
     :open="props.open"
     side="right"
-    :ui="{ content: 'w-full lg:!w-[50vw] !max-w-none' }"
+    :ui="{ content: 'w-full lg:!w-[70vw] !max-w-none' }"
     @update:open="emit('update:open', $event)"
   >
     <template #content>
@@ -771,7 +782,7 @@ const highlightMatch = (text: string, query: string): string => {
           <nav
             class="shrink-0 border-r border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] overflow-y-auto transition-all duration-300 flex flex-col"
             :class="[
-              sidebarCollapsed ? 'w-0 opacity-0 invisible' : 'w-48 opacity-100 visible',
+              sidebarCollapsed ? 'w-0 opacity-0 invisible' : 'w-56 opacity-100 visible',
               'absolute md:relative z-40 h-full md:h-auto',
             ]"
           >

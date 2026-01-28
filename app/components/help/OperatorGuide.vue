@@ -526,11 +526,9 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF Categories</h4>
           <div class="flex flex-wrap gap-2 mb-2">
-            <UBadge color="neutral" variant="subtle">MATERIAL</UBadge>
-            <UBadge color="neutral" variant="subtle">CONSUMABLES</UBadge>
-            <UBadge color="neutral" variant="subtle">SPARE_PARTS</UBadge>
-            <UBadge color="neutral" variant="subtle">ASSET</UBadge>
-            <UBadge color="neutral" variant="subtle">SERVICES</UBadge>
+            <UBadge color="neutral" variant="subtle">FOOD</UBadge>
+            <UBadge color="neutral" variant="subtle">CLEANING</UBadge>
+            <UBadge color="neutral" variant="subtle">OTHER</UBadge>
           </div>
           <p class="text-sm text-[var(--ui-text-muted)]">
             Select the category that best matches your request. This helps with reporting and budget

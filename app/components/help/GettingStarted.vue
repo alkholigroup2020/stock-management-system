@@ -29,10 +29,24 @@
           </span>
         </li>
         <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-clipboard-document-list" class="text-[var(--ui-primary)] shrink-0" />
+          <span>
+            <strong>Purchase Requisitions (PRF)</strong>
+            - Request materials with approval workflow before ordering
+          </span>
+        </li>
+        <li class="flex items-center gap-2">
+          <UIcon name="i-heroicons-shopping-cart" class="text-[var(--ui-primary)] shrink-0" />
+          <span>
+            <strong>Purchase Orders (PO)</strong>
+            - Create orders from approved PRFs with supplier and VAT management
+          </span>
+        </li>
+        <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-truck" class="text-[var(--ui-primary)] shrink-0" />
           <span>
             <strong>Delivery Management</strong>
-            - Record supplier deliveries with automatic WAC recalculation
+            - Record supplier deliveries linked to POs with over-delivery detection
           </span>
         </li>
         <li class="flex items-center gap-2">
