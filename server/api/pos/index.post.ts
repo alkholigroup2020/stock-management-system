@@ -103,7 +103,6 @@ async function generatePONumber(prfId: string): Promise<string> {
   const lastPO = await prisma.pO.findFirst({
     where: {
       po_no: { startsWith: prefix },
-      prf_id: prfId,
     },
     orderBy: { po_no: "desc" },
     select: { po_no: true },

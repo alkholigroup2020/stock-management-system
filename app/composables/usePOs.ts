@@ -464,7 +464,7 @@ export function usePOActions() {
     } catch (err) {
       const errorData = err as { data?: { message?: string } };
       error.value = errorData.data?.message || "Failed to create PO";
-      return null;
+      throw err;
     } finally {
       loading.value = false;
     }
