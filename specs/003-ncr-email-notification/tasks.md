@@ -137,11 +137,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T036 [US5] Add `notification_logs` include to NCR detail API in `server/api/ncrs/[id].get.ts`
-- [ ] T037 [US5] Create notification history component in `app/components/ncr/NotificationHistory.vue` (auto-imports as `<NcrNotificationHistory />`)
-- [ ] T038 [US5] Add notification history section to NCR detail page in `app/pages/ncrs/[id].vue`
-- [ ] T039 [US5] Implement manual resend functionality in `server/api/ncrs/[id]/resend-notification.post.ts` (per-recipient-group, 5-minute rate limit, creates new log entry)
-- [ ] T040 [US5] Add resend button to notification history UI for failed notifications (disabled during rate-limit period, shows countdown)
+- [x] T036 [US5] Add `notification_logs` include to NCR detail API in `server/api/ncrs/[id].get.ts`
+- [x] T037 [US5] Create notification history component in `app/components/ncr/NotificationHistory.vue` (auto-imports as `<NcrNotificationHistory />`)
+- [x] T038 [US5] Add notification history section to NCR detail page in `app/pages/ncrs/[id].vue`
+- [x] T039 [US5] Implement manual resend functionality in `server/api/ncrs/[id]/resend-notification.post.ts` (per-recipient-group, 5-minute rate limit, creates new log entry)
+- [x] T040 [US5] Add resend button to notification history UI for failed notifications (disabled during rate-limit period, shows countdown)
 
 **Checkpoint**: Notification history visible and resend available - User Story 5 complete
 
@@ -151,16 +151,16 @@
 
 **Purpose**: Final improvements and validation
 
-- [ ] T041 Run `pnpm typecheck` to verify zero TypeScript errors
-- [ ] T042 Run `pnpm format` to ensure Prettier compliance
-- [ ] T043 Test notifications with SMTP not configured (verify graceful degradation)
-- [ ] T044 Test with empty recipient lists (verify logging and skip behavior)
-- [ ] T045 Verify dark mode styling on notification settings page
-- [ ] T046 Verify offline-aware behavior (disable save button when offline)
-- [ ] T046b Verify keyboard navigation works on notification settings page (tab order, enter to add, escape to cancel)
-- [ ] T046c Verify WCAG AA contrast ratios on notification history badges (SENT/FAILED status indicators)
-- [ ] T047 Manual end-to-end test: Configure recipients → Create manual NCR → Verify emails sent
-- [ ] T048 Manual end-to-end test: Configure recipients → Post delivery with price variance → Verify emails sent
+- [x] T041 Run `pnpm typecheck` to verify zero TypeScript errors
+- [x] T042 Run `pnpm format` to ensure Prettier compliance
+- [x] T043 Test notifications with SMTP not configured (verify graceful degradation)
+- [x] T044 Test with empty recipient lists (verify logging and skip behavior)
+- [x] T045 Verify dark mode styling on notification settings page
+- [x] T046 Verify offline-aware behavior (disable save button when offline)
+- [x] T046b Verify keyboard navigation works on notification settings page (tab order, enter to add, escape to cancel)
+- [x] T046c Verify WCAG AA contrast ratios on notification history badges (SENT/FAILED status indicators)
+- [x] T047 Manual end-to-end test: Configure recipients → Create manual NCR → Verify emails sent
+- [x] T048 Manual end-to-end test: Configure recipients → Post delivery with price variance → Verify emails sent
 
 ---
 
