@@ -12,6 +12,7 @@
  * Permissions:
  * - User must have access to the delivery's location
  * - DRAFT deliveries are only visible to their creator (unless ADMIN/SUPERVISOR)
+ * - PROCUREMENT_SPECIALIST cannot access deliveries
  */
 
 import prisma from "../../utils/prisma";
@@ -26,6 +27,18 @@ export default defineEventHandler(async (event) => {
       data: {
         code: "NOT_AUTHENTICATED",
         message: "You must be logged in to access this resource",
+      },
+    });
+  }
+
+  // Procurement Specialists cannot access deliveries
+  if (user.role === "PROCUREMENT_SPECIALIST") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
+      data: {
+        code: "ROLE_ACCESS_DENIED",
+        message: "Procurement Specialists cannot access deliveries",
       },
     });
   }
