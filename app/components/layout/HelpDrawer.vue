@@ -433,6 +433,16 @@ const searchableContent = computed(() => {
         content:
           "Close period by clicking Period Close menu. Pre-close checklist: all deliveries posted, all issues posted, all transfers completed, all reconciliations complete, all locations ready. Click Close Period when all items green. Period close creates closing snapshots, cannot be undone.",
         icon: "i-heroicons-cog-6-tooth",
+      },
+      {
+        id: "adm-notifications",
+        section: "Admin Guide",
+        sectionId: "admin-guide",
+        targetSection: "notifications",
+        title: "Notification Settings",
+        content:
+          "Configure NCR email notification recipients. Set Finance Team and Procurement Team email addresses. Notifications automatically sent when NCRs are created. Suppliers notified using email addresses from Supplier Management. Navigate to Settings then Notifications to configure. View notification history on NCR detail pages. Resend failed notifications with 5-minute cooldown.",
+        icon: "i-heroicons-cog-6-tooth",
       }
     );
   }

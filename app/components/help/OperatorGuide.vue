@@ -1176,6 +1176,10 @@ watch(
               expired products. Report these issues to your Supervisor.
             </li>
           </ul>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-2">
+            When any NCR is created, email notifications are automatically sent to the Finance Team,
+            Procurement Team, and Supplier (if linked to a delivery).
+          </p>
         </div>
 
         <div>
@@ -1220,6 +1224,16 @@ watch(
             <li>Click on an NCR to see details</li>
             <li>NCRs marked "Auto-generated" were created from price variances</li>
           </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Notification History</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            When you view an NCR's detail page, you can see a notification history section showing
+            who was notified (Finance Team, Procurement Team, Supplier) and whether the
+            notifications were successfully delivered. This helps track that the right people have
+            been informed about the issue.
+          </p>
         </div>
 
         <div>
