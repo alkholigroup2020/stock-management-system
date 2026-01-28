@@ -29,7 +29,10 @@
           </span>
         </li>
         <li class="flex items-center gap-2">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-[var(--ui-primary)] shrink-0" />
+          <UIcon
+            name="i-heroicons-clipboard-document-list"
+            class="text-[var(--ui-primary)] shrink-0"
+          />
           <span>
             <strong>Purchase Requisitions (PRF)</strong>
             - Request materials with approval workflow before ordering

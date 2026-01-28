@@ -14,6 +14,7 @@
  */
 
 import type { Prisma } from "@prisma/client";
+import { triggerNCRNotification } from "./email";
 
 /**
  * Price variance detection result
@@ -369,6 +370,12 @@ export async function detectAndCreateNCR(
       varianceAmount: varianceResult.varianceAmount,
       createdBy: params.createdBy,
     });
+
+    // Trigger email notification for the created NCR (fire-and-forget)
+    // This sends notifications to Finance, Procurement, and Supplier
+    if (ncr) {
+      triggerNCRNotification(ncr.id, prisma);
+    }
   }
 
   return {

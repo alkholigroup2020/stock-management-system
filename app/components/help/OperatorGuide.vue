@@ -182,7 +182,9 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Over-Delivery Detection</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Over-Delivery Detection
+          </h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
             If you enter a quantity that exceeds the remaining quantity on the PO, the system
             detects this as an over-delivery:
@@ -514,7 +516,8 @@ watch(
             </li>
             <li>
               <strong>DPA (Direct Purchase Authorization):</strong>
-              Pre-approved purchases, often with designated suppliers. May have streamlined approval.
+              Pre-approved purchases, often with designated suppliers. May have streamlined
+              approval.
             </li>
             <li>
               <strong>NORMAL:</strong>
@@ -558,7 +561,9 @@ watch(
               Select
               <strong>Category</strong>
             </li>
-            <li>Add line items - either select an item from the system or enter a custom description</li>
+            <li>
+              Add line items - either select an item from the system or enter a custom description
+            </li>
             <li>Enter quantity and estimated unit price for each item</li>
             <li>Add notes or justification for the request</li>
             <li>
@@ -576,13 +581,13 @@ watch(
           <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
             <li>
               <strong>Item Reference:</strong>
-              Select an existing item from the item master. The item code and name are linked, making
-              it easier to track deliveries against stock.
+              Select an existing item from the item master. The item code and name are linked,
+              making it easier to track deliveries against stock.
             </li>
             <li>
               <strong>Custom Description:</strong>
-              For one-off purchases or services not in the item master. Enter a free-text description
-              of what you need.
+              For one-off purchases or services not in the item master. Enter a free-text
+              description of what you need.
             </li>
           </ul>
         </div>

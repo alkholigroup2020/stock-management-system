@@ -213,7 +213,9 @@ watch(
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-scale" class="text-[var(--ui-primary)] text-xl" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Over-Delivery Approval</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Over-Delivery Approval
+          </span>
         </span>
         <UIcon
           :name="
@@ -333,7 +335,10 @@ watch(
         @click="toggleSection('po-management')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-[var(--ui-primary)] text-xl" />
+          <UIcon
+            name="i-heroicons-clipboard-document-list"
+            class="text-[var(--ui-primary)] text-xl"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">PO Management</span>
         </span>
         <UIcon
@@ -391,8 +396,8 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Auto-Closure</h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            POs are automatically closed when all line items are fully delivered (Remaining = 0
-            for all lines). No manual action is required for fully fulfilled POs.
+            POs are automatically closed when all line items are fully delivered (Remaining = 0 for
+            all lines). No manual action is required for fully fulfilled POs.
           </p>
         </div>
 

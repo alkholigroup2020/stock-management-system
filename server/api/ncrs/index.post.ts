@@ -21,6 +21,7 @@
 import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
+import { triggerNCRNotification } from "../../utils/email";
 
 // User session type
 interface AuthUser {
@@ -254,6 +255,10 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+
+    // Trigger email notification for the created NCR (fire-and-forget)
+    // This sends notifications to Finance, Procurement, and Supplier (if linked via delivery)
+    triggerNCRNotification(ncr.id, prisma);
 
     return {
       message: "NCR created successfully",

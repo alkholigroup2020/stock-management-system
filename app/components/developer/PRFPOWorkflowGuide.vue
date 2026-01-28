@@ -894,7 +894,9 @@ async function generateDocumentNumber(
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Status Workflow Diagram</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Status Workflow Diagram
+          </h4>
           <DeveloperCodeBlock :code="codeExamples.prfStatusWorkflow" language="plaintext" />
         </div>
 
@@ -1074,7 +1076,10 @@ async function generateDocumentNumber(
         @click="toggleSection('po-status-workflow')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-xl text-[var(--ui-primary)]" />
+          <UIcon
+            name="i-heroicons-clipboard-document-list"
+            class="text-xl text-[var(--ui-primary)]"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">PO Status Workflow</span>
         </span>
         <UIcon
@@ -1091,7 +1096,9 @@ async function generateDocumentNumber(
         </p>
 
         <div>
-          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Status Workflow Diagram</h4>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Status Workflow Diagram
+          </h4>
           <DeveloperCodeBlock :code="codeExamples.poStatusWorkflow" language="plaintext" />
         </div>
 
@@ -1132,7 +1139,8 @@ async function generateDocumentNumber(
               <strong>Auto-Close:</strong>
               When all PO lines have delivered_qty &ge; quantity, the PO automatically closes and
               its linked PRF is also closed. API returns
-              <code class="code-inline">po_auto_closed: true</code>.
+              <code class="code-inline">po_auto_closed: true</code>
+              .
             </span>
           </p>
         </div>
@@ -1246,7 +1254,8 @@ async function generateDocumentNumber(
             <span>
               <strong>Role Restriction:</strong>
               PROCUREMENT_SPECIALIST can create and edit POs but
-              <strong>cannot close them</strong>. Only ADMIN and SUPERVISOR can close POs.
+              <strong>cannot close them</strong>
+              . Only ADMIN and SUPERVISOR can close POs.
             </span>
           </p>
         </div>
@@ -1295,9 +1304,7 @@ async function generateDocumentNumber(
               <div class="mb-2 flex items-center gap-2">
                 <UBadge color="neutral" variant="soft">Draft</UBadge>
               </div>
-              <p class="text-xs text-[var(--ui-text-muted)]">
-                Normal draft without over-delivery.
-              </p>
+              <p class="text-xs text-[var(--ui-text-muted)]">Normal draft without over-delivery.</p>
             </div>
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="mb-2 flex items-center gap-2">
@@ -1338,8 +1345,9 @@ async function generateDocumentNumber(
             <span>
               <strong>Rejection is Permanent:</strong>
               When over-delivery is rejected, the delivery is
-              <strong>permanently locked</strong>. All actions (Edit, Delete, Post) are disabled.
-              The user must create a new delivery with correct quantities.
+              <strong>permanently locked</strong>
+              . All actions (Edit, Delete, Post) are disabled. The user must create a new delivery
+              with correct quantities.
             </span>
           </p>
         </div>

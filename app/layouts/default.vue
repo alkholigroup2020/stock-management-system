@@ -186,6 +186,25 @@ const mainMenuItems = computed<NavItem[]>(() => {
     });
   }
 
+  // 11. Settings section (expandable)
+  const settingsChildren: NavItem[] = [];
+  if (permissions.canManageNotificationSettings()) {
+    settingsChildren.push({
+      label: "Notifications",
+      to: "/settings/notifications",
+      permission: true,
+    });
+  }
+
+  if (settingsChildren.length > 0) {
+    items.push({
+      label: "Settings",
+      icon: "i-heroicons-cog-8-tooth",
+      children: settingsChildren,
+      permission: true,
+    });
+  }
+
   return items;
 });
 
@@ -237,6 +256,8 @@ const pageTitleMap: Record<string, string> = {
   "orders-pos": "Purchase Orders",
   "orders-pos-create": "Create PO",
   "orders-pos-id": "PO Details",
+  settings: "Settings",
+  "settings-notifications": "Notification Settings",
 };
 
 // Get page title from route

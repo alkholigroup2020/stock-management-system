@@ -49,9 +49,7 @@ watch(
     <!-- Header -->
     <div class="pb-4 border-b border-[var(--ui-border)]">
       <h2 class="text-2xl font-bold text-[var(--ui-text-highlighted)]">Procurement Guide</h2>
-      <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-        Managing PRFs and Purchase Orders
-      </p>
+      <p class="text-sm text-[var(--ui-text-muted)] mt-1">Managing PRFs and Purchase Orders</p>
     </div>
 
     <!-- Orders Overview Section -->
@@ -64,11 +62,16 @@ watch(
         @click="toggleSection('orders-overview')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-[var(--ui-primary)] text-xl" />
+          <UIcon
+            name="i-heroicons-clipboard-document-list"
+            class="text-[var(--ui-primary)] text-xl"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Orders Overview</span>
         </span>
         <UIcon
-          :name="isExpanded('orders-overview') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+          :name="
+            isExpanded('orders-overview') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
           class="text-[var(--ui-text-muted)]"
         />
       </button>
@@ -76,12 +79,14 @@ watch(
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
           The Orders page is your primary workspace. It contains two tabs: PRFs (Purchase
-          Requisition Forms) and POs (Purchase Orders). Understanding the relationship between
-          these documents and their statuses is essential for effective procurement management.
+          Requisition Forms) and POs (Purchase Orders). Understanding the relationship between these
+          documents and their statuses is essential for effective procurement management.
         </p>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">PRF and PO Relationship</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            PRF and PO Relationship
+          </h4>
           <p class="text-sm text-[var(--ui-text-muted)] mb-2">
             The procurement workflow follows this sequence:
           </p>
@@ -159,7 +164,10 @@ watch(
         @click="toggleSection('viewing-prfs')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-document-magnifying-glass" class="text-[var(--ui-primary)] text-xl" />
+          <UIcon
+            name="i-heroicons-document-magnifying-glass"
+            class="text-[var(--ui-primary)] text-xl"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">Viewing Approved PRFs</span>
         </span>
         <UIcon
@@ -225,9 +233,7 @@ watch(
 
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Filtering PRFs</h4>
-          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
-            Use filters to find specific PRFs:
-          </p>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">Use filters to find specific PRFs:</p>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
@@ -239,7 +245,9 @@ watch(
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span>Filter by category (FOOD, CLEANING, OTHER) for category-specific purchasing</span>
+              <span>
+                Filter by category (FOOD, CLEANING, OTHER) for category-specific purchasing
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
@@ -287,7 +295,9 @@ watch(
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-document-plus" class="text-[var(--ui-primary)] text-xl" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Creating Purchase Orders</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Creating Purchase Orders
+          </span>
         </span>
         <UIcon
           :name="isExpanded('creating-pos') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
@@ -349,8 +359,8 @@ watch(
             </li>
             <li>
               <strong>Custom Description:</strong>
-              Free-text description for one-off purchases or services not in the item master.
-              Enter the description manually.
+              Free-text description for one-off purchases or services not in the item master. Enter
+              the description manually.
             </li>
           </ul>
         </div>
@@ -395,8 +405,8 @@ watch(
             <UIcon name="i-heroicons-check-circle" class="shrink-0 mt-0.5" />
             <span>
               <strong>Tip:</strong>
-              Double-check supplier selection before saving. The supplier determines where the PO
-              is sent and how deliveries are recorded.
+              Double-check supplier selection before saving. The supplier determines where the PO is
+              sent and how deliveries are recorded.
             </span>
           </p>
         </div>
@@ -414,7 +424,9 @@ watch(
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-pencil-square" class="text-[var(--ui-primary)] text-xl" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Editing Purchase Orders</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Editing Purchase Orders
+          </span>
         </span>
         <UIcon
           :name="isExpanded('editing-pos') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"

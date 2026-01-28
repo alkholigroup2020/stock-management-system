@@ -46,6 +46,14 @@ export type ApprovalEntityType = "PRF" | "PO" | "PERIOD_CLOSE" | "TRANSFER";
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 // ========================================
+// NCR NOTIFICATION TYPES
+// ========================================
+
+export type NotificationRecipientType = "FINANCE" | "PROCUREMENT" | "SUPPLIER";
+
+export type NotificationStatus = "SENT" | "FAILED";
+
+// ========================================
 // DECIMAL TYPE
 // ========================================
 
@@ -404,4 +412,37 @@ export interface Approval {
   requested_at: Date | string;
   reviewed_at: Date | string | null;
   comments: string | null;
+}
+
+// ========================================
+// NCR NOTIFICATION MODELS
+// ========================================
+
+export interface NotificationSetting {
+  id: string;
+  key: string;
+  emails: string[];
+  updated_at: Date | string;
+  updated_by: string;
+}
+
+export interface NCRNotificationLog {
+  id: string;
+  ncr_id: string;
+  recipient_type: NotificationRecipientType;
+  recipients: string[];
+  status: NotificationStatus;
+  error_message: string | null;
+  sent_at: Date | string;
+}
+
+// Extended NCR interface with notification logs
+export interface NCRWithNotifications extends NCR {
+  notification_logs?: NCRNotificationLog[];
+}
+
+// Notification settings grouped for UI
+export interface NotificationSettingsData {
+  finance_team_emails: string[];
+  procurement_team_emails: string[];
 }
