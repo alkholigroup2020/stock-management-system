@@ -16,6 +16,8 @@ const props = defineProps<{
   ncrId: string;
   logs: NotificationLog[];
   canResend?: boolean;
+  /** The recipient type currently being resent (for loading state) */
+  loadingType?: "FINANCE" | "PROCUREMENT" | "SUPPLIER" | null;
 }>();
 
 // Emits
@@ -24,7 +26,6 @@ const emit = defineEmits<{
 }>();
 
 // State
-const resendingType = ref<string | null>(null);
 const lastResendTime = ref<Record<string, number>>({});
 const now = ref(Date.now());
 
@@ -182,8 +183,8 @@ function getLatestLog(type: RecipientType): NotificationLog | null {
                 size="xs"
                 icon="i-lucide-refresh-cw"
                 class="cursor-pointer"
-                :disabled="isRateLimited(recipientType) || resendingType === recipientType"
-                :loading="resendingType === recipientType"
+                :disabled="isRateLimited(recipientType) || loadingType === recipientType"
+                :loading="loadingType === recipientType"
                 @click="handleResend(recipientType)"
               >
                 <span v-if="isRateLimited(recipientType)" class="text-xs">

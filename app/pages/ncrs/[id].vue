@@ -92,7 +92,7 @@ const error = ref<string | null>(null);
 const ncr = ref<NCR | null>(null);
 const updateLoading = ref(false);
 const showUpdateModal = ref(false);
-const resendLoading = ref(false);
+const resendLoadingType = ref<"FINANCE" | "PROCUREMENT" | "SUPPLIER" | null>(null);
 
 // Form state for status update
 const statusUpdateForm = ref({
@@ -349,7 +349,7 @@ function openUpdateModal() {
 async function handleResendNotification(recipientType: "FINANCE" | "PROCUREMENT" | "SUPPLIER") {
   if (!ncr.value) return;
 
-  resendLoading.value = true;
+  resendLoadingType.value = recipientType;
 
   try {
     const response = await $fetch<{ message: string; recipients: string[] }>(
@@ -392,7 +392,7 @@ async function handleResendNotification(recipientType: "FINANCE" | "PROCUREMENT"
       });
     }
   } finally {
-    resendLoading.value = false;
+    resendLoadingType.value = null;
   }
 }
 
@@ -716,6 +716,7 @@ onMounted(async () => {
           :ncr-id="ncr.id"
           :logs="ncr.notification_logs || []"
           :can-resend="canResendNotifications"
+          :loading-type="resendLoadingType"
           @resend="handleResendNotification"
         />
       </UCard>
