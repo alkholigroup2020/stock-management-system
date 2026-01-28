@@ -22,6 +22,7 @@ import prisma from "../../utils/prisma";
 import { z } from "zod";
 import type { UserRole } from "@prisma/client";
 import { triggerNCRNotification } from "../../utils/email";
+import { generateNCRNumber } from "../../utils/priceVariance";
 
 // User session type
 interface AuthUser {
@@ -41,43 +42,6 @@ const bodySchema = z.object({
   quantity: z.number().optional(),
   value: z.number().positive(),
 });
-
-/**
- * Generate next NCR number
- * Format: NCR-YYYY-NNN (e.g., NCR-2025-001)
- */
-async function generateNCRNumber(year?: number): Promise<string> {
-  const currentYear = year || new Date().getFullYear();
-  const prefix = `NCR-${currentYear}-`;
-
-  // Find the highest NCR number for this year
-  const lastNCR = await prisma.nCR.findFirst({
-    where: {
-      ncr_no: {
-        startsWith: prefix,
-      },
-    },
-    orderBy: {
-      ncr_no: "desc",
-    },
-    select: {
-      ncr_no: true,
-    },
-  });
-
-  if (!lastNCR) {
-    // First NCR of the year
-    return `${prefix}001`;
-  }
-
-  // Extract number from last NCR and increment
-  const parts = lastNCR.ncr_no.split("-");
-  const lastNumber = parseInt(parts[2] || "0", 10);
-  const nextNumber = lastNumber + 1;
-
-  // Pad with zeros to 3 digits
-  return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
-}
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user as AuthUser | undefined;
@@ -197,7 +161,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Generate NCR number
-    const ncrNo = await generateNCRNumber();
+    const ncrNo = await generateNCRNumber(prisma);
 
     // Create NCR
     const ncr = await prisma.nCR.create({

@@ -1623,7 +1623,10 @@ export function triggerNCRNotification(
         const actualPrice = parseFloat(ncr.delivery_line.unit_price.toString());
         const expectedPrice = parseFloat(ncr.delivery_line.period_price.toString());
         const variance = actualPrice - expectedPrice;
-        const percentChange = ((variance / expectedPrice) * 100).toFixed(1);
+        // Handle division by zero: if expectedPrice is 0, show 100% if there's any actual price, else 0%
+        const percentValue =
+          expectedPrice > 0 ? (variance / expectedPrice) * 100 : actualPrice > 0 ? 100 : 0;
+        const percentChange = percentValue.toFixed(1);
         const sign = variance >= 0 ? "+" : "";
 
         varianceAmount = `SAR ${Math.abs(variance).toFixed(2)}`;
