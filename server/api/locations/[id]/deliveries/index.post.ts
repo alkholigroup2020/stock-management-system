@@ -27,6 +27,7 @@ import { checkPriceVariance } from "../../../../utils/priceVariance";
 import {
   sendOverDeliveryApprovalNotification,
   sendPOClosedNotification,
+  triggerNCRNotification,
 } from "../../../../utils/email";
 import type { UserRole } from "@prisma/client";
 import {
@@ -924,6 +925,14 @@ export default defineEventHandler(async (event) => {
         message = emailSent
           ? "Delivery draft saved. Supervisors have been notified for over-delivery approval."
           : "Delivery draft saved. Over-delivery items require supervisor approval.";
+      }
+    }
+
+    // Send NCR notifications for auto-generated price variance NCRs (fire-and-forget)
+    if (result.ncrs.length > 0) {
+      for (const ncr of result.ncrs) {
+        const ncrAny = ncr as { id: string };
+        triggerNCRNotification(ncrAny.id, prisma);
       }
     }
 
