@@ -185,6 +185,12 @@
                 <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
               </td>
             </tr>
+            <tr class="bg-[var(--ui-bg-elevated)]/50">
+              <td class="p-3 text-[var(--ui-text)]">Notification Settings</td>
+              <td class="p-3 text-center">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)] text-lg" />
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

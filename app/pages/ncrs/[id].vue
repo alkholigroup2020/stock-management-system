@@ -10,7 +10,7 @@ useSeoMeta({
 // Composables
 const route = useRoute();
 const router = useRouter();
-const { canUpdateNCRStatus } = usePermissions();
+const { canUpdateNCRStatus, canManageNotificationSettings } = usePermissions();
 const toast = useAppToast();
 
 // Types
@@ -56,6 +56,15 @@ interface Delivery {
   };
 }
 
+interface NotificationLog {
+  id: string;
+  recipient_type: "FINANCE" | "PROCUREMENT" | "SUPPLIER";
+  recipients: string[];
+  status: "SENT" | "FAILED";
+  error_message: string | null;
+  sent_at: string;
+}
+
 interface NCR {
   id: string;
   ncr_no: string;
@@ -74,6 +83,7 @@ interface NCR {
   resolution_notes: string | null;
   resolution_type: string | null;
   financial_impact: "NONE" | "CREDIT" | "LOSS" | null;
+  notification_logs?: NotificationLog[];
 }
 
 // State
@@ -82,6 +92,7 @@ const error = ref<string | null>(null);
 const ncr = ref<NCR | null>(null);
 const updateLoading = ref(false);
 const showUpdateModal = ref(false);
+const resendLoadingType = ref<"FINANCE" | "PROCUREMENT" | "SUPPLIER" | null>(null);
 
 // Form state for status update
 const statusUpdateForm = ref({
@@ -97,6 +108,10 @@ const ncrId = computed(() => route.params.id as string);
 const canUserUpdate = computed(() => {
   if (!ncr.value) return false;
   return canUpdateNCRStatus();
+});
+
+const canResendNotifications = computed(() => {
+  return canManageNotificationSettings();
 });
 
 const isNCROpen = computed(() => {
@@ -328,6 +343,57 @@ function openUpdateModal() {
     statusUpdateForm.value.financial_impact = ""; // Clear financial impact
   }
   showUpdateModal.value = true;
+}
+
+// Resend notification
+async function handleResendNotification(recipientType: "FINANCE" | "PROCUREMENT" | "SUPPLIER") {
+  if (!ncr.value) return;
+
+  resendLoadingType.value = recipientType;
+
+  try {
+    const response = await $fetch<{ message: string; recipients: string[] }>(
+      `/api/ncrs/${ncrId.value}/resend-notification`,
+      {
+        method: "POST",
+        body: { recipient_type: recipientType },
+      }
+    );
+
+    const recipientLabel =
+      recipientType === "FINANCE"
+        ? "Finance Team"
+        : recipientType === "PROCUREMENT"
+          ? "Procurement Team"
+          : "Supplier";
+
+    toast.success("Notification Sent", {
+      description: `Notification resent to ${recipientLabel}`,
+    });
+
+    // Refresh NCR data to get updated notification logs
+    await fetchNCR();
+  } catch (err: unknown) {
+    console.error("Error resending notification:", err);
+
+    const resendError = err as { statusCode?: number; data?: { code?: string; message?: string } };
+
+    if (resendError.data?.code === "RATE_LIMITED") {
+      toast.warning("Rate Limited", {
+        description: resendError.data?.message || "Please wait before resending",
+      });
+    } else if (resendError.data?.code === "NO_RECIPIENTS") {
+      toast.warning("No Recipients", {
+        description: resendError.data?.message || "No email addresses configured",
+      });
+    } else {
+      toast.error("Send Failed", {
+        description: resendError.data?.message || "Failed to resend notification",
+      });
+    }
+  } finally {
+    resendLoadingType.value = null;
+  }
 }
 
 // Navigation
@@ -637,6 +703,22 @@ onMounted(async () => {
             description="This NCR has been resolved and can no longer be updated."
           />
         </div>
+      </UCard>
+
+      <!-- Notification History Card (Admin only) -->
+      <UCard v-if="canResendNotifications" class="card-elevated" :ui="{ body: 'p-3 sm:p-4' }">
+        <div class="flex items-center gap-2 mb-4">
+          <UIcon name="i-lucide-mail" class="h-5 w-5 text-primary" />
+          <h2 class="text-lg font-semibold">Notification History</h2>
+        </div>
+
+        <NcrNotificationHistory
+          :ncr-id="ncr.id"
+          :logs="ncr.notification_logs || []"
+          :can-resend="canResendNotifications"
+          :loading-type="resendLoadingType"
+          @resend="handleResendNotification"
+        />
       </UCard>
     </div>
 

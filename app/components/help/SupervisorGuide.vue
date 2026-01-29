@@ -213,7 +213,9 @@ watch(
       >
         <span class="flex items-center gap-3">
           <UIcon name="i-heroicons-scale" class="text-[var(--ui-primary)] text-xl" />
-          <span class="font-semibold text-[var(--ui-text-highlighted)]">Over-Delivery Approval</span>
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Over-Delivery Approval
+          </span>
         </span>
         <UIcon
           :name="
@@ -333,7 +335,10 @@ watch(
         @click="toggleSection('po-management')"
       >
         <span class="flex items-center gap-3">
-          <UIcon name="i-heroicons-clipboard-document-list" class="text-[var(--ui-primary)] text-xl" />
+          <UIcon
+            name="i-heroicons-clipboard-document-list"
+            class="text-[var(--ui-primary)] text-xl"
+          />
           <span class="font-semibold text-[var(--ui-text-highlighted)]">PO Management</span>
         </span>
         <UIcon
@@ -391,8 +396,8 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Auto-Closure</h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            POs are automatically closed when all line items are fully delivered (Remaining = 0
-            for all lines). No manual action is required for fully fulfilled POs.
+            POs are automatically closed when all line items are fully delivered (Remaining = 0 for
+            all lines). No manual action is required for fully fulfilled POs.
           </p>
         </div>
 
@@ -854,6 +859,57 @@ watch(
               <strong>Create NCR</strong>
             </li>
           </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Email Notifications on NCR Creation
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            When you create an NCR (manual or auto-generated), email notifications are automatically
+            sent to:
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-calculator" class="text-[var(--ui-primary)]" />
+              <span>Finance Team (configured by Admin in Notification Settings)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-shopping-cart" class="text-[var(--ui-primary)]" />
+              <span>Procurement Team (configured by Admin in Notification Settings)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-building-storefront" class="text-[var(--ui-primary)]" />
+              <span>Supplier (if NCR is linked to a delivery with a supplier)</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Viewing Notification History
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            On the NCR detail page, you can see a notification history section showing:
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Which recipient groups were notified</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Delivery status (SENT or FAILED)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Timestamp of each notification attempt</span>
+            </li>
+          </ul>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-2">
+            If a notification fails, you can click the resend button to retry (5-minute cooldown
+            between attempts).
+          </p>
         </div>
 
         <div>

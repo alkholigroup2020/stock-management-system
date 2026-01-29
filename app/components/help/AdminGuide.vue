@@ -699,6 +699,167 @@ watch(
       </div>
     </section>
 
+    <!-- Notification Settings Section -->
+    <section
+      id="admin-section-notifications"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('notifications')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-bell" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">Notification Settings</span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('notifications') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('notifications')" class="p-4 space-y-4">
+        <!-- Section Introduction -->
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          NCR (Non-Conformance Report) email notifications are automatically sent whenever an NCR is
+          created, whether manually by a user or auto-generated due to price variance during
+          delivery posting. This page allows you to configure which team members receive these
+          notifications.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Notification Recipients
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            NCR notifications are sent to three groups:
+          </p>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Finance Team:</strong>
+              Receives all NCR notifications. Configure email addresses in Notification Settings.
+            </li>
+            <li>
+              <strong>Procurement Team:</strong>
+              Receives all NCR notifications. Configure email addresses in Notification Settings.
+            </li>
+            <li>
+              <strong>Supplier:</strong>
+              Automatically notified when an NCR is linked to their delivery. Uses the email
+              addresses registered in Supplier Management.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Configuring Notification Recipients
+          </h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Click
+              <strong>Settings</strong>
+              in the left menu
+            </li>
+            <li>
+              Click
+              <strong>Notifications</strong>
+            </li>
+            <li>Add email addresses to the Finance Team section</li>
+            <li>Add email addresses to the Procurement Team section</li>
+            <li>
+              Click
+              <strong>Save Changes</strong>
+            </li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Email Validation</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            The system validates email addresses before saving. If you enter an invalid email
+            format, you will see a validation error and the email will not be saved. Make sure all
+            email addresses follow the standard format (e.g., name@example.com).
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            What Triggers Notifications
+          </h4>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-document-text" class="text-[var(--ui-warning)]" />
+              <span>
+                <strong>Price Variance NCRs:</strong>
+                Auto-generated when delivery prices differ from period prices
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-pencil-square" class="text-[var(--ui-info)]" />
+              <span>
+                <strong>Manual NCRs:</strong>
+                Created by Supervisors for quality issues, damages, or shortages
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Viewing Notification History
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            When viewing an NCR detail page, you can see a notification history section showing:
+          </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Who was notified (Finance, Procurement, Supplier)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Email addresses that received the notification</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Delivery status (SENT or FAILED)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Timestamp of each notification attempt</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Resending Notifications
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            If a notification fails to send, you can manually resend it from the NCR detail page.
+            Click the resend button next to the failed notification. Note: There is a 5-minute
+            cooldown between resend attempts for the same recipient group.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              Notification sending is asynchronous. NCR creation completes immediately regardless of
+              email delivery time. If SMTP is unavailable, the system logs the failure but continues
+              to function normally.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- Quick Reference -->
     <section class="p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
       <h3 class="font-semibold text-[var(--ui-text-highlighted)] mb-3 flex items-center gap-2">

@@ -808,6 +808,20 @@ export function usePermissions() {
     return true;
   };
 
+  // ==================== SETTINGS PERMISSIONS ====================
+
+  /**
+   * Check if user can manage notification settings
+   *
+   * Requirements:
+   * - User must be ADMIN role
+   *
+   * @returns true if user can manage notification settings
+   */
+  const canManageNotificationSettings = (): boolean => {
+    return isAdmin.value;
+  };
+
   // ==================== RETURN ALL PERMISSION FUNCTIONS ====================
 
   return {
@@ -884,5 +898,8 @@ export function usePermissions() {
 
     // Dashboard
     canAccessDashboard,
+
+    // Settings
+    canManageNotificationSettings,
   };
 }

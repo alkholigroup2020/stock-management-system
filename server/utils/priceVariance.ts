@@ -13,7 +13,8 @@
  * @module server/utils/priceVariance
  */
 
-import type { Prisma } from "@prisma/client";
+import type { Prisma, PrismaClient } from "@prisma/client";
+import { triggerNCRNotification } from "./email";
 
 /**
  * Price variance detection result
@@ -165,7 +166,7 @@ export function checkPriceVariance(
  * @param year - Year for NCR numbering (defaults to current year)
  * @returns Next available NCR number
  */
-export async function generateNCRNumber(prisma: any, year?: number): Promise<string> {
+export async function generateNCRNumber(prisma: PrismaClient, year?: number): Promise<string> {
   const currentYear = year || new Date().getFullYear();
   const prefix = `NCR-${currentYear}-`;
 
@@ -190,7 +191,8 @@ export async function generateNCRNumber(prisma: any, year?: number): Promise<str
   }
 
   // Extract number from last NCR and increment
-  const lastNumber = parseInt(lastNCR.ncr_no.split("-")[2], 10);
+  const parts = lastNCR.ncr_no.split("-");
+  const lastNumber = parseInt(parts[2] || "0", 10);
   const nextNumber = lastNumber + 1;
 
   // Pad with zeros to 3 digits
@@ -228,7 +230,7 @@ export async function generateNCRNumber(prisma: any, year?: number): Promise<str
  * });
  * ```
  */
-export async function createPriceVarianceNCR(prisma: any, data: PriceVarianceNCRData) {
+export async function createPriceVarianceNCR(prisma: PrismaClient, data: PriceVarianceNCRData) {
   // Validate required data
   if (
     !data.locationId ||
@@ -329,7 +331,7 @@ export async function createPriceVarianceNCR(prisma: any, data: PriceVarianceNCR
  * ```
  */
 export async function detectAndCreateNCR(
-  prisma: any,
+  prisma: PrismaClient,
   params: {
     locationId: string;
     deliveryId: string;
@@ -369,6 +371,12 @@ export async function detectAndCreateNCR(
       varianceAmount: varianceResult.varianceAmount,
       createdBy: params.createdBy,
     });
+
+    // Trigger email notification for the created NCR (fire-and-forget)
+    // This sends notifications to Finance, Procurement, and Supplier
+    if (ncr) {
+      triggerNCRNotification(ncr.id, prisma);
+    }
   }
 
   return {

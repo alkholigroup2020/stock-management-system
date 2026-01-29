@@ -126,6 +126,15 @@
 - ✅ Auto-Generation (Price Variance)
 - ✅ Creating Manual NCRs
 - ✅ NCR Resolution
+- ✅ NCR Reconciliation Impact
+- ✅ **NCR Email Notifications** _(NEW)_
+  - Notification Models (NotificationSetting, NCRNotificationLog)
+  - Notification Flow (trigger → resolve → send → log)
+  - Core Email Functions (triggerNCRNotification, sendNCRCreatedNotification)
+  - Trigger Points (Manual NCR, Price Variance NCR)
+  - Admin Configuration (Settings API, Composable, UI)
+  - Notification History & Resend (with 5-minute rate limit)
+  - Environment Variables (SMTP configuration)
 - ✅ API & Frontend Patterns
 - ✅ Business Rules Summary
 

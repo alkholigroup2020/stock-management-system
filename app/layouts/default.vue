@@ -63,6 +63,13 @@ const mainMenuItems = computed<NavItem[]>(() => {
       permission: true,
     });
   }
+  if (permissions.canManageNotificationSettings()) {
+    masterDataChildren.push({
+      label: "Notifications",
+      to: "/settings/notifications",
+      permission: true,
+    });
+  }
 
   if (masterDataChildren.length > 0) {
     items.push({
@@ -237,6 +244,8 @@ const pageTitleMap: Record<string, string> = {
   "orders-pos": "Purchase Orders",
   "orders-pos-create": "Create PO",
   "orders-pos-id": "PO Details",
+  settings: "Settings",
+  "settings-notifications": "Notification Settings",
 };
 
 // Get page title from route

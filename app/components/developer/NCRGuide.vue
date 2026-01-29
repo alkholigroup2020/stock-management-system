@@ -842,6 +842,204 @@ const handleSubmit = () => {
   </UCard>
 </template>`,
 
+  // NCR Email Notifications section
+  ncrNotificationModels: `// NCR Notification Database Models
+// File: prisma/schema.prisma
+
+model NotificationSetting {
+  id         String   @id @default(uuid())
+  key        String   @unique  // NCR_FINANCE_TEAM_EMAILS, NCR_PROCUREMENT_TEAM_EMAILS
+  emails     String[] @default([])
+  updated_at DateTime @updatedAt
+  updated_by String?  @db.Uuid
+  updater    User?    @relation(...)
+  @@map("notification_settings")
+}
+
+model NCRNotificationLog {
+  id             String                    @id @default(uuid())
+  ncr_id         String                    @db.Uuid
+  recipient_type NotificationRecipientType // FINANCE | PROCUREMENT | SUPPLIER
+  recipients     String[]                  // Email addresses sent to
+  status         NotificationStatus        // SENT | FAILED
+  error_message  String?
+  sent_at        DateTime                  @default(now())
+  ncr            NCR                       @relation(...)
+  @@map("ncr_notification_logs")
+}
+
+enum NotificationRecipientType {
+  FINANCE
+  PROCUREMENT
+  SUPPLIER
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+}`,
+
+  triggerNotificationPattern: `// Fire-and-Forget Notification Pattern
+// File: server/api/ncrs/index.post.ts
+
+export default defineEventHandler(async (event) => {
+  // ... validation and NCR creation ...
+
+  const ncr = await prisma.nCR.create({ data: { ... } });
+
+  // Trigger email notification (fire-and-forget - does not block response)
+  triggerNCRNotification(ncr.id, prisma);
+
+  return { message: "NCR created successfully", ncr };
+});
+
+// The triggerNCRNotification function (server/utils/email.ts):
+// 1. Fetches NCR with all related data (location, delivery, supplier, items)
+// 2. Resolves recipient emails from NotificationSetting table
+// 3. Gets supplier emails from linked delivery→supplier relationship
+// 4. Sends emails to all three groups (Finance, Procurement, Supplier)
+// 5. Logs each attempt to NCRNotificationLog table
+// 6. Never blocks - errors are caught and logged`,
+
+  notificationFlowDiagram: `// NCR Email Notification Flow
+//
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │                     NCR EMAIL NOTIFICATION FLOW                              │
+// └─────────────────────────────────────────────────────────────────────────────┘
+//
+//   ┌─────────────────┐              ┌─────────────────┐
+//   │  Manual NCR     │              │  Price Variance │
+//   │  POST /api/ncrs │              │  Delivery Post  │
+//   └────────┬────────┘              └────────┬────────┘
+//            │                                │
+//            └───────────────┬────────────────┘
+//                            ▼
+//              ┌─────────────────────────┐
+//              │  triggerNCRNotification │
+//              │    (fire-and-forget)    │
+//              └───────────┬─────────────┘
+//                          ▼
+//              ┌─────────────────────────┐
+//              │ resolveRecipients()     │
+//              │ - Finance from settings │
+//              │ - Procurement from      │
+//              │   settings              │
+//              │ - Supplier from         │
+//              │   delivery→supplier     │
+//              └───────────┬─────────────┘
+//                          ▼
+//         ┌────────────────┼────────────────┐
+//         ▼                ▼                ▼
+//   ┌──────────┐    ┌──────────┐    ┌──────────┐
+//   │ Finance  │    │Procurement│   │ Supplier │
+//   │  Email   │    │  Email   │    │  Email   │
+//   │(internal)│    │(internal)│    │(external)│
+//   └────┬─────┘    └────┬─────┘    └────┬─────┘
+//        │               │               │
+//        └───────────────┴───────────────┘
+//                        ▼
+//              ┌─────────────────────────┐
+//              │  logNCRNotification()   │
+//              │  - Creates log entry    │
+//              │  - Records SENT/FAILED  │
+//              │  - Stores error message │
+//              └─────────────────────────┘`,
+
+  adminSettingsComposable: `// Admin Notification Settings Composable
+// File: app/composables/useNotificationSettings.ts
+
+export function useNotificationSettings() {
+  const settings = ref<NotificationSettingsResponse | null>(null);
+  const isLoading = ref(false);
+  const isSaving = ref(false);
+
+  async function fetchSettings(): Promise<void> {
+    isLoading.value = true;
+    try {
+      const response = await $fetch("/api/settings/notifications");
+      settings.value = response;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateSettings(data: NotificationSettingsPayload) {
+    isSaving.value = true;
+    try {
+      const response = await $fetch("/api/settings/notifications", {
+        method: "PUT",
+        body: data,
+      });
+      settings.value = response.settings;
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  return { settings, isLoading, isSaving, fetchSettings, updateSettings };
+}
+
+// Usage in settings page:
+const { settings, fetchSettings, updateSettings } = useNotificationSettings();
+await fetchSettings();
+await updateSettings({
+  finance_team_emails: ["finance@company.com"],
+  procurement_team_emails: ["procurement@company.com"],
+});`,
+
+  resendWithRateLimit: `// Resend Notification with Rate Limiting
+// File: server/api/ncrs/[id]/resend-notification.post.ts
+
+// 5-minute rate limit per recipient type per NCR
+const RATE_LIMIT_MS = 5 * 60 * 1000;
+
+export default defineEventHandler(async (event) => {
+  const { id } = getRouterParams(event);
+  const { recipient_type } = await readBody(event);
+
+  // Check last notification time for this recipient type
+  const lastLog = await prisma.nCRNotificationLog.findFirst({
+    where: { ncr_id: id, recipient_type },
+    orderBy: { sent_at: "desc" },
+  });
+
+  if (lastLog) {
+    const timeSinceLastSend = Date.now() - lastLog.sent_at.getTime();
+    if (timeSinceLastSend < RATE_LIMIT_MS) {
+      const remainingSeconds = Math.ceil((RATE_LIMIT_MS - timeSinceLastSend) / 1000);
+      throw createError({
+        statusCode: 429,
+        data: {
+          code: "RATE_LIMITED",
+          message: \`Please wait \${remainingSeconds} seconds before resending\`,
+          remainingSeconds,
+        },
+      });
+    }
+  }
+
+  // Proceed with resend...
+});`,
+
+  envVariables: `// Environment Variables for Email Notifications
+// Required in .env file
+
+# SMTP Configuration (Required)
+SMTP_HOST=smtp.office365.com    # SMTP server (default: Office 365)
+SMTP_PORT=587                    # SMTP port (default: 587 for STARTTLS)
+SMTP_USER=sender@company.com     # SMTP authentication user
+SMTP_PASSWORD=xxxxxxxx           # SMTP authentication password
+
+# Email Branding (Optional)
+EMAIL_FROM=noreply@company.com   # From address (defaults to SMTP_USER)
+COMPANY_NAME=AKG Group           # Company name in supplier emails
+
+# Application URL (Required for email links)
+NUXT_PUBLIC_SITE_URL=https://stock.company.com
+
+# Development Mode
+# When SMTP_USER is not set, emails are logged to console instead of sent`,
+
   cacheInvalidation: `// Cache Invalidation for NCRs (Recommended Pattern)
 // File: app/composables/useCache.ts
 //
@@ -1406,6 +1604,272 @@ async function handleCreateNCR(data: NCRFormData) {
               <strong>Period Association:</strong>
               NCRs are associated with periods via their linked delivery's period_id. Manual NCRs
               without a delivery link use their creation date to determine the period.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NCR Email Notifications Section -->
+    <section
+      id="dev-section-ncr-notifications"
+      class="overflow-hidden rounded-lg border border-[var(--ui-border)]"
+    >
+      <button
+        class="flex w-full cursor-pointer items-center justify-between bg-[var(--ui-bg-elevated)] p-4 transition-colors hover:bg-[var(--ui-bg-accented)]"
+        @click="toggleSection('ncr-notifications')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-envelope" class="text-xl text-[var(--ui-primary)]" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            NCR Email Notifications
+          </span>
+          <UBadge color="success" variant="soft" size="xs">NEW</UBadge>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('ncr-notifications') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('ncr-notifications')" class="space-y-4 p-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          The NCR Email Notification system automatically sends emails to Finance, Procurement, and
+          Suppliers when NCRs are created (both manual and price variance). Notifications are sent
+          asynchronously using a fire-and-forget pattern to avoid blocking NCR creation.
+        </p>
+
+        <!-- Overview -->
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Overview</h4>
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-building-office" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
+                  Finance Team
+                </span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Internal notification with NCR details for financial tracking and credit note
+                follow-up.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-shopping-cart" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">
+                  Procurement Team
+                </span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                Internal notification for supplier relationship management and issue resolution.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UIcon name="i-heroicons-truck" class="text-[var(--ui-primary)]" />
+                <span class="text-sm font-medium text-[var(--ui-text-highlighted)]">Supplier</span>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                External notification informing supplier of the non-conformance issue raised against
+                them.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Flow Diagram -->
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Notification Flow</h4>
+          <DeveloperCodeBlock :code="codeExamples.notificationFlowDiagram" language="plaintext" />
+        </div>
+
+        <!-- Database Models -->
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Database Models</h4>
+          <DeveloperCodeBlock
+            :code="codeExamples.ncrNotificationModels"
+            language="typescript"
+            filename="prisma/schema.prisma"
+          />
+        </div>
+
+        <!-- Trigger Pattern -->
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Fire-and-Forget Pattern
+          </h4>
+          <DeveloperCodeBlock
+            :code="codeExamples.triggerNotificationPattern"
+            language="typescript"
+            filename="server/api/ncrs/index.post.ts"
+          />
+        </div>
+
+        <!-- Trigger Points -->
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Trigger Points</h4>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="primary" variant="soft">Manual NCR</UBadge>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                When a user creates an NCR via
+                <code class="code-inline">POST /api/ncrs</code>
+                , notifications are triggered after successful creation.
+              </p>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="mb-2 flex items-center gap-2">
+                <UBadge color="warning" variant="soft">Price Variance NCR</UBadge>
+              </div>
+              <p class="text-xs text-[var(--ui-text-muted)]">
+                When a delivery is posted with price variance, the auto-generated NCR also triggers
+                notifications.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Configuration -->
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Admin Configuration</h4>
+          <p class="mb-2 text-sm text-[var(--ui-text-muted)]">
+            Finance and Procurement team emails are configured via the Settings page. Only Admins
+            can modify these settings. Supplier emails are automatically resolved from the supplier
+            linked to the NCR's delivery.
+          </p>
+          <DeveloperCodeBlock
+            :code="codeExamples.adminSettingsComposable"
+            language="typescript"
+            filename="app/composables/useNotificationSettings.ts"
+          />
+        </div>
+
+        <!-- Resend with Rate Limiting -->
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">
+            Resend with Rate Limiting
+          </h4>
+          <p class="mb-2 text-sm text-[var(--ui-text-muted)]">
+            Users can manually resend notifications from the NCR detail page. A 5-minute rate limit
+            prevents spam and abuse.
+          </p>
+          <DeveloperCodeBlock
+            :code="codeExamples.resendWithRateLimit"
+            language="typescript"
+            filename="server/api/ncrs/[id]/resend-notification.post.ts"
+          />
+        </div>
+
+        <!-- Notification History -->
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Notification History</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            All notification attempts are logged in the
+            <code class="code-inline">NCRNotificationLog</code>
+            table. The NCR detail page displays notification history including:
+          </p>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-clock" class="text-[var(--ui-text-muted)]" />
+                <span class="text-sm text-[var(--ui-text-muted)]">Timestamp of each attempt</span>
+              </div>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-user-group" class="text-[var(--ui-text-muted)]" />
+                <span class="text-sm text-[var(--ui-text-muted)]">Recipient type and emails</span>
+              </div>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-check-circle" class="text-[var(--ui-success)]" />
+                <span class="text-sm text-[var(--ui-text-muted)]">Success/failure status</span>
+              </div>
+            </div>
+            <div class="rounded-lg border border-[var(--ui-border)] p-3">
+              <div class="flex items-center gap-2">
+                <UIcon name="i-heroicons-exclamation-circle" class="text-[var(--ui-error)]" />
+                <span class="text-sm text-[var(--ui-text-muted)]">Error message (if failed)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Environment Variables -->
+        <div>
+          <h4 class="mb-2 font-medium text-[var(--ui-text-highlighted)]">Environment Variables</h4>
+          <DeveloperCodeBlock :code="codeExamples.envVariables" language="bash" filename=".env" />
+        </div>
+
+        <!-- Business Rules -->
+        <div class="space-y-3">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)]">Business Rules</h4>
+          <div class="space-y-2">
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Fire-and-forget</strong>
+                - Notifications sent asynchronously; NCR creation never blocked by email sending
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Three recipient groups</strong>
+                - Finance Team, Procurement Team, and Supplier (different email templates)
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Admin-configurable</strong>
+                - Finance/Procurement emails configured via Settings page
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Automatic supplier resolution</strong>
+                - Supplier emails resolved from delivery → supplier relationship
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Comprehensive logging</strong>
+                - All notification attempts logged with status, recipients, timestamps
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Rate-limited resend</strong>
+                - 5-minute cooldown per recipient group per NCR
+              </span>
+            </div>
+            <div class="flex items-start gap-2 text-sm">
+              <UIcon name="i-heroicons-check-circle" class="mt-0.5 text-[var(--ui-success)]" />
+              <span class="text-[var(--ui-text-muted)]">
+                <strong>Development mode</strong>
+                - Emails logged to console when SMTP not configured
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
+          <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
+            <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
+            <span>
+              <strong>UI Location:</strong>
+              Notification settings are found at Settings → Notifications (Admin only). NCR
+              notification history is displayed on the NCR detail page with resend buttons.
             </span>
           </p>
         </div>

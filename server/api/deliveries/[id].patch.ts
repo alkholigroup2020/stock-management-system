@@ -28,6 +28,7 @@ import {
   sendOverDeliveryApprovedNotification,
   sendOverDeliveryRejectedNotification,
   sendPOClosedNotification,
+  triggerNCRNotification,
 } from "../../utils/email";
 import type { UserRole } from "@prisma/client";
 
@@ -1045,6 +1046,14 @@ export default defineEventHandler(async (event) => {
         }
       } catch (emailError) {
         console.error("[Delivery PATCH] Failed to send over-delivery notification:", emailError);
+      }
+    }
+
+    // Send NCR notifications for auto-generated price variance NCRs (fire-and-forget)
+    if (result.ncrs.length > 0) {
+      for (const ncr of result.ncrs) {
+        const ncrAny = ncr as { id: string };
+        triggerNCRNotification(ncrAny.id, prisma);
       }
     }
 

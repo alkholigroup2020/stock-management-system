@@ -109,6 +109,19 @@ export default defineEventHandler(async (event) => {
             role: true,
           },
         },
+        notification_logs: {
+          select: {
+            id: true,
+            recipient_type: true,
+            recipients: true,
+            status: true,
+            error_message: true,
+            sent_at: true,
+          },
+          orderBy: {
+            sent_at: "desc",
+          },
+        },
       },
     });
 
@@ -177,6 +190,7 @@ export default defineEventHandler(async (event) => {
         created_at: ncr.created_at,
         resolved_at: ncr.resolved_at,
         resolution_notes: ncr.resolution_notes,
+        notification_logs: ncr.notification_logs,
       },
     };
   } catch (error) {
