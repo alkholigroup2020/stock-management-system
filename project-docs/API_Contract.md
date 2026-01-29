@@ -1,6 +1,8 @@
 # API Contract - Multi-Location Stock Management System
 
-**Last Updated:** December 2025
+**Last Updated:** January 2026
+
+**Status:** ✅ Fully Implemented (103+ Routes)
 
 **Purpose:** Define the backend API for the multi-location stock management system
 
@@ -14,6 +16,7 @@
 - **Content-Type:** `application/json; charset=utf-8`
 - **Times:** ISO 8601 UTC
 - **Currency:** SAR (Saudi Riyal)
+- **VAT Rate:** 15%
 - **Pagination:** `?page=1&limit=50` + `X-Total-Count` header
 - **Location Context:** Route parameter or query parameter
 
@@ -38,7 +41,7 @@ flowchart LR
 
 ---
 
-## Authentication & Authorization
+## Authentication & Authorization ✅ Implemented
 
 ### Authentication Method
 
@@ -46,6 +49,7 @@ flowchart LR
 - **Library:** nuxt-auth-utils
 - **Session management:** Server-side via Nuxt middleware
 - **No Bearer tokens** - cookies auto-sent by browser
+- **Password hashing:** bcrypt with salt
 
 ### Session Structure
 
@@ -56,13 +60,13 @@ interface UserSession {
     username: string;
     email: string;
     full_name: string;
-    role: "OPERATOR" | "SUPERVISOR" | "ADMIN";
+    role: "OPERATOR" | "SUPERVISOR" | "ADMIN" | "PROCUREMENT_SPECIALIST";
     default_location_id: string | null;
     default_location: {
       id: string;
       code: string;
       name: string;
-      type: string;
+      type: "KITCHEN" | "STORE" | "CENTRAL" | "WAREHOUSE";
     } | null;
     locations: string[]; // Array of location IDs user has access to
   };
@@ -185,11 +189,12 @@ PATCH /api/auth/profile
 
 ### Role Permissions
 
-| Role           | Permissions                                       |
-| -------------- | ------------------------------------------------- |
-| **OPERATOR**   | View/Post at assigned locations only              |
-| **SUPERVISOR** | All locations, approve transfers, manage NCRs     |
-| **ADMIN**      | Full system access, period close, user management |
+| Role                       | Permissions                                              |
+| -------------------------- | -------------------------------------------------------- |
+| **OPERATOR**               | View/Post at assigned locations, create PRFs             |
+| **PROCUREMENT_SPECIALIST** | All locations for PRF/PO, create POs, send PO emails     |
+| **SUPERVISOR**             | All locations, approve PRFs/transfers/over-delivery, NCRs|
+| **ADMIN**                  | Full system access, period close, user management        |
 
 ### Middleware Protection
 
@@ -216,7 +221,7 @@ export default defineEventHandler(async (event) => {
 
 ## Core Endpoints
 
-### 1. Location Management
+### 1. Location Management ✅ Implemented
 
 #### List Locations
 
@@ -326,7 +331,7 @@ DELETE /api/locations/{id}/users/{userId}
 
 ---
 
-### 2. Dashboard
+### 2. Dashboard ✅ Implemented
 
 #### Get Consolidated Dashboard
 
@@ -353,7 +358,7 @@ GET /api/dashboard/consolidated
 
 ---
 
-### 3. Period Management
+### 3. Period Management ✅ Implemented
 
 #### List Periods
 
@@ -476,7 +481,7 @@ Creates next period and copies closing stock as opening stock.
 
 ---
 
-### 4. Period Location Status
+### 4. Period Location Status ✅ Implemented
 
 #### Mark Location Ready for Close
 
@@ -501,7 +506,7 @@ PATCH /api/period-locations/unready
 
 ---
 
-### 5. Stock Operations
+### 5. Stock Operations ✅ Implemented
 
 #### Get Consolidated Stock
 
@@ -553,7 +558,7 @@ GET /api/stock/consolidated
 
 ---
 
-### 6. Items Management
+### 6. Items Management ✅ Implemented
 
 #### List Items
 
@@ -588,9 +593,12 @@ POST /api/items
   "name": "Chicken Breast",
   "unit": "KG",
   "category": "PROTEINS",
-  "sub_category": "Poultry"
+  "sub_category": "Poultry",
+  "min_stock": 50
 }
 ```
+
+**Units:** KG, EA, LTR, BOX, CASE, PACK
 
 **Permissions:** ADMIN only
 
@@ -600,10 +608,18 @@ POST /api/items
 PATCH /api/items/{id}
 ```
 
-#### Delete Item
+#### Deactivate Item
 
 ```
-DELETE /api/items/{id}
+PATCH /api/items/{id}
+```
+
+**Body:**
+
+```json
+{
+  "is_active": false
+}
 ```
 
 **Permissions:** ADMIN only
@@ -623,9 +639,47 @@ PATCH /api/items/{itemId}/price
 }
 ```
 
+#### Import Items (Bulk)
+
+```
+POST /api/items/import
+```
+
+**Body:** `multipart/form-data` with Excel/CSV file
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Import completed",
+  "summary": {
+    "total_rows": 100,
+    "created": 85,
+    "updated": 10,
+    "errors": 5
+  },
+  "errors": [
+    {
+      "row": 15,
+      "code": "PRO-999",
+      "message": "Duplicate item code"
+    }
+  ]
+}
+```
+
+#### Get Import Template
+
+```
+GET /api/items/import/template
+```
+
+**Response:** Excel file download with required columns
+
 ---
 
-### 7. Suppliers Management
+### 7. Suppliers Management ✅ Implemented
 
 #### List Suppliers
 
@@ -671,7 +725,253 @@ DELETE /api/suppliers/{id}
 
 ---
 
-### 8. Deliveries
+### 8. PRF (Purchase Request Forms) ✅ Implemented
+
+#### List PRFs
+
+```
+GET /api/prfs
+```
+
+**Query Params:**
+
+- `locationId`: Filter by location
+- `status`: DRAFT, PENDING, APPROVED, REJECTED, CLOSED
+- `type`: URGENT, DPA, NORMAL
+- `category`: FOOD, CLEANING, OTHER
+
+**Response:**
+
+```json
+{
+  "prfs": [
+    {
+      "id": "uuid",
+      "prf_no": "PRF-KIT-25-Jan-2026-01",
+      "type": "NORMAL",
+      "category": "FOOD",
+      "status": "PENDING",
+      "location": { "id": "uuid", "code": "KIT", "name": "Kitchen" },
+      "requester": { "id": "uuid", "full_name": "Operator One" },
+      "total_amount": 5000.00,
+      "vat_amount": 750.00,
+      "grand_total": 5750.00,
+      "created_at": "2026-01-15T10:00:00Z"
+    }
+  ],
+  "total": 25
+}
+```
+
+#### Get PRF Details
+
+```
+GET /api/prfs/{id}
+```
+
+#### Create PRF
+
+```
+POST /api/prfs
+```
+
+**Body:**
+
+```json
+{
+  "location_id": "uuid",
+  "type": "NORMAL",
+  "category": "FOOD",
+  "notes": "Weekly order",
+  "lines": [
+    {
+      "item_id": "uuid",
+      "quantity": 100,
+      "estimated_price": 25.00
+    },
+    {
+      "description": "Special item not in system",
+      "quantity": 10,
+      "estimated_price": 50.00,
+      "unit": "EA"
+    }
+  ]
+}
+```
+
+**Note:** Lines can reference an `item_id` OR use a custom `description` for non-catalog items.
+
+#### Update PRF (Draft Only)
+
+```
+PATCH /api/prfs/{id}
+```
+
+#### Submit PRF for Approval
+
+```
+POST /api/prfs/{id}/submit
+```
+
+**Response:** PRF with status changed to `PENDING`
+
+#### Approve PRF
+
+```
+POST /api/prfs/{id}/approve
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Response:** PRF with status `APPROVED`, triggers email notification
+
+#### Reject PRF
+
+```
+POST /api/prfs/{id}/reject
+```
+
+**Body:**
+
+```json
+{
+  "reason": "Budget constraints"
+}
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+---
+
+### 9. PO (Purchase Orders) ✅ Implemented
+
+#### List POs
+
+```
+GET /api/pos
+```
+
+**Query Params:**
+
+- `status`: OPEN, CLOSED
+- `supplierId`: Filter by supplier
+- `prfId`: Filter by originating PRF
+
+#### Get PO Details
+
+```
+GET /api/pos/{id}
+```
+
+**Response:**
+
+```json
+{
+  "po": {
+    "id": "uuid",
+    "po_no": "PO-25-Jan-2026-001",
+    "status": "OPEN",
+    "supplier": { "id": "uuid", "name": "Fresh Foods Co.", "email": "orders@freshfoods.com" },
+    "prf": { "id": "uuid", "prf_no": "PRF-KIT-25-Jan-2026-01" },
+    "total_amount": 5000.00,
+    "vat_amount": 750.00,
+    "grand_total": 5750.00,
+    "delivery_terms": "Within 3 days",
+    "payment_terms": "Net 30",
+    "created_at": "2026-01-15T12:00:00Z"
+  },
+  "lines": [
+    {
+      "id": "uuid",
+      "item": { "id": "uuid", "code": "PRO-001", "name": "Chicken Breast" },
+      "quantity_ordered": 100,
+      "quantity_delivered": 75,
+      "quantity_remaining": 25,
+      "unit_price": 25.00,
+      "total": 2500.00
+    }
+  ],
+  "fulfillment": {
+    "total_ordered": 5000.00,
+    "total_delivered": 3750.00,
+    "percent_fulfilled": 75
+  }
+}
+```
+
+#### Create PO from PRF
+
+```
+POST /api/pos
+```
+
+**Body:**
+
+```json
+{
+  "prf_id": "uuid",
+  "supplier_id": "uuid",
+  "delivery_terms": "Within 3 days",
+  "payment_terms": "Net 30",
+  "lines": [
+    {
+      "prf_line_id": "uuid",
+      "quantity": 100,
+      "unit_price": 25.00
+    }
+  ]
+}
+```
+
+**Permissions:** PROCUREMENT_SPECIALIST/ADMIN only
+
+#### Update PO (Open Only)
+
+```
+PATCH /api/pos/{id}
+```
+
+**Permissions:** PROCUREMENT_SPECIALIST/ADMIN only
+
+#### Close PO
+
+```
+POST /api/pos/{id}/close
+```
+
+**Body:**
+
+```json
+{
+  "reason": "Fully delivered"
+}
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Note:** POs auto-close when fully delivered.
+
+#### Send PO Email
+
+```
+POST /api/pos/{id}/send-email
+```
+
+**Permissions:** PROCUREMENT_SPECIALIST/SUPERVISOR/ADMIN
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "PO email sent to supplier",
+  "sent_to": "orders@freshfoods.com"
+}
+```
+
+---
+
+### 10. Deliveries ✅ Implemented
 
 #### List Location Deliveries
 
@@ -683,7 +983,9 @@ GET /api/locations/{id}/deliveries
 
 - `status`: DRAFT, POSTED
 - `supplierId`: Filter by supplier
+- `poId`: Filter by PO
 - `hasVariance`: true/false
+- `hasOverDelivery`: true/false
 - `startDate`: ISO date
 - `endDate`: ISO date
 
@@ -693,7 +995,7 @@ GET /api/locations/{id}/deliveries
 GET /api/deliveries/{id}
 ```
 
-#### Create Delivery
+#### Create Delivery (from PO)
 
 ```
 POST /api/locations/{id}/deliveries
@@ -703,14 +1005,16 @@ POST /api/locations/{id}/deliveries
 
 ```json
 {
+  "po_id": "uuid",
   "supplier_id": "uuid",
-  "invoice_no": "INV-2025-001",
+  "invoice_no": "INV-2026-001",
   "delivery_note": "DN-001",
-  "delivery_date": "2025-12-25",
-  "status": "POSTED",
+  "delivery_date": "2026-01-25",
+  "status": "DRAFT",
   "lines": [
     {
       "item_id": "uuid",
+      "po_line_id": "uuid",
       "quantity": 100,
       "unit_price": 26.0
     }
@@ -723,6 +1027,24 @@ POST /api/locations/{id}/deliveries
 - `DRAFT`: Saves without affecting stock (invoice_no optional)
 - `POSTED`: Immediately updates stock and WAC (invoice_no required)
 
+**Over-Delivery Detection:**
+
+If `quantity > po_line.quantity_remaining`, response includes:
+
+```json
+{
+  "requires_approval": true,
+  "over_delivery_lines": [
+    {
+      "item": "Chicken Breast",
+      "po_remaining": 50,
+      "delivered": 75,
+      "over_amount": 25
+    }
+  ]
+}
+```
+
 **Response with Price Variance:**
 
 ```json
@@ -731,9 +1053,9 @@ POST /api/locations/{id}/deliveries
   "message": "Delivery posted. 1 price variance(s) detected and NCR(s) created automatically.",
   "delivery": {
     "id": "uuid",
-    "delivery_no": "DEL-2025-001",
-    "delivery_date": "2025-12-25",
-    "invoice_no": "INV-2025-001",
+    "delivery_no": "DEL-2026-001",
+    "delivery_date": "2026-01-25",
+    "invoice_no": "INV-2026-001",
     "total_amount": 2600.00,
     "has_variance": true,
     "status": "POSTED"
@@ -742,7 +1064,7 @@ POST /api/locations/{id}/deliveries
   "ncrs": [
     {
       "id": "uuid",
-      "ncr_no": "NCR-2025-001",
+      "ncr_no": "NCR-2026-001",
       "type": "PRICE_VARIANCE",
       "item": { "id": "uuid", "code": "PRO-001", "name": "Chicken Breast" },
       "expected_price": 25.00,
@@ -760,6 +1082,24 @@ POST /api/locations/{id}/deliveries
 PATCH /api/deliveries/{id}
 ```
 
+#### Post Delivery
+
+```
+POST /api/deliveries/{id}/post
+```
+
+Posts a DRAFT delivery, updating stock and WAC.
+
+#### Approve Over-Delivery
+
+```
+POST /api/deliveries/{id}/approve-overdelivery
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Response:** Delivery posted with over-delivery amounts accepted.
+
 #### Delete Delivery (Draft Only)
 
 ```
@@ -768,7 +1108,7 @@ DELETE /api/deliveries/{id}
 
 ---
 
-### 9. Issues
+### 11. Issues ✅ Implemented
 
 #### List Location Issues
 
@@ -827,7 +1167,7 @@ POST /api/locations/{id}/issues
 
 ---
 
-### 10. Transfers
+### 12. Transfers ✅ Implemented
 
 #### List Transfers
 
@@ -918,7 +1258,7 @@ PATCH /api/transfers/{id}/reject
 
 ---
 
-### 11. NCR Management
+### 13. NCR Management ✅ Implemented
 
 #### List NCRs
 
@@ -930,7 +1270,8 @@ GET /api/ncrs
 
 - `locationId`: Filter by location
 - `type`: MANUAL, PRICE_VARIANCE
-- `status`: OPEN, SENT, CREDITED, CLOSED
+- `status`: OPEN, SENT, CREDITED, REJECTED, RESOLVED
+- `deliveryId`: Filter by delivery
 - `startDate`: ISO date
 - `endDate`: ISO date
 
@@ -938,6 +1279,34 @@ GET /api/ncrs
 
 ```
 GET /api/ncrs/{id}
+```
+
+**Response:**
+
+```json
+{
+  "ncr": {
+    "id": "uuid",
+    "ncr_no": "NCR-2026-001",
+    "type": "PRICE_VARIANCE",
+    "status": "OPEN",
+    "auto_generated": true,
+    "location": { "id": "uuid", "code": "KIT", "name": "Kitchen" },
+    "delivery": { "id": "uuid", "delivery_no": "DEL-2026-001" },
+    "financial_impact": "NONE",
+    "total_value": 100.00,
+    "created_at": "2026-01-15T10:00:00Z"
+  },
+  "lines": [...],
+  "notifications": [
+    {
+      "id": "uuid",
+      "sent_at": "2026-01-15T10:30:00Z",
+      "recipients": ["finance@company.com", "procurement@company.com"],
+      "status": "SENT"
+    }
+  ]
+}
 ```
 
 #### Create Manual NCR
@@ -963,7 +1332,7 @@ POST /api/ncrs
 }
 ```
 
-#### Update NCR Status
+#### Update NCR
 
 ```
 PATCH /api/ncrs/{id}
@@ -974,13 +1343,57 @@ PATCH /api/ncrs/{id}
 ```json
 {
   "status": "SENT",
-  "resolution": "Credit note received"
+  "notes": "Sent to supplier"
 }
 ```
 
+#### Resolve NCR
+
+```
+POST /api/ncrs/{id}/resolve
+```
+
+**Body:**
+
+```json
+{
+  "resolution": "CREDITED",
+  "financial_impact": "CREDIT",
+  "credit_amount": 127.50,
+  "notes": "Credit note CN-001 received"
+}
+```
+
+**Resolution Options:** CREDITED, REJECTED, RESOLVED
+
+**Financial Impact Options:** NONE, CREDIT, LOSS
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+#### Send NCR Notification
+
+```
+POST /api/ncrs/{id}/send-notification
+```
+
+**Permissions:** SUPERVISOR/ADMIN only
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "NCR notification sent",
+  "recipients": ["finance@company.com", "procurement@company.com", "supplier@example.com"],
+  "notification_id": "uuid"
+}
+```
+
+**Note:** 5-minute cooldown between notifications for the same NCR.
+
 ---
 
-### 12. POB (People on Board)
+### 14. POB (People on Board) ✅ Implemented
 
 #### Get Location POB Entries
 
@@ -1049,7 +1462,7 @@ PATCH /api/pob/{id}
 
 ---
 
-### 13. Reconciliations
+### 15. Reconciliations ✅ Implemented
 
 #### Get Consolidated Reconciliation
 
@@ -1127,7 +1540,7 @@ POST /api/reconciliations
 
 ---
 
-### 14. Approvals
+### 16. Approvals ✅ Implemented
 
 #### Get Approval Details
 
@@ -1193,7 +1606,7 @@ PATCH /api/approvals/{id}/reject
 
 ---
 
-### 15. Users Management
+### 19. Users Management ✅ Implemented
 
 #### List Users
 
@@ -1237,7 +1650,7 @@ DELETE /api/users/{id}
 
 ---
 
-### 16. Reports
+### 20. Reports ✅ Implemented
 
 #### Stock Now Report
 
@@ -1287,7 +1700,85 @@ GET /api/reports/reconciliation
 
 ---
 
-### 17. System
+### 17. Notification Settings ✅ Implemented
+
+#### Get Notification Settings
+
+```
+GET /api/notification-settings
+```
+
+**Permissions:** ADMIN only
+
+**Response:**
+
+```json
+{
+  "settings": {
+    "ncr_notifications": {
+      "enabled": true,
+      "finance_team_email": "finance@company.com",
+      "procurement_team_email": "procurement@company.com",
+      "notify_supplier": true
+    },
+    "po_notifications": {
+      "enabled": true,
+      "cc_procurement": true
+    }
+  }
+}
+```
+
+#### Update Notification Settings
+
+```
+PATCH /api/notification-settings
+```
+
+**Body:**
+
+```json
+{
+  "ncr_notifications": {
+    "enabled": true,
+    "finance_team_email": "finance@company.com",
+    "procurement_team_email": "procurement@company.com",
+    "notify_supplier": true
+  }
+}
+```
+
+**Permissions:** ADMIN only
+
+#### Test Email Configuration
+
+```
+POST /api/notification-settings/test
+```
+
+**Body:**
+
+```json
+{
+  "email": "test@company.com",
+  "type": "ncr"
+}
+```
+
+**Permissions:** ADMIN only
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Test email sent successfully"
+}
+```
+
+---
+
+### 18. System
 
 #### Health Check
 
@@ -1347,19 +1838,25 @@ throw createError({
 
 ### Error Codes
 
-| Code                       | HTTP Status | Description                         |
-| -------------------------- | ----------- | ----------------------------------- |
-| `NOT_AUTHENTICATED`        | 401         | User not logged in                  |
-| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action     |
-| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location       |
-| `VALIDATION_ERROR`         | 400         | Zod validation failed               |
-| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer |
-| `PERIOD_CLOSED`            | 400         | Cannot post to closed period        |
-| `NO_OPEN_PERIOD`           | 400         | No open period exists               |
-| `INVALID_STATUS`           | 400         | Entity status doesn't allow action  |
-| `NOT_FOUND`                | 404         | Resource not found                  |
-| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number   |
-| `INTERNAL_ERROR`           | 500         | Unexpected server error             |
+| Code                       | HTTP Status | Description                              |
+| -------------------------- | ----------- | ---------------------------------------- |
+| `NOT_AUTHENTICATED`        | 401         | User not logged in                       |
+| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action          |
+| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location            |
+| `VALIDATION_ERROR`         | 400         | Zod validation failed                    |
+| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer      |
+| `PERIOD_CLOSED`            | 400         | Cannot post to closed period             |
+| `NO_OPEN_PERIOD`           | 400         | No open period exists                    |
+| `INVALID_STATUS`           | 400         | Entity status doesn't allow action       |
+| `PRICE_VARIANCE`           | 200         | Price differs from period price (NCR created) |
+| `OVER_DELIVERY`            | 400         | Delivery quantity exceeds PO remaining   |
+| `APPROVAL_REQUIRED`        | 400         | Action requires supervisor approval      |
+| `PRF_NOT_APPROVED`         | 400         | Cannot create PO from unapproved PRF     |
+| `PO_HAS_DELIVERIES`        | 400         | Cannot edit PO with existing deliveries  |
+| `NOT_FOUND`                | 404         | Resource not found                       |
+| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number        |
+| `NOTIFICATION_COOLDOWN`    | 429         | Must wait before sending another notification |
+| `INTERNAL_ERROR`           | 500         | Unexpected server error                  |
 
 ### Validation Errors (Zod)
 
@@ -1457,4 +1954,11 @@ All mutating API calls are logged with:
 
 ---
 
-**Note:** This API contract reflects the actual implemented endpoints as of December 2025. It supports multi-location operations with automatic price variance detection, transfer management, and comprehensive approval workflows.
+**Note:** This API contract reflects the 103+ implemented endpoints as of January 2026. It supports multi-location operations with:
+- PRF → PO → Delivery workflow with approvals
+- Automatic price variance detection (zero-tolerance) with NCR generation
+- Over-delivery detection and approval
+- Transfer management with approval workflow
+- NCR and PO email notifications
+- Coordinated period close across locations
+- RBAC with 4 roles: OPERATOR, PROCUREMENT_SPECIALIST, SUPERVISOR, ADMIN
