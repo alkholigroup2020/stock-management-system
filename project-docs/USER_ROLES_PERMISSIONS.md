@@ -12,12 +12,12 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 ## Role Hierarchy
 
-| Role                       | Description                      | Location Access          | Primary Functions                              |
-| -------------------------- | -------------------------------- | ------------------------ | ---------------------------------------------- |
-| **OPERATOR**               | Day-to-day operations staff      | Assigned locations only  | Post deliveries, issues, PRFs, POB entry       |
-| **PROCUREMENT_SPECIALIST** | Procurement and ordering staff   | All locations (PRF/PO)   | Manage PRFs, create POs from approved PRFs     |
-| **SUPERVISOR**             | Team leads and managers          | All locations (implicit) | Approvals, reconciliations, reports            |
-| **ADMIN**                  | System administrators            | All locations (implicit) | Full system control, period close, user mgmt   |
+| Role                       | Description                    | Location Access          | Primary Functions                            |
+| -------------------------- | ------------------------------ | ------------------------ | -------------------------------------------- |
+| **OPERATOR**               | Day-to-day operations staff    | Assigned locations only  | Post deliveries, issues, PRFs, POB entry     |
+| **PROCUREMENT_SPECIALIST** | Procurement and ordering staff | All locations (PRF/PO)   | Manage PRFs, create POs from approved PRFs   |
+| **SUPERVISOR**             | Team leads and managers        | All locations (implicit) | Approvals, reconciliations, reports          |
+| **ADMIN**                  | System administrators          | All locations (implicit) | Full system control, period close, user mgmt |
 
 ---
 
@@ -55,23 +55,23 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 #### Navigation Access
 
-| Menu Item       | Access                  |
-| --------------- | ----------------------- |
-| Dashboard       | ✅ Yes                  |
-| Orders (PRF)    | ✅ Yes (create PRF)     |
-| Deliveries      | ✅ Yes                  |
-| Issues          | ✅ Yes                  |
-| Transfers       | ✅ Yes (create only)    |
-| NCR             | ✅ Yes (create/view)    |
-| Stock Now       | ✅ Yes                  |
-| Items           | ✅ Yes (view + import)  |
-| POB             | ✅ Yes                  |
-| Users           | ❌ No                   |
-| Locations       | ❌ No                   |
-| Suppliers       | ❌ No                   |
-| Periods         | ❌ No                   |
-| Period Close    | ❌ No                   |
-| Reconciliations | ✅ Limited view         |
+| Menu Item       | Access                 |
+| --------------- | ---------------------- |
+| Dashboard       | ✅ Yes                 |
+| Orders (PRF)    | ✅ Yes (create PRF)    |
+| Deliveries      | ✅ Yes                 |
+| Issues          | ✅ Yes                 |
+| Transfers       | ✅ Yes (create only)   |
+| NCR             | ✅ Yes (create/view)   |
+| Stock Now       | ✅ Yes                 |
+| Items           | ✅ Yes (view + import) |
+| POB             | ✅ Yes                 |
+| Users           | ❌ No                  |
+| Locations       | ❌ No                  |
+| Suppliers       | ❌ No                  |
+| Periods         | ❌ No                  |
+| Period Close    | ❌ No                  |
+| Reconciliations | ✅ Limited view        |
 
 ---
 
@@ -101,23 +101,23 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 #### Navigation Access
 
-| Menu Item       | Access                           |
-| --------------- | -------------------------------- |
-| Dashboard       | ✅ Yes                           |
-| Orders (PRF/PO) | ✅ Yes (full PRF/PO management)  |
-| Deliveries      | ❌ No                            |
-| Issues          | ❌ No                            |
-| Transfers       | ❌ No                            |
-| NCR             | ❌ No                            |
-| Stock Now       | ❌ No                            |
-| Items           | ✅ Yes (view only)               |
-| POB             | ❌ No                            |
-| Users           | ❌ No                            |
-| Locations       | ❌ No                            |
-| Suppliers       | ✅ Yes (view only)               |
-| Periods         | ❌ No                            |
-| Period Close    | ❌ No                            |
-| Reconciliations | ❌ No                            |
+| Menu Item       | Access                          |
+| --------------- | ------------------------------- |
+| Dashboard       | ✅ Yes                          |
+| Orders (PRF/PO) | ✅ Yes (full PRF/PO management) |
+| Deliveries      | ❌ No                           |
+| Issues          | ❌ No                           |
+| Transfers       | ❌ No                           |
+| NCR             | ❌ No                           |
+| Stock Now       | ❌ No                           |
+| Items           | ✅ Yes (view only)              |
+| POB             | ❌ No                           |
+| Users           | ❌ No                           |
+| Locations       | ❌ No                           |
+| Suppliers       | ✅ Yes (view only)              |
+| Periods         | ❌ No                           |
+| Period Close    | ❌ No                           |
+| Reconciliations | ❌ No                           |
 
 ---
 
@@ -197,27 +197,27 @@ This document provides a comprehensive overview of the **User Roles & Permission
 
 #### Navigation Access
 
-| Menu Item       | Access                            |
-| --------------- | --------------------------------- |
-| Dashboard       | ✅ Yes (consolidated view)        |
-| Locations       | ✅ Yes (full CRUD)                |
-| Users           | ✅ Yes (full CRUD + assign locs)  |
-| Orders (PRF/PO) | ✅ Yes (full control)             |
-| Deliveries      | ✅ Yes (full control)             |
-| Issues          | ✅ Yes (full control)             |
-| Transfers       | ✅ Yes (full control)             |
-| NCR             | ✅ Yes (full control + email)     |
-| Stock Now       | ✅ Yes                            |
-| Items           | ✅ Yes (full CRUD + prices)       |
-| POB             | ✅ Yes                            |
-| Suppliers       | ✅ Yes (full CRUD)                |
-| Reconciliations | ✅ Yes (full control)             |
-| Reports         | ✅ Yes (all reports + export)     |
-| Periods         | ✅ Yes (open/close + prices)      |
-| Period Close    | ✅ Yes (execute close)            |
-| Settings        | ✅ Yes (notification config)      |
-| Developer Guide | ✅ Yes                            |
-| Help Center     | ✅ Yes                            |
+| Menu Item       | Access                           |
+| --------------- | -------------------------------- |
+| Dashboard       | ✅ Yes (consolidated view)       |
+| Locations       | ✅ Yes (full CRUD)               |
+| Users           | ✅ Yes (full CRUD + assign locs) |
+| Orders (PRF/PO) | ✅ Yes (full control)            |
+| Deliveries      | ✅ Yes (full control)            |
+| Issues          | ✅ Yes (full control)            |
+| Transfers       | ✅ Yes (full control)            |
+| NCR             | ✅ Yes (full control + email)    |
+| Stock Now       | ✅ Yes                           |
+| Items           | ✅ Yes (full CRUD + prices)      |
+| POB             | ✅ Yes                           |
+| Suppliers       | ✅ Yes (full CRUD)               |
+| Reconciliations | ✅ Yes (full control)            |
+| Reports         | ✅ Yes (all reports + export)    |
+| Periods         | ✅ Yes (open/close + prices)     |
+| Period Close    | ✅ Yes (execute close)           |
+| Settings        | ✅ Yes (notification config)     |
+| Developer Guide | ✅ Yes                           |
+| Help Center     | ✅ Yes                           |
 
 ---
 
@@ -277,14 +277,14 @@ The system provides granular permission check functions via `usePermissions()` c
 
 ### PRF/PO Permissions
 
-| Function                   | Description                    | Roles                                 |
-| -------------------------- | ------------------------------ | ------------------------------------- |
-| `canCreatePRF(locationId)` | Create PRF at location         | OPERATOR, SUPERVISOR, ADMIN           |
-| `canApprovePRF()`          | Approve/reject PRF             | SUPERVISOR, ADMIN                     |
-| `canCreatePO()`            | Create PO from approved PRF    | PROCUREMENT_SPECIALIST, ADMIN         |
-| `canEditPO()`              | Edit PO (while OPEN)           | PROCUREMENT_SPECIALIST, ADMIN         |
-| `canClosePO()`             | Close PO manually              | SUPERVISOR, ADMIN                     |
-| `canSendPOEmail()`         | Send PO email to supplier      | PROCUREMENT_SPECIALIST, SUPERVISOR, ADMIN |
+| Function                   | Description                 | Roles                                     |
+| -------------------------- | --------------------------- | ----------------------------------------- |
+| `canCreatePRF(locationId)` | Create PRF at location      | OPERATOR, SUPERVISOR, ADMIN               |
+| `canApprovePRF()`          | Approve/reject PRF          | SUPERVISOR, ADMIN                         |
+| `canCreatePO()`            | Create PO from approved PRF | PROCUREMENT_SPECIALIST, ADMIN             |
+| `canEditPO()`              | Edit PO (while OPEN)        | PROCUREMENT_SPECIALIST, ADMIN             |
+| `canClosePO()`             | Close PO manually           | SUPERVISOR, ADMIN                         |
+| `canSendPOEmail()`         | Send PO email to supplier   | PROCUREMENT_SPECIALIST, SUPERVISOR, ADMIN |
 
 ### Item Management
 
@@ -314,11 +314,11 @@ The system provides granular permission check functions via `usePermissions()` c
 
 ### NCR Permissions
 
-| Function                 | Description               | Roles                      |
-| ------------------------ | ------------------------- | -------------------------- |
-| `canCreateNCR()`         | Create manual NCR         | All (with location access) |
-| `canResolveNCR()`        | Resolve NCR with outcome  | SUPERVISOR, ADMIN          |
-| `canSendNCRNotification()` | Send NCR email          | SUPERVISOR, ADMIN          |
+| Function                   | Description              | Roles                      |
+| -------------------------- | ------------------------ | -------------------------- |
+| `canCreateNCR()`           | Create manual NCR        | All (with location access) |
+| `canResolveNCR()`          | Resolve NCR with outcome | SUPERVISOR, ADMIN          |
+| `canSendNCRNotification()` | Send NCR email           | SUPERVISOR, ADMIN          |
 
 ### Reconciliation Permissions
 
@@ -330,13 +330,13 @@ The system provides granular permission check functions via `usePermissions()` c
 
 ### Administrative Permissions
 
-| Function                      | Description                  | Roles      |
-| ----------------------------- | ---------------------------- | ---------- |
-| `canManageUsers()`            | User CRUD operations         | ADMIN only |
-| `canAssignUserLocations()`    | Assign users to locations    | ADMIN only |
-| `canManageLocations()`        | Location CRUD operations     | ADMIN only |
-| `canManageSuppliers()`        | Supplier CRUD operations     | ADMIN only |
-| `canConfigureNotifications()` | Configure email settings     | ADMIN only |
+| Function                      | Description               | Roles      |
+| ----------------------------- | ------------------------- | ---------- |
+| `canManageUsers()`            | User CRUD operations      | ADMIN only |
+| `canAssignUserLocations()`    | Assign users to locations | ADMIN only |
+| `canManageLocations()`        | Location CRUD operations  | ADMIN only |
+| `canManageSuppliers()`        | Supplier CRUD operations  | ADMIN only |
+| `canConfigureNotifications()` | Configure email settings  | ADMIN only |
 
 ### Reporting Permissions
 
@@ -377,32 +377,32 @@ All permission checks are enforced at the API level:
 
 ## Summary Matrix ✅
 
-| Feature                  | OPERATOR    | PROCUREMENT | SUPERVISOR | ADMIN   |
-| ------------------------ | ----------- | ----------- | ---------- | ------- |
-| Post Deliveries          | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
-| Post Issues              | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
-| Enter POB                | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
-| Create PRFs              | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
-| Approve PRFs             | ❌          | ❌          | ✅         | ✅      |
-| Create POs               | ❌          | ✅          | ❌         | ✅      |
-| Send PO Emails           | ❌          | ✅          | ✅         | ✅      |
-| Close POs                | ❌          | ❌          | ✅         | ✅      |
-| Approve Over-Delivery    | ❌          | ❌          | ✅         | ✅      |
-| Create Transfers         | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
-| Approve Transfers        | ❌          | ❌          | ✅         | ✅      |
-| Create NCRs              | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
-| Resolve NCRs             | ❌          | ❌          | ✅         | ✅      |
-| Send NCR Emails          | ❌          | ❌          | ✅         | ✅      |
-| View Reconciliations     | ✅ Totals   | ❌          | ✅ Full    | ✅ Full |
-| Edit Reconciliations     | ❌          | ❌          | ✅         | ✅      |
-| Consolidated View        | ❌          | ❌          | ✅         | ✅      |
-| Export Reports           | ❌          | ❌          | ✅         | ✅      |
-| Manage Users             | ❌          | ❌          | ❌         | ✅      |
-| Manage Locations         | ❌          | ❌          | ❌         | ✅      |
-| Manage Suppliers         | ❌          | ❌          | ❌         | ✅      |
-| Manage Items/Prices      | ❌          | ❌          | ❌         | ✅      |
-| Period Close             | ❌          | ❌          | ❌         | ✅      |
-| Configure Notifications  | ❌          | ❌          | ❌         | ✅      |
+| Feature                 | OPERATOR    | PROCUREMENT | SUPERVISOR | ADMIN   |
+| ----------------------- | ----------- | ----------- | ---------- | ------- |
+| Post Deliveries         | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
+| Post Issues             | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
+| Enter POB               | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
+| Create PRFs             | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
+| Approve PRFs            | ❌          | ❌          | ✅         | ✅      |
+| Create POs              | ❌          | ✅          | ❌         | ✅      |
+| Send PO Emails          | ❌          | ✅          | ✅         | ✅      |
+| Close POs               | ❌          | ❌          | ✅         | ✅      |
+| Approve Over-Delivery   | ❌          | ❌          | ✅         | ✅      |
+| Create Transfers        | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
+| Approve Transfers       | ❌          | ❌          | ✅         | ✅      |
+| Create NCRs             | ✅ Assigned | ❌          | ✅ All     | ✅ All  |
+| Resolve NCRs            | ❌          | ❌          | ✅         | ✅      |
+| Send NCR Emails         | ❌          | ❌          | ✅         | ✅      |
+| View Reconciliations    | ✅ Totals   | ❌          | ✅ Full    | ✅ Full |
+| Edit Reconciliations    | ❌          | ❌          | ✅         | ✅      |
+| Consolidated View       | ❌          | ❌          | ✅         | ✅      |
+| Export Reports          | ❌          | ❌          | ✅         | ✅      |
+| Manage Users            | ❌          | ❌          | ❌         | ✅      |
+| Manage Locations        | ❌          | ❌          | ❌         | ✅      |
+| Manage Suppliers        | ❌          | ❌          | ❌         | ✅      |
+| Manage Items/Prices     | ❌          | ❌          | ❌         | ✅      |
+| Period Close            | ❌          | ❌          | ❌         | ✅      |
+| Configure Notifications | ❌          | ❌          | ❌         | ✅      |
 
 ---
 
@@ -410,12 +410,12 @@ All permission checks are enforced at the API level:
 
 The system supports four location types:
 
-| Type          | Description                              |
-| ------------- | ---------------------------------------- |
-| **KITCHEN**   | Food preparation area                    |
-| **STORE**     | Storage/warehouse at site                |
-| **CENTRAL**   | Central distribution point               |
-| **WAREHOUSE** | Main warehouse/receiving                 |
+| Type          | Description                |
+| ------------- | -------------------------- |
+| **KITCHEN**   | Food preparation area      |
+| **STORE**     | Storage/warehouse at site  |
+| **CENTRAL**   | Central distribution point |
+| **WAREHOUSE** | Main warehouse/receiving   |
 
 ---
 

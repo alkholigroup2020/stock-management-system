@@ -295,6 +295,39 @@ const navigateToDevGuide = () => {
 // Show dev tools only in development mode
 const showDevTools = computed(() => import.meta.dev);
 
+// Toast for notifications
+const toast = useAppToast();
+
+// Reset database modal state
+const showResetModal = ref(false);
+const isResetting = ref(false);
+
+// Handle database reset
+async function handleDatabaseReset() {
+  isResetting.value = true;
+  try {
+    const response = await $fetch("/api/dev/reset-all-data", {
+      method: "POST",
+    });
+
+    toast.success("Database Reset Complete", {
+      description: `Only Admin account remains. Email: ${response.admin.email}`,
+    });
+
+    showResetModal.value = false;
+
+    // Redirect to login after reset
+    await navigateTo("/login");
+  } catch (error) {
+    console.error("Reset failed:", error);
+    toast.error("Reset Failed", {
+      description: "An error occurred while resetting the database.",
+    });
+  } finally {
+    isResetting.value = false;
+  }
+}
+
 // Testing plan state
 const { isPanelOpen, isLargeScreen, togglePanel, closePanel } = useTestingPlanProgress();
 
@@ -445,6 +478,17 @@ onUnmounted(() => {
               @click="navigateToDevGuide"
             />
 
+            <!-- Reset Database (dev mode only) -->
+            <UButton
+              v-if="showDevTools"
+              icon="i-heroicons-arrow-path-rounded-square"
+              color="error"
+              variant="ghost"
+              aria-label="Reset database (dev only)"
+              class="cursor-pointer"
+              @click="showResetModal = true"
+            />
+
             <!-- Help -->
             <UButton
               icon="i-heroicons-question-mark-circle"
@@ -556,4 +600,17 @@ onUnmounted(() => {
 
   <!-- Testing Plan Modal (smaller screens) -->
   <TestingPlanModal v-if="isPanelOpen && !isLargeScreen" :open="isPanelOpen" @close="closePanel" />
+
+  <!-- Reset Database Confirmation Modal (dev only) -->
+  <UiConfirmModal
+    v-if="showDevTools"
+    v-model="showResetModal"
+    title="Reset Database"
+    message="This will delete ALL data except the Admin account. This action cannot be undone. Are you sure?"
+    confirm-text="Reset All Data"
+    cancel-text="Cancel"
+    variant="danger"
+    :loading="isResetting"
+    @confirm="handleDatabaseReset"
+  />
 </template>

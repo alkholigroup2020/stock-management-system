@@ -189,12 +189,12 @@ PATCH /api/auth/profile
 
 ### Role Permissions
 
-| Role                       | Permissions                                              |
-| -------------------------- | -------------------------------------------------------- |
-| **OPERATOR**               | View/Post at assigned locations, create PRFs             |
-| **PROCUREMENT_SPECIALIST** | All locations for PRF/PO, create POs, send PO emails     |
-| **SUPERVISOR**             | All locations, approve PRFs/transfers/over-delivery, NCRs|
-| **ADMIN**                  | Full system access, period close, user management        |
+| Role                       | Permissions                                               |
+| -------------------------- | --------------------------------------------------------- |
+| **OPERATOR**               | View/Post at assigned locations, create PRFs              |
+| **PROCUREMENT_SPECIALIST** | All locations for PRF/PO, create POs, send PO emails      |
+| **SUPERVISOR**             | All locations, approve PRFs/transfers/over-delivery, NCRs |
+| **ADMIN**                  | Full system access, period close, user management         |
 
 ### Middleware Protection
 
@@ -753,9 +753,9 @@ GET /api/prfs
       "status": "PENDING",
       "location": { "id": "uuid", "code": "KIT", "name": "Kitchen" },
       "requester": { "id": "uuid", "full_name": "Operator One" },
-      "total_amount": 5000.00,
-      "vat_amount": 750.00,
-      "grand_total": 5750.00,
+      "total_amount": 5000.0,
+      "vat_amount": 750.0,
+      "grand_total": 5750.0,
       "created_at": "2026-01-15T10:00:00Z"
     }
   ],
@@ -787,12 +787,12 @@ POST /api/prfs
     {
       "item_id": "uuid",
       "quantity": 100,
-      "estimated_price": 25.00
+      "estimated_price": 25.0
     },
     {
       "description": "Special item not in system",
       "quantity": 10,
-      "estimated_price": 50.00,
+      "estimated_price": 50.0,
       "unit": "EA"
     }
   ]
@@ -873,9 +873,9 @@ GET /api/pos/{id}
     "status": "OPEN",
     "supplier": { "id": "uuid", "name": "Fresh Foods Co.", "email": "orders@freshfoods.com" },
     "prf": { "id": "uuid", "prf_no": "PRF-KIT-25-Jan-2026-01" },
-    "total_amount": 5000.00,
-    "vat_amount": 750.00,
-    "grand_total": 5750.00,
+    "total_amount": 5000.0,
+    "vat_amount": 750.0,
+    "grand_total": 5750.0,
     "delivery_terms": "Within 3 days",
     "payment_terms": "Net 30",
     "created_at": "2026-01-15T12:00:00Z"
@@ -887,13 +887,13 @@ GET /api/pos/{id}
       "quantity_ordered": 100,
       "quantity_delivered": 75,
       "quantity_remaining": 25,
-      "unit_price": 25.00,
-      "total": 2500.00
+      "unit_price": 25.0,
+      "total": 2500.0
     }
   ],
   "fulfillment": {
-    "total_ordered": 5000.00,
-    "total_delivered": 3750.00,
+    "total_ordered": 5000.0,
+    "total_delivered": 3750.0,
     "percent_fulfilled": 75
   }
 }
@@ -917,7 +917,7 @@ POST /api/pos
     {
       "prf_line_id": "uuid",
       "quantity": 100,
-      "unit_price": 25.00
+      "unit_price": 25.0
     }
   ]
 }
@@ -1359,7 +1359,7 @@ POST /api/ncrs/{id}/resolve
 {
   "resolution": "CREDITED",
   "financial_impact": "CREDIT",
-  "credit_amount": 127.50,
+  "credit_amount": 127.5,
   "notes": "Credit note CN-001 received"
 }
 ```
@@ -1838,25 +1838,25 @@ throw createError({
 
 ### Error Codes
 
-| Code                       | HTTP Status | Description                              |
-| -------------------------- | ----------- | ---------------------------------------- |
-| `NOT_AUTHENTICATED`        | 401         | User not logged in                       |
-| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action          |
-| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location            |
-| `VALIDATION_ERROR`         | 400         | Zod validation failed                    |
-| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer      |
-| `PERIOD_CLOSED`            | 400         | Cannot post to closed period             |
-| `NO_OPEN_PERIOD`           | 400         | No open period exists                    |
-| `INVALID_STATUS`           | 400         | Entity status doesn't allow action       |
+| Code                       | HTTP Status | Description                                   |
+| -------------------------- | ----------- | --------------------------------------------- |
+| `NOT_AUTHENTICATED`        | 401         | User not logged in                            |
+| `INSUFFICIENT_PERMISSIONS` | 403         | User role cannot perform action               |
+| `LOCATION_ACCESS_DENIED`   | 403         | User lacks access to location                 |
+| `VALIDATION_ERROR`         | 400         | Zod validation failed                         |
+| `INSUFFICIENT_STOCK`       | 400         | Not enough stock for issue/transfer           |
+| `PERIOD_CLOSED`            | 400         | Cannot post to closed period                  |
+| `NO_OPEN_PERIOD`           | 400         | No open period exists                         |
+| `INVALID_STATUS`           | 400         | Entity status doesn't allow action            |
 | `PRICE_VARIANCE`           | 200         | Price differs from period price (NCR created) |
-| `OVER_DELIVERY`            | 400         | Delivery quantity exceeds PO remaining   |
-| `APPROVAL_REQUIRED`        | 400         | Action requires supervisor approval      |
-| `PRF_NOT_APPROVED`         | 400         | Cannot create PO from unapproved PRF     |
-| `PO_HAS_DELIVERIES`        | 400         | Cannot edit PO with existing deliveries  |
-| `NOT_FOUND`                | 404         | Resource not found                       |
-| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number        |
+| `OVER_DELIVERY`            | 400         | Delivery quantity exceeds PO remaining        |
+| `APPROVAL_REQUIRED`        | 400         | Action requires supervisor approval           |
+| `PRF_NOT_APPROVED`         | 400         | Cannot create PO from unapproved PRF          |
+| `PO_HAS_DELIVERIES`        | 400         | Cannot edit PO with existing deliveries       |
+| `NOT_FOUND`                | 404         | Resource not found                            |
+| `DUPLICATE_ENTRY`          | 409         | Duplicate invoice/document number             |
 | `NOTIFICATION_COOLDOWN`    | 429         | Must wait before sending another notification |
-| `INTERNAL_ERROR`           | 500         | Unexpected server error                  |
+| `INTERNAL_ERROR`           | 500         | Unexpected server error                       |
 
 ### Validation Errors (Zod)
 
@@ -1955,6 +1955,7 @@ All mutating API calls are logged with:
 ---
 
 **Note:** This API contract reflects the 103+ implemented endpoints as of January 2026. It supports multi-location operations with:
+
 - PRF → PO → Delivery workflow with approvals
 - Automatic price variance detection (zero-tolerance) with NCR generation
 - Over-delivery detection and approval

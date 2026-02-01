@@ -143,6 +143,7 @@ enum SubscriptionStatus { TRIAL, ACTIVE, PAST_DUE, CANCELLED }
 ```
 
 **Files to create:**
+
 - `prisma/control-plane.prisma`
 - `server/utils/prisma-control.ts`
 
@@ -161,18 +162,18 @@ export interface TenantFeatures {
   enableTransfersModule: boolean;
   enablePRFPOModule: boolean;
   enableAdvancedReports: boolean;
-  
+
   // Functional features
   enableBarcodeScanning: boolean;
   enableEmailNotifications: boolean;
   enableExcelExport: boolean;
   enablePDFExport: boolean;
-  
+
   // Limits (overrides plan defaults)
   maxLocations?: number;
   maxUsers?: number;
   maxItemsPerLocation?: number;
-  
+
   // Custom features (enterprise)
   customApprovalWorkflow?: boolean;
   customFields?: boolean;
@@ -180,15 +181,15 @@ export interface TenantFeatures {
 
 export interface TenantSettings {
   // Regional
-  currency: string;           // "SAR", "USD", "EUR"
-  timezone: string;           // "Asia/Riyadh"
-  dateFormat: string;         // "DD/MM/YYYY"
-  
+  currency: string; // "SAR", "USD", "EUR"
+  timezone: string; // "Asia/Riyadh"
+  dateFormat: string; // "DD/MM/YYYY"
+
   // Business rules
   allowNegativeStock: boolean;
   requirePOForDelivery: boolean;
   autoGeneratePriceVarianceNCR: boolean;
-  
+
   // Defaults
   defaultVATPercent: number;
   defaultPaymentTerms: string;
@@ -196,8 +197,8 @@ export interface TenantSettings {
 
 export interface TenantBranding {
   logoUrl?: string;
-  primaryColor?: string;      // "#000046"
-  secondaryColor?: string;    // "#45cf7b"
+  primaryColor?: string; // "#000046"
+  secondaryColor?: string; // "#45cf7b"
   companyName: string;
   supportEmail?: string;
 }
@@ -270,7 +271,7 @@ import type { TenantFeatures } from "~/shared/types/features";
 export function getTenantFeatures(event: H3Event): TenantFeatures {
   const tenant = event.context.tenant;
   const planDefaults = PLAN_DEFAULTS[tenant.plan?.code || "free"];
-  
+
   // Merge: plan defaults + tenant-specific overrides
   return {
     ...planDefaults,
@@ -291,7 +292,7 @@ export function requireFeature(event: H3Event, feature: keyof TenantFeatures): v
 // Usage in API route
 export default defineEventHandler(async (event) => {
   requireFeature(event, "enableTransfersModule");
-  
+
   // ... rest of transfer logic
 });
 ```
@@ -302,19 +303,19 @@ export default defineEventHandler(async (event) => {
 // app/composables/useFeatures.ts
 export function useFeatures() {
   const { session } = useAuth();
-  
+
   const features = computed<TenantFeatures>(() => {
     return session.value?.tenant?.features || {};
   });
-  
+
   const hasFeature = (feature: keyof TenantFeatures): boolean => {
     return Boolean(features.value[feature]);
   };
-  
+
   const getLimit = (limit: "maxLocations" | "maxUsers"): number => {
     return features.value[limit] ?? Infinity;
   };
-  
+
   return {
     features,
     hasFeature,
@@ -328,11 +329,7 @@ export function useFeatures() {
 ```vue
 <!-- Conditional menu item -->
 <template>
-  <USidebarItem
-    v-if="hasFeature('enableTransfersModule')"
-    label="Transfers"
-    to="/transfers"
-  />
+  <USidebarItem v-if="hasFeature('enableTransfersModule')" label="Transfers" to="/transfers" />
 </template>
 
 <script setup>
@@ -343,12 +340,7 @@ const { hasFeature } = useFeatures();
 ```vue
 <!-- Conditional button with upgrade prompt -->
 <template>
-  <UButton
-    v-if="hasFeature('enablePDFExport')"
-    @click="exportPDF"
-  >
-    Export PDF
-  </UButton>
+  <UButton v-if="hasFeature('enablePDFExport')" @click="exportPDF">Export PDF</UButton>
   <UTooltip v-else text="Upgrade to Professional to unlock PDF export">
     <UButton disabled>Export PDF</UButton>
   </UTooltip>
@@ -384,6 +376,7 @@ watchEffect(() => {
 ```
 
 **Files to create:**
+
 - `shared/types/features.ts`
 - `server/utils/plan-features.ts`
 - `server/utils/tenant-features.ts`
@@ -403,45 +396,45 @@ import { getControlPlanePrisma } from "../utils/prisma-control";
 export default defineEventHandler(async (event) => {
   const path = event.path || "";
   const host = getHeader(event, "host") || "";
-  
+
   // === LANDING PAGE ROUTES (No tenant required) ===
   const publicPaths = [
     "/api/health",
     "/api/auth/register-tenant",
-    "/api/public/",           // Public marketing API
-    "/_nuxt/",                // Static assets
+    "/api/public/", // Public marketing API
+    "/_nuxt/", // Static assets
     "/favicon.ico",
   ];
-  
-  if (publicPaths.some(p => path.startsWith(p))) {
+
+  if (publicPaths.some((p) => path.startsWith(p))) {
     return; // Skip tenant resolution
   }
-  
+
   // === DETERMINE ROUTING MODE ===
   const routingResult = resolveRouting(host);
-  
+
   // Handle landing page / marketing site
   if (routingResult.type === "landing") {
     event.context.isLandingPage = true;
     return; // No tenant context needed
   }
-  
+
   // Handle tenant portal (app.stockapp.com)
   if (routingResult.type === "portal") {
     event.context.isTenantPortal = true;
     return; // Tenant selection happens client-side
   }
-  
+
   // === TENANT-SPECIFIC ROUTES ===
   const subdomain = routingResult.subdomain;
-  
+
   if (!subdomain) {
     throw createError({
       statusCode: 400,
       message: "Tenant not specified. Please access via your-company.stockapp.com",
     });
   }
-  
+
   // Look up tenant in control plane
   const controlPrisma = getControlPlanePrisma();
   const tenant = await controlPrisma.tenant.findUnique({
@@ -452,28 +445,28 @@ export default defineEventHandler(async (event) => {
       },
     },
   });
-  
+
   if (!tenant) {
     throw createError({
       statusCode: 404,
       message: `Tenant "${subdomain}" not found`,
     });
   }
-  
+
   if (tenant.status === "SUSPENDED") {
     throw createError({
       statusCode: 403,
       message: "This account has been suspended. Please contact support.",
     });
   }
-  
+
   if (tenant.status !== "ACTIVE") {
     throw createError({
       statusCode: 403,
       message: "This account is not active. Please complete setup.",
     });
   }
-  
+
   // Attach full tenant context
   event.context.tenantId = tenant.id;
   event.context.tenantSlug = tenant.slug;
@@ -497,7 +490,7 @@ interface RoutingResult {
 function resolveRouting(host: string): RoutingResult {
   // Remove port if present
   const hostname = host.split(":")[0];
-  
+
   // Local development
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     const defaultTenant = process.env.DEFAULT_TENANT_SLUG;
@@ -506,20 +499,20 @@ function resolveRouting(host: string): RoutingResult {
     }
     return { type: "portal" }; // Show tenant selector in dev
   }
-  
+
   // Production domain parsing
   const parts = hostname.split(".");
-  
+
   // stockapp.com or www.stockapp.com → Landing page
   if (parts.length <= 2 || parts[0] === "www") {
     return { type: "landing" };
   }
-  
+
   // app.stockapp.com → Tenant portal
   if (parts[0] === "app") {
     return { type: "portal" };
   }
-  
+
   // acme.stockapp.com → Tenant application
   return { type: "tenant", subdomain: parts[0] };
 }
@@ -539,12 +532,12 @@ Create `server/api/public/pricing.get.ts`:
 // Public API for marketing site - no tenant required
 export default defineEventHandler(async (event) => {
   const controlPrisma = getControlPlanePrisma();
-  
+
   const plans = await controlPrisma.plan.findMany({
     orderBy: { monthly_price: "asc" },
   });
-  
-  return plans.map(plan => ({
+
+  return plans.map((plan) => ({
     name: plan.name,
     code: plan.code,
     price: plan.monthly_price,
@@ -560,13 +553,14 @@ Create a landing page redirect in `app/middleware/landing.ts`:
 ```typescript
 export default defineNuxtRouteMiddleware((to) => {
   const { isLandingPage } = useRequestHeaders();
-  
+
   // If accessing root on landing domain, show marketing content
   // Otherwise this middleware doesn't interfere
 });
 ```
 
 **Files to create:**
+
 - `server/middleware/01.tenant.ts` (replaces original)
 - `server/api/public/pricing.get.ts`
 - `server/api/public/register.post.ts` (tenant signup)
@@ -601,18 +595,19 @@ if (hostname === "localhost" || hostname === "127.0.0.1") {
   if (tenantParam) {
     return { type: "tenant", subdomain: tenantParam };
   }
-  
+
   // Fall back to env default
   const defaultTenant = process.env.DEFAULT_TENANT_SLUG;
   if (defaultTenant) {
     return { type: "tenant", subdomain: defaultTenant };
   }
-  
+
   return { type: "portal" };
 }
 ```
 
 **Usage:**
+
 ```
 http://localhost:3000?tenant=acme    → ACME's database
 http://localhost:3000?tenant=beta    → Beta's database
@@ -630,6 +625,7 @@ Edit `/etc/hosts` (Mac/Linux) or `C:\Windows\System32\drivers\etc\hosts` (Window
 ```
 
 Then access:
+
 ```
 http://acme.stockapp.local:3000   → ACME tenant
 http://beta.stockapp.local:3000   → Beta tenant
@@ -656,7 +652,7 @@ import { getControlPlanePrisma } from "../server/utils/prisma-control";
 
 async function seedDevTenants() {
   const prisma = getControlPlanePrisma();
-  
+
   // Create demo tenant
   await prisma.tenant.upsert({
     where: { slug: "demo" },
@@ -678,7 +674,7 @@ async function seedDevTenants() {
       },
     },
   });
-  
+
   // Create test tenant for multi-tenant testing
   await prisma.tenant.upsert({
     where: { slug: "test" },
@@ -698,7 +694,7 @@ async function seedDevTenants() {
       },
     },
   });
-  
+
   console.log("✅ Dev tenants seeded");
 }
 
@@ -723,7 +719,7 @@ Add to `package.json`:
 
 ### Local Development Checklist
 
-```markdown
+````markdown
 ## Local Development Setup
 
 1. Set up Control Plane database:
@@ -731,19 +727,23 @@ Add to `package.json`:
    createdb stockapp_control
    pnpm db:push --schema=prisma/control-plane.prisma
    ```
+````
 
 2. Set up at least one tenant database:
+
    ```bash
    createdb stockapp_demo
    pnpm db:push
    ```
 
 3. Seed dev tenants:
+
    ```bash
    pnpm dev:seed
    ```
 
 4. Configure environment:
+
    ```env
    # .env.development
    CONTROL_PLANE_DATABASE_URL="postgresql://postgres:postgres@localhost:5432/stockapp_control"
@@ -751,6 +751,7 @@ Add to `package.json`:
    ```
 
 5. Start development:
+
    ```bash
    pnpm dev
    ```
@@ -758,7 +759,8 @@ Add to `package.json`:
 6. Access application:
    - Default tenant: http://localhost:3000
    - Switch tenant: http://localhost:3000?tenant=test
-```
+
+````
 
 **Files to create:**
 - `scripts/seed-dev-tenants.ts`
@@ -830,27 +832,27 @@ class TenantConnectionManager {
     const password = decrypt(tenant.database_password);
     return `postgresql://${tenant.database_user}:${password}@${tenant.database_host}:${tenant.database_port}/${tenant.database_name}?sslmode=require&pgbouncer=true`;
   }
-  
+
   private evictOldest(): void {
     let oldest: { key: string; time: Date } | null = null;
-    
+
     for (const [key, conn] of this.connections) {
       if (!oldest || conn.lastAccessed < oldest.time) {
         oldest = { key, time: conn.lastAccessed };
       }
     }
-    
+
     if (oldest) {
       const conn = this.connections.get(oldest.key);
       conn?.prisma.$disconnect();
       this.connections.delete(oldest.key);
     }
   }
-  
+
   // Cleanup idle connections (call periodically)
   async cleanupIdle(): Promise<void> {
     const now = Date.now();
-    
+
     for (const [key, conn] of this.connections) {
       if (now - conn.lastAccessed.getTime() > this.idleTimeoutMs) {
         await conn.prisma.$disconnect();
@@ -869,9 +871,10 @@ export async function getTenantPrisma(event: H3Event): Promise<PrismaClient> {
   }
   return connectionManager.getConnection(tenantId);
 }
-```
+````
 
 **Files to create:**
+
 - `server/utils/tenant-connection.ts`
 - `server/utils/encryption.ts` (for password encryption)
 
@@ -893,7 +896,7 @@ export default defineEventHandler(async (event) => {
   // Query user in tenant's database
   const user = await prisma.user.findUnique({
     where: { email },
-    include: { locations: true }
+    include: { locations: true },
   });
 
   if (!user || !verifyPassword(password, user.password_hash)) {
@@ -907,7 +910,7 @@ export default defineEventHandler(async (event) => {
       username: user.username,
       email: user.email,
       role: user.role,
-      locations: user.locations.map(l => l.location_id)
+      locations: user.locations.map((l) => l.location_id),
     },
     tenant: {
       id: event.context.tenant.id,
@@ -917,7 +920,7 @@ export default defineEventHandler(async (event) => {
       settings: event.context.tenant.settings,
       branding: event.context.tenant.branding,
       plan: event.context.tenant.plan,
-    }
+    },
   });
 
   return { success: true };
@@ -946,6 +949,7 @@ export interface SaaSSession {
 ```
 
 **Files to modify:**
+
 - `server/api/auth/login.post.ts`
 - `server/middleware/auth.ts`
 - `app/stores/auth.ts`
@@ -958,6 +962,7 @@ export interface SaaSSession {
 ### Migration Pattern
 
 **Before:**
+
 ```typescript
 import prisma from "../../utils/prisma";
 
@@ -967,6 +972,7 @@ export default defineEventHandler(async (event) => {
 ```
 
 **After:**
+
 ```typescript
 import { getTenantPrisma } from "../../utils/tenant-connection";
 
@@ -979,6 +985,7 @@ export default defineEventHandler(async (event) => {
 ### Routes to Migrate (103+ files)
 
 **Tier 1 - Core Transactions (Priority):**
+
 - `server/api/locations/[id]/deliveries/*.ts`
 - `server/api/locations/[id]/issues/*.ts`
 - `server/api/transfers/*.ts`
@@ -986,12 +993,14 @@ export default defineEventHandler(async (event) => {
 - `server/api/pos/*.ts`
 
 **Tier 2 - Master Data:**
+
 - `server/api/items/*.ts`
 - `server/api/suppliers/*.ts`
 - `server/api/locations/*.ts`
 - `server/api/users/*.ts`
 
 **Tier 3 - Supporting:**
+
 - `server/api/periods/*.ts`
 - `server/api/ncrs/*.ts`
 - `server/api/reports/*.ts`
@@ -1027,12 +1036,13 @@ export default defineEventHandler(async (event) => {
 
 ### Supabase Strategy
 
-| Plan | Database Strategy | Cost |
-|------|------------------|------|
+| Plan        | Database Strategy                | Cost         |
+| ----------- | -------------------------------- | ------------ |
 | Starter/Pro | Shared project, separate schemas | ~$0-2/tenant |
-| Enterprise | Dedicated Supabase project | $25+/tenant |
+| Enterprise  | Dedicated Supabase project       | $25+/tenant  |
 
 **Files to create:**
+
 - `server/api/admin/tenants/index.post.ts`
 - `server/api/admin/tenants/[id]/provision.post.ts`
 - `server/jobs/provision-tenant.ts`
@@ -1049,7 +1059,7 @@ Create `scripts/migrate-all-tenants.ts`:
 async function migrateAllTenants(targetVersion: string) {
   const controlPrisma = getControlPlanePrisma();
   const tenants = await controlPrisma.tenant.findMany({
-    where: { status: "ACTIVE" }
+    where: { status: "ACTIVE" },
   });
 
   for (const tenant of tenants) {
@@ -1060,13 +1070,14 @@ async function migrateAllTenants(targetVersion: string) {
 
     await controlPrisma.tenant.update({
       where: { id: tenant.id },
-      data: { schema_version: targetVersion }
+      data: { schema_version: targetVersion },
     });
   }
 }
 ```
 
 **Files to create:**
+
 - `scripts/migrate-all-tenants.ts`
 - `scripts/migrate-single-tenant.ts`
 
@@ -1077,6 +1088,7 @@ async function migrateAllTenants(targetVersion: string) {
 ### Stripe Integration
 
 **New routes:**
+
 - `server/api/billing/subscription.get.ts`
 - `server/api/billing/checkout.post.ts`
 - `server/api/billing/portal.post.ts`
@@ -1086,20 +1098,20 @@ async function migrateAllTenants(targetVersion: string) {
 
 ## Critical Files Summary
 
-| File | Action | Purpose |
-|------|--------|---------|
-| `prisma/control-plane.prisma` | NEW | Central tenant management schema |
-| `server/utils/prisma-control.ts` | NEW | Control plane Prisma client |
-| `server/utils/tenant-connection.ts` | NEW | Connection pool manager |
-| `server/utils/tenant-features.ts` | NEW | Feature flag utilities |
-| `server/middleware/01.tenant.ts` | NEW | Tenant resolution + landing page routing |
-| `shared/types/features.ts` | NEW | Feature/settings type definitions |
-| `app/composables/useFeatures.ts` | NEW | Client-side feature checks |
-| `scripts/seed-dev-tenants.ts` | NEW | Development tenant seeding |
-| `server/api/auth/login.post.ts` | MODIFY | Tenant-aware login |
-| `server/middleware/auth.ts` | MODIFY | Include tenant in session |
-| `app/stores/auth.ts` | MODIFY | Add TenantContext to session |
-| All 103+ API routes | MODIFY | Use `getTenantPrisma(event)` |
+| File                                | Action | Purpose                                  |
+| ----------------------------------- | ------ | ---------------------------------------- |
+| `prisma/control-plane.prisma`       | NEW    | Central tenant management schema         |
+| `server/utils/prisma-control.ts`    | NEW    | Control plane Prisma client              |
+| `server/utils/tenant-connection.ts` | NEW    | Connection pool manager                  |
+| `server/utils/tenant-features.ts`   | NEW    | Feature flag utilities                   |
+| `server/middleware/01.tenant.ts`    | NEW    | Tenant resolution + landing page routing |
+| `shared/types/features.ts`          | NEW    | Feature/settings type definitions        |
+| `app/composables/useFeatures.ts`    | NEW    | Client-side feature checks               |
+| `scripts/seed-dev-tenants.ts`       | NEW    | Development tenant seeding               |
+| `server/api/auth/login.post.ts`     | MODIFY | Tenant-aware login                       |
+| `server/middleware/auth.ts`         | MODIFY | Include tenant in session                |
+| `app/stores/auth.ts`                | MODIFY | Add TenantContext to session             |
+| All 103+ API routes                 | MODIFY | Use `getTenantPrisma(event)`             |
 
 ---
 
@@ -1148,26 +1160,26 @@ STRIPE_WEBHOOK_SECRET=
 
 ## Subscription Tiers
 
-| Tier | Users | Locations | Database | Price/mo | Key Features |
-|------|-------|-----------|----------|----------|--------------|
-| FREE | 2 | 1 | Shared | $0 | Basic stock management |
-| STARTER | 5 | 2 | Shared | $49 | + Transfers, Email notifications |
-| PROFESSIONAL | 15 | 5 | Shared | $149 | + PRF/PO, Reports, PDF export |
-| ENTERPRISE | Unlimited | Unlimited | Dedicated | Custom | + Custom workflows, Branding, SLA |
+| Tier         | Users     | Locations | Database  | Price/mo | Key Features                      |
+| ------------ | --------- | --------- | --------- | -------- | --------------------------------- |
+| FREE         | 2         | 1         | Shared    | $0       | Basic stock management            |
+| STARTER      | 5         | 2         | Shared    | $49      | + Transfers, Email notifications  |
+| PROFESSIONAL | 15        | 5         | Shared    | $149     | + PRF/PO, Reports, PDF export     |
+| ENTERPRISE   | Unlimited | Unlimited | Dedicated | Custom   | + Custom workflows, Branding, SLA |
 
 ---
 
 ## Appendix A: Feature Flag Decision Matrix
 
-| Customer Request | Approach | Effort |
-|-----------------|----------|--------|
-| Hide a module | Feature flag | Low |
-| Add custom field | JSON metadata column | Low-Medium |
-| Different default values | Tenant settings | Low |
-| Custom branding/colors | Tenant branding | Low |
-| Different approval workflow | Feature flag + conditional logic | Medium |
-| Completely different business logic | Enterprise custom branch | High |
-| On-premise deployment | Separate deployment | Very High |
+| Customer Request                    | Approach                         | Effort     |
+| ----------------------------------- | -------------------------------- | ---------- |
+| Hide a module                       | Feature flag                     | Low        |
+| Add custom field                    | JSON metadata column             | Low-Medium |
+| Different default values            | Tenant settings                  | Low        |
+| Custom branding/colors              | Tenant branding                  | Low        |
+| Different approval workflow         | Feature flag + conditional logic | Medium     |
+| Completely different business logic | Enterprise custom branch         | High       |
+| On-premise deployment               | Separate deployment              | Very High  |
 
 ---
 

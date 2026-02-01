@@ -14,23 +14,23 @@
 
 ## Implementation Status Summary
 
-| Category | Status | Notes |
-|----------|--------|-------|
-| Authentication & Authorization | ✅ Complete | JWT, RBAC, location-based access |
-| Multi-Location Management | ✅ Complete | Full CRUD, user assignment |
-| Items & Pricing | ✅ Complete | Global items, period pricing, bulk import |
-| PRF/PO Workflow | ✅ Complete | Approval workflow, email notifications |
-| Deliveries | ✅ Complete | WAC calculation, over-delivery approval |
-| Issues | ✅ Complete | Cost centre tracking, stock validation |
-| Transfers | ✅ Complete | Approval workflow, WAC transfer |
-| NCR Management | ✅ Complete | Auto-generated + manual, email notifications |
-| Period Management | ✅ Complete | Coordinated close, price locking |
-| Reconciliations | ✅ Complete | Per-location + consolidated views |
-| PWA | ✅ Complete | Installable, offline-aware UI |
-| Reports | ✅ Complete | Stock Now, Deliveries, Issues, Reconciliation |
-| Email Notifications | ✅ Complete | NCR + PO notifications |
-| Suppliers | ✅ Complete | Full CRUD |
-| User Management | ✅ Complete | Roles, locations, profile management |
+| Category                       | Status      | Notes                                         |
+| ------------------------------ | ----------- | --------------------------------------------- |
+| Authentication & Authorization | ✅ Complete | JWT, RBAC, location-based access              |
+| Multi-Location Management      | ✅ Complete | Full CRUD, user assignment                    |
+| Items & Pricing                | ✅ Complete | Global items, period pricing, bulk import     |
+| PRF/PO Workflow                | ✅ Complete | Approval workflow, email notifications        |
+| Deliveries                     | ✅ Complete | WAC calculation, over-delivery approval       |
+| Issues                         | ✅ Complete | Cost centre tracking, stock validation        |
+| Transfers                      | ✅ Complete | Approval workflow, WAC transfer               |
+| NCR Management                 | ✅ Complete | Auto-generated + manual, email notifications  |
+| Period Management              | ✅ Complete | Coordinated close, price locking              |
+| Reconciliations                | ✅ Complete | Per-location + consolidated views             |
+| PWA                            | ✅ Complete | Installable, offline-aware UI                 |
+| Reports                        | ✅ Complete | Stock Now, Deliveries, Issues, Reconciliation |
+| Email Notifications            | ✅ Complete | NCR + PO notifications                        |
+| Suppliers                      | ✅ Complete | Full CRUD                                     |
+| User Management                | ✅ Complete | Roles, locations, profile management          |
 
 ---
 

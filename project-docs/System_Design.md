@@ -10,20 +10,20 @@
 
 ## Implementation Status
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Core Architecture | ✅ Complete | Nuxt 4 monolith deployed on Vercel |
-| Database | ✅ Complete | PostgreSQL via Supabase + Prisma ORM |
-| Authentication | ✅ Complete | JWT in httpOnly cookies, RBAC |
+| Component           | Status      | Notes                                       |
+| ------------------- | ----------- | ------------------------------------------- |
+| Core Architecture   | ✅ Complete | Nuxt 4 monolith deployed on Vercel          |
+| Database            | ✅ Complete | PostgreSQL via Supabase + Prisma ORM        |
+| Authentication      | ✅ Complete | JWT in httpOnly cookies, RBAC               |
 | Location Management | ✅ Complete | 4 types: Kitchen, Store, Central, Warehouse |
-| Deliveries & WAC | ✅ Complete | Full workflow with over-delivery approval |
-| Issues | ✅ Complete | Cost centre tracking |
-| Transfers | ✅ Complete | Approval workflow implemented |
-| NCR System | ✅ Complete | Auto + manual, email notifications |
-| Period Management | ✅ Complete | Coordinated close across locations |
-| PRF/PO Workflow | ✅ Complete | Full approval workflow |
-| PWA | ✅ Complete | Level 1 - installable, offline-aware |
-| API Routes | ✅ Complete | 103+ server routes implemented |
+| Deliveries & WAC    | ✅ Complete | Full workflow with over-delivery approval   |
+| Issues              | ✅ Complete | Cost centre tracking                        |
+| Transfers           | ✅ Complete | Approval workflow implemented               |
+| NCR System          | ✅ Complete | Auto + manual, email notifications          |
+| Period Management   | ✅ Complete | Coordinated close across locations          |
+| PRF/PO Workflow     | ✅ Complete | Full approval workflow                      |
+| PWA                 | ✅ Complete | Level 1 - installable, offline-aware        |
+| API Routes          | ✅ Complete | 103+ server routes implemented              |
 
 ---
 
@@ -53,13 +53,13 @@ A web application managing stock across **multiple locations**. Core operations 
 
 ## 2) Actors & Roles (Implemented)
 
-| Role                       | Main Actions                                              | Location Scope          |
-| -------------------------- | --------------------------------------------------------- | ----------------------- |
-| **Operator**               | Post Deliveries & Issues; view Stock Now; create PRFs     | Assigned locations only |
-| **Supervisor**             | Approve PRFs, Transfers & Over-deliveries; Reconciliations| All locations           |
-| **Admin**                  | Manage Items/Users; Approve Period Close; system config   | All locations           |
-| **Procurement Specialist** | Manage PRFs and POs; create POs from approved PRFs        | All locations (PO/PRF only) |
-| **System**                 | Auto-generate price variance NCRs; email notifications    | All locations           |
+| Role                       | Main Actions                                               | Location Scope              |
+| -------------------------- | ---------------------------------------------------------- | --------------------------- |
+| **Operator**               | Post Deliveries & Issues; view Stock Now; create PRFs      | Assigned locations only     |
+| **Supervisor**             | Approve PRFs, Transfers & Over-deliveries; Reconciliations | All locations               |
+| **Admin**                  | Manage Items/Users; Approve Period Close; system config    | All locations               |
+| **Procurement Specialist** | Manage PRFs and POs; create POs from approved PRFs         | All locations (PO/PRF only) |
+| **System**                 | Auto-generate price variance NCRs; email notifications     | All locations               |
 
 ## 3) System Context - Multi-Location Architecture (Implemented)
 
