@@ -84,10 +84,9 @@ enum NCRType {
 // NCR Status Enum
 enum NCRStatus {
   OPEN      // Newly created, awaiting action
-  SENT      // Sent to supplier for review
-  CREDITED  // Supplier issued credit note
-  REJECTED  // Supplier rejected the claim
-  RESOLVED  // Internally resolved (uses financial_impact)
+  CREDITED  // Supplier issued credit note (final state)
+  REJECTED  // Supplier rejected the claim (final state)
+  RESOLVED  // Internally resolved (uses financial_impact) (final state)
 }
 
 // NCR Financial Impact Enum (for reconciliation)
@@ -108,31 +107,20 @@ enum NCRFinancialImpact {
 //                              │  (initial)  │
 //                              └──────┬──────┘
 //                                     │
-//                    ┌────────────────┴────────────────┐
-//                    │                                 │
-//                    ▼                                 ▼
-//            ┌───────────────┐               ┌───────────────┐
-//            │     SENT      │               │   RESOLVED    │
-//            │ (to supplier) │               │   (direct)    │
-//            └───────┬───────┘               │   (final)     │
-//                    │                       └───────────────┘
-//                    │
-//       ┌────────────┼────────────┐
-//       │            │            │
-//       ▼            ▼            ▼
-// ┌──────────┐ ┌──────────┐ ┌──────────┐
-// │ CREDITED │ │ REJECTED │ │ RESOLVED │
-// │  (final) │ │  (final) │ │  (final) │
-// │  Credit  │ │  No      │ │ Internal │
-// │  issued  │ │  credit  │ │ resolve  │
-// └──────────┘ └──────────┘ └──────────┘
+//       ┌─────────────────────────────┼─────────────────────────────┐
+//       │                             │                             │
+//       ▼                             ▼                             ▼
+// ┌──────────┐                 ┌──────────┐                 ┌──────────┐
+// │ CREDITED │                 │ REJECTED │                 │ RESOLVED │
+// │  (final) │                 │  (final) │                 │  (final) │
+// │  Credit  │                 │  No      │                 │ Internal │
+// │  issued  │                 │  credit  │                 │ resolve  │
+// └──────────┘                 └──────────┘                 └──────────┘
 //
 // Status Transitions:
-// - OPEN → SENT: Claim sent to supplier
-// - OPEN → RESOLVED: Resolved internally (skip supplier)
-// - SENT → CREDITED: Supplier issued credit note
-// - SENT → REJECTED: Supplier rejected the claim
-// - SENT → RESOLVED: Resolved without credit/rejection
+// - OPEN → CREDITED: Supplier issued credit note
+// - OPEN → REJECTED: Supplier rejected the claim
+// - OPEN → RESOLVED: Resolved internally
 // - CREDITED, REJECTED, RESOLVED are final states`,
 
   ncrTypes: `// NCR Types Explained
@@ -395,7 +383,7 @@ export default defineEventHandler(async (event) => {
 // File: server/api/ncrs/[id].patch.ts
 
 const bodySchema = z.object({
-  status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
+  status: z.enum(["OPEN", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
   resolution_notes: z.string().optional(),
   resolution_type: z.string().max(200).optional(),  // Required for RESOLVED
   financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(), // Required for RESOLVED
@@ -410,8 +398,7 @@ export default defineEventHandler(async (event) => {
 
   // Validate status transition
   const validTransitions: Record<string, string[]> = {
-    OPEN: ["SENT", "RESOLVED"],           // Can send to supplier or resolve directly
-    SENT: ["CREDITED", "REJECTED", "RESOLVED"],  // Supplier response options
+    OPEN: ["CREDITED", "REJECTED", "RESOLVED"],  // Direct transition to closing status
     CREDITED: [],                          // Final state
     REJECTED: [],                          // Final state
     RESOLVED: [],                          // Final state
@@ -569,16 +556,13 @@ INTERNAL_ERROR               // Unexpected server error
 // 3. Status Workflow
 // ──────────────────
 // • OPEN: Initial state for all NCRs
-// • SENT: Claim sent to supplier for review
 // • CREDITED: Supplier issued credit note (final)
 // • REJECTED: Supplier rejected the claim (final)
 // • RESOLVED: Internally resolved, no credit (final)
-// • Can skip SENT and go directly from OPEN to RESOLVED
 //
 // 4. Status Transitions (valid paths)
 // ───────────────────────────────────
-// OPEN → SENT, RESOLVED
-// SENT → CREDITED, REJECTED, RESOLVED
+// OPEN → CREDITED, REJECTED, RESOLVED
 // CREDITED → (none - final state)
 // REJECTED → (none - final state)
 // RESOLVED → (none - final state)
@@ -614,7 +598,6 @@ INTERNAL_ERROR               // Unexpected server error
 // • NCRs with REJECTED status increase consumption (losses)
 // • RESOLVED NCRs use financial_impact: CREDIT, LOSS, or NONE
 // • When status = RESOLVED, resolution_type and financial_impact are required
-// • SENT NCRs appear as "Pending Credits" (informational)
 // • OPEN NCRs trigger warnings during period close (non-blocking)`,
 
   ncrReconciliationImpact: `// NCR Status to Reconciliation Impact
@@ -633,7 +616,6 @@ INTERNAL_ERROR               // Unexpected server error
 // │   RESOLVED      │      CREDIT         │  → ncr_credits (reduces consumption)│
 // │   RESOLVED      │       LOSS          │  → ncr_losses (increases consumption)│
 // │   RESOLVED      │       NONE          │  → No financial effect              │
-// │   SENT          │       N/A           │  → Pending Credits (informational)  │
 // │   OPEN          │       N/A           │  → Warning during period close      │
 // └─────────────────┴─────────────────────┴─────────────────────────────────────┘
 //
@@ -649,7 +631,6 @@ INTERNAL_ERROR               // Unexpected server error
 // Key Points:
 // • NCR Credits REDUCE consumption (money recovered from suppliers)
 // • NCR Losses INCREASE consumption (unrecovered costs absorbed by business)
-// • SENT NCRs shown as "Pending Credits" but don't affect calculation
 // • OPEN NCRs generate non-blocking warning during period close`,
 
   ncrCreditsUtility: `// NCR Credit Utilities
@@ -703,12 +684,6 @@ export async function getLostNCRsForPeriod(
 }
 
 /**
- * Get NCRs with SENT status (pending supplier response).
- * Displayed as "Pending Credits" - informational only.
- */
-export async function getPendingNCRsForPeriod(...): Promise<NCRSummaryCategory> { }
-
-/**
  * Get OPEN NCRs (unresolved).
  * Triggers warning during period close.
  */
@@ -721,10 +696,9 @@ export async function getAllNCRSummaryForPeriod(
   periodId: string,
   locationId: string
 ): Promise<NCRSummaryResponse> {
-  const [credited, losses, pending, open] = await Promise.all([
+  const [credited, losses, open] = await Promise.all([
     getCreditedNCRsForPeriod(periodId, locationId),
     getLostNCRsForPeriod(periodId, locationId),
-    getPendingNCRsForPeriod(periodId, locationId),
     getOpenNCRsForPeriod(periodId, locationId),
   ]);
   return { credited, losses, pending, open };
@@ -897,9 +871,16 @@ export default defineEventHandler(async (event) => {
 // 1. Fetches NCR with all related data (location, delivery, supplier, items)
 // 2. Resolves recipient emails from NotificationSetting table
 // 3. Gets supplier emails from linked delivery→supplier relationship
-// 4. Sends emails to all three groups (Finance, Procurement, Supplier)
-// 5. Logs each attempt to NCRNotificationLog table
-// 6. Never blocks - errors are caught and logged`,
+// 4. Queues emails for sequential sending (prevents SMTP throttling)
+// 5. Sends emails with 1.5 second delays between each
+// 6. Logs each attempt to NCRNotificationLog table
+// 7. Never blocks - errors are caught and logged
+//
+// Email Queue System (prevents delivery issues):
+// - Emails are queued and sent one at a time with delays
+// - Singleton SMTP transporter with connection pooling
+// - Rate limiting: max 5 emails per second
+// - Prevents Office 365 throttling when sending multiple emails`,
 
   notificationFlowDiagram: `// NCR Email Notification Flow
 //
@@ -928,12 +909,18 @@ export default defineEventHandler(async (event) => {
 //              │   delivery→supplier     │
 //              └───────────┬─────────────┘
 //                          ▼
+//                          ▼
+//              ┌─────────────────────────┐
+//              │     EMAIL QUEUE         │
+//              │  (sequential sending)   │
+//              └───────────┬─────────────┘
+//                          ▼
 //         ┌────────────────┼────────────────┐
 //         ▼                ▼                ▼
 //   ┌──────────┐    ┌──────────┐    ┌──────────┐
 //   │ Finance  │    │Procurement│   │ Supplier │
-//   │  Email   │    │  Email   │    │  Email   │
-//   │(internal)│    │(internal)│    │(external)│
+//   │  Email   │ →  │  Email   │ →  │  Email   │
+//   │(1.5s gap)│    │(1.5s gap)│    │          │
 //   └────┬─────┘    └────┬─────┘    └────┬─────┘
 //        │               │               │
 //        └───────────────┴───────────────┘
@@ -1213,14 +1200,6 @@ async function handleCreateNCR(data: NCRFormData) {
             </div>
             <div class="rounded-lg border border-[var(--ui-border)] p-3">
               <div class="mb-2 flex items-center gap-2">
-                <UBadge color="info" variant="soft">SENT</UBadge>
-              </div>
-              <p class="text-xs text-[var(--ui-text-muted)]">
-                Claim sent to supplier for review and response.
-              </p>
-            </div>
-            <div class="rounded-lg border border-[var(--ui-border)] p-3">
-              <div class="mb-2 flex items-center gap-2">
                 <UBadge color="success" variant="soft">CREDITED</UBadge>
               </div>
               <p class="text-xs text-[var(--ui-text-muted)]">
@@ -1250,9 +1229,9 @@ async function handleCreateNCR(data: NCRFormData) {
           <p class="flex items-start gap-2 text-sm text-[var(--ui-info)]">
             <UIcon name="i-heroicons-information-circle" class="mt-0.5 shrink-0" />
             <span>
-              <strong>Shortcut Path:</strong>
-              NCRs can go directly from OPEN to RESOLVED, skipping the SENT state if the issue is
-              resolved internally without supplier involvement.
+              <strong>Direct Resolution:</strong>
+              NCRs transition directly from OPEN to a closing status (CREDITED, REJECTED, or
+              RESOLVED) based on the outcome.
             </span>
           </p>
         </div>
@@ -1561,16 +1540,6 @@ async function handleCreateNCR(data: NCRFormData) {
               <p class="text-xs text-[var(--ui-text-muted)]">
                 NCRs with REJECTED status or RESOLVED with LOSS impact. Unrecovered costs are
                 absorbed by the business, increasing consumption.
-              </p>
-            </div>
-            <div class="rounded-lg border border-[var(--ui-info)]/30 bg-[var(--ui-bg)] p-3">
-              <div class="mb-2 flex items-center gap-2">
-                <UBadge color="info" variant="soft">Pending Credits</UBadge>
-                <span class="text-xs text-[var(--ui-text-muted)]">Informational</span>
-              </div>
-              <p class="text-xs text-[var(--ui-text-muted)]">
-                NCRs with SENT status are displayed as pending credits. These don't affect
-                calculations until supplier responds.
               </p>
             </div>
             <div class="rounded-lg border border-[var(--ui-warning)]/30 bg-[var(--ui-bg)] p-3">

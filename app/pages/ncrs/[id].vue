@@ -76,7 +76,7 @@ interface NCR {
   reason: string;
   quantity: number | null;
   value: number;
-  status: "OPEN" | "SENT" | "CREDITED" | "REJECTED" | "RESOLVED";
+  status: "OPEN" | "CREDITED" | "REJECTED" | "RESOLVED";
   creator: User;
   created_at: string;
   resolved_at: string | null;
@@ -129,19 +129,16 @@ const isNCRResolved = computed(() => {
 // All status options (for reference)
 const allStatusOptions = [
   { value: "OPEN", label: "Open" },
-  { value: "SENT", label: "Sent to Supplier" },
   { value: "CREDITED", label: "Credited" },
   { value: "REJECTED", label: "Rejected by Supplier" },
   { value: "RESOLVED", label: "Resolved" },
 ];
 
 // Valid status transitions
-// OPEN → SENT, RESOLVED (can skip SENT and resolve directly)
-// SENT → CREDITED, REJECTED, RESOLVED
+// OPEN → CREDITED, REJECTED, RESOLVED (direct transition to closing status)
 // CREDITED, REJECTED, RESOLVED → (no further transitions - final states)
 const validTransitions: Record<string, string[]> = {
-  OPEN: ["SENT", "RESOLVED"],
-  SENT: ["CREDITED", "REJECTED", "RESOLVED"],
+  OPEN: ["CREDITED", "REJECTED", "RESOLVED"],
   CREDITED: [], // Final state
   REJECTED: [], // Final state
   RESOLVED: [], // Final state
@@ -164,7 +161,6 @@ function getStatusColor(
 ): "success" | "warning" | "error" | "neutral" | "primary" {
   const statusColors = {
     OPEN: "primary" as const,
-    SENT: "warning" as const,
     CREDITED: "success" as const,
     REJECTED: "error" as const,
     RESOLVED: "neutral" as const,
@@ -175,7 +171,6 @@ function getStatusColor(
 function getStatusLabel(status: NCR["status"]) {
   const statusLabels = {
     OPEN: "Open",
-    SENT: "Sent to Supplier",
     CREDITED: "Credited",
     REJECTED: "Rejected",
     RESOLVED: "Resolved",
@@ -691,7 +686,7 @@ onMounted(async () => {
             color="primary"
             variant="subtle"
             title="Status Flow"
-            description="NCR Status: OPEN → SENT → CREDITED/REJECTED/RESOLVED. You can also mark as RESOLVED directly if the issue is resolved internally."
+            description="NCR Status: OPEN → CREDITED/REJECTED/RESOLVED. Select the appropriate closing status based on the outcome."
           />
 
           <UAlert

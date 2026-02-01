@@ -333,11 +333,11 @@
         },
         {
           "id": "p5-4",
-          "label": "Update NCR status to 'SENT'"
+          "label": "Update NCR status to 'CREDITED' (or 'REJECTED'/'RESOLVED')"
         },
         {
           "id": "p5-5",
-          "label": "Add notes: 'Contacted supplier for credit'"
+          "label": "Add resolution notes as needed"
         },
         {
           "id": "p5-6",

@@ -1193,10 +1193,6 @@ watch(
               Newly created, awaiting action. These appear as warnings during period close.
             </li>
             <li>
-              <strong>SENT:</strong>
-              Claim sent to supplier. Shown as "Pending Credits" on reconciliation.
-            </li>
-            <li>
               <strong>CREDITED:</strong>
               Supplier issued credit. This reduces the location's consumption in reconciliation.
             </li>

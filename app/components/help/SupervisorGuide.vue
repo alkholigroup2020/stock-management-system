@@ -671,11 +671,6 @@ watch(
               <strong>increases</strong>
               your consumption.
             </li>
-            <li>
-              <strong>Pending Credits:</strong>
-              NCRs with SENT status are shown as informational. These may become credits or losses
-              once the supplier responds.
-            </li>
           </ul>
         </div>
 

@@ -37,7 +37,7 @@ export type TransferStatus = "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECT
 
 export type NCRType = "MANUAL" | "PRICE_VARIANCE";
 
-export type NCRStatus = "OPEN" | "SENT" | "CREDITED" | "REJECTED" | "RESOLVED";
+export type NCRStatus = "OPEN" | "CREDITED" | "REJECTED" | "RESOLVED";
 
 export type NCRFinancialImpact = "NONE" | "CREDIT" | "LOSS";
 

@@ -683,7 +683,6 @@ enum NCRType {
 
 enum NCRStatus {
   OPEN
-  SENT
   CREDITED
   REJECTED
   RESOLVED

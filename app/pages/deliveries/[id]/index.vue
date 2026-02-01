@@ -865,8 +865,6 @@ function getNcrStatusColor(status: string): BadgeColor {
   switch (status) {
     case "OPEN":
       return "warning";
-    case "SENT":
-      return "info";
     case "CREDITED":
       return "success";
     case "REJECTED":

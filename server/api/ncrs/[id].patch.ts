@@ -9,8 +9,7 @@
  * - Setting resolved timestamp when status changes to CREDITED, REJECTED, or RESOLVED
  *
  * Status Flow:
- * - OPEN → SENT → CREDITED/REJECTED/RESOLVED
- * - Can skip SENT and go directly to RESOLVED if needed
+ * - OPEN → CREDITED/REJECTED/RESOLVED (direct transition to closing status)
  *
  * Permissions:
  * - User must have POST or MANAGE access to the NCR's location
@@ -33,7 +32,7 @@ interface AuthUser {
 // Request body schema
 const bodySchema = z
   .object({
-    status: z.enum(["OPEN", "SENT", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
+    status: z.enum(["OPEN", "CREDITED", "REJECTED", "RESOLVED"]).optional(),
     resolution_notes: z.string().optional(),
     resolution_type: z.string().max(200).optional(),
     financial_impact: z.enum(["NONE", "CREDIT", "LOSS"]).optional(),
@@ -150,12 +149,10 @@ export default defineEventHandler(async (event) => {
       const newStatus = data.status;
 
       // Define valid status transitions
-      // OPEN → SENT, RESOLVED (can skip SENT and resolve directly)
-      // SENT → CREDITED, REJECTED, RESOLVED
+      // OPEN → CREDITED, REJECTED, RESOLVED (direct transition to closing status)
       // CREDITED, REJECTED, RESOLVED → (no further transitions - final states)
       const validTransitions: Record<string, string[]> = {
-        OPEN: ["SENT", "RESOLVED"],
-        SENT: ["CREDITED", "REJECTED", "RESOLVED"],
+        OPEN: ["CREDITED", "REJECTED", "RESOLVED"],
         CREDITED: [], // Final state
         REJECTED: [], // Final state
         RESOLVED: [], // Final state

@@ -238,7 +238,7 @@ export async function getPendingNCRsForPeriod(
   const ncrs = await prisma.nCR.findMany({
     where: {
       location_id: locationId,
-      status: "SENT",
+      status: "OPEN",
       OR: [
         // NCRs linked to deliveries in this period
         {

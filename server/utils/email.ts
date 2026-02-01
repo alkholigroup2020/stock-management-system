@@ -29,18 +29,46 @@ export interface EmailResult {
 }
 
 // ========================================
-// CONFIGURATION
+// SINGLETON TRANSPORTER & EMAIL QUEUE
 // ========================================
 
 /**
- * Create Office 365 SMTP transporter
- * Returns null if credentials are not configured
+ * Singleton transporter instance - reuses SMTP connection
  */
-function createTransporter(): Transporter | null {
+let transporterInstance: Transporter | null = null;
+let transporterChecked = false;
+
+/**
+ * Email queue for sequential sending with delays
+ */
+interface QueuedEmail {
+  options: EmailOptions;
+  resolve: (result: EmailResult) => void;
+}
+
+const emailQueue: QueuedEmail[] = [];
+let isProcessingQueue = false;
+
+/**
+ * Delay between emails in milliseconds (prevents SMTP throttling)
+ */
+const EMAIL_DELAY_MS = 1500;
+
+/**
+ * Get or create singleton transporter
+ * Reuses SMTP connection for better performance
+ */
+function getTransporter(): Transporter | null {
+  if (transporterChecked) {
+    return transporterInstance;
+  }
+
   const smtpUser = process.env.SMTP_USER;
   const smtpPassword = process.env.SMTP_PASSWORD;
   const smtpHost = process.env.SMTP_HOST || "smtp.office365.com";
   const smtpPort = parseInt(process.env.SMTP_PORT || "587", 10);
+
+  transporterChecked = true;
 
   if (!smtpUser || !smtpPassword) {
     console.warn(
@@ -49,7 +77,7 @@ function createTransporter(): Transporter | null {
     return null;
   }
 
-  return nodemailer.createTransport({
+  transporterInstance = nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
     secure: false, // Use STARTTLS
@@ -61,23 +89,93 @@ function createTransporter(): Transporter | null {
       ciphers: "SSLv3",
       rejectUnauthorized: false,
     },
+    // Connection pooling for better performance
+    pool: true,
+    maxConnections: 3,
+    maxMessages: 100,
+    rateDelta: 1000,
+    rateLimit: 5, // Max 5 emails per second
   });
+
+  // Handle connection errors gracefully
+  transporterInstance.on("error", (err) => {
+    console.error("[Email Service] Transporter error:", err.message);
+  });
+
+  console.log("[Email Service] SMTP transporter initialized with connection pooling");
+
+  return transporterInstance;
 }
 
 /**
- * Get the FROM email address from environment
- * Defaults to SMTP_USER if not configured
+ * Process the email queue sequentially with delays
  */
-function getFromEmail(): string {
-  return process.env.EMAIL_FROM || process.env.SMTP_USER || "noreply@example.com";
+async function processEmailQueue(): Promise<void> {
+  if (isProcessingQueue) return;
+  isProcessingQueue = true;
+
+  while (emailQueue.length > 0) {
+    const item = emailQueue.shift();
+    if (!item) continue;
+
+    const result = await sendEmailDirect(item.options);
+    item.resolve(result);
+
+    // Wait between emails to prevent SMTP throttling
+    if (emailQueue.length > 0) {
+      await new Promise((resolve) => setTimeout(resolve, EMAIL_DELAY_MS));
+    }
+  }
+
+  isProcessingQueue = false;
+}
+
+/**
+ * Direct email send (internal - bypasses queue)
+ */
+async function sendEmailDirect(options: EmailOptions): Promise<EmailResult> {
+  const { to, subject, html, text, replyTo } = options;
+  const recipients = Array.isArray(to) ? to : [to];
+
+  console.log(`[Email Service] Sending email to ${recipients.join(", ")}`);
+
+  const transporter = getTransporter();
+  if (!transporter) {
+    // Development mode fallback
+    console.log("[Email Service] Development mode - email logged but not sent");
+    return { success: true, messageId: `dev-${Date.now()}` };
+  }
+
+  try {
+    const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_USER || "noreply@example.com";
+    const result = await transporter.sendMail({
+      from: fromEmail,
+      to: recipients.join(", "),
+      subject,
+      html,
+      text: text || stripHtml(html),
+      replyTo,
+    });
+
+    console.log(`[Email Service] Email sent: ${result.messageId}`);
+    return { success: true, messageId: result.messageId };
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error(`[Email Service] Failed: ${error.message}`);
+    return { success: false, error: error.message || "Failed to send email" };
+  }
 }
 
 // ========================================
-// MAIN EMAIL FUNCTION
+// MAIN EMAIL FUNCTION (with queue support)
 // ========================================
 
 /**
- * Send an email using Office 365 SMTP
+ * Send an email using Office 365 SMTP with queue support
+ *
+ * Emails are queued and sent sequentially with delays to prevent
+ * SMTP server throttling. This is especially important when sending
+ * multiple notifications (e.g., NCR to Finance, Procurement, Supplier).
  *
  * @param options - Email options (to, subject, html, text, replyTo)
  * @returns Promise<EmailResult> with success status and optional messageId/error
@@ -98,57 +196,14 @@ function getFromEmail(): string {
  * ```
  */
 export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
-  const { to, subject, html, text, replyTo } = options;
+  const recipients = Array.isArray(options.to) ? options.to : [options.to];
+  console.log(`[Email Service] Queuing email to ${recipients.join(", ")} (${options.subject})`);
 
-  // Normalize recipients to array
-  const recipients = Array.isArray(to) ? to : [to];
-
-  // Log email attempt
-  console.log(`[Email Service] Attempting to send email to ${recipients.join(", ")}`);
-  console.log(`[Email Service] Subject: ${subject}`);
-
-  // Development mode fallback - log email instead of sending
-  const transporter = createTransporter();
-  if (!transporter) {
-    console.log("[Email Service] Development mode - email logged but not sent:");
-    console.log("[Email Service] ----------------------------------------");
-    console.log(`[Email Service] To: ${recipients.join(", ")}`);
-    console.log(`[Email Service] Subject: ${subject}`);
-    console.log(`[Email Service] Body (HTML): ${html.substring(0, 200)}...`);
-    console.log("[Email Service] ----------------------------------------");
-
-    return {
-      success: true,
-      messageId: `dev-${Date.now()}`,
-    };
-  }
-
-  try {
-    const fromEmail = getFromEmail();
-    const result = await transporter.sendMail({
-      from: fromEmail,
-      to: recipients.join(", "),
-      subject,
-      html,
-      text: text || stripHtml(html),
-      replyTo,
-    });
-
-    console.log(`[Email Service] Email sent successfully: ${result.messageId}`);
-
-    return {
-      success: true,
-      messageId: result.messageId,
-    };
-  } catch (err: unknown) {
-    const error = err as Error;
-    console.error(`[Email Service] Failed to send email: ${error.message}`);
-
-    return {
-      success: false,
-      error: error.message || "Failed to send email",
-    };
-  }
+  // Add to queue and process
+  return new Promise((resolve) => {
+    emailQueue.push({ options, resolve });
+    void processEmailQueue();
+  });
 }
 
 // ========================================
