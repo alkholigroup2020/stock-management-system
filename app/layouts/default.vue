@@ -328,9 +328,6 @@ async function handleDatabaseReset() {
   }
 }
 
-// Testing plan state
-const { isPanelOpen, isLargeScreen, togglePanel, closePanel } = useTestingPlanProgress();
-
 // Keyboard shortcut for help (? or F1) and developer guide (Ctrl+Shift+D)
 const handleGlobalKeydown = (event: KeyboardEvent) => {
   // Don't trigger if user is typing in an input
@@ -375,7 +372,6 @@ onUnmounted(() => {
     storage="local"
     storage-key="stock-management-dashboard"
     class="transition-all duration-300"
-    :class="{ 'lg:mr-[400px]': isPanelOpen && isLargeScreen }"
   >
     <!-- SIDEBAR -->
     <UDashboardSidebar
@@ -464,9 +460,6 @@ onUnmounted(() => {
 
           <!-- Right side actions -->
           <div class="flex items-center gap-1">
-            <!-- Testing Plan Toggle -->
-            <TestingPlanToggle @click="togglePanel" />
-
             <!-- Developer Guide (dev mode only) -->
             <UButton
               v-if="showDevTools"
@@ -594,12 +587,6 @@ onUnmounted(() => {
 
   <!-- Help Drawer -->
   <LayoutHelpDrawer v-model:open="helpDrawerOpen" />
-
-  <!-- Testing Plan Panel (lg+ screens) -->
-  <TestingPlanPanel v-if="isPanelOpen && isLargeScreen" @close="closePanel" />
-
-  <!-- Testing Plan Modal (smaller screens) -->
-  <TestingPlanModal v-if="isPanelOpen && !isLargeScreen" :open="isPanelOpen" @close="closePanel" />
 
   <!-- Reset Database Confirmation Modal (dev only) -->
   <UiConfirmModal
