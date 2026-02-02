@@ -8,6 +8,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Framework Version:** This project uses **Nuxt 4** (not Nuxt 3). Always refer to Nuxt 4 documentation when implementing features or resolving issues.
 
+## PRODUCTION ENVIRONMENT WARNING
+
+**THIS APPLICATION IS NOW IN PRODUCTION.** Exercise extreme caution to prevent data loss or breaking changes.
+
+**Critical Rules:**
+
+1. **Never make breaking changes** to existing API contracts or database schema without careful consideration
+2. **Always use proper migrations** (`pnpm db:migrate deploy`) - **NEVER use `db:push` in production**
+3. **Preserve existing data** - Any schema changes must be additive or use safe migration strategies
+4. **Test thoroughly** before suggesting any changes
+5. **Validate backwards compatibility** for any modifications to APIs, types, or database models
+6. **No destructive operations** without explicit user confirmation and backup verification
+
+**Before ANY change, ask yourself:**
+
+- Will this affect existing data in the database?
+- Will this break existing API consumers?
+- Is there a safe rollback strategy?
+- Has this been tested in a non-production environment first?
+
 ## Development Best Practices
 
 ### Component Usage and Naming Conventions
@@ -255,12 +275,13 @@ This is a **single Nuxt 4 application** that contains both frontend and backend:
 2. Implement: Schema (Prisma) → API route → Composable → Component/Page → Tests
 3. Test with `pnpm dev` → Push for preview → Merge to `main` for production
 
-**Current:** Focus on frontend. Database, API routes, tests added later.
+**Production System:** This application is live with real users and data. All changes require careful consideration of backwards compatibility and data integrity.
 
-**Future (when configured):**
+**Change Process:**
 
-- Schema changes: Edit `prisma/schema.prisma` → `pnpm db:migrate dev` → Use generated types
+- Schema changes: Edit `prisma/schema.prisma` → Test locally with `pnpm db:migrate dev` → Deploy with `pnpm db:migrate deploy`
 - API routes: Use `defineEventHandler`, access `event.context.user`, validate with middleware
+- **Always ensure changes are non-breaking or have a proper migration path**
 
 ## Key Documentation Files
 
@@ -299,6 +320,8 @@ See `project-docs/dev-phases/` for phased development plans.
 6. **Never bypass approvals** - PRF/PO, Transfers, Period Close need proper workflow
 7. **Never forget audit trail** - Log who/when/what for all mutations
 8. **Never expose Supabase service key** - Server-only, never in client code
+9. **Never make breaking API changes** - Production system with real users; maintain backwards compatibility
+10. **Never delete or modify existing data** without explicit user confirmation and backup verification
 
 **For UI/styling pitfalls, see `/project-docs/UI_DESIGN_SYSTEM.md`**
 

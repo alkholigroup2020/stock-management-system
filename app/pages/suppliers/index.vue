@@ -96,60 +96,113 @@
       <UCard
         v-for="supplier in suppliers"
         :key="supplier.id"
-        class="card-elevated cursor-pointer"
-        :ui="{ body: 'p-6' }"
+        class="card-elevated cursor-pointer group"
+        :ui="{ body: 'p-0' }"
         @click="handleViewDetails(supplier)"
       >
-        <!-- Header Row -->
-        <div class="flex items-start justify-between gap-3 mb-4">
-          <div class="min-w-0 flex-1">
-            <h3 class="font-semibold text-[var(--ui-text)] truncate">
-              {{ supplier.name }}
-            </h3>
-            <p class="text-caption text-[var(--ui-text-muted)] font-mono">
-              {{ supplier.code }}
-            </p>
+        <!-- Header Section with colored accent -->
+        <div
+          class="px-5 py-4 border-b border-[var(--ui-border-muted)]"
+          :class="supplier.is_active ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-zinc-50 dark:bg-zinc-900/30'"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3 min-w-0 flex-1">
+              <!-- Icon -->
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+                :class="supplier.is_active ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-zinc-200 dark:bg-zinc-800'"
+              >
+                <UIcon
+                  name="i-lucide-building-2"
+                  class="w-5 h-5"
+                  :class="supplier.is_active ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'"
+                />
+              </div>
+              <!-- Name and Code -->
+              <div class="min-w-0 flex-1">
+                <h3 class="font-semibold text-[var(--ui-text-highlighted)] truncate leading-tight">
+                  {{ supplier.name }}
+                </h3>
+                <p class="text-xs text-[var(--ui-text-muted)] font-mono mt-0.5">
+                  {{ supplier.code }}
+                </p>
+              </div>
+            </div>
+            <!-- Status Badge -->
+            <UBadge
+              :color="supplier.is_active ? 'success' : 'neutral'"
+              variant="subtle"
+              size="sm"
+              class="flex-shrink-0"
+            >
+              {{ supplier.is_active ? "Active" : "Inactive" }}
+            </UBadge>
           </div>
-          <UBadge :color="supplier.is_active ? 'success' : 'neutral'" variant="subtle" size="sm">
-            {{ supplier.is_active ? "Active" : "Inactive" }}
-          </UBadge>
         </div>
 
-        <!-- Contact Info -->
-        <div v-if="supplier.contact" class="mb-4">
-          <p class="text-sm text-[var(--ui-text-muted)] line-clamp-2">
-            {{ supplier.contact }}
-          </p>
+        <!-- Contact Information Section -->
+        <div class="px-5 py-4 space-y-3">
+          <!-- Contact Person -->
+          <div class="flex items-center gap-3">
+            <UIcon name="i-lucide-user" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0" />
+            <span class="text-sm truncate" :class="supplier.contact ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+              {{ supplier.contact || "No contact person" }}
+            </span>
+          </div>
+
+          <!-- Phone (Landline) -->
+          <div class="flex items-center gap-3">
+            <UIcon name="i-lucide-phone" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0" />
+            <span class="text-sm truncate" :class="supplier.phone ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+              {{ supplier.phone || "No phone" }}
+            </span>
+          </div>
+
+          <!-- Email -->
+          <div class="flex items-center gap-3">
+            <UIcon name="i-lucide-mail" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0" />
+            <span class="text-sm truncate" :class="supplier.emails?.length ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+              {{ supplier.emails?.length ? supplier.emails[0] : "No email" }}
+            </span>
+          </div>
+
+          <!-- Address -->
+          <div class="flex items-start gap-3">
+            <UIcon name="i-lucide-map-pin" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0 mt-0.5" />
+            <span class="text-sm line-clamp-2" :class="supplier.address ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+              {{ supplier.address || "No address" }}
+            </span>
+          </div>
         </div>
 
         <!-- Footer Actions -->
         <div
-          class="flex items-center justify-between pt-3 border-t border-[var(--ui-border-muted)]"
+          class="px-5 py-3 border-t border-[var(--ui-border-muted)] bg-[var(--ui-bg-muted)]/50 flex items-center justify-between"
         >
-          <span class="text-xs text-[var(--ui-text-muted)]">
-            Created {{ formatDate(supplier.created_at) }}
-          </span>
-          <div v-if="canManageSuppliers" class="flex items-center gap-2">
+          <!-- Mobile Number -->
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-smartphone" class="w-4 h-4 text-[var(--ui-text-dimmed)]" />
+            <span class="text-sm" :class="supplier.mobile ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+              {{ supplier.mobile || "No mobile" }}
+            </span>
+          </div>
+          <div v-if="canManageSuppliers" class="flex items-center gap-1">
             <UButton
               color="error"
               variant="ghost"
-              size="sm"
+              size="xs"
               icon="i-lucide-trash-2"
               class="cursor-pointer"
               @click.stop="openDeleteModal(supplier)"
-            >
-              <span class="hidden sm:inline">Delete</span>
-            </UButton>
+            />
             <UButton
               color="primary"
               variant="ghost"
-              size="sm"
+              size="xs"
               icon="i-lucide-edit"
               class="cursor-pointer"
               @click.stop="handleEdit(supplier)"
-            >
-              <span class="hidden sm:inline">Edit</span>
-            </UButton>
+            />
           </div>
         </div>
       </UCard>
@@ -291,14 +344,6 @@ const selectStatus = (statusValue: boolean | undefined) => {
   statusFilter.value = statusValue;
 };
 
-// Format date helper
-const formatDate = (date: string | Date) => {
-  return new Date(date).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
 
 // Handlers
 const handleEdit = (supplier: SupplierItem) => {
