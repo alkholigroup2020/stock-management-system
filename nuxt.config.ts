@@ -104,6 +104,9 @@ export default defineNuxtConfig({
     devOptions: {
       enabled: true,
       type: "module",
+      // Suppress warnings about glob patterns not matching files during dev
+      // These files exist in production build but not in dev-sw-dist
+      suppressWarnings: true,
     },
   },
 
@@ -201,13 +204,15 @@ export default defineNuxtConfig({
           name: "fix-windows-imports",
           renderChunk(code: string) {
             // Fix bare Windows paths in generated code
-            return code.replace(
+            const transformedCode = code.replace(
               /from\s+['"]([A-Za-z]):\\\\([^'"]+)['"]/g,
               (match: string, drive: string, path: string) => {
                 const normalizedPath = path.replace(/\\\\/g, "/");
                 return `from 'file:///${drive}:/${normalizedPath}'`;
               }
             );
+            // Return object with map: null to suppress sourcemap warning
+            return { code: transformedCode, map: null };
           },
         },
       ],
