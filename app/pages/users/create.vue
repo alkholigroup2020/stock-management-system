@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "#ui/types";
 import { z } from "zod";
+import { useDebounceFn } from "@vueuse/core";
 import type { UserRole } from "~~/shared/types/database";
 
 definePageMeta({
@@ -11,11 +12,25 @@ definePageMeta({
 
 // Composables
 const toast = useAppToast();
+const { applyFieldErrors, clearFieldErrors, isFieldError, getToastErrorMessage } =
+  useFormServerErrors();
 
 // State
 const submitting = ref(false);
 const locations = ref<Array<{ id: string; code: string; name: string; type: string }>>([]);
 const isCancelModalOpen = ref(false);
+
+// Server-side field errors (for inline display)
+const serverErrors = reactive<Record<string, string>>({
+  username: "",
+  email: "",
+});
+
+// Validation loading states
+const validating = reactive({
+  username: false,
+  email: false,
+});
 
 // Form schema
 const schema = z
@@ -96,6 +111,72 @@ const locationOptions = computed(() => [
   })),
 ]);
 
+// Debounced username availability check
+const checkUsernameAvailability = useDebounceFn(async (username: string) => {
+  if (!username || username.length < 3) {
+    serverErrors.username = "";
+    return;
+  }
+
+  validating.username = true;
+  try {
+    await $fetch("/api/users/check-availability", {
+      method: "POST",
+      body: { username },
+    });
+    serverErrors.username = "";
+  } catch (err: unknown) {
+    applyFieldErrors(err, serverErrors);
+  } finally {
+    validating.username = false;
+  }
+}, 500);
+
+// Debounced email availability check
+const checkEmailAvailability = useDebounceFn(async (email: string) => {
+  // Basic email format check before server validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    serverErrors.email = "";
+    return;
+  }
+
+  validating.email = true;
+  try {
+    await $fetch("/api/users/check-availability", {
+      method: "POST",
+      body: { email },
+    });
+    serverErrors.email = "";
+  } catch (err: unknown) {
+    applyFieldErrors(err, serverErrors);
+  } finally {
+    validating.email = false;
+  }
+}, 500);
+
+// Watch for username changes to trigger real-time validation
+watch(
+  () => formData.username,
+  (newValue) => {
+    serverErrors.username = "";
+    if (newValue) {
+      checkUsernameAvailability(newValue);
+    }
+  }
+);
+
+// Watch for email changes to trigger real-time validation
+watch(
+  () => formData.email,
+  (newValue) => {
+    serverErrors.email = "";
+    if (newValue) {
+      checkEmailAvailability(newValue);
+    }
+  }
+);
+
 // Fetch locations
 const fetchLocations = async () => {
   try {
@@ -118,6 +199,8 @@ const fetchLocations = async () => {
 
 // Submit handler
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  // Clear server errors before submission
+  clearFieldErrors(serverErrors);
   submitting.value = true;
 
   try {
@@ -136,16 +219,15 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     await navigateTo("/users");
   } catch (err: unknown) {
     console.error("Error creating user:", err);
-    const message =
-      err &&
-      typeof err === "object" &&
-      "data" in err &&
-      err.data &&
-      typeof err.data === "object" &&
-      "message" in err.data
-        ? String(err.data.message)
-        : "Failed to create user";
-    toast.error("Error", { description: message });
+
+    // Apply field-specific errors inline
+    const hasFieldErrors = applyFieldErrors(err, serverErrors);
+
+    // Show toast only for non-field errors
+    if (!hasFieldErrors && !isFieldError(err)) {
+      const message = getToastErrorMessage(err) || "Failed to create user";
+      toast.error("Error", { description: message });
+    }
   } finally {
     submitting.value = false;
   }
@@ -239,6 +321,7 @@ useHead({
               name="username"
               required
               help="Unique username for system login"
+              :error="serverErrors.username || undefined"
             >
               <UInput
                 v-model="formData.username"
@@ -246,12 +329,19 @@ useHead({
                 icon="i-lucide-at-sign"
                 size="lg"
                 :disabled="submitting"
+                :loading="validating.username"
                 class="w-full"
               />
             </UFormField>
 
             <!-- Email -->
-            <UFormField label="Email Address" name="email" required help="User's email address">
+            <UFormField
+              label="Email Address"
+              name="email"
+              required
+              help="User's email address"
+              :error="serverErrors.email || undefined"
+            >
               <UInput
                 v-model="formData.email"
                 type="email"
@@ -259,6 +349,7 @@ useHead({
                 icon="i-lucide-mail"
                 size="lg"
                 :disabled="submitting"
+                :loading="validating.email"
                 class="w-full"
               />
             </UFormField>
