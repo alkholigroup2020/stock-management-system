@@ -26,10 +26,6 @@
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,ts,vue,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{js,ts,vue,json,css,md}\"",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:unit": "vitest run tests/unit",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
@@ -63,16 +59,10 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.0",
-    "@playwright/test": "^1.56.1",
     "@types/bcrypt": "^6.0.0",
     "@types/nodemailer": "^7.0.5",
-    "@vitest/coverage-v8": "^4.0.14",
-    "@vitest/ui": "^4.0.8",
-    "playwright": "^1.57.0",
     "prettier": "^3.6.2",
     "prisma": "^6.18.0",
-    "sharp": "^0.34.5",
-    "vitest": "^4.0.8"
+    "sharp": "^0.34.5"
   }
 }
