@@ -587,7 +587,11 @@ watch(
               Click
               <strong>Manage Prices</strong>
             </li>
-            <li>Enter prices for each item (or import from previous period)</li>
+            <li>
+              Enter prices for each item, or use
+              <strong>Copy Prices</strong>
+              to populate from the previous period (see below)
+            </li>
             <li>
               Click
               <strong>Save Prices</strong>
@@ -597,6 +601,49 @@ watch(
               <strong>Open Period</strong>
             </li>
           </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Copying Prices from a Previous Period
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Use this when starting a new period where most prices haven't changed — it saves you
+            from entering every price manually.
+          </p>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>
+              Open a period in
+              <strong>DRAFT</strong>
+              status and click
+              <strong>Manage Prices</strong>
+            </li>
+            <li>
+              Click the
+              <strong>Copy Prices</strong>
+              button at the top right of the Manage Prices screen
+            </li>
+            <li>
+              Review the confirmation dialog — it shows the source period (the most recent closed
+              period) and the number of prices that will be copied
+            </li>
+            <li>
+              Click
+              <strong>Copy Prices</strong>
+              to confirm
+            </li>
+          </ol>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-2">
+            <strong>What happens:</strong>
+            The system automatically selects the most recent closed period as the source. Every
+            active item that had a price in that period gets the same price in the new period. Any
+            prices already set in the target period are overwritten — there is no merge.
+          </p>
+          <p class="text-sm text-[var(--ui-text-muted)] mt-2">
+            <strong>Restriction:</strong>
+            Copy Prices is only available while the target period is in DRAFT status. Once the
+            period is opened, prices are locked and cannot be changed.
+          </p>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-error)]/30">

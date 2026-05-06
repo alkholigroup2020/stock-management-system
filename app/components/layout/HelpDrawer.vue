@@ -425,6 +425,16 @@ const searchableContent = computed(() => {
         icon: "i-heroicons-cog-6-tooth",
       },
       {
+        id: "adm-period-prices-copy",
+        section: "Admin Guide",
+        sectionId: "admin-guide",
+        targetSection: "periods",
+        title: "Copying Prices from Previous Period",
+        content:
+          "Copy all item prices from the most recent closed period into a new DRAFT period. Click Manage Prices on a DRAFT period, then click Copy Prices button. System automatically picks the most recent closed period as the source — no manual selection needed. All active items with prices are copied. Existing prices in the target period are overwritten — no merge. Only available when target period is in DRAFT status. Once the period is opened, prices are locked.",
+        icon: "i-heroicons-cog-6-tooth",
+      },
+      {
         id: "adm-period-close",
         section: "Admin Guide",
         sectionId: "admin-guide",
