@@ -312,10 +312,6 @@ watch(
               <strong>Unit of Measure:</strong>
               How the item is counted and priced
             </li>
-            <li>
-              <strong>Minimum Stock:</strong>
-              Threshold for low stock alerts (optional)
-            </li>
           </ul>
         </div>
 
@@ -349,7 +345,7 @@ watch(
             </li>
             <li>Enter Item Code and Name</li>
             <li>Select Category and Unit of Measure</li>
-            <li>Optionally set Minimum Stock Level for alerts</li>
+            <li>Optionally enter a Sub-Category.</li>
             <li>
               Click
               <strong>Create Item</strong>
@@ -443,7 +439,7 @@ watch(
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>
               <strong>Code:</strong>
-              Short unique identifier (e.g., "SUP-001", "SYSCO")
+              Short unique identifier (e.g., "SUP-001")
             </li>
             <li>
               <strong>Name:</strong>
@@ -454,12 +450,20 @@ watch(
               Primary contact for orders and issues
             </li>
             <li>
-              <strong>Email/Phone:</strong>
-              Contact details for communication
+              <strong>Emails:</strong>
+              One or more addresses; receive PO and NCR notifications
             </li>
             <li>
-              <strong>Payment Terms:</strong>
-              Standard terms (e.g., "Net 30", "COD")
+              <strong>Phone / Mobile:</strong>
+              Contact numbers
+            </li>
+            <li>
+              <strong>VAT Registration No.:</strong>
+              Supplier's VAT registration (used on POs)
+            </li>
+            <li>
+              <strong>Address:</strong>
+              Full mailing address
             </li>
           </ul>
         </div>
@@ -478,9 +482,11 @@ watch(
               Click
               <strong>New Supplier</strong>
             </li>
-            <li>Enter Supplier Name and Code</li>
-            <li>Enter Contact Person, Email, Phone</li>
-            <li>Enter Payment Terms (e.g., "Net 30")</li>
+            <li>Enter Code, Name, and Contact Person</li>
+            <li>Add one or more Emails</li>
+            <li>Enter Phone and Mobile</li>
+            <li>Enter VAT Registration No. and Address</li>
+            <li>Payment Terms are entered on each Purchase Order, not on the supplier record</li>
             <li>
               Click
               <strong>Create Supplier</strong>
@@ -800,7 +806,8 @@ watch(
               <UIcon name="i-heroicons-pencil-square" class="text-[var(--ui-info)]" />
               <span>
                 <strong>Manual NCRs:</strong>
-                Created by Supervisors for quality issues, damages, or shortages
+                Created manually by Operators, Supervisors, or Admins for quality issues, damages,
+                or shortages
               </span>
             </li>
           </ul>

@@ -769,8 +769,8 @@ watch(
           Non-Conformance Reports (NCRs) document issues with deliveries or stock. They serve as a
           formal record of problems and help track supplier performance over time. NCRs can be
           auto-generated (when delivery prices differ from period prices) or manually created (for
-          quality issues, damages, or shortages). Supervisors can create manual NCRs while Operators
-          can only view them.
+          quality issues, damages, or shortages). Supervisors can create and resolve manual NCRs;
+          Operators and Admins can also create manual NCRs for locations they can access.
         </p>
 
         <div>
@@ -783,8 +783,8 @@ watch(
             </li>
             <li>
               <strong>Manual:</strong>
-              Created by Supervisors for quality issues, damages, short shipments, or other
-              supplier-related problems that need documentation.
+              Created manually by an Operator, Supervisor, or Admin for quality issues, damages,
+              short shipments, or other supplier-related problems that need documentation.
             </li>
           </ul>
         </div>

@@ -229,7 +229,7 @@ const searchableContent = computed(() => {
         targetSection: "items-import",
         title: "Items Import",
         content:
-          "Bulk import items from Excel or CSV files. Click Items menu, then Import Items button. Download template for correct format. Prepare file with required columns: Item Code, Name, Category, Unit, Min Stock, Active. Upload file and validate. System checks for errors and shows preview. Fix any errors and re-upload if needed. Review validation results and import. Supports create new items and update existing items by code.",
+          "Bulk import items from Excel or CSV files. Click Items menu, then Import Items button. Download template for correct format. Prepare file with required columns: Code, Name, Unit, Category, Subcategory. Upload file and validate. System checks for errors and shows preview. Fix any errors and re-upload if needed. Review validation results and import. Supports create new items and update existing items by code.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -239,7 +239,7 @@ const searchableContent = computed(() => {
         targetSection: "issues",
         title: "Issues and Stock Usage",
         content:
-          "Create new issue by clicking Issues menu, then Create Issue. Select issue date and cost centre. Add items with quantities. Cannot issue more than available stock. Submit to finalize and deduct from inventory.",
+          "Create new issue by clicking Issues menu, then Create Issue. Select issue date and cost centre: FOOD (Food), CLEAN (Cleaning), or OTHER (Other). Add items with quantities. Cannot issue more than available stock. Submit to finalize and deduct from inventory.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -279,7 +279,7 @@ const searchableContent = computed(() => {
         targetSection: "ncr",
         title: "NCR Non-Conformance Reports",
         content:
-          "View NCRs by clicking NCR menu. NCRs track quality issues and price variances. Auto-generated NCRs created from price variances during delivery posting. Manual NCRs created by supervisors for quality issues.",
+          "View and create NCRs by clicking NCR menu. NCRs track quality issues and price variances. Auto-generated NCRs are created from price variances during delivery posting. Manual NCRs can be created by Operators, Supervisors, or Admins for quality issues, damaged goods, short shipments, or expired products.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -401,7 +401,7 @@ const searchableContent = computed(() => {
         targetSection: "items",
         title: "Item Management",
         content:
-          "Manage items by clicking Items menu. Create item with code, name, category, unit of measure. Units: KG, EA, LTR, BOX, CASE, PACK. Set minimum stock level for low stock alerts. Avoid changing unit of measure on existing items.",
+          "Manage items by clicking Items menu. Create item with code, name, category, sub-category, and unit of measure. Units: KG, EA, LTR, BOX, CASE, PACK. Avoid changing unit of measure on existing items.",
         icon: "i-heroicons-cog-6-tooth",
       },
       {
@@ -411,7 +411,7 @@ const searchableContent = computed(() => {
         targetSection: "suppliers",
         title: "Supplier Management",
         content:
-          "Manage suppliers by clicking Suppliers menu. Create supplier with name, code, contact person, email, phone, payment terms. Edit supplier details as needed.",
+          "Manage suppliers by clicking Suppliers menu. Create supplier with code, name, contact person, one or more emails, phone, mobile, VAT registration number, and address. Edit supplier details as needed.",
         icon: "i-heroicons-cog-6-tooth",
       },
       {

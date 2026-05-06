@@ -282,7 +282,7 @@ watch(
             </li>
             <li>
               <strong>Bulk Updates:</strong>
-              When you need to update prices, categories, or minimum stock levels for many items at
+              When you need to update names, units, categories, or subcategories for many items at
               once.
             </li>
             <li>
@@ -307,7 +307,7 @@ watch(
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
               <span>
-                <strong>Item Code</strong>
+                <strong>Code</strong>
                 - Unique identifier (e.g., "RICE-001")
               </span>
             </li>
@@ -321,13 +321,6 @@ watch(
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
               <span>
-                <strong>Category</strong>
-                - e.g., "Dry Goods", "Dairy", "Meat"
-              </span>
-            </li>
-            <li class="flex items-center gap-2">
-              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-              <span>
                 <strong>Unit</strong>
                 - e.g., "KG", "EA", "LTR", "BOX"
               </span>
@@ -335,15 +328,15 @@ watch(
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
               <span>
-                <strong>Min Stock</strong>
-                - Minimum quantity threshold
+                <strong>Category</strong>
+                - e.g., "Dry Goods", "Dairy", "Meat"
               </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
               <span>
-                <strong>Active</strong>
-                - "Yes" or "No"
+                <strong>Subcategory</strong>
+                - Optional grouping within the category
               </span>
             </li>
           </ul>
@@ -436,14 +429,6 @@ watch(
             <li>
               <strong>Units:</strong>
               Only use valid units: KG, EA, LTR, BOX, CASE, PACK. Invalid units will cause errors.
-            </li>
-            <li>
-              <strong>Numbers:</strong>
-              Min Stock must be a positive number. Don't include currency symbols or commas.
-            </li>
-            <li>
-              <strong>Active Status:</strong>
-              Must be exactly "Yes" or "No" (case doesn't matter).
             </li>
             <li>
               <strong>File Format:</strong>
@@ -831,11 +816,29 @@ watch(
 
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Cost Centres</h4>
-          <p class="text-sm text-[var(--ui-text-muted)]">
-            Cost Centres represent departments or purposes that consume stock. Common examples
-            include Kitchen, Restaurant, Staff Meals, Functions, or Maintenance. Selecting the
-            correct Cost Centre ensures accurate expense tracking and reporting.
-          </p>
+          <div class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <p>
+              Cost Centres classify what the issued stock is used for. The system supports three
+              cost centres:
+            </p>
+            <ul class="space-y-1">
+              <li>
+                <strong>FOOD (Food):</strong>
+                items consumed for food preparation and service
+              </li>
+              <li>
+                <strong>CLEAN (Cleaning):</strong>
+                cleaning supplies and chemicals
+              </li>
+              <li>
+                <strong>OTHER (Other):</strong>
+                anything that does not fit the above
+              </li>
+            </ul>
+            <p>
+              Selecting the correct Cost Centre ensures accurate expense tracking and reporting.
+            </p>
+          </div>
         </div>
 
         <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-error)]/30">
@@ -1156,10 +1159,11 @@ watch(
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
           Non-Conformance Reports (NCRs) document issues with deliveries or stock quality. They
-          create a formal record of problems for tracking and supplier management. Most NCRs you'll
-          see are auto-generated when delivery prices differ from expected period prices. As an
-          Operator, you can view NCRs but cannot create them - report quality issues to your
-          Supervisor who can create manual NCRs.
+          create a formal record of problems for tracking and supplier management. As an Operator,
+          you can view NCRs for your assigned locations and create manual NCRs when you discover
+          quality issues, damages, short shipments, or other supplier-related problems. Most NCRs
+          you'll see are auto-generated from delivery price variances; you can also raise one
+          yourself when needed.
         </p>
 
         <div>
@@ -1172,8 +1176,8 @@ watch(
             </li>
             <li>
               <strong>Manual:</strong>
-              Created by Supervisors for quality issues like damaged goods, short shipments, or
-              expired products. Report these issues to your Supervisor.
+              Created manually by an Operator, Supervisor, or Admin for quality issues, damaged
+              goods, short shipments, or expired products.
             </li>
           </ul>
           <p class="text-sm text-[var(--ui-text-muted)] mt-2">
@@ -1235,7 +1239,7 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">When to Report Issues</h4>
           <p class="text-sm text-[var(--ui-text-muted)] mb-2">
-            Contact your Supervisor immediately if you notice:
+            Create a manual NCR and notify your Supervisor if you notice:
           </p>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li class="flex items-center gap-2">
@@ -1268,8 +1272,10 @@ watch(
               class="shrink-0 mt-0.5 text-[var(--ui-info)]"
             />
             <span>
-              As an Operator, you can view NCRs but cannot create manual NCRs. Contact your
-              Supervisor to report quality issues - they will create the NCR.
+              To create a manual NCR, click NCR in the left menu, then New NCR. Pick the affected
+              location, optionally link a delivery, describe the issue in the Reason field, and
+              enter the value impact. The NCR is logged immediately and notifications are sent
+              automatically.
             </span>
           </p>
         </div>
