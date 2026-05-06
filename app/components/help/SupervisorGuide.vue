@@ -911,8 +911,9 @@ watch(
             </li>
           </ul>
           <p class="text-sm text-[var(--ui-text-muted)] mt-2">
-            If a notification fails, you can click the resend button to retry (5-minute cooldown
-            between attempts).
+            If a notification fails, an Admin can resend it from the NCR detail page (5-minute
+            cooldown per recipient group between attempts). Supervisors do not have permission to
+            resend — escalate failed notifications to an Admin.
           </p>
         </div>
 

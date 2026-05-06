@@ -852,9 +852,10 @@ watch(
             Resending Notifications
           </h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            If a notification fails to send, you can manually resend it from the NCR detail page.
-            Click the resend button next to the failed notification. Note: There is a 5-minute
-            cooldown between resend attempts for the same recipient group.
+            Resending a failed notification is an Admin-only action. If a notification fails to
+            send, you can manually resend it from the NCR detail page. Click the resend button next
+            to the failed notification. Note: There is a 5-minute cooldown between resend attempts
+            for the same recipient group.
           </p>
         </div>
 

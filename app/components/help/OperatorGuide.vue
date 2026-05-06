@@ -1240,7 +1240,8 @@ watch(
             When you view an NCR's detail page, you can see a notification history section showing
             who was notified (Finance Team, Procurement Team, Supplier) and whether the
             notifications were successfully delivered. This helps track that the right people have
-            been informed about the issue.
+            been informed about the issue. Operators cannot resend failed notifications; if a
+            notification needs to be resent, ask an Admin.
           </p>
         </div>
 
