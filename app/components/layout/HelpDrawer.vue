@@ -209,7 +209,7 @@ const searchableContent = computed(() => {
         targetSection: "prf",
         title: "PRF (Purchase Requisitions)",
         content:
-          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: FOOD, CLEANING, OTHER. Add line items with item reference or custom description. VAT calculated at 15%. Creating a PRF saves it as DRAFT — supervisors cannot see it yet. Submitting for approval is a separate explicit action: open the PRF detail page and click Submit for Approval to move it to PENDING. DRAFT PRFs can be edited or deleted before submission. Once submitted you cannot edit the PRF unless it is rejected. PRF statuses include DRAFT, PENDING, APPROVED, REJECTED, and CLOSED. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone rejected PRFs to create new submissions.",
+          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: FOOD, CLEANING, OTHER. Add line items with item reference or custom description. VAT calculated at 15%. Creating a PRF saves it as DRAFT — supervisors cannot see it yet. Submitting for approval is a separate explicit action: open the PRF detail page and click Submit for Approval to move it to PENDING. DRAFT PRFs can be edited or deleted before submission. Once submitted you cannot edit the PRF unless it is rejected. PRF statuses include DRAFT, PENDING, APPROVED, REJECTED, and CLOSED. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone any PRF (commonly used after rejection or for repeat orders).",
         icon: "i-heroicons-clipboard-document-list",
       },
       {

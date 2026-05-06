@@ -681,10 +681,12 @@ watch(
         </div>
 
         <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Cloning Rejected PRFs</h4>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Cloning a PRF</h4>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            If your PRF is rejected, you can clone it to create a new PRF with the same details.
-            Review the rejection reason, make necessary changes, and resubmit for approval.
+            You can clone any PRF you can view to create a new DRAFT with the same line items. This
+            is most useful when (a) a PRF was rejected and you need to resubmit it after addressing
+            the rejection reason, or (b) you regularly raise the same standing order. The cloned PRF
+            starts in DRAFT and must be submitted for approval like any new PRF.
           </p>
         </div>
 
