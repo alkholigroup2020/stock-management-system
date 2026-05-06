@@ -43,11 +43,7 @@ export const useFormServerErrors = (customMappings?: ErrorCodeMapping) => {
       const outerData = error.data as Record<string, unknown>;
 
       // H3/Nuxt errors nest the actual error data inside data.data
-      if (
-        "data" in outerData &&
-        outerData.data &&
-        typeof outerData.data === "object"
-      ) {
+      if ("data" in outerData && outerData.data && typeof outerData.data === "object") {
         return outerData.data as ServerError;
       }
 
@@ -123,10 +119,7 @@ export const useFormServerErrors = (customMappings?: ErrorCodeMapping) => {
   /**
    * Apply field errors to a reactive errors object
    */
-  const applyFieldErrors = (
-    error: unknown,
-    errorsRef: Record<string, string>
-  ): boolean => {
+  const applyFieldErrors = (error: unknown, errorsRef: Record<string, string>): boolean => {
     const fieldErrors = mapServerErrorToFields(error);
     let hasFieldErrors = false;
 

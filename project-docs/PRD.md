@@ -80,12 +80,14 @@ The system supports four roles defined in the `UserRole` enum (`OPERATOR`, `SUPE
 ### 5.1 User Stories (Core)
 
 **Multi-Location Management:**
+
 - As an Admin, I can create and manage multiple locations.
 - As an Operator, I am assigned to specific locations and can only post to those locations.
 - As a Supervisor, I can view all locations and approve transfers between them.
 - As an Admin, I can view consolidated reports across all locations.
 
 **Stock Movement:**
+
 - As an Operator, I post a Delivery (linked to a PO) to increase stock at my location and update WAC.
 - As an Operator, I post an Issue to record consumption at my location.
 - As an Operator or Supervisor, I create Transfer Requests to move stock between locations.
@@ -93,6 +95,7 @@ The system supports four roles defined in the `UserRole` enum (`OPERATOR`, `SUPE
 - As any user with location access, I can view current stock for that location.
 
 **Procurement (PRF → PO):**
+
 - As an Operator, I create a Purchase Requisition Form (PRF) for needed materials.
 - As a Supervisor, I approve or reject PRFs.
 - As a Procurement Specialist, I see approved PRFs and create Purchase Orders against them.
@@ -100,17 +103,20 @@ The system supports four roles defined in the `UserRole` enum (`OPERATOR`, `SUPE
 - As a Supervisor or Admin, I close POs (manually or implicitly via auto-close on full delivery).
 
 **Price Control:**
+
 - As an Admin, I set item prices per period; prices lock when the period opens.
 - As the system, I automatically create an NCR (`type: PRICE_VARIANCE`) when a posted delivery's unit price differs from the period price.
 - As a Supervisor or Admin, I review and resolve NCRs with a financial impact (`CREDIT`, `LOSS`, or `NONE`).
 
 **Period Management:**
+
 - As an Operator or Supervisor, I enter daily POB for each assigned location.
 - As a Supervisor, I review reconciliations and mark each location READY.
 - As an Admin, I request period close after all locations are READY; the system creates an approval that the Admin then approves to finalise the close.
 - As an Admin, I view consolidated reconciliation across all locations.
 
 **Notifications:**
+
 - As the system, I send NCR notifications (Finance, Procurement, Supplier) on every NCR created.
 - As the system, I email the supplier when a PO is created and when a PO is closed.
 - As the system, I email the PRF requester when their PRF is approved or when the resulting PO is closed.
@@ -119,22 +125,23 @@ The system supports four roles defined in the `UserRole` enum (`OPERATOR`, `SUPE
 - As an Admin, I resend failed NCR notifications (5-minute cooldown per recipient group).
 
 **Progressive Web App (PWA):**
+
 - As any user, I can install the app on my device.
 - As any user, I see clear offline status when internet is unavailable.
 - As the system, I disable data-modifying actions when offline.
 
 ### 5.2 Approval Matrix
 
-| Action                        | Required Approver       |
-| ----------------------------- | ----------------------- |
-| PRF                           | Supervisor or Admin     |
-| PO creation                   | None (Procurement Specialist creates directly from approved PRF) |
-| PO closure (with unfulfilled lines) | Supervisor or Admin (closure reason mandatory) |
-| Over-delivery on a Delivery   | Supervisor or Admin     |
-| Transfer                      | Supervisor or Admin     |
-| Issue                         | None (posts immediately, no draft state) |
-| Reconciliation Mark-Ready     | Supervisor or Admin     |
-| Period Close                  | Admin (uses an Approval record with `entity_type = PERIOD_CLOSE`) |
+| Action                              | Required Approver                                                 |
+| ----------------------------------- | ----------------------------------------------------------------- |
+| PRF                                 | Supervisor or Admin                                               |
+| PO creation                         | None (Procurement Specialist creates directly from approved PRF)  |
+| PO closure (with unfulfilled lines) | Supervisor or Admin (closure reason mandatory)                    |
+| Over-delivery on a Delivery         | Supervisor or Admin                                               |
+| Transfer                            | Supervisor or Admin                                               |
+| Issue                               | None (posts immediately, no draft state)                          |
+| Reconciliation Mark-Ready           | Supervisor or Admin                                               |
+| Period Close                        | Admin (uses an Approval record with `entity_type = PERIOD_CLOSE`) |
 
 ### 5.3 Features (MVP)
 
@@ -170,7 +177,7 @@ The system supports four roles defined in the `UserRole` enum (`OPERATOR`, `SUPE
 
 5. **Numbering Formats** ✅ (authoritative)
    - PRF: `PRF-{LOCATION-UPPERCASE}-{DD}-{Mon}-{YYYY}-{NN}` — e.g. `PRF-KITCHEN-27-Jan-2026-01`
-   - PO:  `PO-{DD}-{Mon}-{YYYY}-{NNN}`
+   - PO: `PO-{DD}-{Mon}-{YYYY}-{NNN}`
    - Delivery: `DLV-{LOCATION-UPPERCASE}-{DD}-{Mon}-{YYYY}-{NN}` — e.g. `DLV-KITCHEN-27-Jan-2026-01`
    - Issue: `ISS-{YYYY}-{NNN}`
    - Transfer: `TRF-{YYYY}-{NNN}`
@@ -273,38 +280,43 @@ The system supports four roles defined in the `UserRole` enum (`OPERATOR`, `SUPE
 ## 7) Functional Requirements
 
 ### 7.1 Location Management
+
 - **Inputs:** `name`, `code` (unique), `type` (`KITCHEN | STORE | CENTRAL | WAREHOUSE`), `address` (optional), `timezone` (default `Asia/Riyadh`)
 - **Constraints:** Cannot delete a location that has any transactions; deactivate instead.
 - **Note:** Locations do not currently have a "manager" field.
 
 ### 7.2 Period Price Management
+
 - **Inputs:** Item prices set on a DRAFT period (per item, currency `SAR`, decimal precision 4)
 - **Process:** Prices freeze when the period transitions to `OPEN`
 - **Validation:** Any posted delivery line whose `unit_price` differs from the period price triggers an automatic `PRICE_VARIANCE` NCR
 - **Output:** NCR created, delivery still posted at the actual price (with `has_variance = true`)
 
 ### 7.3 Transfers
+
 - **Inputs:** Source location, destination location, items with quantities, optional notes
 - **Process:** On approval, deduct from source at source WAC and add to destination, recalculating destination WAC if it already had stock
 - **Validation:** Source on-hand re-checked at approval time, not creation time
 - **Output:** Transfer marked `COMPLETED`
 
 ### 7.4 Multi-Location Period Close
+
 - **Inputs:** All `PeriodLocation` rows must be `READY`; Admin invokes `POST /api/periods/:id/close`
 - **Process:** Period moves to `PENDING_CLOSE`; an `Approval` record (`entity_type = PERIOD_CLOSE`) is created; Admin approves it; the close finalises with snapshots per location
 - **Output:** Period `CLOSED`, all transactions locked, opening balances rolled forward to the next period
 
 ### 7.5 Email Notifications
+
 The system sends the following emails (all asynchronous; failures are logged but do not block the originating action):
 
-| Trigger                                 | Recipients                                            |
-| --------------------------------------- | ----------------------------------------------------- |
-| PRF approved                            | All active Procurement Specialists + the PRF requester |
-| Over-delivery sent for approval         | Supervisors and Admins with access to the location    |
-| PO created                              | Supplier (using `Supplier.emails`)                    |
-| PO closed (manual or auto)              | Original PRF requester                                |
-| NCR created (manual or auto)            | Finance Team, Procurement Team, Supplier (if delivery-linked and has emails) |
-| NCR notification resend                 | Same recipient group (Admin-only action)              |
+| Trigger                         | Recipients                                                                   |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| PRF approved                    | All active Procurement Specialists + the PRF requester                       |
+| Over-delivery sent for approval | Supervisors and Admins with access to the location                           |
+| PO created                      | Supplier (using `Supplier.emails`)                                           |
+| PO closed (manual or auto)      | Original PRF requester                                                       |
+| NCR created (manual or auto)    | Finance Team, Procurement Team, Supplier (if delivery-linked and has emails) |
+| NCR notification resend         | Same recipient group (Admin-only action)                                     |
 
 ## 8) Non-Functional Requirements
 

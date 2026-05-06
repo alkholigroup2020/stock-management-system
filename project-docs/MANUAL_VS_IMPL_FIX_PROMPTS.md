@@ -10,6 +10,7 @@ a fresh Claude Code session and it will have everything it needs to make the fix
 > manual unless the prompt explicitly says so.
 
 > **Project conventions every fix must follow:**
+>
 > - Prettier: double quotes, semicolons, 2-space indent, 100-char lines, ES5 trailing commas
 > - No `any` types, no introducing dead code, no unrequested refactors
 > - After edits, run `pnpm typecheck` and `pnpm format` — both must pass

@@ -557,11 +557,52 @@ watch(
             <li>
               Click
               <strong>Save as Draft</strong>
-              to save for later, or
-              <strong>Submit</strong>
-              for approval
+              — the PRF is saved in DRAFT status and can be edited or deleted before submission
             </li>
           </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Submitting a PRF for Approval
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-2">
+            Creating a PRF only saves it as a
+            <strong>DRAFT</strong>
+            . Supervisors cannot see DRAFT PRFs — you must explicitly submit the PRF to send it for
+            review.
+          </p>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside mb-3">
+            <li>
+              Open the PRF from the
+              <strong>Orders</strong>
+              list (click the PRF number or use the row action menu)
+            </li>
+            <li>
+              Click
+              <strong>Submit for Approval</strong>
+              on the PRF detail page
+            </li>
+            <li>
+              The PRF moves to
+              <strong>PENDING</strong>
+              status and appears in the Supervisor's queue
+            </li>
+          </ol>
+          <ul class="space-y-2 text-sm text-[var(--ui-text-muted)]">
+            <li>
+              <strong>Before submitting:</strong>
+              DRAFT PRFs can be edited or deleted at any time. Supervisors do not see them yet.
+            </li>
+            <li>
+              <strong>After submitting:</strong>
+              The PRF is locked. You cannot edit it while it is PENDING or APPROVED.
+            </li>
+            <li>
+              <strong>If rejected:</strong>
+              Clone the rejected PRF, make your changes in the new draft, then resubmit.
+            </li>
+          </ul>
         </div>
 
         <div>

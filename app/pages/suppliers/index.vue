@@ -103,19 +103,31 @@
         <!-- Header Section with colored accent -->
         <div
           class="px-5 py-4 border-b border-[var(--ui-border-muted)]"
-          :class="supplier.is_active ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-zinc-50 dark:bg-zinc-900/30'"
+          :class="
+            supplier.is_active
+              ? 'bg-emerald-50 dark:bg-emerald-950/30'
+              : 'bg-zinc-50 dark:bg-zinc-900/30'
+          "
         >
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-start gap-3 min-w-0 flex-1">
               <!-- Icon -->
               <div
                 class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
-                :class="supplier.is_active ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-zinc-200 dark:bg-zinc-800'"
+                :class="
+                  supplier.is_active
+                    ? 'bg-emerald-100 dark:bg-emerald-900/50'
+                    : 'bg-zinc-200 dark:bg-zinc-800'
+                "
               >
                 <UIcon
                   name="i-lucide-building-2"
                   class="w-5 h-5"
-                  :class="supplier.is_active ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'"
+                  :class="
+                    supplier.is_active
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-zinc-500 dark:text-zinc-400'
+                  "
                 />
               </div>
               <!-- Name and Code -->
@@ -144,32 +156,66 @@
         <div class="px-5 py-4 space-y-3">
           <!-- Contact Person -->
           <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-user" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0" />
-            <span class="text-sm truncate" :class="supplier.contact ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+            <UIcon
+              name="i-lucide-user"
+              class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0"
+            />
+            <span
+              class="text-sm truncate"
+              :class="
+                supplier.contact ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'
+              "
+            >
               {{ supplier.contact || "No contact person" }}
             </span>
           </div>
 
           <!-- Phone (Landline) -->
           <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-phone" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0" />
-            <span class="text-sm truncate" :class="supplier.phone ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+            <UIcon
+              name="i-lucide-phone"
+              class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0"
+            />
+            <span
+              class="text-sm truncate"
+              :class="
+                supplier.phone ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'
+              "
+            >
               {{ supplier.phone || "No phone" }}
             </span>
           </div>
 
           <!-- Email -->
           <div class="flex items-center gap-3">
-            <UIcon name="i-lucide-mail" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0" />
-            <span class="text-sm truncate" :class="supplier.emails?.length ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+            <UIcon
+              name="i-lucide-mail"
+              class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0"
+            />
+            <span
+              class="text-sm truncate"
+              :class="
+                supplier.emails?.length
+                  ? 'text-[var(--ui-text)]'
+                  : 'text-[var(--ui-text-dimmed)] italic'
+              "
+            >
               {{ supplier.emails?.length ? supplier.emails[0] : "No email" }}
             </span>
           </div>
 
           <!-- Address -->
           <div class="flex items-start gap-3">
-            <UIcon name="i-lucide-map-pin" class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0 mt-0.5" />
-            <span class="text-sm line-clamp-2" :class="supplier.address ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+            <UIcon
+              name="i-lucide-map-pin"
+              class="w-4 h-4 text-[var(--ui-text-dimmed)] flex-shrink-0 mt-0.5"
+            />
+            <span
+              class="text-sm line-clamp-2"
+              :class="
+                supplier.address ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'
+              "
+            >
               {{ supplier.address || "No address" }}
             </span>
           </div>
@@ -182,7 +228,12 @@
           <!-- Mobile Number -->
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-smartphone" class="w-4 h-4 text-[var(--ui-text-dimmed)]" />
-            <span class="text-sm" :class="supplier.mobile ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'">
+            <span
+              class="text-sm"
+              :class="
+                supplier.mobile ? 'text-[var(--ui-text)]' : 'text-[var(--ui-text-dimmed)] italic'
+              "
+            >
               {{ supplier.mobile || "No mobile" }}
             </span>
           </div>
@@ -343,7 +394,6 @@ const currentStatusIcon = computed(() => {
 const selectStatus = (statusValue: boolean | undefined) => {
   statusFilter.value = statusValue;
 };
-
 
 // Handlers
 const handleEdit = (supplier: SupplierItem) => {
