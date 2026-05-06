@@ -110,7 +110,10 @@
         </li>
         <li class="flex items-start gap-2">
           <UBadge color="warning" variant="subtle" size="sm">PENDING_CLOSE</UBadge>
-          <span>Period close is in progress - check with your admin</span>
+          <span>
+            Period close is in progress - check with your admin. After approval, the period briefly
+            enters APPROVED state while the close is finalised.
+          </span>
         </li>
         <li class="flex items-start gap-2">
           <UBadge color="error" variant="subtle" size="sm">CLOSED</UBadge>

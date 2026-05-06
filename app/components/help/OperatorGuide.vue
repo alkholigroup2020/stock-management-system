@@ -595,6 +595,8 @@ watch(
             <UBadge color="success" variant="subtle">APPROVED</UBadge>
             <span>or</span>
             <UBadge color="error" variant="subtle">REJECTED</UBadge>
+            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
+            <UBadge color="neutral" variant="subtle">CLOSED</UBadge>
           </div>
           <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
             <li>
@@ -612,6 +614,11 @@ watch(
             <li>
               <strong>REJECTED:</strong>
               Rejected by Supervisor. Check the rejection reason.
+            </li>
+            <li>
+              <strong>CLOSED:</strong>
+              The Purchase Order created from this PRF was closed (fully delivered, auto-closed, or
+              closed early by a Supervisor). No further action is required on the PRF.
             </li>
           </ul>
         </div>
@@ -884,17 +891,18 @@ watch(
         <div>
           <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Transfer Workflow</h4>
           <div class="flex items-center gap-2 text-sm text-[var(--ui-text-muted)] flex-wrap mb-2">
-            <UBadge color="neutral" variant="subtle">You Create</UBadge>
+            <UBadge color="neutral" variant="subtle">DRAFT</UBadge>
             <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
-            <UBadge color="warning" variant="subtle">Pending Approval</UBadge>
+            <UBadge color="warning" variant="subtle">PENDING_APPROVAL</UBadge>
             <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
-            <UBadge color="success" variant="subtle">Approved</UBadge>
+            <UBadge color="success" variant="subtle">COMPLETED</UBadge>
             <span>or</span>
-            <UBadge color="error" variant="subtle">Rejected</UBadge>
+            <UBadge color="error" variant="subtle">REJECTED</UBadge>
           </div>
           <p class="text-sm text-[var(--ui-text-muted)]">
-            Stock only moves when a Supervisor approves the transfer. If rejected, no stock movement
-            occurs and you'll see the rejection reason.
+            Stock only moves when a Supervisor approves the transfer. Approval immediately moves
+            stock and marks the transfer COMPLETED. Rejection prevents any stock movement and
+            records the reason.
           </p>
         </div>
 

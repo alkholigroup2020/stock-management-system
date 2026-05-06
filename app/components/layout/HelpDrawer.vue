@@ -77,7 +77,7 @@ const searchableContent = computed(() => {
       targetSection: "",
       title: "Understanding Periods",
       content:
-        "System operates on monthly accounting periods. Period indicator shows current status. OPEN status means you can post transactions. PENDING_CLOSE means period close in progress. CLOSED means no transactions can be posted.",
+        "System operates on monthly accounting periods. Period statuses are DRAFT, OPEN, PENDING_CLOSE, APPROVED, and CLOSED. OPEN status means you can post transactions. PENDING_CLOSE means period close in progress. APPROVED means the close request is approved and final close is being executed. CLOSED means no transactions can be posted.",
       icon: "i-heroicons-home",
     },
     {
@@ -163,7 +163,7 @@ const searchableContent = computed(() => {
         targetSection: "orders-overview",
         title: "Orders Overview",
         content:
-          "Orders page contains PRF and PO tabs. PRF statuses: DRAFT, PENDING, APPROVED, REJECTED. PO statuses: OPEN, CLOSED. Procurement Specialists see only approved PRFs ready for PO creation.",
+          "Orders page contains PRF and PO tabs. PRF statuses: DRAFT, PENDING, APPROVED, REJECTED, CLOSED. PO statuses: OPEN, CLOSED. Procurement Specialists see only approved PRFs ready for PO creation.",
         icon: "i-heroicons-shopping-cart",
       },
       {
@@ -209,7 +209,7 @@ const searchableContent = computed(() => {
         targetSection: "prf",
         title: "PRF (Purchase Requisitions)",
         content:
-          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: FOOD, CLEANING, OTHER. Add line items with item reference or custom description. VAT calculated at 15%. Save as DRAFT or submit for PENDING approval. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone rejected PRFs to create new submissions.",
+          "Create Purchase Requisition Forms to request materials. PRF types: URGENT, DPA (Direct Purchase Authorization), NORMAL. Categories: FOOD, CLEANING, OTHER. Add line items with item reference or custom description. VAT calculated at 15%. Save as DRAFT or submit for PENDING approval. PRF statuses include DRAFT, PENDING, APPROVED, REJECTED, and CLOSED. PRF number format: PRF-{LocationName}-{DD}-{Mon}-{YYYY}-{NN}. Clone rejected PRFs to create new submissions.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -249,7 +249,7 @@ const searchableContent = computed(() => {
         targetSection: "transfers",
         title: "Transfer Requests",
         content:
-          "Create transfer requests to move stock between locations. Select source and destination locations, add items with quantities, provide justification. Transfers require Supervisor approval before stock moves.",
+          "Create transfer requests to move stock between locations. Select source and destination locations, add items with quantities, provide justification. Transfers require Supervisor approval before stock moves and can be approved or rejected — approved transfers complete immediately and stock moves atomically.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -305,7 +305,7 @@ const searchableContent = computed(() => {
         targetSection: "prf-approval",
         title: "PRF Approval",
         content:
-          "Review and approve Purchase Requisition Forms from Operators. View pending PRFs in Orders page. Approve to allow PO creation - triggers email notification to procurement specialists. Reject with mandatory reason - requester can clone and resubmit. PRF status workflow: DRAFT, PENDING, APPROVED or REJECTED.",
+          "Review and approve Purchase Requisition Forms from Operators. View pending PRFs in Orders page. Approve to allow PO creation - triggers email notification to procurement specialists. Reject with mandatory reason - requester can clone and resubmit. PRF status workflow: DRAFT, PENDING, APPROVED, REJECTED, CLOSED.",
         icon: "i-heroicons-clipboard-document-check",
       },
       {
@@ -335,7 +335,7 @@ const searchableContent = computed(() => {
         targetSection: "transfers",
         title: "Transfer Management",
         content:
-          "Review pending transfers by clicking Transfers menu. Filter by Pending Approval status. Approve transfer to move stock immediately between locations. Reject transfer with reason if not appropriate. Transfer workflow: Draft, Pending Approval, Approved or Rejected, Completed.",
+          "Review pending transfers by clicking Transfers menu. Filter by Pending Approval status. Approve transfer to move stock immediately between locations. Reject transfer with reason if not appropriate. Transfer workflow: DRAFT, PENDING_APPROVAL, COMPLETED, REJECTED.",
         icon: "i-heroicons-clipboard-document-check",
       },
       {
@@ -421,7 +421,7 @@ const searchableContent = computed(() => {
         targetSection: "periods",
         title: "Period Management",
         content:
-          "Manage periods by clicking Periods menu. Period status: Draft, Open, Pending Close, Closed. Set period prices before opening period. Prices lock when period opens. Price variance during delivery creates NCR.",
+          "Manage periods by clicking Periods menu. Period statuses: DRAFT, OPEN, PENDING_CLOSE, APPROVED, CLOSED. Set period prices before opening period. Prices lock when period opens. Price variance during delivery creates NCR.",
         icon: "i-heroicons-cog-6-tooth",
       },
       {

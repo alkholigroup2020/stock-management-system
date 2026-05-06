@@ -121,6 +121,11 @@ watch(
               <strong>REJECTED:</strong>
               Rejected by Supervisor. Not visible to you.
             </li>
+            <li>
+              <strong>CLOSED:</strong>
+              PO derived from this PRF has been closed. The PRF is finalised and visible for
+              reference but no new POs can be created from it.
+            </li>
           </ul>
         </div>
 

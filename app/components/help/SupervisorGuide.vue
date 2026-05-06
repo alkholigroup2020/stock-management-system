@@ -91,10 +91,19 @@ watch(
             <UBadge color="success" variant="subtle">APPROVED</UBadge>
             <span>or</span>
             <UBadge color="error" variant="subtle">REJECTED</UBadge>
+            <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
+            <UBadge color="neutral" variant="subtle">CLOSED</UBadge>
           </div>
           <p class="text-sm text-[var(--ui-text-muted)]">
             You review PRFs with PENDING status. Your decision moves them to APPROVED or REJECTED.
           </p>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)] mt-2">
+            <li>
+              <strong>CLOSED:</strong>
+              The Purchase Order created from this PRF was closed (fully delivered, auto-closed, or
+              closed early by a Supervisor). No further action is required on the PRF.
+            </li>
+          </ul>
         </div>
 
         <div>
@@ -472,7 +481,7 @@ watch(
             <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
             <UBadge color="warning" variant="subtle">PENDING_APPROVAL</UBadge>
             <UIcon name="i-heroicons-arrow-right" class="text-[var(--ui-text-dimmed)]" />
-            <UBadge color="success" variant="subtle">APPROVED</UBadge>
+            <UBadge color="success" variant="subtle">COMPLETED</UBadge>
             <span>or</span>
             <UBadge color="error" variant="subtle">REJECTED</UBadge>
           </div>
@@ -486,8 +495,8 @@ watch(
               Submitted and waiting for supervisor review
             </li>
             <li>
-              <strong>APPROVED:</strong>
-              Stock moved successfully between locations
+              <strong>COMPLETED:</strong>
+              Approval succeeded - stock has moved between locations atomically.
             </li>
             <li>
               <strong>REJECTED:</strong>

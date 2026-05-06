@@ -552,6 +552,13 @@ watch(
               <span>Close initiated. Locations being finalized. No new transactions.</span>
             </li>
             <li class="flex items-center gap-2">
+              <UBadge color="primary" variant="subtle" size="sm">APPROVED</UBadge>
+              <span>
+                Close request approved by Admin; final close is being executed. No new transactions
+                can be posted.
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
               <UBadge color="error" variant="subtle" size="sm">CLOSED</UBadge>
               <span>Period ended. All data is locked. Opening balances set for next period.</span>
             </li>
