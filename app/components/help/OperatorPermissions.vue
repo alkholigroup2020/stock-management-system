@@ -29,7 +29,7 @@
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
-          <span>Enter daily POB (Persons on Board) counts</span>
+          <span>Enter daily POB (Personnel On Board) counts</span>
         </li>
         <li class="flex items-center gap-2">
           <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />

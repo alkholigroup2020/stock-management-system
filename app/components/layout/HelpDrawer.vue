@@ -219,7 +219,7 @@ const searchableContent = computed(() => {
         targetSection: "deliveries",
         title: "Deliveries",
         content:
-          "Create new delivery by clicking Deliveries menu, then New Delivery. Must select a Purchase Order (PO) to link the delivery. Supplier and line items auto-populate from PO. Enter quantities received - remaining quantities from PO pre-filled. Over-delivery detection triggers PENDING_APPROVAL status for supervisor review. Price variance warning if price differs from period price. Save as draft to edit later, post to finalize and update stock.",
+          "Create new delivery by clicking Deliveries menu, then New Delivery. Must select a Purchase Order (PO) to link the delivery. Supplier and line items auto-populate from PO. Enter quantities received - remaining quantities from PO pre-filled. Over-delivery detection triggers pending approval for supervisor review. Price variance warning if price differs from period price. Save as draft to edit later, post to finalize and update stock.",
         icon: "i-heroicons-clipboard-document-list",
       },
       {
@@ -315,7 +315,7 @@ const searchableContent = computed(() => {
         targetSection: "over-delivery",
         title: "Over-Delivery Approval",
         content:
-          "Approve or reject deliveries that exceed PO quantities. Over-delivery triggers PENDING_APPROVAL status. Review over-delivery items and quantities. Approve to post delivery and update stock. Reject with mandatory reason - delivery is permanently locked, operator must create new delivery.",
+          "Approve or reject deliveries that exceed PO quantities. Over-delivery triggers pending approval. Review over-delivery items and quantities. Approve to post delivery and update stock. Reject with mandatory reason - delivery is permanently locked, operator must create new delivery.",
         icon: "i-heroicons-clipboard-document-check",
       },
       {

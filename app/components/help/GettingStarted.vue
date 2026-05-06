@@ -77,7 +77,7 @@
           <UIcon name="i-heroicons-users" class="text-[var(--ui-primary)] shrink-0" />
           <span>
             <strong>POB & Mandays Calculation</strong>
-            - Record daily crew counts for cost-per-person reporting
+            - Record daily Personnel On Board counts for cost-per-person reporting
           </span>
         </li>
         <li class="flex items-center gap-2">

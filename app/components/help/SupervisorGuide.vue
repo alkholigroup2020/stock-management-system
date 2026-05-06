@@ -253,7 +253,10 @@ watch(
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="text-[var(--ui-warning)]" />
-              <span>Delivery status automatically set to PENDING_APPROVAL</span>
+              <span>
+                The delivery is flagged Pending Approval (it stays in DRAFT status under the hood)
+                and cannot be posted.
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-lock-closed" class="text-[var(--ui-text-muted)]" />
@@ -272,7 +275,7 @@ watch(
               <strong>Deliveries</strong>
               in the left menu
             </li>
-            <li>Filter by status PENDING_APPROVAL</li>
+            <li>Filter by Pending Approval</li>
             <li>Click on a delivery to view details</li>
             <li>Over-delivery items are highlighted with the excess quantity shown</li>
           </ol>

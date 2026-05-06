@@ -196,7 +196,10 @@ watch(
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-clock" class="text-[var(--ui-warning)]" />
-              <span>Delivery status changes to PENDING_APPROVAL</span>
+              <span>
+                The delivery is held with a Pending Approval flag and cannot be posted until a
+                Supervisor approves it.
+              </span>
             </li>
             <li class="flex items-center gap-2">
               <UIcon name="i-heroicons-user-circle" class="text-[var(--ui-info)]" />
@@ -632,7 +635,7 @@ watch(
             </code>
           </p>
           <p class="text-sm text-[var(--ui-text-muted)] mt-1">
-            Example: PRF-Kitchen-15-Jan-2026-01
+            Example: PRF-KITCHEN-15-Jan-2026-01
           </p>
         </div>
 
@@ -1064,7 +1067,7 @@ watch(
       <div v-if="isExpanded('pob')" class="p-4 space-y-4">
         <!-- Section Introduction -->
         <p class="text-sm text-[var(--ui-text-muted)]">
-          POB (Persons On Board) tracks daily headcount at your location. This data is used to
+          POB (Personnel On Board) tracks daily headcount at your location. This data is used to
           calculate mandays (total person-days) for the period, which enables cost-per-person
           reporting. Accurate POB entry is essential for meaningful food cost analysis and
           budgeting. Enter counts daily to maintain accurate records.
