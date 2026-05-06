@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stock Management System Executive Brief</title>
+    <style>
+      /* ===== Page setup ===== */
+      @page {
+        size: A4;
+        margin: 18mm 16mm 18mm 16mm;
+      }
+
+      /* ===== Base ===== */
+      :root {
+        --primary: #0f766e;
+        --primary-dark: #134e4a;
+        --accent: #b45309;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --bg-soft: #f9fafb;
+        --border: #e5e7eb;
+        --success: #047857;
+        --danger: #b91c1c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        color: var(--text);
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.45;
+        background: #fff;
+      }
+
+      .container {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 24px 28px;
+      }
+
+      /* ===== Cover page ===== */
+      .cover {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 95vh;
+        padding: 60px 0 40px;
+        page-break-after: always;
+      }
+
+      .cover-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 999px;
+        font-size: 9pt;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .cover h1 {
+        font-size: 30pt;
+        line-height: 1.1;
+        margin: 24px 0 12px;
+        color: var(--primary-dark);
+      }
+
+      .cover .subtitle {
+        font-size: 14pt;
+        color: var(--muted);
+        margin-bottom: 36px;
+      }
+
+      .cover-meta {
+        border-top: 2px solid var(--border);
+        padding-top: 16px;
+        font-size: 10pt;
+        color: var(--muted);
+      }
+
+      .cover-meta strong {
+        color: var(--text);
+      }
+
+      .cover-summary {
+        background: var(--bg-soft);
+        border-left: 4px solid var(--primary);
+        padding: 18px 20px;
+        font-size: 11.5pt;
+        margin: 30px 0;
+      }
+
+      /* ===== Headings ===== */
+      h2 {
+        font-size: 16pt;
+        color: var(--primary-dark);
+        margin: 28px 0 10px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--primary);
+      }
+
+      h3 {
+        font-size: 12.5pt;
+        color: var(--primary-dark);
+        margin: 18px 0 6px;
+      }
+
+      h4 {
+        font-size: 11pt;
+        margin: 12px 0 4px;
+        color: var(--text);
+      }
+
+      p {
+        margin: 6px 0;
+      }
+
+      /* ===== Lists ===== */
+      ul, ol {
+        margin: 6px 0 10px 22px;
+        padding: 0;
+      }
+
+      li {
+        margin: 3px 0;
+      }
+
+      /* ===== Tables ===== */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+        font-size: 10pt;
+      }
+
+      th, td {
+        border: 1px solid var(--border);
+        padding: 7px 9px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--bg-soft);
+        font-weight: 600;
+        color: var(--primary-dark);
+      }
+
+      /* ===== Cards / callouts ===== */
+      .feature-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 12px 0;
+      }
+
+      .feature-card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        background: var(--bg-soft);
+      }
+
+      .feature-card h4 {
+        margin-top: 0;
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .feature-card p {
+        margin: 4px 0 0;
+        font-size: 10pt;
+        color: var(--muted);
+      }
+
+      .callout {
+        border-left: 4px solid var(--accent);
+        background: #fff7ed;
+        padding: 10px 14px;
+        margin: 12px 0;
+        font-size: 10pt;
+      }
+
+      .callout-success {
+        border-left-color: var(--success);
+        background: #ecfdf5;
+      }
+
+      .callout strong {
+        color: var(--primary-dark);
+      }
+
+      /* ===== Step blocks (testing scenario) ===== */
+      .step {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin: 10px 0;
+        page-break-inside: avoid;
+      }
+
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .step-num {
+        flex: 0 0 28px;
+        height: 28px;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 11pt;
+      }
+
+      .step-title {
+        font-size: 12pt;
+        font-weight: 600;
+        color: var(--primary-dark);
+        margin: 0;
+      }
+
+      .step-role {
+        margin-left: auto;
+        font-size: 9pt;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: var(--primary-dark);
+        color: #fff;
+      }
+
+      .step-role.operator {
+        background: #2563eb;
+      }
+
+      .step-role.supervisor {
+        background: #7c3aed;
+      }
+
+      .step-role.procurement {
+        background: #d97706;
+      }
+
+      .step-role.admin {
+        background: #be123c;
+      }
+
+      .step-actions ol {
+        margin-top: 4px;
+      }
+
+      .verify {
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: #ecfdf5;
+        border-left: 3px solid var(--success);
+        font-size: 10pt;
+      }
+
+      .verify strong {
+        color: var(--success);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 9pt;
+        font-weight: 600;
+      }
+
+      .badge-info { background: #dbeafe; color: #1e40af; }
+      .badge-warn { background: #fef3c7; color: #92400e; }
+      .badge-ok   { background: #d1fae5; color: #065f46; }
+      .badge-mute { background: #f3f4f6; color: #374151; }
+
+      /* ===== Page breaks ===== */
+      .page-break {
+        page-break-before: always;
+      }
+
+      .avoid-break {
+        page-break-inside: avoid;
+      }
+
+      h2 {
+        page-break-after: avoid;
+      }
+
+      /* ===== Print fine-tuning ===== */
+      @media print {
+        body {
+          font-size: 10.5pt;
+        }
+        .feature-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+
+      .no-print-banner {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        color: #78350f;
+        padding: 10px 16px;
+        text-align: center;
+        font-size: 10pt;
+        margin-bottom: 12px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- Banner shown only in browser, hidden when printing -->
+      <div class="no-print no-print-banner">
+        📄 To save as PDF: press <strong>Ctrl + P</strong> (Windows) or <strong>Cmd + P</strong> (macOS), then choose
+        <strong>Save as PDF</strong>. Use A4, default margins, and enable background graphics.
+      </div>
+
+      <!-- ============================================================
+           COVER PAGE
+           ============================================================ -->
+      <section class="cover">
+        <div>
+          <span class="cover-badge">Executive Brief</span>
+          <h1>Stock Management System</h1>
+          <p class="subtitle">
+            Multi-location inventory, procurement, and period-close. Replacing the legacy Excel workbook.
+          </p>
+
+          <div class="cover-summary">
+            A web application that gives every site a single, controlled way to receive stock, record consumption,
+            move items between locations, and close the month. Built for speed on the floor, oversight for
+            supervisors, and a clean audit trail for management.
+          </div>
+
+          <h3>What this document contains</h3>
+          <ol>
+            <li><strong>Main features:</strong> a one-page snapshot per capability area.</li>
+            <li><strong>Roles &amp; responsibilities:</strong> who does what in the system.</li>
+            <li><strong>A testing scenario:</strong> a complete end-to-end test from
+              initial setup to period close.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           1. MAIN FEATURES
+           ============================================================ -->
+      <section>
+        <h2>1. Main features at a glance</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 26%;">Capability</th>
+              <th>What it does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Multi-Location Management</strong></td>
+              <td>
+                Create unlimited locations (Kitchen, Store, Central, Warehouse). Each location has its own
+                stock, WAC, and transaction history. Users can be assigned to one or many locations.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Items &amp; Pricing</strong></td>
+              <td>
+                Global item master with categories and units (KG, EA, LTR, BOX, CASE, PACK). Period prices
+                lock when the period opens, ensuring consistent costing all month.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Bulk Item Import</strong></td>
+              <td>
+                Import hundreds of items from Excel/CSV with validation and a downloadable template.
+                Columns: Code, Name, Unit, Category, Subcategory.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Procurement (PRF → PO)</strong></td>
+              <td>
+                Operators raise Purchase Requisitions. Supervisors approve. Procurement Specialists turn
+                approved PRFs into POs. POs are emailed automatically to suppliers with VAT (15%) calculated.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Deliveries</strong></td>
+              <td>
+                Receive stock against an open PO. Quantities pre-filled. Over-deliveries held for supervisor
+                approval. Posting recalculates Weighted Average Cost (WAC). Price variance auto-creates an
+                NCR with zero tolerance.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Issues (Stock Usage)</strong></td>
+              <td>
+                Record consumption to a cost centre (FOOD / CLEAN / OTHER). System blocks any issue that
+                would cause negative stock.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Transfers</strong></td>
+              <td>
+                Move stock between sites with mandatory supervisor approval. Stock moves atomically at the
+                source location's WAC.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>NCRs (Non-Conformance)</strong></td>
+              <td>
+                Price-variance NCRs auto-created on delivery. Manual NCRs for damages, short shipments,
+                quality issues. Automatic email to Finance, Procurement, and the Supplier. Resolution
+                tracks financial impact (CREDIT, LOSS, NONE) which feeds reconciliation.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Stock Now</strong></td>
+              <td>
+                Real-time inventory view per location and consolidated. Search, category filter, low-stock
+                filter, CSV export.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>POB (Personnel On Board)</strong></td>
+              <td>
+                Daily headcount per location (mandays + visitors meals) with auto-save. Powers
+                cost-per-person reporting.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Reconciliations</strong></td>
+              <td>
+                Per-location and consolidated views. Automated formula:
+                Opening + Receipts + Transfers In − Transfers Out − Issues. NCR credits/losses included.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Period Close</strong></td>
+              <td>
+                All locations must be marked READY. Admin requests close, then approves it. Snapshots are
+                taken per location and opening balances roll forward to the next period.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Reports</strong></td>
+              <td>
+                Stock Now, Deliveries, Issues, and Reconciliation reports. CSV export for further analysis.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Notifications</strong></td>
+              <td>
+                Configurable Finance and Procurement email lists. Automatic emails for PRF approval, PO
+                creation, PO closure, over-delivery approval, and NCR creation.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>PWA &amp; Offline Awareness</strong></td>
+              <td>
+                Installable on any device. Disables write actions when offline so users never lose work.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Audit Trail</strong></td>
+              <td>
+                Every transaction records who created, posted, and approved it, with timestamps. Closed
+                periods are immutable.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================================================
+           2. ROLES
+           ============================================================ -->
+      <section class="page-break">
+        <h2>2. Roles &amp; responsibilities</h2>
+
+        <p>
+          The system has four roles, each scoped to what that person actually needs. Permissions are
+          enforced both at the screen and at the API.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 22%;">Role</th>
+              <th style="width: 18%;">Location Access</th>
+              <th>Can do</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Operator</strong></td>
+              <td>Assigned locations only</td>
+              <td>
+                Create &amp; submit PRFs · Post Deliveries against POs · Post Issues · Enter daily POB ·
+                Create transfer requests · View stock · Create manual NCRs
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Supervisor</strong></td>
+              <td>All locations</td>
+              <td>
+                Everything an Operator can do, plus: approve / reject PRFs · approve over-deliveries ·
+                approve transfers · close POs · manage reconciliations · resolve NCRs with financial impact ·
+                view consolidated reports
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Procurement Specialist</strong></td>
+              <td>All locations (read-only context)</td>
+              <td>
+                See approved PRFs · create &amp; edit Purchase Orders · resend PO emails to suppliers
+                (focused role: no access to deliveries, stock, or other modules)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Admin</strong></td>
+              <td>All locations</td>
+              <td>
+                Full system access · manage users · manage locations · manage items · manage suppliers ·
+                set period prices · execute period close · configure notification recipients · resend
+                failed NCR notifications
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <strong>Approval workflow at a glance.</strong> PRFs are approved by Supervisors. Transfers are
+          approved by Supervisors. Over-deliveries are approved by Supervisors. PO closures with unfulfilled
+          lines need a Supervisor or Admin and a closure reason. Period close is requested and approved by an
+          Admin. Everything else posts immediately with a full audit trail.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           3. A TESTING SCENARIO
+           ============================================================ -->
+      <section class="page-break">
+        <h2>3. A Testing Scenario</h2>
+
+        <p>
+          The following scenario takes you from a clean install to a fully closed period, touching every
+          major workflow on the way. It can be completed in a single sitting and is designed for a live
+          demo. Each step calls out which role performs the action and what success looks like.
+        </p>
+
+        <div class="callout callout-success">
+          <strong>Goal:</strong> Set up one location, raise a PRF, convert it to a PO, receive the delivery,
+          consume some stock, transfer between sites, raise and resolve an NCR, then close the period, all
+          in roughly 30 to 45 minutes.
+        </div>
+
+        <!-- ============== PHASE A: SETUP ============== -->
+        <h3>Phase A: Initial setup (Admin)</h3>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">1</span>
+            <h4 class="step-title">Create the first locations</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Locations</strong> in the left menu.</li>
+              <li>Click <strong>New Location</strong>. Create at least two locations, e.g. <em>"Central Warehouse"</em> (type CENTRAL) and <em>"Site Kitchen 1"</em> (type KITCHEN). Both will be needed for the transfer step later.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Both locations appear in the location switcher in the top bar.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">2</span>
+            <h4 class="step-title">Create user accounts for each role</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Users → Create User</strong>. Create one user per role: an Operator, a Supervisor, a Procurement Specialist, and (if needed) a second Admin.</li>
+              <li>For the Operator, set their <strong>Default Location</strong> to the Kitchen.</li>
+              <li>After creation, open the Operator's profile and on the <strong>Edit</strong> page assign them to <em>both</em> locations under <strong>Locations</strong> (this enables transfers).</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Each new user can log in and only sees the menus relevant to their role.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">3</span>
+            <h4 class="step-title">Create suppliers</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Suppliers → New Supplier</strong>. Create one supplier with: Code, Name, Contact Person, at least one Email (this address will receive PO and NCR emails), Phone/Mobile, VAT Reg No., Address.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Supplier appears in the suppliers list.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">4</span>
+            <h4 class="step-title">Create items (manual or bulk import)</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Items</strong>. Either:
+                <ul>
+                  <li>Click <strong>New Item</strong> and create 3–5 items by hand (Code, Name, Unit, Category, optional Sub-Category), <em>or</em></li>
+                  <li>Click <strong>Import Items</strong> → <strong>Download Template</strong>. Fill the five columns (Code, Name, Unit, Category, Subcategory) and upload the file. Review the validation preview, then confirm.</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Items appear in the items list with the correct units and categories.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">5</span>
+            <h4 class="step-title">Create the first accounting period</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Periods → New Period</strong>. Set name, start date, end date.</li>
+              <li>The period is created in <span class="badge badge-mute">DRAFT</span>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Period appears in the list with status <span class="badge badge-mute">DRAFT</span>.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">6</span>
+            <h4 class="step-title">Set period prices and open the period</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open the DRAFT period. Click <strong>Manage Prices</strong>.</li>
+              <li>Enter a price for each item (or, if you have a previous period, click <strong>Copy from previous period</strong>).</li>
+              <li>Click <strong>Save Prices</strong>, then <strong>Open Period</strong>. Prices are now locked.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Period status changes to <span class="badge badge-ok">OPEN</span>. The period indicator in the top bar shows OPEN.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">7</span>
+            <h4 class="step-title">Configure notification recipients</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Settings → Notifications</strong>.</li>
+              <li>Add the Finance Team and Procurement Team email addresses. Save.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Both email lists are saved. (NCR emails will be sent here in Phase D.)
+          </div>
+        </div>
+
+        <!-- ============== PHASE B: PROCUREMENT ============== -->
+        <h3>Phase B: Procurement cycle</h3>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">8</span>
+            <h4 class="step-title">Operator enters daily POB</h4>
+            <span class="step-role operator">Operator</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Log in as the Operator. Confirm the active location is the Kitchen.</li>
+              <li>Open <strong>POB</strong>. Enter Mandays and Visitors Meals for today and a few prior days. Entries auto-save on blur.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Total Mandays in the summary card increases as you fill in days.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">9</span>
+            <h4 class="step-title">Operator creates a PRF</h4>
+            <span class="step-role operator">Operator</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Orders → New PRF</strong>.</li>
+              <li>Choose <strong>Type</strong> (e.g., NORMAL) and <strong>Category</strong> (e.g., FOOD).</li>
+              <li>Add 2–3 line items with quantities and estimated prices. Add a justification note.</li>
+              <li>Click <strong>Submit for Approval</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> PRF status moves to <span class="badge badge-warn">PENDING</span>. PRF number follows <code>PRF-{LOCATION}-{DD}-{Mon}-{YYYY}-{NN}</code>.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">10</span>
+            <h4 class="step-title">Supervisor approves the PRF</h4>
+            <span class="step-role supervisor">Supervisor</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Log in as Supervisor. Open <strong>Orders</strong>, filter by <em>PENDING</em>.</li>
+              <li>Open the PRF, review the lines, click <strong>Approve</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> PRF status moves to <span class="badge badge-ok">APPROVED</span>. The Procurement Specialist receives an email notification.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">11</span>
+            <h4 class="step-title">Procurement Specialist creates the PO</h4>
+            <span class="step-role procurement">Procurement</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Log in as Procurement Specialist. Open the approved PRF.</li>
+              <li>Click <strong>Create PO</strong>. Choose the supplier created in step 3.</li>
+              <li>Confirm or adjust quantities and unit prices. VAT is auto-calculated at 15%.</li>
+              <li>Click <strong>Save</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> PO is created with status <span class="badge badge-info">OPEN</span>, PO number follows <code>PO-{DD}-{Mon}-{YYYY}-{NNN}</code>, and the supplier receives the PO email automatically.
+          </div>
+        </div>
+
+        <!-- ============== PHASE C: RECEIVING & USAGE ============== -->
+        <h3 class="page-break">Phase C: Receiving and using stock</h3>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">12</span>
+            <h4 class="step-title">Operator posts the delivery</h4>
+            <span class="step-role operator">Operator</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Log in as Operator. Open <strong>Deliveries → New Delivery</strong>.</li>
+              <li>Select the PO created in step 11. Supplier and lines auto-populate.</li>
+              <li>Enter <strong>Invoice Number</strong> and <strong>Delivery Date</strong>.</li>
+              <li>For at least one line, enter a unit price <em>different</em> from the period price (this triggers a price variance for the demo).</li>
+              <li>Click <strong>Post Delivery</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong>
+            <ul>
+              <li>Delivery is <span class="badge badge-ok">POSTED</span>; stock at the Kitchen increases.</li>
+              <li>WAC for each item is recalculated.</li>
+              <li>An NCR with type <em>PRICE_VARIANCE</em> is auto-created and visible in the <strong>NCR</strong> menu.</li>
+              <li>Notifications are sent to Finance, Procurement, and the Supplier.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">13</span>
+            <h4 class="step-title">(Optional) Demonstrate over-delivery approval</h4>
+            <span class="step-role operator">Operator</span>
+            <span class="step-role supervisor">Supervisor</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Operator: create a second delivery against the same PO with a quantity exceeding the remaining qty on a line. Save as draft and click <strong>Send for Approval</strong>.</li>
+              <li>Supervisor: open <strong>Deliveries</strong>, filter by <em>Pending Approval</em>, open the delivery, review the over-delivery, then either <strong>Approve</strong> (delivery posts) or <strong>Reject</strong> with a reason (delivery is locked permanently).</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Delivery shows the correct outcome; on approval, stock updates and the operator receives an email.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">14</span>
+            <h4 class="step-title">Operator records an Issue (consumption)</h4>
+            <span class="step-role operator">Operator</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Issues → New Issue</strong>.</li>
+              <li>Pick the issue date and the <strong>Cost Centre</strong> (FOOD / CLEAN / OTHER).</li>
+              <li>Use <strong>Sync Stock</strong> to load all on-hand items, enter quantities to issue, and remove items you don't need.</li>
+              <li>Click <strong>Create Issue</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Stock decreases at the Kitchen; the issue value is calculated at current WAC. Trying to issue more than on-hand is blocked with a clear error.
+          </div>
+        </div>
+
+        <!-- ============== PHASE D: TRANSFER & NCR ============== -->
+        <h3>Phase D: Inter-location transfer and NCR resolution</h3>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">15</span>
+            <h4 class="step-title">Operator creates a transfer request</h4>
+            <span class="step-role operator">Operator</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Transfers → New Transfer</strong>.</li>
+              <li>Source: <em>Site Kitchen 1</em>. Destination: <em>Central Warehouse</em>.</li>
+              <li>Add 1–2 line items with reasonable quantities. Add a justification note.</li>
+              <li>Click <strong>Create Transfer</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Transfer is created with status <span class="badge badge-warn">PENDING_APPROVAL</span>.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">16</span>
+            <h4 class="step-title">Supervisor approves the transfer</h4>
+            <span class="step-role supervisor">Supervisor</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Log in as Supervisor. Open <strong>Transfers</strong>, filter by <em>Pending Approval</em>.</li>
+              <li>Open the transfer, verify quantities and locations, click <strong>Approve</strong>.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Transfer status is <span class="badge badge-ok">COMPLETED</span>. Stock decreased at the Kitchen and increased at the Central Warehouse atomically. Destination WAC adjusts if it had prior stock.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">17</span>
+            <h4 class="step-title">Supervisor resolves the auto-generated NCR</h4>
+            <span class="step-role supervisor">Supervisor</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>NCR</strong>. Find the price-variance NCR from step 12.</li>
+              <li>Open it, review the variance, set status to <strong>RESOLVED</strong>, choose a <strong>Financial Impact</strong>: CREDIT (money recovered), LOSS (absorbed), or NONE.</li>
+              <li>Add a brief resolution note and save.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> NCR status changes; the financial impact appears in the location's reconciliation as either NCR Credits or NCR Losses.
+          </div>
+        </div>
+
+        <!-- ============== PHASE E: PERIOD CLOSE ============== -->
+        <h3 class="page-break">Phase E: Reconciliation and period close</h3>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">18</span>
+            <h4 class="step-title">Supervisor reviews reconciliations and marks each location ready</h4>
+            <span class="step-role supervisor">Supervisor</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Open <strong>Reconciliations</strong>. Switch through each location.</li>
+              <li>Verify the formula values: Opening + Receipts + Transfers In − Transfers Out − Issues = Expected Closing.</li>
+              <li>Enter any required adjustments (Back Charges, Credits, Condemnations) with notes.</li>
+              <li>Confirm NCR Credits / Losses are reflected.</li>
+              <li>Click <strong>Mark Ready</strong> for each location.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Each location's status changes to READY. The consolidated view shows all locations green.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">19</span>
+            <h4 class="step-title">Admin requests period close</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Log in as Admin. Open <strong>Period Close</strong>.</li>
+              <li>Review the pre-close checklist (deliveries posted, issues posted, transfers completed, all locations READY).</li>
+              <li>Click <strong>Close Period</strong> to request close.</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong> Period status changes to <span class="badge badge-warn">PENDING_CLOSE</span>. An approval record is created.
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-header">
+            <span class="step-num">20</span>
+            <h4 class="step-title">Admin approves the close</h4>
+            <span class="step-role admin">Admin</span>
+          </div>
+          <div class="step-actions">
+            <ol>
+              <li>Approve the period-close request.</li>
+              <li>The system briefly enters status <span class="badge badge-info">APPROVED</span>, then takes closing snapshots per location and finalises to <span class="badge badge-mute">CLOSED</span>.</li>
+              <li>Opening balances roll forward to the next period (which can now be created in DRAFT).</li>
+            </ol>
+          </div>
+          <div class="verify">
+            <strong>Verify:</strong>
+            <ul>
+              <li>Period is <span class="badge badge-mute">CLOSED</span>; no further postings allowed.</li>
+              <li>Closing snapshots stored per location.</li>
+              <li>You can now create the next period in DRAFT and use <strong>Copy from previous period</strong> to bring prices forward.</li>
+            </ul>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </body>
+</html>
