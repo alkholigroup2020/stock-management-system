@@ -528,6 +528,108 @@ watch(
       </div>
     </section>
 
+    <!-- Resending PO Email Section -->
+    <section
+      id="procurement-section-resend-po-email"
+      class="border border-[var(--ui-border)] rounded-lg overflow-hidden"
+    >
+      <button
+        class="w-full flex items-center justify-between p-4 bg-[var(--ui-bg-elevated)] hover:bg-[var(--ui-bg-accented)] transition-colors cursor-pointer"
+        @click="toggleSection('resend-po-email')"
+      >
+        <span class="flex items-center gap-3">
+          <UIcon name="i-heroicons-envelope" class="text-[var(--ui-primary)] text-xl" />
+          <span class="font-semibold text-[var(--ui-text-highlighted)]">
+            Resending PO Email to Supplier
+          </span>
+        </span>
+        <UIcon
+          :name="
+            isExpanded('resend-po-email') ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'
+          "
+          class="text-[var(--ui-text-muted)]"
+        />
+      </button>
+      <div v-if="isExpanded('resend-po-email')" class="p-4 space-y-4">
+        <p class="text-sm text-[var(--ui-text-muted)]">
+          If a supplier did not receive the original PO email, or if their contact details have been
+          updated and they need a fresh copy, you can resend the PO email directly from the PO
+          detail page.
+        </p>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">When to Use</h4>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Supplier reports not receiving the original PO email</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-check" class="text-[var(--ui-success)]" />
+              <span>Supplier contact email addresses were updated after the PO was created</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">How to Resend</h4>
+          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
+            <li>Open the PO detail page</li>
+            <li>
+              Click the
+              <strong>Resend Email</strong>
+              button in the page header
+            </li>
+            <li>The email is sent immediately to all addresses on the supplier's email list</li>
+          </ol>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">What Gets Sent</h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            The resent email is identical to the original PO notification sent at creation time. It
+            includes the PO number, supplier name, total amount, delivery and payment terms, and a
+            link to the PO in the system. The email is sent to all addresses in the supplier's email
+            list.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Restrictions</h4>
+          <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)]" />
+              <span>
+                Only available for
+                <strong>OPEN</strong>
+                POs — closed POs cannot have their email resent
+              </span>
+            </li>
+            <li class="flex items-center gap-2">
+              <UIcon name="i-heroicons-x-circle" class="text-[var(--ui-error)]" />
+              <span>
+                Requires at least one email address on the supplier's profile — contact an Admin to
+                add supplier emails if none are configured
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              <strong>Permissions:</strong>
+              Only Procurement Specialists and Admins can resend PO emails.
+            </span>
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- Quick Reference -->
     <section class="p-4 rounded-lg bg-[var(--ui-bg-elevated)] border border-[var(--ui-border)]">
       <h3 class="font-semibold text-[var(--ui-text-highlighted)] mb-3 flex items-center gap-2">

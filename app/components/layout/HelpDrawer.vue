@@ -195,6 +195,16 @@ const searchableContent = computed(() => {
         content:
           "Edit POs while in OPEN status. Can modify supplier, quantities, prices, add or remove lines. Cannot edit after PO is closed or has deliveries recorded. Cannot close POs - only Supervisors and Admins can close.",
         icon: "i-heroicons-shopping-cart",
+      },
+      {
+        id: "proc-po-resend",
+        section: "Procurement Guide",
+        sectionId: "procurement-specialist-guide",
+        targetSection: "resend-po-email",
+        title: "Resending PO Email to Supplier",
+        content:
+          "Resend PO email to supplier from the PO detail page using the Resend Email button. Use when supplier did not receive the original email or contact details were updated. Only available for OPEN POs. Email goes to all addresses on the supplier's email list. Procurement Specialists and Admins only.",
+        icon: "i-heroicons-shopping-cart",
       }
     );
   }
