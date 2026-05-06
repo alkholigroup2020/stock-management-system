@@ -375,7 +375,7 @@ const searchableContent = computed(() => {
         targetSection: "reports",
         title: "Reports and Analysis",
         content:
-          "Access reports by clicking Reports menu. Stock Now report for current inventory. Deliveries report for delivery history and variances. Issues report for consumption by cost centre. Reconciliation report for period-end summary. Export to CSV for analysis.",
+          "Access reports via the Reports menu. Stock Now: current inventory with location (Supervisor+), category, and low-stock status filters; Export CSV (Supervisor+) downloads one row per item per location. Deliveries: filter by period, location (Supervisor+), date range, and variance-only checkbox; two CSV exports — Export (per delivery) and Detail (per line item), both Supervisor+. Issues: filter by period, location (Supervisor+), cost centre (FOOD/CLEAN/OTHER), and date range; two CSV exports — Export (per issue) and Detail (per line item), both Supervisor+. Reconciliation: period required (auto-selects current period), optional location filter (Supervisor+); Export CSV (Supervisor+) with one row per location and grand total row.",
         icon: "i-heroicons-clipboard-document-check",
       }
     );

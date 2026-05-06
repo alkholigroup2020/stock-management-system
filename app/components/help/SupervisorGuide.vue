@@ -1014,70 +1014,216 @@ watch(
           sorted, and exported for further analysis in spreadsheet applications.
         </p>
 
-        <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Available Reports</h4>
-          <ul class="space-y-3 text-sm text-[var(--ui-text-muted)]">
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-chart-bar" class="text-[var(--ui-primary)] mt-0.5" />
-              <div>
-                <strong>Stock Now:</strong>
-                Current inventory levels at each location. Shows on-hand quantities, WAC values, and
-                total stock value. Use to identify low stock items.
-              </div>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-truck" class="text-[var(--ui-primary)] mt-0.5" />
-              <div>
-                <strong>Deliveries:</strong>
-                History of all deliveries with supplier info, items, quantities, and any price
-                variances. Use to track receiving patterns and supplier performance.
-              </div>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-arrow-up-tray" class="text-[var(--ui-primary)] mt-0.5" />
-              <div>
-                <strong>Issues:</strong>
-                Stock consumption by cost centre. Shows what items were issued, when, and to which
-                department. Use for consumption analysis and budgeting.
-              </div>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon name="i-heroicons-calculator" class="text-[var(--ui-primary)] mt-0.5" />
-              <div>
-                <strong>Reconciliation:</strong>
-                Period-end summary showing opening stock, movements, closing stock, and variances
-                for each location. Use for period-end review.
-              </div>
-            </li>
-          </ul>
+        <!-- Stock Now Report -->
+        <div class="space-y-2">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] flex items-center gap-2">
+            <UIcon name="i-heroicons-chart-bar" class="text-[var(--ui-primary)]" />
+            Stock Now Report
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            Snapshot of current inventory across all locations: on-hand quantity, Weighted Average
+            Cost (WAC), total stock value, and low/over-stock flags per item.
+          </p>
+          <div class="text-sm text-[var(--ui-text-muted)]">
+            <p class="font-medium text-[var(--ui-text)] mb-1">Filters</p>
+            <ul class="space-y-1 ml-3">
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Location</strong>
+                  (Supervisor+ only) — one location or all locations
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Category</strong>
+                  — item category; options loaded from available data
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Status</strong>
+                  — All Items or Low Stock Only
+                </span>
+              </li>
+            </ul>
+          </div>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            <strong>Export (Supervisor+ only):</strong>
+            Click
+            <strong>Export CSV</strong>
+            in the top-right. Produces one row per item per location including min/max stock
+            thresholds and low/over-stock flags.
+          </p>
         </div>
 
-        <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Generating Reports</h4>
-          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Navigate to the relevant report page</li>
-            <li>Set filters (date range, location, category, etc.)</li>
-            <li>
-              Click
+        <!-- Deliveries Report -->
+        <div class="space-y-2">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] flex items-center gap-2">
+            <UIcon name="i-heroicons-truck" class="text-[var(--ui-primary)]" />
+            Deliveries Report
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            Delivery history with per-supplier breakdown, price variance tracking, and NCR count
+            summary. Shows totals by location and top suppliers.
+          </p>
+          <div class="text-sm text-[var(--ui-text-muted)]">
+            <p class="font-medium text-[var(--ui-text)] mb-1">Filters</p>
+            <ul class="space-y-1 ml-3">
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Period</strong>
+                  — select an accounting period or all periods
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Location</strong>
+                  (Supervisor+ only) — one location or all locations
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>From Date / To Date</strong>
+                  — custom date range
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>With variance only</strong>
+                  — checkbox; shows only deliveries that have a price variance
+                </span>
+              </li>
+            </ul>
+          </div>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            <strong>Export (Supervisor+ only):</strong>
+            Two CSV buttons in the top-right.
+            <strong>Export</strong>
+            — one row per delivery (delivery no., date, supplier, location, total amount, variance
+            amount, NCR count).
+            <strong>Detail</strong>
+            — one row per line item (adds item code, quantity, unit price, period price, and
+            variance per line).
+          </p>
+        </div>
+
+        <!-- Issues Report -->
+        <div class="space-y-2">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] flex items-center gap-2">
+            <UIcon name="i-heroicons-arrow-up-tray" class="text-[var(--ui-primary)]" />
+            Issues Report
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            Stock consumption broken down by location and cost centre, with top-consumed items
+            analysis and per-cost-centre value totals.
+          </p>
+          <div class="text-sm text-[var(--ui-text-muted)]">
+            <p class="font-medium text-[var(--ui-text)] mb-1">Filters</p>
+            <ul class="space-y-1 ml-3">
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Period</strong>
+                  — select an accounting period or all periods
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Location</strong>
+                  (Supervisor+ only) — one location or all locations
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Cost Centre</strong>
+                  — Food (FOOD), Cleaning (CLEAN), or Other (OTHER)
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>From Date / To Date</strong>
+                  — custom date range
+                </span>
+              </li>
+            </ul>
+          </div>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            <strong>Export (Supervisor+ only):</strong>
+            Two CSV buttons in the top-right.
+            <strong>Export</strong>
+            — one row per issue (issue no., date, location, cost centre, total value, line item
+            count).
+            <strong>Detail</strong>
+            — one row per line item (adds item code, quantity, WAC at issue, and line value).
+          </p>
+        </div>
+
+        <!-- Reconciliation Report -->
+        <div class="space-y-2">
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] flex items-center gap-2">
+            <UIcon name="i-heroicons-calculator" class="text-[var(--ui-primary)]" />
+            Reconciliation Report
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            Period-based stock reconciliation per location: opening stock, receipts, transfers
+            in/out, issues, closing stock, adjustments, mandays, and average manday cost.
+          </p>
+          <div class="text-sm text-[var(--ui-text-muted)]">
+            <p class="font-medium text-[var(--ui-text)] mb-1">Filters</p>
+            <ul class="space-y-1 ml-3">
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Period</strong>
+                  (required) — must select a period before generating; auto-selects the current open
+                  period on load
+                </span>
+              </li>
+              <li class="flex items-start gap-1">
+                <span class="shrink-0">•</span>
+                <span>
+                  <strong>Location</strong>
+                  (Supervisor+ only) — one location or all locations
+                </span>
+              </li>
+            </ul>
+          </div>
+          <p class="text-sm text-[var(--ui-text-muted)]">
+            <strong>Export (Supervisor+ only):</strong>
+            Click
+            <strong>Export</strong>
+            in the top-right. Produces one row per location covering all reconciliation columns
+            (opening, receipts, transfers, issues, closing, adjustments, mandays, manday cost) plus
+            a GRAND TOTAL row at the bottom.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-border)]">
+          <p class="text-sm text-[var(--ui-text-muted)] flex items-start gap-2">
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="shrink-0 mt-0.5 text-[var(--ui-info)]"
+            />
+            <span>
+              Open
+              <strong>Reports</strong>
+              in the left menu to reach the landing page, then click any report card. Set your
+              filters and click
               <strong>Generate</strong>
-              or
-              <strong>Apply Filters</strong>
-            </li>
-            <li>Review results on screen</li>
-          </ol>
-        </div>
-
-        <div>
-          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">Exporting Reports</h4>
-          <ol class="space-y-1 text-sm text-[var(--ui-text-muted)] list-decimal list-inside">
-            <li>Generate the report with desired filters</li>
-            <li>
-              Click
-              <strong>Export CSV</strong>
-            </li>
-            <li>Open in Excel or Google Sheets for further analysis</li>
-            <li>Use pivot tables for deeper insights</li>
-          </ol>
+              to load data. Export buttons appear in the top-right corner and are only visible to
+              Supervisors and Admins.
+            </span>
+          </p>
         </div>
       </div>
     </section>
