@@ -453,6 +453,16 @@ const searchableContent = computed(() => {
         content:
           "Configure NCR email notification recipients. Set Finance Team and Procurement Team email addresses. Notifications automatically sent when NCRs are created. Suppliers notified using email addresses from Supplier Management. Navigate to Settings then Notifications to configure. View notification history on NCR detail pages. Admins can resend failed notifications with 5-minute cooldown.",
         icon: "i-heroicons-cog-6-tooth",
+      },
+      {
+        id: "adm-period-roll-forward",
+        section: "Admin Guide",
+        sectionId: "admin-guide",
+        targetSection: "periodClose",
+        title: "Rolling Forward to the Next Period",
+        content:
+          "Roll forward roll-forward next period after close. Creates the next accounting period from a CLOSED period. Prerequisites: source period must be CLOSED, no overlapping period, Admin role required. Creates new period in DRAFT status starting the day after the closed period ends. Copies closing stock values as opening balances for all active locations. New locations added after the closed period receive null opening values. Item prices are copied by default (can be skipped). Reconciliation values are not carried forward. No UI button yet — trigger via POST /api/periods/{periodId}/roll-forward API. Not idempotent; calling twice returns 409 Conflict. New period must be manually opened before transactions can be posted.",
+        icon: "i-heroicons-cog-6-tooth",
       }
     );
   }

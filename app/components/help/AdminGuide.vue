@@ -756,6 +756,146 @@ watch(
             </span>
           </p>
         </div>
+
+        <!-- Roll Forward Subsection -->
+        <div>
+          <h4 class="font-medium text-[var(--ui-text-highlighted)] mb-2">
+            Rolling Forward to the Next Period
+          </h4>
+          <p class="text-sm text-[var(--ui-text-muted)] mb-3">
+            After a period is fully closed you can roll it forward to create the next accounting
+            period. Roll-forward copies the closed period's closing stock values as opening balances
+            for the new period and, by default, copies all item prices so you don't have to re-enter
+            them manually.
+          </p>
+
+          <div class="mb-3">
+            <h5 class="text-sm font-medium text-[var(--ui-text-highlighted)] mb-1">
+              Prerequisites
+            </h5>
+            <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+              <li class="flex items-start gap-2">
+                <UIcon
+                  name="i-heroicons-check-circle"
+                  class="shrink-0 mt-0.5 text-[var(--ui-success)]"
+                />
+                <span>
+                  The source period must be in
+                  <strong>CLOSED</strong>
+                  status.
+                </span>
+              </li>
+              <li class="flex items-start gap-2">
+                <UIcon
+                  name="i-heroicons-check-circle"
+                  class="shrink-0 mt-0.5 text-[var(--ui-success)]"
+                />
+                <span>No existing period may overlap the new period's date range.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <UIcon
+                  name="i-heroicons-check-circle"
+                  class="shrink-0 mt-0.5 text-[var(--ui-success)]"
+                />
+                <span>
+                  You must be logged in as an
+                  <strong>Admin</strong>
+                  .
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-3">
+            <h5 class="text-sm font-medium text-[var(--ui-text-highlighted)] mb-1">
+              What Happens at the Data Level
+            </h5>
+            <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+              <li>
+                A new period is created starting the day after the closed period ends. The default
+                name follows the pattern "Month YYYY" (e.g., "February 2025") and the default end
+                date is the last day of that calendar month — both can be customised via the API.
+              </li>
+              <li>
+                The new period always starts in
+                <strong>DRAFT</strong>
+                status so you can review and adjust prices before going live.
+              </li>
+              <li>
+                Each active location receives a
+                <code>PeriodLocation</code>
+                record whose
+                <em>opening value</em>
+                is taken directly from the closed period's
+                <em>closing value</em>
+                . Locations added to the system after the closed period was created receive a
+                <strong>null opening value</strong>
+                and must be set manually.
+              </li>
+              <li>
+                Item prices from the closed period are copied across for all currently active items
+                (this can be skipped by passing
+                <code>copy_prices: false</code>
+                to the API).
+              </li>
+              <li>
+                Reconciliation values are
+                <strong>not</strong>
+                carried forward — each period starts fresh.
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-3">
+            <h5 class="text-sm font-medium text-[var(--ui-text-highlighted)] mb-1">
+              How to Trigger It
+            </h5>
+            <div class="p-3 rounded-lg bg-[var(--ui-bg)] border border-[var(--ui-warning)]/30">
+              <p class="text-sm text-[var(--ui-warning)] flex items-start gap-2">
+                <UIcon name="i-heroicons-exclamation-triangle" class="shrink-0 mt-0.5" />
+                <span>
+                  <strong>No UI button exists yet.</strong>
+                  Roll-forward currently runs via the API only. To trigger it, send a
+                  <code>POST</code>
+                  request to
+                  <code>/api/periods/&#123;periodId&#125;/roll-forward</code>
+                  with a valid session cookie. The optional JSON body accepts
+                  <code>name</code>
+                  (string),
+                  <code>end_date</code>
+                  (YYYY-MM-DD), and
+                  <code>copy_prices</code>
+                  (boolean, default
+                  <code>true</code>
+                  ). A UI button on the Periods detail page is planned for a future release.
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h5 class="text-sm font-medium text-[var(--ui-text-highlighted)] mb-1">
+              Caveats and Idempotency
+            </h5>
+            <ul class="space-y-1 text-sm text-[var(--ui-text-muted)]">
+              <li>
+                Roll-forward is
+                <strong>not idempotent</strong>
+                . Calling it a second time returns a 409 Conflict error because the overlapping
+                period already exists.
+              </li>
+              <li>
+                After the new period is created you must still open it (change status from DRAFT to
+                OPEN) before any transactions can be posted. Use this window to review or adjust the
+                copied prices.
+              </li>
+              <li>
+                The entire operation runs inside a database transaction — if any step fails, nothing
+                is committed and you can retry safely.
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
