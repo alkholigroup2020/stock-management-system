@@ -1,0 +1,145 @@
+I've read the plan and cross-checked it against the actual codebase (97 server files import the singleton Prisma client, including shared utils like documentNumbering.ts and stockValidation.ts). Here's my assessment.
+
+Verdict: the concept is sound and genuinely doable — but the plan has one factual flaw, one architectural mismatch, and a timeline that's optimistic for the real scope
+
+The database-per-tenant + control-plane pattern is a legitimate, well-trodden SaaS architecture, and it's actually a particularly good fit for this app: because tenant isolation lives at the database level, the existing schema needs zero changes — no organization_id retrofit, no touching production data. Your current AKG deployment can become "tenant #1" by simply registering its existing database in the control plane. That's the strongest argument for this plan, and the plan is right to choose it over row-level isolation.
+
+That said, three things need correcting before you build it:
+
+1. The Supabase strategy contradicts itself (factual problem)
+
+The Tenant model stores database_name and buildConnectionUrl() connects to it — that's database-per-tenant. But Phase 8's cost table says Starter/Pro tenants use a "shared project, separate schemas". Supabase doesn't support multiple databases in one project — each project is designed around a single postgres database. So "shared project" necessarily means schema-per-tenant, and the plan's data model has no database_schema field and its connection URL builder can't express it. You'd need to:
+
+- Add a database_schema column and append ?schema=<tenant> to the Prisma connection string, and
+- Verify with a spike that Prisma's schema parameter behaves correctly through Supabase's transaction pooler (port 6543, pgbouncer=true) — search_path handling through transaction-mode pooling has historically been a sharp edge. This is a day-one spike, not a week-7 discovery.
+
+The dedicated-project-per-tenant path (Enterprise) is fine as written, and Supabase's Management API can automate provisioning.
+
+2. The connection manager assumes a long-running server; you deploy to Vercel serverless
+
+The TenantConnectionManager (LRU of 50 PrismaClients, idle cleanup timers, periodic cleanupIdle()) is designed for a persistent Node process. On Vercel, each function instance gets its own copy of that cache, instances come and go, and nothing calls your cleanup loop. It won't break — Fluid Compute reuses instances so caching still helps — but the design needs reframing: per-instance memoization with connection_limit=1 per client, a TTL cache for control-plane tenant lookups (as written, every API request pays a control-plane query before doing any work), and acceptance that eviction/$disconnect() is best-effort. Also, the LRU eviction as written can disconnect a client mid-query in a concurrent request. All fixable, but the Phase 5 code shouldn't be built as-is.
+
+3. The "settings" section quietly triples the scope
+
+Feature flags (hide the Transfers menu, gate PDF export) are cheap — the plan's estimate is fair. But TenantSettings includes allowNegativeStock, requirePOForDelivery, autoGeneratePriceVarianceNCR, and configurable VAT. Those aren't settings — they're forks in your core business invariants, which the codebase currently enforces as hard rules in many places (no-negative-stock validation, mandatory PO link, zero-tolerance NCR). Each one is a business-logic branch with its own test burden. I'd cut these from v1 entirely and ship with today's rules for all tenants. Similarly, enableBarcodeScanning flags a feature that doesn't exist yet.
+
+Smaller but real gaps
+
+- The 103-route migration is bigger than find-and-replace. Besides the 90+ API routes, shared utils (documentNumbering, stockValidation, ncrCredits) import the singleton client at module scope and must become parameterized, and the async email pipeline needs tenant context threaded through it.
+- The dev-only ?tenant= override must be hard-gated on environment — in production it would be a tenant-hopping vulnerability.
+- Wildcard subdomains on Vercel require moving the domain to Vercel nameservers — a checklist item, not a blocker. Cookie isolation per subdomain works naturally with nuxt-auth-utils.
+- Missing operational chapters: per-tenant backup/restore, tenant deletion/offboarding, monitoring, and how migrations behave when tenant #37 of 50 fails mid-deploy (the script continues silently version-skewed). The app.stockapp.com portal login (email → which tenants?) has a TenantUser model but no designed flow.
+- Marketing site in the same SPA is awkward — a separate project on the apex domain is cleaner and removes the "landing" branch from the middleware entirely.
+- Sessions embed feature flags at login, so plan changes won't take effect until re-login — acceptable, but decide it consciously.
+
+Timeline
+
+8–10 weeks is realistic for the code in phases 1–7 for a solo developer, because the migration is mostly mechanical. It is not realistic through phase 10: provisioning automation, Stripe billing with webhook-driven suspension, the tenant portal, and operational hardening are the long tail. I'd plan 12–16 weeks to a sellable product, or keep 8–10 weeks by cutting billing to "manual invoicing + admin toggles" for the first tenants.
+
+Bottom line: validate-and-proceed. The architecture is right for this codebase and avoids touching production data at all. Fix the Supabase schema-vs-database inconsistency first (with a pooler spike), redesign Phase 5 for serverless, defer the business-rule settings, and add a "migrate existing production customer as tenant #1" chapter — then it's a credible plan.
+
+-----------------------------------
+
+The plan is updated — I rewrote project-docs/SAAS_CONVERSION_PLAN.md in place, keeping its structure and all the parts that were sound, and folding in every correction from the feasibility review. No sub-agents were needed since this was a single-document rewrite.
+
+What changed, in order of importance:
+
+Architecture fixes
+- Isolation model corrected. The database-vs-schema contradiction is resolved: shared-infrastructure tenants are now explicitly schema-per-tenant (Supabase = one database per project), with isolation_mode and database_schema added to the Tenant model and a connection URL builder that handles both modes. A new Phase 0 makes the Prisma ?schema= + transaction-pooler spike a day-one go/no-go gate, with a documented fallback (session pooler or dedicated-project-for-all-paid-tiers).
+- Phase 5 connection manager redesigned for serverless. Per-instance memoization instead of a global LRU, connection_limit=1 per client, opportunistic idle-only eviction (fixing the evict-while-in-use race), and a 60-second TTL cache for control-plane lookups so tenant resolution no longer costs a control-plane query on every request.
+
+Scope corrections
+- Business-rule settings cut from v1. allowNegativeStock, requirePOForDelivery, autoGeneratePriceVarianceNCR, and configurable VAT are moved to post-launch with an explanation of why (they fork core invariants enforced throughout the codebase). Flags now cover shipped features only — barcode/PDF flags deferred, enableExcelExport renamed enableCsvExport to match reality.
+- Phase 7 rescoped to the measured 97 files, split into four workstreams: parameterizing the shared utils first (documentNumbering, stockValidation, ncrCredits), the mechanical route sweep, the email pipeline (tenant client passed explicitly), and the dangerous dev endpoints. Added a CI guard against the singleton creeping back.
+
+New chapters
+- Phase 11: AKG cutover as tenant #1 — registered as a DEDICATED tenant against the existing database, custom_domain mapping so the installed PWA and bookmarks keep working, a SINGLE_TENANT_FALLBACK_SLUG flag for a reversible cutover, and verified backup as a precondition.
+- Phase 12: Operations — per-schema nightly dumps with a rehearsed single-tenant restore, offboarding lifecycle (new OFFBOARDING status), monitoring/alerts, and a minimal internal admin page.
+
+Security and hardening
+- ?tenant= override hard-gated to non-production builds; session↔tenant binding check in the auth middleware; enumeration-safe portal email discovery; migration script passes connection strings via env instead of argv; migration runs now record per-tenant migration_state/migration_error, halt on failure, and alert — plus an explicit expand/contract rule since one deployment serves all tenants while migrations roll per tenant.
+
+Structural
+- Marketing site moved to a separate Vercel project (the "landing" middleware branch and the broken landing.ts snippet are gone); wildcard-domain nameserver requirement called out; billing split into manual-first (Option A) vs Stripe (Option B); timeline revised to 8–10 weeks to first tenants with manual billing, 12–16 weeks with Stripe. Everything is traceable in a new Appendix C revision log, and the broken markdown fences in the old Phase 4 checklist are fixed.
+
+One follow-up worth doing when you pick this up for real: run Spike 0.1 (schema isolation through the pooler) before anything else — it's the only item that could force a structural change to the plan.
+
+
+-----------------------------------
+
+The research is done and the full cited report is saved to project-docs/MARKET_RESEARCH.md. Here's the answer to your two questions.
+
+Does it have potential? Conditional yes — a real but narrow niche
+
+The exact feature combination you built is not sold by anyone we could find. Restaurant inventory platforms compete on continuous, invoice-driven costing and actual-vs-theoretical variance — none of them markets locked monthly period prices, PRF→PO approval chains, auto-generated price-variance NCRs, or mandays/cost-per-head reporting. Camp-management software (Gemstone CampWare, Camps & Crew) serves your exact customer segment but solves the billing side (room bookings, key-swipe meal counts for client invoicing) — verified with high confidence that CampWare has no inventory, WAC, period-close, or procurement features at all. Your product sits at an intersection nobody owns: food-cost accounting with period-close discipline, for camp/contract caterers.
+
+The demand tailwind is real: Saudi B2B catering is reported at ~$2.5B (2024) growing to ~$4.7B by 2033, with contract catering ~78% of it, powered by giga-project workforces (NEOM 200k+, ~1.8M peak workers by 2028). But the honest constraint is the customer count: the true ICP — multi-site contract/camp caterers in Saudi — is roughly 30–100 companies, a few hundred GCC-wide. That's a viable bootstrapped niche business, not a venture-scale land grab. It fits a solo developer; it caps the ceiling.
+
+Competitors
+
+┌──────────────┬──────────────────────────────────────────────┬────────────────┬─────────────────────────────────────────────┐
+│    Layer     │                     Who                      │   What they    │          Why they don't cover you           │
+│              │                                              │     charge     │                                             │
+├──────────────┼──────────────────────────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+│ Global       │ MarketMan ($199–249/mo + fees, verified),    │ $160–350/mo    │ No period-lock/WAC/NCR/mandays; G2 reviews  │
+│ restaurant   │ MarginEdge (~$330–350/location/mo), Apicbase │ per location   │ show weak multi-location commissary         │
+│ inventory    │  (quote-based), Crunchtime, Fourth/Adaco,    │ typical        │ handling, painful cancellation, poor mobile │
+│              │ Craftable, Galley, Jamix                     │                │  apps                                       │
+├──────────────┼──────────────────────────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+│              │ Supy (UAE, $8M seed verified, Riyadh office, │                │                                             │
+│ GCC/MENA     │  closest threat), Foodics ($170M Series C    │ Above your     │ Target restaurant groups, not camps; no     │
+│              │ verified, ~30k+ branches, but                │ planned tiers  │ period close or cost-per-manday             │
+│              │ POS/fintech-first), Sapaad, GrubTech         │                │                                             │
+├──────────────┼──────────────────────────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+│ Camp         │ Gemstone CampWare, Camps & Crew              │ —              │ Lodging + meal-count billing, zero          │
+│ management   │                                              │                │ food-cost accounting (verified)             │
+├──────────────┼──────────────────────────────────────────────┼────────────────┼─────────────────────────────────────────────┤
+│ Generic      │ Odoo, Zoho, Cin7, Unleashed                  │ Per-user or    │ Wrong shape entirely; heavy configuration   │
+│              │                                              │ $349–999/mo    │ to approximate any of it                    │
+└──────────────┴──────────────────────────────────────────────┴────────────────┴─────────────────────────────────────────────┘
+
+The three things the research says to change
+
+1. Your pricing is in the danger zone. Sub-$50/month B2B tools sit in the worst churn band in the industry (one benchmark: ~23% gross revenue retention vs 70–85% above $250/month — unverified but directionally consistent with competitors clustering at $160–350/location). For an accounting-adjacent product whose value compounds (WAC history, NCR audit trail, period closes), $49 undersells and attracts churny customers. Price nearer the category ($150–300/location), push annual billing, and shrink the free tier to a trial.
+2. ZATCA e-invoicing compliance is table stakes, not optional — Sapaad already advertises it. Budget it as a hard cost of entry. Don't chase Supy's 75+ integrations; one deep accounting integration + ZATCA is the right MVP bar for your ICP.
+3. Position against camp-billing software explicitly. Your buyers may already use CampWare/Camps & Crew and assume the problem is solved. The pitch is: they tell you what to bill the client; you tell them what it actually cost to feed the camp, per head, per period.
+
+Bottom line
+
+The niche is real, defensible against generic tools and camp-billing incumbents, and it lives in your home market at exactly the right time. The threat isn't a missing market — it's Supy (funded, explicitly expanding into Saudi since 2022) deciding to build camp features, and solo-developer execution capacity. Your best moat is the one asset no competitor has: a live Saudi catering operator running real period closes on your system. Turn that into a quantified case study and sell it to the ~30–100 identified Saudi contract caterers before thinking about GCC-wide or global.
+
+One evidence caveat: competitor pricing for MarginEdge/Apicbase is disputed even among verified sources, and all TAM/market-size figures are context-tier (analyst press releases, not independently verified) — fine for direction, don't put them in a financial model without primary-source validation. The full report with per-claim confidence levels and all source URLs is in project-docs/MARKET_RESEARCH.md.
+
+
+
+-----------------------------------------------
+
+The pricing tiers are updated throughout project-docs/SAAS_CONVERSION_PLAN.md, with every change traced to a specific research finding. Here's the new structure:
+
+┌──────────────┬───────────────────────┬───────────────┬─────────────────────┬──────────────────────────────────────────────┐
+│     Tier     │   Price/mo (annual)   │   Price/mo    │      Locations      │                 What's in it                 │
+│              │                       │   (monthly)   │                     │                                              │
+├──────────────┼───────────────────────┼───────────────┼─────────────────────┼──────────────────────────────────────────────┤
+│ Trial        │ $0 for 30 days        │ —             │ 5                   │ Full Professional features, no credit card;  │
+│              │                       │               │                     │ locks at trial_ends_at                       │
+├──────────────┼───────────────────────┼───────────────┼─────────────────────┼──────────────────────────────────────────────┤
+│ Starter      │ SAR 749 (~$199)       │ SAR 949       │ 2                   │ Core stock + period close, WAC, NCRs,        │
+│              │                       │ (~$249)       │                     │ POB/mandays, transfers, CSV, email           │
+├──────────────┼───────────────────────┼───────────────┼─────────────────────┼──────────────────────────────────────────────┤
+│ Professional │ SAR 1,899 (~$499)     │ SAR 2,249     │ 5 (+SAR 299/~$79    │ + PRF/PO workflow, advanced reports,         │
+│              │                       │ (~$599)       │ each extra)         │ priority support                             │
+├──────────────┼───────────────────────┼───────────────┼─────────────────────┼──────────────────────────────────────────────┤
+│ Enterprise   │ Custom, from ~SAR     │ Custom        │ Unlimited           │ + Dedicated database, branding, custom       │
+│              │ 4,700 (~$1,250)       │               │                     │ domain, SLA, onboarding                      │
+└──────────────┴───────────────────────┴───────────────┴─────────────────────┴──────────────────────────────────────────────┘
+
+The reasoning encoded in the doc:
+
+- Free tier is gone, replaced by a 30-day full-featured trial. The research put sub-$50 tools in the industry's worst churn band, and a durable free tier would mean provisioning schemas and answering support tickets for tenants who never pay. Conveniently, the control-plane schema already had SubscriptionStatus.TRIAL and trial_ends_at, so trials are a subscription state, not a plan row.
+- Starter went $49 → ~$199 and Professional $149 → ~$499. Competitors cluster at $160–350/month per location, so the old numbers were 3–7× under market. Even at the new prices, a 5-location caterer pays ~$499 vs $1,200–1,800 at MarketMan — the doc frames it as "half the price, built for how Saudi caterers actually close their month."
+- Annual billing is the anchor (monthly costs ~25% more), SAR quoted first, and the differentiators (period close, WAC, NCRs, mandays) are guaranteed in every paid tier — gating them would delete the reason to buy.
+- Revenue sanity note added: 30 customers ≈ $12k MRR under the new tiers vs ~$4k under the old ones — the difference between a sustainable solo business and an underwater one at the same logo count.
+
+Supporting changes to keep the plan internally consistent: the Phase 2 PLAN_DEFAULTS code drops free and adds TRIAL_DEFAULTS (= Professional), the Phase 3 middleware now enforces trial expiry with HTTP 402 (checked per-request within the 60s cache TTL, not at login), all plan-code fallbacks changed from "free" to "starter", Phase 10 documents the trial lifecycle plus a ZATCA-compliant invoicing reminder, the Phase 8 provisioning cost table says "Trial (30-day)", and a dated entry was added to the Appendix C revision log.
+
+One flag the doc keeps explicit: these numbers are provisional until validated in discovery calls with actual Saudi contract caterers — the research's own caveat — but the floor is firm at no paid tier below ~$150/month.

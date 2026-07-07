@@ -306,7 +306,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDebounceFn } from "@vueuse/core";
 import type { Item, LocationStock } from "~~/shared/types/database";
 
 // Type for Item with optional location stock

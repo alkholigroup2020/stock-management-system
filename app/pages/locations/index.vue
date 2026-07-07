@@ -212,7 +212,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDebounceFn } from "@vueuse/core";
 import type { LocationType } from "~~/shared/types/database";
 import type { LocationDeleteResponse } from "../../../shared/types/api";
 
